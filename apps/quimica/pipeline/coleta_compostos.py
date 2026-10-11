@@ -52,8 +52,9 @@ CONSULTA_ENRIQUECER = """SELECT ?cid ?item ?sl
 
 
 # ------------------------------------------------------------------------------------------------ Wikidata
-def enriquecer_wikidata(http, cids, log=print):
-    """{cid: {...}} com o item de maior número de sitelinks para cada CID."""
+def enriquecer_wikidata(http, cids, log=print, excluir_qids=frozenset()):
+    """{cid: {...}} com o item de maior número de sitelinks para cada CID. `excluir_qids`: itens que nunca representam o
+    composto (os 118 elementos: o H₂ pegava o CAS do item "hidrogênio", que tem mais sitelinks; conferência de 11/10/2026)."""
     cids = sorted({int(c) for c in cids})
     por_cid, falhas = {}, []
     for i in range(0, len(cids), LOTE_WIKIDATA):
@@ -67,6 +68,8 @@ def enriquecer_wikidata(http, cids, log=print):
             continue
         for l in linhas:
             cid = int(l["cid"])
+            if W.qid(l["item"]) in excluir_qids:
+                continue
             reg = {"qid": W.qid(l["item"]), "sl": int(l["sl"]), "pbr": W.valores(l.get("pbr")), "ppt": W.valores(l.get("ppt")),
                    "pen": W.valores(l.get("pen")), "apt": W.valores(l.get("apts")), "aen": W.valores(l.get("aens")),
                    "cas": W.valores(l.get("cass")), "formulas": W.valores(l.get("frms")),
@@ -77,9 +80,52 @@ def enriquecer_wikidata(http, cids, log=print):
     return por_cid, falhas
 
 
-def escolher_cas(candidatos):
+def escolher_cas(candidatos, sinonimos=None):
+    """CAS válido (dígito verificador). Com mais de um no Wikidata, desempata pela ordem dos sinônimos do PubChem para o
+    mesmo CID: o primeiro CAS listado é o do composto (conferência de 11/10/2026: SnO₂ levava o CAS do Sn(OH)₂ e o
+    tetraborato anidro o do decaidratado, porque a regra antiga pegava o menor número)."""
     validos = sorted({c.strip() for c in candidatos if Q.cas_valido(c.strip())}, key=lambda c: (len(c), c))
+    if len(validos) > 1 and sinonimos:
+        pos = {}
+        for i, s in enumerate(sinonimos):
+            pos.setdefault(s.strip(), i)
+        validos.sort(key=lambda c: pos.get(c, len(sinonimos)))
     return validos[0] if validos else None
+
+
+LIMIAR_ISOTOPO = 0.5  # g/mol: diferença maior que isto entre fórmula e PubChem não é arredondamento, é isótopo (ex.: D₂O)
+
+
+def massa_pela_formula(formula, pesos):
+    """Massa molar pela fórmula e pelos pesos atômicos padrão do pacote (2 casas, como o PubChem), ou None."""
+    if not pesos:
+        return None
+    try:
+        cont = Q.contagem_atomos(formula)
+    except ValueError:
+        return None
+    if not cont or any(el not in pesos for el in cont):
+        return None
+    return round(sum(n * pesos[el] for el, n in cont.items()), 2)
+
+
+def deduplicar(compostos, meta=None):
+    """Remove repetidos (mesmo InChIKey ou mesmo CAS), mantendo o primeiro: a lista fixa vem antes. Devolve (unicos, duplicados)."""
+    por_ik, por_cas, unicos, duplicados = {}, {}, [], []
+    for c in compostos:
+        ik, cas = c.get("inchiKey"), c.get("cas")
+        dono = (por_ik.get(ik) if ik else None) or (por_cas.get(cas) if cas else None)
+        if dono:
+            duplicados.append({"cid": c["cid"], "nome": c.get("nome"), "igualA": dono})
+            if meta is not None:
+                meta.pop(c["cid"], None)
+            continue
+        if ik:
+            por_ik[ik] = c["cid"]
+        if cas:
+            por_cas[cas] = c["cid"]
+        unicos.append(c)
+    return unicos, duplicados
 
 
 def escolher_formula(declarada, wd_formulas, formula_pubchem):
@@ -124,7 +170,7 @@ def montar_sinonimos(exclui, *listas, maximo=10):
 
 
 # ------------------------------------------------------------------------------------------------ montagem
-def montar(sel, props, wd, ghs, chebi, hoje):
+def montar(sel, props, wd, ghs, chebi, hoje, pesos=None, sinonimos_pubchem=None):
     """Monta o registro do contrato §3 (ou None se faltar o essencial)."""
     cid = sel["cid"]
     p = props
@@ -160,13 +206,21 @@ def montar(sel, props, wd, ghs, chebi, hoje):
     mm, me = P.numero(p.get("MolecularWeight")), P.numero(p.get("ExactMass"))
     if mm is None:
         return None, "sem massa molar"
+    calc = massa_pela_formula(p["MolecularFormula"], pesos)
+    isotopico = calc is not None and abs(calc - mm) >= LIMIAR_ISOTOPO
+    if calc is not None and not isotopico:
+        mm = calc  # pesos atômicos padrão: o PubChem arredonda alguns (PbO 223 → 223,2; LiOH 24,0 → 23,95; Ar 39,9 → 39,95)
+    if isotopico:  # a fórmula do PubChem perde o isótopo (D₂O aparece como H2O): usa a fórmula do Wikidata com D
+        f_d = next((Q.sem_subscritos(f).strip() for f in wd.get("formulas", []) if "D" in Q.sem_subscritos(f)), None)
+        if f_d:
+            c["formula"] = f_d
     c["massaMolar"] = mm
     if me is not None:
         c["massaExata"] = me
     c["smiles"] = p["ConnectivitySMILES"]
     if p.get("InChIKey"):
         c["inchiKey"] = p["InChIKey"]
-    cas = escolher_cas(wd.get("cas", []))
+    cas = escolher_cas(wd.get("cas", []), sinonimos_pubchem)
     if cas:
         c["cas"] = cas
         c["icscBuscaUrl"] = coleta_icsc.url_busca_cas(cas)
@@ -195,11 +249,12 @@ def montar(sel, props, wd, ghs, chebi, hoje):
     return c, None
 
 
-def coletar(http, pubchem, selecao, hoje, frases_h=None, com_ghs=True, com_chebi=True, log=print):
+def coletar(http, pubchem, selecao, hoje, frases_h=None, com_ghs=True, com_chebi=True, log=print, pesos=None,
+            qids_elementos=frozenset()):
     """Devolve (compostos, meta, stats). `meta[cid]` = {"sl", "ptwiki", "qid"} para a etapa de textos."""
     cids = [s["cid"] for s in selecao]
     props = pubchem.propriedades(cids)
-    wd_por_cid, wd_falhas = enriquecer_wikidata(http, cids, log)
+    wd_por_cid, wd_falhas = enriquecer_wikidata(http, cids, log, excluir_qids=qids_elementos)
 
     ghs_por_cid, ghs_falhas = {}, []
     if com_ghs:
@@ -219,6 +274,11 @@ def coletar(http, pubchem, selecao, hoje, frases_h=None, com_ghs=True, com_chebi
     if len(ghs_falhas) > max(3, 0.02 * len(cids)):  # não publica pacote com GHS silenciosamente incompleto
         raise RuntimeError(f"GHS: {len(ghs_falhas)} falhas de rede em {len(cids)} compostos (ex.: {ghs_falhas[0]})")
 
+    multi = [cid for cid, wd in wd_por_cid.items() if len({x.strip() for x in wd.get("cas", []) if Q.cas_valido(x.strip())}) > 1]
+    sin_pc = pubchem.sinonimos(multi) if multi else {}
+    if multi:
+        log(f"  [cas] {len(multi)} compostos com mais de um CAS no Wikidata: desempate pelos sinônimos do PubChem")
+
     chebi_dados, chebi_stats = {}, {}
     if com_chebi:
         ids = {int(x) for wd in wd_por_cid.values() for x in wd.get("chebi", []) if str(x).isdigit()}
@@ -234,7 +294,7 @@ def coletar(http, pubchem, selecao, hoje, frases_h=None, com_ghs=True, com_chebi
                 if str(x).isdigit() and int(x) in chebi_dados:
                     ch = dict(chebi_dados[int(x)], id=int(x))
                     break
-        c, motivo = montar(sel, props.get(cid), wd, ghs_por_cid.get(cid), ch, hoje)
+        c, motivo = montar(sel, props.get(cid), wd, ghs_por_cid.get(cid), ch, hoje, pesos=pesos, sinonimos_pubchem=sin_pc.get(cid))
         if c is None:
             descartados.append({"cid": cid, "motivo": motivo})
             continue
@@ -242,8 +302,11 @@ def coletar(http, pubchem, selecao, hoje, frases_h=None, com_ghs=True, com_chebi
         meta[cid] = {"sl": (wd or {}).get("sl", 0), "ptwiki": ((wd or {}).get("ptwiki") or [None])[0],
                      "qid": (wd or {}).get("qid")}
 
+    compostos, duplicados = deduplicar(compostos, meta)
+    if duplicados:
+        log(f"  [compostos] {len(duplicados)} repetidos removidos (mesmo InChIKey ou CAS): " + ", ".join(f"{d['nome']} ({d['cid']})" for d in duplicados))
     faltam_h = sorted({h for c in compostos for h in c.get("ghs", {}).get("frasesH", []) if frases_h is not None and h not in frases_h})
-    stats = {"compostos": len(compostos), "descartados": descartados, "comGhsHarmonizado": len(ghs_por_cid), "ghsFalhasDeRede": ghs_falhas,
+    stats = {"compostos": len(compostos), "descartados": descartados, "duplicados": duplicados, "casDesempatadosPeloPubchem": len(multi), "comGhsHarmonizado": len(ghs_por_cid), "ghsFalhasDeRede": ghs_falhas,
              "comCas": sum(1 for c in compostos if "cas" in c), "comWikidata": sum(1 for c in compostos if "wikidata" in c),
              "nomePtPendente": sum(1 for c in compostos if c.get("nomePtPendente")),
              "comDefinicaoChebi": sum(1 for c in compostos if "definicaoChebi" in c),

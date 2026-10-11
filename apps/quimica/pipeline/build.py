@@ -329,7 +329,9 @@ def construir(opts, log=print):
                                  log, obrigatoria=True)
         stats["familias"]["selecaoCompostos"].update(st_sel)
         compostos, meta, st_cmp = tentar(stats, "compostos",
-                                         lambda: coleta_compostos.coletar(http, pubchem, selecao, hoje, frases_h, log=log),
+                                         lambda: coleta_compostos.coletar(http, pubchem, selecao, hoje, frases_h, log=log,
+                                                                                  pesos={e["simbolo"]: e["massaAtomica"] for e in elementos if e.get("massaAtomica")},
+                                                                                  qids_elementos=frozenset(e["wikidata"] for e in elementos if e.get("wikidata"))),
                                          log, obrigatoria=True)
         stats["familias"]["compostos"].update(st_cmp)
         # segurança: fora do núcleo os agentes de guerra química e as drogas de uso proscrito que viriam pela popularidade

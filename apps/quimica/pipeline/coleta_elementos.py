@@ -172,6 +172,11 @@ def ler_wikidata(http):
     return por_z
 
 
+# A 1 atm estes elementos sublimam: o "ponto de fusão" do PubChem é de outra pressão e a sublimação aparece como "ebulição".
+# Melhor não publicar do que publicar com rótulo errado (conferência de 11/10/2026).
+SUBLIMAM_A_1ATM = {"C", "As"}
+
+
 def montar_elemento(linha, wd, hoje, info=None):
     z = int(linha["AtomicNumber"])
     info = {} if info is None else info
@@ -214,7 +219,7 @@ def montar_elemento(linha, wd, hoje, info=None):
         e["energiaIonizacaoKJmol"] = ie
     for campo, chave in (("pontoFusaoK", "MeltingPoint"), ("pontoEbulicaoK", "BoilingPoint")):
         v = numero(linha.get(chave))
-        if v is not None:
+        if v is not None and simbolo not in SUBLIMAM_A_1ATM:
             e[campo] = _nu(v)
     dens = g_cm3_para_kg_m3(linha.get("Density"))
     if dens is not None:

@@ -61,6 +61,20 @@ class PubChem:
             return []
         return r.json().get("PropertyTable", {}).get("Properties", [])
 
+    # ---- sinônimos (só para desempatar CAS quando o Wikidata traz mais de um válido)
+    def sinonimos(self, cids, lote=50):
+        """{cid: [sinônimos na ordem do PubChem]}; o primeiro CAS da lista é o do próprio composto."""
+        out = {}
+        cids = sorted({int(c) for c in cids})
+        for i in range(0, len(cids), lote):
+            parte = cids[i:i + lote]
+            r = self.http.get(f"{REST}/compound/cid/{','.join(map(str, parte))}/synonyms/JSON")
+            if r.status != 200:
+                continue
+            for inf in r.json().get("InformationList", {}).get("Information", []):
+                out[int(inf["CID"])] = inf.get("Synonym", [])
+        return out
+
     # ---- GHS
     def ghs_harmonizado(self, cid):
         """GHS da classificação harmonizada da UE (Regulamento 1272/2008) ou None."""
