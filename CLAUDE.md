@@ -28,6 +28,8 @@ continuam valendo dentro da pasta.
 6. **Push na `main` não publica os apps:** cada app publica pelo `<app>-data-refresh.yml` (agendado ou `gh workflow run`).
    A home (`portal/`) publica a cada push que a toca (`portal-ci.yml`). Mudou `apps/eleicoes2026/vercel.json` (rotas da
    home e dos apps)? Só vale depois do próximo `eleicoes-data-refresh.yml`. Depois de cada push, conferir todos os
-   workflows disparados (`gh run list --limit 10`).
+   workflows disparados (`gh run list --limit 10`). **Push com mais de 300 arquivos** (ex.: pacote de dados regerado): o GitHub
+   só avalia os filtros de caminho nos primeiros 300 e pode não disparar o workflow de outro projeto do mesmo commit —
+   separe o commit de dados do de código, ou rode o workflow à mão (`gh workflow run <arquivo>.yml`).
 7. **Windows:** `git config core.longpaths true` (alguns caminhos de química passam de 200 caracteres). Depois de usar o
    WSL, `wsl --shutdown`.
