@@ -14,6 +14,13 @@ Saídas (em --out, padrão dataset/nlu): train.jsonl, val.jsonl ({q, alvo}) e st
 ({instruction,input,output,intent,text}, formato de backend/modal/nlu_core.py). Validação: 5 % por hash estável (a chave é a entidade
 principal, para medir generalização a compostos/elementos inéditos).
 
+Ampliação de 10/10/2026 (PENDENCIAS §8.2): comparações com adjetivo e trios (a propriedade implícita no adjetivo é rotulada), extremos de
+grupo/período, rótulo GHS (frase H, pictograma, palavra de advertência, frases P), formas novas de conceito (+ títulos dos artigos de
+conceito do pacote e biografias), fora de escopo (física, biologia, matemática -> DESCONHECIDA; dever inteiro -> AJUDA) e VARIANTES DE
+LINGUAGEM: ~10 % dos exemplos ganham uma variante informal (minúsculas, sem acento, "oq", "vc", "eh", erro de digitação), com fórmula
+subscrita (H₂SO₄) ou com nome popular conferido no pacote (nomes_populares.py); o `composto`/`equacao` do alvo acompanha o texto copiado e a
+variante herda a chave de divisão do original (nunca cai do outro lado da validação).
+
 Uso:
   python dataset/gerar_nlu.py [--data data/quimica] [--out dataset/nlu] [--seed 2026] [--scale 1.0]
 """
@@ -28,12 +35,17 @@ from pathlib import Path
 AQUI = Path(__file__).resolve().parent
 sys.path.insert(0, str(AQUI))
 
+import dados_escopo  # noqa: E402
 import dados_recusas  # noqa: E402
 import equacoes  # noqa: E402
+import fam_conceitos_texto  # noqa: E402
 import fam_nomenclatura  # noqa: E402
+import fam_variantes  # noqa: E402
+import ghs_pt  # noqa: E402
 import vocab_nlu as V  # noqa: E402
-from comum import (PLACEHOLDER, REPO, finalizar, fold, genero, jaccard, ler_json, norm_question, renderizar, stable_bucket,  # noqa: E402
-                   superficie_nome, tokens)
+from comum import (PLACEHOLDER, REPO, finalizar, fold, formula_subscrita, genero, jaccard, ler_json, norm_question, renderizar,  # noqa: E402
+                   sem_acentos, stable_bucket, superficie_nome, tokens)
+from nomes_populares import NOMES_POPULARES, evidencia_ok  # noqa: E402
 from pacote import localizar  # noqa: E402
 
 SCRIPT_VERSION = "1.0"
@@ -142,7 +154,25 @@ T["COMPARAR"] = [(t, {}) for t in [
     "Entre {el_s} e {el2_s}, qual tem menor {prop}?", "Compare {co_s} e {co2_s}", "Diferença entre {co_s} e {co2_s}", "Qual tem maior {prop}: {co_s} ou {co2_s}?",
     "{co_s} x {co2_s}", "Qual a diferença de {prop} entre {co_s} e {co2_s}?", "{el_s} versus {el2_s}", "Compare as propriedades de {co_s} e {co2_s}",
     "Compare {prop_art} {el_de} e {el2_de}", "Quem é mais {adj}, {el_s} ou {el2_s}?",
-]]
+    # trios e ordenação (dataset/fam_comparacoes.py)
+    "Ordene {el_s}, {el2_s} e {el3_s} por {prop}", "Coloque {el_s}, {el2_s} e {el3_s} em ordem crescente de {prop}",
+    "Ordene {el_s}, {el2_s} e {el3_s} em ordem decrescente de {prop}", "Qual a ordem de {prop} entre {el_s}, {el2_s} e {el3_s}?",
+]] + [
+    # comparações com adjetivo: a propriedade fica implícita no adjetivo e é rotulada
+    ("Qual é mais eletronegativo, {el_s} ou {el2_s}?", {"propriedade": "eletronegatividade"}),
+    ("Qual é menos eletronegativo: {el_s} ou {el2_s}?", {"propriedade": "eletronegatividade"}),
+    ("Qual atrai mais os elétrons de uma ligação, {el_s} ou {el2_s}?", {"propriedade": "eletronegatividade"}),
+    ("Qual átomo é maior, {el_s} ou {el2_s}?", {"propriedade": "raioAtomicoPm"}), ("Qual átomo é menor: {el_s} ou {el2_s}?", {"propriedade": "raioAtomicoPm"}),
+    ("Ordene os átomos {el_s}, {el2_s} e {el3_s} do maior para o menor", {"propriedade": "raioAtomicoPm"}),
+    ("É mais fácil tirar um elétron de {el_s} ou de {el2_s}?", {"propriedade": "energiaIonizacaoKJmol"}),
+    ("Qual precisa de mais energia para perder um elétron, {el_s} ou {el2_s}?", {"propriedade": "energiaIonizacaoKJmol"}),
+    ("Qual derrete a uma temperatura mais alta: {el_s} ou {el2_s}?", {"propriedade": "pontoFusaoK"}),
+    ("Qual ferve a uma temperatura mais baixa, {el_s} ou {el2_s}?", {"propriedade": "pontoEbulicaoK"}),
+    ("Qual é mais denso, {el_s} ou {el2_s}?", {"propriedade": "densidadeKgm3"}), ("Qual é menos denso: {el_s} ou {el2_s}?", {"propriedade": "densidadeKgm3"}),
+    ("Qual átomo é mais pesado, {el_s} ou {el2_s}?", {"propriedade": "massaAtomica"}), ("Qual é mais leve: {el_s} ou {el2_s}?", {"propriedade": "massaAtomica"}),
+    ("Ordene {el_s}, {el2_s} e {el3_s} do mais eletronegativo para o menos eletronegativo", {"propriedade": "eletronegatividade"}),
+    ("Coloque {el_s}, {el2_s} e {el3_s} do mais denso para o menos denso", {"propriedade": "densidadeKgm3"}),
+]
 T["TABELA_PERIODICA"] = [(t, {}) for t in [
     "Elementos do grupo {n}", "Elementos do período {n}", "Quais são os halogênios?", "Gases nobres", "Metais alcalinos", "Metais alcalino-terrosos", "Elementos do bloco {b}",
     "Elementos líquidos", "Tabela periódica", "Mostre a tabela periódica", "Quais são os lantanídeos?", "Quais são os actinídeos?", "Quais elementos são metais de transição?",
@@ -152,6 +182,16 @@ T["TABELA_PERIODICA"] = [(t, {}) for t in [
     ("Qual o elemento mais eletronegativo?", {"propriedade": "eletronegatividade"}), ("Qual o elemento com maior raio atômico?", {"propriedade": "raioAtomicoPm"}),
     ("Como varia {prop} ao longo do período?", {}), ("Como varia {prop} no grupo?", {}), ("Qual a tendência {prop_de} na tabela periódica?", {}),
     ("Qual elemento tem o maior ponto de fusão?", {"propriedade": "pontoFusaoK"}), ("Qual o elemento mais denso?", {"propriedade": "densidadeKgm3"}),
+    # extremos dentro de um grupo/período (dataset/fam_comparacoes.py)
+    ("Qual é o elemento mais eletronegativo do período {np}?", {"propriedade": "eletronegatividade"}),
+    ("Qual é o elemento menos eletronegativo do grupo {n}?", {"propriedade": "eletronegatividade"}),
+    ("Qual elemento do grupo {n} tem o maior raio atômico?", {"propriedade": "raioAtomicoPm"}),
+    ("Qual elemento do período {np} tem o menor raio atômico?", {"propriedade": "raioAtomicoPm"}),
+    ("Qual elemento do período {np} tem a maior energia de ionização?", {"propriedade": "energiaIonizacaoKJmol"}),
+    ("Qual elemento do grupo {n} tem o menor ponto de fusão?", {"propriedade": "pontoFusaoK"}),
+    ("Qual elemento do período {np} tem o maior ponto de ebulição?", {"propriedade": "pontoEbulicaoK"}),
+    ("Qual é o elemento mais denso do grupo {n}?", {"propriedade": "densidadeKgm3"}),
+    ("Qual elemento do período {np} tem a maior massa atômica?", {"propriedade": "massaAtomica"}),
 ]
 T["SEGURANCA"] = [(t, {}) for t in [
     "Quais os perigos {co_de}?", "{Co} é perigoso?", "{Co} é tóxico?", "{Co} é inflamável?", "{Co} é corrosivo?", "EPI para manusear {co_s}", "Que equipamento de proteção usar com {co_s}?",
@@ -162,6 +202,11 @@ T["SEGURANCA"] = [(t, {}) for t in [
     "Como neutralizar ácido derramado?", "O que fazer se cair ácido na pele?", "Quais EPIs usar em laboratório?", "O que fazer em caso de intoxicação por produto de limpeza?",
     "Como armazenar produtos químicos com segurança?", "Posso misturar alvejante com vinagre?", "Por que não misturar água sanitária com amoníaco?", "Como lavar os olhos após respingo de reagente?",
     "O que fazer se inalar gás tóxico por acidente?", "Como neutralizar base derramada?", "Quais produtos de limpeza não podem ser misturados?", "Primeiros socorros em acidente com ácido",
+    # rótulo GHS por frase H, pictograma, palavra de advertência e cuidados (dataset/fam_seguranca_rotulo.py)
+    "O que significa a frase {h} no rótulo {co_de}?", "O rótulo {co_de} traz a frase {h}. O que quer dizer?", "{h} no rótulo {co_de}: qual o perigo?",
+    "O que indica o pictograma {pic} no rótulo {co_de}?", "Por que o rótulo {co_de} tem o pictograma de {picn}?", "Qual é a palavra de advertência no rótulo {co_de}?",
+    "O rótulo {co_de} traz Perigo ou Atenção?", "Quais são as frases de precaução {co_de}?", "Quais as frases P {co_de}?", "Que cuidados o rótulo {co_de} recomenda?",
+    "O que significa a frase {h}?", "O que quer dizer {h} no rótulo?", "O que indica o pictograma {pic}?", "O que significa o símbolo de {picn} no rótulo?",
 ]]
 T["_HARD_NEG_INTENT"] = {
     "Quais os perigos da nitroglicerina?": "SEGURANCA", "Qual a massa molar do TNT?": "MASSA_MOLAR", "Primeiros socorros em intoxicação por cianeto": "SEGURANCA",
@@ -172,10 +217,12 @@ T["_HARD_NEG_INTENT"] = {
 }
 INTENT_COTA = {
     "ELEMENTO": 750, "COMPOSTO": 850, "PROPRIEDADE": 3100, "MASSA_MOLAR": 1000, "BALANCEAR": 750, "ESTEQUIOMETRIA": 1200, "CONCENTRACAO": 950, "PH": 700,
-    "GAS_IDEAL": 650, "CONVERSAO_UNIDADE": 850, "NOMENCLATURA": 950, "DESENHAR": 750, "COMPARAR": 650, "TABELA_PERIODICA": 650, "SEGURANCA": 1350,
-    "CONCEITO": 1400, "RECUSA_PERIGO": 950, "SOBRE_DADOS": 110, "FONTES": 110, "AJUDA": 130, "DESCONHECIDA": 420,
+    "GAS_IDEAL": 650, "CONVERSAO_UNIDADE": 850, "NOMENCLATURA": 950, "DESENHAR": 750, "COMPARAR": 950, "TABELA_PERIODICA": 800, "SEGURANCA": 1650,
+    "CONCEITO": 1700, "RECUSA_PERIGO": 950, "SOBRE_DADOS": 110, "FONTES": 110, "AJUDA": 130, "DESCONHECIDA": 520,
 }
-ADJETIVOS = ["denso", "eletronegativo", "pesado"]
+ADJETIVOS = sorted(V.ADJ_PROPRIEDADE)
+FRACAO_VARIANTES_POR_MIL = 100  # 10 % dos exemplos ganham uma variante de linguagem (ver variantes_nlu)
+CODIGOS_H = sorted(ghs_pt.FRASES_H)
 NUMERICAS = {"massaAtomica", "numeroAtomico", "eletronegatividade", "raioAtomicoPm", "afinidadeEletronicaKJmol", "energiaIonizacaoKJmol", "pontoFusaoK",
              "pontoEbulicaoK", "densidadeKgm3", "massaMolar", "massaExata", "xlogp", "tpsa", "doadoresH", "aceptoresH", "ligacoesRotaveis"}
 
@@ -282,7 +329,7 @@ class Gerador:
         lab = {}
         valores = {}
         quant = []
-        e1 = e2 = c1 = c2 = None
+        e1 = e2 = e3 = c1 = c2 = None
         surf_c = {}
         surf_c2 = {}
         bare_e = {}
@@ -317,6 +364,11 @@ class Gerador:
                         e2 = rng.choice([x for x in self.elementos if x is not e1])
                     b, g = self._bare_el(e2)
                     valores[n] = b if n == "el2_s" else f"{self._art(g, 'de')} {b}"
+                elif n.startswith("el3"):
+                    if e3 is None:
+                        e3 = rng.choice([x for x in self.elementos if x is not e1 and x is not e2])
+                    b, g = self._bare_el(e3)
+                    valores[n] = b if n == "el3_s" else f"{self._art(g, 'de')} {b}"
                 else:
                     if "e1" not in bare_e:
                         bare_e["e1"] = self._bare_el(e1)
@@ -379,6 +431,15 @@ class Gerador:
                     valores[n] = f"{art} {txt}"
             elif n == "adj":
                 valores[n] = rng.choice(ADJETIVOS)
+                lab.setdefault("propriedade", V.ADJ_PROPRIEDADE[valores[n]])  # "mais denso" -> densidadeKgm3 (a propriedade está no adjetivo)
+            elif n == "np":
+                valores[n] = str(rng.randint(1, 7))
+            elif n == "h":
+                valores[n] = rng.choice(CODIGOS_H)
+            elif n == "pic":
+                valores[n] = rng.choice(sorted(V.PICTOGRAMAS_NOME))
+            elif n == "picn":
+                valores[n] = rng.choice(sorted(V.PICTOGRAMAS_NOME.values()))
             elif n == "eq":
                 tipo, eq = rng.choice(self.equacoes)
                 reag, prod = eq.split(" -> ")
@@ -440,8 +501,9 @@ class Gerador:
         return pergunta, alvo, chave
 
 
-def topicos_conceito():
-    """Tópicos de conceito: lista fixa + nomes/palavras-chave do mapa de temas (dataset/topicos.json)."""
+def topicos_conceito(pac=None):
+    """Tópicos de conceito: lista fixa + nomes/palavras-chave do mapa de temas (dataset/topicos.json) + (com o pacote) os títulos dos
+    artigos de CONCEITO da Wikipédia em português do pacote (os mesmos de onde saem os pares de dataset/fam_conceitos_texto.py)."""
     out = list(V.TOPICOS)
     p = AQUI / "topicos.json"
     if p.exists():
@@ -450,7 +512,102 @@ def topicos_conceito():
                 for k in [t["nome"]] + list(t.get("chaves", [])):
                     if 3 <= len(k) <= 60 and k not in out:
                         out.append(k)
+    if pac is not None:
+        for k in titulos_de_conceito(pac):
+            if k not in out:
+                out.append(k)
     return out
+
+
+def titulos_de_conceito(pac):
+    """Títulos dos artigos de conceito (Wikipédia pt do pacote), em minúscula quando não são nome próprio. Fora: biografias, artigos
+    sensíveis (explosivos, armas, drogas, venenos) e artigos que não tratam do sentido químico do termo."""
+    out = []
+    for t in sorted(pac.textos.values(), key=lambda x: x["id"]):
+        if t.get("_pasta") != "wikipedia-pt" or t.get("tipo") != "conceito" or not t["id"].endswith("-001"):
+            continue
+        tit = fam_conceitos_texto.titulo_limpo(t)
+        frases = fam_conceitos_texto.dividir_frases(t.get("textoPt") or "")
+        palavras = tit.split()
+        pessoa = len(palavras) >= 2 and all(w[:1].isupper() for w in palavras) and frases and fam_conceitos_texto._PESSOA.search(frases[0])
+        if (not 3 <= len(tit) <= 60 or pessoa or fold(tit) in fam_conceitos_texto.FORA_DO_SENTIDO_QUIMICO
+                or fam_conceitos_texto.artigo_sensivel(t, frases[0] if frases else "")):
+            continue
+        proprio = any(w[:1].isupper() for w in palavras[1:] if len(w) > 2) or tit[:2].isupper()
+        out.append(tit if proprio else tit[:1].lower() + tit[1:])
+    return out
+
+
+def _parece_formula(s):
+    """'H2SO4', 'NaCl', 'HI', 'Ca(OH)2', 'CuSO4·5H2O' sim; 'Teofilina', 'Fe' (símbolo) não. Fórmulas nunca vão para minúsculas."""
+    return fam_variantes.parece_formula(s)
+
+
+def _aliases(pac):
+    """{fold(superfície do composto) -> [(alias, gênero, composto, tipo)]} dos nomes populares CONFERIDOS no pacote."""
+    out = {}
+    for alias, cid, gen, tipo, ev, _ in NOMES_POPULARES:
+        c = pac.comp_cid.get(cid)
+        if not c or not evidencia_ok(pac, ev, alias):
+            continue
+        for s in [pac.nome_composto(c), c.get("nomePopular"), pac.formula_exibicao(c)] + list(c.get("sinonimos") or []):
+            if s:
+                out.setdefault(fold(s), []).append((alias, gen, c, tipo))
+    return out
+
+
+def variante_nlu(q, alvo, tipo, rng, pac, aliases):
+    """Uma variante de linguagem de um exemplo do NLU, com o alvo AJUSTADO ao texto copiado (composto/equação como aparecem na nova
+    pergunta). None se não se aplica. Tipos: informal (minúsculas, sem acento, abreviações, erro de digitação), subscrito (H₂SO₄) e
+    nome popular (só nomes conferidos no pacote; produtos como vinagre só em perguntas de segurança)."""
+    alvo = dict(alvo)
+    comp, eq = alvo.get("composto"), alvo.get("equacao")
+    if tipo == "informal":
+        prot, formulas = set(), set()
+        if comp:
+            prot.add(comp)
+            if _parece_formula(comp):
+                formulas.add(comp)
+        if eq:
+            prot.add(eq)
+            formulas.add(eq)
+        if alvo.get("elemento"):
+            e = pac.el_simbolo[alvo["elemento"]]
+            prot.update(x for x in (e["simbolo"], e["nome"], e.get("nomeEn")) if x)
+        novo = fam_variantes.informal(q, prot, formulas, rng)
+        if not novo:
+            return None
+        if comp and comp not in formulas:
+            alvo["composto"] = sem_acentos(comp).lower()
+    elif tipo == "subscrito":
+        novo = q
+        if comp and _parece_formula(comp):
+            alvo["composto"] = formula_subscrita(comp)
+            novo = novo.replace(comp, alvo["composto"])
+        if eq:
+            alvo["equacao"] = formula_subscrita(eq)
+            novo = novo.replace(eq, alvo["equacao"])
+        if novo == q:
+            return None
+    elif tipo == "popular":
+        opcoes = [a for a in aliases.get(fold(comp or ""), []) if a[3] == "sinonimo" or alvo["intent"] == "SEGURANCA"]
+        if not opcoes:
+            return None
+        alias, gen, c, _ = rng.choice(opcoes)
+        novo = fam_variantes.trocar_por_nome_popular(pac, c, q, alias, gen)
+        if not novo:
+            return None
+        alvo["composto"] = alias
+    else:
+        return None
+    for k in ("composto", "equacao"):
+        if k in alvo and alvo[k] not in novo:
+            return None
+    if "composto" in alvo and not COMPOSTO_OK.match(alvo["composto"]):
+        return None
+    if "equacao" in alvo and not EQUACAO_OK.match(alvo["equacao"]):
+        return None
+    return novo, alvo
 
 
 def ordena(alvo):
@@ -497,7 +654,7 @@ def gerar(pac, seed, scale):
     # conceitos (tópicos × modelos)
     meta = int(INTENT_COTA["CONCEITO"] * scale)
     feitos = tent = 0
-    topicos = topicos_conceito()
+    topicos = topicos_conceito(pac)
     while feitos < meta and tent < meta * 40:
         tent += 1
         modelo, nivel = rng.choice(V.MODELOS_CONCEITO)
@@ -511,6 +668,10 @@ def gerar(pac, seed, scale):
             alvo = {"intent": "CONCEITO"}
         if guardar(q, alvo, norm_question(t)):
             feitos += 1
+    # cientistas das biografias dos trechos -> CONCEITO
+    for p in V.PESSOAS:
+        for modelo in rng.sample(V.MODELOS_PESSOA, 3):
+            guardar(renderizar(modelo, {"p": p}, rng), {"intent": "CONCEITO"}, norm_question(p))
     # casos duros: nomes perigosos em contexto legítimo
     for q, it in T["_HARD_NEG_INTENT"].items():
         alvo = {"intent": it}
@@ -535,6 +696,13 @@ def gerar(pac, seed, scale):
     meta = int(INTENT_COTA["DESCONHECIDA"] * scale)
     for f in fora:
         guardar(f, {"intent": "DESCONHECIDA"}, None)
+    # fora de escopo de verdade (física, biologia, matemática pura) e "faça o dever inteiro" (-> AJUDA: o app mostra o que sabe fazer)
+    for area, perguntas in dados_escopo.AREAS.items():
+        intent = "AJUDA" if area == "dever" else "DESCONHECIDA"
+        for base in perguntas:
+            guardar(base, {"intent": intent}, None)
+            sufixo = 0.0 if base.rstrip("?.!").endswith("pra mim") else 0.25  # sem "pra mim pra mim"
+            guardar(finalizar([(base, False)], rng, permitir_sem_acento=True, p_prefixo=0.4, p_sufixo=sufixo), {"intent": intent}, None)
     letras = "abcdefghijklmnopqrstuvwxyz"
     tent = 0
     n_desc = sum(1 for v in amostras.values() if v[1]["intent"] == "DESCONHECIDA")
@@ -543,7 +711,36 @@ def gerar(pac, seed, scale):
         q = " ".join("".join(rng.choice(letras) for _ in range(rng.randint(3, 9))) for _ in range(rng.randint(1, 3)))
         if guardar(q, {"intent": "DESCONHECIDA"}, None):
             n_desc += 1
+    g.variantes = variantes_nlu(amostras, guardar, rng, pac, seed)
     return list(amostras.values()), g
+
+
+def variantes_nlu(amostras, guardar, rng, pac, seed):
+    """Variedade de linguagem: ~10 % dos exemplos (escolhidos por hash estável) ganham UMA variante (informal, subscrito ou nome popular),
+    com a MESMA chave de divisão treino/validação do original (a variante nunca cai do outro lado). Recusas e frases sem sentido ficam de
+    fora; exemplos parecidos com os contratos de teste (Jaccard >= 0,5) também, para nenhuma variante chegar perto de um caso do golden."""
+    casos = fam_variantes.casos_de_contrato()
+    aliases = _aliases(pac)
+    feitos = Counter()
+    for q, alvo, chave in list(amostras.values()):
+        if alvo["intent"] in ("RECUSA_PERIGO", "DESCONHECIDA"):
+            continue
+        k = norm_question(q) + "|" + json.dumps(alvo, sort_keys=True, ensure_ascii=False)
+        if stable_bucket(k, seed, 1000) >= FRACAO_VARIANTES_POR_MIL or fam_variantes.perto_de_contrato(q, casos):
+            continue
+        comp, eq = alvo.get("composto"), alvo.get("equacao")
+        tipos = ["informal"]
+        if (comp and _parece_formula(comp) and re.search(r"\d", comp)) or eq:
+            tipos.append("subscrito")
+        if comp and fold(comp) in aliases:
+            tipos.append("popular")
+        inicio = stable_bucket(k + "|tipo", seed, len(tipos))
+        for tipo in tipos[inicio:] + tipos[:inicio]:
+            r = variante_nlu(q, alvo, tipo, rng, pac, aliases)
+            if r and guardar(r[0], r[1], chave or norm_question(q)):
+                feitos[tipo] += 1
+                break
+    return dict(sorted(feitos.items()))
 
 
 # ---------------------------------------------------------------------------------------------------------
@@ -622,6 +819,7 @@ def main(argv=None):
         "por_intencao_train": dict(sorted(por_i_train.items())), "por_intencao_val": dict(sorted(por_i_val.items())),
         "elementos_no_pool": len(g.elementos), "compostos_no_pool": len(g.compostos), "formulas_livres": len(g.formulas_livres),
         "templates": sum(len(v) for k, v in T.items() if isinstance(v, list)) + len(V.MODELOS_CONCEITO), "sft_gerado": bool(sft),
+        "variantes_de_linguagem": getattr(g, "variantes", {}),
         **descartes,
     }
     (out / "stats.json").write_text(json.dumps(stats, ensure_ascii=False, indent=1), encoding="utf-8", newline="\n")

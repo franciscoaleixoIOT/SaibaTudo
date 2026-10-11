@@ -9,6 +9,7 @@ from types import SimpleNamespace
 from tests import _base
 import gerar_catalogo
 import gerar_qa
+from comum import fold
 
 
 class TestCatalogo(unittest.TestCase):
@@ -44,9 +45,11 @@ class TestCatalogo(unittest.TestCase):
     def test_md_cobre_todas_as_familias(self):
         stats = json.loads((self.qa / "stats.json").read_text(encoding="utf-8"))
         md = Path(self.md).read_text(encoding="utf-8")
+        md_sem_acento = fold(md)
         for arq in stats["porArquivo"]:
-            self.assertIn(arq[:6].capitalize(), md, arq)  # "Element", "Compos", "Calcul"...
-        self.assertGreaterEqual(md.count("**P:**"), 500)
+            # "element", "compos", "calcul"... sem acento: "Cálculos" no título contém "calcul" (com a fixture não havia outra ocorrência)
+            self.assertIn(arq[:6], md_sem_acento, arq)
+        self.assertGreaterEqual(md.count("**P:**"), 100 if _base.pacote().eh_fixture else 500)  # a fixture tem só 10 elementos e 20 compostos
 
 
 if __name__ == "__main__":

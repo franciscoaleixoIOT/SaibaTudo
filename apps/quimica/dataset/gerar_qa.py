@@ -24,13 +24,18 @@ AQUI = Path(__file__).resolve().parent
 sys.path.insert(0, str(AQUI))
 
 import fam_calculos  # noqa: E402
+import fam_comparacoes  # noqa: E402
+import fam_conceitos_texto  # noqa: E402
+import fam_escopo  # noqa: E402
 import ghs_pt  # noqa: E402
 import fam_compostos  # noqa: E402
 import fam_elementos  # noqa: E402
 import fam_nomenclatura  # noqa: E402
 import fam_recusas_desenho_seguranca as frds  # noqa: E402
 import fam_regras  # noqa: E402
+import fam_seguranca_rotulo  # noqa: E402
 import fam_textos  # noqa: E402
+import fam_variantes  # noqa: E402
 from comum import REPO, escrever_jsonl, jaccard, norm_question, tokens  # noqa: E402
 from dados_recusas import RECUSA_PADRAO  # noqa: E402
 from pacote import localizar  # noqa: E402
@@ -40,7 +45,8 @@ SCRIPT_VERSION = "1.0"
 LICENCA_DATASET = "CC BY-SA 4.0"
 ARQUIVOS = {
     "elementos": ["elementos"], "compostos": ["compostos"], "calculos": ["calculos"], "nomenclatura": ["nomenclatura"], "regras": ["regras"], "desenho": ["desenho"],
-    "seguranca": ["seguranca", "seguranca_texto"], "recusas": ["recusas"], "conceitos": ["conceitos"],
+    "seguranca": ["seguranca", "seguranca_rotulo", "seguranca_texto"], "recusas": ["recusas"], "conceitos": ["conceitos", "conceitos_texto"],
+    "comparacoes": ["comparacoes"], "escopo": ["escopo"], "variantes": ["variantes"],
 }
 
 
@@ -56,6 +62,12 @@ def gerar(pac, seed=2026, variantes_el=2, variantes_co=1, n_recusas=420):
     frds.gerar_seguranca_ghs(ctx)
     frds.gerar_recusas(ctx, n_recusas)
     fam_textos.gerar(ctx)
+    # Famílias da ampliação de 10/10/2026 (PENDENCIAS §8.2). Cada uma tem sorteio próprio (qa_base.SubCtx): as anteriores não mudam.
+    fam_comparacoes.gerar(ctx)
+    fam_seguranca_rotulo.gerar(ctx)
+    fam_conceitos_texto.gerar(ctx)
+    fam_escopo.gerar(ctx)
+    fam_variantes.gerar(ctx)  # por último: varia uma fração dos pares já gerados
     filtrar_contra_casos_de_seguranca(ctx, REPO / "contracts" / "seguranca_cases.json")
     return ctx
 

@@ -117,13 +117,22 @@ def palavra_sinal_pt(p):
 
 _ATIVAS = dict(FRASES_H)
 FONTE_FRASES = "dicionário embutido (adaptação própria do Anexo III do CLP)"
+_INSTRUCOES = re.compile(r"\s*<[^<>]*>")
+
+
+def limpar_frase(texto: str) -> str:
+    """Tira do texto oficial as instruções de redação entre <...> do Anexo III (ex.: "<indicar a via de exposição se existirem provas
+    concludentes...>"): elas orientam quem redige o rótulo e não fazem parte da frase mostrada ao usuário. Nada mais é alterado."""
+    t = _INSTRUCOES.sub("", texto or "")
+    t = re.sub(r"\s+([.,;])", r"\1", t)
+    return re.sub(r"\s{2,}", " ", t).strip()
 
 
 def usar_frases_oficiais(frases: dict):
     """Troca o dicionário embutido pelos textos em português do Anexo III do CLP vindos do pacote (`ghs_frases.json`), se houver."""
     global _ATIVAS, FONTE_FRASES
     if frases:
-        _ATIVAS = dict(frases)
+        _ATIVAS = {k: limpar_frase(v) for k, v in frases.items()}
         FONTE_FRASES = "pacote de dados (Anexo III do CLP, EUR-Lex)"
     else:
         _ATIVAS = dict(FRASES_H)

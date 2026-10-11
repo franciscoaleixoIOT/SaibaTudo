@@ -33,6 +33,9 @@ FAMILIAS = [
     ("7. Segurança química (GHS, riscos, primeiros socorros)", "seguranca"),
     ("8. Recusas (pedidos perigosos)", "recusas"),
     ("9. Conceitos (explicações ancoradas em trechos licenciados)", "conceitos"),
+    ("10. Comparações e raciocínio entre elementos (valores do pacote)", "comparacoes"),
+    ("11. Escopo: perguntas fora da química e dever inteiro (resposta de limite)", "escopo"),
+    ("12. Variantes de linguagem (informal, subscritos, nomes populares)", "variantes"),
 ]
 AUTORIA = {"autoria:conceito", "autoria:seguranca"}
 
@@ -58,7 +61,8 @@ def _exemplo(r):
 def _tabela_contagens(stats):
     nomes = [("elementos", "1. Elementos"), ("compostos", "2. Compostos"), ("calculos", "3. Cálculos"),
              ("nomenclatura", "4. Nomenclatura"), ("regras", "5. Regras de ensino"), ("desenho", "6. Desenho"),
-             ("seguranca", "7. Segurança"), ("recusas", "8. Recusas"), ("conceitos", "9. Conceitos")]
+             ("seguranca", "7. Segurança"), ("recusas", "8. Recusas"), ("conceitos", "9. Conceitos"), ("comparacoes", "10. Comparações"),
+             ("escopo", "11. Escopo"), ("variantes", "12. Variantes de linguagem")]
     linhas = ["| Família | Pares |", "| :-- | --: |"]
     for chave, rot in nomes:
         linhas.append(f"| {rot} | {stats['porArquivo'].get(chave, 0)} |")

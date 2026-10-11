@@ -1,6 +1,6 @@
 # Catálogo completo de perguntas e respostas — SaibaTudo Química
 
-**24023 pares** · dados **real** (versão `20261010T230839Z-30f1eaa2cdb1`) · licença **CC BY-SA 4.0** · semente `2026` · 118 elementos · 491 compostos.
+**29673 pares** · dados **real** (versão `20261010T234125Z-acb63c6864b4`) · licença **CC BY-SA 4.0** · semente `2026` · 118 elementos · 491 compostos.
 
 Este catálogo cobre **todas as famílias e todos os modelos de pergunta**, lista **na íntegra** os pares escritos à mão (conceitos e segurança geral) e todas as perguntas de recusa. A lista **literal** de todos os pares está em `dataset/CATALOGO.jsonl` (e nos originais `dataset/qa/*.jsonl`). Nenhum par aparece sem a sua fonte.
 
@@ -14,14 +14,17 @@ Este catálogo cobre **todas as famílias e todos os modelos de pergunta**, list
 | 4. Nomenclatura | 1374 |
 | 5. Regras de ensino | 370 |
 | 6. Desenho | 970 |
-| 7. Segurança | 594 |
+| 7. Segurança | 2101 |
 | 8. Recusas | 419 |
-| 9. Conceitos | 479 |
-| **Total** | **24023** |
+| 9. Conceitos | 2012 |
+| 10. Comparações | 1418 |
+| 11. Escopo | 131 |
+| 12. Variantes de linguagem | 1061 |
+| **Total** | **29673** |
 
-Por tipo: calculo 4039 · conceito 479 · desenho 970 · fato 16148 · nomenclatura 1374 · recusa 419 · seguranca 594.
+Por tipo: calculo 4211 · conceito 2059 · desenho 1028 · fato 18331 · nomenclatura 1415 · recusa 419 · seguranca 2210.
 
-Por nível: fundamental 7377 · medio 10446 · superior 6200.
+Por nível: fundamental 9260 · medio 13684 · superior 6729.
 
 ## 1. Elementos (fatos da tabela periódica)
 
@@ -1340,9 +1343,57 @@ Vou desenhar a estrutura do ácido clorídrico (HCl) a partir do SMILES do PubCh
 
 ## 7. Segurança química (GHS, riscos, primeiros socorros)
 
-**6 modelos de pergunta** cobrindo 510 pares. Cada modelo é um texto-base com as entidades/valores substituídos; há um exemplo real por modelo.
+**10 modelos de pergunta** cobrindo 2017 pares. Cada modelo é um texto-base com as entidades/valores substituídos; há um exemplo real por modelo.
 
 ### Modelos de pergunta (todos)
+
+#### `template:seguranca_rotulo.frase_h` — 662 pares
+
+**P:** o que quer dizer H314 na ficha do acido cloridrico?
+
+**R:**
+
+```text
+A frase H314, que aparece na classificação harmonizada do ácido clorídrico (HCl), significa: “Provoca queimaduras na pele e lesões oculares graves.” (texto oficial do Regulamento CLP, Anexo III). Fonte da classificação: PubChem, CID 313 (Regulamento CLP, Anexo VI).
+```
+
+`sr-313-H314` · nível `fundamental` · fonte: PubChem CID 313 (domínio público (NCBI/NLM)); Regulamento (CE) n.º 1272/2008, Anexo VI (classificação harmonizada), via PubChem (reutilização livre da legislação (EUR-Lex)); Regulamento CLP (CE) n.º 1272/2008, Anexo III (EUR-Lex) (CC BY 4.0)
+
+#### `template:seguranca_rotulo.pictograma` — 455 pares
+
+**P:** O ácido clorídrico tem o pictograma GHS04. o que ele significa
+
+**R:**
+
+```text
+O pictograma GHS04 (botijão de gás) no rótulo do ácido clorídrico (HCl) indica perigo ligado a: gases sob pressão. Na classificação harmonizada desse composto, as frases de perigo são: H314 (Provoca queimaduras na pele e lesões oculares graves); H331 (Tóxico por inalação). Fonte: PubChem, CID 313; texto das frases: Regulamento CLP, Anexo III.
+```
+
+`sr-313-GHS04` · nível `fundamental` · fonte: PubChem CID 313 (domínio público (NCBI/NLM)); Regulamento (CE) n.º 1272/2008, Anexo VI (classificação harmonizada), via PubChem (reutilização livre da legislação (EUR-Lex)); Regulamento CLP (CE) n.º 1272/2008, Anexo III (EUR-Lex) (CC BY 4.0)
+
+#### `template:seguranca_rotulo.cuidados_sem_frases_p` — 195 pares
+
+**P:** Quais precauções tomar com o ácido clorídrico?
+
+**R:**
+
+```text
+O pacote de dados não traz as frases de precaução (P) do ácido clorídrico (HCl), por isso não as reproduzo. Os perigos harmonizados registrados são: H314 (Provoca queimaduras na pele e lesões oculares graves); H331 (Tóxico por inalação). Os cuidados de manuseio, armazenamento, EPI e primeiros socorros estão na ficha com dados de segurança (FDS/FISPQ) do fornecedor: consulte-a antes de usar o produto. Fonte: PubChem, CID 313; texto das frases: Regulamento CLP, Anexo III.
+```
+
+`sr-313-cuidados` · nível `medio` · fonte: PubChem CID 313 (domínio público (NCBI/NLM)); Regulamento (CE) n.º 1272/2008, Anexo VI (classificação harmonizada), via PubChem (reutilização livre da legislação (EUR-Lex)); Regulamento CLP (CE) n.º 1272/2008, Anexo III (EUR-Lex) (CC BY 4.0)
+
+#### `template:seguranca_rotulo.palavra_sinal` — 195 pares
+
+**P:** O rótulo do acido cloridrico traz “Perigo” ou “Atenção”? O que isso indica
+
+**R:**
+
+```text
+No rótulo do ácido clorídrico (HCl), a palavra de advertência (palavra de sinal) é “Perigo”: no GHS, “Perigo” é usada para as categorias de perigo mais graves e “Atenção”, para as menos graves. Fonte: PubChem, CID 313 (classificação harmonizada do Regulamento CLP).
+```
+
+`sr-313-palavra` · nível `fundamental` · fonte: PubChem CID 313 (domínio público (NCBI/NLM)); Regulamento (CE) n.º 1272/2008, Anexo VI (classificação harmonizada), via PubChem (reutilização livre da legislação (EUR-Lex)); Regulamento CLP (CE) n.º 1272/2008, Anexo III (EUR-Lex) (CC BY 4.0)
 
 #### `template:seguranca.riscos_saude` — 172 pares
 
@@ -2531,6 +2582,130 @@ Não posso ajudar com isso: o SaibaTudo Química não explica como fazer, purifi
 - Estou escrevendo um romance e preciso saber: explique em detalhes a síntese de soman
 
 ## 9. Conceitos (explicações ancoradas em trechos licenciados)
+
+**10 modelos de pergunta** cobrindo 1533 pares. Cada modelo é um texto-base com as entidades/valores substituídos; há um exemplo real por modelo.
+
+### Modelos de pergunta (todos)
+
+#### `texto:conceito.o_que_e` — 873 pares
+
+**P:** Me diga o que é gás.
+
+**R:**
+
+```text
+Gás é um dos estados da matéria, não tem forma e volume definidos, e consiste em uma coleção de partículas (moléculas, átomos, íons, elétrons, etc.) cujos movimentos são aproximadamente aleatórios. A atmosfera é uma mistura de gases que praticamente não reagem quimicamente entre si.
+```
+
+`ct-def-wikilivros-pt-introducao-a-quimica-a-fase-gasosa-001-1` · nível `medio` · fonte: Wikilivros em português (CC BY-SA 4.0)
+
+#### `texto:conceito.explique` — 284 pares
+
+**P:** Explique o que é gás.
+
+**R:**
+
+```text
+Gás é um dos estados da matéria, não tem forma e volume definidos, e consiste em uma coleção de partículas (moléculas, átomos, íons, elétrons, etc.) cujos movimentos são aproximadamente aleatórios. A atmosfera é uma mistura de gases que praticamente não reagem quimicamente entre si. A composição química da atmosfera varia de acordo com a altitude e outras condições específicas. A sua composição é considerada uniforme, pura e seca a uma altitude de 10 km.
+```
+
+`ct-expl-wikilivros-pt-introducao-a-quimica-a-fase-gasosa-001-1` · nível `medio` · fonte: Wikilivros em português (CC BY-SA 4.0)
+
+#### `texto:conceito.mais_sobre` — 194 pares
+
+**P:** O que mais se sabe sobre absorção na química rapidinho
+
+**R:**
+
+```text
+Em termos de aplicações industriais, pode-se citar diversos exemplos de absorção, tais como na purificação de gases de combustão, remoção de CO2 na fabricação de amônia, recuperação de solutos (SO2, acetona, HCl, etc.) em processos diversos. A absorção de gases é fundamental no processo de contato, na produção de ácido sulfúrico.
+```
+
+`ct-mais-wikipedia-pt-absorcao-quimica-003-4` · nível `superior` · fonte: Wikipédia em português (CC BY-SA 4.0)
+
+#### `texto:conceito.para_que_serve` — 60 pares
+
+**P:** para que é usado um ácido?
+
+**R:**
+
+```text
+Ácidos participam da digestão, estão presentes em alimentos e bebidas, são usados em medicamentos e entram em processos industriais como a produção de fertilizantes, o tratamento de metais e o funcionamento de baterias.
+```
+
+`ct-uso-wikipedia-pt-acido-002-1-h2` · nível `medio` · fonte: Wikipédia em português (CC BY-SA 4.0)
+
+#### `texto:conceito.caracteristicas` — 46 pares
+
+**P:** Qual a aparência da acetona?
+
+**R:**
+
+```text
+É um líquido incolor e de odor característico.
+```
+
+`ct-caract-wikipedia-pt-acetona-001-2` · nível `medio` · fonte: Wikipédia em português (CC BY-SA 4.0)
+
+#### `texto:conceito.onde_ocorre` — 24 pares
+
+**P:** Pode me dizer onde o ácido úrico é encontrado?
+
+**R:**
+
+```text
+O ácido úrico é encontrado na urina em pequenas quantidades (o produto de excreção principal é a ureia).
+```
+
+`ct-ocorre-wikipedia-pt-acido-urico-001-2` · nível `medio` · fonte: Wikipédia em português (CC BY-SA 4.0)
+
+#### `texto:conceito.diferenca_entre_artigos` — 21 pares
+
+**P:** Explique a difreença entre reação endotérmica e reação exotérmica.
+
+**R:**
+
+```text
+Uma reação endotérmica é uma reação química cuja energia total (entalpia) dos seus produtos é maior que a de seus reagentes, ou seja, ela absorve energia (na forma de calor). Uma reação exotérmica é uma reação química cuja energia é transferida de um meio interior para o meio exterior, aquecendo o ambiente consequentemente.
+```
+
+`ct-dif2-wikipedia-pt-reacao-endotermica-001-wikipedia-pt-reacao-exotermica-001-h5` · nível `medio` · fonte: Wikipédia em português (CC BY-SA 4.0)
+
+#### `texto:conceito.diferenca` — 13 pares
+
+**P:** Qual a diferença entre densidade e massa específica
+
+**R:**
+
+```text
+Há uma pequena diferença entre densidade e massa específica. A massa específica, embora definida de forma análoga à densidade, contudo para um material e não um objeto, é propriedade de uma substância, e não de um objeto.
+```
+
+`ct-dif-wikipedia-pt-densidade-002-1` · nível `medio` · fonte: Wikipédia em português (CC BY-SA 4.0)
+
+#### `texto:conceito.origem_do_nome` — 12 pares
+
+**P:** De onde vem o nome do ácido etanoico
+
+**R:**
+
+```text
+O ácido acético (do latim acetum, azedo), CH3COOH, oficialmente chamado ácido etanoico, é um ácido carboxílico (especificamente, um ácido monocarboxílico), saturado e de cadeia aberta.
+```
+
+`ct-nome-wikipedia-pt-acido-etanoico-001-1` · nível `medio` · fonte: Wikipédia em português (CC BY-SA 4.0)
+
+#### `texto:conceito.quem_foi` — 6 pares
+
+**P:** Você sabe quem era Ernest Rutherford?
+
+**R:**
+
+```text
+Ernest Rutherford, 1.º Barão Rutherford de Nelson (30 de agosto de 1871 – 19 de outubro de 1937) foi um físico e químico neozelandês que pesquisou a física atômica e a física nuclear. Recebeu o apelido de "pai da física nuclear" e foi chamado de "o maior experimentalista desde Michael Faraday".
+```
+
+`ct-pessoa-wikipedia-pt-ernest-rutherford-001-h8` · nível `medio` · fonte: Wikipédia em português (CC BY-SA 4.0)
 
 ### Pares escritos à mão (479) — na íntegra
 
@@ -6369,33 +6544,647 @@ Não posso ajudar com isso: o SaibaTudo Química não explica como fazer, purifi
 ---
 
 
+## 10. Comparações e raciocínio entre elementos (valores do pacote)
+
+**42 modelos de pergunta** cobrindo 1418 pares. Cada modelo é um texto-base com as entidades/valores substituídos; há um exemplo real por modelo.
+
+### Modelos de pergunta (todos)
+
+#### `template:comparacao.par.massaAtomica.periodo` — 111 pares
+
+**P:** qual tem maior massa atômica, o elemento H ou o helio?
+
+**R:**
+
+```text
+O hélio (He) tem a maior massa atômica: 4,002602 u, contra 1,008 u do hidrogênio (H). Fonte dos valores: PubChem.
+```
+
+`cmp-massaAtomica-H-He` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `template:comparacao.par.pontoFusaoK.periodo` — 96 pares
+
+**P:** Entre o helio e o elemento H, qual tem o menor ponto de fusão?
+
+**R:**
+
+```text
+O hélio (He) tem o menor ponto de fusão: 0,95 K (−272,20 °C), contra 13,81 K (−259,34 °C) do hidrogênio (H). Fonte dos valores: PubChem.
+```
+
+`cmp-pontoFusaoK-H-He` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `template:comparacao.par.energiaIonizacaoKJmol.periodo` — 95 pares
+
+**P:** Cmopare a energia de ionização do helio e do hidrogênio
+
+**R:**
+
+```text
+O hélio (He) tem a maior energia de ionização: 2372,3 kJ/mol, contra 1312,0 kJ/mol do hidrogênio (H). Os dois estão no mesmo período. Tendência geral (Wikilivros em português): “Em um mesmo período a energia de ionização aumenta da esquerda para a direita”. Aqui os valores seguem essa tendência. Fonte dos valores: PubChem.
+```
+
+`cmp-energiaIonizacaoKJmol-H-He` · nível `superior` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0); Wikilivros em português (CC BY-SA 4.0)
+
+#### `template:comparacao.par.raioAtomicoPm.periodo` — 92 pares
+
+**P:** Preciso saber qual átomo é maior, o hidrogênio ou o helio?
+
+**R:**
+
+```text
+O hélio (He) tem o átomo maior (maior raio atômico): 140 pm, contra 120 pm do hidrogênio (H). Os dois estão no mesmo período. Tendência geral (Wikilivros em português): “O átomo que apresenta maior numero de prótons exerce uma maior atração sobre seus elétrons”; no mesmo período, isso tende a diminuir o raio. Aqui os valores fogem dessa tendência geral: vale o valor medido. Fonte dos valores: PubChem.
+```
+
+`cmp-raioAtomicoPm-H-He` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0); Wikilivros em português (CC BY-SA 4.0)
+
+#### `template:comparacao.par.densidadeKgm3.periodo` — 89 pares
+
+**P:** qual tem maior densidade: o hidrogênio ou o hélio?
+
+**R:**
+
+```text
+O hélio (He) tem a maior densidade: 0,1785 kg/m³, contra 0,08988 kg/m³ do hidrogênio (H). Fonte dos valores: PubChem.
+```
+
+`cmp-densidadeKgm3-H-He` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `template:comparacao.par.eletronegatividade.periodo` — 88 pares
+
+**P:** Quem é mais eletronegativo: o berilio ou o Lítio?
+
+**R:**
+
+```text
+O berílio (Be) é mais eletronegativo: 1,57 na escala de Pauling, contra 0,98 do lítio (Li). Os dois estão no mesmo período. Tendência geral (Wikilivros em português): “Na tabela periódica, quanto mais próximo um elemento encontra-se do flúor, maior é sua eletronegatividade”. Aqui os valores seguem essa tendência. Fonte dos valores: PubChem.
+```
+
+`cmp-eletronegatividade-Li-Be` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0); Wikilivros em português (CC BY-SA 4.0)
+
+#### `template:comparacao.par.pontoEbulicaoK.periodo` — 86 pares
+
+**P:** Entre o helio e o hidrogênio, qual tem o menor ponto de ebulição
+
+**R:**
+
+```text
+O hélio (He) tem o menor ponto de ebulição: 4,22 K (−268,93 °C), contra 20,28 K (−252,87 °C) do hidrogênio (H). Fonte dos valores: PubChem.
+```
+
+`cmp-pontoEbulicaoK-H-He` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `template:comparacao.par.massaAtomica.grupo` — 70 pares
+
+**P:** qual átomo é mais pesado: o Lítio ou o hidrogênio?
+
+**R:**
+
+```text
+O lítio (Li) é mais pesado (maior massa atômica): 6,94 u, contra 1,008 u do hidrogênio (H). Fonte dos valores: PubChem.
+```
+
+`cmp-massaAtomica-H-Li` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `template:comparacao.par.energiaIonizacaoKJmol.grupo` — 55 pares
+
+**P:** Oi, é mais fácil tirar um elétron do hidrogênio ou do litio?
+
+**R:**
+
+```text
+O lítio (Li) perde um elétron com mais facilidade (tem a menor energia de ionização): 520,2 kJ/mol, contra 1312,0 kJ/mol do hidrogênio (H). Os dois estão no mesmo grupo. Tendência geral (Wikilivros em português): “Em uma mesma família esta energia aumenta de baixo para cima”. Aqui os valores seguem essa tendência. Fonte dos valores: PubChem.
+```
+
+`cmp-energiaIonizacaoKJmol-H-Li` · nível `superior` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0); Wikilivros em português (CC BY-SA 4.0)
+
+#### `template:comparacao.par.pontoFusaoK.grupo` — 55 pares
+
+**P:** Uma dúvida: qual derrete a uma temperatura mais alta: o lítio ou o hidrogenio?
+
+**R:**
+
+```text
+O lítio (Li) derrete a uma temperatura mais alta (maior ponto de fusão): 453,65 K (180,50 °C), contra 13,81 K (−259,34 °C) do hidrogênio (H). Fonte dos valores: PubChem.
+```
+
+`cmp-pontoFusaoK-H-Li` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `template:comparacao.par.raioAtomicoPm.grupo` — 55 pares
+
+**P:** Oi, qual átomo é maior, o litio ou o hidrogênio
+
+**R:**
+
+```text
+O lítio (Li) tem o átomo maior (maior raio atômico): 182 pm, contra 120 pm do hidrogênio (H). Os dois estão no mesmo grupo. Tendência geral (Wikilivros em português): “Quanto maior o numero de níveis, maior será o tamanho do átomo”; descendo no grupo, o número de níveis aumenta. Aqui os valores seguem essa tendência. Fonte dos valores: PubChem.
+```
+
+`cmp-raioAtomicoPm-H-Li` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0); Wikilivros em português (CC BY-SA 4.0)
+
+#### `template:comparacao.par.densidadeKgm3.grupo` — 54 pares
+
+**P:** Entre o lítio e o Hidrogênio, qual tem a menor densidade?
+
+**R:**
+
+```text
+O hidrogênio (H) tem a menor densidade: 0,08988 kg/m³, contra 534 kg/m³ do lítio (Li). Os dois estão no mesmo grupo. Tendência geral (Wikilivros em português): “Numa família: A densidade cresce de cima para baixo”. Aqui os valores seguem essa tendência. Fonte dos valores: PubChem.
+```
+
+`cmp-densidadeKgm3-H-Li` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0); Wikilivros em português (CC BY-SA 4.0)
+
+#### `template:comparacao.par.pontoEbulicaoK.grupo` — 53 pares
+
+**P:** Qual precisa de temperatura mais alta para ferver, o lítio ou o hidrogênio?
+
+**R:**
+
+```text
+O lítio (Li) precisa de temperatura mais alta para ferver (maior ponto de ebulição): 1615 K (1342 °C), contra 20,28 K (−252,87 °C) do hidrogênio (H). Fonte dos valores: PubChem.
+```
+
+`cmp-pontoEbulicaoK-H-Li` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `template:comparacao.par.eletronegatividade.grupo` — 51 pares
+
+**P:** Entre o lítio e o hidrogenio, qual tem maior eletronegatividade?
+
+**R:**
+
+```text
+O hidrogênio (H) tem a maior eletronegatividade: 2,2 na escala de Pauling, contra 0,98 do lítio (Li). Os dois estão no mesmo grupo. Tendência geral (Wikilivros em português): “Na tabela periódica, quanto mais próximo um elemento encontra-se do flúor, maior é sua eletronegatividade”. Aqui os valores seguem essa tendência. Fonte dos valores: PubChem.
+```
+
+`cmp-eletronegatividade-H-Li` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0); Wikilivros em português (CC BY-SA 4.0)
+
+#### `template:comparacao.trio.pontoFusaoK.periodo` — 24 pares
+
+**P:** Ordene o elemento Ni, o Cobre e o cobalto em ordem crescente de ponto de fusão.
+
+**R:**
+
+```text
+Em ordem crescente de ponto de fusão: cobre (Cu, 1357,77 K / 1084,62 °C) < níquel (Ni, 1728 K / 1455 °C) < cobalto (Co, 1768 K / 1495 °C). Fonte dos valores: PubChem.
+```
+
+`cmp3-pontoFusaoK-Co-Ni-Cu` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `template:comparacao.trio.densidadeKgm3.periodo` — 22 pares
+
+**P:** Coloque o bismuto, o Polônio e o Astato do mais denso para o menos denso.
+
+**R:**
+
+```text
+Em ordem decrescente de densidade: bismuto (Bi, 9807 kg/m³) > polônio (Po, 9320 kg/m³) > astato (At, 7000 kg/m³). Fonte dos valores: PubChem.
+```
+
+`cmp3-densidadeKgm3-Bi-Po-At` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `template:comparacao.trio.massaAtomica.periodo` — 22 pares
+
+**P:** Ordene o níquel, o Ferro e o cobalto em ordem crescente de massa atômica.
+
+**R:**
+
+```text
+Em ordem crescente de massa atômica: ferro (Fe, 55,845 u) < níquel (Ni, 58,6934 u) < cobalto (Co, 58,933194 u). Fonte dos valores: PubChem.
+```
+
+`cmp3-massaAtomica-Fe-Co-Ni` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `template:comparacao.trio.raioAtomicoPm.periodo` — 21 pares
+
+**P:** Ordene os átomos o elemento In, o cádmio e o estanho do maior para o menor.
+
+**R:**
+
+```text
+Em ordem decrescente de raio atômico: estanho (Sn, 217 pm) > índio (In, 193 pm) > cádmio (Cd, 158 pm). Os três estão no mesmo período. Tendência geral (Wikilivros em português): “O átomo que apresenta maior numero de prótons exerce uma maior atração sobre seus elétrons”; no mesmo período, isso tende a diminuir o raio. Aqui os valores fogem dessa tendência geral: vale o valor medido. Fonte dos valores: PubChem.
+```
+
+`cmp3-raioAtomicoPm-Cd-In-Sn` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0); Wikilivros em português (CC BY-SA 4.0)
+
+#### `template:comparacao.trio.pontoEbulicaoK.periodo` — 20 pares
+
+**P:** Coloque o ósmio, o rênio e o irídio do maior para o menor ponto de ebuliãço.
+
+**R:**
+
+```text
+Em ordem decrescente de ponto de ebulição: rênio (Re, 5869 K / 5596 °C) > ósmio (Os, 5285 K / 5012 °C) > irídio (Ir, 4701 K / 4428 °C). Fonte dos valores: PubChem.
+```
+
+`cmp3-pontoEbulicaoK-Re-Os-Ir` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `template:comparacao.trio.energiaIonizacaoKJmol.periodo` — 19 pares
+
+**P:** ordene o elemento Am, o cúrio e o berquélio em ordem crescente de energia de ionização.
+
+**R:**
+
+```text
+Em ordem crescente de energia de ionização: amerício (Am, 578,2 kJ/mol) < cúrio (Cm, 580,8 kJ/mol) < berquélio (Bk, 601,1 kJ/mol). Os três estão no mesmo período. Tendência geral (Wikilivros em português): “Em um mesmo período a energia de ionização aumenta da esquerda para a direita”. Aqui os valores seguem essa tendência. Fonte dos valores: PubChem.
+```
+
+`cmp3-energiaIonizacaoKJmol-Am-Cm-Bk` · nível `superior` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0); Wikilivros em português (CC BY-SA 4.0)
+
+#### `template:comparacao.extremo.densidadeKgm3.grupo` — 17 pares
+
+**P:** qual é o elemento mais denso do grupo 1
+
+**R:**
+
+```text
+Entre os elementos do grupo 1 que têm densidade no pacote de dados, o mais denso é o césio (Cs), com 1930 kg/m³. No outro extremo está o hidrogênio (H), com 0,08988 kg/m³. Sem esse valor no pacote: frâncio (Fr). Fonte dos valores: PubChem.
+```
+
+`cmpx-densidadeKgm3-grupo-1` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `template:comparacao.extremo.energiaIonizacaoKJmol.grupo` — 17 pares
+
+**P:** Qual eleemnto do grupo 1 perde um elétron com mais facilidade?
+
+**R:**
+
+```text
+Entre os elementos do grupo 1 que têm energia de ionização no pacote de dados, o de menor energia de ionização é o césio (Cs), com 375,7 kJ/mol. No outro extremo está o hidrogênio (H), com 1312,0 kJ/mol. Fonte dos valores: PubChem.
+```
+
+`cmpx-energiaIonizacaoKJmol-grupo-1` · nível `superior` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `template:comparacao.extremo.massaAtomica.grupo` — 17 pares
+
+**P:** Qual elemento do grupo 1 tem a maior massa atômica?
+
+**R:**
+
+```text
+Entre os elementos do grupo 1 que têm massa atômica no pacote de dados, o de maior massa atômica é o frâncio (Fr), com 223,019736 u. No outro extremo está o hidrogênio (H), com 1,008 u. Fonte dos valores: PubChem.
+```
+
+`cmpx-massaAtomica-grupo-1` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `template:comparacao.extremo.pontoEbulicaoK.grupo` — 17 pares
+
+**P:** Qual elemento do grupo 1 tem o menor ponto de ebulição
+
+**R:**
+
+```text
+Entre os elementos do grupo 1 que têm ponto de ebulição no pacote de dados, o de menor ponto de ebulição é o hidrogênio (H), com 20,28 K (−252,87 °C). No outro extremo está o lítio (Li), com 1615 K (1342 °C). Sem esse valor no pacote: frâncio (Fr). Fonte dos valores: PubChem.
+```
+
+`cmpx-pontoEbulicaoK-grupo-1` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `template:comparacao.extremo.pontoFusaoK.grupo` — 17 pares
+
+**P:** Qual elemento do grupo 1 tem o maior ponto de fusão?
+
+**R:**
+
+```text
+Entre os elementos do grupo 1 que têm ponto de fusão no pacote de dados, o de maior ponto de fusão é o lítio (Li), com 453,65 K (180,50 °C). No outro extremo está o hidrogênio (H), com 13,81 K (−259,34 °C). Fonte dos valores: PubChem.
+```
+
+`cmpx-pontoFusaoK-grupo-1` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `template:comparacao.extremo.raioAtomicoPm.grupo` — 17 pares
+
+**P:** Qual elemento do grupo 1 tem o menor raio atômico?
+
+**R:**
+
+```text
+Entre os elementos do grupo 1 que têm raio atômico no pacote de dados, o de menor raio atômico é o hidrogênio (H), com 120 pm. No outro extremo está o frâncio (Fr), com 348 pm. Fonte dos valores: PubChem.
+```
+
+`cmpx-raioAtomicoPm-grupo-1` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `template:comparacao.trio.eletronegatividade.periodo` — 16 pares
+
+**P:** Ordene o zinco, o gálio e o cobre em ordem crescente de eletronegatividade.
+
+**R:**
+
+```text
+Em ordem crescente de eletronegatividade: zinco (Zn, 1,65 na escala de Pauling) < gálio (Ga, 1,81 na escala de Pauling) < cobre (Cu, 1,9 na escala de Pauling). Os três estão no mesmo período. Tendência geral (Wikilivros em português): “Na tabela periódica, quanto mais próximo um elemento encontra-se do flúor, maior é sua eletronegatividade”. Aqui os valores fogem dessa tendência geral: vale o valor medido. Fonte dos valores: PubChem.
+```
+
+`cmp3-eletronegatividade-Cu-Zn-Ga` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0); Wikilivros em português (CC BY-SA 4.0)
+
+#### `template:comparacao.extremo.eletronegatividade.grupo` — 14 pares
+
+**P:** Qual é o elemento menos eletronegativo do grupo 1
+
+**R:**
+
+```text
+Entre os elementos do grupo 1 que têm eletronegatividade no pacote de dados, o menos eletronegativo é o frâncio (Fr), com 0,7 na escala de Pauling. No outro extremo está o hidrogênio (H), com 2,2. Fonte dos valores: PubChem.
+```
+
+`cmpx-eletronegatividade-grupo-1` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `template:comparacao.trio.eletronegatividade.grupo` — 14 pares
+
+**P:** Uma dúvida: ordene o chumbo, o germânio e o estanho em ordem crescente de eletronegatividade.
+
+**R:**
+
+```text
+Em ordem crescente de eletronegatividade: estanho (Sn, 1,96 na escala de Pauling) < germânio (Ge, 2,01 na escala de Pauling) < chumbo (Pb, 2,33 na escala de Pauling). Os três estão no mesmo grupo. Tendência geral (Wikilivros em português): “Na tabela periódica, quanto mais próximo um elemento encontra-se do flúor, maior é sua eletronegatividade”. Aqui os valores fogem dessa tendência geral: vale o valor medido. Fonte dos valores: PubChem.
+```
+
+`cmp3-eletronegatividade-Ge-Sn-Pb` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0); Wikilivros em português (CC BY-SA 4.0)
+
+#### `template:comparacao.trio.energiaIonizacaoKJmol.grupo` — 11 pares
+
+**P:** Ordene o argônio, o hélio e o elemento Ne em ordem crescente de energia de ionização.
+
+**R:**
+
+```text
+Em ordem crescente de energia de ionização: argônio (Ar, 1520,6 kJ/mol) < neônio (Ne, 2080,7 kJ/mol) < hélio (He, 2372,3 kJ/mol). Os três estão no mesmo grupo. Tendência geral (Wikilivros em português): “Em uma mesma família esta energia aumenta de baixo para cima”. Aqui os valores seguem essa tendência. Fonte dos valores: PubChem.
+```
+
+`cmp3-energiaIonizacaoKJmol-He-Ne-Ar` · nível `superior` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0); Wikilivros em português (CC BY-SA 4.0)
+
+#### `template:comparacao.trio.pontoEbulicaoK.grupo` — 10 pares
+
+**P:** Ordene o polônio, o telúrio e o selênio em ordem crescente de ponto de ebulição
+
+**R:**
+
+```text
+Em ordem crescente de ponto de ebulição: selênio (Se, 958 K / 685 °C) < polônio (Po, 1235 K / 962 °C) < telúrio (Te, 1261 K / 988 °C). Fonte dos valores: PubChem.
+```
+
+`cmp3-pontoEbulicaoK-Se-Te-Po` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `template:comparacao.trio.raioAtomicoPm.grupo` — 9 pares
+
+**P:** Uma dúvida: ordene os átomos o hidrogenio, o elemento Li e o elemento Na do maior para o menor rapidinho.
+
+**R:**
+
+```text
+Em ordem decrescente de raio atômico: sódio (Na, 227 pm) > lítio (Li, 182 pm) > hidrogênio (H, 120 pm). Os três estão no mesmo grupo. Tendência geral (Wikilivros em português): “Quanto maior o numero de níveis, maior será o tamanho do átomo”; descendo no grupo, o número de níveis aumenta. Aqui os valores seguem essa tendência. Fonte dos valores: PubChem.
+```
+
+`cmp3-raioAtomicoPm-H-Li-Na` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0); Wikilivros em português (CC BY-SA 4.0)
+
+#### `template:comparacao.trio.densidadeKgm3.grupo` — 8 pares
+
+**P:** Coloque o fosforo, o nitrogenio e o arsenio do mais denso para o menos denso.
+
+**R:**
+
+```text
+Em ordem decrescente de densidade: arsênio (As, 5776 kg/m³) > fósforo (P, 1820 kg/m³) > nitrogênio (N, 1,2506 kg/m³). Os três estão no mesmo grupo. Tendência geral (Wikilivros em português): “Numa família: A densidade cresce de cima para baixo”. Aqui os valores seguem essa tendência. Fonte dos valores: PubChem.
+```
+
+`cmp3-densidadeKgm3-N-P-As` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0); Wikilivros em português (CC BY-SA 4.0)
+
+#### `template:comparacao.trio.massaAtomica.grupo` — 8 pares
+
+**P:** ordene o elemento Ag, o ouro e o cobre em ordem crescente de massa atômica.
+
+**R:**
+
+```text
+Em ordem crescente de massa atômica: cobre (Cu, 63,546 u) < prata (Ag, 107,8682 u) < ouro (Au, 196,96657 u). Fonte dos valores: PubChem.
+```
+
+`cmp3-massaAtomica-Cu-Ag-Au` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `template:comparacao.extremo.densidadeKgm3.periodo` — 6 pares
+
+**P:** gostaria de saber: qual é o elemento mais denso do período 2
+
+**R:**
+
+```text
+Entre os elementos do período 2 que têm densidade no pacote de dados, o mais denso é o boro (B), com 2370 kg/m³. No outro extremo está o neônio (Ne), com 0,8999 kg/m³. Fonte dos valores: PubChem.
+```
+
+`cmpx-densidadeKgm3-periodo-2` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `template:comparacao.extremo.eletronegatividade.periodo` — 6 pares
+
+**P:** qual é o elemento menos eletronegativo do período 2?
+
+**R:**
+
+```text
+Entre os elementos do período 2 que têm eletronegatividade no pacote de dados, o menos eletronegativo é o lítio (Li), com 0,98 na escala de Pauling. No outro extremo está o flúor (F), com 3,98. Sem esse valor no pacote: neônio (Ne). Fonte dos valores: PubChem.
+```
+
+`cmpx-eletronegatividade-periodo-2` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `template:comparacao.extremo.energiaIonizacaoKJmol.periodo` — 6 pares
+
+**P:** Qual elemento do período 2 tem a maior energia de ionização
+
+**R:**
+
+```text
+Entre os elementos do período 2 que têm energia de ionização no pacote de dados, o de maior energia de ionização é o neônio (Ne), com 2080,7 kJ/mol. No outro extremo está o lítio (Li), com 520,2 kJ/mol. Fonte dos valores: PubChem.
+```
+
+`cmpx-energiaIonizacaoKJmol-periodo-2` · nível `superior` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `template:comparacao.extremo.massaAtomica.periodo` — 6 pares
+
+**P:** Qual elemento do período 2 tem a maior massa atômica?
+
+**R:**
+
+```text
+Entre os elementos do período 2 que têm massa atômica no pacote de dados, o de maior massa atômica é o neônio (Ne), com 20,1797 u. No outro extremo está o lítio (Li), com 6,94 u. Fonte dos valores: PubChem.
+```
+
+`cmpx-massaAtomica-periodo-2` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `template:comparacao.extremo.pontoEbulicaoK.periodo` — 6 pares
+
+**P:** Quero saber qual elemento do período 2 tem o maior ponto de ebulição
+
+**R:**
+
+```text
+Entre os elementos do período 2 que têm ponto de ebulição no pacote de dados, o de maior ponto de ebulição é o boro (B), com 4273 K (4000 °C). No outro extremo está o neônio (Ne), com 27,07 K (−246,08 °C). Fonte dos valores: PubChem.
+```
+
+`cmpx-pontoEbulicaoK-periodo-2` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `template:comparacao.extremo.pontoFusaoK.periodo` — 6 pares
+
+**P:** Qual elemento do período 2 tem o maior ponto de fusão
+
+**R:**
+
+```text
+Entre os elementos do período 2 que têm ponto de fusão no pacote de dados, o de maior ponto de fusão é o carbono (C), com 3823 K (3550 °C). No outro extremo está o neônio (Ne), com 24,56 K (−248,59 °C). Fonte dos valores: PubChem.
+```
+
+`cmpx-pontoFusaoK-periodo-2` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `template:comparacao.extremo.raioAtomicoPm.periodo` — 6 pares
+
+**P:** Oi, qual elemento do período 2 tem o maior raio atômico?
+
+**R:**
+
+```text
+Entre os elementos do período 2 que têm raio atômico no pacote de dados, o de maior raio atômico é o boro (B), com 192 pm. No outro extremo está o flúor (F), com 135 pm. Fonte dos valores: PubChem.
+```
+
+`cmpx-raioAtomicoPm-periodo-2` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `template:comparacao.trio.pontoFusaoK.grupo` — 6 pares
+
+**P:** Ordene o selênio, o telúrio e o enxofre em ordem crescente de ponto de fusão.
+
+**R:**
+
+```text
+Em ordem crescente de ponto de fusão: enxofre (S, 388,36 K / 115,21 °C) < selênio (Se, 493,65 K / 220,50 °C) < telúrio (Te, 722,66 K / 449,51 °C). Fonte dos valores: PubChem.
+```
+
+`cmp3-pontoFusaoK-S-Se-Te` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+
+## 11. Escopo: perguntas fora da química e dever inteiro (resposta de limite)
+
+**4 modelos de pergunta** cobrindo 131 pares. Cada modelo é um texto-base com as entidades/valores substituídos; há um exemplo real por modelo.
+
+### Modelos de pergunta (todos)
+
+#### `template:escopo.biologia` — 40 pares
+
+**P:** O que é mitose?
+
+**R:**
+
+```text
+Essa é uma pergunta de biologia, fora do que o SaibaTudo Química cobre. Posso ajudar com a química envolvida (substâncias, reações e conceitos de química), com dados de fontes abertas e a fonte de cada resposta.
+```
+
+`es-biologia-1-1` · nível `fundamental` · fonte: Autoria própria (SaibaTudo Química) (CC BY 4.0)
+
+#### `template:escopo.fisica` — 37 pares
+
+**P:** Qual a fórmula da velocidade média?
+
+**R:**
+
+```text
+Essa é uma pergunta de física, e o SaibaTudo Química responde só sobre química: elementos, compostos, cálculos químicos (massa molar, estequiometria, soluções, pH, gases), segurança e conceitos de química, sempre com a fonte. Se a sua dúvida tiver uma parte de química, pergunte por ela.
+```
+
+`es-fisica-1-1` · nível `fundamental` · fonte: Autoria própria (SaibaTudo Química) (CC BY 4.0)
+
+#### `template:escopo.matematica` — 34 pares
+
+**P:** Resolva a equação 2x + 3 = 11
+
+**R:**
+
+```text
+Essa é uma pergunta de matemática pura, e o SaibaTudo Química só faz contas de química (massa molar, mols, concentração, pH, gases e conversão de unidades), mostrando as etapas. Para matemática em geral, use uma calculadora ou um material de matemática.
+```
+
+`es-matematica-1-1` · nível `fundamental` · fonte: Autoria própria (SaibaTudo Química) (CC BY 4.0)
+
+#### `template:escopo.dever` — 20 pares
+
+**P:** Faz meu dever de casa de química inteiro
+
+**R:**
+
+```text
+Não faço o dever, a lista ou a prova inteira por você, mas posso ajudar você a resolver: mande uma questão de cada vez e eu mostro as etapas do cálculo ou explico o conceito, sempre com a fonte.
+```
+
+`es-dever-1-1` · nível `fundamental` · fonte: Autoria própria (SaibaTudo Química) (CC BY 4.0)
+
+
+## 12. Variantes de linguagem (informal, subscritos, nomes populares)
+
+**3 modelos de pergunta** cobrindo 1061 pares. Cada modelo é um texto-base com as entidades/valores substituídos; há um exemplo real por modelo.
+
+### Modelos de pergunta (todos)
+
+#### `variante:informal` — 870 pares
+
+**P:** qual eh o elemento de numero atomico 2
+
+**R:**
+
+```text
+O elemento de número atômico 2 é o hélio (símbolo He). Fonte: PubChem.
+```
+
+`el-2-por_z-2-v-h6` · nível `fundamental` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+#### `variante:subscrito` — 97 pares
+
+**P:** H₂SO₄ oferece algum risco?
+
+**R:**
+
+```text
+Segundo a classificação GHS harmonizada registrada no pacote de dados (via PubChem), sim, há perigos conhecidos do ácido sulfúrico (H2SO4): palavra de sinal “Perigo”; pictogramas GHS05 (corrosão); frases de perigo: H314 (Provoca queimaduras na pele e lesões oculares graves). Antes de manusear, consulte a ficha de segurança (FISPQ/FDS). Fonte: PubChem, CID 1118.
+```
+
+`co-1118-perigoso-1-v` · nível `fundamental` · fonte: PubChem CID 1118 (domínio público (NCBI/NLM)); Regulamento CLP (CE) n.º 1272/2008, Anexo III (EUR-Lex) (CC BY 4.0)
+
+#### `variante:nome_popular` — 94 pares
+
+**P:** Qual a massa molar da soda cáustica? Mostre os cálculos.
+
+**R:**
+
+```text
+Soda cáustica é o nome popular do hidróxido de sódio (NaOH). Massa molar do hidróxido de sódio (NaOH):
+- Na: 1 × 22,98976928 = 22,98976928
+- O: 1 × 15,999 = 15,999
+- H: 1 × 1,008 = 1,008
+Soma: 39,99676928 g/mol ≈ 40,00 g/mol (arredondado para quatro algarismos significativos).
+Fonte: massas atômicas do PubChem Periodic Table (cálculo local).
+```
+
+`ca-mm-14798-2-v` · nível `medio` · fonte: PubChem Periodic Table (domínio público (NCBI/NLM)); PubChem CID 14798 (domínio público (NCBI/NLM))
+
+
 ## Dataset de NLU (interpretação da pergunta)
 
-18206 exemplos · treino 17431 · validação 775 · 329 modelos · 485 compostos no conjunto · arquivos em `dataset/nlu/`.
+20492 exemplos · treino 19627 · validação 865 · 380 modelos · 485 compostos no conjunto · arquivos em `dataset/nlu/`.
 
 | Intenção | Exemplos |
 | :-- | --: |
-| `AJUDA` | 118 |
-| `BALANCEAR` | 713 |
-| `COMPARAR` | 632 |
-| `COMPOSTO` | 799 |
-| `CONCEITO` | 1329 |
-| `CONCENTRACAO` | 918 |
-| `CONVERSAO_UNIDADE` | 793 |
-| `DESCONHECIDA` | 397 |
-| `DESENHAR` | 715 |
-| `ELEMENTO` | 737 |
-| `ESTEQUIOMETRIA` | 1161 |
-| `FONTES` | 103 |
-| `GAS_IDEAL` | 601 |
-| `MASSA_MOLAR` | 939 |
-| `NOMENCLATURA` | 911 |
-| `PH` | 677 |
-| `PROPRIEDADE` | 3012 |
+| `AJUDA` | 149 |
+| `BALANCEAR` | 784 |
+| `COMPARAR` | 988 |
+| `COMPOSTO` | 827 |
+| `CONCEITO` | 1753 |
+| `CONCENTRACAO` | 975 |
+| `CONVERSAO_UNIDADE` | 821 |
+| `DESCONHECIDA` | 494 |
+| `DESENHAR` | 763 |
+| `ELEMENTO` | 759 |
+| `ESTEQUIOMETRIA` | 1241 |
+| `FONTES` | 110 |
+| `GAS_IDEAL` | 631 |
+| `MASSA_MOLAR` | 989 |
+| `NOMENCLATURA` | 958 |
+| `PH` | 709 |
+| `PROPRIEDADE` | 3221 |
 | `RECUSA_PERIGO` | 904 |
-| `SEGURANCA` | 1273 |
-| `SOBRE_DADOS` | 103 |
-| `TABELA_PERIODICA` | 596 |
+| `SEGURANCA` | 1644 |
+| `SOBRE_DADOS` | 104 |
+| `TABELA_PERIODICA` | 803 |
 
 ## Cobertura por tema (dataset/topicos.json)
 

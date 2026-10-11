@@ -17,7 +17,9 @@ from collections import Counter
 from decimal import Decimal, InvalidOperation
 
 from comum import AQUI, Resp, fold, ler_json, ler_jsonl, numeros_do_texto, valor_do_token
-from qa_base import Ctx
+from qa_base import Ctx, fonte_trecho
+
+ALTERACAO_AUTORIA = "resumo/paráfrase escrita à mão a partir do trecho"
 
 TOPICOS_JSON = AQUI / "topicos.json"
 PASTA_AUTORIA = AQUI / "conceitos"
@@ -160,7 +162,7 @@ def gerar(ctx: Ctx):
         fontes = []
         for i in ids:
             t = pac.textos[i]
-            fontes.append({"id": i, "nome": t.get("fonte"), "licenca": t.get("licenca")})
+            fontes.append(fonte_trecho(t, ALTERACAO_AUTORIA))  # atribuição CC BY-SA: URL do artigo, licença e a alteração feita
             por_fonte[t.get("_pasta", "?")] += 1
         extra = {}
         if it.get("tema"):

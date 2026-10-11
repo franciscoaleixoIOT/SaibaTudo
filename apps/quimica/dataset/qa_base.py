@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Base comum das famílias de perguntas e respostas (contexto, registro, superfícies de entidades)."""
+import hashlib
 import random
 from collections import Counter
 
@@ -64,6 +65,55 @@ class Ctx:
 
     def por_familia(self, familia):
         return [{k: v for k, v in r.items() if k != "_familia"} for r in self.registros if r["_familia"] == familia]
+
+
+class SubCtx:
+    """Visão do contexto com um sorteio PRÓPRIO (semente derivada do nome da família). As famílias acrescentadas depois da primeira
+    geração usam isto para não consumir o `ctx.rng` das famílias antigas, que assim continuam gerando exatamente os mesmos pares."""
+
+    def __init__(self, ctx: Ctx, nome: str):
+        self.ctx, self.pac, self.seed = ctx, ctx.pac, ctx.seed
+        self.rng = random.Random(f"{nome}|{ctx.seed}")
+        self.stats, self.avisos = ctx.stats, ctx.avisos
+
+    def add(self, *args, **kwargs):
+        return self.ctx.add(*args, **kwargs)
+
+
+HOLDOUT_PCT_EXPLICADOR = 20
+
+
+def lado_holdout(chave: str, pct: int = HOLDOUT_PCT_EXPLICADOR) -> bool:
+    """Mesmo critério de `backend/modal/ask_core.eh_holdout` (sha256 do id, 20 %): True se o registro cai no holdout do explicador."""
+    return int(hashlib.sha256(str(chave).encode("utf-8")).hexdigest(), 16) % 100 < pct
+
+
+def id_alinhado(base: str, referencia: str, pct: int = HOLDOUT_PCT_EXPLICADOR) -> str:
+    """Id derivado de `base` que cai do MESMO lado (treino ou holdout do explicador) que `referencia` (o id do trecho ou do par
+    original): pares tirados do mesmo trecho, e as variantes de um par, nunca ficam divididos entre treino e holdout."""
+    alvo = lado_holdout(referencia, pct)
+    if lado_holdout(base, pct) == alvo:
+        return base
+    for k in range(2, 500):
+        candidato = f"{base}-h{k}"
+        if lado_holdout(candidato, pct) == alvo:
+            return candidato
+    return base
+
+
+def fonte_trecho(t: dict, alteracoes: str) -> dict:
+    """`fontes[]` de um trecho licenciado do pacote (Wikipédia/Wikilivros): id, nome, URL do artigo, revisão usada e licença, mais a
+    indicação de alteração exigida pela CC BY-SA ("citação literal", "recorte em frases completas", "paráfrase")."""
+    f = {"id": t["id"], "nome": t.get("fonte"), "licenca": t.get("licenca")}
+    url = t.get("urlArtigo") or t.get("url")
+    if url:
+        f["url"] = url
+    if t.get("url") and t.get("url") != url:
+        f["revisao"] = t["url"]
+    if t.get("titulo"):
+        f["titulo"] = t["titulo"]
+    f["alteracoes"] = alteracoes
+    return f
 
 
 # ---------------------------------------------------------------------------------------------------------

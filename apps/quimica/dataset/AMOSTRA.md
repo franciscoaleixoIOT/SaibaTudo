@@ -1,6 +1,6 @@
 # Amostra do dataset de perguntas e respostas
 
-60 pares representativos (5 por família), sorteados com semente fixa (2026) de `dataset/qa/*.jsonl`. Gerado por `python dataset/gerar_amostra.py`. Dados: **real** (versão `20261010T230839Z-30f1eaa2cdb1`); licença do dataset: **CC BY-SA 4.0**.
+85 pares representativos (5 por grupo, 17 grupos), sorteados com semente fixa (2026) de `dataset/qa/*.jsonl`. Gerado por `python dataset/gerar_amostra.py`. Dados: **real** (versão `20261010T234125Z-acb63c6864b4`); licença do dataset: **CC BY-SA 4.0**.
 
 ## 1. Elementos (fatos da tabela periódica)
 
@@ -781,7 +781,7 @@ Vou desenhar a estrutura do álcool benzílico (C6H5CH2OH) a partir do SMILES do
 
 ---
 
-## 12. Conceitos (a partir de trechos licenciados)
+## 12. Conceitos (escritos à mão a partir de trechos licenciados)
 
 **P:** Por que a desidratação no fim da condensação aldólica é espontânea?
 
@@ -840,5 +840,315 @@ Entre os principais minerais de ferro estão a hematita (Fe2O3), a magnetita (Fe
 ```
 
 `co-0413` · tipo `conceito` · nível `medio` · gerado por `autoria:conceito` · fontes: Wikilivros em português (CC BY-SA 4.0)
+
+---
+
+## 13. Conceitos (recortes literais dos textos em português)
+
+**P:** Me explique princípio de Aufbau.
+
+**R:**
+
+```text
+O princípio de Aufbau é um diagrama fundamental para o entendimento da estrutura da Tabela Periódica dos Elementos, o qual no Brasil, em muitos livros de química, o modelo é atribuído ao Químico norte-americano Linus Pauling; entretanto, não há evidências de que tenha sido ele o criador desse método. Especificamente, o diagrama é um auxílio mnemônico para descrever a ordem correta com que os elétrons de um átomo preenchem os subníveis da eletrosfera. Ele está baseado na chamada Regra de Madelung, atribuída ao físico alemão Erwin Madelung.
+```
+
+`ct-expl-wikipedia-pt-principio-de-aufbau-002-1` · tipo `conceito` · nível `medio` · gerado por `texto:conceito.explique` · fontes: Wikipédia em português (CC BY-SA 4.0)
+
+---
+
+**P:** Me ajuda: o que mais se sabe sobre matéria não?
+
+**R:**
+
+```text
+A natureza da matéria foi uma questão recorrente no desenvolvimento das ciências naturais. A ideia de que a matéria é formada por unidades separadas, chamada de teoria corpuscular da matéria, surgiu na Grécia Antiga e na Índia antiga. Entre os primeiros filósofos a propô-la estão o indiano Kanada, por volta do século VI a.C., e os gregos pré-socráticos Leucipo, por volta de 490 a.C., e Demócrito, que viveu aproximadamente entre 470 e 380 a.C.
+```
+
+`ct-mais-wikipedia-pt-materia-003-1` · tipo `conceito` · nível `medio` · gerado por `texto:conceito.mais_sobre` · fontes: Wikipédia em português (CC BY-SA 4.0)
+
+---
+
+**P:** Explique o que é fenômeno físico.
+
+**R:**
+
+```text
+Fenômeno físico (português brasileiro) ou fenómeno físico (português europeu) é uma mudança na estrutura física da matéria, referente a forma, tamanho, aparência, movimento e estado físico, sem que cause uma alteração na composição química da matéria. Um fenômeno físico é um conjunto de mudanças e processos que ocorrem na natureza. Para que os fenômenos físicos ocorram, é necessária uma força. As forças são diversas interações, como interações fundamentais, como as elétricas, magnéticas ou gravitacionais, ou interações derivadas, como as interações intermoleculares ou o atrito.
+```
+
+`ct-expl-wikipedia-pt-fenomeno-fisico-001-1-h3` · tipo `conceito` · nível `medio` · gerado por `texto:conceito.explique` · fontes: Wikipédia em português (CC BY-SA 4.0)
+
+---
+
+**P:** O que é o nitrato de potássio?
+
+**R:**
+
+```text
+O composto químico nitrato de potássio é um nitrato cuja fórmula é KNO3.
+```
+
+`ct-def2-wikipedia-pt-nitrato-de-potassio-001-1` · tipo `conceito` · nível `medio` · gerado por `texto:conceito.o_que_e` · fontes: Wikipédia em português (CC BY-SA 4.0)
+
+---
+
+**P:** Explique o que é o cloro.
+
+**R:**
+
+```text
+O cloro (do grego khlorós, esverdeado) é um elemento químico, símbolo Cl, número atômico 17. Está contido no grupo dos halogênios (grupo 17; anteriormente conhecido como VIIA) e é o segundo halógeno mais leve, após o flúor. Sob condições normais é um gás de coloração amarelo esverdeada, onde forma as moléculas diatômicas. Tem a maior afinidade eletrônica, e a terceira maior eletronegatividade de todos os elementos reativos.
+```
+
+`ct-expl-wikipedia-pt-cloro-001-1` · tipo `conceito` · nível `medio` · gerado por `texto:conceito.explique` · fontes: Wikipédia em português (CC BY-SA 4.0)
+
+---
+
+## 14. Comparações e raciocínio entre elementos
+
+**P:** me ajuda: qual ferve a uma temperatura mais baixa: o Silício ou o fósforo?
+
+**R:**
+
+```text
+O fósforo (P) ferve a uma temperatura mais baixa (menor ponto de ebulição): 553,65 K (280,50 °C), contra 3538 K (3265 °C) do silício (Si). Fonte dos valores: PubChem.
+```
+
+`cmp-pontoEbulicaoK-Si-P` · tipo `fato` · nível `medio` · gerado por `template:comparacao.par.pontoEbulicaoK.periodo` · fontes: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+---
+
+**P:** Ordene o selênio, o Telúrio e o enxofre em ordem crescente de densidade.
+
+**R:**
+
+```text
+Em ordem crescente de densidade: enxofre (S, 2067 kg/m³) < selênio (Se, 4809 kg/m³) < telúrio (Te, 6232 kg/m³). Os três estão no mesmo grupo. Tendência geral (Wikilivros em português): “Numa família: A densidade cresce de cima para baixo”. Aqui os valores seguem essa tendência. Fonte dos valores: PubChem.
+```
+
+`cmp3-densidadeKgm3-S-Se-Te` · tipo `fato` · nível `medio` · gerado por `template:comparacao.trio.densidadeKgm3.grupo` · fontes: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0); Wikilivros em português (CC BY-SA 4.0)
+
+---
+
+**P:** Qual elemento do grupo 18 tem o menor ponto de ebulição?
+
+**R:**
+
+```text
+Entre os elementos do grupo 18 que têm ponto de ebulição no pacote de dados, o de menor ponto de ebulição é o hélio (He), com 4,22 K (−268,93 °C). No outro extremo está o radônio (Rn), com 211,45 K (−61,70 °C). Sem esse valor no pacote: oganessônio (Og). Fonte dos valores: PubChem.
+```
+
+`cmpx-pontoEbulicaoK-grupo-18` · tipo `fato` · nível `medio` · gerado por `template:comparacao.extremo.pontoEbulicaoK.grupo` · fontes: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+---
+
+**P:** Qual é mais denso, o magnesio ou o sódio
+
+**R:**
+
+```text
+O magnésio (Mg) é mais denso: 1740 kg/m³, contra 970 kg/m³ do sódio (Na). Fonte dos valores: PubChem.
+```
+
+`cmp-densidadeKgm3-Na-Mg` · tipo `fato` · nível `medio` · gerado por `template:comparacao.par.densidadeKgm3.periodo` · fontes: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+---
+
+**P:** qual tem maior densidade: o vanádio ou o elemento Ti
+
+**R:**
+
+```text
+O vanádio (V) tem a maior densidade: 6000 kg/m³, contra 4500 kg/m³ do titânio (Ti). Fonte dos valores: PubChem.
+```
+
+`cmp-densidadeKgm3-Ti-V` · tipo `fato` · nível `medio` · gerado por `template:comparacao.par.densidadeKgm3.periodo` · fontes: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+---
+
+## 15. Segurança do rótulo (frase H, pictograma, palavra de advertência, cuidados)
+
+**P:** O que quer dizer o símbolo de corrosão na embalagem do ácido fosforoso?
+
+**R:**
+
+```text
+O pictograma GHS05 (corrosão) no rótulo do ácido fosforoso (H3PO3) indica perigo ligado a: corrosivos para metais, que queimam a pele e causam lesões oculares graves. Na classificação harmonizada desse composto, as frases de perigo são: H302 (Nocivo por ingestão); H314 (Provoca queimaduras na pele e lesões oculares graves). Fonte: PubChem, CID 107909; texto das frases: Regulamento CLP, Anexo III.
+```
+
+`sr-107909-GHS05` · tipo `seguranca` · nível `fundamental` · gerado por `template:seguranca_rotulo.pictograma` · fontes: PubChem CID 107909 (domínio público (NCBI/NLM)); Regulamento (CE) n.º 1272/2008, Anexo VI (classificação harmonizada), via PubChem (reutilização livre da legislação (EUR-Lex)); Regulamento CLP (CE) n.º 1272/2008, Anexo III (EUR-Lex) (CC BY 4.0)
+
+---
+
+**P:** O que significa a frase H350 no rótulo do cumeno rapidinho?
+
+**R:**
+
+```text
+A frase H350, que aparece na classificação harmonizada do cumeno (C9H12), significa: “Pode provocar cancro.” (texto oficial do Regulamento CLP, Anexo III). Fonte da classificação: PubChem, CID 7406 (Regulamento CLP, Anexo VI).
+```
+
+`sr-7406-H350` · tipo `seguranca` · nível `fundamental` · gerado por `template:seguranca_rotulo.frase_h` · fontes: PubChem CID 7406 (domínio público (NCBI/NLM)); Regulamento (CE) n.º 1272/2008, Anexo VI (classificação harmonizada), via PubChem (reutilização livre da legislação (EUR-Lex)); Regulamento CLP (CE) n.º 1272/2008, Anexo III (EUR-Lex) (CC BY 4.0)
+
+---
+
+**P:** O carbonato de sódio tem o pictograma GHS07. o que ele significa?
+
+**R:**
+
+```text
+O pictograma GHS07 (ponto de exclamação) no rótulo do carbonato de sódio (Na2CO3) indica perigo ligado a: toxicidade aguda moderada (nocivo), irritação da pele e dos olhos, sensibilização da pele e irritação das vias respiratórias. Na classificação harmonizada desse composto, as frases de perigo são: H319 (Provoca irritação ocular grave). Fonte: PubChem, CID 10340; texto das frases: Regulamento CLP, Anexo III.
+```
+
+`sr-10340-GHS07` · tipo `seguranca` · nível `fundamental` · gerado por `template:seguranca_rotulo.pictograma` · fontes: PubChem CID 10340 (domínio público (NCBI/NLM)); Regulamento (CE) n.º 1272/2008, Anexo VI (classificação harmonizada), via PubChem (reutilização livre da legislação (EUR-Lex)); Regulamento CLP (CE) n.º 1272/2008, Anexo III (EUR-Lex) (CC BY 4.0)
+
+---
+
+**P:** qual a palavra de sinal da TRIMETILAMINA e o que ela significa?
+
+**R:**
+
+```text
+No rótulo da trimetilamina ((CH3)3N), a palavra de advertência (palavra de sinal) é “Perigo”: no GHS, “Perigo” é usada para as categorias de perigo mais graves e “Atenção”, para as menos graves. Fonte: PubChem, CID 1146 (classificação harmonizada do Regulamento CLP).
+```
+
+`sr-1146-palavra` · tipo `seguranca` · nível `fundamental` · gerado por `template:seguranca_rotulo.palavra_sinal` · fontes: PubChem CID 1146 (domínio público (NCBI/NLM)); Regulamento (CE) n.º 1272/2008, Anexo VI (classificação harmonizada), via PubChem (reutilização livre da legislação (EUR-Lex)); Regulamento CLP (CE) n.º 1272/2008, Anexo III (EUR-Lex) (CC BY 4.0)
+
+---
+
+**P:** Ei, C4H9COOH tem a frase H314 na classificação. Isso significa o quê por favor?
+
+**R:**
+
+```text
+A frase H314, que aparece na classificação harmonizada do ácido pentanoico (C4H9COOH), significa: “Provoca queimaduras na pele e lesões oculares graves.” (texto oficial do Regulamento CLP, Anexo III). Fonte da classificação: PubChem, CID 7991 (Regulamento CLP, Anexo VI).
+```
+
+`sr-7991-H314` · tipo `seguranca` · nível `fundamental` · gerado por `template:seguranca_rotulo.frase_h` · fontes: PubChem CID 7991 (domínio público (NCBI/NLM)); Regulamento (CE) n.º 1272/2008, Anexo VI (classificação harmonizada), via PubChem (reutilização livre da legislação (EUR-Lex)); Regulamento CLP (CE) n.º 1272/2008, Anexo III (EUR-Lex) (CC BY 4.0)
+
+---
+
+## 16. Escopo (fora da química e dever inteiro)
+
+**P:** O que é inércia?
+
+**R:**
+
+```text
+Essa é uma pergunta de física, e o SaibaTudo Química responde só sobre química: elementos, compostos, cálculos químicos (massa molar, estequiometria, soluções, pH, gases), segurança e conceitos de química, sempre com a fonte. Se a sua dúvida tiver uma parte de química, pergunte por ela.
+```
+
+`es-fisica-19-1` · tipo `fato` · nível `fundamental` · gerado por `template:escopo.fisica` · fontes: Autoria própria (SaibaTudo Química) (CC BY 4.0)
+
+---
+
+**P:** Quanto é 2 elevado a 10?
+
+**R:**
+
+```text
+Essa é uma pergunta de matemática pura, e o SaibaTudo Química só faz contas de química (massa molar, mols, concentração, pH, gases e conversão de unidades), mostrando as etapas. Para matemática em geral, use uma calculadora ou um material de matemática.
+```
+
+`es-matematica-23-1` · tipo `fato` · nível `fundamental` · gerado por `template:escopo.matematica` · fontes: Autoria própria (SaibaTudo Química) (CC BY 4.0)
+
+---
+
+**P:** Responda essa lista inteira de química orgânica
+
+**R:**
+
+```text
+Não faço o dever, a lista ou a prova inteira por você, mas posso ajudar você a resolver: mande uma questão de cada vez e eu mostro as etapas do cálculo ou explico o conceito, sempre com a fonte.
+```
+
+`es-dever-9-1` · tipo `fato` · nível `fundamental` · gerado por `template:escopo.dever` · fontes: Autoria própria (SaibaTudo Química) (CC BY 4.0)
+
+---
+
+**P:** Quero saber como calcular a velocidade de um carro em queda livre?
+
+**R:**
+
+```text
+Essa é uma pergunta de física, e o SaibaTudo Química responde só sobre química: elementos, compostos, cálculos químicos (massa molar, estequiometria, soluções, pH, gases), segurança e conceitos de química, sempre com a fonte. Se a sua dúvida tiver uma parte de química, pergunte por ela.
+```
+
+`es-fisica-28-2` · tipo `fato` · nível `fundamental` · gerado por `template:escopo.fisica` · fontes: Autoria própria (SaibaTudo Química) (CC BY 4.0)
+
+---
+
+**P:** Faça meu TCC sobre polímeros
+
+**R:**
+
+```text
+Não faço o dever, a lista ou a prova inteira por você, mas posso ajudar você a resolver: mande uma questão de cada vez e eu mostro as etapas do cálculo ou explico o conceito, sempre com a fonte.
+```
+
+`es-dever-11-1` · tipo `fato` · nível `fundamental` · gerado por `template:escopo.dever` · fontes: Autoria própria (SaibaTudo Química) (CC BY 4.0)
+
+---
+
+## 17. Variantes de linguagem
+
+**P:** preciso saber qual a fromula de C21H26O5
+
+**R:**
+
+```text
+A fórmula molecular da prednisona é C21H26O5. Fonte: PubChem, CID 5865.
+```
+
+`co-5865-formula-1-v` · tipo `fato` · nível `fundamental` · gerado por `variante:informal` · fontes: PubChem CID 5865 (domínio público (NCBI/NLM))
+
+---
+
+**P:** entre o litio e o dubnio, qual tem menor masa atomica rapidinho
+
+**R:**
+
+```text
+O lítio (Li) tem menor massa atômica (6,94 u) do que o dúbnio (Db), cujo valor é 268,12567 u. Fonte: PubChem.
+```
+
+`el-cmp-massaAtomica-Li-Db-v` · tipo `fato` · nível `medio` · gerado por `variante:informal` · fontes: PubChem Periodic Table (domínio público (NCBI/NLM)); Wikidata (CC0)
+
+---
+
+**P:** oq significa nucleo do atomo?
+
+**R:**
+
+```text
+O núcleo do átomo é um aglomerado de prótons e nêutrons. A quantidade de partículas no núcleo denomina-se massa atômica, - que corresponte a massa total do átomo - pois o nêutron e o próton possuem massa próxima e superior a do elétron (que é praticamente desprezível).
+```
+
+`ct-def-wikilivros-pt-quimica-inorganica-introducao-estrutura-do-atomo-002-1-v` · tipo `conceito` · nível `medio` · gerado por `variante:informal` · fontes: Wikilivros em português (CC BY-SA 4.0)
+
+---
+
+**P:** oq mais se sabe sobre propriedades coligativas das solucoes por favor
+
+**R:**
+
+```text
+Todas as propriedades coligativas surgem da diminuição do potencial químico do líquido solvente como resultado da presença do soluto. A diminuição do potencial químico do solvente implica aumento da temperatura em que ocorrerá o equilíbrio líquido-vapor e diminui a temperatura em que ocorre o equilíbrio sólido-líquido (o ponto de fusão é diminuído). A origem molecular da diminuição do potencial químico não está na energia de interação entre o soluto e as partículas do solvente, porque a elevação também ocorre em soluções ideais (as quais tem entalpia de mistura igual a zero).
+```
+
+`ct-mais-wikipedia-pt-propriedades-coligativas-002-1-h5-v-h4` · tipo `conceito` · nível `medio` · gerado por `variante:informal` · fontes: Wikipédia em português (CC BY-SA 4.0)
+
+---
+
+**P:** qual a diferenca de msasa molar entre o 2,2,4-trimetilpentano e o acido palmitico
+
+**R:**
+
+```text
+O ácido palmítico (C16H32O2) tem maior massa molar (256,42 g/mol) do que o 2,2,4-Trimetilpentano (C8H18), com 114,23 g/mol; a diferença é de 142,2 g/mol. Fonte: PubChem, CID 10907 e CID 985.
+```
+
+`co-cmp-10907-985-v-h2` · tipo `fato` · nível `medio` · gerado por `variante:informal` · fontes: PubChem CID 10907 (domínio público (NCBI/NLM)); PubChem CID 985 (domínio público (NCBI/NLM))
 
 ---

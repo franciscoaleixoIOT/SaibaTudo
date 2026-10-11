@@ -5,6 +5,7 @@ from collections import Counter
 from comum import Resp, cap, com_artigo, lista_pt, renderizar
 from dados_recusas import RECUSA_PADRAO, gerar_pedidos
 import ghs_pt
+from fam_seguranca_rotulo import contexto_ghs
 from ghs_pt import PICTOGRAMAS, expandir_h, palavra_sinal_pt
 from pacote import fontes_do_registro
 from qa_base import FONTE_CLP, FONTE_RECUSA, Ctx, nome_em_frase, sup_composto, sup_composto_sem_artigo
@@ -119,5 +120,6 @@ def gerar_seguranca_ghs(ctx: Ctx):
             pergunta = renderizar(rng.choice(modelos), {"c": c_, "c_de": com_artigo(nome, "de", pendente=pend), "c_cap": cap(c_)}, rng)
             texto = (f"Pelas frases de perigo harmonizadas registradas para {c_} ({pac.formula_exibicao(c)}), os riscos {nome_rot} são: "
                      f"{'; '.join(itens)}. Fonte: PubChem, CID {cid}; texto das frases: Regulamento CLP, Anexo III.")
+            # `contexto`: os dados do rótulo que o app mostra (o explicador só pode usar o que está nele; ver fam_seguranca_rotulo)
             ctx.add(f"se-{c['cid']}-{chave}", pergunta, texto, r, "seguranca", "medio", {"compostos": [c["cid"]]}, fontes_do_registro(c, 1) + fontes_clp,
-                    f"template:seguranca.riscos_{chave}", "seguranca")
+                    f"template:seguranca.riscos_{chave}", "seguranca", {"contexto": contexto_ghs(pac, c)})

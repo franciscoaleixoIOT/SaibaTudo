@@ -35,7 +35,9 @@ class TestValidacaoDeTextos(unittest.TestCase):
         self.assertEqual(len(ctx.registros), 1)
         r = ctx.registros[0]
         self.assertEqual(r["tipo"], "conceito")
-        self.assertEqual(r["fontes"], [{"id": "wikipedia-pt-mol-001", "nome": "Wikipédia em português", "licenca": "CC BY-SA 4.0"}])
+        self.assertEqual(r["fontes"], [{"id": "wikipedia-pt-mol-001", "nome": "Wikipédia em português", "licenca": "CC BY-SA 4.0",
+                                        "url": "https://pt.wikipedia.org/wiki/Mol", "titulo": "Mol",
+                                        "alteracoes": fam_textos.ALTERACAO_AUTORIA}])
         self.assertEqual(r["numeros"], ["6,02214076 × 10²³"])
         self.assertEqual(r["numerosOrigem"]["6,02214076 × 10²³"], ["passagem:wikipedia-pt-mol-001"])
         self.assertEqual(r["tema"], "mol-massa-molar")

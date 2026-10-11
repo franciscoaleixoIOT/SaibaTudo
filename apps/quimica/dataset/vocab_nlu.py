@@ -87,7 +87,17 @@ MODELOS_CONCEITO = [
     ("Explique {t} em nível de graduação", "superior"), ("Explique {t} para a faculdade", "superior"), ("{t} explicado em nível universitário", "superior"),
     ("Qual a importância de {t}?", None), ("Dê um exemplo de {t}", None), ("Por que {t} é importante na química?", None),
     ("Tenho prova amanhã, me explica {t}", "medio"), ("Não entendi {t}, pode ajudar?", None), ("Quero entender {t}", None), ("{t}: do que se trata?", None),
+    # formas novas (ampliação de 10/10/2026, ver dataset/fam_conceitos_texto.py)
+    ("Defina {t}", None), ("Qual a definição de {t}?", None), ("Me diga o que é {t}", None), ("Fale mais sobre {t}", None), ("Para que serve {t}?", None),
+    ("Quais as aplicações de {t}?", None), ("O que mais se sabe sobre {t}?", None), ("{t}: o que é?", None),
 ]
+# perguntas sobre cientistas (biografias curtas dos trechos licenciados) -> CONCEITO
+PESSOAS = ["John Dalton", "Niels Bohr", "Ernest Rutherford", "Svante Arrhenius", "Joseph John Thomson", "J. J. Thomson", "Dalton", "Bohr", "Rutherford"]
+MODELOS_PESSOA = ["Quem foi {p}?", "Quem era {p}?", "O que {p} fez pela química?", "Qual a importância de {p}?", "Me fale sobre {p}"]
+# abreviações e erros comuns de estudantes (variantes do NLU; nunca dentro de entidades): ver dataset/fam_variantes.py
+ADJ_PROPRIEDADE = {"denso": "densidadeKgm3", "eletronegativo": "eletronegatividade", "pesado": "massaAtomica"}
+PICTOGRAMAS_NOME = {"GHS01": "bomba explodindo", "GHS02": "chama", "GHS03": "chama sobre círculo", "GHS04": "botijão de gás", "GHS05": "corrosão",
+                    "GHS06": "caveira", "GHS07": "ponto de exclamação", "GHS08": "perigo para a saúde", "GHS09": "meio ambiente"}
 FORA_DO_ESCOPO = [
     "qual a capital da França?", "quem ganhou a copa de 2002?", "me conta uma piada", "qual a previsão do tempo para amanhã?", "como faço um bolo de cenoura?",
     "quem é o presidente do Brasil?", "traduza 'good morning' para o português", "qual o melhor celular?", "como tirar passaporte?", "quanto é 15 vezes 12?",

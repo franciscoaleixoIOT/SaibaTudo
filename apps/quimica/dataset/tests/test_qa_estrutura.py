@@ -124,7 +124,9 @@ class TestDesenhoEConceito(unittest.TestCase):
                 t = self.pac.textos[f["id"]]
                 self.assertEqual(f["nome"], t["fonte"])
                 self.assertEqual(f["licenca"], t["licenca"])
-            self.assertIn(r["geradoPor"], ("autoria:conceito",))
+                # atribuição CC BY-SA: URL do artigo e a alteração feita (recorte, paráfrase...)
+                self.assertTrue(f.get("url") and f.get("alteracoes"), (r["id"], f))
+            self.assertTrue(r["geradoPor"] == "autoria:conceito" or r["geradoPor"].startswith(("texto:conceito.", "variante:")), r["id"])
 
     def test_metas_de_conteudo_com_pacote_real(self):
         if self.pac.eh_fixture:

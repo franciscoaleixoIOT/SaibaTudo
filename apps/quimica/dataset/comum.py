@@ -37,6 +37,29 @@ def fold(s: str) -> str:
     return unicodedata.normalize("NFD", s).encode("ascii", "ignore").decode().lower()
 
 
+def sem_acentos(s: str) -> str:
+    """Tira só os acentos das LETRAS (á -> a, ç -> c), preservando caixa e todos os outros símbolos (×, ², °, ₂, µ...)."""
+    return unicodedata.normalize("NFC", "".join(c for c in unicodedata.normalize("NFD", s or "") if unicodedata.category(c) != "Mn"))
+
+
+def fold_alinhado(s: str) -> str:
+    """Como `fold`, mas caractere a caractere (mesmo comprimento do original): os índices de uma busca valem no texto original."""
+    return "".join(unicodedata.normalize("NFD", c)[0] for c in (s or "")).lower()
+
+
+_SUBSCRITO = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
+_DESSUBSCRITO = str.maketrans("₀₁₂₃₄₅₆₇₈₉", "0123456789")
+
+
+def formula_subscrita(f: str) -> str:
+    """'H2SO4' -> 'H₂SO₄'; 'Ca(OH)2' -> 'Ca(OH)₂'; 'CuSO4·5H2O' -> 'CuSO₄·5H₂O' (só os índices: dígitos depois de letra ou parêntese)."""
+    return re.sub(r"(?<=[A-Za-z)\]])(\d+)", lambda m: m.group(1).translate(_SUBSCRITO), f or "")
+
+
+def formula_sem_subscrito(f: str) -> str:
+    return (f or "").translate(_DESSUBSCRITO)
+
+
 def norm_question(s: str) -> str:
     return " ".join(re.findall(r"[a-z0-9]+", fold(s)))
 

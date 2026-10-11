@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Gera `dataset/AMOSTRA.md`: 60 pares representativos (5 por família, 12 famílias) legíveis, a partir de `dataset/qa/*.jsonl`.
+"""Gera `dataset/AMOSTRA.md`: pares representativos (5 por grupo) legíveis, a partir de `dataset/qa/*.jsonl`.
 
 Uso: python dataset/gerar_amostra.py [--qa dataset/qa] [--out dataset/AMOSTRA.md] [--seed 2026]
 """
@@ -24,11 +24,17 @@ GRUPOS = [
     ("5. Cálculo: estequiometria", "calculos", lambda r: r["geradoPor"].startswith(("calculo:estequiometria", "calculo:massa_para_mol", "calculo:mol_para"))),
     ("6. Cálculo: soluções e pH", "calculos", lambda r: r["geradoPor"].startswith(("calculo:ph", "calculo:molaridade", "calculo:diluicao", "calculo:massa_preparo", "calculo:g_por"))),
     ("7. Cálculo: gás ideal e conversão de unidades", "calculos", lambda r: r["geradoPor"].startswith(("calculo:gas_ideal", "calculo:conversao"))),
-    ("8. Segurança (GHS e segurança geral)", "seguranca", lambda r: True),
+    ("8. Segurança (GHS e segurança geral)", "seguranca", lambda r: not r["geradoPor"].startswith("template:seguranca_rotulo")),
     ("9. Recusas (pedidos perigosos)", "recusas", lambda r: True),
     ("10. Nomenclatura e regras de ensino", "nomenclatura", lambda r: True),
     ("11. Desenho de estruturas", "desenho", lambda r: True),
-    ("12. Conceitos (a partir de trechos licenciados)", "conceitos", lambda r: True),
+    ("12. Conceitos (escritos à mão a partir de trechos licenciados)", "conceitos", lambda r: r["geradoPor"].startswith("autoria:")),
+    ("13. Conceitos (recortes literais dos textos em português)", "conceitos", lambda r: r["geradoPor"].startswith("texto:")),
+    ("14. Comparações e raciocínio entre elementos", "comparacoes", lambda r: True),
+    ("15. Segurança do rótulo (frase H, pictograma, palavra de advertência, cuidados)", "seguranca",
+     lambda r: r["geradoPor"].startswith("template:seguranca_rotulo")),
+    ("16. Escopo (fora da química e dever inteiro)", "escopo", lambda r: True),
+    ("17. Variantes de linguagem", "variantes", lambda r: True),
 ]
 
 
@@ -42,7 +48,7 @@ def main(argv=None):
     qa = Path(a.qa)
     stats = json.loads((qa / "stats.json").read_text(encoding="utf-8"))
     linhas = ["# Amostra do dataset de perguntas e respostas", "",
-              f"60 pares representativos (5 por família), sorteados com semente fixa ({a.seed}) de `dataset/qa/*.jsonl`. "
+              f"{5 * len(GRUPOS)} pares representativos (5 por grupo, {len(GRUPOS)} grupos), sorteados com semente fixa ({a.seed}) de `dataset/qa/*.jsonl`. "
               f"Gerado por `python dataset/gerar_amostra.py`. Dados: **{stats['fonteDados']}** (versão `{stats['versaoDados']}`); "
               f"licença do dataset: **{stats['licenca']}**.", ""]
     if stats["fonteDados"] == "fixture":
