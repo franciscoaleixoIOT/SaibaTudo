@@ -1,5 +1,5 @@
 {
-  "geradoEm": "2026-10-10T23:41:25Z",
+  "geradoEm": "2026-10-11T04:20:03Z",
   "modo": "completo",
   "familias": {
     "elementos": {
@@ -97,7 +97,7 @@
     },
     "selecaoCompostos": {
       "status": "ok",
-      "segundos": 0.2,
+      "segundos": 0.1,
       "listaFixaEntradas": 490,
       "listaFixaResolvidas": 481,
       "listaFixaDescartadas": [
@@ -148,20 +148,63 @@
         }
       ],
       "wikidataItens": 2893,
-      "wikidataAdicionados": 10,
+      "wikidataAdicionados": 519,
       "lotesWikidataFalhos": []
     },
     "compostos": {
       "status": "ok",
-      "segundos": 0.4,
-      "compostos": 491,
+      "segundos": 35.3,
+      "compostos": 992,
       "descartados": [],
-      "comGhsHarmonizado": 195,
+      "duplicados": [
+        {
+          "cid": 764,
+          "nome": "Guanina",
+          "igualA": 135398634
+        },
+        {
+          "cid": 14777,
+          "nome": "Hidróxido de cálcio",
+          "igualA": 6093208
+        },
+        {
+          "cid": 24854,
+          "nome": "Cloreto de cálcio",
+          "igualA": 5284359
+        },
+        {
+          "cid": 24538,
+          "nome": "Sulfato de amónio",
+          "igualA": 6097028
+        },
+        {
+          "cid": 24584,
+          "nome": "Cloreto de magnésio",
+          "igualA": 5360315
+        },
+        {
+          "cid": 14829,
+          "nome": "Óxido de cobre(II)",
+          "igualA": 164827
+        },
+        {
+          "cid": 28387,
+          "nome": "Hidróxido de bário",
+          "igualA": 6093286
+        },
+        {
+          "cid": 24506,
+          "nome": "Fosfato monopotássico",
+          "igualA": 516951
+        }
+      ],
+      "casDesempatadosPeloPubchem": 4,
+      "comGhsHarmonizado": 322,
       "ghsFalhasDeRede": [],
-      "comCas": 482,
-      "comWikidata": 488,
+      "comCas": 977,
+      "comWikidata": 984,
       "nomePtPendente": 0,
-      "comDefinicaoChebi": 374,
+      "comDefinicaoChebi": 736,
       "frasesHSemTextoPt": [
         "H350i",
         "H360D",
@@ -175,20 +218,92 @@
       ],
       "wikidataFalhas": [],
       "chebi": {
-        "solicitados": 492,
-        "encontrados": 491,
-        "comDefinicao": 397,
+        "solicitados": 964,
+        "encontrados": 963,
+        "comDefinicao": 778,
         "falhas": []
       },
-      "sinonimosDePubChem": "não coletados (política de campos calculados do PubChem)"
+      "sinonimosDePubChem": "não coletados (política de campos calculados do PubChem)",
+      "excluidosPorSeguranca": [
+        {
+          "cid": 5761,
+          "nome": "LSD",
+          "motivo": "droga de uso proscrito (LSD)"
+        },
+        {
+          "cid": 7871,
+          "nome": "Sarin",
+          "motivo": "guerra química (Sarin)"
+        },
+        {
+          "cid": 10461,
+          "nome": "Gás mostarda",
+          "motivo": "guerra química (Gás mostarda)"
+        },
+        {
+          "cid": 10624,
+          "nome": "Psilocibina",
+          "motivo": "droga de uso proscrito (Psilocibina)"
+        },
+        {
+          "cid": 4076,
+          "nome": "Mescalina",
+          "motivo": "droga de uso proscrito (Mescalina)"
+        },
+        {
+          "cid": 6468,
+          "nome": "Fenilciclidina",
+          "motivo": "droga de uso proscrito (Fenilciclidina)"
+        },
+        {
+          "cid": 16078,
+          "nome": "Tetraidrocanabinol",
+          "motivo": "droga de uso proscrito (Tetraidrocanabinol)"
+        },
+        {
+          "cid": 10413,
+          "nome": "Ácido gama-hidroxibutírico",
+          "motivo": "droga de uso proscrito (Ácido gama-hidroxibutírico)"
+        },
+        {
+          "cid": 39793,
+          "nome": "VX",
+          "motivo": "guerra química (VX)"
+        },
+        {
+          "cid": 6089,
+          "nome": "Dimetiltriptamina",
+          "motivo": "droga de uso proscrito (Dimetiltriptamina)"
+        },
+        {
+          "cid": 7305,
+          "nome": "Soman",
+          "motivo": "guerra química (Soman)"
+        },
+        {
+          "cid": 62258,
+          "nome": "Catinona",
+          "motivo": "droga de uso proscrito (Catinona)"
+        },
+        {
+          "cid": 4980,
+          "nome": "Psilocina",
+          "motivo": "droga de uso proscrito (Psilocina)"
+        },
+        {
+          "cid": 6292,
+          "nome": "Methaqualone",
+          "motivo": "droga de uso proscrito (Methaqualone)"
+        }
+      ]
     },
     "wikipedia": {
       "status": "ok",
-      "segundos": 0.2,
+      "segundos": 0.1,
       "elementos": 118,
-      "compostos": 143,
+      "compostos": 150,
       "conceitos": 320,
-      "trechos": 920,
+      "trechos": 925,
       "trechosPorTema": {
         "acidez-basicidade-organica": 5,
         "acidos-bases": 7,
@@ -274,12 +389,12 @@
         "índice de fluidez"
       ],
       "descartados": [],
-      "trechosCurtos": 139,
-      "artigos": 581
+      "trechosCurtos": 142,
+      "artigos": 588
     },
     "wikilivros": {
       "status": "ok",
-      "segundos": 0.1,
+      "segundos": 0.0,
       "livros": {
         "Introdução à Química": 72,
         "Química Orgânica": 11,
@@ -326,24 +441,24 @@
     },
     "goldBook": {
       "status": "bloqueado",
-      "segundos": 0.7,
+      "segundos": 0.6,
       "motivo": "HTTP 403 em https://goldbook.iupac.org/"
     }
   },
   "contagens": {
     "textosPorFonte": {
-      "wikipedia-pt": 920,
+      "wikipedia-pt": 925,
       "wikibooks-pt": 258,
-      "chebi": 374,
+      "chebi": 723,
       "gutenberg-14474": 235,
       "gold-book": 0
     },
     "elementos": 118,
-    "compostos": 491,
+    "compostos": 978,
     "constantes": 59,
-    "textos": 1787,
-    "compostosComGhsHarmonizado": 195,
-    "compostosComCas": 482
+    "textos": 2141,
+    "compostosComGhsHarmonizado": 322,
+    "compostosComCas": 963
   },
   "decisoes": [
     "OpenStax Chemistry 2e fora do pacote: CC BY-NC-SA 4.0 e cláusula contra IA generativa (nenhum clone, nenhum texto).",
@@ -368,17 +483,18 @@
     "icsc-oit"
   ],
   "http": {
-    "requisicoes": 2,
-    "doCache": 1242,
+    "requisicoes": 6,
+    "doCache": 263,
     "revalidadas304": 0,
     "tentativasExtras": 0,
     "erros": 0,
     "cacheVencido": 0,
     "porHost": {
+      "www.ebi.ac.uk": 4,
       "goldbook.iupac.org": 2
     }
   },
-  "duracaoSegundos": 3.1,
-  "versao": "20261010T234125Z-acb63c6864b4",
+  "duracaoSegundos": 38.1,
+  "versao": "20261011T042003Z-107cf043a5c3",
   "erros": []
 }

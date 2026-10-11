@@ -139,7 +139,7 @@ PROPRIEDADES = {
     "configuracaoEletronica": ("Configuração eletrônica", "", "elementos.configuracaoEletronica", "elemento",
                                 ["configuração eletrônica", "distribuição eletrônica"]),
     "eletronegatividade": ("Eletronegatividade (Pauling)", "", "elementos.eletronegatividade", "elemento", ["eletronegatividade"]),
-    "raioAtomicoPm": ("Raio atômico", "pm", "elementos.raioAtomicoPm", "elemento", ["raio atômico"]),
+    "raioAtomicoPm": ("Raio atômico (van der Waals)", "pm", "elementos.raioAtomicoPm", "elemento", ["raio atômico", "raio de van der Waals"]),
     "afinidadeEletronicaKJmol": ("Afinidade eletrônica", "kJ/mol", "elementos.afinidadeEletronicaKJmol", "elemento",
                              ["afinidade eletrônica", "eletroafinidade"]),
     "energiaIonizacaoKJmol": ("Energia de ionização", "kJ/mol", "elementos.energiaIonizacaoKJmol", "elemento",

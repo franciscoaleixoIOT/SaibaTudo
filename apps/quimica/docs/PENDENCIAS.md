@@ -1,10 +1,10 @@
 # Pendências — SaibaTudo Química
 
-> **Em 10/10/2026, 23h (horário de Brasília).** Ordem de execução recomendada. `[x]` = feito; `[~]` = feito em parte. Contexto completo em [`PROJECT_MEMORY.md`](PROJECT_MEMORY.md).
+> **Em 11/10/2026, madrugada (horário de Brasília).** Repositório único: este app está em `apps/quimica/` de `franciscoaleixoIOT/SaibaTudo`. Ordem de execução recomendada. `[x]` = feito; `[~]` = feito em parte. Contexto completo em [`PROJECT_MEMORY.md`](PROJECT_MEMORY.md).
 
 ## 1. Pacote de dados (`data/quimica/`)
 - [x] **Pacote real assinado com o núcleo completo da lista fixa** (491 compostos, 1787 textos): `python pipeline/build.py --alvo 491 --assinar-com secrets/data_signing_key.pem` (o build sem limite, alvo 2000, continua válido para ampliar depois). `Pacote válido: 20261010T234125Z-...`.
-- [ ] (Opcional, depois) ampliar para o alvo de 2000 via seleção do Wikidata quando quiser cobrir mais compostos; regerar o dataset.
+- [~] **Ampliar o núcleo de compostos** (11/10/2026): 491 → **978** (alvo 1.000 com `--pubchem-offline`, filtro de segurança e remoção de duplicatas). Para chegar a 2.000: rodar `python pipeline/build.py --alvo 2000 --assinar-com secrets/data_signing_key.pem` quando o PubChem liberar o IP (ele dá 429 por horas depois de ~1.000 consultas de GHS) e então subir o `--alvo` do `quimica-data-refresh.yml`. Pendentes do mesmo build: desempate de CAS do SnO₂ e do tetraborato (precisa dos sinônimos do PubChem).
 - [ ] Conferir `fontes.json` e `manifest.licencas` contra a seção 5 de `FONTES_E_LICENCAS.md` (nada de "CC BY 4.0" para OpenStax; Wikimedia e Gold Book CC BY-SA; ChEBI CC BY).
 - [x] `python -m unittest discover -s pipeline/tests` (83, verde).
 
@@ -25,7 +25,7 @@
 - [x] Repositório de eleições: cartão + regras de proxy + `.vercelignore` publicados (3d5ffa9, 01fb70e), com a regra exata `/quimica/` (sem ela o link do cartão dava 404) e o service worker da home ignorando `/quimica/`.
 - [~] CSP: pelo proxy vale a CSP da home (a de eleições, que só acrescenta `resultados.tse.jus.br`): compatível hoje. No plano de repositório único, a home deixa de aplicar cabeçalhos aos caminhos dos apps.
 - [ ] **Trial do Pro da Vercel:** ao terminar, a cota volta a 5.000 uploads/24 h dividida com eleições. Decidir: manter o Pro ou ficar no Hobby (os lotes de textos da §8.1 reduzem o deploy completo de ~1.930 para ~180 arquivos).
-- [ ] Mantenedor: `VERCEL_TOKEN` em `secrets/vercel_token.txt` → `gh secret set VERCEL_TOKEN < secrets/vercel_token.txt`; testar `gh workflow run quimica-data-refresh.yml -f rapido=true`.
+- [ ] **Mantenedor: token da Vercel com acesso ao time inteiro** (o `VERCEL_TOKEN` do GitHub é restrito ao projeto de eleições: com ele, `vercel whoami` dá "User not found" e os outros projetos dão "Project not found"). Criar em vercel.com → Account Settings → Tokens (escopo: time `franciscoaleixo-9696`), gravar em `SaibaTudo/secrets/vercel_token_time.txt` (ignorado) → `gh secret set VERCEL_TOKEN_TIME < secrets/vercel_token_time.txt`. Sem ele, `quimica-data-refresh.yml` e `portal-ci.yml` testam e NÃO publicam; publicar pela CLI local.
 - [ ] Privacidade: `docs/PRIVACIDADE.md` ainda não existe; criar a partir da página `web/src/quimica/privacidade/` (os dois devem ser idênticos, com teste como no app de eleições).
 
 ## 4. Modelo (fase 5) — só depois de 2
@@ -92,8 +92,32 @@ Diagnóstico sobre o pacote e o dataset reais (números em `PROJECT_MEMORY.md` �
 2. **Monetização:** CIAAW, OpenStax, PhET e o plano Hobby da Vercel só valem para uso não comercial. Confirmar que o app segue gratuito e sem anúncios (hoje sim).
 3. **Pedidos de permissão** (opcionais): OpenStax (formulário), SBQ para QNEsc, OMS/OIT para ICSC em português (ipcsmail@who.int), IUPAC para o Gold Book inteiro.
 
+## 10. Conferência com os livros de referência (11/10/2026) — o que ficou para depois
+Relatório local em `local/conferencia_livros/RELATORIO.md` (fora do Git). Já corrigido no pipeline: massa molar pela fórmula,
+CAS (desempate e item do elemento), duplicatas, carbono/arsênio sem fusão a 1 atm; rótulo "raio atômico (van der Waals)".
+- [ ] **Energia de ionização desatualizada no PubChem** (Ta, W, Os, Ir, Fr, Ac, Th; 1,5–4,5 %): trocar a fonte desses valores por
+      uma aberta e atual (Wikidata P2260, com referência ao NIST) e registrar a fonte por valor. O NIST ASD é "todos os direitos
+      reservados": só link.
+- [ ] **Afinidade eletrônica desatualizada** (B, F, Al, Fe, Ga, Ge, Rb, Nb, Sn, Sb, La, Ce, Tl, Pb, Fr; ex.: Tl 19,3 × 36,4 kJ/mol):
+      mesma estratégia (Wikidata, se houver propriedade com referência); senão, marcar como "valor antigo" ou não publicar.
+- [ ] **Eletronegatividade**: documentar na interface e em "Sobre os dados" que é a escala de Pauling com os valores revisados
+      (Allred), como no PubChem; livros que usam os valores originais diferem (W 1,7 × 2,36; Pb 1,8 × 2,33).
+- [ ] **Bk** (fusão 1323 K × 1259–1269 K), **Tc/Mt** (isótopo mais longevo: ⁹⁸Tc, ²⁷⁸Mt), densidade de **Tc** (calculada),
+      **Cs** e **Am**: rechecar em Wikidata/PubChem e marcar "estimado/calculado" quando for o caso.
+- [ ] **Água deuterada**: conferir no próximo build que a fórmula aparece como D₂O (regra nova do pipeline).
+
+## 11. Observações do agente do dataset (11/10/2026)
+- [ ] **Recusas (meta ≥ 1.000) não foram ampliadas**: o agente se recusou a escrever paráfrases "adversariais" de pedidos de
+      explosivos, armas e drogas, mesmo para treinar recusa. Ficam as 419 revisadas. Alternativa a decidir com o mantenedor:
+      ampliar pela **regra de recusa do próprio app** (casos do contrato `contracts/seguranca_cases.json`, escritos e revisados
+      por pessoa) em vez de gerar pedidos perigosos novos.
+- [ ] **33 trechos com id de mais de 80 caracteres** são rejeitados pelo montador do explicador (já tira 2 pares escritos à mão,
+      co-0318 e co-0319): encurtar os ids no pipeline (ex.: hash curto do título) e regenerar.
+- [ ] Frases P (precaução) não estão no pacote: as respostas dizem isso e remetem à FDS/FISPQ. Primeiros socorros e "qual é
+      mais ácido" dependem de fonte nova (HSDB/NIOSH via PubChem; pKa do Wikidata — §8.1).
+
 ## Pendente com o mantenedor (resumo)
-1. `VERCEL_TOKEN` (arquivo em `secrets/`).
+1. `VERCEL_TOKEN_TIME` (token do time inteiro; ver §3) em `SaibaTudo/secrets/vercel_token_time.txt`.
 2. Origem da chave `apikey-sabetudo.txt`.
 3. Permissão da OpenStax (opcional).
 4. Tokens do Modal e conta do Hugging Face quando o modelo estiver pronto; teto de gasto no Modal.

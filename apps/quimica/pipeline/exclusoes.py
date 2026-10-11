@@ -9,27 +9,29 @@ adicionados pela popularidade; a lista fixa fica como está (ex.: o fosgênio, p
 Medicamentos de uso controlado (morfina, codeína, fentanil, cetamina, diazepam…) continuam: são medicamentos comuns.
 
 Critério: o nome, o nome IUPAC ou um sinônimo do composto é IGUAL (sem acento e sem caixa) a um nome da lista. Não há
-comparação por trecho (evita excluir "fosgênio" por causa de "fosgênio oxima") nem por CAS escrito à mão.
+comparação por trecho (evita excluir "fosgênio" por causa de "fosgênio oxima") nem por CAS escrito à mão. Siglas ambíguas
+ficam de fora da lista ("HN3" é também a fórmula do ácido hidrazoico; "PCP", o pentaclorofenol; "MDA", a metilenodianilina;
+"DMT", o tereftalato de dimetila; "BZ" e "VR" idem): só nomes completos e siglas inequívocas (LSD, MDMA, THC, GHB, VX).
 Fontes da lista: Convenção sobre Armas Químicas, Lista 1 (agentes); Portaria SVS/MS 344/1998, listas F1 e F2
 (substâncias de uso proscrito no Brasil), nomes comuns em português e inglês.
 """
 import unicodedata
 
 GUERRA_QUIMICA = [
-    'sarin', 'soman', 'tabun', 'ciclosarin', 'cyclosarin', 'vx', 'agente vx', 'vx nerve agent', 'vr', 'russian vx',
+    'sarin', 'soman', 'tabun', 'ciclosarin', 'cyclosarin', 'vx', 'agente vx', 'vx nerve agent', 'russian vx',
     'gas mostarda', 'mustard gas', 'sulfur mustard', 'iperita', 'yperite', 'bis(2-chloroethyl) sulfide', 'bis(2-cloroetil) sulfeto',
-    'mostarda nitrogenada', 'nitrogen mustard', 'hn1', 'hn2', 'hn3', 'tris(2-chloroethyl)amine', 'bis(2-chloroethyl)ethylamine',
+    'mostarda nitrogenada', 'nitrogen mustard', 'tris(2-chloroethyl)amine', 'bis(2-chloroethyl)ethylamine',
     'lewisita', 'lewisite', 'fosgenio oxima', 'phosgene oxime', 'novichok', 'a-230', 'a-232', 'a-234',
-    'saxitoxina', 'saxitoxin', 'bz', 'quinuclidinil benzilato', '3-quinuclidinyl benzilate',
+    'saxitoxina', 'saxitoxin', 'quinuclidinil benzilato', '3-quinuclidinyl benzilate',
 ]
 DROGAS_PROSCRITAS = [
     'cocaina', 'cocaine', 'crack', 'heroina', 'heroin', 'diacetilmorfina', 'diacetylmorphine', 'diamorphine',
     'metanfetamina', 'methamphetamine', 'mdma', 'ecstasy', 'midomafetamina', 'midomafetamine', '3,4-methylenedioxymethamphetamine',
-    'mda', 'tenamfetamina', 'tenamfetamine', '3,4-methylenedioxyamphetamine',
+    'tenamfetamina', 'tenamfetamine', '3,4-methylenedioxyamphetamine',
     'lsd', 'lisergida', 'lysergide', 'lysergic acid diethylamide', 'dietilamida do acido lisergico',
     'psilocibina', 'psilocybin', 'psilocina', 'psilocin', 'mescalina', 'mescaline',
-    'dmt', 'dimetiltriptamina', 'dimethyltryptamine', 'n,n-dimethyltryptamine', 'n,n-dimetiltriptamina', '5-meo-dmt',
-    'fenciclidina', 'phencyclidine', 'pcp', 'catinona', 'cathinone', 'metcatinona', 'methcathinone', 'mefedrona', 'mephedrone',
+    'dimetiltriptamina', 'dimethyltryptamine', 'n,n-dimethyltryptamine', 'n,n-dimetiltriptamina', '5-meo-dmt',
+    'fenciclidina', 'fenilciclidina', 'phencyclidine', 'catinona', 'cathinone', 'metcatinona', 'methcathinone', 'mefedrona', 'mephedrone',
     'mdpv', 'metilenodioxipirovalerona', 'methylenedioxypyrovalerone', 'alfa-pvp', 'alpha-pvp',
     'carfentanil', 'carfentanila', 'acetilfentanil', 'acetylfentanyl', '25i-nbome', '2c-b',
     'metaqualona', 'methaqualone', 'tetraidrocanabinol', 'tetrahydrocannabinol', 'thc', 'delta-9-tetrahydrocannabinol',

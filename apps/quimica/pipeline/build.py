@@ -322,7 +322,8 @@ def construir(opts, log=print):
             fontes_usadas.add("clp-eurlex")
 
         log("== compostos")
-        pubchem = PubChem(http)
+        # --pubchem-offline: o PubChem só responde do cache (útil quando ele bloqueia o IP com 429); as outras fontes seguem na rede
+        pubchem = PubChem(HttpCache(pasta=opts.cache, offline=True, log=log) if opts.pubchem_offline else http)
         rapido_n = opts.limite_compostos if opts.limite_compostos is not None else (300 if opts.rapido else None)
         selecao, st_sel = tentar(stats, "selecaoCompostos",
                                  lambda: selecao_compostos.selecionar(http, pubchem, alvo=opts.alvo, rapido_n=rapido_n, log=log),
@@ -456,6 +457,7 @@ def main(argv=None):
     ap.add_argument("--assinar-com", help="chave privada ECDSA (PEM) para assinar o manifesto")
     ap.add_argument("--rapido", action="store_true", help="300 compostos (só lista fixa) e textos reduzidos; para testes e CI")
     ap.add_argument("--offline", action="store_true", help="nunca usa a rede; falha se faltar entrada no cache")
+    ap.add_argument("--pubchem-offline", action="store_true", help="PubChem só do cache (ele bloqueia o IP com 429 depois de muitas requisições)")
     ap.add_argument("--alvo", type=int, default=selecao_compostos.ALVO_PADRAO, help="tamanho do núcleo de compostos")
     ap.add_argument("--limite-compostos", type=int, help="limita o núcleo a N compostos da lista fixa (testes)")
     ap.add_argument("--limite-textos", type=int, help="limita os textos da Wikimedia (testes)")

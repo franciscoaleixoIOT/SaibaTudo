@@ -18,7 +18,7 @@ import coleta_icsc
 import pubchem as P
 import quimica_util as Q
 import wikidata as W
-from http_cache import HttpErro
+from http_cache import CacheMiss, HttpErro
 
 LOTE_ARQUIVO = 200
 LOTE_WIKIDATA = 100
@@ -52,7 +52,24 @@ CONSULTA_ENRIQUECER = """SELECT ?cid ?item ?sl
 
 
 # ------------------------------------------------------------------------------------------------ Wikidata
-def enriquecer_wikidata(http, cids, log=print, excluir_qids=frozenset()):
+def _formula_bate(reg, formula_pubchem):
+    """O item tem fórmula (P274) igual à do PubChem e sem carga (H₂⁺ não representa o H₂ neutro)."""
+    if not formula_pubchem:
+        return False
+    for f in reg.get("formulas", []):
+        f2 = Q.sem_subscritos(f).strip()
+        if f2 and not re.search(r"[+\-⁺⁻]", f2) and Q.hill_igual(f2, formula_pubchem):
+            return True
+    return False
+
+
+def _prefere(novo, atual, formula_pubchem):
+    """Vários itens com o mesmo CID: vence o que tem a fórmula do PubChem; depois, o de mais sitelinks (conferência de
+    11/10/2026: o CID do H₂ aponta também para o íon H₂⁺, que tem mais sitelinks e outro CAS)."""
+    return (_formula_bate(novo, formula_pubchem), novo["sl"]) > (_formula_bate(atual, formula_pubchem), atual["sl"])
+
+
+def enriquecer_wikidata(http, cids, log=print, excluir_qids=frozenset(), formulas_pubchem=None):
     """{cid: {...}} com o item de maior número de sitelinks para cada CID. `excluir_qids`: itens que nunca representam o
     composto (os 118 elementos: o H₂ pegava o CAS do item "hidrogênio", que tem mais sitelinks; conferência de 11/10/2026)."""
     cids = sorted({int(c) for c in cids})
@@ -74,7 +91,7 @@ def enriquecer_wikidata(http, cids, log=print, excluir_qids=frozenset()):
                    "pen": W.valores(l.get("pen")), "apt": W.valores(l.get("apts")), "aen": W.valores(l.get("aens")),
                    "cas": W.valores(l.get("cass")), "formulas": W.valores(l.get("frms")),
                    "chebi": W.valores(l.get("chebis")), "ptwiki": W.valores(l.get("ptws"))}
-            if cid not in por_cid or reg["sl"] > por_cid[cid]["sl"]:
+            if cid not in por_cid or _prefere(reg, por_cid[cid], (formulas_pubchem or {}).get(cid)):
                 por_cid[cid] = reg
         log(f"  [wikidata] enriquecimento {min(i + LOTE_WIKIDATA, len(cids))}/{len(cids)}")
     return por_cid, falhas
@@ -254,13 +271,17 @@ def coletar(http, pubchem, selecao, hoje, frases_h=None, com_ghs=True, com_chebi
     """Devolve (compostos, meta, stats). `meta[cid]` = {"sl", "ptwiki", "qid"} para a etapa de textos."""
     cids = [s["cid"] for s in selecao]
     props = pubchem.propriedades(cids)
-    wd_por_cid, wd_falhas = enriquecer_wikidata(http, cids, log, excluir_qids=qids_elementos)
+    wd_por_cid, wd_falhas = enriquecer_wikidata(http, cids, log, excluir_qids=qids_elementos,
+                                                formulas_pubchem={c: p.get("MolecularFormula") for c, p in props.items() if p})
 
     ghs_por_cid, ghs_falhas = {}, []
     if com_ghs:
         for i, cid in enumerate(cids, 1):
             try:
                 g = pubchem.ghs_harmonizado(cid)
+            except CacheMiss as exc:  # --pubchem-offline sem esta entrada: conta como falha (o limite abaixo decide)
+                ghs_falhas.append({"cid": cid, "erro": f"sem cache: {exc}"[:120]})
+                continue
             except HttpErro as exc:
                 if exc.status == 429:
                     raise

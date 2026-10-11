@@ -142,7 +142,8 @@ def _gerar_massa_molar(ctx: Ctx):
                               f"{r.calc(parc, 'massa_parcial', texto=fmt_plano(parc))}")
             total = info["total"]
             exato4 = arred_sig(total, 4) == total
-            soma = f"Soma: {r.calc(total, 'massa_molar', texto=fmt_plano(total.normalize() if exato4 else total))} g/mol"
+            # exato em 4 algarismos: escreve com os 4 (64,100 → 64,10, não 64,1), igual ao resultado registrado (CaC₂, pacote de 978)
+            soma = f"Soma: {r.calc(total, 'massa_molar', texto=fmt_sig(total, 4) if exato4 else fmt_plano(total))} g/mol"
             if not exato4:
                 soma += f" ≈ {r.calc(total, 'massa_molar', 4)} g/mol (arredondado para {QUATRO})"
             soma += "."

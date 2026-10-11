@@ -34,7 +34,7 @@ object Propriedades {
         p("categoria", "categoria", "elemento", "categoria", "categoria", null, "categoria", "classificacao", "tipo de elemento", "classe do elemento"),
         p("configuracaoEletronica", "configuração eletrônica", "elemento", "configuracaoEletronica", "texto", null, "configuracao eletronica", "distribuicao eletronica"),
         p("eletronegatividade", "eletronegatividade (Pauling)", "elemento", "eletronegatividade", "numero", null, "eletronegatividade"),
-        p("raioAtomicoPm", "raio atômico", "elemento", "raioAtomicoPm", "numero", "pm", "raio atomico", "tamanho do atomo"),
+        p("raioAtomicoPm", "raio atômico (van der Waals)", "elemento", "raioAtomicoPm", "numero", "pm", "raio atomico", "raio de van der waals", "tamanho do atomo"),
         p("afinidadeEletronicaKJmol", "afinidade eletrônica", "elemento", "afinidadeEletronicaKJmol", "numero", "kJ/mol", "afinidade eletronica", "eletroafinidade"),
         p("energiaIonizacaoKJmol", "energia de ionização", "elemento", "energiaIonizacaoKJmol", "numero", "kJ/mol", "energia de ionizacao", "potencial de ionizacao", "primeira energia de ionizacao"),
         p("pontoFusaoK", "ponto de fusão", "elemento", "pontoFusaoK", "temperatura", null, "ponto de fusao", "temperatura de fusao", "fusao", "derrete", "funde"),

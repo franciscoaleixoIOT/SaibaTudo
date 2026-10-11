@@ -65,12 +65,12 @@ PROPS = {
         ("Ordene {a}, {b} e {c} do mais eletronegativo para o menos eletronegativo.", "decrescente"),
         ("Coloque {a}, {b} e {c} em ordem decrescente de eletronegatividade.", "decrescente"),
     ]),
-    "raioAtomicoPm": ("raio atômico", " pm", "medio", [
-        ("Qual átomo é maior, {a} ou {b}?", "maior", "tem o átomo maior (maior raio atômico)"),
-        ("Qual tem maior raio atômico: {a} ou {b}?", "maior", "tem o maior raio atômico"),
-        ("Entre {a} e {b}, qual tem o menor raio atômico?", "menor", "tem o menor raio atômico"),
-        ("Qual átomo é menor: {a} ou {b}?", "menor", "tem o átomo menor (menor raio atômico)"),
-        ("Compare o raio atômico {a_de} e {b_de}: qual é maior?", "maior", "tem o maior raio atômico"),
+    "raioAtomicoPm": ("raio atômico (van der Waals)", " pm", "medio", [
+        ("Qual átomo é maior, {a} ou {b}?", "maior", "tem o átomo maior (maior raio atômico de van der Waals)"),
+        ("Qual tem maior raio atômico: {a} ou {b}?", "maior", "tem o maior raio atômico de van der Waals"),
+        ("Entre {a} e {b}, qual tem o menor raio atômico?", "menor", "tem o menor raio atômico de van der Waals"),
+        ("Qual átomo é menor: {a} ou {b}?", "menor", "tem o átomo menor (menor raio atômico de van der Waals)"),
+        ("Compare o raio atômico {a_de} e {b_de}: qual é maior?", "maior", "tem o maior raio atômico de van der Waals"),
     ], [
         ("Ordene {a}, {b} e {c} em ordem crescente de raio atômico.", "crescente"),
         ("Ordene os átomos {a}, {b} e {c} do maior para o menor.", "decrescente"),
@@ -127,8 +127,8 @@ PROPS = {
 EXTREMOS = {
     "eletronegatividade": [("Qual é o elemento mais eletronegativo {onde}?", "maior", "o mais eletronegativo"),
                            ("Qual é o elemento menos eletronegativo {onde}?", "menor", "o menos eletronegativo")],
-    "raioAtomicoPm": [("Qual elemento {onde} tem o maior raio atômico?", "maior", "o de maior raio atômico"),
-                      ("Qual elemento {onde} tem o menor raio atômico?", "menor", "o de menor raio atômico")],
+    "raioAtomicoPm": [("Qual elemento {onde} tem o maior raio atômico?", "maior", "o de maior raio atômico de van der Waals"),
+                      ("Qual elemento {onde} tem o menor raio atômico?", "menor", "o de menor raio atômico de van der Waals")],
     "energiaIonizacaoKJmol": [("Qual elemento {onde} tem a maior energia de ionização?", "maior", "o de maior energia de ionização"),
                               ("Qual elemento {onde} perde um elétron com mais facilidade?", "menor", "o de menor energia de ionização")],
     "pontoFusaoK": [("Qual elemento {onde} tem o maior ponto de fusão?", "maior", "o de maior ponto de fusão"),

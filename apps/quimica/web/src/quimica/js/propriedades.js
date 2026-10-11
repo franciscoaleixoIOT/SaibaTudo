@@ -17,7 +17,7 @@ export const PROPRIEDADES_PADRAO = [
   { id: 'categoria', rotulo: 'categoria', alvo: 'elemento', campo: 'categoria', tipo: 'categoria', sinonimos: ['categoria', 'classificacao', 'tipo de elemento', 'classe do elemento'] },
   { id: 'configuracaoEletronica', rotulo: 'configuração eletrônica', alvo: 'elemento', campo: 'configuracaoEletronica', tipo: 'texto', sinonimos: ['configuracao eletronica', 'distribuicao eletronica'] },
   { id: 'eletronegatividade', rotulo: 'eletronegatividade (Pauling)', alvo: 'elemento', campo: 'eletronegatividade', tipo: 'numero', sinonimos: ['eletronegatividade'] },
-  { id: 'raioAtomicoPm', rotulo: 'raio atômico', alvo: 'elemento', campo: 'raioAtomicoPm', tipo: 'numero', unidade: 'pm', sinonimos: ['raio atomico', 'tamanho do atomo'] },
+  { id: 'raioAtomicoPm', rotulo: 'raio atômico (van der Waals)', alvo: 'elemento', campo: 'raioAtomicoPm', tipo: 'numero', unidade: 'pm', sinonimos: ['raio atomico', 'raio de van der waals', 'tamanho do atomo'] },
   { id: 'afinidadeEletronicaKJmol', rotulo: 'afinidade eletrônica', alvo: 'elemento', campo: 'afinidadeEletronicaKJmol', tipo: 'numero', unidade: 'kJ/mol', sinonimos: ['afinidade eletronica', 'eletroafinidade'] },
   { id: 'energiaIonizacaoKJmol', rotulo: 'energia de ionização', alvo: 'elemento', campo: 'energiaIonizacaoKJmol', tipo: 'numero', unidade: 'kJ/mol', sinonimos: ['energia de ionizacao', 'potencial de ionizacao', 'primeira energia de ionizacao'] },
   { id: 'pontoFusaoK', rotulo: 'ponto de fusão', alvo: 'elemento', campo: 'pontoFusaoK', tipo: 'temperatura', sinonimos: ['ponto de fusao', 'temperatura de fusao', 'fusao', 'derrete', 'funde'] },

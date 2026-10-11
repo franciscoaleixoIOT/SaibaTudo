@@ -3,7 +3,7 @@ name: Química — Atualização semanal dos dados
 # Reconstrói, valida, assina e publica o pacote de dados de química SEM nova versão do app.
 # Cadência: toda semana (domingo 03:00 de Brasília = 06:00 UTC) e sob demanda. As fontes mudam devagar (PubChem, CODATA,
 # Wikidata, ChEBI, Wikipédia), por isso semanal; o pacote só é publicado se o build mudou algo (hash do manifesto).
-# Alvo fixo de 491 compostos (lista fixa): o alvo padrão de 2000 dispara o limite do PubChem e estoura o tempo.
+# Alvo de 1000 compostos (lista fixa + os mais populares do Wikidata): o alvo padrão de 2000 dispara o limite do PubChem (429).
 # Repositório único: segredos e variáveis com sufixo/prefixo QUIMICA (os sem sufixo são de eleições).
 # Como no app de eleições: testes de INTEGRIDADE bloqueiam a publicação; testes de COMPORTAMENTO só avisam.
 on:
@@ -68,7 +68,7 @@ jobs:
           mkdir -p secrets
           printf '%s' "${{ secrets.DATA_SIGNING_KEY_QUIMICA }}" > secrets/data_signing_key.pem
           ANTES=$(sha256sum data/quimica/manifest.json 2>/dev/null | cut -c1-64 || echo nenhum)
-          ARGS="--alvo 491"
+          ARGS="--alvo 1000"
           if [ "${{ inputs.rapido }}" = "true" ]; then ARGS="--rapido"; fi
           python pipeline/build.py --assinar-com secrets/data_signing_key.pem $ARGS
           python pipeline/sign.py verify data/quimica/manifest.json --public pipeline/data_signing_public.pem

@@ -206,7 +206,7 @@ def r_nome_en(e, r, ctx):
 def r_raio(e, r, ctx):
     if e.get("raioAtomicoPm") is None:
         return None
-    return f"O raio atômico {do(e)} ({e['simbolo']}) é {r.pkg(e['raioAtomicoPm'], P(e, 'raioAtomicoPm'))} pm.{fonte_el(e)}"
+    return f"O raio atômico de van der Waals {do(e)} ({e['simbolo']}) é {r.pkg(e['raioAtomicoPm'], P(e, 'raioAtomicoPm'))} pm.{fonte_el(e)}"
 
 
 def r_ei(e, r, ctx):
@@ -368,7 +368,7 @@ def _gerar_comparacoes(ctx: Ctx):
     props = [
         ("eletronegatividade", "eletronegatividade", "", lambda x: fmt_pacote(x), "maior", "menor"),
         ("massaAtomica", "massa atômica", " u", None, "maior", "menor"),
-        ("raioAtomicoPm", "raio atômico", " pm", None, "maior", "menor"),
+        ("raioAtomicoPm", "raio atômico (van der Waals)", " pm", None, "maior", "menor"),
         ("pontoFusaoK", "ponto de fusão", " K", None, "maior", "menor"),
         ("pontoEbulicaoK", "ponto de ebulição", " K", None, "maior", "menor"),
         ("densidadeKgm3", "densidade", " kg/m³", None, "maior", "menor"),

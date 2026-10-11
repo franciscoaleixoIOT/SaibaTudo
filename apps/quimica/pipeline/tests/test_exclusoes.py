@@ -28,6 +28,11 @@ class Exclusoes(unittest.TestCase):
         self.assertEqual(excluidos, [], 'fosgênio (não é "fosgênio oxima"), medicamentos e a lista fixa ficam')
         self.assertEqual(len(mantidos), 4)
 
+    def test_siglas_ambiguas_nao_excluem_compostos_legitimos(self):
+        for nome, sinonimos in (("Ácido hidrazoico", ["HN3"]), ("Pentaclorofenol", ["PCP"]), ("4,4'-Metilenodianilina", ["MDA"]),
+                                ("Tereftalato de dimetila", ["DMT"])):
+            self.assertIsNone(X.motivo(c(1, nome, sinonimos)), nome)
+
     def test_comparacao_ignora_acento_caixa_e_espacos(self):
         self.assertTrue(X.motivo(c(1, 'Gás  Mostarda')))
         self.assertTrue(X.motivo(c(2, 'x', ['HEROÍNA'])))

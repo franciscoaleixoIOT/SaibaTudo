@@ -10,7 +10,7 @@ harmonizada do Anexo VI); classificações notificadas (ECHA C&L Inventory), NIT
 import re
 import urllib.parse
 
-from http_cache import HttpErro
+from http_cache import CacheMiss, HttpErro
 
 REST = "https://pubchem.ncbi.nlm.nih.gov/rest/pug"
 VIEW = "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view"
@@ -68,7 +68,10 @@ class PubChem:
         cids = sorted({int(c) for c in cids})
         for i in range(0, len(cids), lote):
             parte = cids[i:i + lote]
-            r = self.http.get(f"{REST}/compound/cid/{','.join(map(str, parte))}/synonyms/JSON")
+            try:  # opcional: sem resposta (PubChem bloqueando ou --pubchem-offline sem cache), vale a regra antiga do CAS
+                r = self.http.get(f"{REST}/compound/cid/{','.join(map(str, parte))}/synonyms/JSON")
+            except (HttpErro, CacheMiss):
+                continue
             if r.status != 200:
                 continue
             for inf in r.json().get("InformationList", {}).get("Information", []):

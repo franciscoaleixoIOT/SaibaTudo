@@ -45,6 +45,36 @@ class Cas(unittest.TestCase):
         self.assertEqual(por_cid[783]["cas"], ["1333-74-0"])
 
 
+class SinonimosOpcionais(unittest.TestCase):
+    def test_sem_resposta_do_pubchem_o_desempate_e_pulado_sem_derrubar_o_build(self):
+        import pubchem as PC
+        from http_cache import CacheMiss, HttpErro
+
+        class Http:
+            def __init__(self, erro):
+                self.erro = erro
+
+            def get(self, url):
+                raise self.erro
+        for erro in (CacheMiss("x"), HttpErro(429, "https://pubchem.ncbi.nlm.nih.gov/x")):
+            self.assertEqual(PC.PubChem(Http(erro)).sinonimos([1, 2, 3]), {})
+
+
+class ItemDoWikidata(unittest.TestCase):
+    def test_prefere_o_item_com_a_formula_do_pubchem_ao_de_mais_sitelinks(self):
+        linhas = [{"cid": "783", "item": "http://www.wikidata.org/entity/Q902508", "sl": "17", "cass": "12184-90-6", "frms": "H₂⁺"},
+                  {"cid": "783", "item": "http://www.wikidata.org/entity/Q3027893", "sl": "14", "cass": "1333-74-0", "frms": "H₂"}]
+        original = CC.W.sparql
+        CC.W.sparql = lambda *a, **k: linhas
+        try:
+            por_cid, _ = CC.enriquecer_wikidata(object(), [783], log=lambda *_: None, formulas_pubchem={783: "H2"})
+            sem_formula, _ = CC.enriquecer_wikidata(object(), [783], log=lambda *_: None)
+        finally:
+            CC.W.sparql = original
+        self.assertEqual((por_cid[783]["qid"], por_cid[783]["cas"]), ("Q3027893", ["1333-74-0"]))
+        self.assertEqual(sem_formula[783]["qid"], "Q902508", "sem fórmula do PubChem, a regra antiga (mais sitelinks)")
+
+
 class MassaMolar(unittest.TestCase):
     def test_massa_pela_formula_com_pesos_padrao(self):
         self.assertEqual(CC.massa_pela_formula("PbO", PESOS), 223.2)
