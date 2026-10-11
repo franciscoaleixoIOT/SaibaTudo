@@ -30,6 +30,7 @@ import coleta_wikimedia  # noqa: E402
 import fontes as F  # noqa: E402
 import quimica_util as Q  # noqa: E402
 import regras as R  # noqa: E402
+import exclusoes  # noqa: E402
 import selecao_compostos  # noqa: E402
 from common import dump_json, sha256_file  # noqa: E402
 from http_cache import HttpCache, PASTA_CACHE  # noqa: E402
@@ -331,6 +332,10 @@ def construir(opts, log=print):
                                          lambda: coleta_compostos.coletar(http, pubchem, selecao, hoje, frases_h, log=log),
                                          log, obrigatoria=True)
         stats["familias"]["compostos"].update(st_cmp)
+        # segurança: fora do núcleo os agentes de guerra química e as drogas de uso proscrito que viriam pela popularidade
+        cids_fixos = {s_["cid"] for s_ in selecao if s_.get("origem") != "wikidata"}
+        compostos, excluidos = exclusoes.filtrar_sensiveis(compostos, cids_fixos, log=log)
+        stats["familias"]["compostos"]["excluidosPorSeguranca"] = excluidos
         if any("definicaoChebi" in c for c in compostos):
             fontes_usadas.add("chebi")
 
