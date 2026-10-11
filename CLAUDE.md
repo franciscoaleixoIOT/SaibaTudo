@@ -17,7 +17,8 @@ continuam valendo dentro da pasta.
    `paths: apps/<app>/**`. Num workflow novo, prefixe também concorrência, etiquetas de issue, segredos e variáveis.
    O validador de cada app (`apps/<app>/tools/test_workflows.py`) confere os workflows do seu prefixo.
 3. **Segredos nunca no Git nem no chat.** Locais: `apps/<app>/secrets/` (ignorado). No GitHub: eleições sem sufixo
-   (legado), química com `_QUIMICA`; `VERCEL_TOKEN` e `VERCEL_ORG_ID` compartilhados.
+   (legado), química com `_QUIMICA`; `VERCEL_ORG_ID` compartilhado. `VERCEL_TOKEN` só publica eleições (token restrito);
+   portal e química usam `VERCEL_TOKEN_TIME` (acesso ao time inteiro). Arquivo local: `secrets/` na raiz (ignorado).
 4. **Vercel:** cada app publica da própria pasta (`vercel deploy --prod` dentro de `apps/<app>`, com `.vercelignore`
    próprio). A CLI não lê o `.gitignore`. A cota de uploads é da conta inteira; medir antes de um deploy grande:
    `python apps/quimica/tools/vercel_cota.py --minimo N`.

@@ -20,7 +20,8 @@ oficiais. Tudo é publicado em **https://saibatudo.net**.
   Os endereços públicos não mudaram com a reorganização.
 - **Segredos do GitHub:** os de eleições não têm sufixo (`DATA_SIGNING_KEY`, `VERCEL_PROJECT_ID`…); os de química têm
   `_QUIMICA` (`DATA_SIGNING_KEY_QUIMICA`, `VERCEL_PROJECT_ID_QUIMICA`) e as variáveis, prefixo `QUIMICA_`.
-  `VERCEL_TOKEN` e `VERCEL_ORG_ID` são compartilhados.
+  `VERCEL_ORG_ID` é compartilhado. Tokens da Vercel: `VERCEL_TOKEN` (eleições; restrito àquele projeto) e
+  `VERCEL_TOKEN_TIME` (portal e química; token com acesso ao time inteiro).
 
 Histórico: este repositório se chamava `SaibaTudo-Eleicao2026` (o GitHub redireciona o nome antigo). O antigo
 `SaibaTudo-Quimica` foi incorporado com todo o histórico em `apps/quimica/` e arquivado.

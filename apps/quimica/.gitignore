@@ -43,3 +43,6 @@ Thumbs.db
 
 .vercel
 .env*
+
+# Relatórios locais que usam material de terceiros (ex.: conferência com os livros de referência): nunca vão para o Git
+local/

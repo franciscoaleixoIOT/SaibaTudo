@@ -2,7 +2,8 @@ name: Portal — testes e publicação da home
 
 # A home de saibatudo.net é um projeto próprio (portal/, Vercel saibatudo-portal), servido pelo proxy do projeto de eleições
 # (apps/eleicoes2026/vercel.json). Testa em todo push/PR que toca portal/ e, na main, publica: a home não tem dados
-# agendados, então o push é a publicação.
+# agendados, então o push é a publicação. Token: VERCEL_TOKEN_TIME (acesso ao time inteiro); o VERCEL_TOKEN de eleições
+# é restrito àquele projeto ("User not found" / "Project not found" para os outros). Sem ele, testa e não publica.
 on:
   push:
     branches: [ "main" ]
@@ -44,7 +45,7 @@ jobs:
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_PORTAL }}
-      TEM_VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN != '' }}
+      TEM_VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN_TIME != '' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -55,15 +56,15 @@ jobs:
         run: |
           npm i -g vercel@latest
           for i in 1 2 3; do
-            if vercel deploy --prod --yes --token "${{ secrets.VERCEL_TOKEN }}"; then ok=1; break; fi
+            if vercel deploy --prod --yes --token "${{ secrets.VERCEL_TOKEN_TIME }}"; then ok=1; break; fi
             echo "::warning::deploy falhou (tentativa $i/3)"; sleep $((i * 20))
           done
           [ "${ok:-0}" = "1" ]
       - name: Diagnóstico (só se a publicação falhar) — conta e projetos que o token enxerga
         if: failure()
         run: |
-          vercel whoami --token "${{ secrets.VERCEL_TOKEN }}" 2>&1 | tail -2 || true
-          vercel project ls --token "${{ secrets.VERCEL_TOKEN }}" 2>&1 | grep -E "saibatudo|Projects|found" || true
+          vercel whoami --token "${{ secrets.VERCEL_TOKEN_TIME }}" 2>&1 | tail -2 || true
+          vercel project ls --token "${{ secrets.VERCEL_TOKEN_TIME }}" 2>&1 | grep -E "saibatudo|Projects|found" || true
       - name: Conferir a home publicada (direto e pelo domínio)
         run: |
           curl -fsS -o /dev/null https://saibatudo-portal.vercel.app/

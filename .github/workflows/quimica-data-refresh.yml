@@ -38,7 +38,7 @@ jobs:
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_QUIMICA }}
-      TEM_VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN != '' }}
+      TEM_VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN_TIME != '' }}
       SAIBATUDO_ASK_ENABLED: ${{ vars.QUIMICA_ASK_ENABLED }}
       SAIBATUDO_MELHORIA_ENABLED: ${{ vars.QUIMICA_MELHORIA_ENABLED }}
     steps:
@@ -97,7 +97,7 @@ jobs:
         run: |
           npm i -g vercel@latest
           for i in 1 2 3; do
-            if vercel deploy --prod --yes --token "${{ secrets.VERCEL_TOKEN }}"; then ok=1; break; fi
+            if vercel deploy --prod --yes --token "${{ secrets.VERCEL_TOKEN_TIME }}"; then ok=1; break; fi
             echo "::warning::deploy falhou (tentativa $i/3)"; sleep $((i * 20))
           done
           [ "${ok:-0}" = "1" ]
@@ -122,6 +122,6 @@ jobs:
         run: |
           echo "### Dados de química" >> $GITHUB_STEP_SUMMARY
           echo "Pacote mudou: ${{ steps.build.outputs.mudou }}" >> $GITHUB_STEP_SUMMARY
-          if [ "$TEM_VERCEL_TOKEN" != "true" ]; then echo "::warning::Segredo VERCEL_TOKEN ausente: pacote gerado e assinado, mas NAO publicado."; fi
+          if [ "$TEM_VERCEL_TOKEN" != "true" ]; then echo "::warning::Segredo VERCEL_TOKEN_TIME ausente (token do time inteiro; o VERCEL_TOKEN de eleições só publica aquele projeto): pacote gerado e assinado, mas NAO publicado."; fi
           if [ "${{ steps.comportamento.outcome }}" = "failure" ]; then echo "::warning::Testes de comportamento falharam sobre o pacote novo (publicação mantida): investigar."; fi
           if [ -f data/quimica/stats.json ]; then python -c "import json;s=json.load(open('data/quimica/stats.json'));print({k:v for k,v in s.items() if not isinstance(v,(dict,list))})" >> $GITHUB_STEP_SUMMARY; fi
