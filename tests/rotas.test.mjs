@@ -39,3 +39,19 @@ test('o service worker da home (escopo /) não intercepta nenhum app servido por
   assert.ok(prefixos.includes('quimica'));
   for (const p of prefixos) assert.ok(sw.includes(`p.startsWith('/${p}/')`), `portal/src/sw.js precisa ignorar /${p}/`);
 });
+
+test('todo link da home para um app tem rota (próprio de eleições ou proxy exato), inclusive os cartões fixos', () => {
+  const html = readFileSync(join(RAIZ, 'portal/src/index.html'), 'utf8');
+  const PROPRIOS = ['/', '/eleicoes2026/', '/privacidade', '/sobre-os-dados'];
+  const links = [...html.matchAll(/href="(\/[^"#?]*)"/g)].map((m) => m[1]).filter((u) => !u.startsWith('/portal/') && u !== '/manifest.webmanifest');
+  assert.ok(links.includes('/quimica/') && links.includes('/eleicoes2026/'), 'a home leva aos dois apps');
+  for (const u of links) assert.ok(PROPRIOS.includes(u) || por[u], `link da home sem rota: ${u}`);
+});
+
+test('os números do app de química citados na home batem com o pacote publicado (data-num ↔ manifest.contagens)', () => {
+  const html = readFileSync(join(RAIZ, 'portal/src/index.html'), 'utf8');
+  const contagens = JSON.parse(readFileSync(join(RAIZ, 'apps/quimica/data/quimica/manifest.json'), 'utf8')).contagens;
+  const nums = [...html.matchAll(/<span data-num="([A-Za-z]+)">(\d+)<\/span>/g)];
+  assert.ok(nums.length >= 3, 'a home cita elementos, compostos e compostos com GHS');
+  for (const [, chave, valor] of nums) assert.equal(Number(valor), contagens[chave], `home diz ${valor} ${chave}; o pacote tem ${contagens[chave]}`);
+});

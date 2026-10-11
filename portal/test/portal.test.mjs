@@ -41,6 +41,10 @@ test('todo recurso local da home existe no próprio projeto (independente de ele
   for (const m of ler('portal/base.css').matchAll(/url\("([^"]+)"\)/g)) assert.ok(existe(m[1]), `CSS aponta para arquivo ausente: ${m[1]}`);
   for (const i of JSON.parse(ler('manifest.webmanifest')).icons) assert.ok(existe(i.src), `ícone do manifesto ausente: ${i.src}`);
   assert.equal(readFileSync(join(OUT, 'portal/fonts/poppins-semibold.woff')).subarray(0, 4).toString('latin1'), 'wOFF');
+  // os dois apps têm destaque: botão no topo e cartão principal com ícone próprio
+  assert.match(html, /class="hero-acoes">[\s\S]*href="\/eleicoes2026\/"[\s\S]*href="\/quimica\/"[\s\S]*?<\/p>/);
+  assert.equal((html.match(/class="card app-principal/g) || []).length, 2);
+  assert.ok(html.includes('/portal/brand/svg/quimica-icon.svg') && html.includes('/portal/brand/svg/eleicoes2026-icon.svg'));
 });
 
 test('módulos da home: apps.js e icons.js carregam; cada app tem id, nome e endereço no mesmo domínio', async () => {

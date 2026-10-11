@@ -9,18 +9,10 @@
 export const GOOGLE_PLAY_URL = '';
 
 /**
- * Apps disponíveis além do cartão principal (SaibaTudo — Eleições 2026, que é fixo no HTML da home).
+ * Apps disponíveis além dos cartões principais (Eleições 2026 e Química, fixos no HTML da home).
  * Formato: { id, nome, descricao, url, playUrl? }
  */
-export const APPS = [
-  {
-    id: 'quimica',
-    nome: 'SaibaTudo Química',
-    descricao: 'Elementos, compostos, propriedades, segurança química e cálculos de química geral com fontes abertas (PubChem, Wikidata, CODATA, ChEBI, Wikipédia e Wikilivros). ' +
-      'Desenha moléculas e fórmulas; todo número vem dos dados, com a fonte citada. Repositório: SaibaTudo (pasta apps/quimica).',
-    url: '/quimica/'
-  }
-];
+export const APPS = [];
 
 /**
  * Apps planejados ("Em breve"). Formato: { id, titulo, descricao, repo? }

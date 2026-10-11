@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>SaibaTudo — Informação cívica verificada</title>
-  <meta name="description" content="SaibaTudo: aplicativos cívicos independentes, de código aberto e sem anúncios. Consulte candidaturas, pesquisas registradas, regras e resultados das Eleições 2026 com dados abertos do TSE.">
+  <title>SaibaTudo — Informação verificada: Eleições 2026 e Química</title>
+  <meta name="description" content="SaibaTudo: aplicativos independentes, de código aberto e sem anúncios. Eleições 2026: candidaturas, pesquisas registradas, regras e resultados com dados abertos do TSE. Química: tabela periódica, compostos com estrutura 2D, calculadoras com passo a passo e segurança química com dados abertos.">
   <link rel="canonical" href="https://saibatudo.net/">
   <meta name="theme-color" content="#0C2340">
   <meta name="color-scheme" content="light dark">
@@ -13,16 +13,16 @@
   <meta property="og:type" content="website">
   <meta property="og:locale" content="pt_BR">
   <meta property="og:site_name" content="SaibaTudo">
-  <meta property="og:title" content="SaibaTudo — Informação cívica verificada">
-  <meta property="og:description" content="Aplicativos cívicos independentes e de código aberto. Eleições 2026: candidaturas, pesquisas registradas, regras e resultados com dados abertos do TSE.">
+  <meta property="og:title" content="SaibaTudo — Informação verificada: Eleições 2026 e Química">
+  <meta property="og:description" content="Aplicativos independentes e de código aberto. Eleições 2026 com dados abertos do TSE; Química com tabela periódica, compostos, calculadoras e segurança química a partir de fontes abertas.">
   <meta property="og:url" content="https://saibatudo.net/">
   <meta property="og:image" content="https://saibatudo.net/portal/brand/og-symbol-1200.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="1200">
   <meta property="og:image:alt" content="Símbolo SaibaTudo: lupa com marca de verificação">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="SaibaTudo — Informação cívica verificada">
-  <meta name="twitter:description" content="Aplicativos cívicos independentes e de código aberto, com dados oficiais e sem anúncios.">
+  <meta name="twitter:title" content="SaibaTudo — Informação verificada: Eleições 2026 e Química">
+  <meta name="twitter:description" content="Aplicativos independentes e de código aberto, com dados oficiais e abertos e sem anúncios: Eleições 2026 e Química.">
   <meta name="twitter:image" content="https://saibatudo.net/portal/brand/og-symbol-1200.png">
 
   <link rel="icon" href="/portal/brand/favicon-32.png" type="image/png" sizes="32x32">
@@ -63,8 +63,9 @@
       <div class="hero-in">
         <img class="hero-logo" src="/portal/brand/svg/saibatudo-logo-horizontal-dark.svg" width="900" height="216" alt="SaibaTudo — Informação cívica verificada">
         <h1 id="titulo-hero">Informação cívica verificada</h1>
-        <p class="hero-sub">Aplicativos independentes, de código aberto e sem anúncios, que reúnem dados oficiais para você consultar os fatos e decidir por conta própria.</p>
-        <p class="hero-acoes"><a class="btn btn-ouro grande" href="/eleicoes2026/">Abrir app Eleições 2026</a></p>
+        <p class="hero-sub">Aplicativos independentes, de código aberto e sem anúncios, que reúnem dados oficiais e abertos — das eleições à química — para você consultar os fatos e decidir por conta própria.</p>
+        <p class="hero-acoes"><a class="btn btn-ouro grande" href="/eleicoes2026/">Abrir app Eleições 2026</a>
+          <a class="btn btn-contorno-claro grande" href="/quimica/">Abrir app Química</a></p>
       </div>
     </section>
 
@@ -89,34 +90,53 @@
           <p class="mini mudo" id="play-nota">A versão para Android na Google Play ainda não foi publicada. Enquanto isso, use o app web: ele pode ser instalado e funciona offline.</p>
         </div>
       </article>
+      <article class="card app-principal app-quimica">
+        <img class="app-icone" src="/portal/brand/svg/quimica-icon.svg" width="88" height="88" alt="">
+        <div class="app-corpo">
+          <p class="selo">Química geral — do ensino médio à graduação</p>
+          <h3>SaibaTudo — Química</h3>
+          <p>Tabela periódica, compostos e calculadoras com dados abertos e verificados. Pergunte em português — por exemplo, “massa molar da água” ou “pH de HCl 0,01 mol/L” — e a resposta sai dos dados, com a fonte de cada número e o passo a passo dos cálculos.</p>
+          <ul class="vantagens">
+            <li>Tabela periódica interativa com os <span data-num="elementos">118</span> elementos e suas propriedades (massa atômica, eletronegatividade, raio, energia de ionização, fusão e ebulição)</li>
+            <li><span data-num="compostos">491</span> compostos com fórmula, massa molar, nome IUPAC e estrutura desenhada em 2D; <span data-num="compostosComGhsHarmonizado">195</span> com os perigos oficiais do rótulo (GHS)</li>
+            <li>Calculadoras com passo a passo: massa molar, balanceamento de equações, estequiometria, concentração e diluição, pH, gás ideal e conversão de unidades</li>
+            <li>Fontes abertas citadas em cada resposta: PubChem, Wikidata, CODATA, ChEBI, Wikipédia e Wikilivros</li>
+            <li>Segurança em primeiro lugar: pedidos perigosos são recusados e os riscos de cada substância aparecem na ficha</li>
+          </ul>
+          <div class="acoes">
+            <a class="btn btn-primario grande" href="/quimica/">Abrir app Química</a>
+          </div>
+          <p class="mini mudo">Funciona offline e nada sai do seu aparelho. A versão para Android está em preparação; enquanto isso, o app web pode ser instalado.</p>
+        </div>
+      </article>
       <div id="apps-extra" class="grade-cards"></div>
     </section>
 
     <section class="secao" aria-labelledby="titulo-confianca">
       <h2 id="titulo-confianca">Por que confiar</h2>
       <ul class="grade-cards pilares">
-        <li class="card"><span data-icone="verified" data-tam="28" class="pilar-ic"></span><h3>Dados oficiais</h3><p>Tudo vem dos arquivos abertos do TSE. Cada resposta traz a fonte e a data da extração. Nada é simulado ou inventado.</p></li>
-        <li class="card"><span data-icone="scale" data-tam="28" class="pilar-ic"></span><h3>Neutro e independente</h3><p>Sem vínculo com o TSE, o governo ou partidos. Não indicamos, comparamos nem prevemos candidatos: a decisão do voto é sua.</p></li>
+        <li class="card"><span data-icone="verified" data-tam="28" class="pilar-ic"></span><h3>Dados oficiais e abertos</h3><p>Eleições: arquivos abertos do TSE. Química: PubChem, Wikidata, CODATA e textos abertos. Cada resposta traz a fonte; nada é simulado ou inventado.</p></li>
+        <li class="card"><span data-icone="scale" data-tam="28" class="pilar-ic"></span><h3>Neutro, independente e seguro</h3><p>Sem vínculo com o TSE, o governo ou partidos: não indicamos, comparamos nem prevemos candidatos. Em química, pedidos perigosos são recusados.</p></li>
         <li class="card"><span data-icone="github" data-tam="28" class="pilar-ic"></span><h3>Aberto e sem anúncios</h3><p>Código aberto sob licença MIT, auditável por qualquer pessoa. Sem anúncios e sem cadastro para consultar.</p></li>
       </ul>
     </section>
 
     <section id="instalar" class="secao" aria-labelledby="titulo-instalar">
       <h2 id="titulo-instalar">Instale no seu aparelho</h2>
-      <p class="mudo">O app Eleições 2026 é um PWA: funciona no navegador e pode ser instalado como aplicativo, inclusive para uso offline com os dados já carregados. Abra o app e use o botão <strong>Instalar app</strong>, ou siga o passo a passo do seu aparelho.</p>
+      <p class="mudo">Os apps Eleições 2026 e Química são PWAs: funcionam no navegador e podem ser instalados como aplicativo, inclusive para uso offline com os dados já carregados. Abra o app e use o botão <strong>Instalar app</strong>, ou siga o passo a passo do seu aparelho.</p>
       <div class="grade-cards instal">
         <article class="card">
           <h3>Android</h3>
           <ol class="passos">
-            <li>Abra o app Eleições 2026 no Chrome ou Edge.</li>
+            <li>Abra o app (Eleições 2026 ou Química) no Chrome ou Edge.</li>
             <li>Toque em <strong>Instalar app</strong> (ou no menu ⋮ → <em>Instalar aplicativo</em> / <em>Adicionar à tela inicial</em>).</li>
-            <li>Google Play: em breve.</li>
+            <li>Google Play: em breve para os dois apps.</li>
           </ol>
         </article>
         <article class="card">
           <h3>iPhone e iPad</h3>
           <ol class="passos">
-            <li>Abra o app Eleições 2026 no Safari.</li>
+            <li>Abra o app (Eleições 2026 ou Química) no Safari.</li>
             <li>Toque em <strong>Compartilhar</strong> (quadrado com seta para cima).</li>
             <li>Escolha <strong>Adicionar à Tela de Início</strong> e confirme.</li>
           </ol>
@@ -124,13 +144,14 @@
         <article class="card">
           <h3>Windows, Mac e Linux</h3>
           <ol class="passos">
-            <li>Abra o app Eleições 2026 no Chrome ou Edge.</li>
+            <li>Abra o app (Eleições 2026 ou Química) no Chrome ou Edge.</li>
             <li>Clique no botão <strong>Instalar app</strong> ou no ícone de instalação na barra de endereço.</li>
             <li>O app abre em janela própria, como qualquer programa.</li>
           </ol>
         </article>
       </div>
       <p class="acoes"><a class="btn btn-primario" href="/eleicoes2026/">Abrir app Eleições 2026</a>
+        <a class="btn btn-primario" href="/quimica/">Abrir app Química</a>
         <button type="button" id="btn-instalar" class="btn btn-contorno" hidden><span data-icone="download" data-tam="18"></span>Instalar o portal SaibaTudo</button></p>
     </section>
 
@@ -144,7 +165,8 @@
         </article>
         <article class="card">
           <h3>Fontes oficiais</h3>
-          <p>Dados do <a href="https://dadosabertos.tse.jus.br/" target="_blank" rel="noopener noreferrer">Portal de Dados Abertos do TSE</a>, licença CC BY 4.0. Em caso de divergência, vale sempre o site oficial do TSE.</p>
+          <p>Eleições: <a href="https://dadosabertos.tse.jus.br/" target="_blank" rel="noopener noreferrer">Portal de Dados Abertos do TSE</a>, licença CC BY 4.0; em caso de divergência, vale sempre o site oficial do TSE.</p>
+          <p>Química: PubChem (domínio público), Wikidata (CC0), CODATA/NIST, ChEBI (CC BY 4.0), Wikipédia e Wikilivros (CC BY-SA 4.0); a página “Sobre os dados” do app lista versão e licença de cada fonte.</p>
           <p><a href="/sobre-os-dados">Sobre os dados: versão, fontes e limitações</a></p>
         </article>
         <article class="card">
@@ -172,7 +194,7 @@
       <a href="/sobre-os-dados">Sobre os dados</a>
       <a href="https://github.com/franciscoaleixoIOT/SaibaTudo" target="_blank" rel="noopener noreferrer">GitHub</a>
     </nav>
-    <p class="mini">SaibaTudo é independente, apartidário e não tem vínculo com o TSE, com o governo ou com partidos. Dados: Tribunal Superior Eleitoral — Portal de Dados Abertos, licença CC BY 4.0. Código sob licença MIT.</p>
+    <p class="mini">SaibaTudo é independente, apartidário e não tem vínculo com o TSE, com o governo ou com partidos. Dados eleitorais: Tribunal Superior Eleitoral — Portal de Dados Abertos, licença CC BY 4.0. Dados de química: PubChem, Wikidata, CODATA/NIST, ChEBI, Wikipédia e Wikilivros. Código sob licença MIT.</p>
   </footer>
 
   <script type="module" src="/portal/home.js"></script>

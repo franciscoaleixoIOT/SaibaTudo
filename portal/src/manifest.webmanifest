@@ -2,7 +2,7 @@
   "id": "/",
   "name": "SaibaTudo",
   "short_name": "SaibaTudo",
-  "description": "Informação cívica verificada: aplicativos independentes, de código aberto e sem anúncios, com dados oficiais.",
+  "description": "Informação verificada: aplicativos independentes, de código aberto e sem anúncios, com dados oficiais e abertos — Eleições 2026 e Química.",
   "lang": "pt-BR",
   "dir": "ltr",
   "start_url": "/?source=pwa",
@@ -10,19 +10,61 @@
   "display": "standalone",
   "theme_color": "#0C2340",
   "background_color": "#0C2340",
-  "categories": ["government", "news", "utilities"],
+  "categories": [
+    "government",
+    "news",
+    "utilities"
+  ],
   "icons": [
-    { "src": "/portal/brand/pwa-saibatudo-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/portal/brand/pwa-saibatudo-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "/portal/brand/pwa-saibatudo-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
-    { "src": "/portal/brand/pwa-saibatudo-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "/portal/brand/pwa-saibatudo-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/portal/brand/pwa-saibatudo-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/portal/brand/pwa-saibatudo-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/portal/brand/pwa-saibatudo-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ],
   "shortcuts": [
     {
       "name": "Eleições 2026",
       "short_name": "Eleições 2026",
       "url": "/eleicoes2026/?source=shortcut",
-      "icons": [{ "src": "/portal/brand/pwa-eleicoes2026-192.png", "sizes": "192x192", "type": "image/png" }]
+      "icons": [
+        {
+          "src": "/portal/brand/pwa-eleicoes2026-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Química",
+      "short_name": "Química",
+      "url": "/quimica/?source=shortcut",
+      "icons": [
+        {
+          "src": "/portal/brand/pwa-quimica-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }
