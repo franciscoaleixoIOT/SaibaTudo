@@ -93,7 +93,8 @@ jobs:
 
       - name: Publicar na Vercel (site e dados)
         id: publicar
-        if: steps.build.outcome == 'success' && env.VERCEL_PROJECT_ID != '' && env.TEM_VERCEL_TOKEN == 'true' && (steps.build.outputs.mudou == 'true' || github.event_name == 'workflow_dispatch')
+        # o modo rápido (pacote reduzido, só para testar o fluxo) NUNCA publica
+        if: steps.build.outcome == 'success' && env.VERCEL_PROJECT_ID != '' && env.TEM_VERCEL_TOKEN == 'true' && inputs.rapido != true && (steps.build.outputs.mudou == 'true' || github.event_name == 'workflow_dispatch')
         run: |
           npm i -g vercel@latest
           for i in 1 2 3; do
