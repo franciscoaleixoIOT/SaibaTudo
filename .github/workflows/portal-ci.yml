@@ -59,6 +59,11 @@ jobs:
             echo "::warning::deploy falhou (tentativa $i/3)"; sleep $((i * 20))
           done
           [ "${ok:-0}" = "1" ]
+      - name: Diagnóstico (só se a publicação falhar) — conta e projetos que o token enxerga
+        if: failure()
+        run: |
+          vercel whoami --token "${{ secrets.VERCEL_TOKEN }}" 2>&1 | tail -2 || true
+          vercel project ls --token "${{ secrets.VERCEL_TOKEN }}" 2>&1 | grep -E "saibatudo|Projects|found" || true
       - name: Conferir a home publicada (direto e pelo domínio)
         run: |
           curl -fsS -o /dev/null https://saibatudo-portal.vercel.app/
