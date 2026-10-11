@@ -56,7 +56,7 @@ jobs:
 
       - name: Cache de coleta (ETag, corpos das fontes)
         if: inputs.forcar != true
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: apps/quimica/pipeline/.cache
           key: coleta-${{ github.run_id }}
@@ -117,6 +117,15 @@ jobs:
             git pull -q --rebase origin main
             git push -q origin HEAD:main
           fi
+
+      # Guarda o cache MESMO quando o build falha: o PubChem bloqueia (429) depois de ~1.000 consultas e um runner sem cache
+      # nunca terminaria; assim cada execução aproveita o que a anterior já baixou (11/10/2026: a 1ª execução agendada falhou assim).
+      - name: Guardar o cache de coleta (sempre)
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: apps/quimica/pipeline/.cache
+          key: coleta-${{ github.run_id }}
 
       - name: Resumo
         if: always()
