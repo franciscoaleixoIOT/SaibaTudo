@@ -1,6 +1,12 @@
 # SaibaTudo Química — guia para agentes de código
 
-Segundo app do ecossistema SaibaTudo (o primeiro é o **SaibaTudo Eleições 2026**, em `../SaibaTudoEleicao2026`, que é o **molde**: mesma estrutura, mesmos padrões de teste,
+> **Repositório único (11/10/2026).** Este app vive em `apps/quimica/` do repositório `franciscoaleixoIOT/SaibaTudo`
+> (o antigo `SaibaTudo-Quimica` foi incorporado com todo o histórico e arquivado). Rode os comandos daqui. Workflows na
+> raiz: `.github/workflows/quimica-*.yml`; segredos `DATA_SIGNING_KEY_QUIMICA`, `VERCEL_PROJECT_ID_QUIMICA` e
+> `VERCEL_TOKEN_TIME` (token do time inteiro — **falta criar**; sem ele a atualização semanal gera e assina o pacote, mas
+> não publica). O app de eleições, que era o molde, está em `../eleicoes2026/`. Guia da raiz: [`../../CLAUDE.md`](../../CLAUDE.md).
+
+Segundo app do ecossistema SaibaTudo (o primeiro é o **SaibaTudo Eleições 2026**, em `../eleicoes2026`, que é o **molde**: mesma estrutura, mesmos padrões de teste,
 mesmo pipeline de publicação; leia o `CLAUDE.md` e o `docs/PROJECT_MEMORY.md` de lá quando precisar de um padrão). Tudo o que o usuário lê é em **português do Brasil**.
 
 **Leia antes de codar:** `docs/ARCHITECTURE.md` (princípios, fluxo, modelo, desenho), `docs/DATA_CONTRACT.md` (esquemas), `docs/FONTES_E_LICENCAS.md` (o que pode entrar),

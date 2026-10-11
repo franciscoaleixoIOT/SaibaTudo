@@ -1,5 +1,11 @@
 # SaibaTudo Eleições 2026 — guia para agentes de código
 
+> **Repositório único (11/10/2026).** Este app vive em `apps/eleicoes2026/` do repositório `franciscoaleixoIOT/SaibaTudo`
+> (o antigo `SaibaTudo-Eleicao2026`, renomeado; o GitHub redireciona). Rode os comandos daqui. Workflows na raiz, com prefixo:
+> `.github/workflows/eleicoes-*.yml` (publicar: `gh workflow run eleicoes-data-refresh.yml`). A **home** de saibatudo.net saiu
+> deste app: é o projeto `portal/` (Vercel `saibatudo-portal`), servido pelas regras de proxy do `vercel.json` daqui. O
+> `VERCEL_TOKEN` do GitHub é restrito a este projeto. Guia da raiz: [`../../CLAUDE.md`](../../CLAUDE.md).
+
 App Android + site/PWA cívico, **independente e sem anúncios**, com dados abertos do TSE (Eleições Gerais 2026). Um assistente responde **só com dados oficiais**:
 a IA interpreta a pergunta, os dados respondem. Idioma de tudo o que o usuário lê: **português do Brasil**. Commits e código em inglês/misto, como já está.
 
@@ -37,7 +43,7 @@ JAVA_HOME="/c/Program Files/Android/Android Studio/jbr" ./gradlew.bat --console=
 Antes de dizer "corrigido": **reproduza, corrija, meça de novo** (varredura de todos os candidatos, comparação antigo × novo sobre perguntas conhecidas, resposta real do TSE como amostra) e teste **ao vivo** depois do deploy.
 
 ## Onde mora cada coisa
-`app/` Android · `web/` site e PWA (JS puro) · `api/` funções da Vercel · `pipeline/` dados do TSE · `backend/modal/` serviços e gate do modelo ·
+`app/` Android · `web/` site e PWA (JS puro; a home de saibatudo.net é `../../portal/`) · `api/` funções da Vercel · `pipeline/` dados do TSE · `backend/modal/` serviços e gate do modelo ·
 `backend/retrain/` dados de treino · `backend/hf_space_qwen7b/` Space do texto gerado · `ai_model/` scripts de treino (saídas fora do Git) ·
 `contracts/` casos compartilhados Android×site×servidor · `eval/` histórico do painel (**só um arquivo por modelo em produção**; o resto em `eval/local/`) ·
 `tools/` verificações do CI · `docs/` documentação.

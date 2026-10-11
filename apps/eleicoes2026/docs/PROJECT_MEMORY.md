@@ -1,5 +1,11 @@
 # Memória do projeto — SaibaTudo Eleições 2026
 
+> **Repositório único (11/10/2026).** Este app vive em `apps/eleicoes2026/` do repositório `franciscoaleixoIOT/SaibaTudo`
+> (o antigo `SaibaTudo-Eleicao2026`, renomeado; o GitHub redireciona). Rode os comandos daqui. Workflows na raiz, com prefixo:
+> `.github/workflows/eleicoes-*.yml` (publicar: `gh workflow run eleicoes-data-refresh.yml`). A **home** de saibatudo.net saiu
+> deste app: é o projeto `portal/` (Vercel `saibatudo-portal`), servido pelas regras de proxy do `vercel.json` daqui. O
+> `VERCEL_TOKEN` do GitHub é restrito a este projeto. Guia da raiz: [`../../../CLAUDE.md`](../../../CLAUDE.md).
+
 > **Atualizado em 09/10/2026** (entre o 1º turno, 04/10, e o 2º, 25/10). Feito para que outra pessoa, ou outra sessão do Claude, assuma o projeto sem contexto prévio:
 > o que está no ar, **como publicar**, **como testar**, o que o mantenedor decidiu e o que já deu errado.
 > Estado operacional contínuo (alertas, chaves de desligamento, ciclo de auto-melhoria): [`OPERACAO.md`](OPERACAO.md).

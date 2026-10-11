@@ -1,5 +1,11 @@
 # Memória do projeto — SaibaTudo Química
 
+> **Repositório único (11/10/2026).** Este app vive em `apps/quimica/` do repositório `franciscoaleixoIOT/SaibaTudo`
+> (o antigo `SaibaTudo-Quimica` foi incorporado com todo o histórico e arquivado). Rode os comandos daqui. Workflows na
+> raiz: `.github/workflows/quimica-*.yml`; segredos `DATA_SIGNING_KEY_QUIMICA`, `VERCEL_PROJECT_ID_QUIMICA` e
+> `VERCEL_TOKEN_TIME` (token do time inteiro — **falta criar**; sem ele a atualização semanal gera e assina o pacote, mas
+> não publica). O app de eleições, que era o molde, está em `../eleicoes2026/`. Guia da raiz: [`../../../CLAUDE.md`](../../../CLAUDE.md).
+
 > **Atualizado em 10/10/2026, 23h (horário de Brasília).** Feito para que outra pessoa, ou outra sessão de agente, continue o projeto sem contexto prévio. O que falta está em
 > [`PENDENCIAS.md`](PENDENCIAS.md). Guia curto para agentes: [`../CLAUDE.md`](../CLAUDE.md). Arquitetura: [`ARCHITECTURE.md`](ARCHITECTURE.md). Contrato de dados:
 > [`DATA_CONTRACT.md`](DATA_CONTRACT.md). Fontes e licenças: [`FONTES_E_LICENCAS.md`](FONTES_E_LICENCAS.md). Modelo: [`MODELO.md`](MODELO.md). Plano por fases: [`PLANO.md`](PLANO.md).
