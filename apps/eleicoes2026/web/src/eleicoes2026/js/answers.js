@@ -119,6 +119,21 @@ export function usaMeuEstado(consulta, ufPadrao) {
     !RX_BRASIL_TODO.test(normalizar(consulta.textoOriginal ?? ''));
 }
 
+/** Linhas que antecedem a resposta de resultados: o mais votado (quando perguntado) e o aviso de "deputado" genérico. */
+export function anotarResultado(r, { generico = null, uf = null, maisVotado = null } = {}) {
+  const linhas = [];
+  if (maisVotado) {
+    linhas.push(`Mais votado(a): ${maisVotado.nome} (${maisVotado.partido}), nº ${maisVotado.numero} — ${inteiro(maisVotado.votos)} votos` +
+      (maisVotado.percentual != null ? ` (${maisVotado.percentual}%)` : '') + (maisVotado.eleito ? ' — ELEITO' : '') + '.');
+  }
+  if (generico === 'DEPUTADO_FEDERAL') {
+    const onde = uf && uf !== 'BR' ? ` em ${uf}` : '';
+    linhas.push(`Você perguntou por "deputado": mostrei Deputado Federal${onde}. Para a Assembleia, pergunte "deputado estadual mais votado${onde}".`);
+  }
+  if (!linhas.length || !r.directAnswer) return r;
+  return { ...r, directAnswer: linhas.join('\n') + '\n\n' + r.directAnswer };
+}
+
 export class AnswerBuilder {
   /**
    * @param {object} o
@@ -944,7 +959,11 @@ export class AnswerBuilder {
   // ------------------------------------------------------------------ resultados
 
   async resultados(p) {
-    const cargo = p.cargo ?? null;
+    const textoNorm = normalizar(p.textoOriginal ?? '');
+    // "deputado mais votado" sem federal/estadual: a Câmara é o padrão e o aviso oferece a Assembleia (antes o app pedia o cargo
+    // de novo, e a IA da nuvem recebia esse pedido como contexto e dizia que não tinha o dado — 11/10/2026)
+    const generico = p.cargo == null && /\bdeputad[oa]s?\b/.test(textoNorm) ? 'DEPUTADO_FEDERAL' : null;
+    const cargo = p.cargo ?? generico;
     const abrir = filtros({ cargo, estadoUf: p.uf, resetar: true });
     if (!this.fase.mostraResultados) {
       return resposta({
@@ -982,7 +1001,9 @@ export class AnswerBuilder {
     const turno = ehLegislativo ? 1 : (p.turno ?? (['ENTRE_TURNOS', 'DIA_2T', 'POS_ELEICAO'].includes(this.fase.id) ? 2 : 1));
     let ap = await this.obterApuracao(cargoConsulta, uf, turno);
     if (!ap && turno === 2) ap = await this.obterApuracao(cargoConsulta, uf, 1);
-    return ap && apTemVotos(ap) ? this.respostaApuracao(p, ap, abrir) : this.respostaResultadosCsv(p, cargoConsulta, uf, turno, abrir);
+    const comVotos = Boolean(ap && apTemVotos(ap));
+    const r = comVotos ? this.respostaApuracao(p, ap, abrir) : this.respostaResultadosCsv(p, cargoConsulta, uf, turno, abrir);
+    return anotarResultado(r, { generico, uf, maisVotado: comVotos && /mais votad/.test(textoNorm) ? decrescente(ap.linhas, (l) => l.votos)[0] : null });
   }
 
   async obterApuracao(cargo, uf, turno) {

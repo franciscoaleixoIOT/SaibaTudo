@@ -17,8 +17,13 @@ import net.saibatudo.eleicoes2026.domain.model.tituloCargo
 
 // ------------------------------------------------------------------ resultados
 
+private val RX_DEPUTADO_GENERICO = Regex("""\bdeputad[oa]s?\b""")
+
 internal suspend fun AnswerBuilder.resultados(p: ParsedQuery): AiMenuResponse {
-    val cargo = p.cargo
+    val textoNorm = (p.textoOriginal ?: "").lowercase()
+    // "deputado mais votado" sem federal/estadual: a Câmara é o padrão e o aviso oferece a Assembleia (paridade com o site)
+    val generico = if (p.cargo == null && RX_DEPUTADO_GENERICO.containsMatchIn(textoNorm)) "DEPUTADO_FEDERAL" else null
+    val cargo = p.cargo ?: generico
     val abrir = AiFilterExtraction(cargo = cargo, estadoUf = p.uf, resetar = true)
     if (!fase.mostraResultados) {
         return AiMenuResponse(
@@ -56,8 +61,26 @@ internal suspend fun AnswerBuilder.resultados(p: ParsedQuery): AiMenuResponse {
     val ehLegislativo = cargoConsulta in setOf("SENADOR", "DEPUTADO_FEDERAL", "DEPUTADO_ESTADUAL", "DEPUTADO_DISTRITAL")
     val turno = if (ehLegislativo) 1 else (p.turno ?: if (fase == FaseEleitoral.ENTRE_TURNOS || fase == FaseEleitoral.DIA_2T || fase == FaseEleitoral.POS_ELEICAO) 2 else 1)
     val ap = obterApuracao(cargoConsulta, uf, turno) ?: (if (turno == 2) obterApuracao(cargoConsulta, uf, 1) else null)
-    return if (ap != null && ap.temVotos) respostaApuracao(p, ap, abrir)
-    else respostaResultadosCsv(p, cargoConsulta, uf, turno, abrir)
+    val comVotos = ap != null && ap.temVotos
+    val r = if (comVotos) respostaApuracao(p, ap!!, abrir) else respostaResultadosCsv(p, cargoConsulta, uf, turno, abrir)
+    val maisVotado = if (comVotos && textoNorm.contains("mais votad")) ap!!.linhas.maxByOrNull { it.votos } else null
+    return anotarResultado(r, generico, uf, maisVotado)
+}
+
+/** Linhas que antecedem a resposta de resultados: o mais votado (quando perguntado) e o aviso de "deputado" genérico. */
+internal fun AnswerBuilder.anotarResultado(r: AiMenuResponse, generico: String?, uf: String?, maisVotado: LinhaApuracao?): AiMenuResponse {
+    val linhas = mutableListOf<String>()
+    if (maisVotado != null) {
+        linhas += "Mais votado(a): ${maisVotado.nome} (${maisVotado.partido}), nº ${maisVotado.numero} — ${inteiro.format(maisVotado.votos)} votos" +
+            (maisVotado.percentual?.let { " ($it%)" } ?: "") + (if (maisVotado.eleito) " — ELEITO" else "") + "."
+    }
+    if (generico == "DEPUTADO_FEDERAL") {
+        val onde = if (uf != null && uf != "BR") " em $uf" else ""
+        linhas += "Você perguntou por \"deputado\": mostrei Deputado Federal$onde. Para a Assembleia, pergunte \"deputado estadual mais votado$onde\"."
+    }
+    val atual = r.directAnswer
+    if (linhas.isEmpty() || atual == null) return r
+    return r.copy(directAnswer = linhas.joinToString("\n") + "\n\n" + atual)
 }
 
 internal suspend fun AnswerBuilder.obterApuracao(cargo: String, uf: String, turno: Int): ApuracaoCargo? =

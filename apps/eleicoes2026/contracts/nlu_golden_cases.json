@@ -522,6 +522,23 @@
   {
    "q": "O presidente da mesa receptora tem autoridade de polícia para expulsar desordeiros?",
    "intent": "REGRAS_URNA"
+  },
+  {
+   "q": "qual o candidato a deputado mais votado",
+   "intent": "RESULTADOS",
+   "cargo": null,
+   "nome": null
+  },
+  {
+   "q": "deputado mais votado",
+   "intent": "RESULTADOS",
+   "cargo": null
+  },
+  {
+   "q": "deputado estadual mais votado em SP",
+   "intent": "RESULTADOS",
+   "cargo": "DEPUTADO_ESTADUAL",
+   "uf": "SP"
   }
  ]
 }

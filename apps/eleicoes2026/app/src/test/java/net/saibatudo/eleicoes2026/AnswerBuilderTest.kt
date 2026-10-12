@@ -82,6 +82,36 @@ class AnswerBuilderTest {
     }
 
     @Test
+    fun deputadoMaisVotadoSemFederalOuEstadualMostraDeputadoFederalComAviso() {
+        val pedidos = mutableListOf<String>()
+        val ap = ApuracaoProvider { cargo, uf, turno ->
+            pedidos += cargo
+            ApuracaoCargo(
+                cargo, uf, turno, "05/10/2026 02:00:00", "100,00", true,
+                listOf(
+                    LinhaApuracao(null, "1234", "FULANA MAIS VOTADA", "PX", 900000, "3,50", true),
+                    LinhaApuracao(null, "5678", "BELTRANO", "PY", 400000, "1,60", true)
+                )
+            )
+        }
+        for (q in listOf("qual o candidato a deputado mais votado", "deputado mais votado", "qual deputado foi o mais votado?")) {
+            val r = responder(q, hoje = "2026-10-06", uf = "SP", apuracao = ap)
+            val t = r.directAnswer!!
+            assertEquals(q, Intent.RESULTADOS, r.intent)
+            assertTrue("$q: $t", t.startsWith("Mais votado(a): FULANA MAIS VOTADA (PX), nº 1234 — 900.000 votos (3,50%) — ELEITO."))
+            assertTrue(q, t.contains("Você perguntou por \"deputado\": mostrei Deputado Federal em SP."))
+            assertFalse(q, t.contains("De qual cargo"))
+            assertEquals("DEPUTADO_FEDERAL", r.filters.cargo)
+        }
+        assertTrue(pedidos.toString(), pedidos.all { it == "DEPUTADO_FEDERAL" })
+        // sem estado conhecido pede só a UF; com "estadual" explícito não há aviso
+        assertTrue(responder("deputado mais votado", hoje = "2026-10-06", apuracao = ap).directAnswer!!.startsWith("De qual estado?"))
+        val est = responder("deputado estadual mais votado em SP", hoje = "2026-10-06", apuracao = ap).directAnswer!!
+        assertTrue(est, est.startsWith("Mais votado(a):") && !est.contains("Você perguntou por"))
+        assertFalse(responder("Resultado para deputado federal em SP", hoje = "2026-10-06", apuracao = ap).directAnswer!!.startsWith("Mais votado(a):"))
+    }
+
+    @Test
     fun calendarioMudaComAFaseEleitoral() {
         assertTrue(responder("Quando é a eleição?", hoje = "2026-10-01").directAnswer!!.contains("daqui a 3 dias"))
         assertTrue(responder("Quando é a eleição?", hoje = "2026-10-04").directAnswer!!.contains("Hoje é o 1º turno"))

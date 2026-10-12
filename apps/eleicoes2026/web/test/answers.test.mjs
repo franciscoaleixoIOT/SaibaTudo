@@ -188,6 +188,31 @@ test('o cliente de apuração (ApuracaoClient) alimenta a resposta de resultados
   assert.ok(r.directAnswer.includes('1.234.567 votos (46,10%)'));
 });
 
+test('"deputado mais votado" sem federal/estadual: Deputado Federal com aviso e linha do mais votado (não pede o cargo de novo)', async () => {
+  const pedidos = [];
+  const apDep = { obter: async (cargo, uf, turno) => { pedidos.push(cargo); return cargo !== 'DEPUTADO_FEDERAL' && cargo !== 'DEPUTADO_ESTADUAL' ? null : {
+    cargo, uf, turno, geradoEm: '05/10/2026 02:00:00', secoesTotalizadasPct: '100,00', totalizacaoFinal: true,
+    linhas: [{ sqCandidato: null, numero: '1234', nome: 'FULANA MAIS VOTADA', partido: 'PX', votos: 900000, percentual: '3,50', eleito: true, segundoTurno: false },
+      { sqCandidato: null, numero: '5678', nome: 'BELTRANO', partido: 'PY', votos: 400000, percentual: '1,60', eleito: true, segundoTurno: false }] }; } };
+  for (const q of ['qual o candidato a deputado mais votado', 'deputado mais votado', 'qual deputado foi o mais votado?']) {
+    const r = await responder(q, { hoje: '2026-10-06', uf: 'SP', apuracao: apDep });
+    assert.equal(r.intent, 'RESULTADOS', q);
+    assert.ok(r.directAnswer.startsWith('Mais votado(a): FULANA MAIS VOTADA (PX), nº 1234 — 900.000 votos (3,50%) — ELEITO.'), `${q}: ${r.directAnswer}`);
+    assert.ok(r.directAnswer.includes('Você perguntou por "deputado": mostrei Deputado Federal em SP.'), q);
+    assert.ok(!r.directAnswer.includes('De qual cargo'), q);
+    assert.equal(r.filters.cargo, 'DEPUTADO_FEDERAL');
+  }
+  assert.ok(pedidos.every((c) => c === 'DEPUTADO_FEDERAL'), String(pedidos));
+  // sem estado conhecido pede só a UF (não o cargo); com "estadual" explícito não há aviso
+  const semUf = await responder('deputado mais votado', { hoje: '2026-10-06', apuracao: apDep });
+  assert.ok(semUf.directAnswer.startsWith('De qual estado?'), semUf.directAnswer);
+  const est = await responder('deputado estadual mais votado em SP', { hoje: '2026-10-06', apuracao: apDep });
+  assert.ok(est.directAnswer.startsWith('Mais votado(a):') && !est.directAnswer.includes('Você perguntou por'), est.directAnswer);
+  // perguntas sem "mais votado" não ganham a linha de destaque
+  const normal = await responder('Resultado para deputado federal em SP', { hoje: '2026-10-06', apuracao: apDep });
+  assert.ok(!normal.directAnswer.startsWith('Mais votado(a):'));
+});
+
 test('"Meu estado" vale para cargos estaduais sem UF na pergunta (paridade com o Android)', async () => {
   const r = await responder('Candidatos a governador', { uf: 'SP' });
   assert.equal(r.filters.estadoUf, 'SP');
