@@ -131,12 +131,13 @@ def _abrir_urllib(req, timeout):
 
 class HttpCache:
     def __init__(self, pasta=None, offline=False, ttl_s=TTL_PADRAO_S, tentativas=7, espera_base=1.5, timeout=90,
-                 limitador=None, abrir: Optional[Callable] = None, dormir=time.sleep, agora=time.time, log=None):
+                 limitador=None, abrir: Optional[Callable] = None, dormir=time.sleep, agora=time.time, log=None, espera_max_429=300):
         self.pasta = Path(pasta) if pasta else PASTA_CACHE
         self.offline = offline
         self.ttl_s = ttl_s
         self.tentativas = tentativas
         self.espera_base = espera_base
+        self.espera_max_429 = espera_max_429  # modo paciente: até 900 s por tentativa (o bloqueio do PubChem dura horas)
         self.timeout = timeout
         self.limitador = limitador or LimitadorTaxa()
         self.abrir = abrir or _abrir_urllib
@@ -244,9 +245,9 @@ class HttpCache:
                 ultimo_erro = e
                 ra = cab.get("retry-after")
                 if ra and ra.isdigit():
-                    retry_after = min(int(ra), 300)
+                    retry_after = min(int(ra), self.espera_max_429)
                 elif e.code == 429:  # sem Retry-After: espera longa (o bloqueio por excesso de requisições dura minutos)
-                    retry_after = min(300, 30 * 2 ** (tentativa - 1))
+                    retry_after = min(self.espera_max_429, 30 * 2 ** (tentativa - 1))
                 if e.code == 429:
                     self.limitador.reduzir(host)  # daqui em diante, mais devagar com este host
             except (urllib.error.URLError, TimeoutError, ConnectionError, OSError) as e:

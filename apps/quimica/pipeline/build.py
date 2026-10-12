@@ -293,7 +293,12 @@ def construir(opts, log=print):
     t0 = time.time()
     agora = Q.agora_utc()
     hoje = opts.hoje or Q.hoje_iso()
-    http = HttpCache(pasta=opts.cache, offline=opts.offline, log=log)
+    # --paciente: o bloqueio do PubChem (429) dura horas; em vez de desistir em ~18 min, espera até 15 min por tentativa, 40 vezes,
+    # e pede a 1 req/s (o progresso fica no cache, então o build pode ficar a noite toda e terminar)
+    paciente = dict(tentativas=40, espera_max_429=900) if getattr(opts, 'paciente', False) else {}
+    http = HttpCache(pasta=opts.cache, offline=opts.offline, log=log, **paciente)
+    if paciente:
+        http.limitador.reduzir('pubchem.ncbi.nlm.nih.gov', fator=0.5, minimo=0.5)
     stats = {"geradoEm": agora.strftime("%Y-%m-%dT%H:%M:%SZ"), "modo": "rapido" if opts.rapido else "completo",
              "familias": {}, "contagens": {}, "decisoes": list(DECISOES), "avisos": []}
     out = Path(opts.out)
@@ -457,6 +462,7 @@ def main(argv=None):
     ap.add_argument("--assinar-com", help="chave privada ECDSA (PEM) para assinar o manifesto")
     ap.add_argument("--rapido", action="store_true", help="300 compostos (só lista fixa) e textos reduzidos; para testes e CI")
     ap.add_argument("--offline", action="store_true", help="nunca usa a rede; falha se faltar entrada no cache")
+    ap.add_argument("--paciente", action="store_true", help="espera o PubChem desbloquear (até 15 min por tentativa, 40 tentativas) e pede a 1 req/s")
     ap.add_argument("--pubchem-offline", action="store_true", help="PubChem só do cache (ele bloqueia o IP com 429 depois de muitas requisições)")
     ap.add_argument("--alvo", type=int, default=selecao_compostos.ALVO_PADRAO, help="tamanho do núcleo de compostos")
     ap.add_argument("--limite-compostos", type=int, help="limita o núcleo a N compostos da lista fixa (testes)")
