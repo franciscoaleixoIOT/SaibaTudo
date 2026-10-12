@@ -136,6 +136,14 @@ multilíngue custa ≈220 requisições a 1 req/s sem cache). Armadilha: apelido
 `sinonimo_valido` e o dicionário do site descartam palavras funcionais dos cinco léxicos. Modelos dos subagentes por custo
 (pedido do mantenedor): haiku para o mecânico, sonnet para tradução/testes/portes, opus para arquitetura, fable só com o contexto inteiro.
 
+## 6.g Internacionalização — etapas D e E, e publicação (12/10/2026, noite)
+Site com catálogos es/de/fr completos (golden es 137 / de 150 / fr 183), API multilíngue (segurança e ancoragem pelo léxico
+compartilhado; cópias geradas em `api/_lib/lexico/`), Android por idioma (léxico gerado `tools/gerar_lexico_kt.py`, seletor,
+818 strings em cinco idiomas, 124 testes). Publicado **do diretório local** porque o workflow ficou parado no PubChem
+(§9.c de `PENDENCIAS.md`). Ao vivo: `https://saibatudo.net/quimica/?lang=en|es|de|fr`, pacote `20261012T171653Z` com
+`idiomas` e textos em 5 idiomas. Pendências: revisão nativa (`revisao: pendente`), pistas de cálculo em pt no `AnswerBuilder`,
+elisão francesa no `ground.js`, miúdos listados em `PENDENCIAS.md` §12; versão Android **não** foi subida (sem release novo).
+
 ## 7. Contas e segredos
 Vercel `saibatudo-quimica` (time `franciscoaleixo-9696`); GitHub `franciscoaleixoIOT`; Hugging Face `franciscoaleixo` (PRO, 40 min/dia de ZeroGPU); Modal `franciscoaleixo/main` (US$ 30/mês grátis; já usados pelo app de eleições, ~US$ 5/mês).
 `secrets/data_signing_key.pem` (nova, exclusiva deste app; pública em `pipeline/data_signing_public.pem`). Fazer backup offline. Nenhum outro segredo deste projeto existe ainda.

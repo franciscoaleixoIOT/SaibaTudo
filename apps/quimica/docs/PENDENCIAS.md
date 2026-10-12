@@ -120,6 +120,17 @@ dados na resposta, copiar resposta, fechar resposta, relatar problema (issue com
 - [ ] Enquanto isso o site segue com o pacote de 11/10 (978 compostos); a issue `alerta-dados-quimica` (#17) fica aberta até uma execução
       bem-sucedida.
 
+### 9.c Publicação de 12/10 (noite) — o que aconteceu
+- `quimica-data-refresh.yml` (run 38286751540) ficou **1 h 45 parado** em "Construir, validar e assinar o pacote" (cache HTTP do
+  runner sem o PubChem completo + bloqueio do IP; `--paciente` espera até 15 min por tentativa). Cancelado; a publicação foi feita
+  **do diretório local** (`vercel deploy --prod --yes --token <VERCEL_TOKEN_TIME>` em `apps/quimica`, pacote já comitado) e
+  conferida ao vivo (`/quimica/api/health` = `acde06a`, `data/manifest.json` com `idiomas` e 53 arquivos).
+- [ ] Fazer o workflow **não reconstruir** quando o pacote comitado já é mais novo que o publicado (publicar o que está no Git),
+      ou enviar o cache HTTP completo para o cache do GitHub a partir desta máquina; hoje toda execução agendada corre o risco
+      de ficar horas esperando o PubChem.
+- [ ] `tools/vercel_cota.py` com o token do time respondeu **HTTP 403 / 0 de 0** mas o deploy funcionou: o endpoint de sondagem
+      (`POST /v2/files` vazio) parece bloqueado para tokens de time — rever a sondagem antes de confiar na medida.
+
 ## 10. Conferência com os livros de referência (11/10/2026) — o que ficou para depois
 Relatório local em `local/conferencia_livros/RELATORIO.md` (fora do Git). Já corrigido no pipeline: massa molar pela fórmula,
 CAS (desempate e item do elemento), duplicatas, carbono/arsênio sem fusão a 1 atm; rótulo "raio atômico (van der Waals)".
