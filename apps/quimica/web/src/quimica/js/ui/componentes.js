@@ -130,3 +130,66 @@ export const erroEl = (msg) => h('div', { class: 'erro-calc', role: 'alert' }, m
 export function cartaoEl(href, nomeIcone, titulo, descricao) {
   return h('a', { class: 'cartao', href }, icon(nomeIcone, 24), h('strong', null, titulo), h('span', null, descricao));
 }
+
+/**
+ * Campo de uma linha lógica que cresce com o texto: <textarea> de 1 até `maxLinhas` linhas (depois rola). Não aceita quebra
+ * de linha: Enter chama `onEnter` e quebras coladas viram espaço. A altura é ajustada pelo CSSOM (el.style), permitido pela CSP.
+ * Mesmo comportamento do app de Eleições (padrão dos apps SaibaTudo).
+ */
+export function campoAutoAltura({ maxLinhas = 3, onEnter = null, classe = '', ...props }) {
+  const el = h('textarea', { rows: '1', ...props, class: `auto-altura ${classe}`.trim(), 'data-max-linhas': String(maxLinhas) });
+  el.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' || e.isComposing) return;
+    e.preventDefault();
+    onEnter?.(e);
+  });
+  el.addEventListener('beforeinput', (e) => { // teclados virtuais que não informam a tecla no keydown
+    if (e.inputType !== 'insertLineBreak' && e.inputType !== 'insertParagraph') return;
+    e.preventDefault();
+    onEnter?.(e);
+  });
+  el.addEventListener('input', () => {
+    if (/[\r\n]/.test(el.value)) {
+      const cursor = el.value.slice(0, el.selectionStart ?? el.value.length).replace(/[\r\n]+/g, ' ').length;
+      el.value = el.value.replace(/[\r\n]+/g, ' ');
+      el.setSelectionRange?.(cursor, cursor);
+    }
+    ajustarAltura(el);
+  });
+  ouvirRedimensionamento();
+  (globalThis.requestAnimationFrame ?? setTimeout)(() => ajustarAltura(el));
+  return el;
+}
+
+/** Ajusta a altura de um campo criado por campoAutoAltura (chame depois de mudar `value` por código). */
+export function ajustarAltura(el) {
+  if (!el?.isConnected) return;
+  const cs = getComputedStyle(el);
+  const px = (v) => parseFloat(v) || 0;
+  const linha = px(cs.lineHeight) || px(cs.fontSize) * 1.4;
+  const bordas = px(cs.borderTopWidth) + px(cs.borderBottomWidth);
+  const maximo = Math.ceil(linha * (Number(el.dataset.maxLinhas) || 3) + px(cs.paddingTop) + px(cs.paddingBottom) + bordas);
+  el.style.height = 'auto';
+  const alvo = el.scrollHeight + bordas;
+  el.style.height = `${Math.min(alvo, maximo)}px`;
+  const rola = alvo > maximo + 1;
+  el.style.overflowY = rola ? 'auto' : 'hidden';
+  if (rola && el.ownerDocument?.activeElement === el && el.selectionStart === el.value.length) el.scrollTop = el.scrollHeight;
+}
+
+/** Reajusta todos os campos automáticos visíveis (largura da janela ou tamanho do texto mudou). */
+export function reajustarCamposAuto(raiz = globalThis.document) {
+  for (const el of raiz?.querySelectorAll?.('textarea.auto-altura') ?? []) ajustarAltura(el);
+}
+
+let ouvindoJanela = false;
+function ouvirRedimensionamento() {
+  if (ouvindoJanela || typeof window === 'undefined') return;
+  ouvindoJanela = true;
+  let pendente = false;
+  window.addEventListener('resize', () => {
+    if (pendente) return;
+    pendente = true;
+    requestAnimationFrame(() => { pendente = false; reajustarCamposAuto(); });
+  });
+}
