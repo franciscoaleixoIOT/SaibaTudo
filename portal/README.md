@@ -57,3 +57,6 @@ para `'humana'`.
    (`/<app>`, `/<app>/` e `/<app>/:path*` — a barra final é literal) fora do congelamento de eleições.
 3. Service worker: inclua o prefixo do app nas exclusões de `src/sw.js` (cache-primeiro aqui prenderia arquivos antigos).
 4. `node --test "tests/*.test.mjs"` na raiz do repositório confere as três coisas juntas.
+5. Destaque igual para todos os apps no ar: no `index.html`, um botão no hero com a mesma classe (`btn btn-ouro grande`) e um
+   cartão `card app-principal` com o mesmo botão `btn btn-primario grande` (decisão do mantenedor, 12/10/2026: nenhum app
+   com cor ou destaque diferente dos outros).

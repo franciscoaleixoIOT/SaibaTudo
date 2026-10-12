@@ -34,8 +34,6 @@ main:focus { outline: none; }
 .hero h1 { font-family: var(--fonte-marca); font-weight: 600; font-size: clamp(1.5rem, 4.5vw, 2.25rem); line-height: 1.2; color: #fff; }
 .hero-sub { color: #CBD5E1; font-size: 1.0625rem; max-width: 36rem; }
 .hero-acoes { margin-top: 8px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
-.hero .btn-contorno-claro { border-color: rgb(255 255 255 / .85); color: #fff; background: transparent; --foco: #FFD166; }
-.hero .btn-contorno-claro:hover { background: rgb(255 255 255 / .12); }
 .hero .btn-ouro { background: var(--ouro); color: #0C2340; --foco: #FFD166; }
 
 .secao { max-width: 1040px; margin: 0 auto; padding: 36px 16px 8px; }
