@@ -25,7 +25,7 @@
 - [x] Repositório de eleições: cartão + regras de proxy + `.vercelignore` publicados (3d5ffa9, 01fb70e), com a regra exata `/quimica/` (sem ela o link do cartão dava 404) e o service worker da home ignorando `/quimica/`.
 - [~] CSP: pelo proxy vale a CSP da home (a de eleições, que só acrescenta `resultados.tse.jus.br`): compatível hoje. No plano de repositório único, a home deixa de aplicar cabeçalhos aos caminhos dos apps.
 - [ ] **Trial do Pro da Vercel:** ao terminar, a cota volta a 5.000 uploads/24 h dividida com eleições. Decidir: manter o Pro ou ficar no Hobby (os lotes de textos da §8.1 reduzem o deploy completo de ~1.930 para ~180 arquivos).
-- [ ] **Mantenedor: token da Vercel com acesso ao time inteiro** (o `VERCEL_TOKEN` do GitHub é restrito ao projeto de eleições: com ele, `vercel whoami` dá "User not found" e os outros projetos dão "Project not found"). Criar em vercel.com → Account Settings → Tokens (escopo: time `franciscoaleixo-9696`), gravar em `SaibaTudo/secrets/vercel_token_time.txt` (ignorado) → `gh secret set VERCEL_TOKEN_TIME < secrets/vercel_token_time.txt`. Sem ele, `quimica-data-refresh.yml` e `portal-ci.yml` testam e NÃO publicam; publicar pela CLI local.
+- [x] **Token da Vercel do time inteiro** (`VERCEL_TOKEN_TIME`, criado pelo mantenedor em 11/10/2026; arquivo em `SaibaTudo/secrets/vercel_token_time.txt`): o portal já publicou pelo CI com ele. O `VERCEL_TOKEN` antigo só publica eleições.
 - [ ] Privacidade: `docs/PRIVACIDADE.md` ainda não existe; criar a partir da página `web/src/quimica/privacidade/` (os dois devem ser idênticos, com teste como no app de eleições).
 
 ## 4. Modelo (fase 5) — só depois de 2
@@ -92,6 +92,15 @@ Diagnóstico sobre o pacote e o dataset reais (números em `PROJECT_MEMORY.md` �
 2. **Monetização:** CIAAW, OpenStax, PhET e o plano Hobby da Vercel só valem para uso não comercial. Confirmar que o app segue gratuito e sem anúncios (hoje sim).
 3. **Pedidos de permissão** (opcionais): OpenStax (formulário), SBQ para QNEsc, OMS/OIT para ICSC em português (ipcsmail@who.int), IUPAC para o Gold Book inteiro.
 
+## 9.b Atualização semanal no GitHub × PubChem (12/10/2026)
+- [ ] **O runner do GitHub leva 429 do PubChem antes de terminar** (duas execuções: 11/10 agendada e 12/10 manual, ambas no build). O cache
+      de coleta agora é salvo mesmo em falha (9573091) — a execução de 12/10 guardou 7 MB —, então cada rodada avança um pouco, mas pode
+      levar semanas até completar. Saída mais rápida, a decidir com o mantenedor: **semear o cache** com o `pipeline/.cache` local (27 MB,
+      respostas públicas do PubChem/Wikidata/Wikimedia) publicado como asset de uma release `cache-seed` e baixado pelo workflow quando o
+      cache do Actions estiver vazio. Alternativa: rodar o build sempre local e deixar o workflow só publicar o que está no repositório.
+- [ ] Enquanto isso o site segue com o pacote de 11/10 (978 compostos); a issue `alerta-dados-quimica` (#17) fica aberta até uma execução
+      bem-sucedida.
+
 ## 10. Conferência com os livros de referência (11/10/2026) — o que ficou para depois
 Relatório local em `local/conferencia_livros/RELATORIO.md` (fora do Git). Já corrigido no pipeline: massa molar pela fórmula,
 CAS (desempate e item do elemento), duplicatas, carbono/arsênio sem fusão a 1 atm; rótulo "raio atômico (van der Waals)".
@@ -117,7 +126,7 @@ CAS (desempate e item do elemento), duplicatas, carbono/arsênio sem fusão a 1 
       mais ácido" dependem de fonte nova (HSDB/NIOSH via PubChem; pKa do Wikidata — §8.1).
 
 ## Pendente com o mantenedor (resumo)
-1. `VERCEL_TOKEN_TIME` (token do time inteiro; ver §3) em `SaibaTudo/secrets/vercel_token_time.txt`.
+1. ~~`VERCEL_TOKEN_TIME`~~ criado em 11/10.
 2. Origem da chave `apikey-sabetudo.txt`.
 3. Permissão da OpenStax (opcional).
 4. Tokens do Modal e conta do Hugging Face quando o modelo estiver pronto; teto de gasto no Modal.
