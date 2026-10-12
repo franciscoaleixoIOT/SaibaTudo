@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import net.saibatudo.quimica.data.repository.EstadoDados
+import net.saibatudo.quimica.ui.IdiomaApp
 import net.saibatudo.quimica.ui.viewmodel.MainViewModel
 import net.saibatudo.quimica.ui.viewmodel.Tela
 import net.saibatudo.quimica.ui.viewmodel.aba
@@ -123,7 +124,8 @@ fun MainAppScreen(vm: MainViewModel) {
             Tela.Sobre -> SobreDadosScreen(pacote, estado.prefs, estado.atualizacao, onAtualizar = vm::atualizarAgora, onAbrirUrl = aberto, modifier = m)
             Tela.Privacidade -> PrivacidadeScreen(onAbrirUrl = aberto, onLimparHistorico = vm::limparHistorico, modifier = m)
             Tela.Configuracoes -> ConfiguracoesScreen(
-                estado.prefs, onTema = vm::definirTema, onFonte = vm::definirFonte, onNivel = vm::definirNivel, onEconomia = vm::definirEconomia, modifier = m
+                estado.prefs, onTema = vm::definirTema, onFonte = vm::definirFonte, onNivel = vm::definirNivel, onEconomia = vm::definirEconomia, modifier = m,
+                idioma = estado.idioma, onIdioma = { id -> vm.definirIdioma(id); IdiomaApp.definir(contexto, id) }
             )
         }
     }

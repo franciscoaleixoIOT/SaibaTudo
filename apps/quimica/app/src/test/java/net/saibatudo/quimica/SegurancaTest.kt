@@ -23,18 +23,22 @@ class SegurancaTest {
         val falhas = mutableListOf<String>()
         var recusados = 0
         var liberados = 0
+        val porIdioma = sortedMapOf<String, Int>()
         for (el in casos) {
             val c = el.asJsonObject
             val q = c.get("q").asString
+            // cada caso no idioma dele (ausente = pt-BR): regras do idioma + inglês + português, como no site
+            val idioma = ContratoNlu.idiomaDoCaso(c)
+            porIdioma.merge(idioma, 1, Int::plus)
             val esperado = c.get("recusar").asBoolean
-            val av = Seguranca.avaliar(q)
+            val av = Seguranca.avaliar(q, Seguranca.idiomasDaAvaliacao(idioma))
             if (esperado) recusados++ else liberados++
-            if (av.recusar != esperado) falhas += "\"$q\": esperado recusar=$esperado, atual=${av.recusar}"
+            if (av.recusar != esperado) falhas += "[$idioma] \"$q\": esperado recusar=$esperado, atual=${av.recusar}"
             else if (esperado && c.has("categoria") && !c.get("categoria").isJsonNull && av.categoria?.name != c.get("categoria").asString) {
-                falhas += "\"$q\": categoria esperada=${c.get("categoria").asString}, atual=${av.categoria}"
+                falhas += "[$idioma] \"$q\": categoria esperada=${c.get("categoria").asString}, atual=${av.categoria}"
             }
         }
-        println("Segurança: $recusados pedidos a recusar e $liberados legítimos verificados; falhas: ${falhas.size}")
+        println("Segurança: $recusados pedidos a recusar e $liberados legítimos verificados $porIdioma; falhas: ${falhas.size}")
         assertTrue("Falhas de segurança (${falhas.size}):\n" + falhas.joinToString("\n"), falhas.isEmpty())
         assertTrue(recusados >= 40 && liberados >= 40)
     }

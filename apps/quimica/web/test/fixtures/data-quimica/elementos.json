@@ -8,7 +8,8 @@
    "pt-BR": "Hidrogênio",
    "en": "Hydrogen",
    "es": "hidrógeno",
-   "de": "Wasserstoff"
+   "de": "Wasserstoff",
+   "fr": "hydrogène"
   },
   "massaAtomica": 1.008,
   "massaAtomicaIncerteza": null,
@@ -51,7 +52,8 @@
    "pt-BR": "Hélio",
    "en": "Helium",
    "es": "helio",
-   "de": "Helium"
+   "de": "Helium",
+   "fr": "hélium"
   },
   "massaAtomica": 4.0026,
   "massaAtomicaIncerteza": null,
@@ -90,7 +92,8 @@
    "pt-BR": "Carbono",
    "en": "Carbon",
    "es": "carbono",
-   "de": "Kohlenstoff"
+   "de": "Kohlenstoff",
+   "fr": "carbone"
   },
   "massaAtomica": 12.011,
   "massaAtomicaIncerteza": null,
@@ -136,7 +139,8 @@
    "pt-BR": "Nitrogênio",
    "en": "Nitrogen",
    "es": "nitrógeno",
-   "de": "Stickstoff"
+   "de": "Stickstoff",
+   "fr": "azote"
   },
   "massaAtomica": 14.007,
   "massaAtomicaIncerteza": null,
@@ -184,7 +188,8 @@
    "pt-BR": "Oxigênio",
    "en": "Oxygen",
    "es": "oxígeno",
-   "de": "Sauerstoff"
+   "de": "Sauerstoff",
+   "fr": "oxygène"
   },
   "massaAtomica": 15.999,
   "massaAtomicaIncerteza": null,
@@ -230,7 +235,8 @@
    "pt-BR": "Flúor",
    "en": "Fluorine",
    "es": "flúor",
-   "de": "Fluor"
+   "de": "Fluor",
+   "fr": "fluor"
   },
   "massaAtomica": 18.998,
   "massaAtomicaIncerteza": null,
@@ -272,7 +278,8 @@
    "pt-BR": "Sódio",
    "en": "Sodium",
    "es": "sodio",
-   "de": "Natrium"
+   "de": "Natrium",
+   "fr": "sodium"
   },
   "massaAtomica": 22.99,
   "massaAtomicaIncerteza": null,
@@ -315,7 +322,8 @@
    "pt-BR": "Enxofre",
    "en": "Sulfur",
    "es": "azufre",
-   "de": "Schwefel"
+   "de": "Schwefel",
+   "fr": "soufre"
   },
   "massaAtomica": 32.06,
   "massaAtomicaIncerteza": null,
@@ -360,7 +368,8 @@
    "pt-BR": "Cloro",
    "en": "Chlorine",
    "es": "cloro",
-   "de": "Chlor"
+   "de": "Chlor",
+   "fr": "chlore"
   },
   "massaAtomica": 35.45,
   "massaAtomicaIncerteza": null,
@@ -409,7 +418,8 @@
    "pt-BR": "Cálcio",
    "en": "Calcium",
    "es": "calcio",
-   "de": "Calcium"
+   "de": "Calcium",
+   "fr": "calcium"
   },
   "massaAtomica": 40.078,
   "massaAtomicaIncerteza": null,
@@ -451,7 +461,8 @@
    "pt-BR": "Ferro",
    "en": "Iron",
    "es": "hierro",
-   "de": "Eisen"
+   "de": "Eisen",
+   "fr": "fer"
   },
   "massaAtomica": 55.845,
   "massaAtomicaIncerteza": null,
@@ -496,7 +507,8 @@
    "pt-BR": "Cobre",
    "en": "Copper",
    "es": "cobre",
-   "de": "Kupfer"
+   "de": "Kupfer",
+   "fr": "cuivre"
   },
   "massaAtomica": 63.546,
   "massaAtomicaIncerteza": null,
@@ -537,7 +549,8 @@
    "pt-BR": "Ouro",
    "en": "Gold",
    "es": "oro",
-   "de": "Gold"
+   "de": "Gold",
+   "fr": "or"
   },
   "massaAtomica": 196.97,
   "massaAtomicaIncerteza": null,
@@ -579,7 +592,8 @@
    "pt-BR": "Mercúrio",
    "en": "Mercury",
    "es": "mercurio",
-   "de": "Quecksilber"
+   "de": "Quecksilber",
+   "fr": "mercure"
   },
   "massaAtomica": 200.59,
   "massaAtomicaIncerteza": null,

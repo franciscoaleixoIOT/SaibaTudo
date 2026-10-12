@@ -27,12 +27,16 @@ object ContratoNlu {
         else -> null
     }
 
+    /** Idioma do caso (campo `idioma`; ausente = pt-BR), já no código do projeto. */
+    fun idiomaDoCaso(c: JsonObject): String =
+        net.saibatudo.quimica.domain.Idiomas.normalizar(c.get("idioma")?.takeIf { !it.isJsonNull }?.asString) ?: net.saibatudo.quimica.domain.Idiomas.PADRAO
+
     val CHAVES = listOf("intent", "elemento", "composto", "propriedade", "equacao", "unidadeDestino", "grupo", "periodo", "bloco", "categoria", "estado", "formula")
 
-    /** Falhas de UM caso (lista de textos; vazia = passou). */
+    /** Falhas de UM caso (lista de textos; vazia = passou). [d] é o dicionário do idioma do caso (o léxico vem dele). */
     fun falhasDoCaso(c: JsonObject, d: Dicionario): List<String> {
         val q = c.get("q").asString
-        val r = LocalNlu.parse(q, d)
+        val r = LocalNlu.parse(q, d, null, d.lexico)
         val falhas = mutableListOf<String>()
         for (chave in CHAVES) {
             if (!c.has(chave)) continue

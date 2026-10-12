@@ -7,7 +7,7 @@ import { DADOS, DADOS_REAIS, RAIZ, loja, lojaNova } from './support.mjs';
 import { Engine } from '../src/quimica/js/engine.js';
 import { SUGESTOES_PADRAO, sugestoesPadrao } from '../src/quimica/js/answers.js';
 import { fmt } from '../src/quimica/js/formato.js';
-import { definirIdioma, t } from '../src/quimica/js/i18n/index.js';
+import { IDIOMAS, definirIdioma, t, tl } from '../src/quimica/js/i18n/index.js';
 import { falhasDoCaso } from './contrato.mjs';
 import { validarTexDaResposta } from './tex.mjs';
 
@@ -336,15 +336,77 @@ test('EM INGLÊS: todo caso golden en gera resposta bem formada no idioma; suges
   } finally { definirIdioma('pt-BR'); }
 });
 
-test('com o pacote REAL (se existir): sugestões respondidas e golden cases com respostas bem formadas', { skip: DADOS_REAIS ? false : 'sem pacote real em data/quimica' }, async () => {
+for (const idioma of ['es', 'de', 'fr']) {
+  test(`EM ${idioma.toUpperCase()}: todo caso golden do idioma gera resposta bem formada NO idioma; sugestões (padrão e geradas) respondíveis; números no formato do idioma; recusa e "não entendi" no idioma`, async () => {
+    definirIdioma(idioma);
+    try {
+      const e = await motor();
+      const store = e.store;
+      let n = 0;
+      for (const c of golden.filter((x) => x.idioma === idioma)) {
+        if (c.elemento && !store.porSimbolo.has(c.elemento)) continue;
+        if (typeof c.composto === 'number' && !store.indice.porCid.has(c.composto)) continue;
+        const r = await e.responder(c.q);
+        validarResposta(r, c.q);
+        assert.equal(r.intent, c.intent, c.q);
+        assert.equal(r.idioma, idioma, c.q);
+        // (conceitos citam trechos do pacote, em inglês ou português e sempre rotulados; fontes e sobre-os-dados listam nomes e licenças do fontes.json, que estão em português: ficam fora desta checagem)
+        if (!['CONCEITO', 'FONTES', 'SOBRE_DADOS'].includes(c.intent)) assert.ok(!/ção\b|ções\b|Massa molar|Ponto de fusão|Perigos d|Estrutura 2D|Não entendi|Qual a |Quais /.test(`${r.titulo} ${r.directAnswer}`), `${idioma}: português vazou na resposta de "${c.q}": ${r.titulo} | ${r.directAnswer.slice(0, 120)}`);
+        e.limparContexto();
+        n++;
+      }
+      assert.ok(n >= 60, `casos ${idioma} exercitados: ${n}`);
+      const R = async (q) => { const r = await e.responder(q); validarResposta(r, q); e.limparContexto(); return r; };
+      const sug = (chave) => t(`respostas.sugestoes.${chave}`);
+      // fidelidade numérica: o mesmo valor do pacote/cálculo, formatado pelo idioma (nunca digitado no catálogo)
+      assert.ok((await R(sug('massaAgua'))).directAnswer.includes(`${fmt(18.015)} g/mol`), `${idioma}: massa molar da água`);
+      assert.match((await R(sug('balancear'))).directAnswer, /4 Fe \+ 3 O₂ → 2 Fe₂O₃/);
+      const ph = await R(sug('phHcl'));
+      assert.ok(ph.titulo.startsWith(`pH ${fmt(2, { casas: 2 })}`), `${idioma}: pH do HCl 0,01 mol/L: ${ph.titulo}`);
+      const conv = await R(sug('converter'));
+      assert.ok(conv.titulo.includes(`5 atm = ${fmt(506.625)} kPa`), `${idioma}: 5 atm em kPa: ${conv.titulo}`);
+      assert.equal((await R(sug('fusaoFerro'))).intent, 'PROPRIEDADE');
+      const rec = await R(golden.find((x) => x.idioma === idioma && x.intent === 'RECUSA_PERIGO').q);
+      assert.equal(rec.intent, 'RECUSA_PERIGO');
+      assert.ok(rec.directAnswer.includes(t('respostas.recusa.padrao')) && rec.directAnswer.includes(t('respostas.recusa.alternativas')), `${idioma}: recusa no idioma`);
+      assert.equal(rec.titulo, t('respostas.recusa.titulo'), `${idioma}: título da recusa`);
+      const ne = await R(golden.find((x) => x.idioma === idioma && x.intent === 'DESCONHECIDA').q);
+      assert.equal(ne.intent, 'DESCONHECIDA');
+      assert.equal(ne.titulo, t('respostas.naoEntendi.titulo'), `${idioma}: "não entendi" no idioma`);
+      // todas as sugestões do idioma (padrão e geradas em cada resposta) têm resposta resolvida
+      const fila = [...sugestoesPadrao(), ...tl('respostas.sugestoes.seguras')];
+      const vistas = new Set();
+      const falhas = [];
+      while (fila.length && vistas.size < 150) {
+        const q = fila.shift();
+        if (vistas.has(q)) continue;
+        vistas.add(q);
+        const r = await e.responder(q);
+        e.limparContexto();
+        if (!r.resolvida) falhas.push(`${q} → ${r.intent}: ${r.directAnswer.slice(0, 100)}`);
+        for (const sg of r.sugestoes) if (!vistas.has(sg)) fila.push(sg);
+      }
+      assert.deepEqual(falhas, []);
+      assert.ok(vistas.size >= 14, `${idioma}: sugestões exercitadas ${vistas.size}`);
+    } finally { definirIdioma('pt-BR'); }
+  });
+}
+
+test('com o pacote REAL (se existir): sugestões respondidas e golden cases com respostas bem formadas, em cada idioma', { skip: DADOS_REAIS ? false : 'sem pacote real em data/quimica' }, async () => {
   const e = await motor(DADOS_REAIS);
-  for (const q of SUGESTOES_PADRAO) { const r = await e.responder(q); validarResposta(r, q); assert.equal(r.resolvida, true, q); e.limparContexto(); }
   const store = await loja(DADOS_REAIS);
-  for (const c of golden.filter((x) => !x.idioma)) {
-    const r = await e.responder(c.q);
-    if (!c.q.trim()) continue;
-    validarResposta(r, c.q);
-    assert.deepEqual(falhasDoCaso(c, r.parsed, store), [], c.q);
-    e.limparContexto();
-  }
+  try {
+    for (const idioma of IDIOMAS) {
+      definirIdioma(idioma);
+      e.limparContexto();
+      for (const q of [...sugestoesPadrao(), ...tl('respostas.sugestoes.seguras')]) { const r = await e.responder(q); validarResposta(r, q); assert.equal(r.resolvida, true, `${idioma}: ${q}`); e.limparContexto(); }
+      for (const c of golden.filter((x) => (x.idioma ?? 'pt-BR') === idioma)) {
+        const r = await e.responder(c.q);
+        if (!c.q.trim()) continue;
+        validarResposta(r, c.q);
+        assert.deepEqual(falhasDoCaso(c, r.parsed, store), [], `${idioma}: ${c.q}`);
+        e.limparContexto();
+      }
+    }
+  } finally { definirIdioma('pt-BR'); }
 });

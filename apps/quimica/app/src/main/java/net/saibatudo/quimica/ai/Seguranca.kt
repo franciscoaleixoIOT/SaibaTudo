@@ -1,5 +1,8 @@
 package net.saibatudo.quimica.ai
 
+import net.saibatudo.quimica.ai.nlu.lexico.Lexico
+import net.saibatudo.quimica.domain.Idiomas
+import net.saibatudo.quimica.domain.Texto
 import java.text.Normalizer
 
 /** Categorias de recusa (mesmos ids de web/src/quimica/js/seguranca.js). */
@@ -13,7 +16,8 @@ enum class CategoriaRecusa(val rotulo: String) {
     AUTOLESAO("risco à própria vida")
 }
 
-data class AvaliacaoSeguranca(val recusar: Boolean, val categoria: CategoriaRecusa? = null, val motivo: String? = null) {
+/** [idioma]: léxico cujas regras recusaram o pedido (o ativo, o inglês ou o português). */
+data class AvaliacaoSeguranca(val recusar: Boolean, val categoria: CategoriaRecusa? = null, val motivo: String? = null, val idioma: String? = null) {
     val rotulo: String? get() = categoria?.rotulo
 }
 
@@ -44,7 +48,7 @@ object Seguranca {
 
     /** Texto sem acentos, minúsculo e sem caracteres invisíveis. */
     private fun limpar(texto: String): String =
-        RX_COMBINANTES.replace(RX_INVISIVEIS.replace(Normalizer.normalize(texto, Normalizer.Form.NFKD), ""), "").lowercase()
+        RX_COMBINANTES.replace(RX_INVISIVEIS.replace(Normalizer.normalize(Texto.ligaduras(texto), Normalizer.Form.NFKD), ""), "").lowercase()
 
     private fun espacado(s: String) = RX_ESPACOS.replace(RX_NAO_ALFANUM.replace(s, " "), " ").trim()
 
@@ -60,103 +64,6 @@ object Seguranca {
 
     /** Colada: só letras, sem repetições consecutivas ("exploosivo" vira "explosivo"). */
     private fun colada(s: String) = RX_REPETIDAS.replace(RX_NAO_LETRA.replace(s, ""), "$1")
-
-    private fun rx(partes: List<String>) = Regex("""\b(?:${partes.joinToString("|")})\b""")
-
-    // ---- padrões (texto sem acentos) ---------------------------------------------------------------------------------------
-
-    /** Ações que PRODUZEM, obtêm, ampliam ou escondem. */
-    private val ACAO = rx(listOf(
-        """fa(?:z|zer|zendo|zem|zia|co|ca|cam)""", """fabric(?:ar|ando|o|a|am|ac\w+)""", """produz\w*""", """prepar\w*""", """sintetiz\w*""", "sintese", "obter", """obtenc\w*""", "obtem", "conseguir", "adquirir",
-        "comprar", "compra", "vender", """vend\w+ (?:de|da|do)""", """trafic\w*""", """contrabande\w*""", """desvi\w+""", """burl\w+""", "esconder", """escond\w+""",
-        "extrair", """extrac\w*""", "extrai", "cozinhar", """cozinh\w+""", "montar", "monto", """constru\w+""", "criar", "cria", "gerar", "gero", "gera",
-        """purific\w*""", """refin\w+""", """cristaliz\w*""", """destil\w*""", """escalon\w*""", """escal(?:ar|ando)""", "larga escala", """aument\w+ (?:a |o |de )?(?:producao|rendimento|escala|potencia|pureza)""",
-        "receita", "passo a passo", "tutorial", """instruc\w+""", """ensina\w*""", "rota de sintese", "procedimento (?:de|para)", "protocolo (?:de|para)",
-        "como (?:se )?(?:faz|fabrica|produz|prepara|sintetiza|obtem|extrai|cozinha|monta)",
-        "quantidade de .{1,40} para (?:fazer|produzir|preparar)", "quais reagentes", "que reagentes", "o que preciso para (?:fazer|produzir)", "ingredientes para",
-        "materiais para (?:fazer|montar|produzir)",
-        "make", "making", "synthesi[sz]\\w*", "synthesis", "produce", "cook", "recipe", "manufactur\\w+", "extract", "build", "steps to"
-    ))
-
-    /** Contexto de manuseio, incidente ou descarte: "o que fazer se inalar cloro em casa" NÃO é pedido de produção. */
-    private val CONTEXTO_SEGURO = rx(listOf(
-        """descart\w*""", """neutraliz\w*""", """armazen\w*""", """guard\w*""", """manuse\w*""", """manipul\w*""", "primeiros? socorros?", "epis?", """derram\w*""", """vazament\w*""", """respingo\w*""",
-        "inal(?:ar|ei|ou|ado|acao)", """ingeri\w*""", """queimadura\w*""", """intoxicac\w+ (?:por|com)""", "primeiro atendimento", "equipamento de protecao", "protecao individual", "luvas", "oculos de protecao", "mascara",
-        "o que fazer (?:se|quando|em caso)", "o que (?:eu )?(?:devo|posso) fazer (?:se|quando|em caso)", "em caso de", "ficha de seguranca", "fispq", "icsc", "reciclar", "reciclagem"
-    ))
-
-    private val ALVO_EXPLOSIVOS = rx(listOf(
-        """explosiv\w*""", "dinamite", "tnt", "trinitrotolueno", "nitroglicerina", """c ?4 explosiv\w*""", "c-4", "rdx", "hmx", "petn", "hmtd", "tatp", "peroxido de acetona", "triperoxido de triacetona",
-        "azida de (?:chumbo|sodio)", """fulminato\w*""", "anfo", """picrato\w*""", "tetril", "polvora(?: negra| sem fumaca)?", "nitrato de amonio (?:com|e|\\+|mais) (?:diesel|oleo|combustivel|gasolina)",
-        "bomba[s]? (?:caseira[s]?|artesana(?:l|is)|improvisada[s]?|quimica[s]?|incendiaria[s]?|de fumaca|de pressao|relogio|de pregos?|de tubo)", "pipe bomb", "coquetel[s]? molotov", "molotov", "napalm",
-        "explosives?", "nitroglycerin", "gunpowder", "granada[s]?", "artefato[s]? explosivo[s]?", "detonador(?:es)?", "pavio de bomba", "fogos? de artificio(?: caseiro[s]?)?", "termit[ae]", "thermite", "material incendiario", "bomba atomica", "bomba suja"
-    ))
-
-    /** "fazer uma bomba" sem qualificativo inofensivo (bomba d'água, de calor, calorimétrica, de insulina, de vácuo…). */
-    private val FAZER_BOMBA = Regex(
-        """\b(?:fa(?:z|zer|zendo)|fabric\w*|montar|constru\w+|criar|produzir|preparar|make|build)\s+(?:uma?\s+|an?\s+|as\s+|a\s+)?(?:bomba|bomb)\b(?!\s+(?:de\s+)?(?:agua|calor|vacuo|insulina|combustivel|ar|infusao|hidraulica|calorimetrica|centrifuga|submersa|peristaltica|de))"""
-    )
-
-    private val ALVO_ARMAS = rx(listOf(
-        "sarin", "soman", "tabun", "vx", "nerve agents?", "chemical weapons?", "mustard gas", "novichok", """agentes? (?:nervos\w*|neurotoxic\w*|vesican\w*|quimic\w*(?: de guerra)?)""", """armas? quimic\w*""", """armas? bacteriologic\w*""", "arma de destruicao em massa",
-        """gas(?:es)? (?:mostarda|sarin|nervos\w*|lacrimogeneo\w*|toxic\w*|venenos\w*|letal|letais|asfixiante\w*|de guerra|cloro|fosgenio)""", "mostarda (?:sulfurada|nitrogenada)", "fosgenio", "cloropicrina", "lewisita",
-        "ricina", "cianeto(?: de hidrogenio| de potassio| de sodio)?", "acido cianidrico", "cloraminas?", "arsina", "fosfina", "toxina botulinica", "antraz", "cloro gasoso", "cloro em gas", "acido sulfidrico", "gas sulfidrico",
-        "monoxido de carbono (?:para|pra) (?:matar|ferir|envenenar)"
-    ))
-
-    private val ALVO_DROGAS = rx(listOf(
-        "metanfetamina[s]?", "methamphetamine", "cocaine", "heroin", "meth", "cristal (?:de )?meth", "cocaina", "crack", "pasta base", "merla", "heroina", "lsd", "acido lisergico", "mdma", "ecstasy", "extase", "molly", """fentanil\w*""", "fentanyl",
-        "pcp", "fenciclidina", "ketamina", "cetamina", "dmt", "dimetiltriptamina", "mescalina", "psilocibina", "cogumelos? magicos?", "anfetamina[s]?", "ghb", "gbh", "oxicodona", "opio", "maconha", "cannabis",
-        "haxixe", "thc", "canabinoides? sinteticos?", "spice", "bath salts", "catinonas? sinteticas?", "drogas? sinteticas?", "droga[s]? ilicitas?", "entorpecentes?", "lanca[- ]perfume", "cheirinho da loló", "lolo", "skank",
-        "laboratorio clandestino", "narcolaboratorio"
-    ))
-
-    private val PRECURSORES_NOMES = rx(listOf(
-        "efedrina", "pseudoefedrina", "norefedrina", "safrol", "isosafrol", "piperonal", "fenilacetona", "p2p", "fenil-?2-?propanona", "acido fenilacetico", "anidrido acetico", "ergotamina", "ergometrina",
-        "acido antranilico", "n-?acetilantranilico", "acido lisergico", "precursores? (?:de|da|do|para|quimicos?|controlados?)", "precursores? controlados?", "iodo vermelho", "fosforo vermelho"
-    ))
-
-    private val ALVO_DANO = rx(listOf(
-        "envenen\\w+ (?:alguem|uma pessoa|o|a|meu|minha|um|uma|alguns?|animal|animais|cachorro|gato|crianca[s]?|vizinh\\w+|colega|professor\\w*|chefe|marido|esposa|mulher|namorad\\w+|ex)",
-        "matar (?:alguem|uma pessoa|meu|minha|o|a|um|uma)", "assassinar", "intoxicar (?:alguem|uma pessoa|propositalmente)",
-        "veneno[s]? (?:indetectave\\w+|que nao (?:deixa|deixam) rastro\\w*|sem rastro\\w*|letal|letais|mortal|mortais|caseiro[s]?)",
-        "dose letal para matar", "ferir (?:alguem|uma pessoa)", "queimar (?:alguem|uma pessoa) com (?:acido|quimico)", "jogar acido em", "atacar (?:alguem|uma pessoa) com"
-    ))
-
-    private val ALVO_AUTOLESAO = rx(listOf(
-        "me matar", "me suicidar", "suicidio", "suicidar", "tirar (?:a )?minha vida", "acabar com (?:a )?minha vida", "me envenenar", "quero morrer", "morrer sem dor", "morrer sem sofrer", "overdose para morrer",
-        "me machucar", "me ferir", "me cortar", "me intoxicar de proposito"
-    ))
-
-    private val PERIGOSOS_CASEIROS = rx(listOf(
-        "acido (?:sulfurico|nitrico|cloridrico|muriatico|fluoridrico|perclorico|picrico|cianidrico)", "agua regia", "cloro(?: gasoso| em gas)?", "gas cloro", """cianeto\w*""", "arsenio", "arsina", "fosfina", "fosgenio",
-        "mercurio", "fosforo (?:branco|vermelho)", "sodio metalico", "potassio metalico", "amonia anidra", """clorato\w*""", """perclorato\w*""", "peroxido de (?:acetona|metil\\w*|benzoila)",
-        "agua oxigenada (?:concentrada|de? \\d+ ?volumes?)", "nitrato de (?:amonio|potassio) (?:concentrado)?", "permanganato de potassio", "acido sulfidrico", "sulfeto de hidrogenio", "monoxido de carbono",
-        """gas(?:es)? (?:toxic\w*|venenos\w*|inflamave\w*|asfixiante\w*)""", """fluoreto\w*""", "acido fluoridrico", "veneno[s]?", "toxina[s]?", "napalm", "termit[ae]", "thermite", "nitrocelulose", "nitroglicerina", "tolueno nitrado",
-        "acetona e agua oxigenada", "agua sanitaria e (?:amonia|acido|vinagre)", "cloro e amonia", "soda e aluminio"
-    ))
-
-    private val CASA = rx(listOf(
-        "em casa", "caseir[oa]s?", "artesana(?:l|is)", "improvisad[oa]s?", "na cozinha", "no quintal", "na garagem", "no banheiro", "no apartamento",
-        "com produtos? (?:de casa|domesticos?|de limpeza|de supermercado|de farmacia)", "sem laboratorio", "faca voce mesmo", "diy",
-        "com materiais? (?:facil|faceis|de casa|domesticos?)", "usando (?:so |apenas )?produtos? (?:de casa|domesticos?|de limpeza)"
-    ))
-
-    private val RX_OBTENCAO = Regex("""\b(?:extrair|extrac\w*|obter|comprar|conseguir|desvi\w+|sem (?:receita|licenca|autorizacao)|burl\w+|vender|trafic\w*|esconder|escond\w+|sintese|sintetiz\w*)\b""")
-
-    // Palavras-chave "coladas" (sem espaços nem repetições): pegam "explo sivo", "e x p l o s i v o", "m e t a n f e t a m i n a".
-    private fun colar(vararg l: String) = l.map(::colada)
-
-    private val COLADA_ALVOS: Map<CategoriaRecusa, List<String>> = mapOf(
-        CategoriaRecusa.EXPLOSIVOS to colar("explosivo", "nitroglicerina", "dinamite", "trinitrotolueno", "peroxidodeacetona", "molotov", "napalm", "bombacaseira", "bombaartesanal", "polvora", "detonador", "fulminato", "tatp", "hmtd"),
-        CategoriaRecusa.ARMAS_QUIMICAS to colar("sarin", "novichok", "gasmostarda", "agentenervoso", "armaquimica", "fosgenio", "ricina", "gastoxico", "gasvenenoso", "cianeto", "cloraminas", "gascloro"),
-        CategoriaRecusa.DROGAS to colar("metanfetamina", "cocaina", "heroina", "fentanil", "ecstasy", "mdma", "anfetamina", "drogassinteticas", "pastabase", "crack", "lsd", "ketamina", "cetamina"),
-        CategoriaRecusa.PRECURSORES to colar("pseudoefedrina", "efedrina", "safrol", "fenilacetona", "anidridoacetico", "precursores")
-    )
-    private val COLADA_ACOES = colar(
-        "sintese", "sintetizar", "fazer", "fabricar", "produzir", "preparar", "purificar", "refinar", "cozinhar", "extrair", "comofaz", "receita", "passoapasso",
-        "montar", "construir", "obter", "comprar", "escalonar"
-    )
 
     // ---- mensagens -----------------------------------------------------------------------------------------------------------
 
@@ -180,56 +87,67 @@ object Seguranca {
 
     private val LIBERADO = AvaliacaoSeguranca(false)
 
-    private fun recusa(c: CategoriaRecusa, motivo: String) = AvaliacaoSeguranca(true, c, motivo)
+    private fun recusa(c: CategoriaRecusa, motivo: String, idioma: String) = AvaliacaoSeguranca(true, c, motivo, idioma)
 
-    /** "o que fazer se…", "fazer o descarte…" não são pedidos de produção: saem da frase antes de procurar a ação. */
-    private val TIRAR_FAZER_SEGURO = Regex(
-        """\b(?:o que (?:eu |a gente |se )?(?:devo |posso |preciso |deve |tenho que )?fa(?:zer|co|z) (?:se|quando|em caso|apos|depois|com|ao|diante)|fa(?:zer|co|z) (?:o |a |um |uma )?(?:descarte|limpeza|neutralizacao|armazenamento|transporte|manuseio|diluicao|primeiros socorros))\b"""
-    )
-    private val RX_NAO_ALFANUM_ESPACO = Regex("[^a-z0-9]+")
+    /** Idiomas cujos padrões são aplicados: o ativo e, sempre, inglês e português (um pedido perigoso em qualquer idioma é recusado). */
+    fun idiomasDaAvaliacao(idioma: String = Idiomas.PADRAO): List<String> = listOf(Idiomas.normalizar(idioma) ?: Idiomas.PADRAO, "en", Idiomas.PADRAO).distinct()
 
-    fun avaliar(texto: String): AvaliacaoSeguranca {
+    /**
+     * Avalia o pedido com os léxicos de [idiomas] (padrão: pt-BR + en). Autolesão primeiro, em todos os idiomas; depois, por idioma, dano a
+     * pessoas, "fazer uma bomba", alvos graves com ação, precursores e receitas caseiras; por fim a versão "colada" (grafia disfarçada).
+     */
+    fun avaliar(texto: String, idiomas: List<String> = idiomasDaAvaliacao()): AvaliacaoSeguranca {
         val base = limpar(texto)
         if (base.isBlank()) return LIBERADO
         val v1 = espacado(base)
         val v2 = espacado(leet(base))
         val visoes = if (v1 == v2) listOf(v1) else listOf(v1, v2)
+        val lexicos = idiomas.distinct().map { Lexico.de(it) }.distinctBy { it.idioma }
 
-        // autolesão primeiro: resposta de acolhimento, mesmo sem "ação"
-        for (v in visoes) if (ALVO_AUTOLESAO.containsMatchIn(v)) return recusa(CategoriaRecusa.AUTOLESAO, "pedido ligado a autolesão")
+        // autolesão primeiro, em todos os idiomas: resposta de acolhimento, mesmo sem "ação"
+        for (lx in lexicos) for (v in visoes) if (lx.seguranca.alvoAutolesao.containsMatchIn(v)) return recusa(CategoriaRecusa.AUTOLESAO, "pedido ligado a autolesão", lx.idioma)
 
-        for (v in visoes) {
-            val incidente = CONTEXTO_SEGURO.containsMatchIn(v)
-            val vc = TIRAR_FAZER_SEGURO.replace(v, " ")
-            val acao = ACAO.containsMatchIn(vc)
-            val casa = CASA.containsMatchIn(v)
-            // dano a pessoas: o alvo já contém a ação
-            if (ALVO_DANO.containsMatchIn(v)) return recusa(CategoriaRecusa.DANO_A_PESSOAS, "pedido para ferir ou envenenar")
-            if (FAZER_BOMBA.containsMatchIn(vc)) return recusa(CategoriaRecusa.EXPLOSIVOS, "construção de artefato explosivo")
-            // alvos graves: a recusa vale mesmo com palavras de "segurança" na frase (não há como produzir "com segurança")
-            if (acao && ALVO_EXPLOSIVOS.containsMatchIn(vc)) return recusa(CategoriaRecusa.EXPLOSIVOS, "produção de explosivos")
-            if (acao && ALVO_ARMAS.containsMatchIn(vc)) return recusa(CategoriaRecusa.ARMAS_QUIMICAS, "produção de agentes tóxicos ou armas químicas")
-            if (acao && ALVO_DROGAS.containsMatchIn(vc)) return recusa(CategoriaRecusa.DROGAS, "produção ou obtenção de drogas ilícitas")
-            if (acao && PRECURSORES_NOMES.containsMatchIn(vc) && (ALVO_DROGAS.containsMatchIn(vc) || RX_OBTENCAO.containsMatchIn(vc))) {
-                return recusa(CategoriaRecusa.PRECURSORES, "obtenção ou uso de precursores controlados")
-            }
-            // receitas caseiras com reagentes perigosos: "em casa" + produzir; fica de fora quem trata de descarte, EPI, incidente etc.
-            if (!incidente && acao && casa && PERIGOSOS_CASEIROS.containsMatchIn(vc)) {
-                return recusa(CategoriaRecusa.REAGENTES_CASEIROS, "receita caseira com reagente perigoso")
+        for (lx in lexicos) {
+            val s = lx.seguranca
+            for (v in visoes) {
+                val incidente = s.contextoSeguro.containsMatchIn(v)
+                // "o que fazer se…", "fazer o descarte…" não são pedidos de produção: saem da frase antes de procurar a ação
+                val vc = s.tirarFazerSeguro.replace(v, " ")
+                val acao = s.acao.containsMatchIn(vc)
+                val casa = s.casa.containsMatchIn(v)
+                // dano a pessoas: o alvo já contém a ação
+                if (s.alvoDano.containsMatchIn(v)) return recusa(CategoriaRecusa.DANO_A_PESSOAS, "pedido para ferir ou envenenar", lx.idioma)
+                if (s.fazerBomba.containsMatchIn(vc)) return recusa(CategoriaRecusa.EXPLOSIVOS, "construção de artefato explosivo", lx.idioma)
+                // alvos graves: a recusa vale mesmo com palavras de "segurança" na frase (não há como produzir "com segurança")
+                if (acao && s.alvoExplosivos.containsMatchIn(vc)) return recusa(CategoriaRecusa.EXPLOSIVOS, "produção de explosivos", lx.idioma)
+                if (acao && s.alvoArmas.containsMatchIn(vc)) return recusa(CategoriaRecusa.ARMAS_QUIMICAS, "produção de agentes tóxicos ou armas químicas", lx.idioma)
+                if (acao && s.alvoDrogas.containsMatchIn(vc)) return recusa(CategoriaRecusa.DROGAS, "produção ou obtenção de drogas ilícitas", lx.idioma)
+                if (acao && s.precursoresNomes.containsMatchIn(vc) && (s.alvoDrogas.containsMatchIn(vc) || s.precursoresAcao.containsMatchIn(vc))) {
+                    return recusa(CategoriaRecusa.PRECURSORES, "obtenção ou uso de precursores controlados", lx.idioma)
+                }
+                // receitas caseiras com reagentes perigosos: "em casa" + produzir; fica de fora quem trata de descarte, EPI, incidente etc.
+                if (!incidente && acao && casa && s.perigososCaseiros.containsMatchIn(vc)) {
+                    return recusa(CategoriaRecusa.REAGENTES_CASEIROS, "receita caseira com reagente perigoso", lx.idioma)
+                }
             }
         }
 
         // versão colada: tolera "explo sivo", "e x p l o s i v o", "exploosivo"
-        val c = colada(TIRAR_FAZER_SEGURO.replace(RX_NAO_ALFANUM_ESPACO.replace(leet(base), " "), " "))
-        if (c.length >= 8 && !CONTEXTO_SEGURO.containsMatchIn(v1)) {
-            if (COLADA_ACOES.any { c.contains(it) }) {
-                for ((cat, alvos) in COLADA_ALVOS) {
-                    if (alvos.any { c.contains(it) }) return recusa(cat, "pedido de produção (grafia disfarçada)")
+        for (lx in lexicos) {
+            val s = lx.seguranca
+            val c = colada(s.tirarFazerSeguro.replace(RX_NAO_ALFANUM.replace(leet(base), " "), " "))
+            if (c.length >= 8 && !s.contextoSeguro.containsMatchIn(v1) && s.coladaAcoes.any { c.contains(it) }) {
+                for ((cat, alvos) in s.coladaAlvos) {
+                    val categoria = CategoriaRecusa.entries.firstOrNull { it.name == cat } ?: continue
+                    if (alvos.any { c.contains(it) }) return recusa(categoria, "pedido de produção (grafia disfarçada)", lx.idioma)
                 }
             }
         }
         return LIBERADO
     }
+
+    /** Avaliação no idioma ativo (ele + inglês + português). */
+    fun avaliarNoIdioma(texto: String, idioma: String): AvaliacaoSeguranca = avaliar(texto, idiomasDaAvaliacao(idioma))
 
     /** Resposta padrão de recusa. */
     fun respostaRecusa(avaliacao: AvaliacaoSeguranca?): RespostaRecusa {

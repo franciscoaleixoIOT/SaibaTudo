@@ -1,7 +1,7 @@
 // Sobre os dados: versão e assinatura do pacote, fontes e licenças (exatamente como em fontes.json) e referências externas. Rótulos pelo catálogo.
 import { h, icon } from '../dom.js';
 import { fmt } from '../formato.js';
-import { fmtData, t, tl } from '../i18n/index.js';
+import { caminhoPrivacidade, fmtData, t, tl } from '../i18n/index.js';
 import { kvEl, linkExterno, toast } from './componentes.js';
 
 /** Referências que o aplicativo apenas indica por link (nenhum conteúdo é copiado). Textos de uso: catálogo (ui.sobre.referencias). */
@@ -108,6 +108,6 @@ export function viewSobreDados({ store }) {
     h('section', { class: 'secao' }, h('h2', null, t('ui.sobre.comoObtidos')),
       h('ul', { class: 'lista-pontos' }, tl('ui.sobre.como').map((x) => h('li', null, x)))),
     h('section', { class: 'secao' }, h('h2', null, t('ui.sobre.bibliotecas')), BIBLIOTECAS.map(fonteItem)),
-    h('p', { class: 'pequeno mudo' }, t('ui.sobre.rodape'), h('a', { href: '/quimica/privacidade' }, t('ui.sobre.privacidade')), '.'));
+    h('p', { class: 'pequeno mudo' }, t('ui.sobre.rodape'), h('a', { href: caminhoPrivacidade() }, t('ui.sobre.privacidade')), '.'));
   return { titulo: t('ui.sobre.titulo'), node: no };
 }

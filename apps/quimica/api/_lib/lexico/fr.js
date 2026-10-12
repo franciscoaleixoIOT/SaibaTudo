@@ -5,35 +5,35 @@ export default {
  "descricao": "Lexique français de l'interpréteur local (NLU par règles) et des règles de sécurité. Même structure que pt-BR.json (vérifiée par test). Regex sous forme de TEXTE, sans drapeaux : le client met la question en minuscules sans accents (seulement [a-z0-9+-] et espaces) avant de comparer. Traduction initiale par agent (révision humaine en attente).",
  "intencoes": {
   "saudacao": "^(salut+|bonjour|bonsoir|coucou|hey|hello|hi|merci|merci beaucoup|aide|help|au secours|menu|accueil|demarrer|commencer|test|essai)( tout le monde| a tous| assistant| ia| ami| ca va| comment ca va)*$",
-  "ajuda": "\\b(?:que (?:fais tu|sais tu|peux tu faire|fait (?:l app|l application|cette app|cette application|l ia)|sait (?:l app|l application))|qu est ce que (?:tu fais|tu sais faire|l app fait|l application fait|je peux demander)|comment (?:utiliser|utilise t on|fonctionne|marche) (?:l |cette |l application |cette application |l app |l assistant )?(?:app|application|assistant)?|que puis je demander|j ai besoin d aide|qui a (?:fait|cree|developpe) (?:l |cette )?(?:app|application))\\b",
-  "sobreDados": "\\b(?:a propos des donnees|sur les donnees|d ou (?:viennent|proviennent) les donnees|origine des donnees|source des donnees|mise a jour des donnees|les donnees sont (?:elles )?(?:a jour|mises a jour)|version des donnees|quand (?:ont ete|les donnees ont ete) mises a jour|signature des donnees)\\b",
-  "fontes": "\\b(?:quelles sont les (?:sources|licences)|licences? des donnees|quelle est la source|sources? (?:de (?:l |la |cette )?)?(?:information|reponses?)|d ou (?:vient|sort|provient) (?:cette|la) (?:information|reponse)|references?|bibliographie)\\b",
+  "ajuda": "\\b(?:que (?:fais[- ]tu|sais[- ]tu|peux[- ]tu faire|fait (?:l app|l application|cette app|cette application|l ia)|sait (?:l app|l application))|qu est[- ]ce que (?:tu fais|tu sais faire|l app fait|l application fait|je peux demander)|comment (?:utiliser|utilise[- ]t[- ]on|fonctionne|marche) (?:l |cette |le |l )?(?:app|application|assistant)|que puis[- ]je (?:demander|te demander|vous demander|poser)|que peut[- ]on demander|j ai besoin d aide|(?:pouvez|pouvons|peux|peut)[- ](?:vous|tu|on|nous) m aider|aidez[- ]moi|aide[- ]moi|qui a (?:fait|cree|developpe) (?:l |cette )?(?:app|application))\\b",
+  "sobreDados": "\\b(?:a propos des donnees|sur les donnees|d ou (?:viennent|proviennent) les donnees|origine des donnees|source des donnees|mise a jour des donnees|les donnees sont[- ](?:elles )?(?:a jour|mises a jour)|les donnees sont (?:a jour|mises a jour)|version des donnees|quand (?:ont ete|les donnees ont[- ]elles ete|les donnees ont ete) mises a jour|signature des donnees)\\b",
+  "fontes": "\\b(?:quelles (?:sont )?(?:les )?(?:sources|licences)|quelle licence|sous quelle licence|licences? des donnees|quelle est la source|sources? (?:de (?:l |la |cette )?)?(?:information|reponses?)|d ou (?:vient|sort|provient) (?:cette|la) (?:information|reponse)|references?|bibliographie)\\b",
   "balancear": "\\bequilibr\\w*|\\bajust\\w+ (?:l |une |cette )?equation\\b|\\bajust\\w+ (?:les )?coefficients\\b|\\bbalanc\\w*",
-  "conversao": "\\b(?:convert\\w+|convertis|transform\\w+|passer|passe|equivau\\w+|equival\\w+|combien (?:de |d )?\\S+(?: \\S+)? (?:y a t il|il y a|font|valent|dans|correspondent|font ils)|en combien)\\b",
+  "conversao": "\\b(?:convert\\w+|convertis|transform\\w+|passer|passe|equivau\\w+|equival\\w+|combien (?:de |d )?\\S+(?: \\S+)? (?:y a[- ]t[- ]il|il y a|font|valent|dans|correspondent|font[- ]ils)|en combien)\\b",
   "ph": "\\b(?:ph|poh)\\b|\\bacidite de\\b|\\bbasicite\\b|\\balcalinite\\b",
   "gas": "\\b(?:gaz parfaits?|gaz ideal|gaz ideaux|pv ?= ?nrt|pvnrt|loi des gaz|equation (?:de clapeyron|des gaz parfaits|d etat)|clapeyron|volume (?:molaire|d un gaz|du gaz)|pression (?:d un gaz|du gaz)|loi de boyle|loi de mariotte|boyle mariotte|loi de charles|gay lussac)\\b",
   "gasVariavel": "\\bgaz\\b",
-  "concentracao": "\\b(?:molarite|concentration|concentre\\w*|dilu\\w*|c1 ?v1|c1v1|fraction massique|titre massique|pourcentage (?:en )?masse|pour ?cent (?:en )?masse|parties par million|ppm|normalite|molalite|solution de|grammes? par litre|mol l|mol par litre|moles par litre|g l)\\b",
-  "estequiometria": "\\b(?:stoechiometri\\w*|stoechiometri\\w*|reactif (?:limitant|en exces)|limitant|exces de reactif|rendement|combien de (?:moles?|mol|grammes?|molecules?|atomes?|litres?|ions?|particules?|kilos?|kilogrammes?|mg|milligrammes?)\\b|nombre de (?:moles?|molecules|atomes|particules|ions)|cntp|tpn|conditions normales|volume occupe|constante d avogadro|nombre d avogadro)\\b",
+  "concentracao": "\\b(?:molarite|concentration|concentre\\w*|dilu\\w*|c1 ?v1|c1v1|fraction massique|titre massique|pourcentage (?:en |de )?masse|pourcentage massique|pour ?cent (?:en |de )?masse|pour ?cent massique|parties par million|ppm|normalite|molalite|solution de|grammes? par litre|mol l|mol par litre|moles par litre|g l)\\b",
+  "estequiometria": "\\b(?:st(?:oe| )chiometri\\w*|reactif (?:limitant|en exces)|limitant|exces de reactif|rendement|combien de (?:moles?|mol|grammes?|molecules?|atomes?|litres?|ions?|particules?|kilos?|kilogrammes?|mg|milligrammes?)\\b|nombre de (?:moles?|molecules|atomes|particules|ions)|masse de [0-9][0-9.,]* ?(?:mol|moles?|mmol)\\b|cntp|tpn|conditions normales|volume occupe|constante d avogadro|nombre d avogadro)\\b",
   "massaMolar": "\\b(?:masse molaire|masse moleculaire|masse formulaire|poids moleculaire|poids molaire|combien pese (?:une )?mole|quelle est la masse molaire)\\b|\\bg mol\\b",
   "desenhar": "\\b(?:dessin\\w+|structure (?:2d|moleculaire|chimique|plane|de lewis|du|de la|de l|de)|structure|montr\\w+ (?:moi )?(?:la )?(?:structure|molecule)|molecule (?:du|de la|de l|de)|a quoi ressemble (?:la )?(?:molecule|structure)|formule (?:developpee|structurale|semi developpee)|geometrie moleculaire|visualis\\w+|squelette|schema de)\\b",
-  "comparar": "\\b(?:compar\\w+|differences? entre|\\bversus\\b|\\bvs\\b|quelle est la difference|ressemblance\\w*|similitude\\w*|pareil que|semblable a|similaire a)\\b",
-  "seguranca": "\\b(?:danger\\w*|dangereu\\w*|risque\\w*|toxi\\w+|securit\\w+|sur\\b|epi|equipements? de protection|premiers (?:soins|secours)|deversement\\w*|renvers\\w*|fuite\\w*|stock\\w+|entrepos\\w+|incendie\\w*|feu|inflammab\\w+|corrosi\\w+|irritant\\w*|irrit\\w*|ghs|sgh|pictogramme\\w*|mentions? de danger|phrases? h\\b|fiche de (?:donnees de )?securite|fds|icsc|melang\\w+|incompatib\\w+|elimin\\w+|jeter|manipul\\w+|inhal\\w+|ingest\\w+|ingere\\w*|brulure\\w*|poison\\w*|venimeu\\w*|nocif\\w*|fait mal|est ce (?:sur|dangereux)|neutralis\\w+|gants|lunettes de protection|mention d avertissement|classification (?:de|des) danger|cancerigen\\w*|cancerogen\\w*|explosi\\w+|reagit avec l eau|reacti\\w+ avec)\\b",
-  "nomenclatura": "\\b(?:quel est (?:le |son )?nom|comment (?:s appelle|ca s appelle|on appelle|appelle t on)|nom (?:chimique|iupac|systematique|scientifique|officiel)|nomenclature|comment (?:s ecrit|ecrire|on ecrit)|quelle est (?:la |sa )?formule(?: chimique| brute| moleculaire)?|formule (?:du|de la|de l|de|chimique du|chimique de|brute du|brute de|moleculaire du|moleculaire de)|nom du compose)\\b",
+  "comparar": "\\b(?:compar\\w+|differences? entre|\\bversus\\b|\\bvs\\b|quelle est la difference|\\blequel\\b|\\bquel(?:le)? est (?:le |la )?plus\\b|\\blaquelle\\b|ressemblance\\w*|similitude\\w*|pareil que|semblable a|similaire a)\\b",
+  "seguranca": "\\b(?:danger\\w*|dangereu\\w*|risque\\w*|toxi\\w+|securit\\w+|(?:est|est[- ]il|est[- ]elle|c est) sur\\b|epi|equipements? de protection|premiers (?:soins|secours)|deversement\\w*|renvers\\w*|fuite\\w*|stock\\w+|entrepos\\w+|incendie\\w*|feu|inflammab\\w+|corrosi\\w+|irritant\\w*|irrit\\w*|ghs|sgh|pictogramme\\w*|mentions? de danger|phrases? h\\b|fiche de (?:donnees de )?securite|fds|icsc|melang\\w+|incompatib\\w+|elimin\\w+|jeter|manipul\\w+|inhal\\w+|ingest\\w+|ingere\\w*|brulure\\w*|poison\\w*|venimeu\\w*|nocif\\w*|fait mal|est[- ]ce (?:sur|dangereux)|neutralis\\w+|gants|lunettes de protection|mention d avertissement|classification (?:de|des) danger|cancerigen\\w*|cancerogen\\w*|explosi\\w+|reagit avec l eau|reacti\\w+ avec)\\b",
+  "nomenclatura": "\\b(?:quel est (?:le |son )?nom|comment (?:s appelle|ca s appelle|on appelle|appelle[- ]t[- ]on)|nom (?:chimique|iupac|systematique|scientifique|officiel)|nomenclature|comment (?:s ecrit|ecrire|on ecrit|ecrit[- ]on)|quelle est (?:la |sa )?formule(?: chimique| brute| moleculaire)?|formule (?:du|de la|de l|de|chimique du|chimique de|brute du|brute de|moleculaire du|moleculaire de)|nom du compose)\\b",
   "tabela": "\\b(?:tableau periodique|classification periodique|periodicite|tendance\\w*|groupe \\d{1,2}|famille \\d{1,2}|periode \\d|bloc [spdf]|elements? (?:du|de la|des|de) (?:groupe|periode|bloc|famille)|quels (?:sont )?(?:les )?elements|combien d elements|elements (?:gazeux|liquides|solides)|metaux|non metaux|semi metaux|metalloides|halogenes?|gaz nobles?|gaz rares?|alcalino terreux|alcalins?|lanthanides?|actinides?|element le plus|elements les plus|ordre croissant|ordre decroissant|plus (?:grand|grande|haut|haute|eleve|elevee) (?:rayon|electronegativite|energie|point|masse|densite)|plus (?:petit|petite|bas|basse|faible) (?:rayon|electronegativite|energie|point|masse|densite))\\b",
-  "conceitoCue": "^(?:qu est ce qu(?:e |un |une |l )|c est quoi|que (?:veut dire|signifie)|expli\\w*|defin\\w+|concept de|definition (?:de|du|d)|parle moi de|comment (?:fonctionne|marche)|pourquoi|a quoi sert|quelle est (?:la )?(?:definition|difference|importance|fonction|utilite)|difference entre|apprend\\w+ moi|resum\\w+)\\b",
-  "conceitoTemas": "\\b(?:mole|ph|stoechiometrie|liaison (?:ionique|covalente|metallique|chimique)|electronegativite|oxydation|reduction|oxydoreduction|redox|equilibre chimique|enthalpie|entropie|isomerie|acide|base|sel|oxyde|solution|concentration|molarite|dilution|tableau periodique|reaction chimique|cinetique|catalyseur|electrolyse|pile|polarite|forces? intermoleculaires?)\\b"
+  "conceitoCue": "^(?:qu est[- ]ce (?:que |qu )?|c est quoi |que (?:veut dire|signifie)|expli\\w*(?:[- ]moi)?|defin\\w+|concept de|definition (?:de|du|d)|parle[- ]moi de|dis[- ]moi (?:ce que|ce qu)|comment (?:fonctionne|marche)|pourquoi|a quoi sert|quelle est (?:la )?(?:definition|difference|importance|fonction|utilite)|difference entre|apprend\\w*[- ]moi|resum\\w+)\\b",
+  "conceitoTemas": "\\b(?:mole|ph|st(?:oe| )chiometrie|liaison (?:ionique|covalente|metallique|chimique)|electronegativite|oxydation|reduction|oxydoreduction|redox|equilibre chimique|enthalpie|entropie|isomerie|acide|base|sel|oxyde|solution|concentration|molarite|dilution|tableau periodique|reaction chimique|cinetique|catalyseur|electrolyse|pile|polarite|forces? intermoleculaires?)\\b"
  },
  "pistas": {
   "querCalcular": "\\b(?:limitant|rendement|combien|masse de|grammes?|moles?|mol|produi\\w*|form\\w*|obt\\w+|reagi\\w*|consomm\\w+|reste\\w*|exces|volume|litres?)\\b",
   "conversaoPreposicoes": "(?:->|→| en | vers | to )",
-  "paraUnidade": "\\b(?:en|vers|jusqu a|a)\\s+(?:le |la |les |l )?([A-Za-zµμ°º/³²·.]+(?: celsius| fahrenheit| par litre| de mercure)?)\\s*[?!.]*$",
-  "quantosUnidade": "^\\s*combien (?:de |d )((?:degres\\s+)?[A-Za-zµμ°º/³²·.]+(?: celsius| fahrenheit)?)\\s+(?:y a t il|il y a|font|valent|dans|correspondent|fait|vaut)(?![A-Za-zÀ-ÿ])",
+  "paraUnidade": "(?:\\b(?:en|vers|jusqu['’ ]?a)|(?:^|\\s)[aà])\\s+(?:le |la |les |l['’ ])?((?:degr[eé]s?\\s+)?[A-Za-zÀ-ÿµμ°º/³²·.]+(?: celsius| fahrenheit| par litre| de mercure)?)\\s*[?!.]*$",
+  "quantosUnidade": "^\\s*combien (?:de |d['’ ])((?:degr[eé]s\\s+)?[A-Za-zÀ-ÿµμ°º/³²·.]+(?: celsius| fahrenheit)?)\\s+(?:y a[- ]t[- ]il|il y a|font|valent|dans|correspondent|fait|vaut)(?![A-Za-zÀ-ÿ])",
   "phContexto": "\\b(?:acide|base|solution)\\b",
   "conector": "\\b(?:de|du|d)\\b",
-  "prefixoExplicacao": "^(?:qu est ce|c est quoi|que veut dire|que signifie|expli|defin|concept|definition|comment fonctionne|comment marche|pourquoi)",
-  "prefixoExplicacaoPalavra": "^(?:qu est ce|c est quoi|que veut dire|que signifie|expli|defin|concept|definition|comment fonctionne|comment marche|pourquoi)\\b",
-  "prefixoDefinicao": "^(?:qu est ce|c est quoi|que veut dire|que signifie|expli|defin|concept|definition)\\b",
+  "prefixoExplicacao": "^(?:qu est[- ]ce|c est quoi|que veut dire|que signifie|expli|defin|concept|definition|comment fonctionne|comment marche|pourquoi)",
+  "prefixoExplicacaoPalavra": "^(?:qu est[- ]ce|c est quoi|que veut dire|que signifie|expli\\w*|defin\\w*|concept|definition|parle[- ]moi de|comment fonctionne|comment marche|pourquoi)\\b",
+  "prefixoDefinicao": "^(?:qu est[- ]ce|c est quoi|que veut dire|que signifie|expli\\w*|defin\\w*|concept|definition)\\b",
   "gasGrandezas": "\\b(?:volume|pression|temperature|moles?|mol|combien)\\b",
   "concentracaoForte": "\\bdilu\\w*|molarite|concentration\\b",
   "propriedadesPalavra": "\\bproprietes\\b",
@@ -47,7 +47,7 @@ export default {
   "bloco": "\\bbloc\\s+([spdf])\\b",
   "continuacao": "^et (?:le |la |les |l |celui |celle |ceux )?(?:de |du |des |d |pour )?",
   "limparConceito": [
-   "^(?:est |sont |signifie |veut dire |serait |ce que |que )+",
+   "^[- ]*(?:est |sont |signifie |veut dire |serait |ce que |que |moi )*",
    "^(?:un |une |le |la |les |l |de |du |des |d )+"
   ],
   "constantes": "\\b(pka|pkb|ka|kb)\\s*(?:=|:|de|egal a|egale a|vaut|est)?\\s*([0-9][0-9.,]*(?:\\s*(?:[x×*]\\s*10\\s*\\^?\\s*\\{?-?\\d+\\}?|e-?\\d+))?)",
@@ -78,7 +78,7 @@ export default {
    "K"
   ],
   [
-   "^atmospheres?$",
+   "^atmospheres?$|^atmosph$",
    "atm"
   ],
   [
@@ -272,72 +272,72 @@ export default {
  ],
  "extremos": [
   [
-   "\\bplus electronegati\\w+|\\bplus (?:grande|forte|haute) electronegativite",
+   "\\bplus electronegati\\w+|\\bplus (?:grande|forte|haute|elevee) electronegativite|\\belectronegativite (?:la )?plus (?:grande|forte|haute|elevee)",
    "eletronegatividade",
    "max"
   ],
   [
-   "\\bmoins electronegati\\w+|\\bplus (?:petite|faible|basse) electronegativite",
+   "\\bmoins electronegati\\w+|\\bplus (?:petite|faible|basse) electronegativite|\\belectronegativite (?:la )?plus (?:petite|faible|basse)",
    "eletronegatividade",
    "min"
   ],
   [
-   "\\bplus dense\\b|\\bplus (?:grande|forte|haute) densite|\\bplus lourd",
+   "\\bplus dense\\b|\\bplus (?:grande|forte|haute|elevee) (?:densite|masse volumique)|\\b(?:densite|masse volumique) (?:la )?plus (?:grande|forte|haute|elevee)",
    "densidadeKgm3",
    "max"
   ],
   [
-   "\\bmoins dense\\b|\\bplus (?:petite|faible|basse) densite|\\bplus leger",
+   "\\bmoins dense\\b|\\bplus (?:petite|faible|basse) (?:densite|masse volumique)|\\b(?:densite|masse volumique) (?:la )?plus (?:petite|faible|basse)",
    "densidadeKgm3",
    "min"
   ],
   [
-   "\\bplus (?:grand|gros) rayon|\\bplus volumineu\\w+",
+   "\\bplus (?:grand|gros) rayon|\\brayon (?:atomique )?(?:le )?plus (?:grand|gros)|\\bplus volumineu\\w+",
    "raioAtomicoPm",
    "max"
   ],
   [
-   "\\bplus petit rayon",
+   "\\bplus petit rayon|\\brayon (?:atomique )?(?:le )?plus petit",
    "raioAtomicoPm",
    "min"
   ],
   [
-   "\\bplus (?:haut|eleve|grand) point de fusion",
+   "\\bplus (?:haut|eleve|grand) point de fusion|\\bpoint de fusion (?:le )?plus (?:haut|eleve|grand)",
    "pontoFusaoK",
    "max"
   ],
   [
-   "\\bplus (?:bas|faible|petit) point de fusion",
+   "\\bplus (?:bas|faible|petit) point de fusion|\\bpoint de fusion (?:le )?plus (?:bas|faible|petit)",
    "pontoFusaoK",
    "min"
   ],
   [
-   "\\bplus (?:haut|eleve|grand) point d ebullition",
+   "\\bplus (?:haut|eleve|grand) point d ebullition|\\bpoint d ebullition (?:le )?plus (?:haut|eleve|grand)",
    "pontoEbulicaoK",
    "max"
   ],
   [
-   "\\bplus (?:bas|faible|petit) point d ebullition",
+   "\\bplus (?:bas|faible|petit) point d ebullition|\\bpoint d ebullition (?:le )?plus (?:bas|faible|petit)",
    "pontoEbulicaoK",
    "min"
   ],
   [
-   "\\bplus (?:haute|elevee|grande) energie d ionisation",
+   "\\bplus (?:haute|elevee|grande) energie d ionisation|\\benergie d ionisation (?:la )?plus (?:haute|elevee|grande)",
    "energiaIonizacaoKJmol",
    "max"
   ],
   [
-   "\\bplus (?:basse|faible|petite) energie d ionisation",
+   "\\bplus (?:basse|faible|petite) energie d ionisation|\\benergie d ionisation (?:la )?plus (?:basse|faible|petite)",
    "energiaIonizacaoKJmol",
    "min"
   ],
   [
-   "\\bplus lourd\\w*|\\bplus (?:grande|haute|elevee) masse atomique",
+   "\\bplus lourd\\w*|\\bplus (?:grande|haute|elevee) masse atomique|\\bmasse atomique (?:la )?plus (?:grande|haute|elevee)",
    "massaAtomica",
    "max"
   ],
   [
-   "\\bplus (?:petite|faible|basse) masse atomique|\\bplus leger atome",
+   "\\bplus (?:petite|faible|basse) masse atomique|\\bmasse atomique (?:la )?plus (?:petite|faible|basse)|\\bplus leger\\w*",
    "massaAtomica",
    "min"
   ]
@@ -418,7 +418,21 @@ export default {
    "est solide",
    "est liquide",
    "est gazeux",
-   "est un gaz"
+   "est un gaz",
+   "est il liquide",
+   "est il solide",
+   "est il gazeux",
+   "est il un gaz",
+   "est elle liquide",
+   "est elle solide",
+   "est elle gazeuse",
+   "est-il liquide",
+   "est-il solide",
+   "est-il gazeux",
+   "est-il un gaz",
+   "est-elle liquide",
+   "est-elle solide",
+   "est-elle gazeuse"
   ],
   "estadosOxidacao": [
    "etats d oxydation",
@@ -658,7 +672,33 @@ export default {
   "nom",
   "masse",
   "molaire",
-  "etat"
+  "etat",
+  "pas",
+  "cet",
+  "nos",
+  "tel",
+  "periodique",
+  "difference",
+  "differences",
+  "definition",
+  "explication",
+  "signification",
+  "exemple",
+  "exemples",
+  "importance",
+  "utilite",
+  "poser",
+  "passer",
+  "fontes",
+  "titre",
+  "litre",
+  "litres",
+  "plane",
+  "eleve",
+  "elevee",
+  "rayon",
+  "rayons",
+  "master"
  ],
  "simbolosAmbiguos": [
   "Na",
@@ -719,6 +759,7 @@ export default {
   "acao": [
    "fai(?:re|s|t|sons|tes|sant)",
    "fabriqu\\w*",
+   "fabrication",
    "produi\\w*",
    "production",
    "prepar\\w*",
@@ -742,12 +783,14 @@ export default {
    "dissimul\\w*",
    "extrai\\w*",
    "extraction",
-   "cuisin\\w*",
-   "mont\\w*",
+   "cuisin(?:er|ez|ons|ant)",
+   "(?:je|tu|on|nous|vous|ils?|elles?) cuisin(?:e|es|ent)",
+   "mont(?:er|e|es|ons|ez|ent|ant|ages?|ees?)",
    "assembl\\w*",
    "constru(?:ire|is|it|isons|isez|isent)",
-   "cre\\w*",
-   "gener\\w*",
+   "cre(?:er|ez|ons|ant|ation)",
+   "(?:je|tu|on) cree",
+   "gener(?:er|e|es|ons|ez|ent|ant|ation|ees?)",
    "purifi\\w*",
    "raffin\\w*",
    "cristallis\\w*",
@@ -773,7 +816,8 @@ export default {
    "quels produits",
    "de quoi ai je besoin pour (?:faire|produire|fabriquer)",
    "ingredients pour",
-   "materiel pour (?:faire|monter|produire|fabriquer)"
+   "materiel pour (?:faire|monter|produire|fabriquer)",
+   "sans (?:ordonnance|licence|autorisation|permis)"
   ],
   "contextoSeguro": [
    "elimin\\w*",
@@ -813,7 +857,7 @@ export default {
    "icsc",
    "recycl\\w*"
   ],
-  "tirarFazerSeguro": "\\b(?:que (?:dois je|puis je|faut il|doit on|peut on|devrais je) faire (?:si|quand|en cas|lorsque|apres|avec|face a)|que faire (?:si|quand|en cas|lorsque|apres|avec|face a)|faire (?:l |la |le |un |une )?(?:elimination|nettoyage|neutralisation|stockage|transport|manipulation|dilution|premiers soins|premiers secours))\\b",
+  "tirarFazerSeguro": "\\b(?:que (?:(?:dois|puis|devrais|peux|doit|peut|faut|pourrais|pourrait|devons|pouvons)[- ](?:je|tu|on|il|nous|vous) )?faire (?:si|quand|en cas|lorsque|apres|avec|face a|de la|de l|des|du|de|d)|faire (?:l |la |le |un |une )?(?:elimination|nettoyage|neutralisation|stockage|transport|manipulation|dilution|premiers soins|premiers secours|rangement|recyclage|(?:un |une |le |la |l |des )?(?:expose|presentation|resume|dissertation|devoir|fiche|recherche|etude|rapport|analyse|calcul|schema|dessin|bilan|inventaire)s?))\\b",
   "alvoExplosivos": [
    "explosi\\w*",
    "dynamite",
@@ -1027,7 +1071,13 @@ export default {
    "m intoxiquer volontairement",
    "me matar",
    "suicidio",
-   "kill myself"
+   "kill myself",
+   "s empoisonner",
+   "s intoxiquer volontairement",
+   "se tuer",
+   "se suicider",
+   "me donner la mort",
+   "(?:dose|quantite|combien) .{0,40}pour (?:mourir|me tuer|en finir)"
   ],
   "perigososCaseiros": [
    "acide (?:sulfurique|nitrique|chlorhydrique|muriatique|fluorhydrique|perchlorique|picrique|cyanhydrique)",

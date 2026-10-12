@@ -88,14 +88,26 @@ test('unidades por extenso em cada idioma e quantidades com os dois separadores 
   assert.deepEqual(q('5 degrees celsius', 'en'), [[5, '°C']]);
   assert.deepEqual(q('1.234,56 g', 'pt-BR'), [[1234.56, 'g']]);
   assert.deepEqual(q('1,234.56 g', 'en'), [[1234.56, 'g']]);
+  // es, de e fr: vírgula e ponto decimais, milhar do idioma, unidades coladas à preposição do idioma
+  assert.deepEqual(q('1,5 mol/L de HCl', 'es'), [[1.5, 'mol/L']]);
+  assert.deepEqual(q('1.5 mol/L de HCl', 'es'), [[1.5, 'mol/L']]);
+  assert.deepEqual(q('100 mL de agua a 300 K', 'es'), [[100, 'mL'], [300, 'K']]);
+  assert.deepEqual(q('2,5 mol Wasser', 'de'), [[2.5, 'mol']]);
+  assert.deepEqual(q('1.5 mol/L HCl', 'de'), [[1.5, 'mol/L']]);
+  assert.deepEqual(q('100 mL Wasser bei 300 K', 'de'), [[100, 'mL'], [300, 'K']]);
+  assert.deepEqual(q('1,5 mol/L de HCl', 'fr'), [[1.5, 'mol/L']]);
+  assert.deepEqual(q('100 mL d eau à 300 K', 'fr'), [[100, 'mL'], [300, 'K']]);
+  assert.deepEqual(q('1.234,56 g', 'de'), [[1234.56, 'g']]);
+  assert.deepEqual(q('1.234,56 g', 'es'), [[1234.56, 'g']]);
 });
 
-test('segurança por idioma: o idioma ativo E sempre inglês e português; os casos pt-BR também são recusados pelo léxico en+pt e vice-versa', () => {
+test('segurança por idioma: o idioma ativo E sempre inglês e português; os casos pt-BR e en valem sob QUALQUER idioma ativo; cada idioma recusa os próprios casos com o próprio léxico', () => {
   assert.deepEqual(idiomasDaAvaliacao('de'), ['de', 'en', 'pt-BR']);
   assert.deepEqual(idiomasDaAvaliacao('en'), ['en', 'pt-BR']);
   const casos = JSON.parse(readFileSync(resolve(RAIZ, 'contracts/seguranca_cases.json'), 'utf8')).cases;
-  const en = casos.filter((c) => c.idioma === 'en');
-  const pt = casos.filter((c) => !c.idioma);
+  const doIdioma = (i) => casos.filter((c) => (c.idioma ?? 'pt-BR') === i);
+  const pt = doIdioma('pt-BR');
+  const en = doIdioma('en');
   assert.ok(en.filter((c) => c.recusar).length >= 40 && en.filter((c) => !c.recusar).length >= 40, 'casos em inglês suficientes');
   for (const idioma of IDIOMAS) {
     const falhas = [];
@@ -106,9 +118,24 @@ test('segurança por idioma: o idioma ativo E sempre inglês e português; os ca
     }
     assert.deepEqual(falhas, [], `com o idioma ativo ${idioma}`);
   }
-  // só o léxico en (sem pt) recusa os casos em inglês; só o pt recusa os em português
-  for (const c of en.filter((x) => x.recusar)) assert.equal(avaliarSeguranca(c.q, ['en']).recusar, true, `só en: ${c.q}`);
-  for (const c of pt.filter((x) => x.recusar)) assert.equal(avaliarSeguranca(c.q, ['pt-BR']).recusar, true, `só pt: ${c.q}`);
+  // só o léxico do próprio idioma (sem os de reserva) recusa os casos do idioma; os pedidos legítimos de um idioma também passam sob o léxico de cada outro idioma ativo
+  for (const idioma of IDIOMAS) {
+    const proprios = doIdioma(idioma);
+    for (const c of proprios.filter((x) => x.recusar)) assert.equal(avaliarSeguranca(c.q, [idioma]).recusar, true, `só ${idioma}: ${c.q}`);
+    const falhas = [];
+    for (const c of proprios) {
+      for (const ativo of IDIOMAS) {
+        const r = avaliarSeguranca(c.q, idiomasDaAvaliacao(ativo));
+        if (!c.recusar && r.recusar) falhas.push(`[${ativo}] recusou indevidamente (${idioma}): "${c.q}" (${r.categoria}/${r.idioma})`);
+        // o idioma do caso, ativo, decide a categoria; sob outro idioma ativo o pedido do idioma não coberto por en/pt-BR pode passar, mas nunca ser permitido pelo PRÓPRIO idioma
+        if (c.recusar && ativo === idioma) {
+          if (!r.recusar) falhas.push(`[${ativo}] NÃO recusou (${idioma}): "${c.q}"`);
+          else if (c.categoria && r.categoria !== c.categoria) falhas.push(`[${ativo}] categoria de "${c.q}": esperada ${c.categoria}, veio ${r.categoria}`);
+        }
+      }
+    }
+    assert.deepEqual(falhas, [], `casos de ${idioma}`);
+  }
 });
 
 test('o NLU em inglês usa o léxico en: intenções, propriedades e categorias com o pacote de teste', async () => {

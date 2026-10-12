@@ -124,7 +124,7 @@ internal suspend fun AnswerBuilder.estequiometria(q: ParsedQuery): Resposta {
     val conhecidas = mutableListOf<QuantidadeConhecida>()
     val usadas = mutableSetOf<Int>()
     val rotulos = bal.equacao.todas.map { it.rotulo }
-    for (ql in Quantidades.ler(texto, un)) {
+    for (ql in Quantidades.ler(texto, un, dic.lexico)) {
         val u = ql.unidade?.let { unidadeDe(it) } ?: continue
         if (u.grandeza != "massa" && u.grandeza != "quantidade") continue
         val indice = especieMaisProxima(texto, ql.faixa, rotulos) ?: continue

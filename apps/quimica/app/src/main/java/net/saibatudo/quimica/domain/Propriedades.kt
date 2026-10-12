@@ -1,5 +1,6 @@
 package net.saibatudo.quimica.domain
 
+import net.saibatudo.quimica.ai.nlu.lexico.Lexico
 import net.saibatudo.quimica.data.model.CategoriaElemento
 import net.saibatudo.quimica.data.model.Composto
 import net.saibatudo.quimica.data.model.Elemento
@@ -60,19 +61,45 @@ object Propriedades {
         p("tpsa", "área de superfície polar (TPSA)", "composto", "tpsa", "numero", "Å²", "tpsa", "area de superficie polar")
     )
 
-    /** Lista efetiva: a do pacote (regras.propriedades) complementa ou substitui a padrão por id. */
-    fun tabela(regras: Regras): List<PropriedadeDef> {
+    /**
+     * Lista efetiva no [idioma] (espelha `tabelaDePropriedades` do site): a padrão, com os sinônimos do LÉXICO do idioma
+     * (contracts/lexico/<idioma>.json, `propriedades`), enriquecida com `regras.propriedades` do pacote — casada pelo id ou pelo campo de
+     * `origem` ("elementos.pontoFusaoK"); somam-se os sinônimos do pacote (`sinonimos` legados valem em pt-BR; `sinonimosPorIdioma[idioma]`
+     * no idioma) e o rótulo passa a ser `rotulos[idioma]`. Propriedade do pacote sem correspondente e sem `campo` (pictogramas, frases H)
+     * fica de fora: os perigos têm tratamento próprio.
+     */
+    fun tabela(regras: Regras, idioma: String = Idiomas.PADRAO): List<PropriedadeDef> {
+        val id = Idiomas.normalizar(idioma) ?: Idiomas.PADRAO
+        val lex = Lexico.de(id)
         val mapa = LinkedHashMap<String, PropriedadeDef>()
-        PADRAO.forEach { mapa[it.id] = it }
+        PADRAO.forEach { mapa[it.id] = it.copy(sinonimos = lex.propriedades[it.id].orEmpty()) }
+        fun doPacote(r: PropriedadeDef) = (if (id == Idiomas.PADRAO) r.sinonimos else emptyList()) + r.sinonimosPorIdioma[id].orEmpty()
+        // rótulo: o do idioma no pacote; em pt-BR o `rotulo`/`nome` do pacote; nos outros idiomas o inglês do pacote e, sem ele, o padrão
+        fun rotulo(r: PropriedadeDef, padrao: String) = r.rotulos[id] ?: if (id == Idiomas.PADRAO) r.rotulo else r.rotulos["en"] ?: padrao
         for (r in regras.propriedades) {
-            val base = mapa[r.id]
-            mapa[r.id] = if (base == null) r.copy(alvo = r.alvo.ifEmpty { "elemento" }, tipo = r.tipo.ifEmpty { "texto" }) else r.copy(
-                campo = r.campo ?: base.campo,
-                alvo = r.alvo.ifEmpty { base.alvo },
-                tipo = r.tipo.ifEmpty { base.tipo },
-                unidade = r.unidade ?: base.unidade,
-                sinonimos = (base.sinonimos + r.sinonimos).distinct()
-            )
+            val alvoR = r.alvo.takeIf { it.isNotEmpty() }
+            var chave = r.id.takeIf { mapa.containsKey(it) }
+            if (chave == null && r.origem != null) {
+                val caminho = r.origem.split('.').drop(1)                                   // [pontoFusaoK] | [descoberta, ano] | [propriedades, xlogp]
+                val campo = if (caminho.firstOrNull() == "propriedades") caminho.getOrNull(1) else caminho.firstOrNull()
+                chave = mapa.values.firstOrNull { x -> (alvoR == null || x.alvo == alvoR) && (x.campo == campo || (caminho.firstOrNull() == "propriedades" && x.id == campo)) }?.id
+            }
+            val base = chave?.let { mapa[it] }
+            if (base != null) {
+                mapa[base.id] = base.copy(
+                    rotulo = rotulo(r, base.rotulo),
+                    campo = r.campo ?: base.campo,
+                    alvo = r.alvo.ifEmpty { base.alvo },
+                    tipo = r.tipo.ifEmpty { base.tipo },
+                    unidade = r.unidade ?: base.unidade,
+                    sinonimos = (base.sinonimos + doPacote(r)).distinct(),
+                    rotulos = r.rotulos, sinonimosPorIdioma = r.sinonimosPorIdioma
+                )
+                continue
+            }
+            if (r.campo != null) {
+                mapa[r.id] = r.copy(alvo = r.alvo.ifEmpty { "elemento" }, tipo = r.tipo.ifEmpty { "texto" }, sinonimos = doPacote(r), rotulo = rotulo(r, r.rotulo))
+            }
         }
         return mapa.values.toList()
     }

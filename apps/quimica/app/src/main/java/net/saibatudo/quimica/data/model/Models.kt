@@ -49,6 +49,8 @@ data class Elemento(
     val simbolo: String,
     val nome: String,
     val nomeEn: String? = null,
+    /** Nome por idioma (`elementos[].nomes`, Wikidata; es/fr vêm em minúsculas como no Wikidata). Só os idiomas com dado. */
+    val nomes: Map<String, String> = emptyMap(),
     val massaAtomica: Double? = null,
     val massaAtomicaIncerteza: Double? = null,
     val grupo: Int? = null,
@@ -91,6 +93,10 @@ data class Composto(
     val nomeIupac: String? = null,
     val nomePtPendente: Boolean = false,
     val sinonimos: List<String> = emptyList(),
+    /** Nome por idioma (`compostos[].nomes`, Wikidata; sem `pt-BR` quando o nome em português está pendente; `en` nunca é o IUPAC). */
+    val nomes: Map<String, String> = emptyMap(),
+    /** Apelidos por idioma (`compostos[].sinonimosPorIdioma`, até 10 por idioma). */
+    val sinonimosPorIdioma: Map<String, List<String>> = emptyMap(),
     val formula: String? = null,
     val formulaHill: String? = null,
     val massaMolar: Double? = null,
@@ -136,8 +142,24 @@ data class Trecho(
     val textoOriginal: String? = null,
     val textoPt: String? = null,
     val traducao: String? = null,
-    val palavrasChave: List<String> = emptyList()
-)
+    val palavrasChave: List<String> = emptyList(),
+    /** Idioma do TEXTO como vem no trecho (`pt`, `en`, `es`…); ausente nos pacotes antigos (= português). */
+    val idiomaTexto: String? = null,
+    /** Caminho do arquivo do pacote de onde o trecho veio (lote ou arquivo avulso). */
+    val caminho: String? = null
+) {
+    /** Idioma do trecho no código do projeto (`pt-BR`, `en`…), para casar com o idioma ativo; sem o campo vale português. */
+    val idioma: String get() = net.saibatudo.quimica.domain.Idiomas.normalizar(idiomaTexto) ?: net.saibatudo.quimica.domain.Idiomas.PADRAO
+}
+
+/** Um trecho listado em `textos/index.json` (sem o texto: só o que serve para escolher o lote). */
+data class TrechoIndice(val id: String, val titulo: String? = null, val chave: String? = null)
+
+/** Um lote de textos (`textos/<fonte>/lote-NNN.json`) listado no índice, com o idioma no código do projeto. */
+data class LoteTextos(val caminho: String, val fonte: String, val idioma: String, val trechos: List<TrechoIndice>)
+
+/** `textos/index.json` (docs/DATA_CONTRACT.md §5): os lotes de trechos por fonte e idioma. */
+data class TextosIndice(val versao: Int, val lotes: List<LoteTextos>)
 
 /** Definição de propriedade pesquisável (regras.propriedades). `alvo`: elemento ou composto; `tipo` define a formatação. */
 data class PropriedadeDef(
@@ -147,7 +169,13 @@ data class PropriedadeDef(
     val alvo: String = "elemento",
     val tipo: String = "texto",
     val unidade: String? = null,
-    val sinonimos: List<String> = emptyList()
+    val sinonimos: List<String> = emptyList(),
+    /** Rótulo por idioma (`regras.propriedades[id].rotulos`). */
+    val rotulos: Map<String, String> = emptyMap(),
+    /** Sinônimos por idioma (`regras.propriedades[id].sinonimosPorIdioma`); `sinonimos` continua sendo pt-BR. */
+    val sinonimosPorIdioma: Map<String, List<String>> = emptyMap(),
+    /** Campo de origem no formato do pipeline ("elementos.pontoFusaoK", "compostos.propriedades.xlogp"). */
+    val origem: String? = null
 )
 
 /** Unidade de medida: base = valor × fator + offset (unidade-base da grandeza). */
@@ -174,7 +202,9 @@ data class Regras(
     val solubilidade: List<String> = emptyList(),
     val nomenclatura: List<String> = emptyList(),
     /** Frases H (código → texto em português), se o pacote trouxer. */
-    val frasesH: Map<String, String> = emptyMap()
+    val frasesH: Map<String, String> = emptyMap(),
+    /** Frases H por idioma (`ghs_frases.json`: código → idioma → texto oficial do Anexo III do CLP). */
+    val frasesHPorIdioma: Map<String, Map<String, String>> = emptyMap()
 )
 
 /** Entrada do índice de compostos (cid → lote) com os dados necessários para a busca. */
@@ -184,7 +214,11 @@ data class EntradaIndice(
     val nomes: List<String> = emptyList(),
     val formula: String? = null,
     val cas: String? = null,
-    val nomePtPendente: Boolean = false
+    val nomePtPendente: Boolean = false,
+    /** Chaves de busca já normalizadas do formato do pipeline (`index.nomes` = [[chave, cid]]): nomes, sinônimos e fórmulas. */
+    val chaves: List<String> = emptyList(),
+    /** Chaves por idioma (`index.nomesPorIdioma[idioma]`): só as que não estão em [chaves]. */
+    val chavesPorIdioma: Map<String, List<String>> = emptyMap()
 )
 
 class CompostoIndice(val entradas: List<EntradaIndice>) {

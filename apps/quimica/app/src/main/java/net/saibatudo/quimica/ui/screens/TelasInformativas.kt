@@ -26,12 +26,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import net.saibatudo.quimica.BuildConfig
+import net.saibatudo.quimica.R
 import net.saibatudo.quimica.data.bundle.EstadoAtualizacao
 import net.saibatudo.quimica.data.prefs.Nivel
 import net.saibatudo.quimica.data.prefs.TamanhoFonte
@@ -39,6 +41,7 @@ import net.saibatudo.quimica.data.prefs.TemaApp
 import net.saibatudo.quimica.data.prefs.UserPreferences
 import net.saibatudo.quimica.data.repository.Pacote
 import net.saibatudo.quimica.domain.GhsTextos
+import net.saibatudo.quimica.domain.Idiomas
 import net.saibatudo.quimica.ui.components.AvisoBox
 import net.saibatudo.quimica.ui.components.Cartao
 import net.saibatudo.quimica.ui.components.FontesView
@@ -66,7 +69,7 @@ fun MaisScreen(onAbrir: (Tela) -> Unit, modifier: Modifier = Modifier) {
         Triple("Segurança e GHS", "Pictogramas, palavras de sinal e frases de perigo", Tela.Seguranca),
         Triple("Sobre os dados", "Versão, fontes, licenças e atualização", Tela.Sobre),
         Triple("Privacidade", "O que fica no aparelho e o que sai dele", Tela.Privacidade),
-        Triple("Configurações", "Tema, tamanho do texto e nível", Tela.Configuracoes)
+        Triple("Configurações", "Idioma, tema, tamanho do texto e nível", Tela.Configuracoes)
     )
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         Text("Mais", Modifier.padding(16.dp).semantics { heading() }, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
@@ -259,9 +262,16 @@ fun PrivacidadeScreen(onAbrirUrl: (String) -> Unit, onLimparHistorico: () -> Uni
 @Composable
 fun ConfiguracoesScreen(
     prefs: UserPreferences, onTema: (TemaApp) -> Unit, onFonte: (TamanhoFonte) -> Unit, onNivel: (Nivel) -> Unit, onEconomia: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier, idioma: String = Idiomas.PADRAO, onIdioma: (String) -> Unit = {}
 ) {
     Pagina("Configurações", modifier) {
+        Cartao {
+            TituloSecao(stringResource(R.string.config_idioma_titulo))
+            Text(stringResource(R.string.config_idioma_descricao), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Column(Modifier.selectableGroup()) {
+                IDIOMAS_DO_SELETOR.forEach { (id, rotulo) -> OpcaoRadio(stringResource(rotulo), null, idioma == id) { onIdioma(id) } }
+            }
+        }
         Cartao {
             TituloSecao("Tema")
             Column(Modifier.selectableGroup()) {
@@ -292,6 +302,11 @@ fun ConfiguracoesScreen(
         }
     }
 }
+
+/** Idiomas do seletor, cada um com o nome no próprio idioma (endônimo, igual em todos os catálogos). */
+private val IDIOMAS_DO_SELETOR: List<Pair<String, Int>> = listOf(
+    "pt-BR" to R.string.idioma_pt_br, "en" to R.string.idioma_en, "es" to R.string.idioma_es, "de" to R.string.idioma_de, "fr" to R.string.idioma_fr
+)
 
 @Composable
 private fun OpcaoRadio(rotulo: String, descricao: String?, selecionado: Boolean, onClick: () -> Unit) {

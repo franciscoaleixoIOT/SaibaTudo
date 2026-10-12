@@ -3,6 +3,9 @@ package net.saibatudo.quimica.ai.nlu
 import net.saibatudo.quimica.data.model.Composto
 import net.saibatudo.quimica.data.model.PropriedadeDef
 import net.saibatudo.quimica.data.repository.Pacote
+import net.saibatudo.quimica.ai.nlu.lexico.Lexico
+import net.saibatudo.quimica.domain.Idiomas
+import net.saibatudo.quimica.domain.Nomes
 import net.saibatudo.quimica.domain.Propriedades
 import net.saibatudo.quimica.domain.Texto
 import net.saibatudo.quimica.domain.calc.FormulaQuimica
@@ -35,19 +38,31 @@ data class PropriedadeAchada(val id: String, val alvo: String, val pos: Int)
 data class ResultadoBusca(val ehElemento: Boolean, val titulo: String, val detalhe: String, val z: Int? = null, val cid: Long? = null, val pontos: Int = 0)
 
 /**
- * Dicionário do NLU, derivado dos DADOS do pacote: nomes de elementos e compostos (PT, EN, IUPAC, populares, sinônimos),
- * fórmulas, CAS e sinônimos de propriedades. Nada é embutido por elemento ou composto. Espelha
- * web/src/quimica/js/dicionario.js.
+ * Dicionário do NLU, derivado dos DADOS do pacote e do IDIOMA: nomes de elementos e compostos (no idioma, em inglês/IUPAC e em
+ * português, populares, sinônimos por idioma, chaves do índice), fórmulas, CAS e sinônimos de propriedades (léxico do idioma + pacote).
+ * Nada é embutido por elemento ou composto. Espelha web/src/quimica/js/dicionario.js: nomes do idioma têm prioridade, o inglês (IUPAC) vale
+ * em todos e o português é a última reserva; apelidos iguais a palavras funcionais de qualquer idioma ("PARA") nunca viram nome.
  */
 class Dicionario private constructor(
     val pacote: Pacote,
     private val entradas: List<EntradaDic>,
-    private val nomesPorCid: Map<Long, String>
+    private val nomesPorCid: Map<Long, String>,
+    /** Idioma do dicionário (pt-BR, en, es, de, fr). */
+    val idioma: String = Idiomas.PADRAO
 ) {
-    class EntradaDic(val cid: Long, val nomes: List<String>, val formula: String?, val cas: String?)
+    /**
+     * Composto do índice para o NLU: [nomes] legados (índice com nomes ou nomes do lote, pt-BR primeiro), o registro do lote (nomes por
+     * idioma), se lido, e as chaves normalizadas do índice do pipeline (`nomes` e `nomesPorIdioma`).
+     */
+    class EntradaDic(
+        val cid: Long, val nomes: List<String>, val formula: String?, val cas: String?,
+        val composto: Composto? = null, val chaves: List<String> = emptyList(), val chavesPorIdioma: Map<String, List<String>> = emptyMap()
+    )
 
+    /** Léxico do idioma do dicionário (o NLU usa o mesmo). */
+    val lexico: Lexico = Lexico.de(idioma)
     val unidades: Unidades = Unidades.de(pacote.regras)
-    val propriedades: List<PropriedadeDef> = Propriedades.tabela(pacote.regras)
+    val propriedades: List<PropriedadeDef> = Propriedades.tabela(pacote.regras, idioma)
     private val propPorId: Map<String, PropriedadeDef> = propriedades.associateBy { it.id }
 
     private val nomesElemento: List<Pair<String, String>>
@@ -58,24 +73,39 @@ class Dicionario private constructor(
     val totalCompostos: Int = entradas.size
 
     init {
+        // elementos: nome → símbolo (nomes do idioma primeiro, depois inglês e português)
         val el = LinkedHashMap<String, String>()
         for (e in pacote.elementos) {
-            for (n in listOfNotNull(e.nome, e.nomeEn)) {
+            for (n in Nomes.todosDoElemento(e, idioma)) {
                 val k = Texto.nlu(n)
                 if (k.length >= 3 && !el.containsKey(k)) el[k] = e.simbolo
             }
         }
         nomesElemento = el.map { (k, s) -> k to s }.sortedByDescending { it.first.length }
 
+        // compostos: nome → cid, em passes de prioridade (idioma ativo, inglês/IUPAC, português, chaves do índice), como no site
+        val pt = idioma == Idiomas.PADRAO
+        val passes: List<(EntradaDic) -> List<String?>> = listOf(
+            { e -> listOf(e.composto?.nomes?.get(idioma)) },
+            { e -> e.composto?.sinonimosPorIdioma?.get(idioma).orEmpty() },
+            { e -> if (pt) e.composto?.let { listOf(it.nome, it.nomePopular) } ?: e.nomes.take(1) else emptyList() },
+            { e -> if (pt) e.composto?.sinonimos.orEmpty() + e.nomes.drop(1) else emptyList() },
+            { e -> listOf(e.composto?.nomes?.get("en"), e.composto?.nomeIupac) },
+            { e -> e.composto?.sinonimosPorIdioma?.get("en").orEmpty() },
+            { e -> e.composto?.sinonimos.orEmpty() + e.nomes.drop(1) },
+            { e -> e.composto?.let { listOf(it.nome, it.nomePopular) } ?: e.nomes.take(1) },
+            { e -> e.chavesPorIdioma[idioma].orEmpty() },
+            { e -> e.chaves },
+            { e -> if (idioma != "en") e.chavesPorIdioma["en"].orEmpty() else emptyList() }
+        )
+        val funcionais = Lexico.PALAVRAS_FUNCIONAIS_TODAS
         val co = LinkedHashMap<String, Long>()
-        // prioridade: o primeiro nome de cada composto (nome em português), depois os demais
-        for (passo in 0..1) {
+        for (pega in passes) {
             for (e in entradas) {
-                val nomes = if (passo == 0) e.nomes.take(1) else e.nomes.drop(1)
-                for (n in nomes) {
-                    val k = Texto.nlu(n)
+                for (n in pega(e)) {
+                    val k = Texto.nlu(n ?: continue)
                     // um termo que é, ele mesmo, nome de ELEMENTO (ex.: "oxigênio" = O2) fica para o matcher de elementos; "gás oxigênio", "O2" seguem casando
-                    if (k.length >= 3 && !k.all { it.isDigit() } && !co.containsKey(k) && !el.containsKey(k)) co[k] = e.cid
+                    if (k.length >= 3 && !k.all { it.isDigit() } && k !in funcionais && !co.containsKey(k) && !el.containsKey(k)) co[k] = e.cid
                 }
             }
         }
@@ -91,7 +121,8 @@ class Dicionario private constructor(
 
     fun propriedade(id: String): PropriedadeDef? = propPorId[id]
     fun nomeDoComposto(cid: Long): String? = nomesPorCid[cid]
-    fun nomeDoElemento(simbolo: String): String = pacote.porSimbolo[simbolo]?.nome ?: simbolo
+    /** Nome do elemento no idioma do dicionário (reserva em inglês/português; quem exibe rotula). */
+    fun nomeDoElemento(simbolo: String): String = pacote.porSimbolo[simbolo]?.let { Nomes.elemento(it, idioma).nome } ?: simbolo
     /** Nomes (sem acento, minúsculos, com a pontuação original dos nomes simples) e fórmula do composto, para casar com o texto. */
     fun nomesEFormulaDe(cid: Long): List<String> {
         val nomes = nomesComposto.filter { it.second == cid }.map { it.first }
@@ -134,9 +165,9 @@ class Dicionario private constructor(
     private val RX_CID = Regex("""\bCID\s*[:#]?\s*(\d{1,9})\b""", RegexOption.IGNORE_CASE)
     private val RX_CAS = Regex("""\b(\d{2,7}-\d{2}-\d)\b""")
     private val RX_TOKEN_FORMULA = Regex("""^[A-Za-z0-9()·.*+^\-−₀-₉⁰-⁹⁺⁻]+$""")
-    private val RX_CUE_ELEMENTO = Regex("""\b(elemento|s[ií]mbolo|s[ií]mbolo qu[ií]mico)\b""", RegexOption.IGNORE_CASE)
 
-    fun cueElemento(texto: String) = RX_CUE_ELEMENTO.containsMatchIn(texto)
+    /** A pergunta fala em "elemento"/"símbolo" (no idioma)? Então um símbolo de uma letra ("O", "C") vale como elemento. */
+    fun cueElemento(texto: String) = lexico.pista("cueElemento").containsMatchIn(Texto.nlu(texto))
 
     fun entidades(original: String): Entidades {
         val texto = original
@@ -177,7 +208,7 @@ class Dicionario private constructor(
         for ((idx, t) in toks.withIndex()) {
             val pos = idx / total
             if (!RX_TOKEN_FORMULA.matches(t) || !t.any { it in 'A'..'Z' || it in 'a'..'z' }) continue
-            if (t.uppercase() in NAO_FORMULAS) continue
+            if (t.uppercase() in lexico.naoFormulas) continue
             val temDigito = t.any { it.isDigit() }
             val properCase = t.first() in 'A'..'Z' || t.first() == '('
             val f = if (properCase) FormulaQuimica.tentar(t) else null
@@ -186,7 +217,7 @@ class Dicionario private constructor(
             // A) fórmula conhecida do índice
             if (cid != null) {
                 val minuscula = Regex("^[a-z0-9()]+$").matches(t)
-                val aceita = temDigito || (f != null && nEl >= 2) || (minuscula && t.length >= 3 && t !in STOP_PALAVRAS && recuperarCaixa(t) != null)
+                val aceita = temDigito || (f != null && nEl >= 2) || (minuscula && t.length >= 3 && t !in lexico.stopPalavras && recuperarCaixa(t) != null)
                 if (aceita) { achados += Achado(Achado.Tipo.COMPOSTO, "formula", pos, cid = cid, nome = nomesPorCid[cid], texto = t); continue }
             }
             // B) fórmula bem escrita fora do índice; C) símbolo de um elemento
@@ -199,7 +230,7 @@ class Dicionario private constructor(
                     }
                 } else {
                     val s = f.contagem.keys.first()
-                    val ambiguo = s.length == 2 && s in SIMBOLOS_AMBIGUOS && idx == 0 && !unico
+                    val ambiguo = s.length == 2 && s in lexico.simbolosAmbiguos && idx == 0 && !unico
                     if (!ambiguo && (s.length == 2 || unico || cueElemento(texto))) {
                         achados += Achado(Achado.Tipo.ELEMENTO, "simbolo", pos, simbolo = s, nome = nomeDoElemento(s))
                         continue
@@ -254,7 +285,7 @@ class Dicionario private constructor(
                 val janela = palavras.subList(i, i + tam)
                 val frase = janela.joinToString(" ")
                 i++
-                if (frase.length < 5 || janela.all { it in PALAVRAS_FUNCIONAIS }) continue
+                if (frase.length < 5 || janela.all { it in lexico.palavrasFuncionais }) continue
                 // frases com mais de uma palavra só aproximam com 1 edição (evita "ácido fraco" → "ácido úrico")
                 val lim = if (frase.length >= 10 && tam == 1) 2 else 1
                 for ((chave, simbolo) in nomesElemento) {
@@ -319,12 +350,12 @@ class Dicionario private constructor(
             val z = bruta.toIntOrNull()
             if (z != null && z == e.z) p = 95
             if (bruta.equals(e.simbolo, ignoreCase = true)) p = maxOf(p, if (bruta == e.simbolo) 98 else 90)
-            for (n in listOfNotNull(e.nome, e.nomeEn)) p = maxOf(p, pontosDe(Texto.nlu(n)))
-            if (p > 0) saida += ResultadoBusca(true, "${e.nome} (${e.simbolo})", "Elemento ${e.z}" + (e.massaAtomica?.let { " · " + Texto.numero(it, 4) + " u" } ?: ""), z = e.z, pontos = p)
+            for (n in Nomes.todosDoElemento(e, idioma)) p = maxOf(p, pontosDe(Texto.nlu(n)))
+            if (p > 0) saida += ResultadoBusca(true, "${Nomes.elemento(e, idioma).nome} (${e.simbolo})", "Elemento ${e.z}" + (e.massaAtomica?.let { " · " + Texto.numero(it, 4) + " u" } ?: ""), z = e.z, pontos = p)
         }
         for (en in entradas) {
             var p = 0
-            for (n in en.nomes) p = maxOf(p, pontosDe(Texto.nlu(n)))
+            for (n in en.nomes + nomesNoIdioma(en)) p = maxOf(p, pontosDe(Texto.nlu(n)))
             en.formula?.let { f ->
                 val kf = chaveFormula(f)
                 if (kf == formulaQ) p = maxOf(p, 92) else if (formulaQ.length >= 2 && kf.startsWith(formulaQ)) p = maxOf(p, 50)
@@ -337,6 +368,12 @@ class Dicionario private constructor(
             }
         }
         return saida.sortedWith(compareByDescending<ResultadoBusca> { it.pontos }.thenBy { it.titulo.length }.thenBy { it.titulo }).take(limite)
+    }
+
+    /** Nomes do composto no idioma do dicionário e em inglês (registro do lote), para a busca. */
+    private fun nomesNoIdioma(e: EntradaDic): List<String> {
+        val c = e.composto ?: return emptyList()
+        return listOfNotNull(c.nomes[idioma], c.nomes["en"]) + c.sinonimosPorIdioma[idioma].orEmpty()
     }
 
     /** Propriedades citadas no texto normalizado, na ordem em que aparecem. */
@@ -362,18 +399,6 @@ class Dicionario private constructor(
 
     /** Categoria de elemento citada (halogênios, gases nobres…): a primeira que casar, como no site. */
     companion object {
-        private val SIMBOLOS_AMBIGUOS = setOf("Na", "No", "Os", "As", "Se", "Ar", "Si", "In", "At", "Be", "Am", "Ta", "Re", "Ge", "Pa", "Mo", "Ho", "Er", "Ra", "Ca", "Co", "Ir", "La", "Li", "Lu", "Mi", "Y")
-        private val NAO_FORMULAS = setOf("OK", "SOS", "PH", "HOHO", "IN", "AS", "BIS", "PIS", "SP", "CIP", "OH")
-        private val STOP_PALAVRAS = setOf("de", "da", "do", "dos", "das", "e", "o", "a", "os", "as", "um", "uma", "em", "no", "na", "que", "para", "por", "com", "ao", "se")
-        /** Palavras funcionais que NÃO valem aproximação por erro de digitação (ex.: "sobre" não é "cobre"; "fontes" não é "Fontex"). */
-        private val PALAVRAS_FUNCIONAIS = STOP_PALAVRAS + setOf(
-            "sobre", "entre", "como", "onde", "quando", "qual", "quais", "mais", "menos", "muito", "pouco", "tudo", "nada",
-            "tambem", "porque", "entao", "assim", "ainda", "depois", "antes", "agora", "sempre", "nunca", "seja", "foi", "ser",
-            "sao", "esta", "estao", "tem", "ter", "fale", "fala", "diga", "mostre", "explique", "explica", "quimica", "favor",
-            "gostaria", "queria", "poderia", "pode", "quero", "preciso",
-            "fontes", "fonte", "dados", "ajuda", "licenca", "licencas", "informacao", "informacoes", "versao", "referencia",
-            "referencias", "offline", "gratis", "gratuito")
-
         fun chaveFormula(texto: String): String = FormulaQuimica.normalizarEntrada(texto).replace("^", "").lowercase()
 
         /** Tokens do texto original separados por espaço, sem pontuação final (preserva parênteses internos). */
@@ -387,35 +412,26 @@ class Dicionario private constructor(
 
         fun nomesDe(c: Composto): List<String> = listOfNotNull(c.nome, c.nomePopular, c.nomeIupac) + c.sinonimos
 
-        /** Cria o dicionário; se o índice não traz nomes, lê os lotes de compostos uma vez. */
-        suspend fun criar(pacote: Pacote): Dicionario {
+        /**
+         * Cria o dicionário do [idioma]. Lê os lotes de compostos uma vez (cacheados no [Pacote]) quando o pacote tem até
+         * [LIMITE_LEITURA_LOTES] compostos: os nomes por idioma, a fórmula e o CAS vêm do registro; o índice dá o lote, as chaves de busca
+         * (`nomes`/`nomesPorIdioma` do pipeline) e, no formato antigo, os nomes de exibição.
+         */
+        suspend fun criar(pacote: Pacote, idioma: String = Idiomas.PADRAO): Dicionario {
+            val id = Idiomas.normalizar(idioma) ?: Idiomas.PADRAO
+            val registros: Map<Long, Composto> =
+                if (pacote.indice.tamanho in 1..LIMITE_LEITURA_LOTES) pacote.todosOsCompostos().associateBy { it.cid } else emptyMap()
             val entradas = mutableListOf<EntradaDic>()
-            val principais = LinkedHashMap<Long, String>()
-            if (pacote.indice.temNomes) {
-                for (e in pacote.indice.entradas) {
-                    entradas += EntradaDic(e.cid, e.nomes, e.formula, e.cas)
-                    e.nomes.firstOrNull()?.let { principais[e.cid] = it }
-                }
+            val exibicao = LinkedHashMap<Long, String>()
+            for (e in pacote.indice.entradas) {
+                val c = registros[e.cid]
+                val nomes = e.nomes.ifEmpty { c?.let(::nomesDe).orEmpty() }
+                if (nomes.isEmpty() && c == null && e.chaves.isEmpty() && e.chavesPorIdioma.isEmpty()) continue
+                entradas += EntradaDic(e.cid, nomes, e.formula ?: c?.formula, e.cas ?: c?.cas, c, e.chaves, e.chavesPorIdioma)
+                val nome = if (id == Idiomas.PADRAO) e.nomes.firstOrNull() ?: c?.nomeExibicao else c?.let { Nomes.composto(it, id).nome } ?: e.nomes.firstOrNull()
+                nome?.let { exibicao[e.cid] = it }
             }
-            val precisaLotes = !pacote.indice.temNomes || pacote.indice.entradas.none { it.formula != null }
-            if (precisaLotes && pacote.indice.tamanho <= LIMITE_LEITURA_LOTES) {
-                val todos = pacote.todosOsCompostos()
-                if (!pacote.indice.temNomes) {
-                    for (c in todos) {
-                        entradas += EntradaDic(c.cid, nomesDe(c), c.formula, c.cas)
-                        principais[c.cid] = c.nomeExibicao
-                    }
-                } else {
-                    // o índice tem nomes, mas não fórmulas/CAS: completa a partir dos lotes
-                    val porCid = todos.associateBy { it.cid }
-                    for (i in entradas.indices) {
-                        val e = entradas[i]
-                        val c = porCid[e.cid] ?: continue
-                        entradas[i] = EntradaDic(e.cid, e.nomes, e.formula ?: c.formula, e.cas ?: c.cas)
-                    }
-                }
-            }
-            return Dicionario(pacote, entradas, principais)
+            return Dicionario(pacote, entradas, exibicao, id)
         }
 
         private const val LIMITE_LEITURA_LOTES = 4000

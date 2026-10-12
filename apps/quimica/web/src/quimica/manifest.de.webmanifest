@@ -1,0 +1,44 @@
+{
+  "id": "/quimica/",
+  "name": "SaibaTudo Química",
+  "short_name": "Chemie",
+  "description": "Periodensystem, Verbindungen mit 2D-Strukturen, Rechner mit Rechenweg und chemische Sicherheit, mit offenen Daten. Funktioniert offline und nichts verlässt Ihr Gerät.",
+  "lang": "de",
+  "dir": "ltr",
+  "start_url": "/quimica/?source=pwa&lang=de",
+  "scope": "/quimica/",
+  "display": "standalone",
+  "theme_color": "#0C2340",
+  "background_color": "#0C2340",
+  "categories": ["education", "utilities", "science"],
+  "icons": [
+    { "src": "/quimica/brand/pwa-quimica-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/quimica/brand/pwa-quimica-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/quimica/brand/pwa-quimica-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/quimica/brand/pwa-quimica-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/quimica/brand/quimica-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Periodensystem",
+      "short_name": "Tabelle",
+      "description": "Interaktives Periodensystem",
+      "url": "/quimica/tabela?source=shortcut&lang=de",
+      "icons": [{ "src": "/quimica/brand/pwa-quimica-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Rechner",
+      "short_name": "Rechner",
+      "description": "Molare Masse, Gleichungen ausgleichen, Stöchiometrie, pH und mehr",
+      "url": "/quimica/calculadoras?source=shortcut&lang=de",
+      "icons": [{ "src": "/quimica/brand/pwa-quimica-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Verbindungen",
+      "short_name": "Verbindungen",
+      "description": "Verbindungen suchen und die 2D-Struktur ansehen",
+      "url": "/quimica/compostos?source=shortcut&lang=de",
+      "icons": [{ "src": "/quimica/brand/pwa-quimica-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
+}

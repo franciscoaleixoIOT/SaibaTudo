@@ -1,0 +1,4 @@
+<resources>
+    <string name="config_idioma_titulo">Langue</string>
+    <string name="config_idioma_descricao">Langue de l’assistant, des noms et des textes des données. Sans choix, la langue de l’appareil est utilisée.</string>
+</resources>

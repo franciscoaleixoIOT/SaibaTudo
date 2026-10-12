@@ -11,6 +11,7 @@ import net.saibatudo.quimica.data.model.Elemento
 import net.saibatudo.quimica.data.model.Fonte
 import net.saibatudo.quimica.data.model.PropriedadeDef
 import net.saibatudo.quimica.data.model.Trecho
+import net.saibatudo.quimica.domain.Idiomas
 import net.saibatudo.quimica.domain.Propriedades
 import net.saibatudo.quimica.domain.Texto
 
@@ -130,15 +131,20 @@ private fun AnswerBuilder.descrever(def: PropriedadeDef, seq: List<Elemento>): S
 
 // ---- conceito (textos licenciados) -------------------------------------------------------------------------------------------------
 
+/**
+ * "O que é…?": o trecho licenciado que melhor cobre o tema, no idioma das respostas. Como no site (answers.js `conceito`): primeiro só os
+ * lotes/arquivos do idioma cujo nome combina com a pergunta; depois com as reservas (inglês, português); se nada servir, todos. Um trecho em
+ * outro idioma perde um ponto (só entra se for o único jeito de responder) e sai rotulado ("Trecho em inglês").
+ */
 internal suspend fun AnswerBuilder.buscarConceito(q: ParsedQuery): Resposta {
     val tema = Texto.nlu(q.conceito.orEmpty())
-    val palavras = LocalNlu.termosDeBusca(tema).filter { it.length >= 3 }
-    val trechos = pacote.trechos()
+    val palavras = LocalNlu.termosDeBusca(tema, dic.lexico).filter { it.length >= 3 }
+    fun corpoDe(t: Trecho) = if (t.idioma == Idiomas.PADRAO) t.textoPt ?: t.textoOriginal.orEmpty() else t.textoOriginal ?: t.textoPt.orEmpty()
     fun pontos(t: Trecho): Int {
         var s = 0
         val chaves = t.palavrasChave.map { Texto.nlu(it) }
         val titulo = Texto.nlu(t.titulo.orEmpty() + " " + t.secao.orEmpty())
-        val corpo = Texto.nlu(t.textoPt ?: t.textoOriginal.orEmpty())
+        val corpo = Texto.nlu(corpoDe(t))
         if (tema.isNotBlank()) {
             if (chaves.any { it == tema }) s += 10
             if (titulo.contains(tema)) s += 6
@@ -148,9 +154,12 @@ internal suspend fun AnswerBuilder.buscarConceito(q: ParsedQuery): Resposta {
             if (titulo.split(' ').contains(p)) s += 2
             if (corpo.split(' ').contains(p)) s += 1
         }
-        return s
+        return if (t.idioma == idioma) s else s - 1
     }
-    val melhor = trechos.map { it to pontos(it) }.filter { it.second >= 3 }.maxByOrNull { it.second }?.first
+    fun melhorDe(trechos: List<Trecho>) = trechos.map { it to pontos(it) }.filter { it.second >= 3 }.maxByOrNull { it.second }?.first
+    val melhor = melhorDe(pacote.trechos(idioma, palavras))
+        ?: melhorDe(pacote.trechos(idioma, palavras, reserva = true))
+        ?: melhorDe(pacote.trechos(idioma, null, reserva = true))
     if (melhor == null) {
         return Resposta(
             Intent.CONCEITO, "Ainda não tenho um texto sobre isso",
@@ -158,9 +167,12 @@ internal suspend fun AnswerBuilder.buscarConceito(q: ParsedQuery): Resposta {
             sugestoes = sugestoes(4), entendida = false
         )
     }
-    val texto = melhor.textoPt ?: melhor.textoOriginal.orEmpty()
+    val texto = corpoDe(melhor)
     val blocos = mutableListOf<Bloco>(Bloco.Paragrafo(texto))
-    if (melhor.traducao?.contains("automática", true) == true) blocos += Bloco.Aviso("Tradução automática, ainda não revisada por uma pessoa.")
+    // trecho em pt-BR cujo original é inglês e ainda sem tradução conta como inglês
+    val idiomaDoTexto = if (melhor.idioma == Idiomas.PADRAO && melhor.textoPt == null && melhor.traducao?.contains("pendente", true) == true) "en" else melhor.idioma
+    if (idiomaDoTexto != idioma) blocos += Bloco.Aviso(Moldes.trechoEm(idiomaDoTexto, idioma))
+    else if (idioma == Idiomas.PADRAO && melhor.traducao?.contains("automática", true) == true) blocos += Bloco.Aviso("Tradução automática, ainda não revisada por uma pessoa.")
     val fonte = Fonte(
         nome = buildString { append(melhor.fonte); melhor.secao?.let { append(", ").append(it) } },
         url = melhor.url, licenca = melhor.licenca
@@ -194,7 +206,7 @@ internal suspend fun AnswerBuilder.respostaNaoEntendi(q: ParsedQuery): Resposta 
 
 /** Interpreta e responde sem gerar o fluxo de "não entendi" (usado para validar sugestões). */
 internal suspend fun AnswerBuilder.responderSemRecursao(pergunta: String): Pair<ParsedQuery, Resposta?> {
-    val q = LocalNlu.parse(pergunta, dic)
+    val q = LocalNlu.parse(pergunta, dic, null, dic.lexico)
     if (q.intent == Intent.DESCONHECIDA || q.intent == Intent.RECUSA_PERIGO) return q to null
     val r = try { construir(q, corrigir = false) } catch (_: Exception) { null }
     return q to r?.takeIf { it.entendida }
@@ -225,7 +237,7 @@ suspend fun AnswerBuilder.sugestoes(max: Int = 6): List<String> {
         if (c.massaMolar != null && candidatas.none { it.startsWith("Qual a massa molar de") }) candidatas += "Qual a massa molar de $nome?"
         if (candidatas.size >= 14) break
     }
-    pacote.trechos().firstOrNull { !it.titulo.isNullOrBlank() }?.let { candidatas += "O que é ${it.titulo!!.lowercase()}?" }
+    if (idioma == Idiomas.PADRAO) pacote.trechos(idioma).firstOrNull { !it.titulo.isNullOrBlank() }?.let { candidatas += "O que é ${it.titulo!!.lowercase()}?" }
     if (pacote.elemento("Cl") != null && h != null) candidatas += "Qual o pH de HCl 0,01 mol/L?"
     candidatas += "Quais são os halogênios?"
     val validas = mutableListOf<String>()

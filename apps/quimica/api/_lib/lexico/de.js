@@ -4,36 +4,36 @@ export default {
  "versao": 1,
  "descricao": "Deutsches Lexikon des lokalen regelbasierten Interpreters (NLU) und der Sicherheitsregeln. Gleiche Struktur wie pt-BR.json (per Test geprüft). Regexes als TEXT ohne Flags: der Client normalisiert die Frage (Kleinbuchstaben, ohne Akzente/Umlaute: ä→a, ö→o, ü→u, ß bleibt; nur [a-z0-9+-] und Leerzeichen). Erste Übersetzung durch Agent (menschliche Prüfung ausstehend).",
  "intencoes": {
-  "saudacao": "^(hi+|hallo+|hey|moin|servus|guten morgen|guten tag|guten abend|danke|vielen danke|dankeschon|hilfe|help|menu|start|startseite|test|teste)( zusammen| alle| assistent| ki| freund| wie gehts| alles gut)*$",
-  "ajuda": "\\b(?:was (?:kannst du|machst du|weisst du|kann (?:die|diese) app|macht (?:die|diese) app|kann die ki)|wie (?:benutze|nutze|verwende) ich (?:die|diese) (?:app|anwendung|assistent)|wie funktioniert (?:die|diese|das) (?:app|anwendung|assistent)?|was kann ich fragen|ich brauche hilfe|wer hat (?:die|diese) app (?:gemacht|erstellt|entwickelt))\\b",
+  "saudacao": "^(hi+|hallo+|hey|moin|servus|guten morgen|gru(?:ss| )(?:dich|gott|euch)|guten tag|guten abend|danke|vielen danke|dankeschon|hilfe|help|menu|start|startseite|test|teste)( zusammen| alle| schon| sehr| dir| euch| assistent| ki| freund| wie gehts| alles gut)*$",
+  "ajuda": "\\b(?:was (?:kannst du|machst du|wei(?:ss| )t du|kann (?:die|diese) app|macht (?:die|diese) app|kann die ki)|wie (?:benutze|nutze|verwende) ich (?:die|diese) (?:app|anwendung|assistent)|wie funktioniert (?:die|diese|das) (?:app|anwendung|assistent)?|was kann ich fragen|ich brauche hilfe|wer hat (?:die|diese) app (?:gemacht|erstellt|entwickelt))\\b",
   "sobreDados": "\\b(?:uber die daten|woher (?:kommen|stammen) die daten|herkunft der daten|datenquelle|aktualisierung der daten|sind die daten aktuell|datenversion|wann wurden die daten aktualisiert|signatur der daten)\\b",
   "fontes": "\\b(?:welche (?:quellen|lizenzen)|was sind die quellen|lizenzen? der daten|was ist die quelle|quellen? (?:der |dieser )?(?:information|antwort(?:en)?)|woher (?:hast du|kommt|stammt) (?:diese|die) (?:information|antwort)|referenzen?|literatur)\\b",
-  "balancear": "\\bausgleich\\w*|\\bausbalancier\\w*|\\bbalancier\\w*|\\breaktionsgleichung (?:aufstellen|ausgleichen)|\\bgleichung (?:ausgleichen|aufstellen)|\\bkoeffizienten (?:bestimmen|anpassen)|\\bstochiometrisch\\w* koeffizient\\w*",
-  "conversao": "\\b(?:umrechn\\w*|umwandl\\w*|konvertier\\w*|rechne .{1,30} um|entspricht|entsprechen|wie ?viele? \\S+(?: \\S+)? (?:sind|hat|haben|entsprechen|ergeben|passen)|in wie ?viele?)\\b",
+  "balancear": "\\bausgleich\\w*|\\bausbalancier\\w*|\\bbalancier\\w*|\\breaktionsgleichung (?:aufstellen|ausgleichen)|\\bgleichung (?:ausgleichen|aufstellen)|\\bkoeffizienten (?:bestimmen|anpassen)|\\bstochiometrisch\\w* koeffizient\\w*|\\bgleich(?:e|en|st|t)? .{1,60}\\baus\\b|\\bstell\\w* .{0,30}gleichung\\w* auf\\b|\\bgleichung\\w* aufstell\\w*",
+  "conversao": "\\b(?:umrechn\\w*|umwandl\\w*|konvertier\\w*|rechn(?:e|en|et) .{1,40} um|wandl\\w* .{1,40} um|stell\\w* .{1,40} um|entspricht|entsprechen|wie ?viele? \\S+(?: \\S+)? (?:sind|hat|haben|entsprechen|ergeben|passen)|in wie ?viele?)\\b",
   "ph": "\\b(?:ph|poh)\\b|\\bph wert\\b|\\bsaure(?:grad|starke) von\\b|\\bbasizitat\\b|\\balkalitat\\b",
   "gas": "\\b(?:ideale?s? gase?|perfektes gas|pv ?= ?nrt|pvnrt|gasgesetz\\w*|allgemeine gasgleichung|ideale gasgleichung|zustandsgleichung|clapeyron|molvolumen|molares volumen|volumen (?:eines|des) gases|druck (?:eines|des) gases|boyle mariotte|gesetz von boyle|gesetz von charles|gay lussac)\\b",
   "gasVariavel": "\\bgase?s?\\b",
   "concentracao": "\\b(?:molaritat|konzentration|konzentriert\\w*|verdunn\\w*|c1 ?v1|c1v1|massenanteil|massenprozent|gewichtsprozent|prozent (?:der )?masse|teile pro million|ppm|normalitat|molalitat|losung (?:von|aus)|gramm pro liter|mol l|mol pro liter|g l)\\b",
-  "estequiometria": "\\b(?:stochiometri\\w*|limitierend\\w* (?:reagenz|reaktant|edukt)|begrenzend\\w* (?:reagenz|reaktant)|im uberschuss|uberschuss|ausbeute|wie ?viele? (?:mol|gramm|molekule|atome|liter|ionen|teilchen|kilo|kilogramm|mg|milligramm)\\b|anzahl (?:der |an )?(?:mol|molekule|atome|teilchen|ionen)|normbedingungen|standardbedingungen|eingenommenes volumen|avogadro(?:konstante|zahl)|avogadro'?sche (?:zahl|konstante))\\b",
-  "massaMolar": "\\b(?:molare masse|molmasse|molekulmasse|molekulargewicht|molekulare masse|formelmasse|molgewicht|wie ?viel wiegt (?:ein )?mol|was ist die molare masse)\\b|\\bg mol\\b",
+  "estequiometria": "\\b(?:stochiometri\\w*|limitierend\\w* (?:reagenz|reaktant|edukt)|begrenzend\\w* (?:reagenz|reaktant)|im uberschuss|uberschuss|ausbeute|wie ?viele? (?:mol|molekule|atome|ionen|teilchen)\\b|wie ?viele? (?:gramm|liter|kilo|kilogramm|mg|milligramm)\\b(?!\\s+(?:sind|ist|entsprechen|entspricht|ergeben|hat|haben)\\s+\\d+(?: \\d+)* ?(?:kg|g|mg|l|ml|liter|milliliter|gramm|kilogramm|milligramm)\\b)|anzahl (?:der |an )?(?:mol|molekule|atome|teilchen|ionen)|normbedingungen|standardbedingungen|eingenommenes volumen|avogadro(?:konstante|zahl)|avogadro'?sche (?:zahl|konstante))\\b",
+  "massaMolar": "\\b(?:molare masse|molmasse|molekulmasse|molekulargewicht|molekulare masse|formelmasse|molgewicht|wie ?viel wiegt (?:ein )?mol|wie ?viel wiegen (?:ein|1) mol|wie schwer (?:ist|sind) (?:ein|1) mol|wie gro(?:ss| ) ist (?:die )?molare masse|was ist die molare masse)\\b|\\bg mol\\b",
   "desenhar": "\\b(?:zeichn\\w+|struktur (?:2d|molekular|chemisch\\w*|von|des|der)|2d struktur|struktur|zeig\\w* (?:mir )?(?:die )?(?:struktur|molekul)|molekul (?:von|des|der)|wie sieht (?:das |die )?(?:molekul|struktur) (?:von \\S+ )?aus|strukturformel|molekulgeometrie|visualisier\\w*|gerust|skizz\\w+)\\b",
-  "comparar": "\\b(?:vergleich\\w*|unterschied(?:e)? zwischen|\\bversus\\b|\\bvs\\b|was ist der unterschied|ahnlichkeit\\w*|gleich wie|ahnlich wie|gemeinsamkeit\\w*)\\b",
+  "comparar": "\\b(?:vergleich\\w*|unterscheid\\w*|unterschied(?:e)? zwischen|\\bversus\\b|\\bvs\\b|was ist der unterschied|ahnlichkeit\\w*|gleich wie|(?:was|welches|welcher|welche) (?:element |stoff |verbindung |von beiden )?(?:ist|hat|sind) (?:schwerer|leichter|dichter|gro(?:ss| )er|kleiner|hoher|niedriger|starker|schwacher|elektronegativer|reaktiver)|ahnlich wie|gemeinsamkeit\\w*)\\b",
   "seguranca": "\\b(?:gefahr\\w*|gefahrlich\\w*|giftig\\w*|toxisch\\w*|toxizitat|sicher\\w*|psa|schutzausrustung|erste hilfe|verschutt\\w*|auslauf\\w*|leck\\w*|lager\\w*|aufbewahr\\w*|brand\\w*|feuer\\w*|entzundlich\\w*|brennbar\\w*|atzend\\w*|korrosiv\\w*|reizend\\w*|reiz\\w*|ghs|piktogramm\\w*|h[- ]?satz\\w*|h[- ]?satze|gefahrenhinweis\\w*|sicherheitsdatenblatt|sdb|icsc|misch\\w*|unvertraglich\\w*|entsorg\\w*|handhab\\w*|umgang mit|einatm\\w*|verschluck\\w*|verbrenn\\w*|gift|vergift\\w*|schadlich|ist (?:es|das) sicher|ist (?:es|das) gefahrlich|neutralisier\\w*|handschuhe|schutzbrille|signalwort|gefahreneinstufung|krebserregend|karzinogen\\w*|explosiv\\w*|reagiert mit wasser|reaktiv\\w* mit)\\b",
-  "nomenclatura": "\\b(?:wie (?:heisst|lautet) der name|wie heisst|wie nennt man|name (?:von|des|der|fur)|chemische\\w* name|iupac name|systematische\\w* name|wissenschaftliche\\w* name|offizielle\\w* name|nomenklatur|wie schreibt man|wie lautet die (?:chemische |molekulare |summen)?formel|was ist die (?:chemische |summen)?formel|formel (?:von|des|der|fur)|summenformel|name der verbindung)\\b",
-  "tabela": "\\b(?:periodensystem|pse|periodizitat|trends?|gruppe \\d{1,2}|familie \\d{1,2}|periode \\d|block [spdf]|[spdf][- ]block|elemente? (?:der|des|aus der|aus dem|in der|in) (?:gruppe|periode|block|familie)|welche elemente|wie ?viele elemente|(?:gasformige|flussige|feste) elemente|metalle|nichtmetalle|halbmetalle|metalloide|halogene?|edelgase?|erdalkalimetalle?|alkalimetalle?|lanthanoide?|lanthanide?|actinoide?|actinide?|element mit (?:der|dem) (?:hochsten|grossten|niedrigsten|kleinsten)|aufsteigend\\w* reihenfolge|absteigend\\w* reihenfolge|(?:hochste|grosste|niedrigste|kleinste)r? (?:atomradius|radius|elektronegativitat|energie|punkt|masse|dichte))\\b",
-  "conceitoCue": "^(?:was (?:ist|sind|bedeutet|heisst|bedeuten)|erklar\\w*|definier\\w*|definition (?:von|des|der)|begriff|konzept|erzahl\\w* mir|wie funktioniert|wie funktionieren|warum|wieso|weshalb|wozu (?:dient|braucht man)|was ist (?:die |der )?(?:definition|unterschied|bedeutung|funktion|rolle)|unterschied zwischen|bring\\w* mir .{1,20} bei|zusammenfass\\w*|fasse .{1,30} zusammen)\\b",
+  "nomenclatura": "\\b(?:wie (?:hei(?:ss| )t|lautet) der name|wie hei(?:ss| )t|wie nennt man|name (?:von|des|der|fur)|chemische\\w* name|iupac name|systematische\\w* name|wissenschaftliche\\w* name|offizielle\\w* name|nomenklatur|wie schreibt man|wie lautet die (?:chemische |molekulare |summen)?formel|was ist die (?:chemische |summen)?formel|formel (?:von|des|der|fur)|summenformel|name der verbindung)\\b",
+  "tabela": "\\b(?:periodensystem|pse|periodizitat|trends?|gruppe \\d{1,2}|familie \\d{1,2}|periode \\d|block [spdf]|[spdf][- ]block|elemente? (?:der|des|aus der|aus dem|in der|in) (?:gruppe|periode|block|familie)|welche elemente|wie ?viele elemente|(?:gasformige|flussige|feste) elemente|metalle|nichtmetalle|halbmetalle|metalloide|halogene?|edelgase?|erdalkalimetalle?|alkalimetalle?|lanthanoide?|lanthanide?|actinoide?|actinide?|element mit (?:der|dem) (?:hochsten|gro(?:ss| )ten|niedrigsten|kleinsten)|aufsteigend\\w* reihenfolge|absteigend\\w* reihenfolge|(?:hochste|gro(?:ss| )te|niedrigste|kleinste)r? (?:atomradius|radius|elektronegativitat|energie|punkt|masse|dichte))\\b",
+  "conceitoCue": "^(?:was (?:ist|sind|bedeutet|hei(?:ss| )t|bedeuten)|erklar\\w*|definier\\w*|definition (?:von|des|der)|begriff|konzept|erzahl\\w* mir|wie funktioniert|wie funktionieren|warum|wieso|weshalb|wozu (?:dient|braucht man)|was ist (?:die |der )?(?:definition|unterschied|bedeutung|funktion|rolle)|unterschied zwischen|bring\\w* mir .{1,20} bei|zusammenfass\\w*|fasse .{1,30} zusammen)\\b",
   "conceitoTemas": "\\b(?:mol|ph|stochiometrie|(?:ionen|atom|metall|kovalente|chemische) ?bindung|elektronegativitat|oxidation|reduktion|redox|chemisches gleichgewicht|enthalpie|entropie|isomerie|saure|base|salz|oxid|losung|konzentration|molaritat|verdunnung|periodensystem|chemische reaktion|kinetik|katalysator|elektrolyse|batterie|galvanische zelle|polaritat|zwischenmolekulare krafte|intermolekulare krafte)\\b"
  },
  "pistas": {
   "querCalcular": "\\b(?:limitierend\\w*|ausbeute|wie ?viele?|masse von|gramm|mol|entsteh\\w*|bild\\w*|erhalt\\w*|reagier\\w*|verbrauch\\w*|ubrig|bleib\\w*|uberschuss|volumen|liter)\\b",
   "conversaoPreposicoes": "(?:->|→| in | zu | nach | to )",
-  "paraUnidade": "\\b(?:in|zu|nach)\\s+(?:den |die |das |dem |der )?([A-Za-zµμ°º/³²·.]+(?: celsius| fahrenheit| pro liter| quecksilbersaule)?)\\s*[?!.]*$",
+  "paraUnidade": "\\b(?:in|zu|nach)\\s+(?:den |die |das |dem |der )?([A-Za-zµμ°º/³²·.]+(?: celsius| fahrenheit| pro liter| quecksilbersaule)?)(?:\\s+(?:umrechnen|umwandeln|konvertieren|angeben|ausdrucken|darstellen|um|dar|an|aus))?\\s*[?!.]*$",
   "quantosUnidade": "^\\s*(?:wie ?viele?|wieviel)\\s+((?:grad\\s+)?[A-Za-zµμ°º/³²·.]+(?: celsius| fahrenheit)?)\\s+(?:sind|hat|haben|entsprechen|ergeben|passen|ist)(?![A-Za-z])",
   "phContexto": "\\b(?:saure|base|losung|lauge)\\b",
   "conector": "\\b(?:von|des|der)\\b",
   "prefixoExplicacao": "^(?:was ist|was sind|erklar|definier|definition|begriff|konzept|wie funktioniert|warum|wieso)",
-  "prefixoExplicacaoPalavra": "^(?:was ist|was sind|erklar|definier|definition|begriff|konzept|wie funktioniert|warum|wieso)\\b",
-  "prefixoDefinicao": "^(?:was ist|was sind|erklar|definier|definition|begriff|konzept)\\b",
+  "prefixoExplicacaoPalavra": "^(?:was ist|was sind|erklar\\w*|definier\\w*|definition|begriff|konzept|wie funktioniert|warum|wieso)\\b",
+  "prefixoDefinicao": "^(?:was ist|was sind|erklar\\w*|definier\\w*|definition|begriff|konzept)\\b(?!\\s+(?:die |der |das )?(?:molare masse|molmasse|molekulmasse|formelmasse|molgewicht|molekulargewicht)\\s+(?:von|des|der|vom)\\b)",
   "gasGrandezas": "\\b(?:volumen|druck|temperatur|mol|wie ?viele?)\\b",
   "concentracaoForte": "\\bverdunn\\w*|molaritat|konzentration\\b",
   "propriedadesPalavra": "\\beigenschaften\\b",
@@ -44,11 +44,14 @@ export default {
   "tabelaPalavra": "\\bperiodensystem\\b",
   "grupo": "\\b(?:gruppe|familie)\\s+(\\d{1,2})\\b",
   "periodo": "\\bperiode\\s+(\\d)\\b",
-  "bloco": "\\bblock\\s+([spdf])\\b|\\b([spdf])[- ]block\\b",
+  "bloco": "\\bblocks?\\s+([spdf])\\b|\\b([spdf])[- ]blocks?\\b",
   "continuacao": "^und (?:der |die |das |den |dem )?(?:von |des |der )?",
   "limparConceito": [
-   "^(?:ist |sind |bedeutet |heisst |bedeuten )+",
-   "^(?:ein |eine |einer |der |die |das |den |dem |von |des )+"
+   "^\\s*(?:mir |uns |bitte |doch |mal |kurz |genau |eigentlich |noch |einmal )+",
+   "^\\s*(?:was|wie|wer|wo)\\s+(?=\\S)",
+   "^\\s*(?:ist |sind |bedeutet |hei(?:ss| )t |bedeuten )+",
+   "^\\s*(?:ein |eine |einer |der |die |das |den |dem |von |des )+",
+   "\\s+(?:ist|sind|bedeutet|hei(?:ss| )t|bedeuten)$"
   ],
   "constantes": "\\b(pka|pkb|ka|kb)\\s*(?:=|:|von|ist|gleich|betragt)?\\s*([0-9][0-9.,]*(?:\\s*(?:[x×*]\\s*10\\s*\\^?\\s*\\{?-?\\d+\\}?|e-?\\d+))?)",
   "quantidadeComplemento": "(?:pro|an)",
@@ -94,15 +97,15 @@ export default {
    "mmHg"
   ],
   [
-   "^liter$",
+   "^liter?n?$",
    "L"
   ],
   [
-   "^milliliter$",
+   "^milliliter?n?$",
    "mL"
   ],
   [
-   "^mikroliter$",
+   "^mikroliter?n?$",
    "µL"
   ],
   [
@@ -166,23 +169,23 @@ export default {
    "particulas"
   ],
   [
-   "^meter$",
+   "^meter?n?$",
    "m"
   ],
   [
-   "^zentimeter$",
+   "^zentimeter?n?$",
    "cm"
   ],
   [
-   "^millimeter$",
+   "^millimeter?n?$",
    "mm"
   ],
   [
-   "^nanometer$",
+   "^nanometer?n?$",
    "nm"
   ],
   [
-   "^kilometer$",
+   "^kilometer?n?$",
    "km"
   ],
   [
@@ -282,7 +285,7 @@ export default {
    "min"
   ],
   [
-   "\\bdichteste\\w*|\\bam dichtesten|\\bhochste dichte|\\bschwerste\\w*",
+   "\\bdichteste\\w*|\\bam dichtesten|\\bhochste dichte",
    "densidadeKgm3",
    "max"
   ],
@@ -292,7 +295,7 @@ export default {
    "min"
   ],
   [
-   "\\bgrosste\\w* (?:atom)?radius|\\bam grossten|\\bvoluminoseste\\w*",
+   "\\bgro(?:ss| )te\\w* (?:atom)?radius|\\bam gro(?:ss| )ten|\\bvoluminoseste\\w*",
    "raioAtomicoPm",
    "max"
   ],
@@ -332,7 +335,7 @@ export default {
    "min"
   ],
   [
-   "\\bschwerste\\w* atom|\\bhochste\\w* atommasse",
+   "\\bschwerste\\w*|\\bhochste\\w* atommasse",
    "massaAtomica",
    "max"
   ],
@@ -389,7 +392,9 @@ export default {
    "atomradius",
    "van der waals radius",
    "grosse des atoms",
-   "atomgrosse"
+   "atomgrosse",
+   "gro e des atoms",
+   "atomgro e"
   ],
   "afinidadeEletronicaKJmol": [
    "elektronenaffinitat"
@@ -424,7 +429,14 @@ export default {
    "ist fest",
    "ist flussig",
    "ist gasformig",
-   "ist ein gas"
+   "ist ein gas",
+   "flussig",
+   "gasformig",
+   "fest bei raumtemperatur",
+   "flussig bei raumtemperatur",
+   "gasformig bei raumtemperatur",
+   "ist ein feststoff",
+   "ist eine flussigkeit"
   ],
   "estadosOxidacao": [
    "oxidationsstufen",
@@ -722,7 +734,13 @@ export default {
  ],
  "seguranca": {
   "acao": [
-   "herstell\\w*",
+   "richt\\w* .{0,60}\\bein\\b",
+   "aufzureinig\\w*",
+   "anzufertig\\w*",
+   "zusammenzubau\\w*",
+   "zuzubereit\\w*",
+   "herzustell\\w*",
+   "herstell(?:en|e|st|t|ung|ungs\\w*)\\b",
    "mach(?:en|e|t|st)",
    "gemacht",
    "produzier\\w*",
@@ -755,7 +773,7 @@ export default {
    "koch(?:en|e|t)",
    "bau(?:en|e|t|st)",
    "zusammenbau\\w*",
-   "zusammensetz\\w*",
+   "zusammensetz(?:en|e|t|st)\\b",
    "konstruier\\w*",
    "erschaff\\w*",
    "erzeug\\w*",
@@ -767,8 +785,8 @@ export default {
    "destillier\\w*",
    "hochskalier\\w*",
    "skalier\\w*",
-   "im grossen massstab",
-   "grosstechnisch",
+   "im gro(?:ss| )en ma(?:ss| )stab",
+   "gro(?:ss| )technisch",
    "(?:die |den )?(?:produktion|ausbeute|reinheit|wirkung|menge) (?:erhoh|steiger|verbesser)\\w*",
    "rezept",
    "schritt fur schritt",
@@ -785,7 +803,18 @@ export default {
    "welche (?:reagenzien|chemikalien|zutaten|stoffe)",
    "was brauche ich (?:um|fur|zum|zur)",
    "zutaten fur",
-   "materialien (?:fur|um|zum)"
+   "materialien (?:fur|um|zum)",
+   "stell\\w* .{0,60}\\bher\\b",
+   "bau\\w* .{0,60}\\bzusammen\\b",
+   "kauf\\w* .{0,60}\\bein\\b",
+   "fertig\\w* .{0,60}\\ban\\b",
+   "bereit\\w* .{0,60}\\bzu\\b",
+   "ruhr\\w* .{0,60}\\ban\\b",
+   "misch\\w* .{0,60}\\ban\\b",
+   "gewinn\\w* .{0,60}\\baus\\b",
+   "baste\\w*",
+   "selber (?:bauen|machen|herstellen)",
+   "selbst (?:bauen|machen|herstellen)"
   ],
   "contextoSeguro": [
    "entsorg\\w*",
@@ -850,7 +879,7 @@ export default {
    "pikrinsaure",
    "tetryl",
    "schwarzpulver",
-   "schiesspulver",
+   "schie(?:ss| )pulver",
    "rauchloses pulver",
    "ammoniumnitrat (?:mit|und|\\+|plus) (?:diesel|ol|treibstoff|benzin)",
    "(?:selbstgebaute|selbstgemachte|improvisierte|chemische|brand|rauch|rohr|nagel|zeit|auto|dunger|schnellkochtopf)bombe\\w*",
@@ -878,7 +907,7 @@ export default {
    "polvora",
    "gunpowder"
   ],
-  "fazerBomba": "\\b(?:bau(?:en|e|t)|herstell\\w*|mach(?:en|e|t)|zusammenbau\\w*|konstruier\\w*|erschaff\\w*|produzier\\w*|basteln?|make|build|fazer)\\s+(?:eine?\\s+|einen\\s+|die\\s+|an?\\s+|uma?\\s+)?(?:bombe|bomb|bomba)n?\\b(?!\\s+(?:kalorimeter|drohung|fur (?:wasser|warme|vakuum|insulin|treibstoff|luft)))",
+  "fazerBomba": "\\b(?:bau(?:en|e|t|st)|herstell\\w*|mach(?:en|e|t|st)|zusammenbau\\w*|konstruier\\w*|erschaff\\w*|produzier\\w*|bast(?:le|elt|eln|elst)|basteln?)\\s+(?:(?!bomb)\\w+\\s+){0,5}?(?:eine?\\s+|einen\\s+|die\\s+|an?\\s+|uma?\\s+)?(?:(?:selbst\\w*|hausgemacht\\w*|improvisiert\\w*)\\s+)?(?:bombe|bomb|bomba)n?\\b(?!\\s+(?:kalorimeter|drohung|fur (?:wasser|warme|vakuum|insulin|treibstoff|luft)))|\\b(?:make|build|fazer)\\s+(?:eine?\\s+|einen\\s+|die\\s+|an?\\s+|uma?\\s+)?(?:bombe|bomb|bomba)n?\\b(?!\\s+(?:kalorimeter|drohung|fur (?:wasser|warme|vakuum|insulin|treibstoff|luft)))|\\b(?:bombe|bomb|bomba)n?\\s+(?:(?!bomb)\\w+\\s+){0,3}?(?:selber |selbst )?(?:bauen|basteln|herstellen|machen|zusammenbauen|produzieren|konstruieren|zubereiten)\\b|\\b(?:bau|herstellung|konstruktion|zusammenbau)\\s+(?:von |einer |eines |der |ein )?(?:(?:selbst\\w*|hausgemacht\\w*|improvisiert\\w*)\\s+)?bomben?\\b",
   "alvoArmas": [
    "sarin",
    "soman",
@@ -928,7 +957,9 @@ export default {
    "mustard gas",
    "arma quimica",
    "gas sarin",
-   "fosgenio"
+   "fosgenio",
+   "(?:wasserstoff|kalium|natrium)?zyanid\\w*",
+   "zyanwasserstoff"
   ],
   "alvoDrogas": [
    "methamphetamin\\w*",
@@ -1013,16 +1044,17 @@ export default {
    "vorlaufersubstanz\\w*",
    "roter phosphor",
    "rotes iod",
-   "iod und roter phosphor"
+   "iod und roter phosphor",
+   "roten? phosphor",
+   "rotem iod"
   ],
-  "precursoresAcao": "\\b(?:extrahier\\w*|gewinn\\w*|beschaff\\w*|besorg\\w*|kauf\\w*|erwerb\\w*|bekomm\\w*|umleit\\w*|ohne (?:rezept|lizenz|genehmigung|erlaubnis)|umgeh\\w*|verkauf\\w*|handel\\w*|schmuggel\\w*|versteck\\w*|verberg\\w*|synthese|synthetisier\\w*)\\b",
+  "precursoresAcao": "\\b(?:extrahier\\w*|gewinn\\w*|beschaff\\w*|besorg\\w*|kauf\\w*|erwerb\\w*|bekomm\\w*|komm\\w* .{0,30}\\ban\\b|ranzukomm\\w*|umleit\\w*|ohne (?:rezept|lizenz|genehmigung|erlaubnis)|umgeh\\w*|verkauf\\w*|handel\\w*|schmuggel\\w*|versteck\\w*|verberg\\w*|synthese|synthetisier\\w*)\\b",
   "alvoDano": [
    "(?:jemanden|eine person|menschen|leute|meinen|meine|mein|den|die|das|ihn|sie|einen hund|eine katze|ein tier|tiere|kinder|ein kind|nachbar\\w*|kolleg\\w*|lehrer\\w*|chef\\w*|mann|frau|freund\\w*|ex|partner\\w*) (?:vergift\\w*|tot\\w*|umbring\\w*|verletz\\w*|schaden)",
    "vergift\\w* (?:jemanden|eine person|menschen|leute|meinen|meine|mein|den|die|das|ihn|sie|einen hund|eine katze|ein tier|tiere|kinder|ein kind)",
    "ermord\\w*",
    "mord",
    "umbring\\w*",
-   "tot(?:en|e)\\b",
    "absichtlich (?:vergift|betaub)\\w*",
    "(?:unauffindbare\\w*|nicht nachweisbare\\w*|spurlose\\w*|todliche\\w*|selbstgemachte\\w*) gift\\w*",
    "gift(?:,)? das keine spuren hinterlasst",
@@ -1034,7 +1066,11 @@ export default {
    "envenenar alguem",
    "matar alguem",
    "kill someone",
-   "poison someone"
+   "poison someone",
+   "vergift(?:e|en|et|st) (?:ich |man |wir |du )?(?:jemanden|eine person|menschen|leute|meinen|meine|mein|den|die|das|ihn|einen hund|eine katze|ein tier|tiere|kinder|ein kind|nachbar\\w*|kolleg\\w*|lehrer\\w*|chef\\w*|mann|frau|freund\\w*|ex|partner\\w*)\\b",
+   "bring(?:e|en|t|st) (?:ich |man |wir |du )?(?:jemanden|eine person|menschen|leute|meinen \\w+|meine \\w+|mein \\w+|ihn|sie) um\\b",
+   "(?:jemanden|jemand|eine person|einen menschen|menschen|leute|mensch|ihn|sie|nachbar\\w*|kolleg\\w*|lehrer\\w*|chef\\w*|mann|frau|freund\\w*|partner\\w*|hund|katze|kind\\w*|baby|eltern|mutter|vater) (?:\\w+ ){0,5}tot(?:en|e)\\b",
+   "\\btot(?:e|en|et) (?:ich |man |wir |du )?(?:jemanden|eine person|einen menschen|menschen|leute|meinen \\w+|meine \\w+|mein \\w+|ihn|sie)\\b"
   ],
   "alvoAutolesao": [
    "mich (?:selbst )?(?:toten|umbringen|vergiften|verletzen|schneiden|ritzen)",
@@ -1093,7 +1129,7 @@ export default {
    "thermit",
    "nitrocellulose",
    "nitrozellulose",
-   "schiessbaumwolle",
+   "schie(?:ss| )baumwolle",
    "nitroglycerin",
    "nitroglyzerin",
    "nitriertes toluol",
@@ -1168,7 +1204,8 @@ export default {
     "blausaure",
     "chloramin",
     "chlorgas",
-    "armaquimica"
+    "armaquimica",
+    "zyanid"
    ],
    "DROGAS": [
     "methamphetamin",

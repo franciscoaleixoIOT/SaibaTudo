@@ -12,9 +12,12 @@ import net.saibatudo.quimica.data.model.Composto
 import net.saibatudo.quimica.data.model.Constante
 import net.saibatudo.quimica.data.model.Elemento
 import net.saibatudo.quimica.data.model.Fonte
+import net.saibatudo.quimica.data.model.LoteTextos
 import net.saibatudo.quimica.data.model.PacoteJson
 import net.saibatudo.quimica.data.model.Regras
+import net.saibatudo.quimica.data.model.TextosIndice
 import net.saibatudo.quimica.data.model.Trecho
+import net.saibatudo.quimica.domain.Idiomas
 import net.saibatudo.quimica.domain.Texto
 
 /**
@@ -81,14 +84,72 @@ class Pacote(
         return lista
     }
 
-    /** Trechos licenciados de texto (pasta textos/ do pacote), lidos uma vez. */
+    /** Arquivos de textos já lidos (caminho → trechos); falha de leitura = lista vazia (o resto do pacote continua). */
+    private val textosLidos = HashMap<String, List<Trecho>>()
+    private var indiceTextosLido = false
+    private var indiceTextosCache: TextosIndice? = null
+
+    /** `textos/index.json` (lotes por fonte e idioma) ou null quando o pacote é do formato antigo (um arquivo por trecho). */
+    suspend fun indiceDeTextos(): TextosIndice? {
+        if (indiceTextosLido) return indiceTextosCache
+        val idx = if (existe(CAMINHO_INDICE_TEXTOS)) runCatching { PacoteJson.textosIndice(PacoteJson.parse(bytes(CAMINHO_INDICE_TEXTOS))) }.getOrNull() else null
+        trava.withLock { indiceTextosCache = idx; indiceTextosLido = true }
+        return idx
+    }
+
+    private suspend fun lerTextos(caminho: String): List<Trecho> {
+        trava.withLock { textosLidos[caminho] }?.let { return it }
+        val lista = runCatching { PacoteJson.trechos(PacoteJson.parse(bytes(caminho)), caminho) }.getOrDefault(emptyList())
+        trava.withLock { textosLidos[caminho] = lista }
+        return lista
+    }
+
+    /** Arquivos de texto fora do índice (formato antigo: um trecho por arquivo), sem o próprio índice. */
+    private suspend fun avulsos(): List<String> {
+        val emLote = indiceDeTextos()?.lotes?.map { it.caminho }?.toSet().orEmpty()
+        return manifest.caminhos("textos/").filter { it.endsWith(".json") && it != CAMINHO_INDICE_TEXTOS && it !in emLote }
+    }
+
+    /** TODOS os trechos licenciados do pacote (lotes do índice + arquivos avulsos), de todos os idiomas e fontes, lidos uma vez. */
     suspend fun trechos(): List<Trecho> {
         trechosCache?.let { return it }
-        val lista = manifest.caminhos("textos/").filter { it.endsWith(".json") }.mapNotNull { c ->
-            runCatching { PacoteJson.trecho(PacoteJson.parse(bytes(c))) }.getOrNull()
-        }
+        val caminhos = indiceDeTextos()?.lotes?.map { it.caminho }.orEmpty().filter { existe(it) } + avulsos()
+        val lista = caminhos.flatMap { lerTextos(it) }
         trava.withLock { trechosCache = lista }
         return lista
+    }
+
+    /**
+     * Trechos para o retrieval de "O que é…?" no [idioma] (espelha `DataStore.textos` do site): com [reserva], também inglês e depois português,
+     * nessa ordem de prioridade (o trecho traz o próprio idioma, para a interface rotular). Com [termos] (palavras da pergunta), lê só os lotes/
+     * arquivos cuja chave ou título combina com algum termo; sem combinação, todos os do(s) idioma(s). As definições do ChEBI ficam de fora (já
+     * vêm no registro do composto). Aceita o pacote antigo (um arquivo por trecho, sem índice).
+     */
+    suspend fun trechos(idioma: String, termos: List<String>? = null, reserva: Boolean = false): List<Trecho> {
+        val idiomas = if (reserva) Idiomas.comReservas(idioma) else listOf(Idiomas.normalizar(idioma) ?: Idiomas.PADRAO)
+        val uteis = termos.orEmpty().filter { it.length >= 3 }
+        fun combina(chaves: List<String>) = uteis.isEmpty() || chaves.any { c -> uteis.any { c.contains(it) } }
+        val lotes = indiceDeTextos()?.lotes.orEmpty().filter { existe(it.caminho) && !it.caminho.startsWith("textos/chebi/") && it.fonte != "chebi" }
+        val lotesAlvo = lotes.filter { it.idioma in idiomas }
+        val chavesDoLote = { l: LoteTextos -> l.trechos.flatMap { listOf(Texto.nlu(it.chave), Texto.nlu(it.titulo)) }.filter { it.isNotEmpty() } }
+        val lotesCand = if (uteis.isNotEmpty()) lotesAlvo.filter { combina(chavesDoLote(it)) } else lotesAlvo
+        val soltos = avulsos().filter { !it.startsWith("textos/chebi/") }
+        val nomeDoArquivo = { c: String -> Texto.nlu(c.removePrefix("textos/").substringAfter('/').removeSuffix(".json")) }
+        val soltosCand = if (uteis.isNotEmpty()) soltos.filter { combina(listOf(nomeDoArquivo(it))) } else soltos
+        val final = if (lotesCand.size + soltosCand.size > 0) lotesCand.map { it.caminho } + soltosCand else lotesAlvo.map { it.caminho } + soltos
+        val ordem = idiomas.withIndex().associate { (i, id) -> id to i }
+        return final.flatMap { lerTextos(it) }.filter { it.idioma in ordem }.sortedBy { ordem.getValue(it.idioma) }
+    }
+
+    /**
+     * Texto das frases H no [idioma] (código → frase): `ghs_frases.json` do pacote (`textoPorIdioma`, Anexo III do CLP). Em pt-BR fica o que o
+     * app já mostrava (GhsTextos, mesmo texto do site); nos outros idiomas, o idioma pedido e, sem ele, o inglês do pacote e o português.
+     */
+    fun frasesH(idioma: String): Map<String, String> {
+        val id = Idiomas.normalizar(idioma) ?: Idiomas.PADRAO
+        if (id == Idiomas.PADRAO) return regras.frasesH
+        val ordem = Idiomas.comReservas(id)
+        return regras.frasesHPorIdioma.mapNotNull { (cod, m) -> ordem.firstNotNullOfOrNull { m[it] }?.let { cod to it } }.toMap()
     }
 
     /** Fontes para "Sobre os dados": `fontes.json` e, se faltar, as do manifesto. */
@@ -99,5 +160,6 @@ class Pacote(
 
     companion object {
         private const val MAX_LOTES_EM_MEMORIA = 12
+        const val CAMINHO_INDICE_TEXTOS = "textos/index.json"
     }
 }

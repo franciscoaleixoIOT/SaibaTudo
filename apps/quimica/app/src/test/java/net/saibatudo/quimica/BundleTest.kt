@@ -28,7 +28,7 @@ class BundleTest {
 
     private val fixture = TestData.Fixture
 
-    private fun pacotes(): List<PacoteDeTeste> = listOfNotNull(TestData.Fixture, TestData.Real)
+    private fun pacotes(): List<PacoteDeTeste> = listOfNotNull(TestData.Fixture, TestData.Real, TestData.Embutido)
 
     // ---- assinatura -----------------------------------------------------------------------------------------------------------
 
@@ -118,7 +118,8 @@ class BundleTest {
         val etanol = p.composto(702)!!
         assertTrue(etanol.icscBuscaUrl!!.startsWith("https://"))
         assertEquals("CHEBI:16236", etanol.definicaoChebi!!.id)
-        assertEquals(3, p.trechos().size)
+        // 3 arquivos avulsos (formato antigo, um trecho por arquivo) + 1 lote listado em textos/index.json com 2 trechos
+        assertEquals(5, p.trechos().size)
     }
 
     @Test fun arquivoAdulteradoNoDiscoEhDetectadoNaCargaEmLote() {

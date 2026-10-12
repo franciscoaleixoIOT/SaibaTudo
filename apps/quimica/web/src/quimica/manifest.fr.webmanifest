@@ -1,0 +1,44 @@
+{
+  "id": "/quimica/",
+  "name": "SaibaTudo Química",
+  "short_name": "Chimie",
+  "description": "Tableau périodique, composés avec structures 2D, calculatrices pas à pas et sécurité chimique, avec des données ouvertes. Fonctionne hors ligne et rien ne quitte votre appareil.",
+  "lang": "fr",
+  "dir": "ltr",
+  "start_url": "/quimica/?source=pwa&lang=fr",
+  "scope": "/quimica/",
+  "display": "standalone",
+  "theme_color": "#0C2340",
+  "background_color": "#0C2340",
+  "categories": ["education", "utilities", "science"],
+  "icons": [
+    { "src": "/quimica/brand/pwa-quimica-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/quimica/brand/pwa-quimica-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/quimica/brand/pwa-quimica-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/quimica/brand/pwa-quimica-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/quimica/brand/quimica-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Tableau périodique",
+      "short_name": "Tableau",
+      "description": "Tableau périodique interactif",
+      "url": "/quimica/tabela?source=shortcut&lang=fr",
+      "icons": [{ "src": "/quimica/brand/pwa-quimica-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Calculatrices",
+      "short_name": "Calculatrices",
+      "description": "Masse molaire, équilibrage, stœchiométrie, pH et plus encore",
+      "url": "/quimica/calculadoras?source=shortcut&lang=fr",
+      "icons": [{ "src": "/quimica/brand/pwa-quimica-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Composés",
+      "short_name": "Composés",
+      "description": "Rechercher des composés et voir la structure 2D",
+      "url": "/quimica/compostos?source=shortcut&lang=fr",
+      "icons": [{ "src": "/quimica/brand/pwa-quimica-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
+}

@@ -32,6 +32,7 @@ import net.saibatudo.quimica.data.prefs.UserPreferences
 import net.saibatudo.quimica.data.repository.EstadoDados
 import net.saibatudo.quimica.data.repository.Pacote
 import net.saibatudo.quimica.data.repository.QuimicaDataStore
+import net.saibatudo.quimica.domain.Idiomas
 
 /** Telas do app. As cinco primeiras são as abas; as demais são empilhadas por cima. */
 sealed interface Tela {
@@ -66,13 +67,16 @@ data class UiState(
     val atualizacao: EstadoAtualizacao = EstadoAtualizacao.Ociosa,
     val resposta: RespostaUi? = null,
     val pensando: Boolean = false,
-    val sugestoes: List<String> = emptyList()
+    val sugestoes: List<String> = emptyList(),
+    /** Idioma do app (pt-BR, en, es, de, fr): o do interpretador, do dicionário e das respostas. */
+    val idioma: String = Idiomas.PADRAO
 )
 
 class MainViewModel(
     private val dados: QuimicaDataStore,
     private val prefs: PreferencesStore,
-    private val atualizacoes: UpdateCoordinator
+    private val atualizacoes: UpdateCoordinator,
+    idiomaInicial: String = Idiomas.PADRAO
 ) : ViewModel() {
 
     private val _pilha = MutableStateFlow<List<Tela>>(listOf(Tela.Inicio))
@@ -81,9 +85,10 @@ class MainViewModel(
     private val _resposta = MutableStateFlow<RespostaUi?>(null)
     private val _pensando = MutableStateFlow(false)
     private val _sugestoes = MutableStateFlow<List<String>>(emptyList())
+    private val _idioma = MutableStateFlow(Idiomas.normalizar(idiomaInicial) ?: Idiomas.PADRAO)
     private var contexto: ParsedQuery? = null
 
-    /** Dicionário e montador de respostas do pacote em uso; reconstruídos quando o pacote ou o nível mudam. */
+    /** Dicionário e montador de respostas do pacote em uso; reconstruídos quando o pacote, o idioma ou o nível mudam. */
     @Volatile private var dicionarioAtual: Pair<Pacote, Dicionario>? = null
     @Volatile private var construtor: AnswerBuilder? = null
     @Volatile private var nivelDoConstrutor: Nivel? = null
@@ -92,7 +97,7 @@ class MainViewModel(
         UiState(dados = d, prefs = p, atualizacao = a, resposta = r, pensando = pe)
     }
 
-    val estado: StateFlow<UiState> = combine(base, _sugestoes) { b, s -> b.copy(sugestoes = s) }
+    val estado: StateFlow<UiState> = combine(base, _sugestoes, _idioma) { b, s, i -> b.copy(sugestoes = s, idioma = i) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UiState())
 
     init {
@@ -141,9 +146,10 @@ class MainViewModel(
     private suspend fun montador(): AnswerBuilder? {
         val pacote = (dados.estado.value as? EstadoDados.Pronto)?.pacote ?: return null
         val nivel = prefs.atual().nivel
-        construtor?.let { if (nivelDoConstrutor == nivel && dicionarioAtual?.first === pacote) return it }
-        val dic = dicionarioAtual?.takeIf { it.first === pacote }?.second
-            ?: withContext(Dispatchers.Default) { Dicionario.criar(pacote) }.also { dicionarioAtual = pacote to it }
+        val idioma = _idioma.value
+        construtor?.let { if (nivelDoConstrutor == nivel && dicionarioAtual?.first === pacote && it.dic.idioma == idioma) return it }
+        val dic = dicionarioAtual?.takeIf { it.first === pacote && it.second.idioma == idioma }?.second
+            ?: withContext(Dispatchers.Default) { Dicionario.criar(pacote, idioma) }.also { dicionarioAtual = pacote to it }
         return AnswerBuilder(pacote, dic, nivel).also { construtor = it; nivelDoConstrutor = nivel }
     }
 
@@ -194,6 +200,24 @@ class MainViewModel(
 
     fun definirTema(t: TemaApp) { viewModelScope.launch { prefs.atualizar { it.copy(tema = t) } } }
     fun definirFonte(f: TamanhoFonte) { viewModelScope.launch { prefs.atualizar { it.copy(tamanhoFonte = f) } } }
+    /**
+     * Novo idioma (seletor das configurações ou mudança no sistema): limpa a conversa (o contexto é de outro idioma) e refaz dicionário,
+     * respostas e sugestões no idioma. A interface é recriada por [net.saibatudo.quimica.ui.IdiomaApp.definir].
+     */
+    fun definirIdioma(idioma: String) {
+        val id = Idiomas.normalizar(idioma) ?: Idiomas.PADRAO
+        if (id == _idioma.value) return
+        _idioma.value = id
+        contexto = null
+        _resposta.value = null
+        construtor = null
+        _sugestoes.value = emptyList()
+        prepararSugestoes()
+    }
+
+    /** Ao (re)criar a tela: confere se o idioma do app mudou por fora (configurações do sistema). */
+    fun sincronizarIdioma(idioma: String) = definirIdioma(idioma)
+
     fun definirNivel(n: Nivel) { viewModelScope.launch { prefs.atualizar { it.copy(nivel = n) }; _resposta.value = null } }
     fun definirEconomia(v: Boolean) { viewModelScope.launch { prefs.atualizar { it.copy(economiaDeDados = v) } } }
 

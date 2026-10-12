@@ -9,7 +9,8 @@ import net.saibatudo.quimica.data.repository.Pacote
 
 /**
  * Carrega o NÚCLEO do pacote (elementos, constantes, regras, fontes e índice de compostos) a partir de um [BundleReader].
- * Lotes de compostos, fichas ICSC e textos ficam para depois (sob demanda, em [Pacote]).
+ * Lotes de compostos, fichas ICSC e textos ficam para depois (sob demanda, em [Pacote]: `textos/index.json` + lotes por fonte e idioma,
+ * ou um arquivo por trecho no pacote antigo).
  *
  * Os arquivos do núcleo são conferidos contra o sha256 do manifesto sempre que [verificarHash] for verdadeiro
  * (pacote baixado); o pacote embutido faz parte do APK assinado.
@@ -33,11 +34,14 @@ object BundleLoader {
             check(elementos.isNotEmpty()) { "elementos.json sem elementos" }
             val constantes = opcional("constantes.json")?.let { PacoteJson.constantes(PacoteJson.parse(it)) }.orEmpty()
             var regras = opcional("regras.json")?.let { PacoteJson.regras(PacoteJson.parse(it)) } ?: Regras()
-            // frases H em português: arquivo opcional do pacote (complementa regras.frasesH)
+            // frases H: arquivo opcional do pacote (formato antigo em português complementa regras.frasesH; o multilíngue vai para frasesHPorIdioma)
             for (caminho in listOf("ghs_frases.json", "seguranca/ghs_frases.json", "ghs/frases.json")) {
                 val bytes = opcional(caminho) ?: continue
-                val frases = runCatching { PacoteJson.frasesH(PacoteJson.parse(bytes)) }.getOrDefault(emptyMap())
-                if (frases.isNotEmpty()) { regras = regras.copy(frasesH = frases + regras.frasesH); break }
+                val json = runCatching { PacoteJson.parse(bytes) }.getOrNull() ?: continue
+                val frases = runCatching { PacoteJson.frasesH(json) }.getOrDefault(emptyMap())
+                // formato multilíngue (docs/DATA_CONTRACT.md §6): código → idioma → texto oficial
+                val porIdioma = runCatching { PacoteJson.frasesHPorIdioma(json) }.getOrDefault(emptyMap())
+                if (frases.isNotEmpty() || porIdioma.isNotEmpty()) { regras = regras.copy(frasesH = frases + regras.frasesH, frasesHPorIdioma = porIdioma); break }
             }
             val fontes = opcional("fontes.json")?.let { PacoteJson.fontesDeArquivo(PacoteJson.parse(it)) }.orEmpty()
             val indice = opcional("compostos/index.json")?.let { PacoteJson.indiceCompostos(PacoteJson.parse(it)) } ?: CompostoIndice(emptyList())

@@ -62,6 +62,25 @@ object PacoteJson {
         return emptyList()
     }
 
+    /** Dicionário `{ "<idioma>": "texto" }` (campos por idioma do contrato); entradas vazias ficam de fora. */
+    internal fun porIdioma(e: JsonElement?): Map<String, String> {
+        val o = e.obj() ?: return emptyMap()
+        val out = linkedMapOf<String, String>()
+        for ((k, v) in o.entrySet()) if (v.isJsonPrimitive) v.asString.trim().takeIf { it.isNotEmpty() }?.let { out[k] = it }
+        return out
+    }
+
+    /** Dicionário `{ "<idioma>": ["a", "b"] }`. */
+    internal fun listasPorIdioma(e: JsonElement?): Map<String, List<String>> {
+        val o = e.obj() ?: return emptyMap()
+        val out = linkedMapOf<String, List<String>>()
+        for ((k, v) in o.entrySet()) {
+            val l = v.arr()?.mapNotNull { if (it.isJsonPrimitive) it.asString.trim().takeIf { s -> s.isNotEmpty() } else null }.orEmpty()
+            if (l.isNotEmpty()) out[k] = l
+        }
+        return out
+    }
+
     /** Lista de objetos na raiz ou dentro de [chaves] (primeira que existir). */
     private fun listaDeObjetos(raiz: JsonElement, vararg chaves: String): List<JsonObject> {
         raiz.arr()?.let { a -> return a.mapNotNull { it.obj() } }
@@ -106,6 +125,7 @@ object PacoteJson {
             simbolo = simbolo,
             nome = o.texto("nome") ?: simbolo,
             nomeEn = o.texto("nomeEn"),
+            nomes = porIdioma(o.get("nomes")),
             massaAtomica = o.numero("massaAtomica"),
             massaAtomicaIncerteza = o.numero("massaAtomicaIncerteza"),
             grupo = o.inteiro("grupo"),
@@ -154,6 +174,8 @@ object PacoteJson {
             nomeIupac = nomeIupac,
             nomePtPendente = o.booleano("nomePtPendente") ?: false,
             sinonimos = o.textos("sinonimos"),
+            nomes = porIdioma(o.get("nomes")),
+            sinonimosPorIdioma = listasPorIdioma(o.get("sinonimosPorIdioma")),
             formula = o.texto("formula"),
             formulaHill = o.texto("formulaHill"),
             massaMolar = o.numero("massaMolar"),
@@ -215,6 +237,8 @@ object PacoteJson {
             var formula: String? = null
             var cas: String? = null
             var ptPendente = false
+            val chaves = LinkedHashSet<String>()
+            val chavesPorIdioma = LinkedHashMap<String, LinkedHashSet<String>>()
         }
         val porCid = LinkedHashMap<Long, Acc>()
         fun acc(cid: Long) = porCid.getOrPut(cid) { Acc(cid) }
@@ -264,18 +288,39 @@ object PacoteJson {
                         v.asString.trim().toLongOrNull()?.let { porCid[it]?.nomes?.add(chave) }   // { nome: cid }
                     }
                 }
-                o.get("nomes").arr()?.forEach { el ->                              // [ {nome, cid} ]
-                    val x = el.obj() ?: return@forEach
+                o.get("nomes").arr()?.forEach { el ->
+                    val par = el.arr()
+                    if (par != null) {                                             // formato do pipeline: [ [chave normalizada, cid] ]
+                        val (chave, cid) = parDeChave(par) ?: return@forEach
+                        porCid[cid]?.chaves?.add(chave)
+                        return@forEach
+                    }
+                    val x = el.obj() ?: return@forEach                             // [ {nome, cid} ]
                     val cid = x.longo("cid") ?: return@forEach
                     x.texto("nome", "n")?.let { porCid[cid]?.nomes?.add(it) }
+                }
+                // nomes por idioma (I18N §4): só as chaves que não estão em `nomes`; busca no idioma X = nomes ∪ nomesPorIdioma[X]
+                o.get("nomesPorIdioma").obj()?.entrySet()?.forEach { (idioma, lista) ->
+                    lista.arr()?.forEach { el ->
+                        val (chave, cid) = el.arr()?.let(::parDeChave) ?: el.obj()?.let { x -> x.texto("nome", "n")?.let { n -> x.longo("cid")?.let { n to it } } } ?: return@forEach
+                        porCid[cid]?.chavesPorIdioma?.getOrPut(idioma) { LinkedHashSet() }?.add(chave)
+                    }
                 }
                 o.get("formulas").obj()?.entrySet()?.forEach { (k, v) -> k.toLongOrNull()?.let { c -> if (v.isJsonPrimitive) porCid[c]?.formula = v.asString } }
                 o.get("cas").obj()?.entrySet()?.forEach { (k, v) -> k.toLongOrNull()?.let { c -> if (v.isJsonPrimitive) porCid[c]?.cas = v.asString } }
             }
         }
         return CompostoIndice(porCid.values.mapNotNull { a ->
-            a.lote?.let { EntradaIndice(a.cid, it, a.nomes.toList(), a.formula, a.cas, a.ptPendente) }
+            a.lote?.let { EntradaIndice(a.cid, it, a.nomes.toList(), a.formula, a.cas, a.ptPendente, a.chaves.toList(), a.chavesPorIdioma.mapValues { (_, v) -> v.toList() }) }
         })
+    }
+
+    /** `["aspirina", 2244]` → ("aspirina", 2244). */
+    private fun parDeChave(par: JsonArray): Pair<String, Long>? {
+        if (par.size() < 2 || !par[0].isJsonPrimitive || !par[1].isJsonPrimitive) return null
+        val chave = par[0].asString.trim().takeIf { it.isNotEmpty() } ?: return null
+        val cid = runCatching { par[1].asLong }.getOrNull() ?: return null
+        return chave to cid
     }
 
     /** Caminho do lote no pacote: `compostos/<lote>.json` (aceita lote já com pasta e/ou extensão). */
@@ -301,7 +346,10 @@ object PacoteJson {
         val o = raiz.obj() ?: return Regras()
         val props = listaDeObjetos(o, "propriedades").mapNotNull { p ->
             val id = p.texto("id") ?: return@mapNotNull null
-            PropriedadeDef(id, p.texto("rotulo", "nome") ?: id, p.texto("campo"), p.texto("alvo") ?: "", p.texto("tipo") ?: "", p.texto("unidade"), p.textos("sinonimos"))
+            PropriedadeDef(
+                id, p.texto("rotulo", "nome") ?: id, p.texto("campo"), p.texto("alvo", "escopo") ?: "", p.texto("tipo") ?: "", p.texto("unidade"), p.textos("sinonimos"),
+                rotulos = porIdioma(p.get("rotulos")), sinonimosPorIdioma = listasPorIdioma(p.get("sinonimosPorIdioma")), origem = p.texto("origem")
+            )
         }
         val unidades = unidadesDeRegras(o)
         val prefixos = (o.get("prefixosSi") ?: o.get("prefixos")).arr()?.mapNotNull { it.obj() }.orEmpty().mapNotNull { p ->
@@ -378,6 +426,7 @@ object PacoteJson {
      */
     fun frasesH(raiz: JsonElement): Map<String, String> {
         val o = raiz.obj()
+        if (o?.get("frasesH").obj() != null) return emptyMap()   // formato multilíngue (frasesHPorIdioma); o texto pt-BR do app vem de GhsTextos
         val fonte: JsonElement = o?.get("frases") ?: raiz
         val saida = linkedMapOf<String, String>()
         fonte.obj()?.entrySet()?.forEach { (k, v) ->
@@ -393,9 +442,50 @@ object PacoteJson {
         return saida
     }
 
+    /**
+     * `ghs_frases.json` multilíngue (docs/DATA_CONTRACT.md §6): código → idioma → texto. Usa `frasesH[cod].textoPorIdioma` e, como reserva,
+     * `todasAsFrasesPorIdioma[cod]`; o `texto` (português) entra como `pt-BR` quando o idioma não vier. Formato antigo = vazio.
+     */
+    fun frasesHPorIdioma(raiz: JsonElement): Map<String, Map<String, String>> {
+        val o = raiz.obj() ?: return emptyMap()
+        val saida = linkedMapOf<String, Map<String, String>>()
+        o.get("todasAsFrasesPorIdioma").obj()?.entrySet()?.forEach { (cod, v) -> porIdioma(v).takeIf { it.isNotEmpty() }?.let { saida[cod.replace(" ", "")] = it } }
+        o.get("frasesH").obj()?.entrySet()?.forEach { (cod, v) ->
+            val x = v.obj() ?: return@forEach
+            val m = LinkedHashMap(saida[cod.replace(" ", "")].orEmpty())
+            m.putAll(porIdioma(x.get("textoPorIdioma")))
+            x.texto("texto")?.let { m.putIfAbsent("pt-BR", it) }
+            if (m.isNotEmpty()) saida[cod.replace(" ", "")] = m
+        }
+        return saida
+    }
+
     // ---- trechos ----------------------------------------------------------------------------------------------------
 
-    fun trecho(raiz: JsonElement): Trecho? {
+    /** Trechos de um arquivo de textos: lote (lista JSON, formato atual) ou arquivo avulso (um objeto, formato antigo). */
+    fun trechos(raiz: JsonElement, caminho: String? = null): List<Trecho> =
+        (raiz.arr()?.toList() ?: listOf(raiz)).mapNotNull { trecho(it, caminho) }
+
+    /** `textos/index.json` (docs/DATA_CONTRACT.md §5); null se não for o formato esperado. */
+    fun textosIndice(raiz: JsonElement): TextosIndice? {
+        val o = raiz.obj() ?: return null
+        val lotes = o.get("lotes").arr() ?: return null
+        return TextosIndice(
+            versao = o.inteiro("versao") ?: 1,
+            lotes = lotes.mapNotNull { el ->
+                val l = el.obj() ?: return@mapNotNull null
+                val caminho = l.texto("caminho") ?: return@mapNotNull null
+                LoteTextos(
+                    caminho = caminho,
+                    fonte = l.texto("fonte") ?: caminho.substringAfter("textos/").substringBefore('/'),
+                    idioma = net.saibatudo.quimica.domain.Idiomas.normalizar(l.texto("idioma")) ?: net.saibatudo.quimica.domain.Idiomas.PADRAO,
+                    trechos = l.get("trechos").arr()?.mapNotNull { t -> t.obj()?.let { x -> x.texto("id")?.let { TrechoIndice(it, x.texto("titulo"), x.texto("chave")) } } }.orEmpty()
+                )
+            }
+        )
+    }
+
+    fun trecho(raiz: JsonElement, caminho: String? = null): Trecho? {
         val o = raiz.obj() ?: return null
         return Trecho(
             id = o.texto("id") ?: return null,
@@ -403,7 +493,9 @@ object PacoteJson {
             licenca = o.texto("licenca") ?: "licença não informada",
             url = o.texto("url"), capitulo = o.texto("capitulo"), secao = o.texto("secao"), titulo = o.texto("titulo"),
             textoOriginal = o.texto("textoOriginal"), textoPt = o.texto("textoPt"), traducao = o.texto("traducao"),
-            palavrasChave = o.textos("palavrasChave")
+            palavrasChave = o.textos("palavrasChave"),
+            idiomaTexto = o.texto("idioma"),
+            caminho = caminho
         )
     }
 }

@@ -16,6 +16,8 @@ import net.saibatudo.quimica.data.model.Fonte
 import net.saibatudo.quimica.data.prefs.Nivel
 import net.saibatudo.quimica.data.repository.Pacote
 import net.saibatudo.quimica.domain.GhsTextos
+import net.saibatudo.quimica.domain.Idiomas
+import net.saibatudo.quimica.domain.Nomes
 import net.saibatudo.quimica.domain.Propriedades
 import net.saibatudo.quimica.domain.Texto
 import net.saibatudo.quimica.domain.calc.CalculoInvalido
@@ -29,7 +31,7 @@ import net.saibatudo.quimica.domain.calc.ResultadoCalculo
  */
 class AnswerBuilder(
     internal val pacote: Pacote,
-    internal val dic: Dicionario,
+    val dic: Dicionario,
     internal val nivel: Nivel = Nivel.MEDIO
 ) {
     internal var sugestoesCache: List<String>? = null
@@ -89,8 +91,12 @@ class AnswerBuilder(
 
     internal suspend fun compostoDe(q: ParsedQuery): Composto? = q.composto?.toLongOrNull()?.let { pacote.composto(it) }
 
-    internal fun nomeDe(e: Elemento) = e.nome
-    internal fun nomeDe(c: Composto) = c.nomeExibicao
+    /** Idioma das respostas: o do dicionário (o mesmo do NLU). Os moldes de texto ainda são pt-BR (etapa "strings" do docs/I18N.md §6). */
+    internal val idioma: String get() = dic.idioma
+
+    /** Nome no idioma (reserva em inglês/português, sem rótulo por enquanto; em pt-BR, o de sempre). */
+    internal fun nomeDe(e: Elemento) = Nomes.elemento(e, idioma).nome
+    internal fun nomeDe(c: Composto) = Nomes.composto(c, idioma).nome
 
     internal fun fontesDeElementos(simbolos: Collection<String>): List<Fonte> =
         simbolos.mapNotNull { pacote.porSimbolo[it] }.flatMap { it.fontes }.distinctBy { it.nome }.take(3)
@@ -124,7 +130,7 @@ class AnswerBuilder(
     // ---- recusa, ajuda, dados ---------------------------------------------------------------------------------------------------
 
     private fun recusa(q: ParsedQuery): Resposta {
-        val av = Seguranca.avaliar(q.textoOriginal)
+        val av = Seguranca.avaliarNoIdioma(q.textoOriginal, idioma)
         val r = Seguranca.respostaRecusa(av)
         val acoes = if (r.categoria == net.saibatudo.quimica.ai.CategoriaRecusa.AUTOLESAO) listOf(Acao.AbrirUrl("https://cvv.org.br", "Falar com o CVV (cvv.org.br)")) else emptyList()
         return Resposta(
@@ -393,8 +399,9 @@ class AnswerBuilder(
 
     internal fun textosH(doComposto: Map<String, String>): Map<String, String> {
         val m = LinkedHashMap<String, String>()
-        m.putAll(pacote.regras.frasesH)
-        m.putAll(doComposto)
+        m.putAll(pacote.frasesH(idioma))
+        // os textos que vêm no registro do composto são em português: só valem em pt-BR (nos outros idiomas, o pacote multilíngue)
+        if (idioma == Idiomas.PADRAO) m.putAll(doComposto) else doComposto.forEach { (k, v) -> m.putIfAbsent(k, v) }
         return m
     }
 

@@ -106,6 +106,14 @@ android {
     packaging {
         resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
     }
+
+    // O idioma é escolhido DENTRO do app (Configurações > Idioma, docs/I18N.md §2): todos os res/values-<idioma> precisam estar no aparelho,
+    // não só os idiomas do sistema. Sem isso o Play entregaria só as strings dos idiomas do aparelho (AppBundleLocaleChanges).
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
 }
 
 dependencies {

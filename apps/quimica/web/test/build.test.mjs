@@ -9,6 +9,9 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createHash } from 'node:crypto';
 import { DADOS, RAIZ } from './support.mjs';
 
+/** Idiomas além do português (páginas de privacidade, manifestos, catálogos e léxicos próprios). */
+const IDIOMAS_EXTRA = ['en', 'es', 'de', 'fr'];
+
 const aqui = dirname(fileURLToPath(import.meta.url));
 const BUILD = resolve(aqui, '../build.mjs');
 const tmp = mkdtempSync(join(tmpdir(), 'stq-build-'));
@@ -26,7 +29,7 @@ const vercel = JSON.parse(readFileSync(join(RAIZ, 'vercel.json'), 'utf8'));
 const jsDe = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? jsDe(join(dir, e.name)) : e.name.endsWith('.js') ? [join(dir, e.name)] : []);
 
 test('estrutura de dist: tudo sob /quimica/ (páginas, manifesto, service worker, marca, fonte, bibliotecas e dados)', () => {
-  for (const p of ['index.html', 'offline.html', 'privacidade/index.html', 'privacidade/en.html', 'manifest.webmanifest', 'manifest.en.webmanifest', 'js/i18n/index.js', 'js/i18n/catalogos/en.js', 'js/nlu/lex/en.js', 'sw.js', 'css/base.css', 'css/app.css', 'js/main.js', 'js/nlu.js', 'js/seguranca.js',
+  for (const p of ['index.html', 'offline.html', 'privacidade/index.html', ...IDIOMAS_EXTRA.flatMap((i) => [`privacidade/${i}.html`, `manifest.${i}.webmanifest`, `js/i18n/catalogos/${i}.js`, `js/nlu/lex/${i}.js`]), 'manifest.webmanifest', 'js/i18n/index.js', 'sw.js', 'css/base.css', 'css/app.css', 'js/main.js', 'js/nlu.js', 'js/seguranca.js',
     'js/answers.js', 'js/engine.js', 'js/data.js', 'js/verify.js', 'js/calc/balancear.js', 'js/ui/calculadoras.js', 'js/build-info.js', 'js/theme-init.js',
     'vendor/katex/katex.min.js', 'vendor/katex/katex.min.css', 'vendor/katex/LICENSE', 'vendor/katex/fonts/KaTeX_Main-Regular.woff2', 'vendor/smiles-drawer/smiles-drawer.min.js', 'vendor/smiles-drawer/LICENSE',
     'vendor/ghs/ghs05.svg', 'vendor/VENDOR.md', 'fonts/poppins-semibold.woff', 'fonts/OFL.txt',
@@ -53,7 +56,7 @@ test('service worker gerado: versão e listas de pré-cache preenchidas, URLs li
   assert.ok(new RegExp(`export const BUILD = "${versao}"`).test(ler('js/build-info.js')));
   assert.match(ler('js/build-info.js'), /DATA_VERSION = "fixture-1"/);
   const pre = JSON.parse(/const PRECACHE = (\[[\s\S]*?\]);/.exec(sw)[1]);
-  for (const u of ['/quimica/', '/quimica/offline', '/quimica/privacidade', '/quimica/privacidade/en', '/quimica/manifest.en.webmanifest', '/quimica/js/i18n/catalogos/en.js', '/quimica/js/nlu/lex/en.js', '/quimica/js/main.js', '/quimica/css/app.css', '/quimica/manifest.webmanifest', '/quimica/vendor/katex/katex.min.js',
+  for (const u of ['/quimica/', '/quimica/offline', '/quimica/privacidade', ...IDIOMAS_EXTRA.flatMap((i) => [`/quimica/privacidade/${i}`, `/quimica/manifest.${i}.webmanifest`, `/quimica/js/i18n/catalogos/${i}.js`, `/quimica/js/nlu/lex/${i}.js`]), '/quimica/js/main.js', '/quimica/css/app.css', '/quimica/manifest.webmanifest', '/quimica/vendor/katex/katex.min.js',
     '/quimica/vendor/katex/katex.min.css', '/quimica/vendor/smiles-drawer/smiles-drawer.min.js', '/quimica/vendor/ghs/ghs01.svg', '/quimica/vendor/katex/fonts/KaTeX_Main-Regular.woff2', '/quimica/fonts/poppins-semibold.woff', '/quimica/brand/quimica-icon.svg']) {
     assert.ok(pre.includes(u), `pré-cache sem ${u}`);
   }

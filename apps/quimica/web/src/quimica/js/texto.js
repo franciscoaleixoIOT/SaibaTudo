@@ -3,6 +3,7 @@
 /** "Ácido  Sulfúrico!" → "acido sulfurico" (letras e números, separados por um espaço). */
 export function normalizar(s) {
   return String(s ?? '')
+    .replace(/ß/g, 'ss').replace(/œ/g, 'oe').replace(/æ/g, 'ae').replace(/ø/g, 'o')
     .normalize('NFKD').replace(/[̀-ͯ]/g, '')
     .toLowerCase()
     .replace(/[^a-z0-9+\-]+/g, ' ')

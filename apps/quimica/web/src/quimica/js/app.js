@@ -4,7 +4,7 @@
 import { DataStore } from './data.js';
 import { Engine } from './engine.js';
 import { h, icon, anunciar } from './dom.js';
-import { aplicarIdiomaAoDocumento, definirIdioma, detectarIdioma, idiomaAtual, t } from './i18n/index.js';
+import { aplicarIdiomaAoDocumento, caminhoPrivacidade, definirIdioma, detectarIdioma, idiomaAtual, t } from './i18n/index.js';
 import { iniciarInstalacao } from './install.js';
 import { aplicarAparencia, carregar, salvarIdioma } from './prefs.js';
 import { roteador, toast } from './ui/componentes.js';
@@ -99,7 +99,7 @@ function montarShell() {
       h('div', { class: 'appbar-textos' }, h('div', { class: 'appbar-titulo' }, t('ui.marca')), h('div', { class: 'appbar-sub' }, t('ui.app.marcaSub')))),
     h('div', { class: 'appbar-acoes' }, idiomaEl, h('a', { class: 'btn-icone claro', href: '/quimica/configuracoes', 'aria-label': t('ui.app.configuracoes'), 'data-aba': '/quimica/configuracoes' }, icon('settings', 22))));
   const rodape = h('footer', { class: 'rodape' },
-    h('a', { href: '/quimica/sobre-os-dados' }, t('ui.app.rodape.sobre')), h('a', { href: '/quimica/privacidade' }, t('ui.app.rodape.privacidade')), h('a', { href: '/quimica/configuracoes' }, t('ui.app.rodape.configuracoes')),
+    h('a', { href: '/quimica/sobre-os-dados' }, t('ui.app.rodape.sobre')), h('a', { href: caminhoPrivacidade() }, t('ui.app.rodape.privacidade')), h('a', { href: '/quimica/configuracoes' }, t('ui.app.rodape.configuracoes')),
     h('p', null, t('ui.app.rodape.projeto')));
   const aviso = h('div', { id: 'aviso-global' });
   raiz().replaceChildren(h('div', { class: 'app' }, topo, nav, aviso, conteudo, rodape));

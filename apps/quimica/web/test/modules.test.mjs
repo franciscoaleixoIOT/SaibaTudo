@@ -62,14 +62,18 @@ test('páginas HTML: lang pt-BR, viewport, sem script/estilo inline e todos os r
       assert.ok(existsSync(join(SRC, p)) || existsSync(join(SRC, p, 'index.html')), `${pagina}: recurso ausente ${p}`);
     }
   }
-  // política de privacidade em inglês: mesma casca, lang="en", sem recursos ausentes
-  const en = readFileSync(join(Q, 'privacidade/en.html'), 'utf8');
-  assert.match(en, /<html lang="en">/);
-  assert.ok(!/<script(?![^>]*\bsrc=)[^>]*>[^<]/i.test(en) && !/<style[\s>]/i.test(en) && !/\sstyle=/.test(en), 'privacidade/en.html: CSP');
-  for (const m of en.matchAll(/(?:href|src)="(\/[^"#?]*)"/g)) {
-    const p = m[1];
-    if (gerados(p) || rotasSpa.test(p) || p === '/quimica/privacidade/en') continue;
-    assert.ok(existsSync(join(SRC, p)) || existsSync(join(SRC, p, 'index.html')), `privacidade/en.html: recurso ausente ${p}`);
+  // políticas de privacidade nos outros idiomas: mesma casca, lang do idioma, sem recursos ausentes, sem inline (CSP)
+  for (const idioma of ['en', 'es', 'de', 'fr']) {
+    const pag = readFileSync(join(Q, `privacidade/${idioma}.html`), 'utf8');
+    assert.match(pag, new RegExp(`<html lang="${idioma}">`), idioma);
+    assert.match(pag, /name="viewport"/, idioma);
+    assert.ok(!/<script(?![^>]*\bsrc=)[^>]*>[^<]/i.test(pag) && !/<style[\s>]/i.test(pag) && !/\sstyle=/.test(pag), `privacidade/${idioma}.html: CSP`);
+    assert.ok(!/(?:src|href)="https?:\/\/[^"]*\.(?:js|css|woff2?|png|jpe?g|svg)"/i.test(pag), `privacidade/${idioma}.html: recurso de terceiros`);
+    for (const m of pag.matchAll(/(?:href|src)="(\/[^"#?]*)"/g)) {
+      const p = m[1];
+      if (gerados(p) || rotasSpa.test(p) || p.startsWith('/quimica/privacidade/')) continue;
+      assert.ok(existsSync(join(SRC, p)) || existsSync(join(SRC, p, 'index.html')), `privacidade/${idioma}.html: recurso ausente ${p}`);
+    }
   }
   const index = readFileSync(join(Q, 'index.html'), 'utf8');
   assert.match(index, /<link rel="canonical" href="https:\/\/saibatudo\.net\/quimica\/">/);
@@ -98,7 +102,7 @@ test('ícones usados existem; todas as rotas "/quimica/..." do código resolvem 
     for (const m of s.matchAll(/\bicone:\s*'([a-zA-Z]+)'/g)) assert.ok(ICONES.includes(m[1]), `${f}: ícone inexistente ${m[1]}`);
     for (const m of s.matchAll(/['"`](\/quimica\/[^'"`?#\s]*)/g)) {
       const p = m[1].replace(/\$\{[^}]*\}/g, '1').replace(/\/$/, ''); // "${...}" vira um valor qualquer que as rotas aceitam
-      if (p === '/quimica' || gerados(p) || /\/quimica\/(js|css|vendor|data|brand|fonts)\//.test(m[1]) || p.endsWith('/sw.js') || p === '/quimica/privacidade') continue;
+      if (p === '/quimica' || gerados(p) || /\/quimica\/(js|css|vendor|data|brand|fonts)\//.test(m[1]) || p.endsWith('/sw.js') || p === '/quimica/privacidade' || p === '/quimica/privacidade/1') continue; // privacidade/<idioma>: páginas estáticas (caminhoPrivacidade); cada arquivo é conferido em i18n.test.mjs
       assert.ok(resolverRota(p) || existsSync(join(SRC, p)), `${f}: rota sem tela ${m[1]}`);
     }
   }

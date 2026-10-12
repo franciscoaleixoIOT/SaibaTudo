@@ -107,6 +107,9 @@ export const nomeDoIdioma = (idioma) => t(`ui.idiomas.${idioma}`);
 /** Caminho do arquivo por idioma: ("manifest", "webmanifest") → manifest.webmanifest | manifest.en.webmanifest. */
 export const arquivoPorIdioma = (base, ext, idioma = atual) => (idioma === IDIOMA_PADRAO ? `${base}.${ext}` : `${base}.${idioma}.${ext}`);
 
+/** Política de privacidade no idioma ativo: pt-BR é a página-fonte (/quimica/privacidade); os outros idiomas têm /quimica/privacidade/<idioma> (privacidade/<idioma>.html). */
+export const caminhoPrivacidade = (idioma = atual) => (idioma === IDIOMA_PADRAO ? '/quimica/privacidade' : `/quimica/privacidade/${idioma}`);
+
 /** URLs alternativas da home por idioma (hreflang): pt-BR é a canônica e o x-default. */
 export function alternativasHreflang(origem = 'https://saibatudo.net') {
   const base = `${origem}/quimica/`;

@@ -60,3 +60,20 @@ gera `app-release-unsigned.apk`.
 
 `ai/nlu/LocalNlu.kt` é o espelho de `web/src/quimica/js/nlu.js` (mesma ordem de regras, documentada no cabeçalho) e `ai/Seguranca.kt` de `seguranca.js`;
 os casos de `contracts/nlu_golden_cases.json` e `contracts/seguranca_cases.json` conferem os dois. O dicionário é derivado dos dados do pacote.
+
+## Idiomas (docs/I18N.md §6)
+
+pt-BR é o padrão; o app fala também en, es, de e fr. **Seletor** em Configurações > Idioma (`ui/IdiomaApp.kt`: `LocaleManager` no Android 13+,
+que também aparece em Configurações do sistema > Idiomas do app via `res/xml/locales_config.xml`; idioma aplicado ao contexto da Activity
+antes disso); sem escolha, vale o primeiro idioma do sistema que o app fala. O idioma escolhido vai para o NLU, o dicionário e as respostas.
+- **Léxico** (padrões do NLU e da segurança): `ai/nlu/lexico/Lexico<Idioma>.kt` + `LexicosGerados.kt` são **gerados** de
+  `contracts/lexico/<idioma>.json` por `python tools/gerar_lexico_kt.py` (`--check` só confere; teste: `python -m unittest tools.test_gerar_lexico_kt`).
+  Não edite à mão. `Lexico.kt` compila as regexes por idioma; `I18nTest` falha se o gerado ficou para trás do JSON e compila todas as regexes
+  com `java.util.regex`. `Seguranca.kt` aplica o idioma ativo + en + pt-BR (autolesão primeiro).
+- **Dados no idioma** vêm do pacote: `nomes[idioma]`, `sinonimosPorIdioma`, `compostos/index.json.nomesPorIdioma`, `regras.propriedades[id].rotulos`
+  e `sinonimosPorIdioma`, `ghs_frases.json` `textoPorIdioma` (pt-BR continua com `GhsTextos`), `textos/index.json` + lotes (o pacote antigo, um arquivo
+  por trecho, continua aceito). Reserva: inglês, depois português (`domain/Nomes.kt` marca a reserva).
+- **Números**: `Quantidades.lerNumero(texto, idioma)` aceita vírgula e ponto (I18N §1.3).
+- **Textos da interface**: só o seletor de idioma está em `res/values*/strings.xml`; os demais textos (respostas e telas) migram na etapa
+  "strings" — os moldes de resposta que já dependem do idioma ficam em `ai/answer/Moldes.kt`.
+- O AAB não separa idiomas (`bundle.language.enableSplit = false`): todas as strings precisam estar no aparelho para o seletor funcionar.

@@ -6,7 +6,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DADOS, lojaNova } from './support.mjs';
-import { CATALOGOS, IDIOMAS, alternativasHreflang, definirIdioma, detectarIdioma, fmtData, fmtNumero, idiomaAtual, lerChave, nomeDoIdioma, normalizarIdioma, onIdioma, t, tl } from '../src/quimica/js/i18n/index.js';
+import { CATALOGOS, IDIOMAS, alternativasHreflang, aplicarIdiomaAoDocumento, arquivoPorIdioma, caminhoPrivacidade, definirIdioma, detectarIdioma, fmtData, fmtNumero, idiomaAtual, lerChave, nomeDoIdioma, normalizarIdioma, onIdioma, t, tl } from '../src/quimica/js/i18n/index.js';
 import { fmt, fmtTex, lerNumero, separadores } from '../src/quimica/js/formato.js';
 import { listar } from '../src/quimica/js/texto.js';
 import { exibirNome, minusNoMeio, nomeComposto, nomeElemento, todosOsNomes } from '../src/quimica/js/nomes.js';
@@ -51,6 +51,63 @@ test('catálogos: os cinco idiomas existem, pt-BR é a referência e todos têm 
   }
   // os endônimos e as listas são iguais em todo idioma (regra da interface)
   assert.deepEqual(tl('respostas.sugestoes.padrao', 'en').length, tl('respostas.sugestoes.padrao', 'pt-BR').length);
+});
+
+test('catálogos es/de/fr: traduzidos de verdade (sem andaime), funções de plural/concordância devolvem texto bem formado e nada fica em inglês ou português por engano', () => {
+  const en = new Map(folhas(CATALOGOS.en));
+  const pt = new Map(folhas(CATALOGOS['pt-BR']));
+  // chaves cujo valor pode (e costuma) coincidir com o inglês: marca, siglas, termos técnicos iguais, endereços e exemplos de fórmula
+  const igualPermitido = (k, v) => typeof v !== 'string' || k === 'revisao' || /^(ui\.idiomas\.|ui\.marca$)/.test(k) || !/[A-Za-zÀ-ÿ]{4,}/.test(v.replace(/https?:[^\s]+/g, '').replace(/SaibaTudo Química|PubChem|Wikidata|SMILES|InChIKey|CAS|CID|ChEBI|XLogP|TPSA|GHS|UNECE|ECHA|CLP|ICSC|ILO|CODATA|NIST|NCBI|NLM/g, ''));
+  const bags = [];
+  for (const n of [1, 3]) for (const alvo of ['composto', 'elemento']) for (const flag of [true, false]) {
+    const base = { n, alvo, outros: 'densidad', prop: 'propiedad', nome: 'agua', formula: 'H2O', acido: flag, carga: flag, mmc: flag, hidrato: flag, den: 2, el: 'O', lado: flag ? 'r' : 'p', rotulo: 'agua', M: '18,015', rend: flag ? 90 : null, ph: '2,00', conc: '0,1', dir: flag ? 'max' : 'min', simbolo: 'O', grandeza: flag ? 'P' : 'V', cond: flag };
+    bags.push(base, { ...base, n: String(n), nome: 'presión' });
+  }
+  for (const idioma of ['es', 'de', 'fr']) {
+    const cat = CATALOGOS[idioma];
+    assert.equal(cat.copiaDe, undefined, `${idioma}: ainda é andaime (copiaDe)`);
+    assert.equal(cat.revisao, 'pendente', `${idioma}: revisão humana é pendência registrada`);
+    assert.deepEqual(cat.regras, { minusculaNoMeio: idioma !== 'de' }, `${idioma}: regra de caixa (substantivos alemães ficam maiúsculos)`);
+    let iguais = 0;
+    for (const [k, v] of folhas(cat)) {
+      if (k === 'copiaDe') continue;
+      if (typeof v === 'function') {
+        for (const b of bags) {
+          const s = v(b);
+          assert.ok(typeof s === 'string' && s.trim() && !/undefined|NaN|\[object|\{\w+\}/.test(s), `${idioma}: ${k}(${JSON.stringify(b)}) = ${s}`);
+        }
+        continue;
+      }
+      if (typeof v !== 'string') continue;
+      assert.ok(!/[ \t]{2,}|^\s|\s$/.test(v.replace(/^ +| +$/g, '')), `${idioma}: espaços estranhos em ${k}`);
+      if (en.get(k) === v && !igualPermitido(k, v)) { iguais++; }
+      if (!k.startsWith('respostas.sugestoes.') && pt.get(k) === v && /[ãõç]/.test(v)) assert.fail(`${idioma}: ${k} ficou em português: ${v}`);
+    }
+    assert.ok(iguais <= 80, `${idioma}: ${iguais} textos idênticos ao inglês (esperado: só cognatos como "Volume", "Danger", "Name", "Symbol", "base", "ester")`);
+    for (const k of ['ui.app.abas.inicio', 'ui.app.abas.tabela', 'ui.inicio.cabecalho', 'ui.tabela.titulo', 'ui.seguranca.titulo', 'respostas.recusa.padrao', 'respostas.ajuda.titulo', 'ui.sobre.titulo', 'ui.config.titulo', 'propriedades.rotulos.massaMolar']) {
+      assert.notEqual(lerChave(cat, k), lerChave(CATALOGOS.en, k), `${idioma}: ${k} igual ao inglês`);
+      assert.notEqual(lerChave(cat, k), lerChave(CATALOGOS['pt-BR'], k), `${idioma}: ${k} igual ao português`);
+    }
+    // a marca e os termos técnicos que não se traduzem aparecem como no original
+    assert.equal(cat.ui.marca, 'SaibaTudo Química');
+    assert.ok(cat.ui.html.titulo.startsWith('SaibaTudo Química'));
+    assert.equal(cat.ui.html.ogLocale, { es: 'es_ES', de: 'de_DE', fr: 'fr_FR' }[idioma]);
+    assert.equal(cat.ui.listas.e, { es: ' y ', de: ' und ', fr: ' et ' }[idioma]);
+    // o catálogo nomeia os cinco idiomas no próprio idioma da interface
+    assert.deepEqual(Object.keys(cat.ui.idiomas).sort(), [...IDIOMAS].sort());
+    // glossário (docs/I18N.md §8): termos fixos por idioma
+    const termos = { es: ['masa molar', 'punto de fusión', 'punto de ebullición', 'electronegatividad', 'densidad'], de: ['molare Masse', 'Schmelzpunkt', 'Siedepunkt', 'Elektronegativität', 'Dichte'], fr: ['masse molaire', 'point de fusion', 'point d’ébullition', 'électronégativité', 'densité'] }[idioma];
+    const rotulos = cat.propriedades.rotulos;
+    for (const [campo, termo] of [['massaMolar', termos[0]], ['pontoFusaoK', termos[1]], ['pontoEbulicaoK', termos[2]], ['eletronegatividade', termos[3]], ['densidadeKgm3', termos[4]]]) {
+      assert.ok(rotulos[campo].toLowerCase().includes(termo.toLowerCase()), `${idioma}: rótulo de ${campo} ("${rotulos[campo]}") deveria usar o termo do glossário "${termo}"`);
+    }
+  }
+  // tipografia francesa (espaço normal antes de : ; ? !) e alemã (substantivos com maiúscula no meio da frase)
+  const fr = folhas(CATALOGOS.fr).filter(([k, v]) => typeof v === 'string' && !k.startsWith('ui.idiomas'));
+  for (const [k, v] of fr) {
+    assert.ok(!/[\u00A0\u202F\u2009]/.test(v), `fr: espaço especial em ${k}`);
+    assert.ok(!/\S[?!;]/.test(v.replace(/https?:[^\s]+/g, '').replace(/\?[a-z]+=/g, '')), `fr: falta espaço antes de ? ! ; em ${k}: ${v}`);
+  }
 });
 
 test('t(): interpolação, funções (plural), listas, reserva em pt-BR e chave ausente devolvida como está', () => {
@@ -208,7 +265,9 @@ test('nomes por idioma (nomes.js): nomes[idioma] → inglês rotulado → portug
   assert.deepEqual(nomeComposto(pendente, 'es'), { nome: '2-acetyloxybenzoic acid', idioma: 'en', rotulado: true });
   assert.deepEqual(nomeComposto({ cid: 5 }, 'en'), { nome: 'CID 5', idioma: 'en', rotulado: false });
   definirIdioma('es');
-  assert.equal(exibirNome(nomeComposto(co, 'es')), 'water (name in English)'.replace('name in English', `name in ${nomeDoIdioma('en')}`).replace('name in', 'name in'), 'rótulo no idioma ativo (andaime es herda o inglês)');
+  assert.equal(exibirNome(nomeComposto(co, 'es')), t('ui.nomes.emIdioma', { nome: 'water', idioma: nomeDoIdioma('en') }), 'rótulo da reserva no idioma ativo (catálogo es)');
+  assert.notEqual(exibirNome(nomeComposto(co, 'es')), 'water (name in English)', 'o catálogo es não herda mais o rótulo em inglês');
+  assert.match(exibirNome(nomeComposto(co, 'es')), /^water \(.*inglés.*\)$/);
   definirIdioma('pt-BR');
   assert.equal(exibirNome(nomeComposto(co, 'fr')), 'water (nome em inglês)');
   assert.equal(exibirNome(nomeComposto(co, 'pt-BR')), 'Água');
@@ -303,24 +362,78 @@ test('nenhum texto fixo em português fora dos catálogos e léxicos (answers, n
   assert.deepEqual(problemas, []);
 });
 
-test('index.html: hreflang dos cinco idiomas + x-default e manifestos por idioma existem', () => {
+test('index.html: hreflang dos cinco idiomas + x-default; cada idioma tem manifesto e política de privacidade próprios, e o app troca para eles', () => {
   const html = readFileSync(join(SRC, 'index.html'), 'utf8');
   for (const i of IDIOMAS) assert.match(html, new RegExp(`<link rel="alternate" hreflang="${i}" href="https://saibatudo\\.net/quimica/${i === 'pt-BR' ? '' : `\\?lang=${i}`}">`), i);
   assert.match(html, /hreflang="x-default" href="https:\/\/saibatudo\.net\/quimica\/"/);
-  const en = JSON.parse(readFileSync(join(SRC, 'manifest.en.webmanifest'), 'utf8'));
   const pt = JSON.parse(readFileSync(join(SRC, 'manifest.webmanifest'), 'utf8'));
-  assert.equal(en.lang, 'en');
-  assert.equal(en.id, pt.id);
-  assert.equal(en.scope, pt.scope);
-  assert.deepEqual(en.icons, pt.icons);
-  assert.equal(en.shortcuts.length, pt.shortcuts.length);
-  assert.ok(en.start_url.includes('lang=en'));
-  const priv = readFileSync(join(SRC, 'privacidade/en.html'), 'utf8');
-  assert.match(priv, /<html lang="en">/);
-  assert.match(priv, /hreflang="pt-BR" href="https:\/\/saibatudo\.net\/quimica\/privacidade"/);
-  assert.ok(!/<script(?![^>]*\bsrc=)[^>]*>[^<]/i.test(priv) && !/\sstyle=/.test(priv), 'CSP: sem inline');
   const ptPriv = readFileSync(join(SRC, 'privacidade/index.html'), 'utf8');
-  assert.equal((priv.match(/<h2>/g) ?? []).length, (ptPriv.match(/<h2>/g) ?? []).length, 'mesma estrutura de seções da política em português');
+  const alternativas = (pagina) => [...pagina.matchAll(/<link rel="alternate" hreflang="([^"]+)" href="([^"]+)">/g)].map((m) => `${m[1]} ${m[2]}`);
+  const esperadas = [...IDIOMAS.map((i) => `${i} https://saibatudo.net/quimica/privacidade${i === 'pt-BR' ? '' : `/${i}`}`), 'x-default https://saibatudo.net/quimica/privacidade'];
+  assert.deepEqual(alternativas(ptPriv), esperadas, 'a política em português lista as cinco versões');
+  const descricoes = new Set([pt.description]);
+  for (const idioma of IDIOMAS.filter((i) => i !== 'pt-BR')) {
+    const m = JSON.parse(readFileSync(join(SRC, arquivoPorIdioma('manifest', 'webmanifest', idioma)), 'utf8'));
+    assert.equal(m.lang, idioma);
+    assert.equal(m.id, pt.id);
+    assert.equal(m.scope, pt.scope);
+    assert.equal(m.name, pt.name, 'a marca não se traduz');
+    assert.deepEqual(m.icons, pt.icons);
+    assert.equal(m.theme_color, pt.theme_color);
+    assert.equal(m.shortcuts.length, pt.shortcuts.length);
+    assert.ok(m.start_url.includes(`lang=${idioma}`), `${idioma}: start_url`);
+    for (const [k, s] of m.shortcuts.entries()) {
+      assert.ok(s.url.includes(`lang=${idioma}`), `${idioma}: atalho ${k}`);
+      assert.equal(s.url.split('?')[0], pt.shortcuts[k].url.split('?')[0], `${idioma}: atalho ${k} aponta para a mesma rota`);
+      assert.ok(s.name && s.short_name && s.description, `${idioma}: atalho ${k} sem texto`);
+    }
+    assert.ok(!descricoes.has(m.description), `${idioma}: descrição repetida de outro idioma`);
+    descricoes.add(m.description);
+    const priv = readFileSync(join(SRC, `privacidade/${idioma}.html`), 'utf8');
+    assert.match(priv, new RegExp(`<html lang="${idioma}">`));
+    assert.match(priv, new RegExp(`<link rel="canonical" href="https://saibatudo\\.net/quimica/privacidade/${idioma}">`));
+    assert.deepEqual(alternativas(priv), esperadas, `${idioma}: as cinco versões da política + x-default`);
+    assert.match(priv, /<a href="\/quimica\/privacidade" hreflang="pt-BR" lang="pt-BR">/, `${idioma}: link para o texto-fonte em português`);
+    assert.ok(priv.includes(`/quimica/?lang=${idioma}`), `${idioma}: volta ao app no mesmo idioma`);
+    assert.ok(!/<script(?![^>]*\bsrc=)[^>]*>[^<]/i.test(priv) && !/\sstyle=/.test(priv), `${idioma}: CSP, sem inline`);
+    assert.equal((priv.match(/<h2>/g) ?? []).length, (ptPriv.match(/<h2>/g) ?? []).length, `${idioma}: mesma estrutura de seções da política em português`);
+    assert.equal((priv.match(/<tr>/g) ?? []).length, (ptPriv.match(/<tr>/g) ?? []).length, `${idioma}: mesma tabela de conexões`);
+    assert.ok(priv.includes('saibatudo@saibatudo.net') && priv.includes('Francisco Aleixo'), `${idioma}: contato do responsável`);
+    assert.equal(arquivoPorIdioma('manifest', 'webmanifest', idioma), `manifest.${idioma}.webmanifest`);
+    assert.equal(caminhoPrivacidade(idioma), `/quimica/privacidade/${idioma}`);
+  }
+  assert.equal(arquivoPorIdioma('manifest', 'webmanifest', 'pt-BR'), 'manifest.webmanifest');
+  assert.equal(caminhoPrivacidade('pt-BR'), '/quimica/privacidade');
+});
+
+test('aplicarIdiomaAoDocumento troca <html lang>, descrição, og:locale, manifesto e hreflang para QUALQUER idioma', () => {
+  const criar = () => {
+    const attrs = new Map();
+    const meta = { desc: null, og: null, manifest: null };
+    const links = [];
+    const el = (tag) => ({ tag, attrs: new Map(), setAttribute(k, v) { this.attrs.set(k, v); }, remove() { links.splice(links.indexOf(this), 1); } });
+    const head = { append: (l) => links.push(l) };
+    const nos = { 'meta[name="description"]': el('meta'), 'meta[property="og:locale"]': el('meta'), 'link[rel="manifest"]': el('link') };
+    return {
+      documentElement: { setAttribute: (k, v) => attrs.set(k, v) }, head, attrs, links, nos,
+      querySelector: (sel) => nos[sel] ?? null,
+      querySelectorAll: () => [...links],
+      createElement: el
+    };
+  };
+  try {
+    for (const idioma of IDIOMAS) {
+      const doc = criar();
+      definirIdioma(idioma);
+      aplicarIdiomaAoDocumento(doc);
+      assert.equal(doc.attrs.get('lang'), idioma);
+      assert.equal(doc.nos['meta[name="description"]'].attrs.get('content'), t('ui.html.descricao'));
+      assert.equal(doc.nos['meta[property="og:locale"]'].attrs.get('content'), t('ui.html.ogLocale'));
+      assert.equal(doc.nos['link[rel="manifest"]'].attrs.get('href'), `/quimica/${idioma === 'pt-BR' ? 'manifest.webmanifest' : `manifest.${idioma}.webmanifest`}`);
+      assert.deepEqual(doc.links.map((l) => l.attrs.get('hreflang')), ['pt-BR', 'en', 'es', 'de', 'fr', 'x-default']);
+    }
+    assert.deepEqual(['pt-BR', 'en', 'es', 'de', 'fr'].map((i) => CATALOGOS[i].ui.html.ogLocale), ['pt_BR', 'en_US', 'es_ES', 'de_DE', 'fr_FR']);
+  } finally { definirIdioma('pt-BR'); }
 });
 
 test('DADOS da fixture trazem os campos por idioma do contrato (nomes, sinonimosPorIdioma, nomesPorIdioma, frases por idioma, index de textos)', async () => {

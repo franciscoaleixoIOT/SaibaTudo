@@ -155,11 +155,26 @@ Etapas (A–F em `I18N.md` §9):
       en/es/de/fr via sitelinks, `textos/index.json` + 36 lotes (pacote: 2.742 → 56 arquivos, 15 MB), contrato reescrito.
       Apelidos do Wikidata iguais a palavras funcionais ("PARA") são descartados (pipeline e dicionário do site).
 - [x] **C** home (12/10, no ar): `/en/`, `/es/`, `/de/`, `/fr/` + `hreflang` + regras no proxy de eleições publicadas.
-- [ ] **D** catálogos es/de/fr do site: hoje são **andaimes** (`copiaDe: 'en'`, herdam o inglês); léxicos es/de/fr escritos e
-      validados estruturalmente, **sem casos golden** nem revisão nativa. Traduzir os catálogos e escrever ≥ 60 golden por idioma.
-- [ ] API da nuvem (`api/`): regra de segurança e ancoragem lendo `contracts/lexico/` (em andamento em 12/10).
-- [ ] Android: `app/src/main/assets/quimica/` ainda é o snapshot antigo (um arquivo por trecho); atualizar com
-      `python app/tools/copiar_pacote_para_assets.py` quando o `BundleLoader` ler lotes (etapa E).
+- [x] **D** (12/10): catálogos es/de/fr completos (1.056 chaves cada, `revisao: 'pendente'`), privacidade e manifesto por idioma,
+      golden es 137 / de 150 / fr 183 casos (21 intenções), segurança ≈ 75 recusar / 90 permitir por idioma, léxicos ajustados
+      (verbos separáveis em de, elisão em fr, `elaborar` em es). Revisão nativa pendente — termos a conferir: es "disolución",
+      "balanceo"; de Protolysegrad, Normbedingungen, Edukte/Produkte, Ka/Kb; fr "jeu de données", CNTP, "métal pauvre".
+- [x] API da nuvem (12/10): segurança nos cinco idiomas (léxico compartilhado + regras pt próprias, em OU) e ancoragem com formas
+      por idioma (`api/_lib/vocab-i18n.js`); cópias geradas em `api/_lib/lexico/` (`node _lib/lexico/sincronizar.mjs --check`),
+      porque `.vercelignore` exclui `contracts/`. Falta: `fold` do `ground.js` não trata elisão francesa ("énergie d'ionisation") —
+      2 golden fr foram retirados até corrigir.
+- [x] **E (núcleo)** Android (12/10): `tools/gerar_lexico_kt.py` → `ai/nlu/lexico/` (5 léxicos + índice, `--check`); `LocalNlu`,
+      `Seguranca`, `Dicionario`, `Propriedades`, `Pacote` (lotes + `textoPorIdioma`) por idioma; seletor em Configurações
+      (`LocaleManager`/`attachBaseContext`, `locales_config.xml`); `bundle.language.enableSplit = false`; snapshot de assets
+      atualizado (2.744 → 55 arquivos; APK debug +0,5 MB); golden e segurança por idioma no mesmo contrato.
+- [ ] **E (strings)** Android: ~770 textos fixos do Kotlin (recusas, sugestões, telas, moldes em `ai/answer/Moldes.kt`) ainda
+      saem em português em qualquer idioma; externalizar para `strings.xml` + `values-{en,es,de,fr}`; rótulo de reserva
+      ("nome em inglês"); calculadoras chamam `lerNumero` sem idioma.
+- [ ] Miúdos do site achados na etapa D: `ligarQuantidades` exige preposição (alemão "4 g H2 und 16 g O2"); quantidade só aceita
+      ASCII no 1º token ("20 degrés Celsius"); nomes de elemento com < 3 letras ("or", ouro em fr) não entram no dicionário;
+      "radio" (Ra) vence "radio atómico"; aproximação faz "Francia" virar frâncio; `calc/gas.js` baixa "Druck"/"Volumen";
+      "rótulo: valor" sem espaço antes dos dois-pontos em fr; composição percentual com nome pt; licenças de `fontes.json` em pt.
+- [ ] Pipeline: apelidos comuns em de (Salzsäure, Natronlauge, Essig, Zucker) e fr ("eau de Javel") não vêm do Wikidata; glicose sem es/de/fr.
 - [ ] Pipeline, miúdos: `regras.nomenclatura` por idioma; H281/H351/EUH211 sem texto em algum idioma (formato da linha no
       EUR-Lex); glicose (CID 5793) cai no item "D-glucopyranose" do Wikidata (sem es/de) — conferir o casamento do item.
 - [ ] **E** Android: `strings.xml` por idioma (~770 textos fixos), léxico gerado do mesmo JSON, lotes de textos, seletor.

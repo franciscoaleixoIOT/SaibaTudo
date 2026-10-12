@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Idiomas do app (docs/I18N.md): o Android 13+ lista estes em Configurações > Idiomas do app. pt-BR é o padrão. -->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="pt-BR" />
+    <locale android:name="en" />
+    <locale android:name="es" />
+    <locale android:name="de" />
+    <locale android:name="fr" />
+</locale-config>

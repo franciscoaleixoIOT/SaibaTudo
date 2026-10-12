@@ -16,6 +16,7 @@ const LEET = { 0: 'o', 1: 'i', 3: 'e', 4: 'a', 5: 's', 7: 't', 8: 'b', '@': 'a',
 /** Texto sem acentos, minúsculo e sem caracteres invisíveis. */
 function limpar(texto) {
   return String(texto ?? '')
+    .replace(/[ßẞ]/g, 'ss').replace(/[œŒ]/g, 'oe').replace(/[æÆ]/g, 'ae').replace(/[øØ]/g, 'o')
     .normalize('NFKD')
     .replace(/[​-‏⁠﻿­‪-‮]/g, '')
     .replace(/[̀-ͯ]/g, '')

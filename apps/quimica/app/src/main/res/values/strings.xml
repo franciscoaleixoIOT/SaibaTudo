@@ -1,3 +1,15 @@
 <resources>
-    <string name="app_name">SaibaTudo Química</string>
+    <!-- Marca: igual em todos os idiomas (docs/I18N.md §8). -->
+    <string name="app_name" translatable="false">SaibaTudo Química</string>
+
+    <!-- Configurações > Idioma (docs/I18N.md §2). Os demais textos do app migram para cá na etapa "strings" (§6). -->
+    <string name="config_idioma_titulo">Idioma</string>
+    <string name="config_idioma_descricao">Idioma do assistente, dos nomes e dos textos dos dados. Sem escolha, vale o idioma do aparelho.</string>
+
+    <!-- Endônimos: cada idioma com o nome no próprio idioma, iguais em todos os catálogos. -->
+    <string name="idioma_pt_br" translatable="false">Português (Brasil)</string>
+    <string name="idioma_en" translatable="false">English</string>
+    <string name="idioma_es" translatable="false">Español</string>
+    <string name="idioma_de" translatable="false">Deutsch</string>
+    <string name="idioma_fr" translatable="false">Français</string>
 </resources>

@@ -27,6 +27,10 @@ object TestData {
     private val dirReal = File("../data/quimica").canonicalFile
     val Real: PacoteDeTeste? = if (File(dirReal, "manifest.json").isFile && File(dirReal, "manifest.sig").isFile) PacoteDeTeste(dirReal) else null
 
+    /** Snapshot embutido no APK (app/src/main/assets/quimica, copiado por app/tools/copiar_pacote_para_assets.py), se existir. */
+    private val dirEmbutido = File("src/main/assets/quimica").canonicalFile
+    val Embutido: PacoteDeTeste? = if (File(dirEmbutido, "manifest.json").isFile && File(dirEmbutido, "manifest.sig").isFile) PacoteDeTeste(dirEmbutido) else null
+
     /** Pacote usado onde só importa ter dados (NLU, respostas): o real, se existir; senão o fixture. */
     val Melhor: PacoteDeTeste get() = Real ?: Fixture
 

@@ -12,7 +12,7 @@ object Texto {
     /** Minúsculas, sem acentos, símbolos unicode de sub/sobrescrito convertidos, espaços colapsados. */
     fun normalizar(s: String?): String {
         if (s.isNullOrEmpty()) return ""
-        val baixo = paraAscii(s).lowercase(Locale.ROOT)
+        val baixo = ligaduras(paraAscii(s)).lowercase(Locale.ROOT)
         val semAcento = RX_COMBINANTES.replace(Normalizer.normalize(baixo, Normalizer.Form.NFD), "")
         return RX_ESPACOS.replace(semAcento, " ").trim()
     }
@@ -22,6 +22,10 @@ object Texto {
         val n = normalizar(s)
         return RX_ESPACOS.replace(n.replace(Regex("[^a-z0-9]+"), " "), " ").trim()
     }
+
+    /** ß→ss, œ→oe, æ→ae, ø→o: letras que a decomposição NFD não reduz a ASCII (o site faz o mesmo em texto.js/seguranca.js). */
+    fun ligaduras(s: String): String = s.replace("ß", "ss").replace("ẞ", "SS").replace("œ", "oe").replace("Œ", "OE")
+        .replace("æ", "ae").replace("Æ", "AE").replace("ø", "o").replace("Ø", "O")
 
     /** Remove os acentos mantendo a caixa e o comprimento do texto (para casar com expressões escritas sem acento). */
     fun semAcentos(s: String): String = RX_COMBINANTES.replace(Normalizer.normalize(s, Normalizer.Form.NFD), "")

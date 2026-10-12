@@ -22,7 +22,9 @@
   "nomes": {
    "pt-BR": "Água",
    "en": "water",
-   "es": "agua"
+   "es": "agua",
+   "de": "Wasser",
+   "fr": "eau"
   },
   "sinonimosPorIdioma": {
    "en": [
@@ -30,6 +32,18 @@
    ],
    "es": [
     "óxido de hidrógeno"
+   ],
+   "de": [
+    "blaues Gold",
+    "pures Wasser"
+   ],
+   "fr": [
+    "monoxide de dihydrogène",
+    "oxide de dihydrogène",
+    "eau pure",
+    "oxide d'hydrogène",
+    "dihydrooxigène",
+    "hydroxide d'hydrogène"
    ]
   },
   "formula": "H2O",
@@ -77,7 +91,9 @@
   "nomes": {
    "pt-BR": "Dióxido de carbono",
    "en": "carbon dioxide",
-   "es": "dióxido de carbono"
+   "es": "dióxido de carbono",
+   "de": "Kohlenstoffdioxid",
+   "fr": "dioxyde de carbone"
   },
   "sinonimosPorIdioma": {
    "en": [
@@ -87,6 +103,13 @@
    "es": [
     "anhídrido carbónico",
     "gas carbónico"
+   ],
+   "de": [
+    "Kohlendioxid"
+   ],
+   "fr": [
+    "gaz carbonique",
+    "anhydride carbonique"
    ]
   },
   "formula": "CO2",
@@ -124,7 +147,9 @@
   "nomes": {
    "pt-BR": "Cloreto de sódio",
    "en": "sodium chloride",
-   "es": "cloruro de sodio"
+   "es": "cloruro de sodio",
+   "de": "Natriumchlorid",
+   "fr": "chlorure de sodium"
   },
   "sinonimosPorIdioma": {
    "en": [
@@ -136,7 +161,13 @@
     "sal de mesa",
     "sal común",
     "halita"
-   ]
+   ],
+   "de": [
+    "Kochsalz",
+    "Speisesalz",
+    "Salz"
+   ],
+   "fr": []
   },
   "formula": "NaCl",
   "formulaHill": "ClNa",
@@ -177,7 +208,8 @@
   "nomes": {
    "pt-BR": "Glicose",
    "en": "glucose",
-   "es": "glucosa"
+   "es": "glucosa",
+   "fr": "D-glucopyranose"
   },
   "sinonimosPorIdioma": {
    "en": [
@@ -188,7 +220,8 @@
    "es": [
     "dextrosa",
     "azúcar de uva"
-   ]
+   ],
+   "fr": []
   },
   "formula": "C6H12O6",
   "formulaHill": "C6H12O6",
@@ -246,7 +279,9 @@
   "nomes": {
    "pt-BR": "Ácido acético",
    "en": "acetic acid",
-   "es": "ácido acético"
+   "es": "ácido acético",
+   "de": "Essigsäure",
+   "fr": "acide acétique"
   },
   "sinonimosPorIdioma": {
    "en": [
@@ -255,6 +290,17 @@
    ],
    "es": [
     "ácido etanoico"
+   ],
+   "de": [
+    "Haushaltsessig",
+    "Methancarbonsäure",
+    "Acetoxylsäure",
+    "Ethansäure",
+    "Säureessig",
+    "Acetylsäure"
+   ],
+   "fr": [
+    "acide éthanoïque"
    ]
   },
   "formula": "C2H4O2",
@@ -315,7 +361,9 @@
   "nomes": {
    "pt-BR": "Etanol",
    "en": "ethanol",
-   "es": "etanol"
+   "es": "etanol",
+   "de": "Ethanol",
+   "fr": "éthanol"
   },
   "sinonimosPorIdioma": {
    "en": [
@@ -324,6 +372,22 @@
    ],
    "es": [
     "alcohol etílico"
+   ],
+   "de": [
+    "Äthanol",
+    "Ethylalkohol",
+    "Alkohol",
+    "Trinkalkohol",
+    "Weingeist",
+    "Äthylalkohol"
+   ],
+   "fr": [
+    "alcool éthylique",
+    "Flegmasse",
+    "esprit-de-vin",
+    "esprit de vin",
+    "alcool de grain",
+    "alcool"
    ]
   },
   "formula": "C2H6O",
@@ -383,7 +447,9 @@
   "nomes": {
    "pt-BR": "Amônia",
    "en": "ammonia",
-   "es": "amoníaco"
+   "es": "amoníaco",
+   "de": "Ammoniak",
+   "fr": "ammoniac"
   },
   "sinonimosPorIdioma": {
    "en": [
@@ -391,7 +457,9 @@
    ],
    "es": [
     "amoniaco"
-   ]
+   ],
+   "de": [],
+   "fr": []
   },
   "formula": "NH3",
   "formulaHill": "H3N",
@@ -447,7 +515,9 @@
   "nomes": {
    "pt-BR": "Ácido acetilsalicílico",
    "en": "acetylsalicylic acid",
-   "es": "ácido acetilsalicílico"
+   "es": "ácido acetilsalicílico",
+   "de": "Acetylsalicylsäure",
+   "fr": "acide acétylsalicylique"
   },
   "sinonimosPorIdioma": {
    "en": [
@@ -457,6 +527,13 @@
    "es": [
     "aspirina",
     "AAS"
+   ],
+   "de": [
+    "acesal",
+    "ASS"
+   ],
+   "fr": [
+    "aspirine"
    ]
   },
   "formula": "C9H8O4",
@@ -508,7 +585,9 @@
   "nomes": {
    "pt-BR": "Ácido sulfúrico",
    "en": "sulfuric acid",
-   "es": "ácido sulfúrico"
+   "es": "ácido sulfúrico",
+   "de": "Schwefelsäure",
+   "fr": "acide sulfurique"
   },
   "sinonimosPorIdioma": {
    "en": [
@@ -518,7 +597,9 @@
    ],
    "es": [
     "aceite de vitriolo"
-   ]
+   ],
+   "de": [],
+   "fr": []
   },
   "formula": "H2SO4",
   "formulaHill": "H2O4S",
@@ -565,7 +646,9 @@
   "nomes": {
    "pt-BR": "Hidróxido de sódio",
    "en": "sodium hydroxide",
-   "es": "hidróxido de sodio"
+   "es": "hidróxido de sodio",
+   "de": "Natriumhydroxid",
+   "fr": "hydroxyde de sodium"
   },
   "sinonimosPorIdioma": {
    "en": [
@@ -575,6 +658,17 @@
    "es": [
     "sosa cáustica",
     "soda cáustica"
+   ],
+   "de": [
+    "Natriumoxydhydrat",
+    "Natronhydrat",
+    "Ätznatron",
+    "Ätzsoda",
+    "Kaustisches Soda"
+   ],
+   "fr": [
+    "Lessive de soude",
+    "Soude caustique"
    ]
   },
   "formula": "NaOH",
@@ -629,7 +723,9 @@
   "nomes": {
    "pt-BR": "Ácido clorídrico",
    "en": "hydrogen chloride",
-   "es": "cloruro de hidrógeno"
+   "es": "cloruro de hidrógeno",
+   "de": "Chlorwasserstoff",
+   "fr": "chlorure d'hydrogène"
   },
   "sinonimosPorIdioma": {
    "en": [
@@ -639,7 +735,15 @@
    "es": [
     "ácido clorhídrico",
     "ácido muriático"
-   ]
+   ],
+   "de": [
+    "Chloran",
+    "Hydrogenchlorid",
+    "Salzsäure wasserfrei",
+    "Wasserstoffchlorid",
+    "Salzsäuregas"
+   ],
+   "fr": []
   },
   "formula": "HCl",
   "formulaHill": "ClH",
@@ -693,7 +797,9 @@
   "nomes": {
    "pt-BR": "Metano",
    "en": "methane",
-   "es": "metano"
+   "es": "metano",
+   "de": "Methan",
+   "fr": "méthane"
   },
   "sinonimosPorIdioma": {
    "en": [
@@ -701,7 +807,13 @@
    ],
    "es": [
     "gas de los pantanos"
-   ]
+   ],
+   "de": [
+    "Methangas",
+    "Methylwasserstoff",
+    "Carban"
+   ],
+   "fr": []
   },
   "formula": "CH4",
   "formulaHill": "CH4",
@@ -758,7 +870,9 @@
   "nomes": {
    "pt-BR": "Benzeno",
    "en": "benzene",
-   "es": "benceno"
+   "es": "benceno",
+   "de": "Benzol",
+   "fr": "benzène"
   },
   "sinonimosPorIdioma": {
    "en": [
@@ -767,6 +881,12 @@
    ],
    "es": [
     "benzol"
+   ],
+   "de": [
+    "Benzen"
+   ],
+   "fr": [
+    "Ar-H"
    ]
   },
   "formula": "C6H6",
@@ -820,7 +940,9 @@
   "nomes": {
    "pt-BR": "Fosgênio",
    "en": "phosgene",
-   "es": "fosgeno"
+   "es": "fosgeno",
+   "de": "Phosgen",
+   "fr": "phosgène"
   },
   "sinonimosPorIdioma": {
    "en": [
@@ -829,6 +951,18 @@
    ],
    "es": [
     "cloruro de carbonilo"
+   ],
+   "de": [
+    "Kohlenoxiddichlorid",
+    "Kohlenoxychlorid",
+    "Kohlensäuredichlorid",
+    "Carbonylchlorid",
+    "Grünkreuz"
+   ],
+   "fr": [
+    "Dichlorure de méthanoyle",
+    "Dichlorure de carbonyle",
+    "Oxychlorure de carbone"
    ]
   },
   "formula": "COCl2",
@@ -879,7 +1013,9 @@
   "nomes": {
    "pt-BR": "Hipoclorito de sódio",
    "en": "sodium hypochlorite",
-   "es": "hipoclorito de sodio"
+   "es": "hipoclorito de sodio",
+   "de": "Natriumhypochlorit",
+   "fr": "hypochlorite de sodium"
   },
   "sinonimosPorIdioma": {
    "en": [
@@ -889,7 +1025,16 @@
    "es": [
     "lejía",
     "lavandina"
-   ]
+   ],
+   "de": [
+    "Natronbleichlauge",
+    "Chlorlauge",
+    "Eau de Labarraque",
+    "Aktivchlor",
+    "Chlorbleichlauge",
+    "Bleichlauge"
+   ],
+   "fr": []
   },
   "formula": "NaOCl",
   "formulaHill": "ClNaO",

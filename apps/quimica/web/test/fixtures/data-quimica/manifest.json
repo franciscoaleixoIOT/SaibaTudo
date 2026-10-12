@@ -4,20 +4,20 @@
  "schemaVersion": 1,
  "files": {
   "compostos/index.json": {
-   "bytes": 5636,
-   "sha256": "0ea20ca98db0941b31da5f6c7ce1e82fad726d63f7acb8658e09842d2ccf60f3"
+   "bytes": 9369,
+   "sha256": "f33cb9bf04c223cee723dadea17d21c1a6a1dc1dfe42bc9981e680f49426eba9"
   },
   "compostos/lote-001.json": {
-   "bytes": 18580,
-   "sha256": "17ea87d446c0d0c553b73f026e8fcb2b8e121a8b919605fe9cbf5fa6188a727b"
+   "bytes": 21196,
+   "sha256": "8c3ae5fbcfa0d839ce286a24873233daa0f63ad5512e1220b11fa8a18f1cab6b"
   },
   "constantes.json": {
    "bytes": 703,
    "sha256": "f016e3d346490dfa3a8faa9ce00b38edc0d8daa0fb4228cc85497d1856b68f84"
   },
   "elementos.json": {
-   "bytes": 12850,
-   "sha256": "527f582ee9371a72d02b0c634c713824634e0fffdee1d069022846cef9cd26ec"
+   "bytes": 13117,
+   "sha256": "5fc55351cbb3c95a9fd84fa398d16f1033c11c462cd7726a1d975e3dc9fb0f1e"
   },
   "fontes.json": {
    "bytes": 6357,

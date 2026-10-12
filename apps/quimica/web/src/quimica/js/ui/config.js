@@ -1,6 +1,6 @@
 // Configurações: idioma, aparência, instalação do app, IA na nuvem (ainda indisponível) e apagar os dados deste aparelho.
 import { h, icon } from '../dom.js';
-import { IDIOMAS, NOMES_IDIOMAS, idiomaAtual, t } from '../i18n/index.js';
+import { IDIOMAS, NOMES_IDIOMAS, caminhoPrivacidade, idiomaAtual, t } from '../i18n/index.js';
 import { instalar, instrucoes, jaInstalado, podeInstalarAgora } from '../install.js';
 import { FONTES, TEMAS, apagar, aplicarAparencia, carregar, salvar } from '../prefs.js';
 import { botaoAtualizacao } from './sobre.js';
@@ -54,7 +54,7 @@ export function viewConfig({ store, mudarIdioma }) {
     kvEl([{ rotulo: t('ui.config.versaoPacote'), valor: String(store.versao) }, { rotulo: t('ui.config.assinatura'), valor: t(`ui.config.assinaturaValor.${store.sig.estado}`) }]),
     botaoAtualizacao(store),
     h('div', { class: 'grupo' }, t('ui.config.privacidade')),
-    h('p', { class: 'pequeno mudo' }, t('ui.config.privacidadeTexto'), h('a', { href: '/quimica/privacidade' }, t('ui.config.politica')), '.'),
+    h('p', { class: 'pequeno mudo' }, t('ui.config.privacidadeTexto'), h('a', { href: caminhoPrivacidade() }, t('ui.config.politica')), '.'),
     botaoApagar, status);
   return { titulo: t('ui.config.titulo'), node: no };
 }
