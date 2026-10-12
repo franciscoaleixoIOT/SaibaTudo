@@ -34,9 +34,14 @@ llama.cpp** (o Modal serve assim), **saída JSON confiável** (o NLU usa gramát
 | Mistral (Ministral 3B/8B; Mistral Small 24B) | Ministral: licença de pesquisa (uso comercial sob contrato); Small: Apache 2.0 | bom | 24B não cabe | não | Descartada: os tamanhos pequenos não têm licença livre; o livre é grande demais. |
 | Phi-4-mini (3.8B) | MIT | pt fraco em relação aos demais | 3.8B | sim | Descartada pela qualidade em português. |
 | SmolLM3 (3B) / EuroLLM (1.7B, 9B) | Apache 2.0 | EuroLLM: bom em pt-PT/es/de/fr; SmolLM3: razoável | 1.7B, 3B | sim | Alternativas abertas para o **benchmark** do NLU; EuroLLM não tem pt-BR como foco. |
+| **IBM Granite 3.1–3.3** (2B, 8B) / Granite 4.0 | **Apache 2.0** | treinado em 12 idiomas que incluem **pt, es, de, fr**; bom em instrução e JSON | 2B (NLU), 8B (explicador, apertado) | 2B: sim; 8B: apertado | **Desafiante principal do benchmark** (pedido do mantenedor, 12/10): mesma liberdade de marca do Qwen3; na faixa de 2B compete de perto. Granite 4.0 (híbrido Mamba) só se o llama.cpp do Modal já o servir. |
+| Phi-4-mini (3.8B) / Phi-4 (14B) | MIT | pt mais fraco que Qwen3/Granite; explicação menos natural | 3.8B | 3.8B: sim; 14B: não | Entra no benchmark **só como controle barato** do NLU. |
+| DeepSeek-V3 / R1 e "R1-Distill" | MIT (a parte da DeepSeek); os *distill* pequenos herdam a licença da base (Qwen2.5 ou Llama) | bom | 671B não cabe; distill 1.5B–8B | distill: sim | **Descartada:** os grandes são inviáveis; os pequenos são Qwen/Llama com raciocínio longo em `<think>` (latência e JSON piores). |
+| Mistral 7B v0.3 / Mixtral 8x7B | Apache 2.0 | razoável (2023) | 7B | não (7B em 8 GB só com 512 tokens) | Descartada: perde para o Qwen3-4B em multilíngue e é mais cara de treinar. |
+| OLMo 2 / OLMoE (Allen AI) | Apache 2.0, dados e treino abertos | fraco em pt (Dolma é quase todo inglês) | 1B, 7B | sim | Descartada pela qualidade em português; a transparência de dados não é o gargalo. |
 | Modelos brasileiros (Tucano 1.1B/2.4B, Sabiá) | Tucano Apache 2.0 (base Llama-like treinada do zero em pt); Sabiá-3 só por API | Tucano: pt-BR forte, sem os outros idiomas | 1.1B, 2.4B | sim | Tucano entra no benchmark **do app de eleições** (só pt). Sabiá não serve: não é aberto. |
 
-**Decisão proposta:** família **Qwen3** como base da **SaibaTudo IA**, com Gemma 3 e Tucano medidos no mesmo benchmark para
+**Decisão proposta:** família **Qwen3** como base da **SaibaTudo IA**, com **Granite 3.3**, Gemma 3 e Tucano medidos no mesmo benchmark para
 confirmar (ou derrubar) a escolha antes de treinar o modelo definitivo. Se Gemma 3 4B vencer o Qwen3 4B por margem clara em
 português (≥ 3 pontos no gate) o custo da licença passa a valer a pena e a decisão volta ao mantenedor.
 
@@ -78,8 +83,9 @@ opt-in e filtrada; segredos em `secrets/`.
   entidades, JSON válido, alucinação, latência (CPU Modal-equivalente) e tamanho; para o explicador mede aderência à fonte
   (todo número da resposta existe nos trechos), idioma da resposta, recusas corretas, tamanho da resposta, e um painel de 50
   perguntas por app avaliado às cegas pelo mantenedor (A × B, sem saber qual modelo).
-- Candidatos do benchmark: NLU — Qwen2.5-1.5B (atual, referência), Qwen3-1.7B, Gemma-3-1B, Tucano-2.4B (só eleições), SmolLM3-3B;
-  Explica — Qwen2.5-7B (atual), Qwen3-4B, Gemma-3-4B, Qwen3-8B (se couber no treino).
+- Candidatos do benchmark: NLU — Qwen2.5-1.5B (atual, referência), Qwen3-1.7B, **Granite-3.3-2B**, Gemma-3-1B, Phi-4-mini
+  (controle), Tucano-2.4B (só eleições), SmolLM3-3B; Explica — Qwen2.5-7B (atual), Qwen3-4B, **Granite-3.3-8B**, Gemma-3-4B,
+  Qwen3-8B (se couber no treino).
 - O gate existente (`convert_local.py`) passa a receber `--app` e `--idioma` e a **catraca** compara com o modelo em produção
   de cada app. Nada sobe se perder para o atual.
 
