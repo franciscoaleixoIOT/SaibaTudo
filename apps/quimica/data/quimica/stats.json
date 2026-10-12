@@ -1,6 +1,19 @@
 {
-  "geradoEm": "2026-10-12T07:17:13Z",
+  "geradoEm": "2026-10-12T17:16:53Z",
   "modo": "completo",
+  "idiomas": [
+    "pt-BR",
+    "en",
+    "es",
+    "de",
+    "fr"
+  ],
+  "idiomasTextos": [
+    "en",
+    "es",
+    "de",
+    "fr"
+  ],
   "familias": {
     "elementos": {
       "status": "ok",
@@ -66,6 +79,12 @@
         117,
         118
       ],
+      "rotulosWikidata": "ok",
+      "nomesSemRotulo": {
+        "es": 0,
+        "de": 0,
+        "fr": 0
+      },
       "elementos": 118
     },
     "constantes": {
@@ -80,9 +99,23 @@
       "segundos": 0.1,
       "celex": "02008R1272-20260701",
       "url": "https://eur-lex.europa.eu/legal-content/PT/TXT/?uri=CELEX:02008R1272-20260701",
+      "idiomas": [
+        "pt-BR",
+        "en",
+        "es",
+        "de",
+        "fr"
+      ],
       "frasesH": 73,
       "frasesEUH": 2,
       "combinadas": 3,
+      "frasesPorIdioma": {
+        "pt-BR": 75,
+        "en": 74,
+        "es": 74,
+        "de": 74,
+        "fr": 75
+      },
       "codigosSemTextoPt": [
         "H350i",
         "H360D",
@@ -153,7 +186,7 @@
     },
     "compostos": {
       "status": "ok",
-      "segundos": 0.9,
+      "segundos": 1.8,
       "compostos": 1990,
       "descartados": [],
       "duplicados": [
@@ -232,6 +265,21 @@
         "encontrados": 1775,
         "comDefinicao": 1375,
         "falhas": []
+      },
+      "rotulosWikidata": "ok",
+      "comNomePorIdioma": {
+        "pt-BR": 1983,
+        "en": 1982,
+        "es": 1743,
+        "de": 1953,
+        "fr": 1900
+      },
+      "comArtigoPorIdioma": {
+        "pt-BR": 1931,
+        "en": 1951,
+        "es": 1722,
+        "de": 1908,
+        "fr": 1853
       },
       "sinonimosDePubChem": "não coletados (política de campos calculados do PubChem)",
       "excluidosPorSeguranca": [
@@ -427,9 +475,71 @@
       "trechosCurtos": 142,
       "artigos": 588
     },
+    "sitelinksConceitos": {
+      "status": "ok",
+      "segundos": 0.0
+    },
+    "wikipedia-en": {
+      "status": "ok",
+      "segundos": 0.1,
+      "idioma": "en",
+      "elementos": 118,
+      "compostos": 150,
+      "conceitos": 301,
+      "trechos": 1073,
+      "artigos": 569,
+      "semArtigoNoIdioma": 14,
+      "descartados": [],
+      "trechosCurtos": 80
+    },
+    "wikipedia-es": {
+      "status": "ok",
+      "segundos": 0.1,
+      "idioma": "es",
+      "elementos": 118,
+      "compostos": 150,
+      "conceitos": 294,
+      "trechos": 981,
+      "artigos": 563,
+      "semArtigoNoIdioma": 21,
+      "descartados": [
+        {
+          "tipo": "conceito",
+          "qid": "Q9033898",
+          "titulo": "Modelo atómico"
+        }
+      ],
+      "trechosCurtos": 127
+    },
+    "wikipedia-de": {
+      "status": "ok",
+      "segundos": 0.1,
+      "idioma": "de",
+      "elementos": 118,
+      "compostos": 150,
+      "conceitos": 283,
+      "trechos": 766,
+      "artigos": 551,
+      "semArtigoNoIdioma": 32,
+      "descartados": [],
+      "trechosCurtos": 142
+    },
+    "wikipedia-fr": {
+      "status": "ok",
+      "segundos": 0.1,
+      "idioma": "fr",
+      "elementos": 118,
+      "compostos": 150,
+      "conceitos": 294,
+      "trechos": 804,
+      "artigos": 562,
+      "semArtigoNoIdioma": 24,
+      "descartados": [],
+      "trechosCurtos": 146
+    },
     "wikilivros": {
       "status": "ok",
-      "segundos": 0.0,
+      "segundos": 0.1,
       "livros": {
         "Introdução à Química": 72,
         "Química Orgânica": 11,
@@ -476,13 +586,17 @@
     },
     "goldBook": {
       "status": "bloqueado",
-      "segundos": 0.6,
+      "segundos": 0.7,
       "motivo": "HTTP 403 em https://goldbook.iupac.org/"
     }
   },
   "contagens": {
     "textosPorFonte": {
       "wikipedia-pt": 925,
+      "wikipedia-en": 1073,
+      "wikipedia-es": 981,
+      "wikipedia-de": 766,
+      "wikipedia-fr": 804,
       "wikibooks-pt": 258,
       "chebi": 1305,
       "gutenberg-14474": 235,
@@ -491,9 +605,31 @@
     "elementos": 118,
     "compostos": 1971,
     "constantes": 59,
-    "textos": 2723,
+    "textos": 6347,
+    "textosPorIdioma": {
+      "pt-BR": 1183,
+      "en": 2613,
+      "es": 981,
+      "de": 766,
+      "fr": 804
+    },
+    "lotesDeTextos": 36,
     "compostosComGhsHarmonizado": 485,
-    "compostosComCas": 1954
+    "compostosComCas": 1954,
+    "compostosComNomePorIdioma": {
+      "pt-BR": 1964,
+      "en": 1963,
+      "es": 1724,
+      "de": 1934,
+      "fr": 1881
+    },
+    "elementosComNomePorIdioma": {
+      "pt-BR": 118,
+      "en": 118,
+      "es": 118,
+      "de": 118,
+      "fr": 118
+    }
   },
   "decisoes": [
     "OpenStax Chemistry 2e fora do pacote: CC BY-NC-SA 4.0 e cláusula contra IA generativa (nenhum clone, nenhum texto).",
@@ -503,6 +639,8 @@
     "Frases H/EUH em português: Anexo III do CLP consolidado (EUR-Lex/Cellar); combinadas ausentes viram junção dos textos oficiais.",
     "CAS: só do Wikidata (identificador, CC0), validado pelo dígito verificador; elementos não levam CAS (CAS do átomo != substância).",
     "Textos: Wikipédia pt e Wikilivros pt (CC BY-SA 4.0), ChEBI (CC BY 4.0), Faraday (domínio público). Gold Book: bloqueado por Cloudflare.",
+    "Idiomas (I18N §4): nomes de elementos/compostos por idioma só do Wikidata (CC0); textos em en/es/de/fr só da Wikipédia daquele idioma (CC BY-SA 4.0), escolhidos pelo item do Wikidata (sitelinks) — nunca tradução automática; frases H por idioma do Anexo III do CLP.",
+    "Textos em lotes (textos/<fonte>/lote-NNN.json + textos/index.json) em vez de um arquivo por trecho (cota de upload da Vercel).",
     "APIs oficiais (PUG REST, WDQS, /w/api.php) são acessadas apesar do Disallow genérico do robots.txt, conforme robots.EXCECOES."
   ],
   "avisos": [],
@@ -513,13 +651,17 @@
     "clp-eurlex",
     "chebi",
     "wikipedia-pt",
+    "wikipedia-en",
+    "wikipedia-es",
+    "wikipedia-de",
+    "wikipedia-fr",
     "wikibooks-pt",
     "gutenberg-14474",
     "icsc-oit"
   ],
   "http": {
     "requisicoes": 2,
-    "doCache": 290,
+    "doCache": 455,
     "revalidadas304": 0,
     "tentativasExtras": 0,
     "erros": 0,
@@ -528,7 +670,7 @@
       "goldbook.iupac.org": 2
     }
   },
-  "duracaoSegundos": 4.5,
-  "versao": "20261012T071713Z-977773cb4920",
+  "duracaoSegundos": 3.7,
+  "versao": "20261012T171653Z-3b8afa4f320b",
   "erros": []
 }
