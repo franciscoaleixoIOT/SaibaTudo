@@ -1,5 +1,7 @@
 package net.saibatudo.quimica.domain
 
+import androidx.annotation.StringRes
+import net.saibatudo.quimica.R
 import net.saibatudo.quimica.ai.nlu.lexico.Lexico
 import net.saibatudo.quimica.data.model.CategoriaElemento
 import net.saibatudo.quimica.data.model.Composto
@@ -22,59 +24,59 @@ data class LinhaFicha(val rotulo: String, val valor: String)
  */
 object Propriedades {
 
-    private fun p(id: String, rotulo: String, alvo: String, campo: String, tipo: String, unidade: String? = null, vararg sinonimos: String) =
-        PropriedadeDef(id, rotulo, campo, alvo, tipo, unidade, sinonimos.toList())
+    /** Propriedade padrão do contrato: o rótulo é um recurso de strings.xml (cada idioma tem o seu); os sinônimos vêm do léxico do idioma. */
+    private class Padrao(val id: String, @param:StringRes val rotulo: Int, val alvo: String, val campo: String, val tipo: String, val unidade: String? = null)
 
-    val PADRAO: List<PropriedadeDef> = listOf(
-        p("numeroAtomico", "número atômico", "elemento", "z", "inteiro", null, "numero atomico", "z"),
-        p("massaAtomica", "massa atômica", "elemento", "massaAtomica", "massaAtomica", "u", "massa atomica", "peso atomico", "massa do atomo"),
-        p("simbolo", "símbolo", "elemento", "simbolo", "texto", null, "simbolo"),
-        p("grupo", "grupo (família)", "elemento", "grupo", "inteiro", null, "grupo", "familia"),
-        p("periodo", "período", "elemento", "periodo", "inteiro", null, "periodo"),
-        p("bloco", "bloco", "elemento", "bloco", "texto", null, "bloco"),
-        p("categoria", "categoria", "elemento", "categoria", "categoria", null, "categoria", "classificacao", "tipo de elemento", "classe do elemento"),
-        p("configuracaoEletronica", "configuração eletrônica", "elemento", "configuracaoEletronica", "texto", null, "configuracao eletronica", "distribuicao eletronica"),
-        p("eletronegatividade", "eletronegatividade (Pauling)", "elemento", "eletronegatividade", "numero", null, "eletronegatividade"),
-        p("raioAtomicoPm", "raio atômico (van der Waals)", "elemento", "raioAtomicoPm", "numero", "pm", "raio atomico", "raio de van der waals", "tamanho do atomo"),
-        p("afinidadeEletronicaKJmol", "afinidade eletrônica", "elemento", "afinidadeEletronicaKJmol", "numero", "kJ/mol", "afinidade eletronica", "eletroafinidade"),
-        p("energiaIonizacaoKJmol", "energia de ionização", "elemento", "energiaIonizacaoKJmol", "numero", "kJ/mol", "energia de ionizacao", "potencial de ionizacao", "primeira energia de ionizacao"),
-        p("pontoFusaoK", "ponto de fusão", "elemento", "pontoFusaoK", "temperatura", null, "ponto de fusao", "temperatura de fusao", "fusao", "derrete", "funde"),
-        p("pontoEbulicaoK", "ponto de ebulição", "elemento", "pontoEbulicaoK", "temperatura", null, "ponto de ebulicao", "temperatura de ebulicao", "ebulicao", "ferve"),
-        p("densidadeKgm3", "densidade", "elemento", "densidadeKgm3", "densidade", null, "densidade", "massa especifica"),
-        p("estadoPadrao", "estado físico (condições padrão)", "elemento", "estadoPadrao", "estado", null, "estado fisico", "estado padrao", "estado da materia", "e solido", "e liquido", "e gasoso"),
-        p("estadosOxidacao", "estados de oxidação", "elemento", "estadosOxidacao", "lista", null, "estados de oxidacao", "numeros de oxidacao", "nox", "estado de oxidacao", "valencia"),
-        p("descoberta", "descoberta", "elemento", "descoberta", "descoberta", null, "descoberta", "descobriu", "descobridor", "quem descobriu", "ano da descoberta", "quando foi descoberto", "foi descoberto", "foi descoberta", "foram descobertos"),
+    private val PADRAO: List<Padrao> = listOf(
+        Padrao("numeroAtomico", R.string.prop_numero_atomico, "elemento", "z", "inteiro"),
+        Padrao("massaAtomica", R.string.prop_massa_atomica, "elemento", "massaAtomica", "massaAtomica", "u"),
+        Padrao("simbolo", R.string.prop_simbolo, "elemento", "simbolo", "texto"),
+        Padrao("grupo", R.string.prop_grupo, "elemento", "grupo", "inteiro"),
+        Padrao("periodo", R.string.prop_periodo, "elemento", "periodo", "inteiro"),
+        Padrao("bloco", R.string.prop_bloco, "elemento", "bloco", "texto"),
+        Padrao("categoria", R.string.prop_categoria, "elemento", "categoria", "categoria"),
+        Padrao("configuracaoEletronica", R.string.prop_configuracao_eletronica, "elemento", "configuracaoEletronica", "texto"),
+        Padrao("eletronegatividade", R.string.prop_eletronegatividade, "elemento", "eletronegatividade", "numero"),
+        Padrao("raioAtomicoPm", R.string.prop_raio_atomico, "elemento", "raioAtomicoPm", "numero", "pm"),
+        Padrao("afinidadeEletronicaKJmol", R.string.prop_afinidade_eletronica, "elemento", "afinidadeEletronicaKJmol", "numero", "kJ/mol"),
+        Padrao("energiaIonizacaoKJmol", R.string.prop_energia_ionizacao, "elemento", "energiaIonizacaoKJmol", "numero", "kJ/mol"),
+        Padrao("pontoFusaoK", R.string.prop_ponto_fusao, "elemento", "pontoFusaoK", "temperatura"),
+        Padrao("pontoEbulicaoK", R.string.prop_ponto_ebulicao, "elemento", "pontoEbulicaoK", "temperatura"),
+        Padrao("densidadeKgm3", R.string.prop_densidade, "elemento", "densidadeKgm3", "densidade"),
+        Padrao("estadoPadrao", R.string.prop_estado_padrao, "elemento", "estadoPadrao", "estado"),
+        Padrao("estadosOxidacao", R.string.prop_estados_oxidacao, "elemento", "estadosOxidacao", "lista"),
+        Padrao("descoberta", R.string.prop_descoberta, "elemento", "descoberta", "descoberta"),
 
-        p("massaMolar", "massa molar", "composto", "massaMolar", "massaMolar", "g/mol", "massa molar", "massa molecular", "peso molecular", "peso molar", "massa formula"),
-        p("massaExata", "massa exata (monoisotópica)", "composto", "massaExata", "numero", "u", "massa exata", "massa monoisotopica"),
-        p("formula", "fórmula", "composto", "formula", "formula", null, "formula", "formula molecular", "formula quimica"),
-        p("cas", "número CAS", "composto", "cas", "texto", null, "numero cas", "cas"),
-        p("cid", "CID no PubChem", "composto", "cid", "inteiro", null, "cid", "pubchem"),
-        p("smiles", "SMILES", "composto", "smiles", "texto", null, "smiles"),
-        p("inchiKey", "InChIKey", "composto", "inchiKey", "texto", null, "inchikey", "inchi key"),
-        p("nomeIupac", "nome IUPAC", "composto", "nomeIupac", "texto", null, "nome iupac", "nome sistematico", "iupac"),
-        p("xlogp", "XLogP (lipofilicidade calculada)", "composto", "xlogp", "numero", null, "xlogp", "logp", "lipofilicidade", "coeficiente de particao"),
-        p("doadoresH", "doadores de ligação de hidrogênio", "composto", "doadoresH", "inteiro", null, "doadores de hidrogenio", "doadores de ligacao de hidrogenio"),
-        p("aceptoresH", "aceptores de ligação de hidrogênio", "composto", "aceptoresH", "inteiro", null, "aceptores de hidrogenio", "aceptores de ligacao de hidrogenio"),
-        p("ligacoesRotaveis", "ligações rotáveis", "composto", "ligacoesRotaveis", "inteiro", null, "ligacoes rotaveis"),
-        p("carga", "carga elétrica", "composto", "carga", "inteiro", null, "carga eletrica", "carga formal"),
-        p("tpsa", "área de superfície polar (TPSA)", "composto", "tpsa", "numero", "Å²", "tpsa", "area de superficie polar")
+        Padrao("massaMolar", R.string.prop_massa_molar, "composto", "massaMolar", "massaMolar", "g/mol"),
+        Padrao("massaExata", R.string.prop_massa_exata, "composto", "massaExata", "numero", "u"),
+        Padrao("formula", R.string.prop_formula, "composto", "formula", "formula"),
+        Padrao("cas", R.string.prop_cas, "composto", "cas", "texto"),
+        Padrao("cid", R.string.prop_cid, "composto", "cid", "inteiro"),
+        Padrao("smiles", R.string.prop_smiles, "composto", "smiles", "texto"),
+        Padrao("inchiKey", R.string.prop_inchikey, "composto", "inchiKey", "texto"),
+        Padrao("nomeIupac", R.string.prop_nome_iupac, "composto", "nomeIupac", "texto"),
+        Padrao("xlogp", R.string.prop_xlogp, "composto", "xlogp", "numero"),
+        Padrao("doadoresH", R.string.prop_doadores_h, "composto", "doadoresH", "inteiro"),
+        Padrao("aceptoresH", R.string.prop_aceptores_h, "composto", "aceptoresH", "inteiro"),
+        Padrao("ligacoesRotaveis", R.string.prop_ligacoes_rotaveis, "composto", "ligacoesRotaveis", "inteiro"),
+        Padrao("carga", R.string.prop_carga, "composto", "carga", "inteiro"),
+        Padrao("tpsa", R.string.prop_tpsa, "composto", "tpsa", "numero", "Å²")
     )
 
     /**
-     * Lista efetiva no [idioma] (espelha `tabelaDePropriedades` do site): a padrão, com os sinônimos do LÉXICO do idioma
-     * (contracts/lexico/<idioma>.json, `propriedades`), enriquecida com `regras.propriedades` do pacote — casada pelo id ou pelo campo de
-     * `origem` ("elementos.pontoFusaoK"); somam-se os sinônimos do pacote (`sinonimos` legados valem em pt-BR; `sinonimosPorIdioma[idioma]`
+     * Lista efetiva no idioma de [t] (espelha `tabelaDePropriedades` do site): a padrão (rótulos de strings.xml no idioma), com os sinônimos do
+     * LÉXICO do idioma (contracts/lexico/<idioma>.json, `propriedades`), enriquecida com `regras.propriedades` do pacote — casada pelo id ou pelo
+     * campo de `origem` ("elementos.pontoFusaoK"); somam-se os sinônimos do pacote (`sinonimos` legados valem em pt-BR; `sinonimosPorIdioma[idioma]`
      * no idioma) e o rótulo passa a ser `rotulos[idioma]`. Propriedade do pacote sem correspondente e sem `campo` (pictogramas, frases H)
      * fica de fora: os perigos têm tratamento próprio.
      */
-    fun tabela(regras: Regras, idioma: String = Idiomas.PADRAO): List<PropriedadeDef> {
-        val id = Idiomas.normalizar(idioma) ?: Idiomas.PADRAO
+    fun tabela(regras: Regras, t: Textos): List<PropriedadeDef> {
+        val id = t.idioma
         val lex = Lexico.de(id)
         val mapa = LinkedHashMap<String, PropriedadeDef>()
-        PADRAO.forEach { mapa[it.id] = it.copy(sinonimos = lex.propriedades[it.id].orEmpty()) }
+        PADRAO.forEach { mapa[it.id] = PropriedadeDef(it.id, t(it.rotulo), it.campo, it.alvo, it.tipo, it.unidade, lex.propriedades[it.id].orEmpty()) }
         fun doPacote(r: PropriedadeDef) = (if (id == Idiomas.PADRAO) r.sinonimos else emptyList()) + r.sinonimosPorIdioma[id].orEmpty()
-        // rótulo: o do idioma no pacote; em pt-BR o `rotulo`/`nome` do pacote; nos outros idiomas o inglês do pacote e, sem ele, o padrão
+        // rótulo: o do idioma no pacote; em pt-BR o `rotulo`/`nome` do pacote; nos outros idiomas o inglês do pacote e, sem ele, o padrão (strings.xml)
         fun rotulo(r: PropriedadeDef, padrao: String) = r.rotulos[id] ?: if (id == Idiomas.PADRAO) r.rotulo else r.rotulos["en"] ?: padrao
         for (r in regras.propriedades) {
             val alvoR = r.alvo.takeIf { it.isNotEmpty() }
@@ -104,11 +106,8 @@ object Propriedades {
         return mapa.values.toList()
     }
 
-    fun rotuloCategoria(c: CategoriaElemento): String = when (c) {
-        CategoriaElemento.SEMIMETAL -> "semimetal (metaloide)"
-        CategoriaElemento.DESCONHECIDA -> "propriedades químicas desconhecidas"
-        else -> c.rotulo.replaceFirstChar { it.lowercase() }
-    }
+    /** Categoria no meio da frase ("metal alcalino", "semimetal (metaloide)"). */
+    fun rotuloCategoria(c: CategoriaElemento, t: Textos): String = t(c.meio)
 
     // ---- valores ---------------------------------------------------------------------------------------------------------------
 
@@ -151,9 +150,9 @@ object Propriedades {
         }
     }
 
-    fun formatar(def: PropriedadeDef, valor: Any?, un: Unidades, nivel: Nivel = Nivel.MEDIO): ValorFormatado? {
+    fun formatar(t: Textos, def: PropriedadeDef, valor: Any?, un: Unidades, nivel: Nivel = Nivel.MEDIO): ValorFormatado? {
         if (valor == null) return null
-        fun num(d: Double, sig: Int = 7) = Texto.significativos(d, sig)
+        fun num(d: Double, sig: Int = 7) = t.sig(d, sig)
         return when (def.tipo) {
             "temperatura" -> {
                 val k = (valor as? Number)?.toDouble() ?: return null
@@ -175,13 +174,13 @@ object Propriedades {
                 ValorFormatado(t, t)
             }
             "inteiro" -> (valor as? Number)?.let { ValorFormatado(it.toLong().toString(), it.toLong().toString()) }
-            "categoria" -> (valor as? CategoriaElemento)?.let { ValorFormatado(rotuloCategoria(it), rotuloCategoria(it)) }
-            "estado" -> (valor as? net.saibatudo.quimica.data.model.EstadoFisico)?.let { ValorFormatado(it.rotulo.lowercase(), it.rotulo.lowercase()) }
+            "categoria" -> (valor as? CategoriaElemento)?.let { ValorFormatado(rotuloCategoria(it, t), rotuloCategoria(it, t)) }
+            "estado" -> (valor as? net.saibatudo.quimica.data.model.EstadoFisico)?.let { ValorFormatado(t(it.meio), t(it.meio)) }
             "lista" -> (valor as? List<*>)?.let { l -> l.joinToString(", ") { x -> (x as? Number)?.toInt()?.let { n -> if (n > 0) "+$n" else "$n" } ?: x.toString() } }?.let { ValorFormatado(it, it) }
             "formula" -> (valor as? String)?.let { ValorFormatado(Texto.formulaUnicode(it), Texto.formulaUnicode(it)) }
             "descoberta" -> (valor as? Pair<*, *>)?.let { (ano, por) ->
-                val t = listOfNotNull((ano as? Int)?.toString(), (por as? String)?.takeIf { it.isNotBlank() }?.let { "por $it" }).joinToString(" ")
-                t.takeIf { it.isNotBlank() }?.let { ValorFormatado(it, it) }
+                val texto = listOfNotNull((ano as? Int)?.toString(), (por as? String)?.takeIf { it.isNotBlank() }?.let { p -> t(R.string.prop_descoberta_por, p) }).joinToString(" ")
+                texto.takeIf { it.isNotBlank() }?.let { ValorFormatado(it, it) }
             }
             else -> valor.toString().takeIf { it.isNotBlank() }?.let { ValorFormatado(it, it) }
         }
@@ -193,7 +192,7 @@ object Propriedades {
     private val ELEMENTO_MEDIO = ELEMENTO_BASICAS + listOf("bloco", "configuracaoEletronica", "eletronegatividade", "pontoFusaoK", "pontoEbulicaoK", "densidadeKgm3", "estadosOxidacao", "descoberta")
 
     /** Linhas da ficha do elemento; o nível controla quantas propriedades aparecem. */
-    fun fichaElemento(e: Elemento, tabela: List<PropriedadeDef>, un: Unidades, nivel: Nivel): List<LinhaFicha> {
+    fun fichaElemento(t: Textos, e: Elemento, tabela: List<PropriedadeDef>, un: Unidades, nivel: Nivel): List<LinhaFicha> {
         val defs = tabela.filter { it.alvo == "elemento" || it.alvo == "ambos" }
         val ids: List<String> = when (nivel) {
             Nivel.FUNDAMENTAL -> ELEMENTO_BASICAS
@@ -203,7 +202,7 @@ object Propriedades {
         return ids.mapNotNull { id ->
             val d = defs.firstOrNull { it.id == id } ?: return@mapNotNull null
             if (id == "simbolo") return@mapNotNull null
-            val v = formatar(d, bruto(d, e), un, nivel) ?: return@mapNotNull null
+            val v = formatar(t, d, bruto(d, e), un, nivel) ?: return@mapNotNull null
             LinhaFicha(d.rotulo.replaceFirstChar { it.uppercase() }, v.texto)
         }
     }
@@ -211,7 +210,7 @@ object Propriedades {
     private val COMPOSTO_BASICAS = listOf("formula", "massaMolar", "cas", "pontoFusaoK", "pontoEbulicaoK", "densidadeKgm3")
 
     /** Linhas de propriedades do composto (identificadores ficam em bloco próprio na tela). */
-    fun fichaComposto(c: Composto, tabela: List<PropriedadeDef>, un: Unidades, nivel: Nivel): List<LinhaFicha> {
+    fun fichaComposto(t: Textos, c: Composto, tabela: List<PropriedadeDef>, un: Unidades, nivel: Nivel): List<LinhaFicha> {
         val defs = tabela.filter { it.alvo == "composto" || it.alvo == "ambos" || it.campo?.let { campo -> c.propriedades.containsKey(campo) } == true }
         val usados = mutableSetOf<String>()
         val linhas = mutableListOf<LinhaFicha>()
@@ -221,7 +220,7 @@ object Propriedades {
         }
         for (d in ordem) {
             if (d.id in setOf("cid", "smiles", "inchiKey", "nomeIupac", "cas")) continue
-            val v = formatar(d, bruto(d, c), un, nivel) ?: continue
+            val v = formatar(t, d, bruto(d, c), un, nivel) ?: continue
             if (usados.add(d.id)) linhas += LinhaFicha(d.rotulo.replaceFirstChar { it.uppercase() }, v.texto)
         }
         // propriedades numéricas do pacote que a tabela não nomeia: rótulo derivado da chave
@@ -229,7 +228,7 @@ object Propriedades {
             val conhecidos = tabela.mapNotNull { it.campo }.toSet()
             for ((chave, valor) in c.propriedades) {
                 if (chave in conhecidos) continue
-                linhas += LinhaFicha(rotuloDeChave(chave), Texto.significativos(valor, 7) + sufixoPorChave(chave))
+                linhas += LinhaFicha(rotuloDeChave(chave), t.sig(valor, 7) + sufixoPorChave(chave))
             }
         }
         return linhas

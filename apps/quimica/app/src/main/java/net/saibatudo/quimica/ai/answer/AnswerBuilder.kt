@@ -1,5 +1,6 @@
 package net.saibatudo.quimica.ai.answer
 
+import net.saibatudo.quimica.R
 import net.saibatudo.quimica.ai.Seguranca
 import net.saibatudo.quimica.ai.model.Acao
 import net.saibatudo.quimica.ai.model.Bloco
@@ -15,11 +16,12 @@ import net.saibatudo.quimica.data.model.Elemento
 import net.saibatudo.quimica.data.model.Fonte
 import net.saibatudo.quimica.data.prefs.Nivel
 import net.saibatudo.quimica.data.repository.Pacote
-import net.saibatudo.quimica.domain.GhsTextos
+import net.saibatudo.quimica.domain.GhsPictogramas
 import net.saibatudo.quimica.domain.Idiomas
 import net.saibatudo.quimica.domain.Nomes
 import net.saibatudo.quimica.domain.Propriedades
 import net.saibatudo.quimica.domain.Texto
+import net.saibatudo.quimica.domain.Textos
 import net.saibatudo.quimica.domain.calc.CalculoInvalido
 import net.saibatudo.quimica.domain.calc.MassaMolar
 import net.saibatudo.quimica.domain.calc.ResultadoCalculo
@@ -28,6 +30,9 @@ import net.saibatudo.quimica.domain.calc.ResultadoCalculo
  * Monta a RESPOSTA a partir de uma [ParsedQuery] usando SOMENTE os dados do pacote e cálculo local testado.
  * Nenhum texto gerado por modelo de linguagem é exibido como fato (origem sempre LOCAL nesta versão). Toda resposta
  * traz as fontes dos dados usados; quando o pacote não tem o dado, a resposta diz isso em vez de inventar.
+ *
+ * Todo texto sai de `res/values-<idioma>/strings.xml` no idioma do dicionário ([t] = `dic.textos`, o mesmo do interpretador): nada de português fixo
+ * aqui (docs/I18N.md §6). Números e nomes seguem o idioma; um nome que não existe no idioma sai na reserva, com o rótulo "(nome em inglês)".
  */
 class AnswerBuilder(
     internal val pacote: Pacote,
@@ -68,14 +73,14 @@ class AnswerBuilder(
                 Intent.DESCONHECIDA -> naoEntendi(q)
             }
         } catch (e: CalculoInvalido) {
-            erroDeCalculo(q, e.message ?: "Não consegui fazer esta conta.")
+            erroDeCalculo(q, e.texto(t))
         }
         // pergunta sem entidade reconhecida: pode ser erro de digitação ("oxigenioo"); oferece o nome certo, já conferido
         if (corrigir && !resposta.entendida && q.intent != Intent.DESCONHECIDA && q.elemento == null && q.composto == null && q.formula == null) {
             val sugeridas = correcoes(q.textoOriginal)
             if (sugeridas.isNotEmpty()) {
                 return resposta.copy(
-                    blocos = resposta.blocos + Bloco.Paragrafo("Você quis dizer: ${sugeridas.first()}"),
+                    blocos = resposta.blocos + Bloco.Paragrafo(t(R.string.resp_voce_quis_dizer, sugeridas.first())),
                     sugestoes = (sugeridas.take(2) + resposta.sugestoes).distinct()
                 )
             }
@@ -87,21 +92,59 @@ class AnswerBuilder(
 
     internal val un get() = dic.unidades
 
+    /** Os textos do idioma das respostas (o do dicionário). */
+    internal val t: Textos get() = dic.textos
+
     internal fun elementoDe(q: ParsedQuery): Elemento? = q.elemento?.let { pacote.porSimbolo[it] }
 
     internal suspend fun compostoDe(q: ParsedQuery): Composto? = q.composto?.toLongOrNull()?.let { pacote.composto(it) }
 
-    /** Idioma das respostas: o do dicionário (o mesmo do NLU). Os moldes de texto ainda são pt-BR (etapa "strings" do docs/I18N.md §6). */
+    /** Idioma das respostas: o do dicionário (o mesmo do NLU). */
     internal val idioma: String get() = dic.idioma
 
-    /** Nome no idioma (reserva em inglês/português, sem rótulo por enquanto; em pt-BR, o de sempre). */
-    internal fun nomeDe(e: Elemento) = Nomes.elemento(e, idioma).nome
-    internal fun nomeDe(c: Composto) = Nomes.composto(c, idioma).nome
+    /** Nome no idioma para EXIBIR: se vem de outro idioma (reserva em inglês/português), sai com o rótulo "(nome em inglês)". */
+    internal fun nomeDe(e: Elemento) = t.nomeRotulado(Nomes.elemento(e, idioma))
+    internal fun nomeDe(c: Composto) = t.nomeRotulado(Nomes.composto(c, idioma))
+
+    /** Nome no idioma SEM rótulo, para montar perguntas sugeridas (o interpretador entende o nome, não o rótulo). */
+    internal fun nomeCru(e: Elemento) = Nomes.elemento(e, idioma).nome
+    internal fun nomeCru(c: Composto) = Nomes.composto(c, idioma).nome
 
     internal fun fontesDeElementos(simbolos: Collection<String>): List<Fonte> =
         simbolos.mapNotNull { pacote.porSimbolo[it] }.flatMap { it.fontes }.distinctBy { it.nome }.take(3)
 
     internal fun fontesDoPacote(): List<Fonte> = pacote.fontesExibicao.take(2)
+
+    /** "Cálculo feito no aparelho": fonte de toda resposta calculada localmente. */
+    internal fun fonteCalculo() = Fonte(t(R.string.fonte_calculo_nome), licenca = t(R.string.fonte_calculo_licenca))
+
+    // ---- ações (atalhos) --------------------------------------------------------------------------------------------------------
+
+    internal fun acaoTabela() = Acao.AbrirTabela(t(R.string.acao_abrir_tabela))
+    internal fun acaoSobreDados() = Acao.AbrirSobreDados(t(R.string.acao_sobre_dados))
+    internal fun acaoSeguranca() = Acao.AbrirSeguranca(t(R.string.acao_ghs))
+    internal fun acaoFichaElemento(e: Elemento) = Acao.AbrirElemento(e.z, t(R.string.acao_abrir_ficha_de, nomeDe(e)))
+    internal fun acaoFichaComposto(c: Composto) = Acao.AbrirComposto(c.cid, t(R.string.acao_abrir_ficha_de, nomeDe(c)))
+    internal fun acaoAbrir(e: Elemento) = Acao.AbrirElemento(e.z, t(R.string.acao_abrir_x, nomeDe(e)))
+    internal fun acaoAbrir(c: Composto) = Acao.AbrirComposto(c.cid, t(R.string.acao_abrir_x, nomeDe(c)))
+    internal fun acaoIcsc(url: String) = Acao.AbrirUrl(url, t(R.string.acao_icsc))
+
+    /** Atalho para uma calculadora, com o texto próprio dela ("Abrir a calculadora de pH"). */
+    internal fun acaoCalculadora(tipo: TipoCalculadora, preenchimento: Map<String, String> = emptyMap()) = Acao.AbrirCalculadora(
+        tipo,
+        t(
+            when (tipo) {
+                TipoCalculadora.MASSA_MOLAR -> R.string.acao_calc_massa_molar
+                TipoCalculadora.BALANCEAMENTO -> R.string.acao_calc_balanceamento
+                TipoCalculadora.ESTEQUIOMETRIA -> R.string.acao_calc_estequiometria
+                TipoCalculadora.CONCENTRACAO -> R.string.acao_calc_concentracao
+                TipoCalculadora.PH -> R.string.acao_calc_ph
+                TipoCalculadora.GAS_IDEAL -> R.string.acao_calc_gas_ideal
+                TipoCalculadora.UNIDADES -> R.string.acao_calc_unidades
+            }
+        ),
+        preenchimento
+    )
 
     internal fun erroDeCalculo(q: ParsedQuery, mensagem: String): Resposta {
         val calc = when (q.intent) {
@@ -114,16 +157,16 @@ class AnswerBuilder(
             else -> TipoCalculadora.MASSA_MOLAR
         }
         return Resposta(
-            q.intent, "Não consegui fazer esta conta",
-            listOf(Bloco.Aviso(mensagem), Bloco.Paragrafo("Você pode preencher os campos na calculadora; ela mostra os passos.")),
-            acoes = listOf(Acao.AbrirCalculadora(calc, "Abrir a calculadora de ${calc.rotulo.lowercase()}")),
+            q.intent, t(R.string.resp_erro_calculo_titulo),
+            listOf(Bloco.Aviso(mensagem), Bloco.Paragrafo(t(R.string.resp_erro_calculo_dica))),
+            acoes = listOf(Acao.AbrirCalculadora(calc, t(R.string.acao_abrir_calculadora_de, t.minusNoMeio(t(calc.rotulo))))),
             sugestoes = emptyList(), entendida = false
         )
     }
 
     internal fun resultadoComoBlocos(r: ResultadoCalculo): List<Bloco> = buildList {
         r.linhas.forEach { add(Bloco.Campo(it.rotulo, it.valor)) }
-        if (r.passos.isNotEmpty()) add(Bloco.Passos("Passo a passo", if (nivel == Nivel.FUNDAMENTAL) r.passos else r.passos))
+        if (r.passos.isNotEmpty()) add(Bloco.Passos(t(R.string.resp_passo_a_passo), if (nivel == Nivel.FUNDAMENTAL) r.passos else r.passos))
         r.notas.forEach { add(Bloco.Aviso(it)) }
     }
 
@@ -131,25 +174,25 @@ class AnswerBuilder(
 
     private fun recusa(q: ParsedQuery): Resposta {
         val av = Seguranca.avaliarNoIdioma(q.textoOriginal, idioma)
-        val r = Seguranca.respostaRecusa(av)
-        val acoes = if (r.categoria == net.saibatudo.quimica.ai.CategoriaRecusa.AUTOLESAO) listOf(Acao.AbrirUrl("https://cvv.org.br", "Falar com o CVV (cvv.org.br)")) else emptyList()
+        val r = Seguranca.respostaRecusa(av, t)
+        val acoes = if (r.categoria == net.saibatudo.quimica.ai.CategoriaRecusa.AUTOLESAO) listOf(Acao.AbrirUrl("https://cvv.org.br", t(R.string.acao_cvv))) else emptyList()
         return Resposta(
-            Intent.RECUSA_PERIGO, "Não posso ajudar com isso", r.linhas.map { Bloco.Paragrafo(it) },
-            origem = OrigemResposta.AVISO, acoes = acoes, sugestoes = Seguranca.SUGESTOES_SEGURAS, recusa = true
+            Intent.RECUSA_PERIGO, t(R.string.resp_recusa_titulo), r.linhas.map { Bloco.Paragrafo(it) },
+            origem = OrigemResposta.AVISO, acoes = acoes, sugestoes = Seguranca.sugestoesSeguras(t), recusa = true
         )
     }
 
     private suspend fun ajuda(): Resposta = Resposta(
-        Intent.AJUDA, "O que o SaibaTudo Química responde",
+        Intent.AJUDA, t(R.string.resp_ajuda_titulo),
         listOf(
-            Bloco.Paragrafo("Pergunte sobre elementos e compostos (propriedades, massa molar, estrutura, perigos GHS), faça cálculos com os passos à vista e consulte a tabela periódica."),
+            Bloco.Paragrafo(t(R.string.resp_ajuda_intro)),
             Bloco.Lista(
                 listOf(
-                    "Propriedades: \"ponto de fusão do ferro\", \"fórmula da água\"",
-                    "Cálculos: massa molar, balanceamento, estequiometria, concentração, pH de ácidos e bases fortes, gás ideal, unidades",
-                    "Estrutura: \"desenhe a molécula do etanol\"",
-                    "Segurança: perigos e pictogramas GHS de um composto",
-                    "Os números vêm do pacote de dados assinado ou de cálculo no aparelho; nada é inventado."
+                    t(R.string.resp_ajuda_item_propriedades),
+                    t(R.string.resp_ajuda_item_calculos),
+                    t(R.string.resp_ajuda_item_estrutura),
+                    t(R.string.resp_ajuda_item_seguranca),
+                    t(R.string.resp_ajuda_item_numeros)
                 )
             )
         ),
@@ -160,12 +203,15 @@ class AnswerBuilder(
         val e = elementoDe(q)
         val lista = (e?.fontes.orEmpty() + pacote.fontesExibicao).distinctBy { it.nome }
         return Resposta(
-            Intent.FONTES, "Fontes e licenças dos dados",
+            Intent.FONTES, t(R.string.resp_fontes_titulo),
             listOf(
-                Bloco.Paragrafo("Cada resposta traz a fonte do dado. Estas são as fontes do pacote de dados em uso:"),
-                Bloco.Lista(lista.map { f -> f.rotulo() + (f.url?.let { " ($it)" } ?: "") + (f.acessadoEm?.let { " – acesso em $it" } ?: "") })
+                Bloco.Paragrafo(t(R.string.resp_fontes_intro)),
+                Bloco.Lista(lista.map { f ->
+                    val base = f.rotulo() + (f.url?.let { " ($it)" } ?: "")
+                    f.acessadoEm?.let { t(R.string.resp_fonte_acesso_em, base, it) } ?: base
+                })
             ),
-            acoes = listOf(Acao.AbrirSobreDados()), fontes = emptyList()
+            acoes = listOf(acaoSobreDados()), fontes = emptyList()
         )
     }
 
@@ -173,27 +219,27 @@ class AnswerBuilder(
         val m = pacote.manifest
         val dias = m.pollIntervalMinutes / (24 * 60)
         val blocos = mutableListOf<Bloco>(
-            Bloco.Campo("Versão dos dados", m.version.orEmpty()),
-            Bloco.Campo("Gerado em", m.generatedAt.orEmpty()),
-            Bloco.Campo("Origem", pacote.origem),
-            Bloco.Campo("Elementos", pacote.elementos.size.toString()),
-            Bloco.Campo("Compostos no pacote", dic.totalCompostos.toString()),
-            Bloco.Paragrafo("O pacote é assinado digitalmente (ECDSA P-256) e conferido a cada atualização; o app verifica se há um novo a cada $dias dias.")
+            Bloco.Campo(t(R.string.rot_versao_dados), m.version.orEmpty()),
+            Bloco.Campo(t(R.string.rot_gerado_em), m.generatedAt.orEmpty()),
+            Bloco.Campo(t(R.string.rot_origem), t(pacote.origem.rotulo)),
+            Bloco.Campo(t(R.string.rot_elementos), pacote.elementos.size.toString()),
+            Bloco.Campo(t(R.string.rot_compostos_pacote), dic.totalCompostos.toString()),
+            Bloco.Paragrafo(t.plural(R.plurals.resp_pacote_assinado, dias, dias))
         )
-        return Resposta(Intent.SOBRE_DADOS, "Sobre os dados", blocos, acoes = listOf(Acao.AbrirSobreDados()), fontes = fontesDoPacote())
+        return Resposta(Intent.SOBRE_DADOS, t(R.string.resp_sobre_dados_titulo), blocos, acoes = listOf(acaoSobreDados()), fontes = fontesDoPacote())
     }
 
     // ---- elemento e composto ------------------------------------------------------------------------------------------------------
 
     private fun elemento(q: ParsedQuery): Resposta {
-        val e = elementoDe(q) ?: return semDado(q, "Não encontrei esse elemento no pacote de dados.")
-        val linhas = Propriedades.fichaElemento(e, dic.propriedades, un, nivel)
-        val blocos = mutableListOf<Bloco>(Bloco.Paragrafo("${e.nome}, símbolo ${e.simbolo}, número atômico ${e.z}.") )
+        val e = elementoDe(q) ?: return semDado(q, t(R.string.resp_elemento_nao_encontrado))
+        val linhas = Propriedades.fichaElemento(t, e, dic.propriedades, un, nivel)
+        val blocos = mutableListOf<Bloco>(Bloco.Paragrafo(t(R.string.resp_elemento_intro, nomeDe(e), e.simbolo, e.z)))
         linhas.forEach { blocos += Bloco.Campo(it.rotulo, it.valor) }
         return Resposta(
-            Intent.ELEMENTO, "${e.nome} (${e.simbolo})", blocos, fontes = e.fontes.ifEmpty { fontesDoPacote() },
-            acoes = listOf(Acao.AbrirElemento(e.z, "Abrir a ficha de ${e.nome}"), Acao.AbrirTabela()),
-            sugestoes = listOf("Qual o ponto de fusão de ${e.nome}?", "Qual a massa molar de ${e.nome}?")
+            Intent.ELEMENTO, "${nomeDe(e)} (${e.simbolo})", blocos, fontes = e.fontes.ifEmpty { fontesDoPacote() },
+            acoes = listOf(acaoFichaElemento(e), acaoTabela()),
+            sugestoes = listOf(t(R.string.sug_fusao_de, nomeCru(e)), t(R.string.sug_massa_molar_de, nomeCru(e)))
         )
     }
 
@@ -201,30 +247,31 @@ class AnswerBuilder(
         val c = compostoDe(q)
         if (c == null) {
             // fórmula válida fora do índice: a massa molar ainda é calculável
-            val f = q.formula ?: return semDado(q, "Não encontrei esse composto no pacote de dados.")
+            val f = q.formula ?: return semDado(q, t(R.string.resp_composto_nao_encontrado))
             val mm = MassaMolar.calcular(f, pacote.porSimbolo)
             return Resposta(
                 Intent.COMPOSTO, Texto.formulaUnicode(f),
                 listOf(
-                    Bloco.Aviso("Este composto não está no núcleo de compostos do pacote; mostro só o que dá para calcular."),
-                    Bloco.Campo("Massa molar", "${Texto.fixo(mm.massaMolar, 3)} g/mol")
-                ) + listOf(Bloco.Passos("Como calculei", mm.comoResultado().passos)),
+                    Bloco.Aviso(t(R.string.resp_composto_fora_indice)),
+                    Bloco.Campo(t(R.string.rot_massa_molar), "${t.fixo(mm.massaMolar, 3)} g/mol")
+                ) + listOf(Bloco.Passos(t(R.string.resp_como_calculei), mm.comoResultado(t).passos)),
                 fontes = fontesDeElementos(mm.formula.contagem.keys),
-                acoes = listOf(Acao.AbrirCalculadora(TipoCalculadora.MASSA_MOLAR, "Abrir a calculadora de massa molar", mapOf("formula" to f)))
+                acoes = listOf(acaoCalculadora(TipoCalculadora.MASSA_MOLAR, mapOf("formula" to f)))
             )
         }
         val blocos = mutableListOf<Bloco>()
         c.formula?.let { blocos += Bloco.Destaque(Texto.formulaUnicode(it)) }
-        if (c.nomePtPendente) blocos += Bloco.Aviso("Nome em português ainda não revisado: mostro o nome IUPAC.")
-        c.nomePopular?.takeIf { !it.equals(c.nome, true) }?.let { blocos += Bloco.Campo("Também conhecido como", it) }
-        Propriedades.fichaComposto(c, dic.propriedades, un, nivel).forEach { blocos += Bloco.Campo(it.rotulo, it.valor) }
-        c.cas?.let { blocos += Bloco.Campo("Número CAS", it) }
-        c.smiles?.let { blocos += Bloco.Estrutura(it, "${c.nomeExibicao}${c.formula?.let { f -> ", ${Texto.formulaUnicode(f)}" } ?: ""}") }
-        c.definicaoChebi?.let { blocos += Bloco.Paragrafo("Definição (ChEBI, ${it.licenca}): ${it.texto}") }
+        // o aviso é sobre o nome em PORTUGUÊS: nos outros idiomas o nome vem do idioma (ou da reserva rotulada)
+        if (c.nomePtPendente && idioma == Idiomas.PADRAO) blocos += Bloco.Aviso(t(R.string.resp_nome_pt_pendente))
+        c.nomePopular?.takeIf { !it.equals(c.nome, true) }?.let { blocos += Bloco.Campo(t(R.string.rot_conhecido_como), it) }
+        Propriedades.fichaComposto(t, c, dic.propriedades, un, nivel).forEach { blocos += Bloco.Campo(it.rotulo, it.valor) }
+        c.cas?.let { blocos += Bloco.Campo(t(R.string.rot_numero_cas), it) }
+        c.smiles?.let { blocos += Bloco.Estrutura(it, "${nomeDe(c)}${c.formula?.let { f -> ", ${Texto.formulaUnicode(f)}" } ?: ""}") }
+        c.definicaoChebi?.let { blocos += Bloco.Paragrafo(t(R.string.resp_definicao_chebi, it.licenca, it.texto)) }
         return Resposta(
-            Intent.COMPOSTO, c.nomeExibicao, blocos, fontes = c.fontes.ifEmpty { fontesDoPacote() },
-            acoes = listOf(Acao.AbrirComposto(c.cid, "Abrir a ficha de ${c.nomeExibicao}")) + listOfNotNull(c.icscBuscaUrl?.let { Acao.AbrirUrl(it, "Ficha ICSC no site da OIT") }),
-            sugestoes = listOf("Quais os perigos de ${c.nomeExibicao}?", "Desenhe a estrutura de ${c.nomeExibicao}")
+            Intent.COMPOSTO, nomeDe(c), blocos, fontes = c.fontes.ifEmpty { fontesDoPacote() },
+            acoes = listOf(acaoFichaComposto(c)) + listOfNotNull(c.icscBuscaUrl?.let { acaoIcsc(it) }),
+            sugestoes = listOf(t(R.string.sug_perigos_de, nomeCru(c)), t(R.string.sug_estrutura_de, nomeCru(c)))
         )
     }
 
@@ -233,30 +280,37 @@ class AnswerBuilder(
         val e = elementoDe(q)
         val c = if (e == null) compostoDe(q) else null
         if (e == null && c == null) {
-            val exemplos = pacote.elementos.take(40).mapNotNull { el -> if (Propriedades.formatar(def, Propriedades.bruto(def, el), un) != null) "Qual ${def.rotulo.replaceFirstChar { it.lowercase() }} de ${el.nome}?".replace("Qual ponto", "Qual o ponto") else null }.take(3)
+            val exemplos = pacote.elementos.take(40).mapNotNull { el ->
+                if (Propriedades.formatar(t, def, Propriedades.bruto(def, el), un) != null) {
+                    val pergunta = t(R.string.sug_propriedade_de, t.minusNoMeio(def.rotulo), nomeCru(el))
+                    // português: "Qual ponto de fusão de X?" vira "Qual o ponto de fusão de X?" (nos outros idiomas o par de ajuste é vazio)
+                    val de = t(R.string.sug_propriedade_ajuste_de)
+                    if (de.isEmpty()) pergunta else pergunta.replace(de, t(R.string.sug_propriedade_ajuste_para))
+                } else null
+            }.take(3)
             return Resposta(
                 Intent.PROPRIEDADE, def.rotulo.replaceFirstChar { it.uppercase() },
-                listOf(Bloco.Paragrafo("De qual elemento ou composto? Diga o nome, o símbolo ou a fórmula.")),
+                listOf(Bloco.Paragrafo(t(R.string.resp_prop_de_qual))),
                 sugestoes = exemplos, entendida = false
             )
         }
-        val nome = e?.let { "${it.nome} (${it.simbolo})" } ?: c!!.nomeExibicao
-        val valor = if (e != null) Propriedades.formatar(def, Propriedades.bruto(def, e), un, nivel) else Propriedades.formatar(def, Propriedades.bruto(def, c!!), un, nivel)
+        val nome = e?.let { "${nomeDe(it)} (${it.simbolo})" } ?: nomeDe(c!!)
+        val valor = if (e != null) Propriedades.formatar(t, def, Propriedades.bruto(def, e), un, nivel) else Propriedades.formatar(t, def, Propriedades.bruto(def, c!!), un, nivel)
         if (valor == null) {
             return Resposta(
                 Intent.PROPRIEDADE, "$nome: ${def.rotulo}",
-                listOf(Bloco.Paragrafo("O pacote de dados não traz ${def.rotulo} para $nome. Não vou estimar esse valor.")),
+                listOf(Bloco.Paragrafo(t(R.string.resp_prop_sem_valor, def.rotulo, nome))),
                 fontes = if (e != null) e.fontes else c!!.fontes,
-                acoes = if (e != null) listOf(Acao.AbrirElemento(e.z, "Abrir a ficha de ${e.nome}")) else listOf(Acao.AbrirComposto(c!!.cid, "Abrir a ficha de ${c.nomeExibicao}")),
+                acoes = if (e != null) listOf(acaoFichaElemento(e)) else listOf(acaoFichaComposto(c!!)),
                 entendida = false
             )
         }
         val blocos = mutableListOf<Bloco>(Bloco.Campo(def.rotulo.replaceFirstChar { it.uppercase() }, valor.texto))
-        if (def.id == "estadosOxidacao" || def.id == "configuracaoEletronica") blocos += Bloco.Paragrafo("Valor do pacote de dados.")
+        if (def.id == "estadosOxidacao" || def.id == "configuracaoEletronica") blocos += Bloco.Paragrafo(t(R.string.resp_valor_do_pacote))
         return Resposta(
             Intent.PROPRIEDADE, "$nome: ${def.rotulo}", blocos,
             fontes = (if (e != null) e.fontes else c!!.fontes).ifEmpty { fontesDoPacote() },
-            acoes = if (e != null) listOf(Acao.AbrirElemento(e.z, "Abrir a ficha de ${e.nome}")) else listOf(Acao.AbrirComposto(c!!.cid, "Abrir a ficha de ${c.nomeExibicao}"))
+            acoes = if (e != null) listOf(acaoFichaElemento(e)) else listOf(acaoFichaComposto(c!!))
         )
     }
 
@@ -268,53 +322,55 @@ class AnswerBuilder(
             val perguntaFormula = Regex("""\bformula\b""").containsMatchIn(Texto.chaveNome(q.textoOriginal)) && q.formula == null
             val blocos = mutableListOf<Bloco>()
             if (perguntaFormula || q.formula == null) {
-                c.formula?.let { blocos += Bloco.Campo("Fórmula", Texto.formulaUnicode(it)) }
-                blocos += Bloco.Campo("Nome", c.nomeExibicao)
+                c.formula?.let { blocos += Bloco.Campo(t(R.string.rot_formula), Texto.formulaUnicode(it)) }
+                blocos += Bloco.Campo(t(R.string.rot_nome), nomeDe(c))
             } else {
-                blocos += Bloco.Campo("Nome", c.nomeExibicao)
-                c.formula?.let { blocos += Bloco.Campo("Fórmula", Texto.formulaUnicode(it)) }
+                blocos += Bloco.Campo(t(R.string.rot_nome), nomeDe(c))
+                c.formula?.let { blocos += Bloco.Campo(t(R.string.rot_formula), Texto.formulaUnicode(it)) }
             }
-            c.nomeIupac?.let { blocos += Bloco.Campo("Nome IUPAC", it) }
-            c.nomePopular?.let { blocos += Bloco.Campo("Nome popular", it) }
+            c.nomeIupac?.let { blocos += Bloco.Campo(t(R.string.rot_nome_iupac), it) }
+            c.nomePopular?.let { blocos += Bloco.Campo(t(R.string.rot_nome_popular), it) }
             return Resposta(
-                Intent.NOMENCLATURA, "${c.nomeExibicao}: nome e fórmula", blocos, fontes = c.fontes.ifEmpty { fontesDoPacote() },
-                acoes = listOf(Acao.AbrirComposto(c.cid, "Abrir a ficha de ${c.nomeExibicao}"))
+                Intent.NOMENCLATURA, t(R.string.resp_nome_e_formula, nomeDe(c)), blocos, fontes = c.fontes.ifEmpty { fontesDoPacote() },
+                acoes = listOf(acaoFichaComposto(c))
             )
         }
         val e = elementoDe(q)
         if (e != null) {
+            // o nome em inglês só vale como campo à parte quando o idioma não é o inglês
+            val ingles = e.nomeEn?.takeIf { idioma != "en" }
             return Resposta(
-                Intent.NOMENCLATURA, "${e.nome}: nome e símbolo",
-                listOf(Bloco.Campo("Nome", e.nome), Bloco.Campo("Símbolo", e.simbolo), Bloco.Campo("Nome em inglês", e.nomeEn.orEmpty()).takeIf { e.nomeEn != null } ?: Bloco.Paragrafo("")),
-                fontes = e.fontes, acoes = listOf(Acao.AbrirElemento(e.z, "Abrir a ficha de ${e.nome}"))
+                Intent.NOMENCLATURA, t(R.string.resp_nome_e_simbolo, nomeDe(e)),
+                listOf(Bloco.Campo(t(R.string.rot_nome), nomeDe(e)), Bloco.Campo(t(R.string.rot_simbolo), e.simbolo), ingles?.let { Bloco.Campo(t.rotuloNomeEm("en"), it) } ?: Bloco.Paragrafo("")),
+                fontes = e.fontes, acoes = listOf(acaoFichaElemento(e))
             )
         }
-        return semDado(q, "Não encontrei essa substância no pacote de dados, então não posso informar o nome ou a fórmula sem inventar.")
+        return semDado(q, t(R.string.resp_nomenclatura_nao_encontrada))
     }
 
     private suspend fun desenhar(q: ParsedQuery): Resposta {
         val c = compostoDe(q)
         if (c?.smiles != null) {
             return Resposta(
-                Intent.DESENHAR, "Estrutura de ${c.nomeExibicao}",
+                Intent.DESENHAR, t(R.string.resp_estrutura_de, nomeDe(c)),
                 listOf(
-                    Bloco.Estrutura(c.smiles, "${c.nomeExibicao}${c.formula?.let { ", ${Texto.formulaUnicode(it)}" } ?: ""}"),
-                    Bloco.Campo("SMILES", c.smiles)
+                    Bloco.Estrutura(c.smiles, "${nomeDe(c)}${c.formula?.let { ", ${Texto.formulaUnicode(it)}" } ?: ""}"),
+                    Bloco.Campo(t(R.string.rot_smiles), c.smiles)
                 ),
                 fontes = c.fontes.ifEmpty { fontesDoPacote() },
-                acoes = listOf(Acao.AbrirComposto(c.cid, "Abrir a ficha de ${c.nomeExibicao}"))
+                acoes = listOf(acaoFichaComposto(c))
             )
         }
-        if (c != null) return semDado(q, "O pacote de dados não traz a estrutura (SMILES) de ${c.nomeExibicao}.")
+        if (c != null) return semDado(q, t(R.string.resp_sem_smiles, nomeDe(c)))
         val e = elementoDe(q)
         if (e != null) {
             return Resposta(
-                Intent.DESENHAR, "${e.nome} é um elemento",
-                listOf(Bloco.Paragrafo("Elementos não têm estrutura 2D como as moléculas. Veja a ficha do elemento, com a configuração eletrônica."), Bloco.Campo("Configuração eletrônica", e.configuracaoEletronica.orEmpty()).takeIf { e.configuracaoEletronica != null } ?: Bloco.Paragrafo("")),
-                fontes = e.fontes, acoes = listOf(Acao.AbrirElemento(e.z, "Abrir a ficha de ${e.nome}"))
+                Intent.DESENHAR, t(R.string.resp_e_um_elemento, nomeDe(e)),
+                listOf(Bloco.Paragrafo(t(R.string.resp_elemento_sem_estrutura)), Bloco.Campo(t(R.string.rot_configuracao_eletronica), e.configuracaoEletronica.orEmpty()).takeIf { e.configuracaoEletronica != null } ?: Bloco.Paragrafo("")),
+                fontes = e.fontes, acoes = listOf(acaoFichaElemento(e))
             )
         }
-        return semDado(q, "Não encontrei esse composto no pacote de dados, então não posso desenhar a estrutura.")
+        return semDado(q, t(R.string.resp_desenhar_nao_encontrado))
     }
 
     private suspend fun comparar(q: ParsedQuery): Resposta {
@@ -323,29 +379,33 @@ class AnswerBuilder(
         val blocos = mutableListOf<Bloco>()
         val fontes = mutableListOf<Fonte>()
         val acoes = mutableListOf<Acao>()
+        val semDado = t(R.string.resp_sem_dado_valor)
         if (elementos.size >= 2) {
             val ids = listOf("numeroAtomico", "massaAtomica", "categoria", "eletronegatividade", "raioAtomicoPm", "pontoFusaoK", "pontoEbulicaoK", "densidadeKgm3")
             for (id in ids) {
                 val d = dic.propriedade(id) ?: continue
-                val valores = elementos.map { Propriedades.formatar(d, Propriedades.bruto(d, it), un, nivel)?.curto }
+                val valores = elementos.map { Propriedades.formatar(t, d, Propriedades.bruto(d, it), un, nivel)?.curto }
                 if (valores.all { it == null }) continue
-                blocos += Bloco.Campo(d.rotulo.replaceFirstChar { it.uppercase() }, elementos.indices.joinToString(" | ") { i -> "${elementos[i].nome}: ${valores[i] ?: "sem dado"}" })
+                blocos += Bloco.Campo(d.rotulo.replaceFirstChar { it.uppercase() }, elementos.indices.joinToString(" | ") { i -> "${nomeDe(elementos[i])}: ${valores[i] ?: semDado}" })
             }
-            elementos.forEach { fontes += it.fontes; acoes += Acao.AbrirElemento(it.z, "Abrir ${it.nome}") }
+            elementos.forEach { fontes += it.fontes; acoes += acaoAbrir(it) }
         } else if (compostos.size >= 2) {
             val ids = listOf("formula", "massaMolar", "pontoFusaoK", "pontoEbulicaoK", "densidadeKgm3", "xlogp")
             for (id in ids) {
                 val d = dic.propriedade(id) ?: continue
-                val valores = compostos.map { Propriedades.formatar(d, Propriedades.bruto(d, it), un, nivel)?.curto }
+                val valores = compostos.map { Propriedades.formatar(t, d, Propriedades.bruto(d, it), un, nivel)?.curto }
                 if (valores.all { it == null }) continue
-                blocos += Bloco.Campo(d.rotulo.replaceFirstChar { it.uppercase() }, compostos.indices.joinToString(" | ") { i -> "${compostos[i].nomeExibicao}: ${valores[i] ?: "sem dado"}" })
+                blocos += Bloco.Campo(d.rotulo.replaceFirstChar { it.uppercase() }, compostos.indices.joinToString(" | ") { i -> "${nomeDe(compostos[i])}: ${valores[i] ?: semDado}" })
             }
-            compostos.forEach { fontes += it.fontes; acoes += Acao.AbrirComposto(it.cid, "Abrir ${it.nomeExibicao}") }
+            compostos.forEach { fontes += it.fontes; acoes += acaoAbrir(it) }
         } else {
-            return semDado(q, "Para comparar, cite dois elementos ou dois compostos do pacote de dados.")
+            return semDado(q, t(R.string.resp_comparar_cite_dois))
         }
-        val titulo = if (elementos.size >= 2) elementos.joinToString(" × ") { it.nome } else compostos.joinToString(" × ") { it.nomeExibicao }
-        return Resposta(Intent.COMPARAR, "Comparação: $titulo", blocos.ifEmpty { listOf(Bloco.Paragrafo("O pacote não traz propriedades em comum para comparar.")) }, fontes = fontes.distinctBy { it.nome }.take(3), acoes = acoes)
+        val titulo = if (elementos.size >= 2) elementos.joinToString(" × ") { nomeDe(it) } else compostos.joinToString(" × ") { nomeDe(it) }
+        return Resposta(
+            Intent.COMPARAR, t(R.string.resp_comparar_titulo, titulo), blocos.ifEmpty { listOf(Bloco.Paragrafo(t(R.string.resp_comparar_sem_comum))) },
+            fontes = fontes.distinctBy { it.nome }.take(3), acoes = acoes
+        )
     }
 
     // ---- segurança -----------------------------------------------------------------------------------------------------------------------
@@ -359,42 +419,42 @@ class AnswerBuilder(
         val titulo: String
         val emMistura = Regex("""\b(misturar|mistura|misturo|misturas|juntar|combinar)\b""").containsMatchIn(Texto.chaveNome(q.textoOriginal))
         if (emMistura) {
-            titulo = "Misturar produtos químicos"
-            blocos += Bloco.Paragrafo("Não misture produtos químicos, principalmente de limpeza (água sanitária, amoníaco, ácidos, desentupidores): a reação entre eles pode liberar gases tóxicos, calor ou projeção de líquido. Use cada produto sozinho, com o ambiente ventilado, e siga o rótulo.")
+            titulo = t(R.string.resp_misturar_titulo)
+            blocos += Bloco.Paragrafo(t(R.string.resp_misturar_aviso))
             val citados = q.compostos.mapNotNull { it.toLongOrNull() }.mapNotNull { pacote.composto(it) }
             for (x in citados.filter { it.ghs != null && (it.ghs.pictogramas.isNotEmpty() || it.ghs.frasesH.isNotEmpty()) }) {
-                blocos += Bloco.Paragrafo("${x.nomeExibicao}, classificação GHS no pacote:")
+                blocos += Bloco.Paragrafo(t(R.string.resp_ghs_no_pacote, nomeDe(x)))
                 blocos += Bloco.GhsBloco(x.ghs!!, textosH(x.ghs.textosH))
             }
             fontes = citados.flatMap { it.fontes }.distinctBy { it.nome }.take(3)
-            citados.firstOrNull()?.let { acoes += Acao.AbrirComposto(it.cid, "Abrir a ficha de ${it.nomeExibicao}") }
+            citados.firstOrNull()?.let { acoes += acaoFichaComposto(it) }
         } else if (c != null) {
-            titulo = "Segurança: ${c.nomeExibicao}"
+            titulo = t(R.string.resp_seguranca_titulo, nomeDe(c))
             val g = c.ghs
             if (g != null && (g.pictogramas.isNotEmpty() || g.frasesH.isNotEmpty())) {
                 blocos += Bloco.GhsBloco(g, textosH(g.textosH))
-                g.fonte?.let { blocos += Bloco.Paragrafo("Classificação: $it.") }
+                g.fonte?.let { blocos += Bloco.Paragrafo(t(R.string.resp_ghs_classificacao, it)) }
             } else {
-                blocos += Bloco.Paragrafo("O pacote de dados não traz classificação GHS harmonizada para ${c.nomeExibicao}. Isso não significa que a substância seja segura.")
+                blocos += Bloco.Paragrafo(t(R.string.resp_sem_ghs, nomeDe(c)))
             }
-            blocos += Bloco.Aviso("Antes de usar, leia a ficha de segurança (FISPQ) do fabricante e use os equipamentos de proteção indicados. Este app não substitui a ficha.")
+            blocos += Bloco.Aviso(t(R.string.resp_fispq_aviso))
             fontes = c.fontes
-            acoes += Acao.AbrirComposto(c.cid, "Abrir a ficha de ${c.nomeExibicao}")
-            c.icscBuscaUrl?.let { acoes += Acao.AbrirUrl(it, "Ficha ICSC no site da OIT") }
+            acoes += acaoFichaComposto(c)
+            c.icscBuscaUrl?.let { acoes += acaoIcsc(it) }
         } else if (e != null) {
-            titulo = "Segurança: ${e.nome}"
-            blocos += Bloco.Paragrafo("O pacote de dados não traz classificação de perigo para elementos isolados. Consulte a ficha de segurança do material específico (a forma química importa: ${e.nome} metálico, óxido e sais têm perigos diferentes).")
+            titulo = t(R.string.resp_seguranca_titulo, nomeDe(e))
+            blocos += Bloco.Paragrafo(t(R.string.resp_seguranca_elemento, nomeDe(e)))
             fontes = e.fontes
-            acoes += Acao.AbrirElemento(e.z, "Abrir a ficha de ${e.nome}")
+            acoes += acaoFichaElemento(e)
         } else {
-            titulo = "Segurança química e GHS"
-            blocos += Bloco.Paragrafo("O GHS é o sistema internacional que padroniza pictogramas, palavras de sinal e frases de perigo (H). Estes são os nove pictogramas:")
-            blocos += Bloco.Lista(GhsTextos.PICTOGRAMAS.entries.sortedBy { it.key }.map { "${it.key}: ${it.value.first} (${it.value.second})" })
-            fontes = listOf(Fonte(GhsTextos.FONTE_NOME, licenca = GhsTextos.FONTE_LICENCA))
+            titulo = t(R.string.resp_seguranca_geral_titulo)
+            blocos += Bloco.Paragrafo(t(R.string.resp_seguranca_geral_intro))
+            blocos += Bloco.Lista(GhsPictogramas.CODIGOS.map { "$it: ${t(GhsPictogramas.desenho(it))} (${t(GhsPictogramas.descricao(it))})" })
+            fontes = listOf(Fonte(t(R.string.fonte_ghs_nome), licenca = t(R.string.fonte_ghs_licenca)))
         }
-        blocos += Bloco.Paragrafo("Em caso de exposição ou acidente, procure atendimento: SAMU 192, Bombeiros 193 ou Disque-Intoxicação 0800 722 6001 (Brasil).")
-        acoes += Acao.AbrirSeguranca()
-        return Resposta(Intent.SEGURANCA, titulo, blocos, fontes = fontes.ifEmpty { fontesDoPacote() }, acoes = acoes, sugestoes = Seguranca.SUGESTOES_SEGURAS.take(0))
+        blocos += Bloco.Paragrafo(t(R.string.resp_emergencia))
+        acoes += acaoSeguranca()
+        return Resposta(Intent.SEGURANCA, titulo, blocos, fontes = fontes.ifEmpty { fontesDoPacote() }, acoes = acoes, sugestoes = emptyList())
     }
 
     internal fun textosH(doComposto: Map<String, String>): Map<String, String> {
@@ -412,7 +472,7 @@ class AnswerBuilder(
     private suspend fun naoEntendi(q: ParsedQuery): Resposta = respostaNaoEntendi(q)
 
     internal fun semDado(q: ParsedQuery, mensagem: String): Resposta = Resposta(
-        q.intent, "Não encontrei esse dado", listOf(Bloco.Paragrafo(mensagem)),
+        q.intent, t(R.string.resp_sem_dado_titulo), listOf(Bloco.Paragrafo(mensagem)),
         sugestoes = emptyList(), entendida = false
     )
 }

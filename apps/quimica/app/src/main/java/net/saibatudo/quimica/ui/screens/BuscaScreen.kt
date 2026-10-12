@@ -32,7 +32,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import net.saibatudo.quimica.R
 import net.saibatudo.quimica.ai.nlu.ResultadoBusca
+import net.saibatudo.quimica.ui.LocalTextos
 
 /** Busca de elementos e compostos por nome (PT, EN, IUPAC), símbolo, fórmula, CAS ou CID. */
 @Composable
@@ -43,6 +45,7 @@ fun BuscaScreen(
     onAbrirComposto: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val t = LocalTextos.current
     var consulta by rememberSaveable { mutableStateOf("") }
     var resultados by remember { mutableStateOf<List<ResultadoBusca>>(emptyList()) }
     LaunchedEffect(consulta, pronto) {
@@ -54,26 +57,26 @@ fun BuscaScreen(
         OutlinedTextField(
             value = consulta, onValueChange = { consulta = it.take(80) }, singleLine = true,
             modifier = Modifier.fillMaxWidth().padding(16.dp),
-            label = { Text("Nome, símbolo, fórmula, CAS ou CID") }, placeholder = { Text("Ex.: etanol, Fe, H2SO4, 64-17-5") },
+            label = { Text(t(R.string.ui_busca_rotulo)) }, placeholder = { Text(t(R.string.ui_busca_exemplo)) },
             leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
-            trailingIcon = { if (consulta.isNotEmpty()) IconButton(onClick = { consulta = "" }) { Icon(Icons.Filled.Clear, contentDescription = "Limpar a busca") } }
+            trailingIcon = { if (consulta.isNotEmpty()) IconButton(onClick = { consulta = "" }) { Icon(Icons.Filled.Clear, contentDescription = t(R.string.ui_busca_limpar)) } }
         )
         when {
-            !pronto -> Text("Carregando os dados…", Modifier.padding(16.dp))
+            !pronto -> Text(t(R.string.ui_tabela_carregando), Modifier.padding(16.dp))
             consulta.isBlank() -> Text(
-                "Digite para procurar entre os elementos e os compostos do pacote de dados. Funciona sem internet.",
+                t(R.string.ui_busca_dica),
                 Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            resultados.isEmpty() -> Text("Nada encontrado para \"$consulta\". Tente o nome em inglês, a fórmula ou o número CAS.", Modifier.padding(horizontal = 16.dp))
+            resultados.isEmpty() -> Text(t(R.string.ui_busca_nada, consulta), Modifier.padding(horizontal = 16.dp))
             else -> LazyColumn(Modifier.fillMaxSize()) {
                 items(resultados, key = { (if (it.ehElemento) "e" else "c") + (it.z ?: it.cid) }) { r ->
                     Column(
                         Modifier.fillMaxWidth().clickable { if (r.ehElemento) onAbrirElemento(r.z!!) else onAbrirComposto(r.cid!!) }
-                            .semantics(mergeDescendants = true) { contentDescription = "${if (r.ehElemento) "Elemento" else "Composto"} ${r.titulo}, ${r.detalhe}" }
+                            .semantics(mergeDescendants = true) { contentDescription = t(if (r.ehElemento) R.string.ui_busca_elemento_desc else R.string.ui_busca_composto_desc, r.titulo, r.detalhe) }
                             .padding(horizontal = 16.dp, vertical = 10.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Text(if (r.ehElemento) "Elemento" else "Composto", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+                            Text(t(if (r.ehElemento) R.string.ui_titulo_elemento else R.string.ui_titulo_composto), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
                             Text(r.titulo, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
                         }
                         Text(r.detalhe, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)

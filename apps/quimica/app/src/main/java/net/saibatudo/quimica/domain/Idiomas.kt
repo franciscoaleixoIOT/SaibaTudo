@@ -32,4 +32,14 @@ object Idiomas {
     fun separadorDecimal(idioma: String): Char = if (normalizar(idioma) == "en") '.' else ','
 
     fun locale(idioma: String): Locale = Locale.forLanguageTag(normalizar(idioma) ?: PADRAO)
+
+    /**
+     * Primeira letra minúscula no meio da frase ("Ponto de fusão" → "ponto de fusão"), exceto no alemão, que mantém a maiúscula dos substantivos
+     * (catálogo `regras.minusculaNoMeio` do site); siglas e fórmulas ("CID 962", "DDT", "H₂O") ficam como estão.
+     */
+    fun minusNoMeio(s: String, idioma: String): String {
+        if (s.isEmpty() || normalizar(idioma) == "de") return s
+        if (s.length >= 2 && s[0] in 'A'..'Z' && s[1] in 'A'..'Z' || s.take(3).any { it.isDigit() }) return s
+        return s.replaceFirstChar { it.lowercase(locale(idioma)) }
+    }
 }

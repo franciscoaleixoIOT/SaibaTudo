@@ -167,9 +167,11 @@ Etapas (A–F em `I18N.md` §9):
       `Seguranca`, `Dicionario`, `Propriedades`, `Pacote` (lotes + `textoPorIdioma`) por idioma; seletor em Configurações
       (`LocaleManager`/`attachBaseContext`, `locales_config.xml`); `bundle.language.enableSplit = false`; snapshot de assets
       atualizado (2.744 → 55 arquivos; APK debug +0,5 MB); golden e segurança por idioma no mesmo contrato.
-- [ ] **E (strings)** Android: ~770 textos fixos do Kotlin (recusas, sugestões, telas, moldes em `ai/answer/Moldes.kt`) ainda
-      saem em português em qualquer idioma; externalizar para `strings.xml` + `values-{en,es,de,fr}`; rótulo de reserva
-      ("nome em inglês"); calculadoras chamam `lerNumero` sem idioma.
+- [x] **E (strings)** Android (12/10): 818 strings + 3 plurais em `res/values{,-en,-es,-de,-fr}/strings.xml` (única fonte;
+      `domain/Textos.kt`, `ui/RecursosAndroid.kt`, testes leem o XML do disco sem Robolectric); rótulo de reserva de nome;
+      números/datas por idioma; 124 testes, lint 0 erros; APK debug +0,97 MB (`resources.arsc`). Falta: pistas de cálculo só em
+      pt no `AnswerBuilder` ("ácido forte", "final", CNTP, "misturar") → mover para `contracts/lexico`; letra da célula da tabela
+      (`CategoriaElemento.letra`) ainda é a inicial em português; revisão nativa (níveis de ensino, sugestões em fr, "paquet de données").
 - [ ] Miúdos do site achados na etapa D: `ligarQuantidades` exige preposição (alemão "4 g H2 und 16 g O2"); quantidade só aceita
       ASCII no 1º token ("20 degrés Celsius"); nomes de elemento com < 3 letras ("or", ouro em fr) não entram no dicionário;
       "radio" (Ra) vence "radio atómico"; aproximação faz "Francia" virar frâncio; `calc/gas.js` baixa "Druck"/"Volumen";

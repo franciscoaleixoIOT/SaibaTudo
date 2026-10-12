@@ -32,10 +32,12 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import net.saibatudo.quimica.R
 import net.saibatudo.quimica.ai.model.Acao
 import net.saibatudo.quimica.ai.model.Bloco
 import net.saibatudo.quimica.ai.model.OrigemResposta
 import net.saibatudo.quimica.ai.model.Resposta
+import net.saibatudo.quimica.ui.LocalTextos
 
 /** Uma resposta do motor local: título, blocos, fontes, atalhos e perguntas sugeridas. */
 @OptIn(ExperimentalLayoutApi::class)
@@ -48,6 +50,7 @@ fun RespostaView(
     modifier: Modifier = Modifier
 ) {
     val area = LocalClipboardManager.current
+    val t = LocalTextos.current
     Cartao(modifier) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(
@@ -55,14 +58,14 @@ fun RespostaView(
                 fontWeight = FontWeight.SemiBold,
                 color = if (resposta.recusa) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
             )
-            IconButton(onClick = { area.setText(AnnotatedString(resposta.texto())) }) {
-                Icon(Icons.Filled.ContentCopy, contentDescription = "Copiar a resposta")
+            IconButton(onClick = { area.setText(AnnotatedString(resposta.texto(t))) }) {
+                Icon(Icons.Filled.ContentCopy, contentDescription = t(R.string.ui_copiar_resposta))
             }
         }
         resposta.blocos.forEach { BlocoView(it, onAbrirUrl) }
         FontesView(resposta.fontes, onAbrirUrl)
         Text(
-            if (resposta.origem == OrigemResposta.LOCAL) "Calculado no aparelho a partir do pacote de dados assinado. Nenhuma IA gerou estes números." else resposta.origem.rotulo,
+            if (resposta.origem == OrigemResposta.LOCAL) t(R.string.ui_origem_local) else t(resposta.origem.rotulo),
             style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         if (resposta.acoes.isNotEmpty()) {
@@ -71,7 +74,7 @@ fun RespostaView(
             }
         }
         if (resposta.sugestoes.isNotEmpty()) {
-            Text("Experimente perguntar:", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(t(R.string.ui_experimente_perguntar_dois_pontos), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 resposta.sugestoes.forEach { s -> SuggestionChip(onClick = { onSugestao(s) }, label = { Text(s) }) }
             }
@@ -106,12 +109,13 @@ fun BlocoView(bloco: Bloco, onAbrirUrl: (String) -> Unit) {
 /** Passo a passo recolhível: começa aberto, para a pessoa ver a conta. */
 @Composable
 fun PassosView(titulo: String, passos: List<String>) {
+    val t = LocalTextos.current
     var aberto by rememberSaveable { mutableStateOf(true) }
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
             Text(titulo, Modifier.semantics { heading() }, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
             TextButton(onClick = { aberto = !aberto }) {
-                Text(if (aberto) "Recolher" else "Mostrar")
+                Text(t(if (aberto) R.string.ui_recolher else R.string.ui_mostrar))
                 Icon(if (aberto) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore, contentDescription = null)
             }
         }

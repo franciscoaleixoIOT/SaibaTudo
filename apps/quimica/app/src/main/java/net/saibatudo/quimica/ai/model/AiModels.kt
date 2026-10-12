@@ -1,7 +1,10 @@
 package net.saibatudo.quimica.ai.model
 
+import androidx.annotation.StringRes
+import net.saibatudo.quimica.R
 import net.saibatudo.quimica.data.model.Fonte
 import net.saibatudo.quimica.data.model.Ghs
+import net.saibatudo.quimica.domain.Textos
 
 /**
  * Intenções reconhecidas (docs/DATA_CONTRACT.md §8). O NLU só produz uma [ParsedQuery]; TODA resposta factual é montada
@@ -75,20 +78,20 @@ data class ParsedQuery(
     val herdado: Boolean = false
 )
 
-enum class OrigemResposta(val rotulo: String) {
-    LOCAL("Resposta local • dados do pacote"),
-    AVISO("Aviso")
+enum class OrigemResposta(@param:StringRes val rotulo: Int) {
+    LOCAL(R.string.origem_local),
+    AVISO(R.string.origem_aviso)
 }
 
 /** Calculadoras do app, para os atalhos "Abrir calculadora". */
-enum class TipoCalculadora(val rotulo: String) {
-    MASSA_MOLAR("Massa molar"),
-    BALANCEAMENTO("Balanceamento"),
-    ESTEQUIOMETRIA("Estequiometria"),
-    CONCENTRACAO("Concentração e diluição"),
-    PH("pH de ácidos e bases"),
-    GAS_IDEAL("Gás ideal"),
-    UNIDADES("Conversão de unidades")
+enum class TipoCalculadora(@param:StringRes val rotulo: Int) {
+    MASSA_MOLAR(R.string.calculadora_massa_molar),
+    BALANCEAMENTO(R.string.calculadora_balanceamento),
+    ESTEQUIOMETRIA(R.string.calculadora_estequiometria),
+    CONCENTRACAO(R.string.calculadora_concentracao),
+    PH(R.string.calculadora_ph),
+    GAS_IDEAL(R.string.calculadora_gas_ideal),
+    UNIDADES(R.string.calculadora_unidades)
 }
 
 sealed interface Bloco {
@@ -108,9 +111,9 @@ sealed interface Acao {
     data class AbrirElemento(val z: Int, override val rotulo: String) : Acao
     data class AbrirComposto(val cid: Long, override val rotulo: String) : Acao
     data class AbrirCalculadora(val tipo: TipoCalculadora, override val rotulo: String, val preenchimento: Map<String, String> = emptyMap()) : Acao
-    data class AbrirTabela(override val rotulo: String = "Abrir a tabela periódica") : Acao
-    data class AbrirSobreDados(override val rotulo: String = "Abrir \"Sobre os dados\"") : Acao
-    data class AbrirSeguranca(override val rotulo: String = "Entender o GHS e os pictogramas") : Acao
+    data class AbrirTabela(override val rotulo: String) : Acao
+    data class AbrirSobreDados(override val rotulo: String) : Acao
+    data class AbrirSeguranca(override val rotulo: String) : Acao
     data class AbrirUrl(val url: String, override val rotulo: String) : Acao
 }
 
@@ -128,8 +131,8 @@ data class Resposta(
     /** false = o app não entendeu ou não tem o dado. */
     val entendida: Boolean = true
 ) {
-    /** Texto simples (testes, acessibilidade e compartilhamento): título, blocos e fontes. */
-    fun texto(): String = buildString {
+    /** Texto simples (copiar, acessibilidade e testes): título, blocos e fontes, com os rótulos no idioma de [t]. */
+    fun texto(t: Textos): String = buildString {
         append(titulo)
         for (b in blocos) {
             append('\n')
@@ -139,15 +142,15 @@ data class Resposta(
                 is Bloco.Lista -> append(b.itens.joinToString("\n") { "• $it" })
                 is Bloco.Passos -> append(b.titulo).append('\n').append(b.passos.joinToString("\n") { "• $it" })
                 is Bloco.Destaque -> append(b.texto)
-                is Bloco.Estrutura -> append("Estrutura 2D: ").append(b.descricao)
+                is Bloco.Estrutura -> append(t(R.string.texto_estrutura_2d, b.descricao))
                 is Bloco.Aviso -> append(b.texto)
                 is Bloco.GhsBloco -> {
-                    append("GHS: ").append(b.ghs.pictogramas.joinToString(", "))
-                    b.ghs.palavraSinal?.let { append(" – ").append(it) }
-                    if (b.ghs.frasesH.isNotEmpty()) append('\n').append(b.ghs.frasesH.joinToString("; ") { c -> c + (b.textosH[c]?.let { t -> " ($t)" } ?: "") })
+                    append(t(R.string.texto_ghs, b.ghs.pictogramas.joinToString(", ")))
+                    b.ghs.palavraSinal?.let { append(" – ").append(t.palavraSinal(it)) }
+                    if (b.ghs.frasesH.isNotEmpty()) append('\n').append(b.ghs.frasesH.joinToString("; ") { c -> c + (b.textosH[c]?.let { h -> " ($h)" } ?: "") })
                 }
             }
         }
-        if (fontes.isNotEmpty()) append("\nFonte: ").append(fontes.joinToString("; ") { it.rotulo() })
+        if (fontes.isNotEmpty()) append('\n').append(t(R.string.texto_fonte, fontes.joinToString("; ") { it.rotulo() }))
     }
 }

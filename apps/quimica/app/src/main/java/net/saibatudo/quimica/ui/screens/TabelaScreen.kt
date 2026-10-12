@@ -1,5 +1,6 @@
 package net.saibatudo.quimica.ui.screens
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -41,14 +42,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import net.saibatudo.quimica.R
 import net.saibatudo.quimica.data.model.CategoriaElemento
 import net.saibatudo.quimica.data.model.Elemento
 import net.saibatudo.quimica.data.model.EstadoFisico
 import net.saibatudo.quimica.data.repository.Pacote
+import net.saibatudo.quimica.domain.Nomes
 import net.saibatudo.quimica.domain.Propriedades
+import net.saibatudo.quimica.ui.LocalTextos
 import net.saibatudo.quimica.ui.theme.LocalTemaEscuro
 
-private enum class ModoCor(val rotulo: String) { CATEGORIA("Categoria"), ESTADO("Estado"), BLOCO("Bloco") }
+private enum class ModoCor(@param:StringRes val rotulo: Int) {
+    CATEGORIA(R.string.ui_tabela_modo_categoria), ESTADO(R.string.ui_tabela_modo_estado), BLOCO(R.string.ui_tabela_modo_bloco)
+}
 
 private data class CorCelula(val fundo: Color, val texto: Color)
 
@@ -101,11 +107,12 @@ private fun corDe(modo: ModoCor, el: Elemento, escuro: Boolean) = when (modo) {
 @Composable
 fun TabelaScreen(pacote: Pacote?, onAbrirElemento: (Int) -> Unit, modifier: Modifier = Modifier) {
     val escuro = LocalTemaEscuro.current
+    val t = LocalTextos.current
     var modo by rememberSaveable { mutableStateOf(ModoCor.CATEGORIA) }
     var filtro by rememberSaveable { mutableStateOf<String?>(null) }
 
     if (pacote == null) {
-        Text("Carregando os dados…", modifier.padding(16.dp))
+        Text(t(R.string.ui_tabela_carregando), modifier.padding(16.dp))
         return
     }
     val elementos = pacote.elementos
@@ -118,22 +125,22 @@ fun TabelaScreen(pacote: Pacote?, onAbrirElemento: (Int) -> Unit, modifier: Modi
     val maxGrupo = (principais.maxOfOrNull { it.grupo!! } ?: 18).coerceAtLeast(1)
 
     // legenda = filtro: só aparece o que existe nos dados
-    val legenda: List<Pair<String, String>> = remember(modo, elementos) {
+    val legenda: List<Pair<String, String>> = remember(modo, elementos, t) {
         when (modo) {
-            ModoCor.CATEGORIA -> CategoriaElemento.entries.filter { c -> elementos.any { it.categoria == c } }.map { it.id to it.rotulo }
-            ModoCor.ESTADO -> EstadoFisico.entries.filter { s -> elementos.any { it.estadoPadrao == s } }.map { it.id to it.rotulo }
-            ModoCor.BLOCO -> listOf("s", "p", "d", "f").filter { b -> elementos.any { it.bloco == b } }.map { it to "Bloco $it" }
+            ModoCor.CATEGORIA -> CategoriaElemento.entries.filter { c -> elementos.any { it.categoria == c } }.map { it.id to t(it.rotulo) }
+            ModoCor.ESTADO -> EstadoFisico.entries.filter { s -> elementos.any { it.estadoPadrao == s } }.map { it.id to t(it.rotulo) }
+            ModoCor.BLOCO -> listOf("s", "p", "d", "f").filter { b -> elementos.any { it.bloco == b } }.map { it to t(R.string.ui_tabela_bloco_n, it) }
         }
     }
 
     Column(modifier.fillMaxSize()) {
         Column(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text("Tabela periódica", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, modifier = Modifier.semantics { heading() })
-            Text("Toque num elemento para abrir a ficha. Toque na legenda para destacar um grupo.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(t(R.string.ui_tabela_titulo), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, modifier = Modifier.semantics { heading() })
+            Text(t(R.string.ui_tabela_instrucao), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text("Colorir por", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(t(R.string.ui_tabela_colorir_por), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 ModoCor.entries.forEach { m ->
-                    FilterChip(selected = m == modo, onClick = { modo = m; filtro = null }, label = { Text(m.rotulo) })
+                    FilterChip(selected = m == modo, onClick = { modo = m; filtro = null }, label = { Text(t(m.rotulo)) })
                 }
             }
             FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -157,14 +164,14 @@ fun TabelaScreen(pacote: Pacote?, onAbrirElemento: (Int) -> Unit, modifier: Modi
                 Row(horizontalArrangement = Arrangement.spacedBy(CELULA_ESPACO)) {
                     Box(Modifier.width(RotuloLargura))
                     for (g in 1..maxGrupo) {
-                        Box(Modifier.width(CELULA_W).semantics { contentDescription = "Grupo $g" }, contentAlignment = Alignment.Center) {
+                        Box(Modifier.width(CELULA_W).semantics { contentDescription = t(R.string.ui_tabela_grupo_n, g) }, contentAlignment = Alignment.Center) {
                             Text("$g", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                 }
                 for (p in 1..maxPeriodo) {
                     Row(horizontalArrangement = Arrangement.spacedBy(CELULA_ESPACO), verticalAlignment = Alignment.CenterVertically) {
-                        Box(Modifier.width(RotuloLargura).semantics { contentDescription = "Período $p" }, contentAlignment = Alignment.Center) {
+                        Box(Modifier.width(RotuloLargura).semantics { contentDescription = t(R.string.ui_tabela_periodo_n, p) }, contentAlignment = Alignment.Center) {
                             Text("$p", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         for (g in 1..maxGrupo) {
@@ -177,10 +184,10 @@ fun TabelaScreen(pacote: Pacote?, onAbrirElemento: (Int) -> Unit, modifier: Modi
                 }
                 if (lantanideos.isNotEmpty() || actinideos.isNotEmpty()) {
                     Box(Modifier.height(8.dp))
-                    if (lantanideos.isNotEmpty()) LinhaSerie("Lantanídeos", lantanideos, modo, filtro, escuro, onAbrirElemento)
-                    if (actinideos.isNotEmpty()) LinhaSerie("Actinídeos", actinideos, modo, filtro, escuro, onAbrirElemento)
+                    if (lantanideos.isNotEmpty()) LinhaSerie(t(R.string.ui_tabela_serie_lantanideos), lantanideos, modo, filtro, escuro, onAbrirElemento)
+                    if (actinideos.isNotEmpty()) LinhaSerie(t(R.string.ui_tabela_serie_actinideos), actinideos, modo, filtro, escuro, onAbrirElemento)
                 }
-                if (sem.isNotEmpty()) LinhaSerie("Outros", sem, modo, filtro, escuro, onAbrirElemento)
+                if (sem.isNotEmpty()) LinhaSerie(t(R.string.ui_tabela_serie_outros), sem, modo, filtro, escuro, onAbrirElemento)
             }
         }
     }
@@ -204,10 +211,12 @@ private fun LinhaSerie(titulo: String, lista: List<Elemento>, modo: ModoCor, fil
 
 @Composable
 private fun MarcadorSerie(lista: List<Elemento>, escuro: Boolean) {
+    val t = LocalTextos.current
     val c = corCategoria(lista.first().categoria, escuro)
+    val serie = t(if (lista.first().categoria == CategoriaElemento.LANTANIDEO) R.string.ui_tabela_serie_lantanideos else R.string.ui_tabela_serie_actinideos)
     Box(
         Modifier.size(CELULA_W, CELULA_H).clip(RoundedCornerShape(6.dp)).background(c.fundo.copy(alpha = 0.45f))
-            .semantics { contentDescription = "${lista.first().categoria.rotulo}s, elementos ${lista.first().z} a ${lista.last().z}, mostrados abaixo da tabela" },
+            .semantics { contentDescription = t(R.string.ui_tabela_serie_descricao, serie, lista.first().z, lista.last().z) },
         contentAlignment = Alignment.Center
     ) {
         Text("${lista.first().z}–${lista.last().z}", fontSize = 10.sp, color = c.texto, textAlign = TextAlign.Center)
@@ -216,22 +225,25 @@ private fun MarcadorSerie(lista: List<Elemento>, escuro: Boolean) {
 
 @Composable
 private fun Celula(e: Elemento, modo: ModoCor, filtro: String?, escuro: Boolean, onAbrir: (Int) -> Unit) {
+    val t = LocalTextos.current
     val c = corDe(modo, e, escuro)
     val destacado = filtro == null || chaveDe(modo, e) == filtro
+    val nomeNoIdioma = Nomes.elemento(e, t.idioma)
+    val nome = t.nomeRotulado(nomeNoIdioma)
     val descricao = buildString {
-        append("${e.nome}, símbolo ${e.simbolo}, número atômico ${e.z}, ${Propriedades.rotuloCategoria(e.categoria)}")
-        if (e.estadoPadrao != EstadoFisico.DESCONHECIDO) append(", ${e.estadoPadrao.rotulo.lowercase()}")
-        e.massaAtomica?.let { append(", massa atômica ${net.saibatudo.quimica.domain.Texto.numero(it, 4)}") }
+        append(t(R.string.ui_elemento_descricao, nome, e.simbolo, e.z, Propriedades.rotuloCategoria(e.categoria, t)))
+        if (e.estadoPadrao != EstadoFisico.DESCONHECIDO) append(", ").append(t(e.estadoPadrao.meio))
+        e.massaAtomica?.let { append(", ").append(t(R.string.ui_tabela_celula_massa, t.num(it, 4))) }
     }
     Box(
         Modifier.size(CELULA_W, CELULA_H).alpha(if (destacado) 1f else 0.25f).clip(RoundedCornerShape(6.dp)).background(c.fundo)
-            .clickable(role = Role.Button, onClickLabel = "Abrir a ficha de ${e.nome}") { onAbrir(e.z) }
+            .clickable(role = Role.Button, onClickLabel = t(R.string.ui_tabela_abrir_ficha, nome)) { onAbrir(e.z) }
             .semantics(mergeDescendants = true) { contentDescription = descricao; role = Role.Button }
     ) {
         Text("${e.z}", Modifier.align(Alignment.TopStart).padding(start = 3.dp, top = 2.dp), fontSize = 9.sp, color = c.texto)
         Text(e.simbolo, Modifier.align(Alignment.Center), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = c.texto)
         Text(
-            abreviar(e.nome), Modifier.align(Alignment.BottomCenter).padding(bottom = 2.dp), fontSize = 8.sp, color = c.texto, maxLines = 1, textAlign = TextAlign.Center
+            abreviar(nomeNoIdioma.nome), Modifier.align(Alignment.BottomCenter).padding(bottom = 2.dp), fontSize = 8.sp, color = c.texto, maxLines = 1, textAlign = TextAlign.Center
         )
         if (modo == ModoCor.CATEGORIA) {
             Text(e.categoria.letra, Modifier.align(Alignment.TopEnd).padding(end = 3.dp, top = 2.dp), fontSize = 8.sp, color = c.texto)

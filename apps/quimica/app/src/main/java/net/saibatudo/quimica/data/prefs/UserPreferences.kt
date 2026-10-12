@@ -1,6 +1,7 @@
 package net.saibatudo.quimica.data.prefs
 
 import android.content.Context
+import androidx.annotation.StringRes
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
@@ -12,18 +13,19 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import net.saibatudo.quimica.R
 
-enum class TemaApp(val rotulo: String) { SISTEMA("Seguir o sistema"), CLARO("Claro"), ESCURO("Escuro") }
+enum class TemaApp(@param:StringRes val rotulo: Int) { SISTEMA(R.string.tema_sistema), CLARO(R.string.tema_claro), ESCURO(R.string.tema_escuro) }
 
-enum class TamanhoFonte(val rotulo: String, val fator: Float) {
-    PEQUENA("Pequeno", 0.9f), NORMAL("Normal", 1f), GRANDE("Grande", 1.15f), MUITO_GRANDE("Muito grande", 1.3f)
+enum class TamanhoFonte(@param:StringRes val rotulo: Int, val fator: Float) {
+    PEQUENA(R.string.fonte_pequena, 0.9f), NORMAL(R.string.fonte_normal, 1f), GRANDE(R.string.fonte_grande, 1.15f), MUITO_GRANDE(R.string.fonte_muito_grande, 1.3f)
 }
 
 /** Nível de detalhe das explicações e fichas: fundamental, médio ou superior. */
-enum class Nivel(val id: String, val rotulo: String, val descricao: String) {
-    FUNDAMENTAL("fundamental", "Fundamental", "Fichas enxutas e passos explicados com calma"),
-    MEDIO("medio", "Médio", "O conjunto usual de propriedades e passos"),
-    SUPERIOR("superior", "Superior", "Todas as propriedades, notas e detalhes dos cálculos");
+enum class Nivel(val id: String, @param:StringRes val rotulo: Int, @param:StringRes val descricao: Int) {
+    FUNDAMENTAL("fundamental", R.string.nivel_fundamental, R.string.nivel_fundamental_descricao),
+    MEDIO("medio", R.string.nivel_medio, R.string.nivel_medio_descricao),
+    SUPERIOR("superior", R.string.nivel_superior, R.string.nivel_superior_descricao);
 
     companion object {
         fun de(id: String?): Nivel = entries.firstOrNull { it.id == id } ?: MEDIO

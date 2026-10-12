@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.saibatudo.quimica.R
 import net.saibatudo.quimica.SaibaTudoApp
 import net.saibatudo.quimica.data.prefs.PreferencesStore
 import net.saibatudo.quimica.data.repository.QuimicaDataStore
@@ -53,14 +54,14 @@ class UpdateCoordinator(
     private suspend fun verificarSerializado(forcar: Boolean): UpdateResult {
         val p = prefs.atual()
         if (p.economiaDeDados && redeComFranquia() && !forcar) {
-            return UpdateResult.Skipped("economia de dados: aguardando Wi-Fi")
+            return UpdateResult.Skipped(R.string.atualizacao_economia_dados)
         }
         // 90% do intervalo: o WorkManager periódico pode disparar um pouco antes do prazo exato
         val intervaloMs = (intervaloMinutos() * 60_000L * 9) / 10
         if (!forcar && agora() - p.ultimaVerificacaoDados < intervaloMs) {
-            return UpdateResult.Skipped("verificado há pouco")
+            return UpdateResult.Skipped(R.string.atualizacao_verificado_pouco)
         }
-        if (!forcar && agora() - ultimaFalha < 60 * 60_000L) return UpdateResult.Skipped("nova tentativa em breve")
+        if (!forcar && agora() - ultimaFalha < 60 * 60_000L) return UpdateResult.Skipped(R.string.atualizacao_nova_tentativa)
         _estado.value = EstadoAtualizacao.Verificando
         val r = updater.atualizar()
         if (r is UpdateResult.Failed) ultimaFalha = agora()

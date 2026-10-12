@@ -7,6 +7,7 @@ import kotlinx.coroutines.withContext
 import net.saibatudo.quimica.data.bundle.BundleManifest
 import net.saibatudo.quimica.data.bundle.BundleReader
 import net.saibatudo.quimica.data.bundle.ManifestVerifier
+import net.saibatudo.quimica.data.bundle.OrigemPacote
 import net.saibatudo.quimica.data.model.CompostoIndice
 import net.saibatudo.quimica.data.model.Composto
 import net.saibatudo.quimica.data.model.Constante
@@ -27,7 +28,7 @@ import net.saibatudo.quimica.domain.Texto
  */
 class Pacote(
     val manifest: BundleManifest,
-    val origem: String,
+    val origem: OrigemPacote,
     val elementos: List<Elemento>,
     val constantes: List<Constante>,
     val regras: Regras,

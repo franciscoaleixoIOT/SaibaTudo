@@ -15,6 +15,8 @@ import net.saibatudo.quimica.data.prefs.DataStorePreferences
 import net.saibatudo.quimica.data.prefs.PreferencesStore
 import net.saibatudo.quimica.data.remote.HttpClientFactory
 import net.saibatudo.quimica.data.repository.QuimicaDataStore
+import net.saibatudo.quimica.domain.FonteDeTextos
+import net.saibatudo.quimica.ui.RecursosAndroid
 import okhttp3.OkHttpClient
 
 /** Contêiner de dependências do app (injeção manual). */
@@ -23,6 +25,9 @@ class AppContainer(private val app: Context) {
 
     /** Único cliente HTTP do app: usado só pela atualização assinada do pacote de dados. */
     val http: OkHttpClient by lazy { HttpClientFactory.criar(BuildConfig.VERSION_NAME) }
+
+    /** Textos do app (res/values-<idioma>/strings.xml) por idioma: respostas, dicionário e telas. */
+    val recursos: FonteDeTextos by lazy { RecursosAndroid(app) }
 
     val preferencias: PreferencesStore by lazy { DataStorePreferences(app) }
     private val verificador: ManifestVerifier by lazy { ManifestVerifier(BuildConfig.DATA_PUBLIC_KEY) }

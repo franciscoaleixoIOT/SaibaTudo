@@ -1,9 +1,26 @@
 package net.saibatudo.quimica.domain.calc
 
+import androidx.annotation.StringRes
+import net.saibatudo.quimica.R
+import net.saibatudo.quimica.data.model.Elemento
+import net.saibatudo.quimica.domain.Nomes
+import net.saibatudo.quimica.domain.Textos
 import java.text.Normalizer
 
-/** Erro de entrada de cálculo, com mensagem pronta para o usuário (pt-BR). */
-class CalculoInvalido(mensagem: String) : Exception(mensagem)
+/**
+ * Erro de entrada de cálculo. A mensagem é um recurso de `strings.xml` mais os argumentos: o texto sai no idioma de quem a mostra
+ * ([texto]), nunca fixo em quem lançou o erro. Um argumento que seja outro [CalculoInvalido] é resolvido junto (erros aninhados) um [Elemento] vira o nome dele no idioma e uma [GrandezaRef] o nome da grandeza.
+ */
+class CalculoInvalido(@param:StringRes val id: Int, vararg val args: Any?) : Exception("CalculoInvalido($id)") {
+    fun texto(t: Textos): String = t(id, *args.map {
+        when (it) {
+            is CalculoInvalido -> it.texto(t)
+            is Elemento -> t.nomeRotulado(Nomes.elemento(it, t.idioma))   // o nome do elemento no idioma (rotulado se for reserva)
+            is GrandezaRef -> t.grandeza(it.id)
+            else -> it
+        }
+    }.toTypedArray())
+}
 
 /**
  * Fórmula interpretada: contagem de átomos por símbolo (na ordem em que aparecem), carga líquida, o texto normalizado
@@ -99,23 +116,23 @@ object FormulaQuimica {
     fun analisar(texto: String, simbolosValidos: Set<String>? = null): FormulaAnalisada {
         val simbolos = simbolosValidos ?: SIMBOLOS
         val norm = normalizarEntrada(texto)
-        if (norm.isEmpty()) throw CalculoInvalido("Digite uma fórmula, por exemplo H2O.")
+        if (norm.isEmpty()) throw CalculoInvalido(R.string.erro_formula_digite)
         val (corpo, carga) = separarCarga(norm)
-        if (corpo.isEmpty()) throw CalculoInvalido("Fórmula vazia.")
+        if (corpo.isEmpty()) throw CalculoInvalido(R.string.erro_formula_vazia)
         val total = LinkedHashMap<String, Int>()
         var nPartes = 0
         for (bruta in corpo.split('·')) {
             var i = 0
             while (i < bruta.length && bruta[i].isDigit()) i++
-            val coef = if (i == 0) 1 else bruta.substring(0, i).toIntOrNull()?.takeIf { it in 1..MAX_QUANTIDADE } ?: throw CalculoInvalido("Coeficiente inválido em \"$bruta\".")
+            val coef = if (i == 0) 1 else bruta.substring(0, i).toIntOrNull()?.takeIf { it in 1..MAX_QUANTIDADE } ?: throw CalculoInvalido(R.string.erro_coeficiente_invalido, bruta)
             val resto = bruta.substring(i)
-            if (resto.isEmpty()) throw CalculoInvalido("Parte vazia (confira o \"·\" do hidrato).")
+            if (resto.isEmpty()) throw CalculoInvalido(R.string.erro_parte_vazia)
             val grupo = Leitor(resto, simbolos).ler()
-            if (grupo.isEmpty()) throw CalculoInvalido("Fórmula sem elementos: $texto")
+            if (grupo.isEmpty()) throw CalculoInvalido(R.string.erro_formula_sem_elementos, texto)
             nPartes++
             for ((s, n) in grupo) {
                 val novo = total.getOrDefault(s, 0).toLong() + n.toLong() * coef
-                if (novo > MAX_QUANTIDADE) throw CalculoInvalido("Quantidade de átomos grande demais em \"$texto\".")
+                if (novo > MAX_QUANTIDADE) throw CalculoInvalido(R.string.erro_atomos_demais, texto)
                 total[s] = novo.toInt()
             }
         }
@@ -142,14 +159,14 @@ object FormulaQuimica {
                 val c = s[i]
                 when {
                     c == ')' -> {
-                        if (!aninhado) throw CalculoInvalido("Parêntese \")\" sem \"(\" correspondente.")
+                        if (!aninhado) throw CalculoInvalido(R.string.erro_parentese_fecha_sem_abre)
                         return atomos
                     }
                     c == '(' -> {
                         i++
                         val interno = grupo(aninhado = true)
-                        if (i >= s.length || s[i] != ')') throw CalculoInvalido("Parêntese \"(\" sem \")\" correspondente.")
-                        if (interno.isEmpty()) throw CalculoInvalido("Parênteses vazios.")
+                        if (i >= s.length || s[i] != ')') throw CalculoInvalido(R.string.erro_parentese_abre_sem_fecha)
+                        if (interno.isEmpty()) throw CalculoInvalido(R.string.erro_parenteses_vazios)
                         i++
                         val q = contagem()
                         for ((k, v) in interno) atomos[k] = atomos.getOrDefault(k, 0) + v * q
@@ -159,16 +176,16 @@ object FormulaQuimica {
                         val simbolo = when {
                             dois != null && dois in simbolos -> dois
                             c.toString() in simbolos -> c.toString()
-                            else -> throw CalculoInvalido("\"${dois ?: c}\" não é símbolo de elemento.")
+                            else -> throw CalculoInvalido(R.string.erro_nao_e_simbolo, dois ?: c)
                         }
                         i += simbolo.length
                         atomos[simbolo] = atomos.getOrDefault(simbolo, 0) + contagem()
                     }
-                    c in 'a'..'z' -> throw CalculoInvalido("Letra minúscula \"$c\" fora de lugar (símbolos começam com maiúscula, como em \"Na\" e \"Cl\").")
-                    else -> throw CalculoInvalido("Caractere inesperado \"$c\".")
+                    c in 'a'..'z' -> throw CalculoInvalido(R.string.erro_letra_minuscula, c)
+                    else -> throw CalculoInvalido(R.string.erro_caractere_inesperado, c)
                 }
             }
-            if (aninhado) throw CalculoInvalido("Parêntese \"(\" sem \")\" correspondente.")
+            if (aninhado) throw CalculoInvalido(R.string.erro_parentese_abre_sem_fecha)
             return atomos
         }
 
@@ -176,9 +193,9 @@ object FormulaQuimica {
             val ini = i
             while (i < s.length && s[i] in '0'..'9') i++
             if (i == ini) return 1
-            val n = s.substring(ini, i).toLongOrNull() ?: throw CalculoInvalido("Quantidade inválida \"${s.substring(ini, i)}\".")
-            if (n < 1) throw CalculoInvalido("Quantidade inválida \"${s.substring(ini, i)}\".")
-            if (n > MAX_QUANTIDADE) throw CalculoInvalido("Quantidade grande demais.")
+            val n = s.substring(ini, i).toLongOrNull() ?: throw CalculoInvalido(R.string.erro_quantidade_invalida, s.substring(ini, i))
+            if (n < 1) throw CalculoInvalido(R.string.erro_quantidade_invalida, s.substring(ini, i))
+            if (n > MAX_QUANTIDADE) throw CalculoInvalido(R.string.erro_quantidade_grande)
             return n.toInt()
         }
     }

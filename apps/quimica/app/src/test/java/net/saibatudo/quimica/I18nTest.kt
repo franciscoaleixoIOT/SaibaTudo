@@ -36,7 +36,7 @@ class I18nTest {
     private val pastaLexicos = File(TestData.contratos, "lexico")
     private val fixture = TestData.Fixture.pacote
     private val dics = HashMap<String, Dicionario>()
-    private fun dic(idioma: String) = dics.getOrPut(idioma) { runBlocking { Dicionario.criar(fixture, idioma) } }
+    private fun dic(idioma: String) = dics.getOrPut(idioma) { dicionario(fixture, idioma) }
     private fun p(q: String, idioma: String) = LocalNlu.parse(q, dic(idioma))
 
     // ---- léxico ---------------------------------------------------------------------------------------------------------------
@@ -174,7 +174,7 @@ class I18nTest {
         assertTrue("para" in funcionais && "the" in funcionais)
         val pacote = TestData.Melhor.pacote
         for (idioma in Idiomas.TODOS) {
-            val d = runBlocking { Dicionario.criar(pacote, idioma) }
+            val d = dicionario(pacote, idioma)
             for (w in listOf("para", "the", "de", "por")) assertNull("$idioma: '$w' virou composto", d.compostoPorNome(w))
         }
     }
@@ -191,15 +191,15 @@ class I18nTest {
     // ---- propriedades, GHS e textos ------------------------------------------------------------------------------------------
 
     @Test fun rotulosESinonimosDePropriedadePorIdioma() {
-        val en = Propriedades.tabela(fixture.regras, "en").associateBy { it.id }
+        val en = Propriedades.tabela(fixture.regras, Tx.de("en")).associateBy { it.id }
         assertEquals("Molar mass", en.getValue("massaMolar").rotulo)
         assertTrue(en.getValue("massaMolar").sinonimos.containsAll(listOf("molar mass", "molecular weight")))
         assertFalse("sinônimo pt-BR não entra em inglês", "peso molecular" in en.getValue("massaMolar").sinonimos)
-        val es = Propriedades.tabela(fixture.regras, "es").associateBy { it.id }
+        val es = Propriedades.tabela(fixture.regras, Tx.de("es")).associateBy { it.id }
         assertEquals("Masa molar", es.getValue("massaMolar").rotulo)
         // alemão sem rótulo no pacote do fixture: cai para o inglês do pacote
-        assertEquals("Molar mass", Propriedades.tabela(fixture.regras, "de").first { it.id == "massaMolar" }.rotulo)
-        val pt = Propriedades.tabela(fixture.regras, "pt-BR").associateBy { it.id }
+        assertEquals("Molar mass", Propriedades.tabela(fixture.regras, Tx.de("de")).first { it.id == "massaMolar" }.rotulo)
+        val pt = Propriedades.tabela(fixture.regras, Tx.de("pt-BR")).associateBy { it.id }
         assertEquals("Massa molar", pt.getValue("massaMolar").rotulo)
         assertTrue("peso molecular" in pt.getValue("massaMolar").sinonimos)
     }

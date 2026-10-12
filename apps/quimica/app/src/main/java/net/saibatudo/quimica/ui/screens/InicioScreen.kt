@@ -44,10 +44,12 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import net.saibatudo.quimica.R
 import net.saibatudo.quimica.ai.model.Acao
 import net.saibatudo.quimica.data.repository.EstadoDados
 import net.saibatudo.quimica.ui.components.AvisoBox
 import net.saibatudo.quimica.ui.components.Cartao
+import net.saibatudo.quimica.ui.LocalTextos
 import net.saibatudo.quimica.ui.components.RespostaView
 import net.saibatudo.quimica.ui.viewmodel.Tela
 import net.saibatudo.quimica.ui.viewmodel.UiState
@@ -66,6 +68,7 @@ fun InicioScreen(
     onLimparHistorico: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val t = LocalTextos.current
     var texto by rememberSaveable { mutableStateOf("") }
     val pronto = estado.dados is EstadoDados.Pronto
     val enviar = { if (texto.isNotBlank() && pronto) { onPerguntar(texto) } }
@@ -73,9 +76,9 @@ fun InicioScreen(
     LazyColumn(modifier.fillMaxSize(), contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text("SaibaTudo Química", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, modifier = Modifier.semantics { heading() })
+                Text(t(R.string.app_name), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, modifier = Modifier.semantics { heading() })
                 Text(
-                    "Elementos, compostos, cálculos e segurança química, com fonte em cada resposta.",
+                    t(R.string.ui_inicio_subtitulo),
                     style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -83,11 +86,11 @@ fun InicioScreen(
         item {
             OutlinedTextField(
                 value = texto, onValueChange = { texto = it.take(300) }, modifier = Modifier.fillMaxWidth(),
-                label = { Text("Pergunte sobre um elemento, composto ou cálculo") },
-                placeholder = { Text("Ex.: massa molar da água") },
+                label = { Text(t(R.string.ui_inicio_campo_rotulo)) },
+                placeholder = { Text(t(R.string.ui_inicio_campo_dica)) },
                 trailingIcon = {
                     IconButton(onClick = enviar, enabled = pronto && texto.isNotBlank()) {
-                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Enviar pergunta")
+                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = t(R.string.ui_inicio_enviar))
                     }
                 },
                 singleLine = false, maxLines = 3,
@@ -96,38 +99,40 @@ fun InicioScreen(
             )
         }
         when (val d = estado.dados) {
-            EstadoDados.Carregando -> item { Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) { CircularProgressIndicator(Modifier.padding(4.dp)); Text("Carregando os dados…") } }
-            is EstadoDados.Erro -> item { AvisoBox("Não foi possível carregar o pacote de dados: ${d.mensagem}. Tente atualizar em Mais > Sobre os dados.") }
+            EstadoDados.Carregando -> item { Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) { CircularProgressIndicator(Modifier.padding(4.dp)); Text(t(R.string.ui_inicio_carregando)) } }
+            is EstadoDados.Erro -> item {
+                AvisoBox(d.mensagem?.let { t(R.string.ui_inicio_erro_pacote, it) } ?: t(R.string.ui_inicio_erro_pacote_sem_detalhe))
+            }
             is EstadoDados.Pronto -> Unit
         }
         if (estado.pensando) item { LinearProgressIndicator(Modifier.fillMaxWidth()) }
         estado.resposta?.let { r ->
             item(key = "resposta-" + r.pergunta) {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text("Você perguntou: ${r.pergunta}", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(t(R.string.ui_inicio_voce_perguntou, r.pergunta), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     RespostaView(r.resposta, onAcao = onAcao, onSugestao = { s -> texto = s; onPerguntar(s) }, onAbrirUrl = onAbrirUrl)
-                    TextButton(onClick = { onLimpar(); texto = "" }) { Text("Nova pergunta") }
+                    TextButton(onClick = { onLimpar(); texto = "" }) { Text(t(R.string.ui_inicio_nova_pergunta)) }
                 }
             }
         }
         if (estado.resposta == null) {
             item {
-                Text("Atalhos", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.semantics { heading() })
+                Text(t(R.string.ui_inicio_atalhos), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.semantics { heading() })
             }
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Atalho("Tabela periódica", Icons.Filled.GridView, Modifier.weight(1f)) { onAba(Tela.Tabela) }
-                        Atalho("Buscar", Icons.Filled.Search, Modifier.weight(1f)) { onAba(Tela.Busca) }
+                        Atalho(t(R.string.ui_inicio_atalho_tabela), Icons.Filled.GridView, Modifier.weight(1f)) { onAba(Tela.Tabela) }
+                        Atalho(t(R.string.ui_inicio_atalho_buscar), Icons.Filled.Search, Modifier.weight(1f)) { onAba(Tela.Busca) }
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Atalho("Calculadoras", Icons.Filled.Calculate, Modifier.weight(1f)) { onAba(Tela.Calculadoras) }
-                        Atalho("Segurança e GHS", Icons.Filled.Security, Modifier.weight(1f)) { onAbrir(Tela.Seguranca) }
+                        Atalho(t(R.string.ui_inicio_atalho_calculadoras), Icons.Filled.Calculate, Modifier.weight(1f)) { onAba(Tela.Calculadoras) }
+                        Atalho(t(R.string.ui_inicio_atalho_seguranca), Icons.Filled.Security, Modifier.weight(1f)) { onAbrir(Tela.Seguranca) }
                     }
                 }
             }
             if (estado.sugestoes.isNotEmpty()) {
-                item { Text("Experimente perguntar", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.semantics { heading() }) }
+                item { Text(t(R.string.ui_inicio_experimente), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.semantics { heading() }) }
                 item {
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         estado.sugestoes.forEach { s -> SuggestionChip(onClick = { texto = s; onPerguntar(s) }, label = { Text(s) }) }
@@ -138,8 +143,8 @@ fun InicioScreen(
             if (historico.isNotEmpty()) {
                 item {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Perguntas recentes", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.semantics { heading() })
-                        TextButton(onClick = onLimparHistorico) { Text("Limpar") }
+                        Text(t(R.string.ui_inicio_recentes), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.semantics { heading() })
+                        TextButton(onClick = onLimparHistorico) { Text(t(R.string.ui_inicio_limpar)) }
                     }
                 }
                 items(historico, key = { "h-$it" }) { h ->
@@ -150,7 +155,7 @@ fun InicioScreen(
                 }
             }
             item {
-                AvisoBox("Privacidade: suas perguntas são respondidas neste aparelho e não são enviadas a ninguém. A internet só serve para baixar atualizações assinadas dos dados.")
+                AvisoBox(t(R.string.ui_inicio_privacidade))
             }
         }
     }

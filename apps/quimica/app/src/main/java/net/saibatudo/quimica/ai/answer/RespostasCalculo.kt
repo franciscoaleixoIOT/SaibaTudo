@@ -1,5 +1,6 @@
 package net.saibatudo.quimica.ai.answer
 
+import net.saibatudo.quimica.R
 import net.saibatudo.quimica.ai.model.Acao
 import net.saibatudo.quimica.ai.model.Bloco
 import net.saibatudo.quimica.ai.model.Intent
@@ -10,6 +11,7 @@ import net.saibatudo.quimica.ai.nlu.LocalNlu
 import net.saibatudo.quimica.ai.nlu.Quantidades
 import net.saibatudo.quimica.data.model.Fonte
 import net.saibatudo.quimica.data.model.UnidadeDef
+import net.saibatudo.quimica.domain.Idiomas
 import net.saibatudo.quimica.domain.Texto
 import net.saibatudo.quimica.domain.calc.Balanceador
 import net.saibatudo.quimica.domain.calc.CalculoInvalido
@@ -26,11 +28,9 @@ import net.saibatudo.quimica.domain.calc.Solucoes
 import net.saibatudo.quimica.domain.calc.TipoForte
 import net.saibatudo.quimica.domain.calc.VariavelGas
 
-/** Respostas de cálculo: tudo vem de cálculo local testado (com os passos) e dos dados do pacote. */
+/** Respostas de cálculo: tudo vem de cálculo local testado (com os passos) e dos dados do pacote; os textos, de strings.xml no idioma. */
 
-internal fun fonteCalculo() = Fonte("Cálculo feito no aparelho", licenca = "sem dados de terceiros além das massas e constantes do pacote")
-
-private fun fonteDe(vararg extras: List<Fonte>): List<Fonte> = listOf(fonteCalculo()) + extras.flatMap { it }.distinctBy { it.nome }.take(3)
+private fun AnswerBuilder.fonteDe(vararg extras: List<Fonte>): List<Fonte> = listOf(fonteCalculo()) + extras.flatMap { it }.distinctBy { it.nome }.take(3)
 
 private fun AnswerBuilder.unidadeDe(simbolo: String): UnidadeDef? = un.buscar(simbolo)
 
@@ -44,17 +44,17 @@ internal suspend fun AnswerBuilder.massaMolar(q: ParsedQuery): Resposta {
     val formula = q.formula ?: c?.formula ?: e?.simbolo
     if (formula == null) {
         return Resposta(
-            Intent.MASSA_MOLAR, "Massa molar", listOf(Bloco.Paragrafo("De qual substância? Digite a fórmula (por exemplo, Ca(OH)2 ou CuSO4·5H2O) ou o nome.")),
-            acoes = listOf(Acao.AbrirCalculadora(TipoCalculadora.MASSA_MOLAR, "Abrir a calculadora de massa molar")),
-            sugestoes = listOf("Qual a massa molar da água?", "Massa molar do Ca(OH)2"), entendida = false
+            Intent.MASSA_MOLAR, t(R.string.rot_massa_molar), listOf(Bloco.Paragrafo(t(R.string.resp_mm_de_qual))),
+            acoes = listOf(acaoCalculadora(TipoCalculadora.MASSA_MOLAR)),
+            sugestoes = listOf(t(R.string.sug_massa_molar_agua), t(R.string.sug_massa_molar_caoh2)), entendida = false
         )
     }
     val mm = MassaMolar.calcular(formula, pacote.porSimbolo)
-    val res = mm.comoResultado()
-    val nome = e?.let { "${it.nome} (${it.simbolo})" } ?: c?.nomeExibicao ?: mm.formula.exibicao()
-    val blocos = mutableListOf<Bloco>(Bloco.Destaque("${Texto.fixo(mm.massaMolar, 3)} g/mol"))
+    val res = mm.comoResultado(t)
+    val nome = e?.let { "${nomeDe(it)} (${it.simbolo})" } ?: c?.let { nomeDe(it) } ?: mm.formula.exibicao()
+    val blocos = mutableListOf<Bloco>(Bloco.Destaque("${t.fixo(mm.massaMolar, 3)} g/mol"))
     if (c != null && c.massaMolar != null && kotlin.math.abs(c.massaMolar - mm.massaMolar) > 0.005) {
-        blocos += Bloco.Campo("Valor do pacote (PubChem)", "${Texto.numero(c.massaMolar, 4)} g/mol")
+        blocos += Bloco.Campo(t(R.string.resp_mm_valor_pacote), "${t.num(c.massaMolar, 4)} g/mol")
     }
     // massa <-> mol de uma quantidade citada na pergunta
     val gUn = un.porSimbolo("g", "massa")
@@ -65,21 +65,21 @@ internal suspend fun AnswerBuilder.massaMolar(q: ParsedQuery): Resposta {
         if (u.grandeza == "massa" && gUn != null && molUn != null) {
             val massaG = un.converter(qt.valor, u, gUn)
             val mols = massaG / mm.massaMolar
-            blocos += Bloco.Campo("${Texto.significativos(qt.valor, 5)} ${u.simbolo} de $nome", "${Texto.significativos(mols, 5)} mol")
-            extras += "n = m / MM = ${Texto.significativos(massaG, 5)} g ÷ ${Texto.fixo(mm.massaMolar, 3)} g/mol = ${Texto.significativos(mols, 5)} mol"
+            blocos += Bloco.Campo(t(R.string.resp_x_de_y, t.sig(qt.valor, 5), u.simbolo, nome), "${t.sig(mols, 5)} mol")
+            extras += t(R.string.calc_mm_n_de_m, t.sig(massaG, 5), t.fixo(mm.massaMolar, 3), t.sig(mols, 5))
         } else if (u.grandeza == "quantidade" && gUn != null && molUn != null) {
             val mols = un.converter(qt.valor, u, molUn)
             val massa = mols * mm.massaMolar
-            blocos += Bloco.Campo("${Texto.significativos(qt.valor, 5)} ${u.simbolo} de $nome", "${Texto.significativos(massa, 5)} g")
-            extras += "m = n × MM = ${Texto.significativos(mols, 5)} mol × ${Texto.fixo(mm.massaMolar, 3)} g/mol = ${Texto.significativos(massa, 5)} g"
+            blocos += Bloco.Campo(t(R.string.resp_x_de_y, t.sig(qt.valor, 5), u.simbolo, nome), "${t.sig(massa, 5)} g")
+            extras += t(R.string.calc_mm_m_de_n, t.sig(mols, 5), t.fixo(mm.massaMolar, 3), t.sig(massa, 5))
         }
     }
-    blocos += Bloco.Passos("Como calculei", res.passos + extras)
+    blocos += Bloco.Passos(t(R.string.resp_como_calculei), res.passos + extras)
     res.notas.forEach { blocos += Bloco.Aviso(it) }
     return Resposta(
-        Intent.MASSA_MOLAR, "Massa molar: $nome", blocos,
+        Intent.MASSA_MOLAR, t(R.string.resp_mm_titulo, nome), blocos,
         fontes = fonteDe(fontesDeElementos(mm.formula.contagem.keys)),
-        acoes = listOf(Acao.AbrirCalculadora(TipoCalculadora.MASSA_MOLAR, "Abrir a calculadora de massa molar", mapOf("formula" to formula)))
+        acoes = listOf(acaoCalculadora(TipoCalculadora.MASSA_MOLAR, mapOf("formula" to formula)))
     )
 }
 
@@ -89,18 +89,18 @@ internal suspend fun AnswerBuilder.balancear(q: ParsedQuery): Resposta {
     val eq = q.equacao
     if (eq == null) {
         return Resposta(
-            Intent.BALANCEAR, "Balanceamento de equações",
-            listOf(Bloco.Paragrafo("Escreva a equação com uma seta, por exemplo: H2 + O2 -> H2O. Eu acho os menores coeficientes inteiros e mostro os passos.")),
-            acoes = listOf(Acao.AbrirCalculadora(TipoCalculadora.BALANCEAMENTO, "Abrir a calculadora de balanceamento")),
-            sugestoes = listOf("Balancear Fe + O2 -> Fe2O3"), entendida = false
+            Intent.BALANCEAR, t(R.string.resp_bal_titulo),
+            listOf(Bloco.Paragrafo(t(R.string.resp_bal_escreva))),
+            acoes = listOf(acaoCalculadora(TipoCalculadora.BALANCEAMENTO)),
+            sugestoes = listOf(t(R.string.sug_balancear_fe)), entendida = false
         )
     }
-    val r = Balanceador.balancear(eq)
+    val r = Balanceador.balancear(t, eq)
     return Resposta(
-        Intent.BALANCEAR, "Equação balanceada",
-        listOf(Bloco.Destaque(r.balanceada.texto()), Bloco.Passos("Passo a passo", r.passos)),
+        Intent.BALANCEAR, t(R.string.calc_bal_titulo),
+        listOf(Bloco.Destaque(r.balanceada.texto()), Bloco.Passos(t(R.string.resp_passo_a_passo), r.passos)),
         fontes = listOf(fonteCalculo()),
-        acoes = listOf(Acao.AbrirCalculadora(TipoCalculadora.BALANCEAMENTO, "Abrir a calculadora de balanceamento", mapOf("equacao" to eq)))
+        acoes = listOf(acaoCalculadora(TipoCalculadora.BALANCEAMENTO, mapOf("equacao" to eq)))
     )
 }
 
@@ -110,17 +110,17 @@ internal suspend fun AnswerBuilder.estequiometria(q: ParsedQuery): Resposta {
     val eq = q.equacao ?: return conversaoMolar(q)
     val aviso: (String) -> Resposta = { msg ->
         Resposta(
-            Intent.ESTEQUIOMETRIA, "Estequiometria", listOf(Bloco.Aviso(msg)),
-            acoes = listOf(Acao.AbrirCalculadora(TipoCalculadora.ESTEQUIOMETRIA, "Abrir a calculadora de estequiometria", mapOf("equacao" to eq))),
+            Intent.ESTEQUIOMETRIA, t(R.string.calc_est_titulo), listOf(Bloco.Aviso(msg)),
+            acoes = listOf(acaoCalculadora(TipoCalculadora.ESTEQUIOMETRIA, mapOf("equacao" to eq))),
             sugestoes = emptyList(), entendida = false
         )
     }
-    val bal = Balanceador.balancear(eq).balanceada
-    if (bal.equacao.todas.any { it.eletron }) return aviso("A estequiometria por massa não trata elétrons livres. Use uma equação sem elétrons.")
+    val bal = Balanceador.balancear(t, eq).balanceada
+    if (bal.equacao.todas.any { it.eletron }) return aviso(t(R.string.resp_est_sem_eletrons))
     val posEq = LocalNlu.extrairEquacaoComPosicao(q.textoOriginal)?.second
     val texto = if (posEq != null) q.textoOriginal.replaceRange(posEq.first, minOf(posEq.last + 1, q.textoOriginal.length), " ".repeat((posEq.last - posEq.first + 1).coerceAtLeast(0))) else q.textoOriginal
-    val gUn = un.porSimbolo("g", "massa") ?: return aviso("Faltam as unidades de massa nos dados.")
-    val molUn = un.porSimbolo("mol", "quantidade") ?: return aviso("Faltam as unidades de quantidade nos dados.")
+    val gUn = un.porSimbolo("g", "massa") ?: return aviso(t(R.string.resp_est_falta_massa))
+    val molUn = un.porSimbolo("mol", "quantidade") ?: return aviso(t(R.string.resp_est_falta_qtd))
     val conhecidas = mutableListOf<QuantidadeConhecida>()
     val usadas = mutableSetOf<Int>()
     val rotulos = bal.equacao.todas.map { it.rotulo }
@@ -132,17 +132,17 @@ internal suspend fun AnswerBuilder.estequiometria(q: ParsedQuery): Resposta {
         val valor = if (u.grandeza == "massa") un.converter(ql.valor, u, gUn) else un.converter(ql.valor, u, molUn)
         conhecidas += QuantidadeConhecida(indice, valor, emMols = u.grandeza == "quantidade")
     }
-    if (conhecidas.isEmpty()) return aviso("Diga a que substância cada quantidade se refere, por exemplo: 4 g de H2 ou 0,5 mol de O2.")
-    val r = Estequiometria.calcular(bal, conhecidas, pacote.porSimbolo)
-    val res = r.comoResultado()
+    if (conhecidas.isEmpty()) return aviso(t(R.string.resp_est_diga_qual))
+    val r = Estequiometria.calcular(t, bal, conhecidas, pacote.porSimbolo)
+    val res = r.comoResultado(t)
     val blocos = mutableListOf<Bloco>(Bloco.Destaque(bal.texto()))
-    r.limitante?.let { blocos += Bloco.Campo("Reagente limitante", Texto.formulaUnicode(it)) }
+    r.limitante?.let { blocos += Bloco.Campo(t(R.string.resp_est_reagente_limitante), Texto.formulaUnicode(it)) }
     res.linhas.forEach { blocos += Bloco.Campo(it.rotulo, it.valor) }
-    blocos += Bloco.Passos("Passo a passo", r.passos)
+    blocos += Bloco.Passos(t(R.string.resp_passo_a_passo), r.passos)
     val simbolos = bal.equacao.todas.flatMap { it.formula.contagem.keys }.toSet()
     return Resposta(
-        Intent.ESTEQUIOMETRIA, "Estequiometria", blocos, fontes = fonteDe(fontesDeElementos(simbolos)),
-        acoes = listOf(Acao.AbrirCalculadora(TipoCalculadora.ESTEQUIOMETRIA, "Abrir a calculadora de estequiometria", mapOf("equacao" to eq)))
+        Intent.ESTEQUIOMETRIA, t(R.string.calc_est_titulo), blocos, fontes = fonteDe(fontesDeElementos(simbolos)),
+        acoes = listOf(acaoCalculadora(TipoCalculadora.ESTEQUIOMETRIA, mapOf("equacao" to eq)))
     )
 }
 
@@ -166,62 +166,74 @@ private fun especieMaisProxima(texto: String, faixa: IntRange, rotulos: List<Str
  */
 private suspend fun AnswerBuilder.conversaoMolar(q: ParsedQuery): Resposta {
     val n = Texto.nlu(q.textoOriginal)
-    val acoes = listOf(Acao.AbrirCalculadora(TipoCalculadora.ESTEQUIOMETRIA, "Abrir a calculadora de estequiometria"))
+    val acoes = listOf(acaoCalculadora(TipoCalculadora.ESTEQUIOMETRIA))
     val molUn = un.porSimbolo("mol", "quantidade")!!
     val gUn = un.porSimbolo("g", "massa")!!
     val cntp = Regex("""\b(?:cntp|condicoes normais|ntp)\b""").containsMatchIn(n)
     if (cntp) {
         val mols = q.quantidades.firstNotNullOfOrNull { qt -> unidadeDe(qt.unidade)?.takeIf { it.grandeza == "quantidade" }?.let { un.converter(qt.valor, it, molUn) } } ?: 1.0
-        val r = pacote.constante("R") ?: throw CalculoInvalido("O pacote de dados não traz a constante dos gases (R).")
+        val r = pacote.constante("R") ?: throw CalculoInvalido(R.string.erro_gas_sem_r)
         val res = GasIdeal.resolver(
-            CampoQtd(1.0, un.porSimbolo("atm", "pressao")!!), CampoQtd(null, un.porSimbolo("L", "volume")!!),
+            t, CampoQtd(1.0, un.porSimbolo("atm", "pressao")!!), CampoQtd(null, un.porSimbolo("L", "volume")!!),
             CampoQtd(mols, molUn), CampoQtd(0.0, un.porSimbolo("°C", "temperatura")!!), r, un
         )
         return Resposta(
-            Intent.ESTEQUIOMETRIA, "Volume de gás nas CNTP",
-            listOf(Bloco.Paragrafo("CNTP adotadas aqui: 0 °C e 1 atm.")) + resultadoComoBlocos(res), fontes = fonteDe(r.fontes), acoes = acoes
+            Intent.ESTEQUIOMETRIA, t(R.string.resp_est_volume_cntp_titulo),
+            listOf(Bloco.Paragrafo(t(R.string.resp_est_cntp_adotadas))) + resultadoComoBlocos(res), fontes = fonteDe(r.fontes), acoes = acoes
         )
     }
     val c = compostoDe(q)
     val formula = q.formula ?: c?.formula ?: elementoDe(q)?.simbolo
         ?: return Resposta(
-            Intent.ESTEQUIOMETRIA, "Estequiometria",
-            listOf(Bloco.Paragrafo("Diga a substância e a quantidade, por exemplo: 18 g de H2O, ou escreva a reação com uma seta (H2 + O2 -> H2O) e as quantidades.")),
-            acoes = acoes, sugestoes = listOf("Quantos mols tem em 18 g de água?"), entendida = false
+            Intent.ESTEQUIOMETRIA, t(R.string.calc_est_titulo),
+            listOf(Bloco.Paragrafo(t(R.string.resp_est_diga_substancia))),
+            acoes = acoes, sugestoes = listOf(t(R.string.sug_mols_agua)), entendida = false
         )
     val mm = MassaMolar.calcular(formula, pacote.porSimbolo)
     val avogadro = pacote.constante("NA")
-    val nome = c?.nomeExibicao ?: mm.formula.exibicao()
+    val nome = c?.let { nomeDe(it) } ?: mm.formula.exibicao()
     var mols: Double? = null
-    var origem = ""
+    var passoMols = ""
     for (qt in q.quantidades) {
         val u = unidadeDe(qt.unidade)
         if (qt.unidade == "particulas" && avogadro != null) {
-            mols = qt.valor / avogadro.valor; origem = "N / N_A = ${Texto.significativos(qt.valor, 5)} ÷ ${Texto.cientifica(avogadro.valor, 4)} = "
+            mols = qt.valor / avogadro.valor
+            passoMols = t(R.string.calc_est_passo_n_avogadro, t.sig(qt.valor, 5), t.cient(avogadro.valor, 4), t.sig(mols, 5))
             break
         }
-        if (u?.grandeza == "massa") { val g = un.converter(qt.valor, u, gUn); mols = g / mm.massaMolar; origem = "n = m / MM = ${Texto.significativos(g, 5)} g ÷ ${Texto.fixo(mm.massaMolar, 3)} g/mol = "; break }
-        if (u?.grandeza == "quantidade") { mols = un.converter(qt.valor, u, molUn); origem = "n informado = "; break }
+        if (u?.grandeza == "massa") {
+            val g = un.converter(qt.valor, u, gUn); mols = g / mm.massaMolar
+            passoMols = t(R.string.calc_est_passo_n_massa, t.sig(g, 5), t.fixo(mm.massaMolar, 3), t.sig(mols, 5))
+            break
+        }
+        if (u?.grandeza == "quantidade") {
+            mols = un.converter(qt.valor, u, molUn)
+            passoMols = t(R.string.calc_est_passo_n_informado, t.sig(mols, 5))
+            break
+        }
     }
     if (mols == null) {
         return Resposta(
-            Intent.ESTEQUIOMETRIA, "Estequiometria: $nome", listOf(Bloco.Paragrafo("Informe a quantidade (massa em g, mol ou número de moléculas) de $nome.")),
-            acoes = acoes, sugestoes = listOf("Quantos mols tem em 18 g de água?"), entendida = false
+            Intent.ESTEQUIOMETRIA, t(R.string.resp_est_titulo_nome, nome), listOf(Bloco.Paragrafo(t(R.string.resp_est_informe_qtd, nome))),
+            acoes = acoes, sugestoes = listOf(t(R.string.sug_mols_agua)), entendida = false
         )
     }
     val blocos = mutableListOf<Bloco>(
-        Bloco.Campo("Massa molar de $nome", "${Texto.fixo(mm.massaMolar, 3)} g/mol"),
-        Bloco.Campo("Quantidade de matéria", "${Texto.significativos(mols, 5)} mol"),
-        Bloco.Campo("Massa", "${Texto.significativos(mols * mm.massaMolar, 5)} g")
+        Bloco.Campo(t(R.string.resp_est_massa_molar_de, nome), "${t.fixo(mm.massaMolar, 3)} g/mol"),
+        Bloco.Campo(t(R.string.calc_sol_qtd_materia), "${t.sig(mols, 5)} mol"),
+        Bloco.Campo(t(R.string.rot_massa), "${t.sig(mols * mm.massaMolar, 5)} g")
     )
-    val passos = mutableListOf(mm.comoResultado().passos.last(), "$origem${Texto.significativos(mols, 5)} mol.", "m = n × MM = ${Texto.significativos(mols, 5)} mol × ${Texto.fixo(mm.massaMolar, 3)} g/mol = ${Texto.significativos(mols * mm.massaMolar, 5)} g.")
+    val passos = mutableListOf(
+        mm.comoResultado(t).passos.last(), passoMols,
+        t(R.string.calc_est_passo_m, t.sig(mols, 5), t.fixo(mm.massaMolar, 3), t.sig(mols * mm.massaMolar, 5))
+    )
     if (avogadro != null) {
-        blocos += Bloco.Campo("Número de entidades (n × N_A)", Texto.cientifica(mols * avogadro.valor, 4))
-        passos += "N = n × N_A = ${Texto.significativos(mols, 5)} mol × ${Texto.cientifica(avogadro.valor, 4)} mol⁻¹ = ${Texto.cientifica(mols * avogadro.valor, 4)}."
+        blocos += Bloco.Campo(t(R.string.resp_est_entidades), t.cient(mols * avogadro.valor, 4))
+        passos += t(R.string.calc_est_passo_avogadro, t.sig(mols, 5), t.cient(avogadro.valor, 4), t.cient(mols * avogadro.valor, 4))
     }
-    blocos += Bloco.Passos("Como calculei", passos)
+    blocos += Bloco.Passos(t(R.string.resp_como_calculei), passos)
     return Resposta(
-        Intent.ESTEQUIOMETRIA, "Estequiometria: $nome", blocos,
+        Intent.ESTEQUIOMETRIA, t(R.string.resp_est_titulo_nome, nome), blocos,
         fontes = fonteDe(fontesDeElementos(mm.formula.contagem.keys), avogadro?.fontes.orEmpty()), acoes = acoes
     )
 }
@@ -236,8 +248,10 @@ internal suspend fun AnswerBuilder.concentracao(q: ParsedQuery): Resposta {
     val concs = qtds.filter { it.unidade.grandeza == "concentracao" }
     val c = compostoDe(q)
     val formula = q.formula ?: c?.formula
-    val acoes = listOf(Acao.AbrirCalculadora(TipoCalculadora.CONCENTRACAO, "Abrir a calculadora de concentração"))
-    val emDiluicao = Regex("""\b(?:diluic\w+|dilui\w*|diluid\w+|c ?1 ?v ?1)\b""").containsMatchIn(n)
+    val acoes = listOf(acaoCalculadora(TipoCalculadora.CONCENTRACAO))
+    // a pista "diluição" do idioma (léxico) vale em todos os idiomas; o padrão em português continua valendo em pt-BR
+    val emDiluicao = Regex("""\b(?:diluic\w+|dilui\w*|diluid\w+|c ?1 ?v ?1)\b""").containsMatchIn(n) ||
+        (idioma != Idiomas.PADRAO && dic.lexico.pista("diluicao").containsMatchIn(n))
 
     fun pronta(r: ResultadoCalculo, fontes: List<Fonte> = emptyList()) = Resposta(
         Intent.CONCENTRACAO, r.titulo, resultadoComoBlocos(r), fontes = fonteDe(fontes), acoes = acoes
@@ -253,23 +267,21 @@ internal suspend fun AnswerBuilder.concentracao(q: ParsedQuery): Resposta {
                 else listOf(CampoQtd(concs[0].valor, concs[0].unidade), CampoQtd(volumes[0].valor, volumes[0].unidade), CampoQtd(concs[1].valor, concs[1].unidade), CampoQtd(null, lv))
             concs.size == 1 && volumes.size == 2 ->
                 listOf(CampoQtd(concs[0].valor, concs[0].unidade), CampoQtd(volumes[0].valor, volumes[0].unidade), CampoQtd(null, lc), CampoQtd(volumes[1].valor, volumes[1].unidade))
-            else -> throw CalculoInvalido("Para a diluição informe três valores: por exemplo, 2 mol/L, 50 mL e 0,5 mol/L (calculo o volume final).")
+            else -> throw CalculoInvalido(R.string.erro_conc_diluicao_tres)
         }
-        return pronta(Solucoes.diluicao(c1, v1, c2, v2, un))
+        return pronta(Solucoes.diluicao(t, c1, v1, c2, v2, un))
     }
     if (massas.size == 1 && volumes.size == 1) {
-        val f = formula ?: throw CalculoInvalido("Diga a substância (fórmula ou nome) para eu achar a massa molar.")
+        val f = formula ?: throw CalculoInvalido(R.string.erro_conc_diga_substancia)
         val mm = MassaMolar.calcular(f, pacote.porSimbolo)
-        return pronta(Solucoes.molaridade(massas[0], mm.massaMolar, volumes[0], un, mm.formula.exibicao()), fontesDeElementos(mm.formula.contagem.keys))
+        return pronta(Solucoes.molaridade(t, massas[0], mm.massaMolar, volumes[0], un, mm.formula.exibicao()), fontesDeElementos(mm.formula.contagem.keys))
     }
     if (concs.size == 1 && volumes.size == 1) {
-        val f = formula ?: throw CalculoInvalido("Diga a substância (fórmula ou nome) para eu achar a massa molar.")
+        val f = formula ?: throw CalculoInvalido(R.string.erro_conc_diga_substancia)
         val mm = MassaMolar.calcular(f, pacote.porSimbolo)
-        return pronta(Solucoes.massaParaPreparar(concs[0], volumes[0], mm.massaMolar, un, mm.formula.exibicao()), fontesDeElementos(mm.formula.contagem.keys))
+        return pronta(Solucoes.massaParaPreparar(t, concs[0], volumes[0], mm.massaMolar, un, mm.formula.exibicao()), fontesDeElementos(mm.formula.contagem.keys))
     }
-    throw CalculoInvalido(
-        "Para molaridade informe a massa e o volume (5,844 g de NaCl em 500 mL); para preparar uma solução, a concentração e o volume (250 mL de NaOH 0,1 mol/L); para diluir, três valores de C₁V₁ = C₂V₂."
-    )
+    throw CalculoInvalido(R.string.erro_conc_geral)
 }
 
 // ---- pH ----------------------------------------------------------------------------------------------------------------------------------------
@@ -283,10 +295,10 @@ internal suspend fun AnswerBuilder.ph(q: ParsedQuery): Resposta {
     val c = compostoDe(q)
     val formula = q.formula ?: c?.formula
     val conc = q.quantidades.mapNotNull { qt -> unidadeDe(qt.unidade)?.takeIf { it.grandeza == "concentracao" }?.let { Qtd(qt.valor, it) } }.firstOrNull()
-        ?: throw CalculoInvalido("Informe a concentração em mol/L, por exemplo: pH de HCl 0,01 mol/L.")
+        ?: throw CalculoInvalido(R.string.erro_ph_informe_conc)
     val pKw = Solucoes.pKwDoPacote(pacote.constantes)
-    val acoes = listOf(Acao.AbrirCalculadora(TipoCalculadora.PH, "Abrir a calculadora de pH"))
-    val nome = c?.nomeExibicao ?: formula?.let { FormulaQuimica.tentar(it)?.exibicao() ?: it }
+    val acoes = listOf(acaoCalculadora(TipoCalculadora.PH))
+    val nome = c?.let { nomeDe(it) } ?: formula?.let { FormulaQuimica.tentar(it)?.exibicao() ?: it }
 
     // ácido ou base FRACOS: a pessoa informa Ka/Kb (ou pKa/pKb)
     val k = q.constantes
@@ -294,8 +306,8 @@ internal suspend fun AnswerBuilder.ph(q: ParsedQuery): Resposta {
     val kb = k["Kb"] ?: k["pKb"]?.let { Math.pow(10.0, -it) }
     if (ka != null || kb != null) {
         val tipo = if (ka != null) TipoForte.ACIDO else TipoForte.BASE
-        val r = Solucoes.phFraco(tipo, conc, ka ?: kb!!, if (ka != null) "Ka" else "Kb", un, pKw.first, pKw.second)
-        val titulo = (nome?.let { "pH de $it ${Texto.significativos(conc.valor, 4)} ${conc.unidade.simbolo}" } ?: r.titulo)
+        val r = Solucoes.phFraco(t, tipo, conc, ka ?: kb!!, if (ka != null) "Ka" else "Kb", un, pKw.first, pKw.second)
+        val titulo = (nome?.let { t(R.string.resp_ph_titulo_nome, it, t.sig(conc.valor, 4), conc.unidade.simbolo) } ?: r.titulo)
         return Resposta(Intent.PH, titulo, resultadoComoBlocos(r), fontes = fonteDe(emptyList()), acoes = acoes)
     }
 
@@ -309,14 +321,11 @@ internal suspend fun AnswerBuilder.ph(q: ParsedQuery): Resposta {
         }
         Regex("""\bbases? fortes?\b""").containsMatchIn(n) -> { tipo = TipoForte.BASE; ionizaveis = 1 }
         Regex("""\bacidos? fortes?\b""").containsMatchIn(n) -> { tipo = TipoForte.ACIDO; ionizaveis = 1 }
-        formula != null -> throw CalculoInvalido(
-            "Para ${Texto.formulaUnicode(formula)} informe a constante de equilíbrio, por exemplo: pH de ${Texto.formulaUnicode(formula)} 0,1 mol/L com Ka 1,8e-5 (ácido fraco) ou Kb (base fraca). " +
-                "Sem constante, só trato ácidos e bases FORTES (HCl, HBr, HI, HNO₃, HClO₄, H₂SO₄ e hidróxidos dos grupos 1 e 2)."
-        )
-        else -> throw CalculoInvalido("Diga qual é o ácido ou a base forte (por exemplo, HCl ou NaOH), escreva \"ácido forte\" / \"base forte\" ou informe o Ka/Kb.")
+        formula != null -> throw CalculoInvalido(R.string.erro_ph_precisa_constante, Texto.formulaUnicode(formula))
+        else -> throw CalculoInvalido(R.string.erro_ph_diga_qual)
     }
-    val r = Solucoes.phForte(tipo, conc, ionizaveis, un, pKw.first, pKw.second)
-    val titulo = if (nome != null) "pH de $nome ${Texto.significativos(conc.valor, 4)} ${conc.unidade.simbolo}" else r.titulo
+    val r = Solucoes.phForte(t, tipo, conc, ionizaveis, un, pKw.first, pKw.second)
+    val titulo = if (nome != null) t(R.string.resp_ph_titulo_nome, nome, t.sig(conc.valor, 4), conc.unidade.simbolo) else r.titulo
     return Resposta(
         Intent.PH, titulo, resultadoComoBlocos(r),
         fontes = fonteDe(pacote.constantes.filter { it.id.equals("Kw", true) || it.id.equals("pKw", true) }.flatMap { it.fontes }),
@@ -328,12 +337,12 @@ internal suspend fun AnswerBuilder.ph(q: ParsedQuery): Resposta {
 
 internal suspend fun AnswerBuilder.gasIdeal(q: ParsedQuery): Resposta {
     val n = Texto.nlu(q.textoOriginal)
-    val r = pacote.constante("R") ?: throw CalculoInvalido("O pacote de dados não traz a constante dos gases (R).")
+    val r = pacote.constante("R") ?: throw CalculoInvalido(R.string.erro_gas_sem_r)
     val porGrandeza = HashMap<String, Qtd>()
     for (qt in q.quantidades) {
         val u = unidadeDe(qt.unidade) ?: continue
         if (u.grandeza in setOf("pressao", "volume", "temperatura", "quantidade") && porGrandeza.put(u.grandeza, Qtd(qt.valor, u)) != null) {
-            throw CalculoInvalido("Há dois valores para a mesma grandeza (${u.grandeza}). Informe cada um uma vez só.")
+            throw CalculoInvalido(R.string.erro_gas_duas_vezes, t.grandeza(u.grandeza))
         }
     }
     if (Regex("""\b(?:volume molar|cntp|ntp|condicoes (?:normais|padrao))\b""").containsMatchIn(n) && porGrandeza.size < 3) {
@@ -343,7 +352,7 @@ internal suspend fun AnswerBuilder.gasIdeal(q: ParsedQuery): Resposta {
         porGrandeza.putIfAbsent("pressao", Qtd(1.0, un.porSimbolo("atm", "pressao")!!))
     }
     if (porGrandeza.size != 3) {
-        throw CalculoInvalido("Para o gás ideal informe três das quatro grandezas (pressão, volume, quantidade de matéria e temperatura), por exemplo: 2 mol de gás a 300 K e 1 atm; eu calculo a que falta.")
+        throw CalculoInvalido(R.string.erro_gas_tres)
     }
     val destino = q.unidadeDestino?.let { un.buscar(it) }
     fun campo(v: VariavelGas, padrao: String): CampoQtd {
@@ -352,33 +361,37 @@ internal suspend fun AnswerBuilder.gasIdeal(q: ParsedQuery): Resposta {
         val alvo = destino?.takeIf { it.grandeza == v.grandeza } ?: un.porSimbolo(padrao, v.grandeza) ?: un.base(v.grandeza)!!
         return CampoQtd(null, alvo)
     }
-    val res = GasIdeal.resolver(campo(VariavelGas.P, "atm"), campo(VariavelGas.V, "L"), campo(VariavelGas.N, "mol"), campo(VariavelGas.T, "K"), r, un)
+    val res = GasIdeal.resolver(t, campo(VariavelGas.P, "atm"), campo(VariavelGas.V, "L"), campo(VariavelGas.N, "mol"), campo(VariavelGas.T, "K"), r, un)
     return Resposta(
-        Intent.GAS_IDEAL, res.titulo, resultadoComoBlocos(res), fontes = fonteDe(r.fontes.ifEmpty { listOf(Fonte("Constantes do pacote de dados")) }),
-        acoes = listOf(Acao.AbrirCalculadora(TipoCalculadora.GAS_IDEAL, "Abrir a calculadora de gás ideal"))
+        Intent.GAS_IDEAL, res.titulo, resultadoComoBlocos(res), fontes = fonteDe(r.fontes.ifEmpty { listOf(Fonte(t(R.string.fonte_constantes_pacote))) }),
+        acoes = listOf(acaoCalculadora(TipoCalculadora.GAS_IDEAL))
     )
 }
 
 // ---- conversão de unidades ------------------------------------------------------------------------------------------------------------------------
 
 internal suspend fun AnswerBuilder.conversao(q: ParsedQuery): Resposta {
-    val qt = q.quantidades.firstOrNull() ?: throw CalculoInvalido("Informe o valor e a unidade, por exemplo: 25 °C para K.")
-    val de = unidadeDe(qt.unidade) ?: throw CalculoInvalido("Não conheço a unidade \"${qt.unidade}\".")
-    val destino = q.unidadeDestino?.let { un.buscar(it) } ?: throw CalculoInvalido("Para qual unidade converter? Por exemplo: ${Texto.significativos(qt.valor, 4)} ${de.simbolo} para ${un.daGrandeza(de.grandeza).firstOrNull { it.simbolo != de.simbolo }?.simbolo ?: "outra unidade"}.")
-    val (valor, passo) = un.converterComPasso(qt.valor, de, destino)
+    val qt = q.quantidades.firstOrNull() ?: throw CalculoInvalido(R.string.erro_conv_informe)
+    val de = unidadeDe(qt.unidade) ?: throw CalculoInvalido(R.string.erro_conv_unidade_desconhecida, qt.unidade)
+    val destino = q.unidadeDestino?.let { un.buscar(it) } ?: throw CalculoInvalido(
+        R.string.erro_conv_para_qual, t.sig(qt.valor, 4), de.simbolo,
+        un.daGrandeza(de.grandeza).firstOrNull { it.simbolo != de.simbolo }?.simbolo ?: t(R.string.erro_conv_outra_unidade)
+    )
+    val (valor, passo) = un.converterComPasso(t, qt.valor, de, destino)
     val base = un.base(de.grandeza)
     val passos = mutableListOf<String>()
     if (base != null && (de.offset != 0.0 || destino.offset != 0.0)) {
         val emBase = un.paraBase(qt.valor, de)
-        passos += "Para a unidade-base (${base.simbolo}): valor × fator + deslocamento = ${Texto.significativos(qt.valor, 6)} × ${Texto.significativos(de.fator, 7)} + ${Texto.significativos(de.offset, 7)} = ${Texto.significativos(emBase, 7)} ${base.simbolo}."
-        passos += "Da base para ${destino.simbolo}: (valor − deslocamento) ÷ fator = (${Texto.significativos(emBase, 7)} − ${Texto.significativos(destino.offset, 7)}) ÷ ${Texto.significativos(destino.fator, 7)} = ${Texto.significativos(valor, 7)} ${destino.simbolo}."
+        passos += t(R.string.calc_conv_para_base, base.simbolo, t.sig(qt.valor, 6), t.sig(de.fator, 7), t.sig(de.offset, 7), t.sig(emBase, 7))
+        passos += t(R.string.calc_conv_da_base, destino.simbolo, t.sig(emBase, 7), t.sig(destino.offset, 7), t.sig(destino.fator, 7), t.sig(valor, 7))
     } else {
-        passos += "1 ${de.simbolo} = ${Texto.significativos(de.fator, 7)} ${base?.simbolo ?: "unidade-base"} e 1 ${destino.simbolo} = ${Texto.significativos(destino.fator, 7)} ${base?.simbolo ?: "unidade-base"}."
+        val unidadeBase = base?.simbolo ?: t(R.string.calc_conv_unidade_base)
+        passos += t(R.string.calc_conv_fatores, de.simbolo, t.sig(de.fator, 7), unidadeBase, destino.simbolo, t.sig(destino.fator, 7))
         passos += "$passo."
     }
     return Resposta(
-        Intent.CONVERSAO_UNIDADE, "Conversão de unidades",
-        listOf(Bloco.Destaque("${Texto.significativos(qt.valor, 6)} ${de.simbolo} = ${Texto.significativos(valor, 7)} ${destino.simbolo}"), Bloco.Passos("Como converti", passos)),
-        fontes = fonteDe(emptyList()), acoes = listOf(Acao.AbrirCalculadora(TipoCalculadora.UNIDADES, "Abrir a conversão de unidades"))
+        Intent.CONVERSAO_UNIDADE, t(R.string.resp_conv_titulo),
+        listOf(Bloco.Destaque("${t.sig(qt.valor, 6)} ${de.simbolo} = ${t.sig(valor, 7)} ${destino.simbolo}"), Bloco.Passos(t(R.string.resp_como_converti), passos)),
+        fontes = fonteDe(emptyList()), acoes = listOf(acaoCalculadora(TipoCalculadora.UNIDADES))
     )
 }

@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
                     initializer {
                         MainViewModel(
                             dados = container.dados, prefs = container.preferencias, atualizacoes = container.atualizacoes,
-                            idiomaInicial = IdiomaApp.atual(this@MainActivity)
+                            fonteDeTextos = container.recursos, idiomaInicial = IdiomaApp.atual(this@MainActivity)
                         )
                     }
                 }

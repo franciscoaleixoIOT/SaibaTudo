@@ -1,5 +1,8 @@
 package net.saibatudo.quimica.data.model
 
+import androidx.annotation.StringRes
+import net.saibatudo.quimica.R
+
 /** Fonte de um dado (nome, endereço, licença e data de acesso), exibida em toda resposta e em "Sobre os dados". */
 data class Fonte(
     val nome: String,
@@ -16,27 +19,34 @@ data class Fonte(
     }
 }
 
-/** Categorias de elemento do contrato (docs/DATA_CONTRACT.md §2). */
-enum class CategoriaElemento(val id: String, val rotulo: String, val letra: String) {
-    METAL_ALCALINO("metal_alcalino", "Metal alcalino", "A"),
-    METAL_ALCALINO_TERROSO("metal_alcalino_terroso", "Metal alcalino-terroso", "T"),
-    METAL_TRANSICAO("metal_transicao", "Metal de transição", "M"),
-    METAL_POS_TRANSICAO("metal_pos_transicao", "Metal pós-transição", "P"),
-    SEMIMETAL("semimetal", "Semimetal", "S"),
-    NAO_METAL("nao_metal", "Não metal", "N"),
-    HALOGENIO("halogenio", "Halogênio", "H"),
-    GAS_NOBRE("gas_nobre", "Gás nobre", "G"),
-    LANTANIDEO("lantanideo", "Lantanídeo", "L"),
-    ACTINIDEO("actinideo", "Actinídeo", "C"),
-    DESCONHECIDA("desconhecida", "Categoria desconhecida", "?");
+/**
+ * Categorias de elemento do contrato (docs/DATA_CONTRACT.md §2). Três textos por categoria, todos em strings.xml: [rotulo] ("Metal alcalino", para
+ * listas e legendas), [meio] (no meio da frase: "metal alcalino", "semimetal (metaloide)") e [plural] ("metais alcalinos").
+ */
+enum class CategoriaElemento(
+    val id: String, @param:StringRes val rotulo: Int, @param:StringRes val meio: Int, @param:StringRes val plural: Int, val letra: String
+) {
+    METAL_ALCALINO("metal_alcalino", R.string.categoria_metal_alcalino, R.string.categoria_metal_alcalino_meio, R.string.categoria_metal_alcalino_plural, "A"),
+    METAL_ALCALINO_TERROSO("metal_alcalino_terroso", R.string.categoria_metal_alcalino_terroso, R.string.categoria_metal_alcalino_terroso_meio, R.string.categoria_metal_alcalino_terroso_plural, "T"),
+    METAL_TRANSICAO("metal_transicao", R.string.categoria_metal_transicao, R.string.categoria_metal_transicao_meio, R.string.categoria_metal_transicao_plural, "M"),
+    METAL_POS_TRANSICAO("metal_pos_transicao", R.string.categoria_metal_pos_transicao, R.string.categoria_metal_pos_transicao_meio, R.string.categoria_metal_pos_transicao_plural, "P"),
+    SEMIMETAL("semimetal", R.string.categoria_semimetal, R.string.categoria_semimetal_meio, R.string.categoria_semimetal_plural, "S"),
+    NAO_METAL("nao_metal", R.string.categoria_nao_metal, R.string.categoria_nao_metal_meio, R.string.categoria_nao_metal_plural, "N"),
+    HALOGENIO("halogenio", R.string.categoria_halogenio, R.string.categoria_halogenio_meio, R.string.categoria_halogenio_plural, "H"),
+    GAS_NOBRE("gas_nobre", R.string.categoria_gas_nobre, R.string.categoria_gas_nobre_meio, R.string.categoria_gas_nobre_plural, "G"),
+    LANTANIDEO("lantanideo", R.string.categoria_lantanideo, R.string.categoria_lantanideo_meio, R.string.categoria_lantanideo_plural, "L"),
+    ACTINIDEO("actinideo", R.string.categoria_actinideo, R.string.categoria_actinideo_meio, R.string.categoria_actinideo_plural, "C"),
+    DESCONHECIDA("desconhecida", R.string.categoria_desconhecida, R.string.categoria_desconhecida_meio, R.string.categoria_desconhecida_plural, "?");
 
     companion object {
         fun de(id: String?): CategoriaElemento = entries.firstOrNull { it.id == id } ?: DESCONHECIDA
     }
 }
 
-enum class EstadoFisico(val id: String, val rotulo: String) {
-    SOLIDO("solido", "Sólido"), LIQUIDO("liquido", "Líquido"), GAS("gas", "Gás"), DESCONHECIDO("desconhecido", "Desconhecido");
+/** Estado físico: [rotulo] ("Sólido", para legendas) e [meio] ("sólido", no meio da frase), ambos em strings.xml. */
+enum class EstadoFisico(val id: String, @param:StringRes val rotulo: Int, @param:StringRes val meio: Int) {
+    SOLIDO("solido", R.string.estado_solido, R.string.estado_solido_meio), LIQUIDO("liquido", R.string.estado_liquido, R.string.estado_liquido_meio),
+    GAS("gas", R.string.estado_gas, R.string.estado_gas_meio), DESCONHECIDO("desconhecido", R.string.estado_desconhecido, R.string.estado_desconhecido_meio);
 
     companion object {
         fun de(id: String?): EstadoFisico = entries.firstOrNull { it.id == id } ?: DESCONHECIDO

@@ -1,9 +1,14 @@
 package net.saibatudo.quimica.domain.calc
 
+import net.saibatudo.quimica.R
 import net.saibatudo.quimica.data.model.PrefixoSi
 import net.saibatudo.quimica.data.model.Regras
 import net.saibatudo.quimica.data.model.UnidadeDef
 import net.saibatudo.quimica.domain.Texto
+import net.saibatudo.quimica.domain.Textos
+
+/** Id de uma grandeza ("massa", "volume"…) como argumento de [CalculoInvalido]: vira o nome da grandeza no idioma de quem mostra o erro. */
+class GrandezaRef(val id: String)
 
 /** Valor com unidade (usado pelas calculadoras). */
 data class Qtd(val valor: Double, val unidade: UnidadeDef)
@@ -52,15 +57,15 @@ class Unidades(lista: List<UnidadeDef>, val prefixos: List<PrefixoSi> = PREFIXOS
     fun deBase(base: Double, u: UnidadeDef): Double = (base - u.offset) / u.fator
 
     fun converter(valor: Double, de: UnidadeDef, para: UnidadeDef): Double {
-        if (de.grandeza != para.grandeza) throw CalculoInvalido("Não é possível converter ${de.simbolo} (${de.grandeza}) em ${para.simbolo} (${para.grandeza}).")
+        if (de.grandeza != para.grandeza) throw CalculoInvalido(R.string.erro_converter_grandezas, de.simbolo, GrandezaRef(de.grandeza), para.simbolo, GrandezaRef(para.grandeza))
         return deBase(paraBase(valor, de), para)
     }
 
     /** Valor convertido de [de] para [para], com o passo explicado em texto. */
-    fun converterComPasso(valor: Double, de: UnidadeDef, para: UnidadeDef): Pair<Double, String> {
+    fun converterComPasso(t: Textos, valor: Double, de: UnidadeDef, para: UnidadeDef): Pair<Double, String> {
         val r = converter(valor, de, para)
-        val passo = if (de.simbolo == para.simbolo) "${Texto.significativos(valor, 6)} ${de.simbolo}"
-        else "${Texto.significativos(valor, 6)} ${de.simbolo} = ${Texto.significativos(r, 6)} ${para.simbolo}"
+        val passo = if (de.simbolo == para.simbolo) "${t.sig(valor, 6)} ${de.simbolo}"
+        else "${t.sig(valor, 6)} ${de.simbolo} = ${t.sig(r, 6)} ${para.simbolo}"
         return r to passo
     }
 

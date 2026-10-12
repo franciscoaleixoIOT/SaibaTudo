@@ -171,7 +171,7 @@ class BundleTest {
     }
 
     private fun armazenamento(verificador: ManifestVerifier? = null) =
-        BundleStore(File(tmp.root, "bundles"), DirBundleReader(fixture.dir, "Pacote embutido (teste)"), verificador)
+        BundleStore(File(tmp.root, "bundles"), DirBundleReader(fixture.dir, net.saibatudo.quimica.data.bundle.OrigemPacote.EMBUTIDO), verificador)
 
     @Test fun semAtualizacaoUsaOPacoteEmbutido() {
         val a = armazenamento().ativo()

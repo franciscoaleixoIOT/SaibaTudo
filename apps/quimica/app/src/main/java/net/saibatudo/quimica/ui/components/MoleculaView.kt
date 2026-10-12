@@ -20,6 +20,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import net.saibatudo.quimica.R
+import net.saibatudo.quimica.ui.LocalTextos
 import net.saibatudo.quimica.ui.theme.LocalTemaEscuro
 import org.json.JSONObject
 import java.io.ByteArrayInputStream
@@ -42,6 +44,7 @@ private class EstadoMolecula {
 fun MoleculaView(smiles: String, descricao: String, modifier: Modifier = Modifier, altura: Dp = 240.dp) {
     val contexto = LocalContext.current
     val escuro = LocalTemaEscuro.current
+    val textoEstrutura = LocalTextos.current(R.string.molecula_desc, descricao)
     val estado = remember { EstadoMolecula() }
     val webView = remember { criarWebView(contexto, estado) }
 
@@ -63,7 +66,7 @@ fun MoleculaView(smiles: String, descricao: String, modifier: Modifier = Modifie
                 estado.desenhado = pedido
             }
         },
-        modifier = modifier.fillMaxWidth().height(altura).semantics { contentDescription = "Estrutura 2D de $descricao" }
+        modifier = modifier.fillMaxWidth().height(altura).semantics { contentDescription = textoEstrutura }
     )
 }
 

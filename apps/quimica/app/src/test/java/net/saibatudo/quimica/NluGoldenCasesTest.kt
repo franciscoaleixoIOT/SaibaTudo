@@ -33,7 +33,7 @@ class NluGoldenCasesTest {
         var verificados = 0
         for ((idioma, lista) in porIdioma) {
             assertTrue("idioma desconhecido no contrato: $idioma", idioma in Lexico.IDIOMAS)
-            val d = runBlocking { Dicionario.criar(pacote, idioma) }
+            val d = dicionario(pacote, idioma)
             val validos = lista.filter { usandoReal || ContratoNlu.elegivel(it, d) }
             val f = validos.flatMap { c -> ContratoNlu.falhasDoCaso(c, d).map { "[$idioma] \"${c.get("q").asString}\": $it" } }
             resumo += "$idioma ${validos.size}/${lista.size} (falhas ${f.size})"

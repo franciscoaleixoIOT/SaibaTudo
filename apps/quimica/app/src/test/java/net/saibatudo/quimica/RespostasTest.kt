@@ -21,7 +21,7 @@ import org.junit.Test
 class RespostasTest {
 
     private val pacote = TestData.Fixture.pacote
-    private val builder = runBlocking { AnswerBuilder(pacote, Dicionario.criar(pacote), Nivel.MEDIO) }
+    private val builder = runBlocking { AnswerBuilder(pacote, dicionario(pacote), Nivel.MEDIO) }
 
     private fun r(q: String): Resposta = runBlocking { builder.responder(q).second }
 
@@ -191,7 +191,7 @@ class RespostasTest {
         assertTrue(x.recusa)
         assertEquals(OrigemResposta.AVISO, x.origem)
         assertFalse(x.texto().contains("passo a passo:", ignoreCase = true))
-        for (s in Seguranca.SUGESTOES_SEGURAS) {
+        for (s in Seguranca.sugestoesSeguras(Tx.pt)) {
             val y = r(s)
             assertTrue("sugestão de segurança não respondível: $s -> ${y.texto()}", !y.recusa && y.intent == Intent.SEGURANCA)
         }

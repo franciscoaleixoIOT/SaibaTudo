@@ -75,7 +75,7 @@ class CalculosTest {
     }
 
     @Test fun massaMolarMostraPassosEElementoDesconhecido() {
-        val r = MassaMolar.calcular("Ca(OH)2", el).comoResultado()
+        val r = MassaMolar.calcular("Ca(OH)2", el).comoResultado(Tx.pt)
         assertTrue(r.passos.any { it.startsWith("Ca") })
         assertTrue(r.passos.last().startsWith("Soma"))
         try { MassaMolar.calcular("Uuo", el); fail() } catch (_: CalculoInvalido) { }
@@ -84,7 +84,7 @@ class CalculosTest {
 
     // ---- balanceamento -------------------------------------------------------------------------------------------
 
-    private fun bal(eq: String) = Balanceador.balancear(eq, el.keys + setOf("K", "Mn", "Al", "P", "Cr", "Zn", "Mg", "Ag")).balanceada.coeficientes
+    private fun bal(eq: String) = Balanceador.balancear(Tx.pt, eq, el.keys + setOf("K", "Mn", "Al", "P", "Cr", "Zn", "Mg", "Ag")).balanceada.coeficientes
 
     @Test fun balanceiaDezEquacoes() {
         assertEquals(listOf(2, 1, 2), bal("H2 + O2 -> H2O"))
@@ -110,15 +110,15 @@ class CalculosTest {
     }
 
     @Test fun balanceiaEquacaoIonicaComCarga() {
-        val r = Balanceador.balancear("Fe3+ + OH- -> Fe(OH)3", el.keys + "Fe")
+        val r = Balanceador.balancear(Tx.pt, "Fe3+ + OH- -> Fe(OH)3", el.keys + "Fe")
         assertEquals(listOf(1, 3, 1), r.balanceada.coeficientes)
         assertTrue(r.passos.any { it.startsWith("Carga:") })
-        val r2 = Balanceador.balancear("Cu2+ + Fe -> Cu + Fe2+", el.keys)
+        val r2 = Balanceador.balancear(Tx.pt, "Cu2+ + Fe -> Cu + Fe2+", el.keys)
         assertEquals(listOf(1, 1, 1, 1), r2.balanceada.coeficientes)
     }
 
     @Test fun balanceadorMostraPassosETextoFinal() {
-        val r = Balanceador.balancear("H2 + O2 -> H2O", el.keys)
+        val r = Balanceador.balancear(Tx.pt, "H2 + O2 -> H2O", el.keys)
         assertEquals("2 H₂ + O₂ → 2 H₂O", r.balanceada.texto())
         assertEquals("2 H2 + O2 -> 2 H2O", r.balanceada.texto(unicode = false))
         assertTrue(r.passos.any { it.contains("Gauss") })
@@ -128,7 +128,7 @@ class CalculosTest {
     @Test fun balanceadorRecusaEquacoesImpossiveis() {
         for (ruim in listOf("H2 -> O2", "H2O -> H2O2 + O", "NaCl -> Na", "H2 + O2", "->", "", "H2 + O2 -> H2O -> H2")) {
             try {
-                Balanceador.balancear(ruim, el.keys)
+                Balanceador.balancear(Tx.pt, ruim, el.keys)
                 fail("deveria recusar: \"$ruim\"")
             } catch (_: CalculoInvalido) {
             }
@@ -146,8 +146,8 @@ class CalculosTest {
 
     @Test fun estequiometriaMassaDeProduto() {
         // 2 H2 + O2 -> 2 H2O: 4,032 g de H2 (2 mol) produzem 2 mol de água = 36,03 g
-        val eq = Balanceador.balancear("H2 + O2 -> H2O", el.keys).balanceada
-        val r = Estequiometria.calcular(eq, listOf(QuantidadeConhecida(0, 4.0, emMols = false)), el)
+        val eq = Balanceador.balancear(Tx.pt, "H2 + O2 -> H2O", el.keys).balanceada
+        val r = Estequiometria.calcular(Tx.pt, eq, listOf(QuantidadeConhecida(0, 4.0, emMols = false)), el)
         val agua = r.linhas.first { it.especie == "H2O" }
         assertEquals(4.0 / (2 * 1.008) * 18.015, agua.massa, 0.05)
         assertEquals(4.0 / (2 * 1.008), agua.mols, 1e-9)
@@ -156,8 +156,8 @@ class CalculosTest {
 
     @Test fun estequiometriaReagenteLimitante() {
         // 2 H2 + O2 -> 2 H2O com 3 mol de H2 e 1 mol de O2: limitante O2 (1 < 1,5); formam 2 mol de H2O; sobra 1 mol de H2
-        val eq = Balanceador.balancear("H2 + O2 -> H2O", el.keys).balanceada
-        val r = Estequiometria.calcular(eq, listOf(QuantidadeConhecida(0, 3.0, true), QuantidadeConhecida(1, 1.0, true)), el)
+        val eq = Balanceador.balancear(Tx.pt, "H2 + O2 -> H2O", el.keys).balanceada
+        val r = Estequiometria.calcular(Tx.pt, eq, listOf(QuantidadeConhecida(0, 3.0, true), QuantidadeConhecida(1, 1.0, true)), el)
         assertEquals("O2", r.limitante)
         assertEquals(2.0, r.linhas.first { it.especie == "H2O" }.mols, 1e-9)
         assertEquals(1.0, r.linhas.first { it.especie == "H2" }.sobraMols!!, 1e-9)
@@ -165,17 +165,17 @@ class CalculosTest {
     }
 
     @Test fun estequiometriaRecusaEntradasRuins() {
-        val eq = Balanceador.balancear("H2 + O2 -> H2O", el.keys).balanceada
-        try { Estequiometria.calcular(eq, emptyList(), el); fail() } catch (_: CalculoInvalido) { }
-        try { Estequiometria.calcular(eq, listOf(QuantidadeConhecida(0, -1.0, true)), el); fail() } catch (_: CalculoInvalido) { }
-        try { Estequiometria.calcular(eq, listOf(QuantidadeConhecida(0, 1.0, true), QuantidadeConhecida(2, 1.0, true)), el); fail() } catch (_: CalculoInvalido) { }
+        val eq = Balanceador.balancear(Tx.pt, "H2 + O2 -> H2O", el.keys).balanceada
+        try { Estequiometria.calcular(Tx.pt, eq, emptyList(), el); fail() } catch (_: CalculoInvalido) { }
+        try { Estequiometria.calcular(Tx.pt, eq, listOf(QuantidadeConhecida(0, -1.0, true)), el); fail() } catch (_: CalculoInvalido) { }
+        try { Estequiometria.calcular(Tx.pt, eq, listOf(QuantidadeConhecida(0, 1.0, true), QuantidadeConhecida(2, 1.0, true)), el); fail() } catch (_: CalculoInvalido) { }
     }
 
     // ---- gás ideal -------------------------------------------------------------------------------------------------
 
     @Test fun gasIdealVolumeMolarNasCNTP() {
         val r = pacote.constante("R")
-        val res = GasIdeal.resolver(CampoQtd(101325.0, u("Pa")), CampoQtd(null, u("L")), CampoQtd(1.0, u("mol")), CampoQtd(273.15, u("K")), r, un)
+        val res = GasIdeal.resolver(Tx.pt, CampoQtd(101325.0, u("Pa")), CampoQtd(null, u("L")), CampoQtd(1.0, u("mol")), CampoQtd(273.15, u("K")), r, un)
         val litros = res.linhas.first().valor.replace(" L", "").replace(",", ".").toDouble()
         assertEquals(22.414, litros, 0.002)
     }
@@ -183,10 +183,10 @@ class CalculosTest {
     @Test fun gasIdealComUnidadesMistas() {
         val r = pacote.constante("R")
         // 1 atm, 0 °C, 1 mol -> 22,41 L
-        val a = GasIdeal.resolver(CampoQtd(1.0, u("atm")), CampoQtd(null, u("L")), CampoQtd(1.0, u("mol")), CampoQtd(0.0, u("°C")), r, un)
+        val a = GasIdeal.resolver(Tx.pt, CampoQtd(1.0, u("atm")), CampoQtd(null, u("L")), CampoQtd(1.0, u("mol")), CampoQtd(0.0, u("°C")), r, un)
         assertEquals(22.41, a.linhas.first().valor.replace(" L", "").replace(",", ".").toDouble(), 0.01)
         // temperatura: 2 atm, 10 L, 0,8 mol  ->  T = PV/(nR)
-        val t = GasIdeal.resolver(CampoQtd(2.0, u("atm")), CampoQtd(10.0, u("L")), CampoQtd(0.8, u("mol")), CampoQtd(null, u("K")), r, un)
+        val t = GasIdeal.resolver(Tx.pt, CampoQtd(2.0, u("atm")), CampoQtd(10.0, u("L")), CampoQtd(0.8, u("mol")), CampoQtd(null, u("K")), r, un)
         val esperado = 2 * 101325.0 * 0.010 / (0.8 * 8.314462618)
         assertEquals(esperado, t.linhas.first().valor.replace(" K", "").replace(".", "").replace(",", ".").toDouble(), 0.05)
         assertTrue(t.passos.first().contains("P·V = n·R·T"))
@@ -194,10 +194,10 @@ class CalculosTest {
 
     @Test fun gasIdealExigeUmCampoVazioEValoresPositivos() {
         val r = pacote.constante("R")
-        try { GasIdeal.resolver(CampoQtd(1.0, u("atm")), CampoQtd(1.0, u("L")), CampoQtd(1.0, u("mol")), CampoQtd(300.0, u("K")), r, un); fail() } catch (_: CalculoInvalido) { }
-        try { GasIdeal.resolver(CampoQtd(1.0, u("atm")), CampoQtd(null, u("L")), CampoQtd(1.0, u("mol")), CampoQtd(-5.0, u("K")), r, un); fail() } catch (_: CalculoInvalido) { }
-        try { GasIdeal.resolver(CampoQtd(1.0, u("L")), CampoQtd(null, u("L")), CampoQtd(1.0, u("mol")), CampoQtd(300.0, u("K")), r, un); fail() } catch (_: CalculoInvalido) { }
-        try { GasIdeal.resolver(CampoQtd(1.0, u("atm")), CampoQtd(null, u("L")), CampoQtd(1.0, u("mol")), CampoQtd(300.0, u("K")), null, un); fail() } catch (_: CalculoInvalido) { }
+        try { GasIdeal.resolver(Tx.pt, CampoQtd(1.0, u("atm")), CampoQtd(1.0, u("L")), CampoQtd(1.0, u("mol")), CampoQtd(300.0, u("K")), r, un); fail() } catch (_: CalculoInvalido) { }
+        try { GasIdeal.resolver(Tx.pt, CampoQtd(1.0, u("atm")), CampoQtd(null, u("L")), CampoQtd(1.0, u("mol")), CampoQtd(-5.0, u("K")), r, un); fail() } catch (_: CalculoInvalido) { }
+        try { GasIdeal.resolver(Tx.pt, CampoQtd(1.0, u("L")), CampoQtd(null, u("L")), CampoQtd(1.0, u("mol")), CampoQtd(300.0, u("K")), r, un); fail() } catch (_: CalculoInvalido) { }
+        try { GasIdeal.resolver(Tx.pt, CampoQtd(1.0, u("atm")), CampoQtd(null, u("L")), CampoQtd(1.0, u("mol")), CampoQtd(300.0, u("K")), null, un); fail() } catch (_: CalculoInvalido) { }
     }
 
     // ---- pH ---------------------------------------------------------------------------------------------------------
@@ -205,16 +205,16 @@ class CalculosTest {
     private fun ph(r: net.saibatudo.quimica.domain.calc.ResultadoCalculo) = r.linhas.first { it.rotulo == "pH" }.valor.replace(",", ".").toDouble()
 
     @Test fun phDeAcidosEBasesFortes() {
-        assertEquals(2.0, ph(Solucoes.phForte(TipoForte.ACIDO, Qtd(0.01, u("mol/L")), 1, un)), 0.005)
-        assertEquals(11.0, ph(Solucoes.phForte(TipoForte.BASE, Qtd(0.001, u("mol/L")), 1, un)), 0.005)
-        assertEquals(12.0, ph(Solucoes.phForte(TipoForte.BASE, Qtd(0.005, u("mol/L")), 2, un)), 0.005)   // Ca(OH)2
-        assertEquals(2.0, ph(Solucoes.phForte(TipoForte.ACIDO, Qtd(0.005, u("mol/L")), 2, un)), 0.005)   // H2SO4 (2 H+)
-        assertEquals(0.0, ph(Solucoes.phForte(TipoForte.ACIDO, Qtd(1.0, u("mol/L")), 1, un)), 0.005)
-        assertEquals(3.0, ph(Solucoes.phForte(TipoForte.ACIDO, Qtd(1.0, u("mmol/L")), 1, un)), 0.005)
+        assertEquals(2.0, ph(Solucoes.phForte(Tx.pt, TipoForte.ACIDO, Qtd(0.01, u("mol/L")), 1, un)), 0.005)
+        assertEquals(11.0, ph(Solucoes.phForte(Tx.pt, TipoForte.BASE, Qtd(0.001, u("mol/L")), 1, un)), 0.005)
+        assertEquals(12.0, ph(Solucoes.phForte(Tx.pt, TipoForte.BASE, Qtd(0.005, u("mol/L")), 2, un)), 0.005)   // Ca(OH)2
+        assertEquals(2.0, ph(Solucoes.phForte(Tx.pt, TipoForte.ACIDO, Qtd(0.005, u("mol/L")), 2, un)), 0.005)   // H2SO4 (2 H+)
+        assertEquals(0.0, ph(Solucoes.phForte(Tx.pt, TipoForte.ACIDO, Qtd(1.0, u("mol/L")), 1, un)), 0.005)
+        assertEquals(3.0, ph(Solucoes.phForte(Tx.pt, TipoForte.ACIDO, Qtd(1.0, u("mmol/L")), 1, un)), 0.005)
     }
 
     @Test fun phMuitoDiluidoConsideraAAgua() {
-        val r = Solucoes.phForte(TipoForte.ACIDO, Qtd(1e-8, u("mol/L")), 1, un)
+        val r = Solucoes.phForte(Tx.pt, TipoForte.ACIDO, Qtd(1e-8, u("mol/L")), 1, un)
         assertEquals(6.98, ph(r), 0.005)       // e não 8
         assertTrue(r.notas.any { it.contains("autoionização") })
     }
@@ -228,22 +228,22 @@ class CalculosTest {
 
     @Test fun molaridadeEMassaParaPreparar() {
         // 5,844 g de NaCl (58,44 g/mol) em 500 mL -> 0,2 mol/L
-        val r = Solucoes.molaridade(Qtd(5.844, u("g")), 58.44, Qtd(500.0, u("mL")), un)
+        val r = Solucoes.molaridade(Tx.pt, Qtd(5.844, u("g")), 58.44, Qtd(500.0, u("mL")), un)
         assertEquals(0.2, r.linhas.first { it.destaque }.valor.replace(" mol/L", "").replace(",", ".").toDouble(), 1e-4)
         // 250 mL de NaOH 0,1 mol/L (39,997 g/mol) -> 1,0 g
-        val m = Solucoes.massaParaPreparar(Qtd(0.1, u("mol/L")), Qtd(250.0, u("mL")), 39.997, un)
+        val m = Solucoes.massaParaPreparar(Tx.pt, Qtd(0.1, u("mol/L")), Qtd(250.0, u("mL")), 39.997, un)
         assertEquals(1.0, m.linhas.first().valor.replace(" g", "").replace(",", ".").toDouble(), 0.001)
     }
 
     @Test fun diluicaoResolveQualquerIncognita() {
         // 2 mol/L, 50 mL -> 0,5 mol/L: V2 = 200 mL
-        val v2 = Solucoes.diluicao(CampoQtd(2.0, u("mol/L")), CampoQtd(50.0, u("mL")), CampoQtd(0.5, u("mol/L")), CampoQtd(null, u("mL")), un)
+        val v2 = Solucoes.diluicao(Tx.pt, CampoQtd(2.0, u("mol/L")), CampoQtd(50.0, u("mL")), CampoQtd(0.5, u("mol/L")), CampoQtd(null, u("mL")), un)
         assertEquals(200.0, v2.linhas.first().valor.replace(" mL", "").replace(",", ".").toDouble(), 1e-6)
-        val c2 = Solucoes.diluicao(CampoQtd(2.0, u("mol/L")), CampoQtd(0.05, u("L")), CampoQtd(null, u("mmol/L")), CampoQtd(200.0, u("mL")), un)
+        val c2 = Solucoes.diluicao(Tx.pt, CampoQtd(2.0, u("mol/L")), CampoQtd(0.05, u("L")), CampoQtd(null, u("mmol/L")), CampoQtd(200.0, u("mL")), un)
         assertEquals(500.0, c2.linhas.first().valor.replace(" mmol/L", "").replace(",", ".").toDouble(), 1e-6)
-        val v1 = Solucoes.diluicao(CampoQtd(1.0, u("mol/L")), CampoQtd(null, u("mL")), CampoQtd(0.1, u("mol/L")), CampoQtd(100.0, u("mL")), un)
+        val v1 = Solucoes.diluicao(Tx.pt, CampoQtd(1.0, u("mol/L")), CampoQtd(null, u("mL")), CampoQtd(0.1, u("mol/L")), CampoQtd(100.0, u("mL")), un)
         assertEquals(10.0, v1.linhas.first().valor.replace(" mL", "").replace(",", ".").toDouble(), 1e-6)
-        try { Solucoes.diluicao(CampoQtd(1.0, u("mol/L")), CampoQtd(1.0, u("mL")), CampoQtd(1.0, u("mol/L")), CampoQtd(1.0, u("mL")), un); fail() } catch (_: CalculoInvalido) { }
+        try { Solucoes.diluicao(Tx.pt, CampoQtd(1.0, u("mol/L")), CampoQtd(1.0, u("mL")), CampoQtd(1.0, u("mol/L")), CampoQtd(1.0, u("mL")), un); fail() } catch (_: CalculoInvalido) { }
     }
 
     // ---- unidades ---------------------------------------------------------------------------------------------------------

@@ -12,7 +12,8 @@ import net.saibatudo.quimica.data.bundle.PacoteStore
 sealed interface EstadoDados {
     data object Carregando : EstadoDados
     data class Pronto(val pacote: Pacote) : EstadoDados
-    data class Erro(val mensagem: String) : EstadoDados
+    /** [mensagem] é o diagnóstico técnico da exceção (null = sem detalhe; a tela mostra um texto genérico). */
+    data class Erro(val mensagem: String?) : EstadoDados
 }
 
 /**
@@ -39,7 +40,7 @@ class QuimicaDataStore(private val store: PacoteStore) {
             }
         }
         if (_estado.value !is EstadoDados.Pronto) {
-            _estado.value = EstadoDados.Erro(ultimoErro?.message ?: "falha ao carregar o pacote de dados")
+            _estado.value = EstadoDados.Erro(ultimoErro?.message)
         }
     }
 

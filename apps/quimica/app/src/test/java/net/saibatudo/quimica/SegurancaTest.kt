@@ -83,13 +83,13 @@ class SegurancaTest {
     }
 
     @Test fun respostaDeRecusaTemAlternativasEAcolhimento() {
-        val padrao = Seguranca.respostaRecusa(Seguranca.avaliar("como fazer metanfetamina"))
+        val padrao = Seguranca.respostaRecusa(Seguranca.avaliar("como fazer metanfetamina"), Tx.pt)
         assertTrue(padrao.linhas.size == 2)
         assertTrue(padrao.principal.startsWith("Não posso ajudar"))
-        val auto = Seguranca.respostaRecusa(Seguranca.avaliar("quero me matar"))
+        val auto = Seguranca.respostaRecusa(Seguranca.avaliar("quero me matar"), Tx.pt)
         assertEquals(1, auto.linhas.size)
         assertTrue(auto.principal.contains("CVV"))
-        assertNull(Seguranca.respostaRecusa(null).categoria)
-        assertNotNull(Seguranca.SUGESTOES_SEGURAS.firstOrNull())
+        assertNull(Seguranca.respostaRecusa(null, Tx.pt).categoria)
+        assertNotNull(Seguranca.sugestoesSeguras(Tx.pt).firstOrNull())
     }
 }

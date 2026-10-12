@@ -3,7 +3,7 @@ package net.saibatudo.quimica.domain
 import java.text.Normalizer
 import java.util.Locale
 
-/** Utilitários de texto: normalização para busca/NLU, formatação pt-BR de números e fórmulas com sub/sobrescrito. */
+/** Utilitários de texto: normalização para busca/NLU, formatação de números no idioma (pt-BR por padrão) e fórmulas com sub/sobrescrito. */
 object Texto {
     private val RX_COMBINANTES = Regex("\\p{Mn}+")
     private val RX_ESPACOS = Regex("\\s+")
@@ -61,14 +61,12 @@ object Texto {
         return sb.toString()
     }
 
-    // ---- números pt-BR ---------------------------------------------------------------------------------------------
+    // ---- números no formato do idioma (I18N §1.3): pt-BR (padrão), es, de e fr com vírgula decimal; en com ponto ------------------------
 
-    private val PT_BR: Locale = Locale.forLanguageTag("pt-BR")
-
-    /** 1234.5 → "1.234,5" com [casas] casas decimais no máximo (zeros à direita removidos). */
-    fun numero(v: Double, casas: Int = 3): String {
+    /** 1234.5 → "1.234,5" (pt-BR) ou "1,234.5" (en) com [casas] casas decimais no máximo (zeros à direita removidos). */
+    fun numero(v: Double, casas: Int = 3, idioma: String = Idiomas.PADRAO): String {
         if (v.isNaN() || v.isInfinite()) return "—"
-        val fmt = java.text.NumberFormat.getNumberInstance(PT_BR).apply {
+        val fmt = java.text.NumberFormat.getNumberInstance(Idiomas.locale(idioma)).apply {
             maximumFractionDigits = casas
             minimumFractionDigits = 0
             isGroupingUsed = true
@@ -77,10 +75,10 @@ object Texto {
         return if (s == "-0") "0" else s
     }
 
-    /** Casas decimais fixas: 18.0153 com 3 → "18,015". */
-    fun fixo(v: Double, casas: Int): String {
+    /** Casas decimais fixas: 18.0153 com 3 → "18,015" (pt-BR) ou "18.015" (en). */
+    fun fixo(v: Double, casas: Int, idioma: String = Idiomas.PADRAO): String {
         if (v.isNaN() || v.isInfinite()) return "—"
-        val fmt = java.text.NumberFormat.getNumberInstance(PT_BR).apply {
+        val fmt = java.text.NumberFormat.getNumberInstance(Idiomas.locale(idioma)).apply {
             maximumFractionDigits = casas
             minimumFractionDigits = casas
             isGroupingUsed = true
@@ -89,7 +87,7 @@ object Texto {
     }
 
     /** [algarismos] algarismos significativos; usa notação científica "6,022 × 10²³" fora de 1e-3 ≤ |v| < 1e6. */
-    fun significativos(v: Double, algarismos: Int = 4): String {
+    fun significativos(v: Double, algarismos: Int = 4, idioma: String = Idiomas.PADRAO): String {
         if (v.isNaN() || v.isInfinite()) return "—"
         if (v == 0.0) return "0"
         val a = kotlin.math.abs(v)
@@ -97,13 +95,13 @@ object Texto {
             val ordem = kotlin.math.floor(kotlin.math.log10(a)).toInt()
             val casas = (algarismos - 1 - ordem).coerceIn(0, 10)
             val bd = java.math.BigDecimal(v).setScale(casas, java.math.RoundingMode.HALF_UP)
-            return numero(bd.toDouble(), casas)
+            return numero(bd.toDouble(), casas, idioma)
         }
-        return cientifica(v, algarismos - 1)
+        return cientifica(v, algarismos - 1, idioma)
     }
 
     /** "6,022 × 10²³" (mantissa com [casas] casas). */
-    fun cientifica(v: Double, casas: Int = 3): String {
+    fun cientifica(v: Double, casas: Int = 3, idioma: String = Idiomas.PADRAO): String {
         if (v == 0.0) return "0"
         val exp = kotlin.math.floor(kotlin.math.log10(kotlin.math.abs(v))).toInt()
         var mant = v / Math.pow(10.0, exp.toDouble())
@@ -115,7 +113,7 @@ object Texto {
         } else {
             mant = arred
         }
-        return fixo(mant, casas) + " × 10" + sobrescrito(e.toString())
+        return fixo(mant, casas, idioma) + " × 10" + sobrescrito(e.toString())
     }
 
     /** Distância de Damerau-Levenshtein com corte: devolve max+1 se passar de [max]. */

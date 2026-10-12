@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import androidx.activity.compose.BackHandler
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -21,26 +22,31 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
+import net.saibatudo.quimica.R
 import net.saibatudo.quimica.data.repository.EstadoDados
+import net.saibatudo.quimica.domain.Nomes
 import net.saibatudo.quimica.ui.IdiomaApp
+import net.saibatudo.quimica.ui.LocalTextos
 import net.saibatudo.quimica.ui.viewmodel.MainViewModel
 import net.saibatudo.quimica.ui.viewmodel.Tela
 import net.saibatudo.quimica.ui.viewmodel.aba
 
-private data class ItemAba(val tela: Tela, val rotulo: String, val icone: ImageVector)
+private data class ItemAba(val tela: Tela, @param:StringRes val rotulo: Int, val icone: ImageVector)
 
 private val ABAS = listOf(
-    ItemAba(Tela.Inicio, "Início", Icons.Filled.Home),
-    ItemAba(Tela.Tabela, "Tabela", Icons.Filled.GridView),
-    ItemAba(Tela.Busca, "Buscar", Icons.Filled.Search),
-    ItemAba(Tela.Calculadoras, "Calcular", Icons.Filled.Calculate),
-    ItemAba(Tela.Mais, "Mais", Icons.Filled.MoreHoriz)
+    ItemAba(Tela.Inicio, R.string.ui_aba_inicio, Icons.Filled.Home),
+    ItemAba(Tela.Tabela, R.string.ui_aba_tabela, Icons.Filled.GridView),
+    ItemAba(Tela.Busca, R.string.ui_aba_buscar, Icons.Filled.Search),
+    ItemAba(Tela.Calculadoras, R.string.ui_aba_calcular, Icons.Filled.Calculate),
+    ItemAba(Tela.Mais, R.string.ui_aba_mais, Icons.Filled.MoreHoriz)
 )
 
 /** Abre um endereço https no navegador (nunca outro esquema). */
@@ -53,9 +59,18 @@ fun abrirUrl(contexto: Context, url: String) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+/** Fornece os textos do idioma do app a todas as telas (`LocalTextos`). */
 @Composable
 fun MainAppScreen(vm: MainViewModel) {
+    val estado by vm.estado.collectAsState()
+    val textos = remember(estado.idioma) { vm.textos(estado.idioma) }
+    CompositionLocalProvider(LocalTextos provides textos) { MainAppConteudo(vm) }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun MainAppConteudo(vm: MainViewModel) {
+    val t = LocalTextos.current
     val estado by vm.estado.collectAsState()
     val pilha by vm.pilha.collectAsState()
     val contexto = LocalContext.current
@@ -74,18 +89,18 @@ fun MainAppScreen(vm: MainViewModel) {
                     title = {
                         Text(
                             when (tela) {
-                                is Tela.Elemento -> pacote?.porZ?.get(tela.z)?.nome ?: "Elemento"
-                                is Tela.Composto -> pacote?.indice?.entrada(tela.cid)?.nomes?.firstOrNull() ?: "Composto"
-                                is Tela.Calculadora -> tela.tipo.rotulo
-                                Tela.Seguranca -> "Segurança e GHS"
-                                Tela.Sobre -> "Sobre os dados"
-                                Tela.Privacidade -> "Privacidade"
-                                Tela.Configuracoes -> "Configurações"
-                                else -> "SaibaTudo Química"
+                                is Tela.Elemento -> pacote?.porZ?.get(tela.z)?.let { t.nomeRotulado(Nomes.elemento(it, t.idioma)) } ?: t(R.string.ui_titulo_elemento)
+                                is Tela.Composto -> vm.nomeDoComposto(tela.cid) ?: pacote?.indice?.entrada(tela.cid)?.nomes?.firstOrNull() ?: t(R.string.ui_titulo_composto)
+                                is Tela.Calculadora -> t(tela.tipo.rotulo)
+                                Tela.Seguranca -> t(R.string.ui_titulo_seguranca)
+                                Tela.Sobre -> t(R.string.ui_titulo_sobre)
+                                Tela.Privacidade -> t(R.string.ui_titulo_privacidade)
+                                Tela.Configuracoes -> t(R.string.ui_titulo_configuracoes)
+                                else -> t(R.string.app_name)
                             }
                         )
                     },
-                    navigationIcon = { IconButton(onClick = { vm.voltar() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar") } }
+                    navigationIcon = { IconButton(onClick = { vm.voltar() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = t(R.string.ui_voltar)) } }
                 )
             }
         },
@@ -96,7 +111,7 @@ fun MainAppScreen(vm: MainViewModel) {
                         selected = tela.aba() == item.tela,
                         onClick = { vm.irParaAba(item.tela) },
                         icon = { Icon(item.icone, contentDescription = null) },
-                        label = { Text(item.rotulo) }
+                        label = { Text(t(item.rotulo)) }
                     )
                 }
             }

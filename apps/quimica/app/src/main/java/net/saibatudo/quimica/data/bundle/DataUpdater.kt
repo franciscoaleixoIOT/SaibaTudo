@@ -1,7 +1,9 @@
 package net.saibatudo.quimica.data.bundle
 
+import androidx.annotation.StringRes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import net.saibatudo.quimica.R
 import okhttp3.CacheControl
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -13,8 +15,10 @@ import java.security.MessageDigest
 sealed interface UpdateResult {
     data object UpToDate : UpdateResult
     data class Updated(val dataVersion: String, val arquivosBaixados: Int, val bytesBaixados: Long) : UpdateResult
-    data class Skipped(val motivo: String) : UpdateResult
-    data class Failed(val erro: String) : UpdateResult
+    /** Nada a fazer agora; [motivo] é um recurso de strings.xml (com [detalhe] como argumento, se o texto o pedir). */
+    data class Skipped(@param:StringRes val motivo: Int, val detalhe: Any? = null) : UpdateResult
+    /** Falha: [erro] é o diagnóstico técnico (mensagem da exceção; não traduzido); [motivo], quando há, é a explicação para o usuário. */
+    data class Failed(val erro: String, @param:StringRes val motivo: Int? = null) : UpdateResult
 }
 
 /**
@@ -52,16 +56,16 @@ class DataUpdater(
         val manifestBytes = baixarBytes(base + "manifest.json")
         val assinatura = String(baixarBytes(base + "manifest.sig"), Charsets.UTF_8)
         if (!verifier.verify(manifestBytes, assinatura)) {
-            return UpdateResult.Failed("assinatura do manifesto INVÁLIDA: atualização rejeitada")
+            return UpdateResult.Failed("assinatura do manifesto INVÁLIDA: atualização rejeitada", R.string.atualizacao_assinatura_invalida)
         }
         val novo = BundleManifest.parse(manifestBytes).also { it.validar() }
         if (novo.minAppVersionCode > appVersionCode) {
-            return UpdateResult.Skipped("requer versão mais nova do app (>= ${novo.minAppVersionCode})")
+            return UpdateResult.Skipped(R.string.atualizacao_requer_app, novo.minAppVersionCode)
         }
         val ativo = store.ativo()
         val gerAtivo = ativo.manifest.generatedAt.orEmpty()
         val gerNovo = novo.generatedAt.orEmpty()
-        if (gerNovo < gerAtivo) return UpdateResult.Skipped("pacote remoto é mais antigo que o ativo (anti-rollback)")
+        if (gerNovo < gerAtivo) return UpdateResult.Skipped(R.string.atualizacao_anti_rollback)
         val versao = novo.version!!
         if (versao == ativo.manifest.version && gerNovo == gerAtivo) return UpdateResult.UpToDate
 

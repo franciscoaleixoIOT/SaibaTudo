@@ -1,4 +1,856 @@
-<resources>
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- 00_base -->
     <string name="config_idioma_titulo">Langue</string>
-    <string name="config_idioma_descricao">Langue de l’assistant, des noms et des textes des données. Sans choix, la langue de l’appareil est utilisée.</string>
+    <string name="config_idioma_descricao">Langue de l’assistant, des noms et des textes des données. Sans choix, la langue de l’appareil s’applique.</string>
+    <string name="idioma_nome_pt_br">portugais</string>
+    <string name="idioma_nome_en">anglais</string>
+    <string name="idioma_nome_es">espagnol</string>
+    <string name="idioma_nome_de">allemand</string>
+    <string name="idioma_nome_fr">français</string>
+    <string name="nome_em_idioma">%1$s (nom en %2$s)</string>
+    <string name="rotulo_nome_em_idioma">Nom en %1$s</string>
+
+    <!-- 10_erros_formula -->
+    <string name="erro_formula_digite">Saisissez une formule, par exemple H2O.</string>
+    <string name="erro_formula_vazia">Formule vide.</string>
+    <string name="erro_coeficiente_invalido">Coefficient non valide dans « %1$s ».</string>
+    <string name="erro_parte_vazia">Partie vide (vérifiez le « · » de l’hydrate).</string>
+    <string name="erro_formula_sem_elementos">Formule sans éléments : %1$s</string>
+    <string name="erro_atomos_demais">Nombre d’atomes trop grand dans « %1$s ».</string>
+    <string name="erro_parentese_fecha_sem_abre">Parenthèse « ) » sans « ( » correspondante.</string>
+    <string name="erro_parentese_abre_sem_fecha">Parenthèse « ( » sans « ) » correspondante.</string>
+    <string name="erro_parenteses_vazios">Parenthèses vides.</string>
+    <string name="erro_nao_e_simbolo">« %1$s » n’est pas un symbole d’élément.</string>
+    <string name="erro_letra_minuscula">Lettre minuscule « %1$s » mal placée (les symboles commencent par une majuscule, comme dans « Na » et « Cl »).</string>
+    <string name="erro_caractere_inesperado">Caractère inattendu « %1$s ».</string>
+    <string name="erro_quantidade_invalida">Indice non valide « %1$s ».</string>
+    <string name="erro_quantidade_grande">Indice trop grand.</string>
+
+    <!-- 11_balanceamento -->
+    <string name="erro_equacao_digite">Saisissez l’équation, par exemple : Fe + O2 -> Fe2O3</string>
+    <string name="erro_equacao_sem_seta">Je n’ai pas trouvé la flèche de réaction. Écrivez réactifs -> produits, par exemple : H2 + O2 -> H2O</string>
+    <string name="erro_equacao_varias_setas">L’équation contient plus d’une flèche. Saisissez une réaction à la fois.</string>
+    <string name="erro_equacao_faltam_reagentes">Il manque les réactifs de l’équation.</string>
+    <string name="erro_equacao_faltam_produtos">Il manque les produits de l’équation.</string>
+    <string name="erro_substancia">Substance « %1$s » : %2$s</string>
+    <string name="erro_equacao_grande">Équation trop grande (maximum de 26 espèces).</string>
+    <string name="erro_bal_sem_combinacao">Aucune combinaison de coefficients ne conserve les atomes. Vérifiez les formules : chaque élément doit apparaître des deux côtés.</string>
+    <string name="erro_bal_sem_combinacao_carga">Aucune combinaison de coefficients ne conserve les atomes et la charge. Vérifiez les formules : chaque élément doit apparaître des deux côtés.</string>
+    <string name="erro_bal_varias_solucoes">Cette équation admet plusieurs solutions indépendantes (elle semble mélanger deux réactions ou plus). Séparez-la en réactions plus petites et équilibrez-les une à la fois.</string>
+    <string name="erro_bal_sem_positivos">Il n’existe pas de coefficients positifs qui équilibrent cette équation (problème avec : %1$s). Vérifiez que les espèces sont du bon côté et qu’aucune n’est en trop.</string>
+    <string name="erro_bal_coef_grandes">Les coefficients obtenus sont trop grands.</string>
+    <string name="calc_bal_titulo">Équation équilibrée</string>
+    <string name="calc_bal_linha_equacao">Équation</string>
+    <string name="calc_bal_especies">Espèces : %1$s.</string>
+    <string name="calc_bal_cada_letra">Chaque lettre est le coefficient de l’espèce. Conserver chaque élément donne une équation (atomes dans les réactifs = atomes dans les produits) :</string>
+    <string name="calc_bal_cada_letra_carga">Chaque lettre est le coefficient de l’espèce. Conserver chaque élément et la charge donne une équation (atomes dans les réactifs = atomes dans les produits) :</string>
+    <string name="calc_bal_carga">Charge : %1$s = 0</string>
+    <string name="calc_bal_resolvendo">En résolvant le système par élimination de Gauss–Jordan (avec des fractions exactes), %1$s reste libre : %1$s = 1 et %2$s.</string>
+    <string name="calc_bal_multiplicando">En multipliant par le plus petit nombre qui élimine les fractions, puis en simplifiant : %1$s.</string>
+    <string name="calc_equacao_balanceada">Équation équilibrée : %1$s</string>
+    <string name="calc_bal_rotulo_carga">charge</string>
+    <string name="calc_bal_verificacao_ok" tools:ignore="PluralsCandidate">Vérification – %1$s : %2$d dans les réactifs et %3$d dans les produits (conservé).</string>
+    <string name="calc_bal_verificacao_erro" tools:ignore="PluralsCandidate">Vérification – %1$s : %2$d dans les réactifs et %3$d dans les produits (ERREUR).</string>
+
+    <!-- 12_calculos -->
+    <string name="grandeza_massa">masse</string>
+    <string name="grandeza_volume">volume</string>
+    <string name="grandeza_comprimento">longueur</string>
+    <string name="grandeza_pressao">pression</string>
+    <string name="grandeza_energia">énergie</string>
+    <string name="grandeza_temperatura">température</string>
+    <string name="grandeza_tempo">temps</string>
+    <string name="grandeza_quantidade">quantité de matière</string>
+    <string name="grandeza_concentracao">concentration</string>
+    <string name="grandeza_densidade">densité</string>
+    <string name="var_gas_pressao">Pression</string>
+    <string name="var_gas_volume">Volume</string>
+    <string name="var_gas_quantidade">Quantité de matière</string>
+    <string name="var_gas_temperatura">Température</string>
+    <string name="erro_converter_grandezas">Impossible de convertir %1$s (%2$s) en %3$s (%4$s).</string>
+    <string name="erro_unidade_nao_serve">L’unité %1$s ne convient pas pour cette grandeur (%2$s).</string>
+    <string name="erro_falta_unidade_base">Il manque l’unité de base de la grandeur « %1$s » dans les données.</string>
+    <string name="erro_falta_unidade_grama">Il manque l’unité gramme dans les données.</string>
+    <string name="erro_falta_unidade_litro">Il manque l’unité litre dans les données.</string>
+    <string name="erro_falta_unidade_mol_l">Il manque l’unité mol/L dans les données.</string>
+    <string name="erro_deve_ser_positivo">%1$s doit être un nombre positif.</string>
+    <string name="erro_um_campo_vazio">Laissez exactement un champ vide : c’est ce qui sera calculé.</string>
+    <string name="rot_massa_molar">Masse molaire</string>
+    <string name="calc_mm_titulo">Masse molaire : %1$s</string>
+    <string name="calc_mm_passo">%1$s (%2$s) : %3$d × %4$s = %5$s</string>
+    <string name="calc_mm_soma">Somme : %1$s g/mol, c’est-à-dire que 1 mole de %2$s pèse %3$s g.</string>
+    <string name="calc_mm_nota_carga">La charge (%1$d) ne modifie pas la masse molaire : la masse des électrons est négligeable dans ce calcul.</string>
+    <string name="erro_nao_e_elemento_do_pacote">« %1$s » n’est pas un élément du paquet de données.</string>
+    <string name="erro_sem_massa_atomica">Le paquet de données n’a pas de masse atomique pour %1$s.</string>
+    <string name="calc_est_titulo">Stœchiométrie</string>
+    <string name="calc_est_consumido">consommé</string>
+    <string name="calc_est_formado">formé</string>
+    <string name="calc_est_com_rendimento">%1$s avec un rendement de %2$s %%</string>
+    <string name="erro_est_sem_quantidade">Indiquez la quantité d’au moins une espèce.</string>
+    <string name="erro_est_especie_repetida">La même espèce est indiquée deux fois.</string>
+    <string name="erro_est_especie_inexistente">Espèce absente de l’équation.</string>
+    <string name="erro_est_quantidade_positiva">Les quantités doivent être des nombres positifs.</string>
+    <string name="erro_est_so_reagentes">Indiquez uniquement des réactifs (pour trouver le réactif limitant) ou une seule espèce.</string>
+    <string name="calc_est_massas_molares">Masses molaires : %1$s.</string>
+    <string name="calc_est_mol_informado">%1$s : %2$s mol (indiqué).</string>
+    <string name="calc_est_mol_de_massa">%1$s : n = m / M = %2$s g ÷ %3$s g/mol = %4$s mol.</string>
+    <string name="calc_est_razao">Rapport n ÷ coefficient : %1$s.</string>
+    <string name="calc_est_limitante">Réactif limitant : %1$s (plus petit rapport). Il détermine l’avancement de la réaction : ξ = %2$s mol.</string>
+    <string name="calc_est_uma_especie">Avec une seule espèce connue : ξ = n ÷ coefficient = %1$s ÷ %2$d = %3$s mol.</string>
+    <string name="calc_est_cada_especie">Pour chaque espèce : n = coefficient × ξ ; masse = n × M.</string>
+    <string name="calc_est_sobra">Reste de %1$s : %2$s mol (%3$s g).</string>
+    <string name="erro_gas_sem_r">Le paquet de données ne contient pas la constante des gaz (R).</string>
+    <string name="erro_um_campo_vazio_gas" tools:ignore="PluralsCandidate">Laissez exactement un champ vide : c’est ce qui sera calculé (champs vides : %1$d).</string>
+    <string name="erro_gas_positiva">%1$s : la valeur doit être positive (en %2$s).</string>
+    <string name="calc_gas_equacao">Équation des gaz parfaits : P·V = n·R·T, avec R = %1$s %2$s (%3$s).</string>
+    <string name="calc_gas_fonte_padrao">constantes du paquet</string>
+    <string name="calc_gas_convertendo_si">Conversion en unités SI (Pa, m³, mol, K) :</string>
+    <string name="calc_gas_isolando">En isolant %1$s : %2$s = %3$s %4$s.</string>
+    <string name="calc_convertendo_para">Conversion en %1$s : %2$s %3$s = %4$s %1$s.</string>
+    <string name="calc_gas_nota">Modèle du gaz parfait : bonne approximation à basse pression et à haute température.</string>
+    <string name="calc_gas_titulo">Gaz parfait : %1$s</string>
+    <string name="forte_acido">Acide fort</string>
+    <string name="forte_base">Base forte</string>
+    <string name="sol_a_massa">La masse</string>
+    <string name="sol_o_volume">Le volume</string>
+    <string name="sol_a_massa_molar">La masse molaire</string>
+    <string name="sol_a_concentracao">La concentration</string>
+    <string name="sol_a_constante">La constante %1$s</string>
+    <string name="calc_sol_massa_passo">Masse : %1$s.</string>
+    <string name="calc_sol_volume_passo">Volume : %1$s.</string>
+    <string name="calc_sol_concentracao_passo">Concentration : %1$s.</string>
+    <string name="calc_sol_mols_de_massa">Quantité de matière : n = m / M = %1$s g ÷ %2$s g/mol = %3$s mol.</string>
+    <string name="calc_sol_molaridade_passo">Molarité : C = n / V = %1$s mol ÷ %2$s L = %3$s mol/L.</string>
+    <string name="calc_sol_molaridade">Molarité</string>
+    <string name="calc_sol_molaridade_de">Molarité : %1$s</string>
+    <string name="calc_sol_qtd_materia">Quantité de matière</string>
+    <string name="calc_sol_mols_de_conc">Quantité de matière : n = C · V = %1$s mol/L × %2$s L = %3$s mol.</string>
+    <string name="calc_sol_massa_de_mols">Masse : m = n · M = %1$s mol × %2$s g/mol = %3$s g.</string>
+    <string name="calc_sol_preparar">Masse pour préparer la solution</string>
+    <string name="calc_sol_preparar_de">Masse pour préparer la solution : %1$s</string>
+    <string name="calc_sol_massa_soluto">Masse de soluté</string>
+    <string name="calc_sol_nota_dissolver">Dissolvez le soluté dans une partie du solvant, puis complétez jusqu’au volume final.</string>
+    <string name="calc_dil_titulo">Dilution</string>
+    <string name="calc_dil_principio">Dans une dilution, la quantité de soluté ne change pas : n = C·V, donc C₁·V₁ = C₂·V₂.</string>
+    <string name="calc_dil_valores">Valeurs en mol/L et en L : %1$s.</string>
+    <string name="calc_dil_convertendo">Conversion : %1$s %2$s = %3$s %4$s.</string>
+    <string name="calc_dil_nota_c2_maior">Attention : une dilution réduit la concentration ; vérifiez que C₂ n’est pas supérieur à C₁.</string>
+    <string name="erro_ph_ionizaveis">Le nombre de H⁺ (ou OH⁻) libérés par unité de formule doit être compris entre 1 et 4.</string>
+    <string name="calc_ph_titulo_acido_forte">pH d’un acide fort</string>
+    <string name="calc_ph_titulo_base_forte">pH d’une base forte</string>
+    <string name="calc_ph_titulo_acido_fraco">pH d’un acide faible</string>
+    <string name="calc_ph_titulo_base_fraca">pH d’une base faible</string>
+    <string name="calc_ph_linha_solucao">Solution</string>
+    <string name="calc_ph_linha_grau">Degré d’ionisation</string>
+    <string name="calc_ph_solucao_acida">acide</string>
+    <string name="calc_ph_solucao_basica">basique</string>
+    <string name="calc_ph_solucao_neutra">neutre</string>
+    <string name="calc_ph_forte_acido_ionizado">Un acide fort est totalement ionisé : [H⁺] ≈ n·C = %1$d × %2$s = %3$s mol/L.</string>
+    <string name="calc_ph_forte_base_ionizada">Une base forte est totalement ionisée : [OH⁻] ≈ n·C = %1$d × %2$s = %3$s mol/L.</string>
+    <string name="calc_ph_forte_acido_ph">pH = −log₁₀[H⁺] = −log₁₀(%1$s) = %2$s.</string>
+    <string name="calc_ph_forte_acido_poh">pOH = pKw − pH = %1$s − %2$s = %3$s.</string>
+    <string name="calc_ph_forte_base_poh">pOH = −log₁₀[OH⁻] = −log₁₀(%1$s) = %2$s.</string>
+    <string name="calc_ph_forte_base_ph">pH = pKw − pOH = %1$s − %2$s = %3$s.</string>
+    <string name="calc_ph_fraco_acido_1">Acide faible HA ⇌ H⁺ + A⁻ : %1$s = [H⁺][A⁻] / [HA] = x² / (C − x), avec C = %2$s mol/L et %1$s = %3$s.</string>
+    <string name="calc_ph_fraco_acido_2">En résolvant x² + %1$s·x − %1$s·C = 0 : x = [H⁺] = %2$s mol/L.</string>
+    <string name="calc_ph_fraco_acido_3">pH = −log₁₀[H⁺] = %1$s ; pOH = pKw − pH = %2$s.</string>
+    <string name="calc_ph_fraco_base_1">Base faible B + H₂O ⇌ BH⁺ + OH⁻ : %1$s = [BH⁺][OH⁻] / [B] = x² / (C − x), avec C = %2$s mol/L et %1$s = %3$s.</string>
+    <string name="calc_ph_fraco_base_2">En résolvant x² + %1$s·x − %1$s·C = 0 : x = [OH⁻] = %2$s mol/L.</string>
+    <string name="calc_ph_fraco_base_3">pOH = −log₁₀[OH⁻] = %1$s ; pH = pKw − pOH = %2$s.</string>
+    <string name="calc_ph_grau_passo">Degré d’ionisation : α = x / C = %1$s %%.</string>
+    <string name="calc_ph_nota_pkw_pacote">Produit ionique de l’eau : pKw = %1$s (données du paquet).</string>
+    <string name="calc_ph_nota_kw_padrao">On considère Kw = 1,0 × 10⁻¹⁴ (pKw = 14,00) à 25 °C.</string>
+    <string name="calc_ph_nota_k_informada">Vous avez indiqué la constante %1$s ; l’application ne l’a pas dans ses données.</string>
+    <string name="calc_ph_nota_diluida">Solution très diluée : l’autoionisation de l’eau a été incluse (le calcul simple donnerait une autre valeur).</string>
+    <string name="calc_ph_nota_vale_fortes">Valable pour les acides forts et les bases fortes. Les acides faibles et les bases faibles exigent la constante d’équilibre (Ka ou Kb).</string>
+
+    <!-- 20_respostas -->
+    <string name="resp_voce_quis_dizer">Vous vouliez dire : %1$s</string>
+    <string name="resp_passo_a_passo">Pas à pas</string>
+    <string name="resp_como_calculei">Comment j’ai calculé</string>
+    <string name="resp_como_converti">Comment j’ai converti</string>
+    <string name="resp_x_de_y">%1$s %2$s de %3$s</string>
+    <string name="resp_sem_dado_titulo">Je n’ai pas trouvé cette donnée</string>
+    <string name="resp_sem_dado_valor">pas de donnée</string>
+    <string name="resp_valor_do_pacote">Valeur du paquet de données.</string>
+    <string name="rot_versao_dados">Version des données</string>
+    <string name="rot_gerado_em">Généré le</string>
+    <string name="rot_origem">Origine</string>
+    <string name="rot_elementos">Éléments</string>
+    <string name="rot_compostos_pacote">Composés dans le paquet</string>
+    <string name="rot_conhecido_como">Aussi connu sous le nom de</string>
+    <string name="rot_numero_cas">Numéro CAS</string>
+    <string name="rot_formula">Formule</string>
+    <string name="rot_nome">Nom</string>
+    <string name="rot_nome_iupac">Nom IUPAC</string>
+    <string name="rot_nome_popular">Nom courant</string>
+    <string name="rot_simbolo">Symbole</string>
+    <string name="rot_smiles">SMILES</string>
+    <string name="rot_massa">Masse</string>
+    <string name="rot_configuracao_eletronica">Configuration électronique</string>
+    <string name="fonte_calculo_nome">Calcul effectué sur l’appareil</string>
+    <string name="fonte_calculo_licenca">sans données de tiers autres que les masses et les constantes du paquet</string>
+    <string name="fonte_constantes_pacote">Constantes du paquet de données</string>
+    <string name="fonte_ghs_nome">SGH de la CEE-ONU (mentions H) / CLP de l’ECHA</string>
+    <string name="fonte_ghs_licenca">usage libre (CEE-ONU) ; jeu de données sous CC BY 4.0</string>
+    <string name="origem_pacote_embutido">Paquet intégré à l’application</string>
+    <string name="origem_pacote_baixado">Mise à jour téléchargée</string>
+    <string name="acao_abrir_tabela">Ouvrir le tableau périodique</string>
+    <string name="acao_sobre_dados">Ouvrir « À propos des données »</string>
+    <string name="acao_ghs">Comprendre le SGH et les pictogrammes</string>
+    <string name="acao_abrir_ficha_de">Ouvrir la fiche : %1$s</string>
+    <string name="acao_abrir_x">Ouvrir %1$s</string>
+    <string name="acao_icsc">Fiche ICSC sur le site de l’OIT</string>
+    <string name="acao_cvv">Parler au CVV (cvv.org.br)</string>
+    <string name="acao_abrir_calculadora_de">Ouvrir la calculatrice : %1$s</string>
+    <string name="acao_calc_massa_molar">Ouvrir la calculatrice de masse molaire</string>
+    <string name="acao_calc_balanceamento">Ouvrir la calculatrice d’équilibrage</string>
+    <string name="acao_calc_estequiometria">Ouvrir la calculatrice de stœchiométrie</string>
+    <string name="acao_calc_concentracao">Ouvrir la calculatrice de concentration</string>
+    <string name="acao_calc_ph">Ouvrir la calculatrice de pH</string>
+    <string name="acao_calc_gas_ideal">Ouvrir la calculatrice des gaz parfaits</string>
+    <string name="acao_calc_unidades">Ouvrir la conversion d’unités</string>
+    <string name="texto_estrutura_2d">Structure 2D : %1$s</string>
+    <string name="texto_ghs">SGH : %1$s</string>
+    <string name="texto_fonte">Source : %1$s</string>
+    <string name="resp_erro_calculo_titulo">Je n’ai pas pu faire ce calcul</string>
+    <string name="resp_erro_calculo_dica">Vous pouvez remplir les champs dans la calculatrice ; elle affiche les étapes.</string>
+    <string name="resp_recusa_titulo">Je ne peux pas vous aider pour cela</string>
+    <string name="seg_recusa_padrao">Je ne peux pas vous aider pour cela. SaibaTudo Química ne fournit pas d’instructions de synthèse, de purification, de montée en échelle ni de recettes maison pour des explosifs, des armes chimiques, des drogues illicites, leurs précurseurs ou d’autres réactifs dangereux, car elles peuvent causer des morts et des blessures graves.</string>
+    <string name="seg_recusa_alternativas">Je peux vous aider sur la sécurité et les connaissances : dangers, équipements de protection individuelle (EPI), stockage, élimination et premiers secours pour une substance ; propriétés, formule, masse molaire et structure ; calculs et notions de chimie.</string>
+    <string name="seg_recusa_dano">Je ne peux pas vous aider pour cela. Je ne donne aucune indication pour blesser, empoisonner ou intoxiquer des personnes ou des animaux. Si quelqu’un est en danger ou a été exposé à une substance, contactez immédiatement un service d’urgence ou le centre antipoison de votre région.</string>
+    <string name="seg_recusa_autolesao">Je suis navré que vous traversiez cette épreuve. Je ne peux pas donner d’indications sur ce sujet, mais vous n’êtes pas seul(e) : contactez dès maintenant une personne de confiance et un service d’urgence de votre région. Au Brésil, le Centro de Valorização da Vida (CVV) écoute toute personne, gratuitement et de façon confidentielle, sur https://cvv.org.br ; ailleurs, cherchez la ligne d’écoute de crise de votre pays.</string>
+    <string name="sug_segura_epi">Quels EPI utiliser avec l’acide sulfurique ?</string>
+    <string name="sug_segura_primeiros_socorros">Premiers secours en cas de projection de soude caustique dans l’œil</string>
+    <string name="sug_segura_misturar">Pourquoi ne faut-il pas mélanger l’hypochlorite de sodium et l’ammoniac ?</string>
+    <string name="resp_ajuda_titulo">Ce que répond SaibaTudo Química</string>
+    <string name="resp_ajuda_intro">Posez des questions sur les éléments et les composés (propriétés, masse molaire, structure, dangers SGH), faites des calculs avec toutes les étapes affichées et consultez le tableau périodique.</string>
+    <string name="resp_ajuda_item_propriedades">Propriétés : « point de fusion du fer », « formule de l’eau »</string>
+    <string name="resp_ajuda_item_calculos">Calculs : masse molaire, équilibrage, stœchiométrie, concentration, pH des acides forts et des bases fortes, gaz parfait, unités</string>
+    <string name="resp_ajuda_item_estrutura">Structure : « dessinez la molécule d’éthanol »</string>
+    <string name="resp_ajuda_item_seguranca">Sécurité : dangers et pictogrammes SGH d’un composé</string>
+    <string name="resp_ajuda_item_numeros">Les nombres proviennent du paquet de données signé ou d’un calcul effectué sur l’appareil ; rien n’est inventé.</string>
+    <string name="resp_fontes_titulo">Sources et licences des données</string>
+    <string name="resp_fontes_intro">Chaque réponse indique la source de la donnée. Voici les sources du paquet de données utilisé :</string>
+    <string name="resp_fonte_acesso_em">%1$s – consulté le %2$s</string>
+    <string name="resp_sobre_dados_titulo">À propos des données</string>
+    <string name="resp_elemento_nao_encontrado">Je n’ai pas trouvé cet élément dans le paquet de données.</string>
+    <string name="resp_elemento_intro">%1$s, symbole %2$s, numéro atomique %3$d.</string>
+    <string name="resp_composto_nao_encontrado">Je n’ai pas trouvé ce composé dans le paquet de données.</string>
+    <string name="resp_composto_fora_indice">Ce composé ne fait pas partie du noyau de composés du paquet ; je n’affiche que ce qui peut être calculé.</string>
+    <string name="resp_nome_pt_pendente">Le nom en portugais n’a pas encore été relu : j’affiche le nom IUPAC.</string>
+    <string name="resp_definicao_chebi">Définition (ChEBI, %1$s) : %2$s</string>
+    <string name="resp_prop_de_qual">De quel élément ou composé ? Indiquez le nom, le symbole ou la formule.</string>
+    <string name="resp_prop_sem_valor">Le paquet de données ne contient aucune valeur de « %1$s » pour %2$s. Je n’estimerai pas cette valeur.</string>
+    <string name="resp_nome_e_formula">%1$s : nom et formule</string>
+    <string name="resp_nome_e_simbolo">%1$s : nom et symbole</string>
+    <string name="resp_nomenclatura_nao_encontrada">Je n’ai pas trouvé cette substance dans le paquet de données, donc je ne peux pas indiquer le nom ou la formule sans les inventer.</string>
+    <string name="resp_estrutura_de">Structure : %1$s</string>
+    <string name="resp_sem_smiles">Le paquet de données ne contient pas la structure (SMILES) pour %1$s.</string>
+    <string name="resp_e_um_elemento">%1$s est un élément</string>
+    <string name="resp_elemento_sem_estrutura">Les éléments n’ont pas de structure 2D comme les molécules. Consultez la fiche de l’élément, avec la configuration électronique.</string>
+    <string name="resp_desenhar_nao_encontrado">Je n’ai pas trouvé ce composé dans le paquet de données, donc je ne peux pas dessiner la structure.</string>
+    <string name="resp_comparar_cite_dois">Pour comparer, citez deux éléments ou deux composés du paquet de données.</string>
+    <string name="resp_comparar_titulo">Comparaison : %1$s</string>
+    <string name="resp_comparar_sem_comum">Le paquet ne contient pas de propriétés communes à comparer.</string>
+    <string name="resp_misturar_titulo">Mélanger des produits chimiques</string>
+    <string name="resp_misturar_aviso" tools:ignore="Typos">Ne mélangez pas de produits chimiques, surtout des produits d’entretien (eau de Javel, ammoniaque, acides, déboucheurs) : la réaction entre eux peut dégager des gaz toxiques, de la chaleur ou provoquer des projections de liquide. Utilisez chaque produit seul, dans un endroit ventilé, et suivez l’étiquette.</string>
+    <string name="resp_ghs_no_pacote">%1$s, classification SGH dans le paquet :</string>
+    <string name="resp_seguranca_titulo">Sécurité : %1$s</string>
+    <string name="resp_ghs_classificacao">Classification : %1$s.</string>
+    <string name="resp_sem_ghs">Le paquet de données ne contient aucune classification SGH harmonisée pour %1$s. Cela ne signifie pas que la substance soit sûre.</string>
+    <string name="resp_fispq_aviso">Avant toute utilisation, lisez la fiche de données de sécurité (FDS) du fabricant et utilisez les équipements de protection indiqués. Cette application ne remplace pas la fiche.</string>
+    <string name="resp_seguranca_elemento">Le paquet de données ne contient pas de classification de danger pour les éléments isolés. Consultez la fiche de données de sécurité du matériau concerné (la forme chimique compte : %1$s métallique, oxyde et sels présentent des dangers différents).</string>
+    <string name="resp_seguranca_geral_titulo">Sécurité chimique et SGH</string>
+    <string name="resp_seguranca_geral_intro">Le SGH est le système international qui normalise les pictogrammes, les mentions d’avertissement et les mentions de danger (H). Voici les neuf pictogrammes :</string>
+    <string name="resp_emergencia">En cas d’exposition ou d’accident, demandez de l’aide (numéros du Brésil) : SAMU 192, Bombeiros (pompiers) 193 ou Disque-Intoxicação 0800 722 6001.</string>
+    <string name="resp_tab_titulo">Tableau périodique</string>
+    <string name="resp_tab_descricao" tools:ignore="PluralsCandidate">Le tableau de l’application compte %1$d éléments, organisés par groupe (colonnes) et par période (lignes), avec des couleurs par catégorie.</string>
+    <string name="resp_tab_grupo">groupe %1$d</string>
+    <string name="resp_tab_periodo">période %1$d</string>
+    <string name="resp_tab_bloco">bloc %1$s</string>
+    <string name="resp_tab_estado">état %1$s</string>
+    <string name="resp_tab_elementos_titulo">Éléments : %1$s</string>
+    <string name="resp_tab_sem_elementos">Le paquet de données ne contient aucun élément pour %1$s.</string>
+    <string name="resp_tab_sem_dado_props">Le paquet de données ne contient aucune valeur de « %1$s » pour ces éléments.</string>
+    <string name="resp_tab_extremo_menor">Parmi les éléments du paquet disposant de cette donnée%1$s, la valeur la plus basse pour « %2$s » est celle de l’élément %3$s : %4$s.</string>
+    <string name="resp_tab_extremo_maior">Parmi les éléments du paquet disposant de cette donnée%1$s, la valeur la plus élevée pour « %2$s » est celle de l’élément %3$s : %4$s.</string>
+    <string name="resp_tab_titulo_menor">Valeur minimale : %1$s</string>
+    <string name="resp_tab_titulo_maior">Valeur maximale : %1$s</string>
+    <string name="resp_tab_tendencias_titulo">Tendances périodiques</string>
+    <string name="resp_tab_qual_propriedade">De quelle propriété ? Par exemple : électronégativité, rayon atomique ou énergie d’ionisation.</string>
+    <string name="resp_tab_tendencia_titulo">Tendance : %1$s</string>
+    <string name="resp_tab_ao_longo_periodo">Le long de la période %1$d (de gauche à droite), d’après les données : %2$s</string>
+    <string name="resp_tab_descendo_grupo">En descendant dans le groupe %1$d, d’après les données : %2$s</string>
+    <string name="resp_tab_sem_tendencia">Le paquet de données ne contient pas assez de valeurs de « %1$s » pour montrer la tendance.</string>
+    <string name="resp_tab_aumenta_todos" tools:ignore="PluralsCandidate">La valeur augmente à toutes les étapes (%1$d).</string>
+    <string name="resp_tab_diminui_todos" tools:ignore="PluralsCandidate">La valeur diminue à toutes les étapes (%1$d).</string>
+    <string name="resp_tab_aumenta_parcial" tools:ignore="PluralsCandidate">La valeur augmente dans %1$d étapes sur %2$d.</string>
+    <string name="resp_tab_diminui_parcial" tools:ignore="PluralsCandidate">La valeur diminue dans %1$d étapes sur %2$d.</string>
+    <string name="resp_tab_sem_tendencia_unica">Il n’y a pas de tendance unique dans cette séquence.</string>
+    <string name="resp_conceito_sem_titulo">Je n’ai pas encore de texte à ce sujet</string>
+    <string name="resp_conceito_sem_texto_geral">Les textes d’explication de l’application proviennent de sources ouvertes et sous licence, et il n’y a pas encore d’extrait sur ce sujet. Je ne répondrai pas de mémoire.</string>
+    <string name="resp_conceito_sem_texto_tema">Les textes d’explication de l’application proviennent de sources ouvertes et sous licence, et il n’y a pas encore d’extrait sur « %1$s ». Je ne répondrai pas de mémoire.</string>
+    <string name="resp_trecho_em">Texte en %1$s (pas encore traduit).</string>
+    <string name="resp_traducao_automatica">Traduction automatique, pas encore relue par une personne.</string>
+    <string name="resp_nao_entendi_titulo">Je n’ai pas compris</string>
+    <string name="resp_nao_entendi_texto">Je n’ai pas compris la question. Essayez de nommer un élément, un composé ou une formule, et ce que vous voulez savoir (propriété, masse molaire, structure, dangers ou un calcul).</string>
+    <string name="resp_mm_de_qual">De quelle substance ? Saisissez la formule (par exemple, Ca(OH)2 ou CuSO4·5H2O) ou le nom.</string>
+    <string name="resp_mm_valor_pacote">Valeur du paquet (PubChem)</string>
+    <string name="resp_mm_titulo">Masse molaire : %1$s</string>
+    <string name="calc_mm_n_de_m">n = m / M = %1$s g ÷ %2$s g/mol = %3$s mol</string>
+    <string name="calc_mm_m_de_n">m = n × M = %1$s mol × %2$s g/mol = %3$s g</string>
+    <string name="resp_bal_titulo">Équilibrage d’équations</string>
+    <string name="resp_bal_escreva">Écrivez l’équation avec une flèche, par exemple : H2 + O2 -> H2O. Je trouve les plus petits coefficients entiers et j’affiche les étapes.</string>
+    <string name="resp_est_sem_eletrons">La stœchiométrie en masse ne traite pas les électrons libres. Utilisez une équation sans électrons.</string>
+    <string name="resp_est_falta_massa">Les unités de masse manquent dans les données.</string>
+    <string name="resp_est_falta_qtd">Les unités de quantité manquent dans les données.</string>
+    <string name="resp_est_diga_qual">Indiquez à quelle substance se rapporte chaque quantité, par exemple : 4 g de H2 ou 0,5 mol de O2.</string>
+    <string name="resp_est_reagente_limitante">Réactif limitant</string>
+    <string name="resp_est_volume_cntp_titulo">Volume de gaz aux CNTP</string>
+    <string name="resp_est_cntp_adotadas">CNTP adoptées ici : 0 °C et 1 atm.</string>
+    <string name="resp_est_diga_substancia">Indiquez la substance et la quantité, par exemple : 18 g de H2O, ou écrivez la réaction avec une flèche (H2 + O2 -> H2O) et les quantités.</string>
+    <string name="resp_est_titulo_nome">Stœchiométrie : %1$s</string>
+    <string name="resp_est_informe_qtd">Indiquez la quantité (masse en g, moles ou nombre de molécules) pour %1$s.</string>
+    <string name="resp_est_massa_molar_de">Masse molaire : %1$s</string>
+    <string name="resp_est_entidades">Nombre d’entités (n × N_A)</string>
+    <string name="calc_est_passo_n_avogadro">N / N_A = %1$s ÷ %2$s = %3$s mol.</string>
+    <string name="calc_est_passo_n_massa">n = m / M = %1$s g ÷ %2$s g/mol = %3$s mol.</string>
+    <string name="calc_est_passo_n_informado">n indiqué = %1$s mol.</string>
+    <string name="calc_est_passo_m">m = n × M = %1$s mol × %2$s g/mol = %3$s g.</string>
+    <string name="calc_est_passo_avogadro">N = n × N_A = %1$s mol × %2$s mol⁻¹ = %3$s.</string>
+    <string name="erro_conc_diluicao_tres">Pour la dilution, indiquez trois valeurs : par exemple, 2 mol/L, 50 mL et 0,5 mol/L (je calcule le volume final).</string>
+    <string name="erro_conc_diga_substancia">Indiquez la substance (formule ou nom) pour que je trouve la masse molaire.</string>
+    <string name="erro_conc_geral">Pour la molarité, indiquez la masse et le volume (5,844 g de NaCl dans 500 mL) ; pour préparer une solution, la concentration et le volume (250 mL de NaOH à 0,1 mol/L) ; pour diluer, trois valeurs de C₁V₁ = C₂V₂.</string>
+    <string name="erro_ph_informe_conc">Indiquez la concentration en mol/L, par exemple : pH de HCl 0,01 mol/L.</string>
+    <string name="resp_ph_titulo_nome">pH de %1$s %2$s %3$s</string>
+    <string name="erro_ph_precisa_constante">Pour %1$s, indiquez la constante d’équilibre, par exemple : pH de %1$s 0,1 mol/L avec Ka 1,8e-5 (acide faible) ou Kb (base faible). Sans constante, je ne traite que les acides FORTS et les bases FORTES (HCl, HBr, HI, HNO₃, HClO₄, H₂SO₄ et hydroxydes des groupes 1 et 2).</string>
+    <string name="erro_ph_diga_qual">Indiquez quel est l’acide fort ou la base forte (par exemple HCl ou NaOH), écrivez « acide fort » / « base forte » ou indiquez le Ka/Kb.</string>
+    <string name="erro_gas_duas_vezes">Il y a deux valeurs pour la même grandeur (%1$s). Indiquez chacune une seule fois.</string>
+    <string name="erro_gas_tres">Pour le gaz parfait, indiquez trois des quatre grandeurs (pression, volume, quantité de matière et température), par exemple : 2 moles de gaz à 300 K et 1 atm ; je calcule celle qui manque.</string>
+    <string name="erro_conv_informe">Indiquez la valeur et l’unité, par exemple : 25 °C en K.</string>
+    <string name="erro_conv_unidade_desconhecida">Je ne connais pas l’unité « %1$s ».</string>
+    <string name="erro_conv_para_qual">Vers quelle unité convertir ? Par exemple : %1$s %2$s en %3$s.</string>
+    <string name="erro_conv_outra_unidade">autre unité</string>
+    <string name="resp_conv_titulo">Conversion d’unités</string>
+    <string name="calc_conv_para_base">Vers l’unité de base (%1$s) : valeur × facteur + décalage = %2$s × %3$s + %4$s = %5$s %1$s.</string>
+    <string name="calc_conv_da_base">De la base vers %1$s : (valeur − décalage) ÷ facteur = (%2$s − %3$s) ÷ %4$s = %5$s %1$s.</string>
+    <string name="calc_conv_fatores">1 %1$s = %2$s %3$s et 1 %4$s = %5$s %3$s.</string>
+    <string name="calc_conv_unidade_base">unité de base</string>
+    <string name="sug_fusao_de">Point de fusion : %1$s</string>
+    <string name="sug_massa_molar_de">Masse molaire : %1$s</string>
+    <string name="sug_eletronegatividade_de">Électronégativité : %1$s</string>
+    <string name="sug_estrutura_de">Structure : %1$s</string>
+    <string name="sug_perigos_de">Dangers : %1$s</string>
+    <string name="sug_o_que_e">Définition : %1$s</string>
+    <string name="sug_ph_hcl">pH de HCl 0,01 mol/L</string>
+    <string name="sug_halogenios">Quels sont les halogènes ?</string>
+    <string name="sug_mais_eletronegativo">Quel élément est le plus électronégatif ?</string>
+    <string name="sug_tendencia">Tendance de l’électronégativité dans la période 2</string>
+    <string name="sug_converter">Convertir 25 °C en K</string>
+    <string name="sug_balancear">Équilibrer H2 + O2 -> H2O</string>
+    <string name="sug_balancear_fe">Équilibrer Fe + O2 -> Fe2O3</string>
+    <string name="sug_massa_molar_caoh2">Masse molaire de Ca(OH)2</string>
+    <string name="sug_massa_molar_agua">Quelle est la masse molaire de l’eau ?</string>
+    <string name="sug_mols_agua">Combien de moles y a-t-il dans 18 g d’eau ?</string>
+    <string name="sug_propriedade_de">%1$s : %2$s</string>
+    <string name="sug_propriedade_ajuste_de"></string>
+    <string name="sug_propriedade_ajuste_para"></string>
+    <string name="busca_elemento">Élément %1$d</string>
+    <string name="atualizacao_atual">Les données sont déjà à la dernière version.</string>
+    <string name="atualizacao_atualizado">Données mises à jour vers la version %1$s.</string>
+    <string name="atualizacao_ignorado">Rien à faire pour le moment : %1$s.</string>
+    <string name="atualizacao_falhou">Impossible de mettre à jour : %1$s.</string>
+    <string name="atualizacao_economia_dados">économie de données : en attente du Wi-Fi</string>
+    <string name="atualizacao_verificado_pouco">vérifié récemment</string>
+    <string name="atualizacao_nova_tentativa">nouvelle tentative bientôt</string>
+    <string name="atualizacao_requer_app">nécessite une version plus récente de l’application (>= %1$d)</string>
+    <string name="atualizacao_anti_rollback">le paquet distant est plus ancien que le paquet actif (protection contre le retour en arrière)</string>
+    <string name="atualizacao_assinatura_invalida">signature du manifeste INVALIDE : mise à jour rejetée</string>
+    <plurals name="resp_pacote_assinado">
+        <item quantity="one">Le paquet est signé numériquement (ECDSA P-256) et vérifié à chaque mise à jour ; l’application cherche un nouveau paquet avec un intervalle de %1$d jour.</item>
+        <item quantity="many">Le paquet est signé numériquement (ECDSA P-256) et vérifié à chaque mise à jour ; l’application cherche un nouveau paquet avec un intervalle de %1$d jours.</item>
+        <item quantity="other">Le paquet est signé numériquement (ECDSA P-256) et vérifié à chaque mise à jour ; l’application cherche un nouveau paquet avec un intervalle de %1$d jours.</item>
+    </plurals>
+    <plurals name="resp_tab_n_elementos">
+        <item quantity="one">%1$d élément dans le paquet de données.</item>
+        <item quantity="many">%1$d éléments dans le paquet de données.</item>
+        <item quantity="other">%1$d éléments dans le paquet de données.</item>
+    </plurals>
+
+    <!-- 21_enums_ghs_componentes -->
+    <string name="tema_sistema">Suivre le système</string>
+    <string name="tema_claro">Clair</string>
+    <string name="tema_escuro">Sombre</string>
+    <string name="fonte_pequena">Petite</string>
+    <string name="fonte_normal">Normale</string>
+    <string name="fonte_grande">Grande</string>
+    <string name="fonte_muito_grande">Très grande</string>
+    <string name="nivel_fundamental">Collège</string>
+    <string name="nivel_fundamental_descricao">Fiches allégées et étapes expliquées calmement</string>
+    <string name="nivel_medio">Lycée</string>
+    <string name="nivel_medio_descricao">L’ensemble usuel de propriétés et d’étapes</string>
+    <string name="nivel_superior">Supérieur</string>
+    <string name="nivel_superior_descricao">Toutes les propriétés, notes et détails des calculs</string>
+    <string name="calculadora_massa_molar">Masse molaire</string>
+    <string name="calculadora_balanceamento">Équilibrage</string>
+    <string name="calculadora_estequiometria">Stœchiométrie</string>
+    <string name="calculadora_concentracao">Concentration et dilution</string>
+    <string name="calculadora_ph">pH des acides et des bases</string>
+    <string name="calculadora_gas_ideal">Gaz parfait</string>
+    <string name="calculadora_unidades">Conversion d’unités</string>
+    <string name="origem_local">Réponse locale • données du paquet</string>
+    <string name="origem_aviso">Avertissement</string>
+    <string name="ghs_nome_ghs01">Explosif</string>
+    <string name="ghs_nome_ghs02">Inflammable</string>
+    <string name="ghs_nome_ghs03">Comburant</string>
+    <string name="ghs_nome_ghs04">Gaz sous pression</string>
+    <string name="ghs_nome_ghs05">Corrosif</string>
+    <string name="ghs_nome_ghs06">Toxicité aiguë (toxique ou mortel)</string>
+    <string name="ghs_nome_ghs07">Nocif, irritant ou sensibilisant</string>
+    <string name="ghs_nome_ghs08">Danger grave pour la santé</string>
+    <string name="ghs_nome_ghs09">Dangereux pour le milieu aquatique</string>
+    <string name="ghs_desenho_ghs01">bombe qui explose</string>
+    <string name="ghs_desenho_ghs02">flamme</string>
+    <string name="ghs_desenho_ghs03">flamme au-dessus d’un cercle</string>
+    <string name="ghs_desenho_ghs04">bouteille de gaz</string>
+    <string name="ghs_desenho_ghs05">corrosion</string>
+    <string name="ghs_desenho_ghs06">tête de mort et tibias croisés</string>
+    <string name="ghs_desenho_ghs07">point d’exclamation</string>
+    <string name="ghs_desenho_ghs08">danger pour la santé</string>
+    <string name="ghs_desenho_ghs09">environnement</string>
+    <string name="ghs_descricao_ghs01">explosifs, substances auto-réactives et peroxydes organiques</string>
+    <string name="ghs_descricao_ghs02">inflammables, pyrophoriques, substances auto-échauffantes ou qui dégagent des gaz inflammables au contact de l’eau</string>
+    <string name="ghs_descricao_ghs03">comburants</string>
+    <string name="ghs_descricao_ghs04">gaz sous pression</string>
+    <string name="ghs_descricao_ghs05">corrosif pour les métaux, provoquant des brûlures de la peau et de graves lésions des yeux</string>
+    <string name="ghs_descricao_ghs06">toxicité aiguë (mortelle ou toxique)</string>
+    <string name="ghs_descricao_ghs07">toxicité aiguë modérée (nocif), irritation de la peau et des yeux, sensibilisation cutanée et irritation des voies respiratoires</string>
+    <string name="ghs_descricao_ghs08">cancérogénicité, mutagénicité, toxicité pour la reproduction, sensibilisation respiratoire, toxicité pour certains organes cibles et danger en cas d’aspiration</string>
+    <string name="ghs_descricao_ghs09">dangereux pour le milieu aquatique</string>
+    <string name="ghs_sinal_perigo">Danger</string>
+    <string name="ghs_sinal_atencao">Attention</string>
+    <string name="ghs_pictograma_desc">Pictogramme %1$s : %2$s (dessin : %3$s)</string>
+    <string name="ghs_palavra_sinal_rotulo">Mention d’avertissement :</string>
+    <string name="ghs_palavra_sinal_desc">Mention d’avertissement : %1$s</string>
+    <string name="ghs_classificacao">Classification : %1$s</string>
+    <string name="ui_fonte">Source</string>
+    <string name="ui_fontes">Sources</string>
+    <string name="ui_abrir">Ouvrir</string>
+    <string name="ui_unidade">Unité</string>
+    <string name="ui_formula_desc">Formule %1$s</string>
+    <string name="ui_copiar_resposta">Copier la réponse</string>
+    <string name="ui_origem_local">Calculé sur l’appareil à partir du paquet de données signé. Aucune IA n’a généré ces nombres.</string>
+    <string name="ui_experimente_perguntar_dois_pontos">Essayez de demander :</string>
+    <string name="ui_recolher">Réduire</string>
+    <string name="ui_mostrar">Afficher</string>
+    <string name="ui_aba_inicio">Accueil</string>
+    <string name="ui_aba_tabela">Tableau</string>
+    <string name="ui_aba_buscar">Recherche</string>
+    <string name="ui_aba_calcular">Calculer</string>
+    <string name="ui_aba_mais">Plus</string>
+    <string name="ui_titulo_elemento">Élément</string>
+    <string name="ui_titulo_composto">Composé</string>
+    <string name="ui_titulo_seguranca">Sécurité et SGH</string>
+    <string name="ui_titulo_sobre">À propos des données</string>
+    <string name="ui_titulo_privacidade">Confidentialité</string>
+    <string name="ui_titulo_configuracoes">Paramètres</string>
+    <string name="ui_voltar">Retour</string>
+    <string name="ui_inicio_subtitulo">Éléments, composés, calculs et sécurité chimique, avec la source de chaque réponse.</string>
+    <string name="ui_inicio_campo_rotulo">Posez une question sur un élément, un composé ou un calcul</string>
+    <string name="ui_inicio_campo_dica">Ex. : masse molaire de l’eau</string>
+    <string name="ui_inicio_enviar">Envoyer la question</string>
+    <string name="ui_inicio_carregando">Chargement des données…</string>
+    <string name="ui_inicio_erro_pacote">Impossible de charger le paquet de données : %1$s. Essayez de le mettre à jour dans Plus > À propos des données.</string>
+    <string name="ui_inicio_erro_pacote_sem_detalhe">Impossible de charger le paquet de données. Essayez de le mettre à jour dans Plus > À propos des données.</string>
+    <string name="ui_inicio_voce_perguntou">Vous avez demandé : %1$s</string>
+    <string name="ui_inicio_nova_pergunta">Nouvelle question</string>
+    <string name="ui_inicio_atalhos">Raccourcis</string>
+    <string name="ui_inicio_atalho_tabela">Tableau périodique</string>
+    <string name="ui_inicio_atalho_buscar">Rechercher</string>
+    <string name="ui_inicio_atalho_calculadoras">Calculatrices</string>
+    <string name="ui_inicio_atalho_seguranca">Sécurité et SGH</string>
+    <string name="ui_inicio_experimente">Essayez de demander</string>
+    <string name="ui_inicio_recentes">Questions récentes</string>
+    <string name="ui_inicio_limpar">Effacer</string>
+    <string name="ui_inicio_privacidade">Confidentialité : vos questions sont traitées sur cet appareil et ne sont envoyées à personne. Internet ne sert qu’à télécharger des mises à jour signées des données.</string>
+    <string name="molecula_desc">Structure 2D : %1$s</string>
+
+    <!-- 23_propriedades -->
+    <string name="prop_numero_atomico">numéro atomique</string>
+    <string name="prop_massa_atomica">masse atomique</string>
+    <string name="prop_simbolo">symbole</string>
+    <string name="prop_grupo">groupe (famille)</string>
+    <string name="prop_periodo">période</string>
+    <string name="prop_bloco">bloc</string>
+    <string name="prop_categoria">catégorie</string>
+    <string name="prop_configuracao_eletronica">configuration électronique</string>
+    <string name="prop_eletronegatividade">électronégativité (Pauling)</string>
+    <string name="prop_raio_atomico">rayon atomique (van der Waals)</string>
+    <string name="prop_afinidade_eletronica">affinité électronique</string>
+    <string name="prop_energia_ionizacao">énergie d’ionisation</string>
+    <string name="prop_ponto_fusao">point de fusion</string>
+    <string name="prop_ponto_ebulicao">point d’ébullition</string>
+    <string name="prop_densidade">densité</string>
+    <string name="prop_estado_padrao">état physique (conditions standard)</string>
+    <string name="prop_estados_oxidacao">nombres d’oxydation</string>
+    <string name="prop_descoberta">découverte</string>
+    <string name="prop_massa_molar">masse molaire</string>
+    <string name="prop_massa_exata">masse exacte (monoisotopique)</string>
+    <string name="prop_formula">formule</string>
+    <string name="prop_cas">numéro CAS</string>
+    <string name="prop_cid">CID PubChem</string>
+    <string name="prop_smiles">SMILES</string>
+    <string name="prop_inchikey">InChIKey</string>
+    <string name="prop_nome_iupac">nom IUPAC</string>
+    <string name="prop_xlogp">XLogP (lipophilie calculée)</string>
+    <string name="prop_doadores_h">donneurs de liaison hydrogène</string>
+    <string name="prop_aceptores_h">accepteurs de liaison hydrogène</string>
+    <string name="prop_ligacoes_rotaveis">liaisons rotatives</string>
+    <string name="prop_carga">charge électrique</string>
+    <string name="prop_tpsa">surface polaire (TPSA)</string>
+    <string name="prop_descoberta_por">par %1$s</string>
+
+    <!-- 24_categorias_estados -->
+    <string name="categoria_metal_alcalino">Métal alcalin</string>
+    <string name="categoria_metal_alcalino_terroso">Métal alcalino-terreux</string>
+    <string name="categoria_metal_transicao">Métal de transition</string>
+    <string name="categoria_metal_pos_transicao">Métal pauvre</string>
+    <string name="categoria_semimetal">Métalloïde</string>
+    <string name="categoria_nao_metal">Non-métal</string>
+    <string name="categoria_halogenio">Halogène</string>
+    <string name="categoria_gas_nobre">Gaz noble</string>
+    <string name="categoria_lantanideo">Lanthanide</string>
+    <string name="categoria_actinideo">Actinide</string>
+    <string name="categoria_desconhecida">Catégorie inconnue</string>
+    <string name="categoria_metal_alcalino_meio">métal alcalin</string>
+    <string name="categoria_metal_alcalino_terroso_meio">métal alcalino-terreux</string>
+    <string name="categoria_metal_transicao_meio">métal de transition</string>
+    <string name="categoria_metal_pos_transicao_meio">métal pauvre</string>
+    <string name="categoria_semimetal_meio">métalloïde</string>
+    <string name="categoria_nao_metal_meio">non-métal</string>
+    <string name="categoria_halogenio_meio">halogène</string>
+    <string name="categoria_gas_nobre_meio">gaz noble</string>
+    <string name="categoria_lantanideo_meio">lanthanide</string>
+    <string name="categoria_actinideo_meio">actinide</string>
+    <string name="categoria_desconhecida_meio">propriétés chimiques inconnues</string>
+    <string name="categoria_metal_alcalino_plural">métaux alcalins</string>
+    <string name="categoria_metal_alcalino_terroso_plural">métaux alcalino-terreux</string>
+    <string name="categoria_metal_transicao_plural">métaux de transition</string>
+    <string name="categoria_metal_pos_transicao_plural">métaux pauvres</string>
+    <string name="categoria_semimetal_plural">métalloïdes</string>
+    <string name="categoria_nao_metal_plural">non-métaux</string>
+    <string name="categoria_halogenio_plural">halogènes</string>
+    <string name="categoria_gas_nobre_plural">gaz nobles</string>
+    <string name="categoria_lantanideo_plural">lanthanides</string>
+    <string name="categoria_actinideo_plural">actinides</string>
+    <string name="categoria_desconhecida_plural">catégories inconnues</string>
+    <string name="categoria_metal_plural">métaux</string>
+    <string name="estado_solido">Solide</string>
+    <string name="estado_liquido">Liquide</string>
+    <string name="estado_gas">Gaz</string>
+    <string name="estado_desconhecido">Inconnu</string>
+    <string name="estado_solido_meio">solide</string>
+    <string name="estado_liquido_meio">liquide</string>
+    <string name="estado_gas_meio">gaz</string>
+    <string name="estado_desconhecido_meio">inconnu</string>
+
+    <!-- 30_ui_calculadoras -->
+    <string name="ui_calc_lista_titulo">Calculatrices</string>
+    <string name="ui_calc_lista_intro">Les calculs sont effectués sur l’appareil, avec les nombres du paquet de données. Rien ne vient d’un modèle d’IA.</string>
+    <string name="ui_calc_desc_massa_molar">Additionne les masses atomiques du paquet de données, avec parenthèses et hydrates (CuSO₄·5H₂O).</string>
+    <string name="ui_calc_desc_balanceamento">Trouve les plus petits coefficients entiers par algèbre linéaire exacte, ions compris.</string>
+    <string name="ui_calc_desc_estequiometria">Masse et moles des réactifs et des produits, réactif limitant et rendement.</string>
+    <string name="ui_calc_desc_concentracao">Molarité, masse pour préparer une solution et dilution (C₁V₁ = C₂V₂).</string>
+    <string name="ui_calc_desc_ph">pH et pOH des acides et des bases forts ou faibles (avec Ka ou Kb).</string>
+    <string name="ui_calc_desc_gas_ideal">PV = nRT avec la constante R du paquet ; choisissez les unités.</string>
+    <string name="ui_calc_desc_unidades">Température, pression, volume, masse, énergie et plus encore, d’après les règles du paquet.</string>
+    <string name="ui_calc_carregando">Chargement des données…</string>
+    <string name="ui_calc_passo_a_passo">Pas à pas</string>
+    <string name="ui_calc_nao_foi_possivel">Impossible de calculer avec ces valeurs.</string>
+    <string name="ui_calc_confira_valores">Vérifiez les valeurs saisies.</string>
+    <string name="ui_calc_formula_invalida">Formule non valide.</string>
+    <string name="ui_calc_equacao_invalida">Équation non valide.</string>
+    <string name="ui_calc_rot_formula">Formule</string>
+    <string name="ui_calc_mm_descricao">Saisissez la formule : Ca(OH)2, Fe2(SO4)3, CuSO4·5H2O. La somme utilise les masses atomiques du paquet de données.</string>
+    <string name="ui_calc_mm_carga_nao_altera">La charge ne modifie pas la masse molaire dans ce calcul.</string>
+    <string name="ui_calc_mm_massa_e_qtd">Masse et quantité de matière</string>
+    <string name="ui_calc_mm_massa_para_mol">Masse (g) → mol</string>
+    <string name="ui_calc_mm_mol_para_massa">Quantité (mol) → g</string>
+    <string name="ui_calc_bal_descricao">Écrivez les réactifs et les produits avec une flèche : Fe + O2 -> Fe2O3. Les ions fonctionnent aussi : Zn + Cu2+ -> Zn2+ + Cu.</string>
+    <string name="ui_calc_est_descricao">Indiquez la réaction et les quantités connues (en grammes ou en moles) et voyez ce qui se forme, ce qui reste et le réactif limitant.</string>
+    <string name="ui_calc_est_preencha">Renseignez la quantité d’une ou de plusieurs espèces (laissez les autres vides).</string>
+    <string name="ui_calc_est_qtd_de">Quantité de %1$s</string>
+    <string name="ui_calc_est_rendimento">Rendement réel (%) — facultatif</string>
+    <string name="ui_calc_est_aguardando">En attente des quantités.</string>
+    <string name="ui_calc_est_como_balanceei">Comment j’ai équilibré</string>
+    <string name="ui_calc_conc_descricao">Choisissez ce que vous voulez calculer. Les champs acceptent la virgule ou le point décimal et la notation scientifique (1,8e-5).</string>
+    <string name="ui_calc_conc_modo_preparar">Préparer une solution</string>
+    <string name="ui_calc_conc_substancia">Substance (formule)</string>
+    <string name="ui_calc_conc_ex_nacl">Ex. : NaCl</string>
+    <string name="ui_calc_conc_massa_soluto">Masse de soluté</string>
+    <string name="ui_calc_conc_volume_solucao">Volume de solution</string>
+    <string name="ui_calc_conc_conc_desejada">Concentration souhaitée</string>
+    <string name="ui_calc_conc_volume_de_solucao">Volume de solution</string>
+    <string name="ui_calc_conc_dil_ajuda">C₁·V₁ = C₂·V₂. Laissez vide le champ que vous voulez trouver.</string>
+    <string name="ui_calc_conc_c1">C₁ (concentration initiale)</string>
+    <string name="ui_calc_conc_v1">V₁ (volume initial)</string>
+    <string name="ui_calc_conc_c2">C₂ (concentration finale)</string>
+    <string name="ui_calc_conc_v2">V₂ (volume final)</string>
+    <string name="ui_calc_ph_descricao">Les acides et les bases forts s’ionisent complètement. Pour les faibles, indiquez la constante d’équilibre (Ka ou Kb), que l’application n’a pas dans ses données.</string>
+    <string name="ui_calc_ph_modo_acido_fraco">Acide faible</string>
+    <string name="ui_calc_ph_modo_base_fraca">Base faible</string>
+    <string name="ui_calc_ph_conc_acido">Concentration de l’acide</string>
+    <string name="ui_calc_ph_conc_base">Concentration de la base</string>
+    <string name="ui_calc_ph_quantos_h">Combien d’ions H⁺ chaque formule libère-t-elle ?</string>
+    <string name="ui_calc_ph_quantos_oh">Combien d’ions OH⁻ chaque formule libère-t-elle ?</string>
+    <string name="ui_calc_ph_exemplos">Exemples : HCl et NaOH = 1 ; H₂SO₄ et Ca(OH)₂ = 2.</string>
+    <string name="ui_calc_ph_dica_k">Ex. : 1,8e-5 (acide acétique)</string>
+    <string name="ui_calc_ph_informe_constante">Indiquez la constante %1$s.</string>
+    <string name="ui_calc_gas_descricao">PV = nRT. Renseignez trois champs et laissez vide celui que vous voulez calculer. R provient des constantes du paquet.</string>
+    <string name="ui_calc_gas_cntp">CNTP : 1 mol, 0 °C, 1 atm</string>
+    <string name="ui_calc_un_descricao">Les unités proviennent des règles du paquet de données (avec les définitions exactes du SI quand elles manquent).</string>
+    <string name="ui_calc_un_valor">Valeur</string>
+    <string name="ui_calc_un_de">De</string>
+    <string name="ui_calc_un_para">Vers</string>
+    <string name="ui_calc_un_sem_unidades">Le paquet de données ne contient pas d’unités pour cette grandeur.</string>
+    <string name="ui_calc_un_resultado">Résultat</string>
+    <string name="ui_calc_un_base">base</string>
+    <string name="ui_calc_un_para_base">Vers la base (%1$s) : valeur × facteur + décalage = %2$s × %3$s + %4$s = %5$s %1$s.</string>
+    <string name="ui_calc_un_da_base">De la base vers %1$s : (valeur − décalage) ÷ facteur = %2$s %1$s.</string>
+    <string name="ui_calc_un_fatores">1 %1$s = %2$s %5$s ; 1 %3$s = %4$s %5$s.</string>
+
+    <!-- 31_ui_informativas -->
+    <string name="ui_mais_titulo">Plus</string>
+    <string name="ui_mais_seguranca_descricao">Pictogrammes, mentions d’avertissement et mentions de danger</string>
+    <string name="ui_mais_sobre_descricao">Version, sources, licences et mise à jour</string>
+    <string name="ui_mais_privacidade_descricao">Ce qui reste sur l’appareil et ce qui en sort</string>
+    <string name="ui_mais_config_descricao">Langue, thème, taille du texte et niveau</string>
+    <string name="ui_mais_versao">SaibaTudo Química %1$s (version %2$d). Open source, licence MIT.</string>
+    <string name="ui_seguranca_titulo">Sécurité et SGH</string>
+    <string name="ui_seguranca_oque_titulo">Qu’est-ce que le SGH</string>
+    <string name="ui_seguranca_oque_p1">Le Système général harmonisé (SGH) normalise la présentation des dangers d’une substance sur les étiquettes : pictogrammes, mention d’avertissement (Danger ou Attention) et mentions de danger (H).</string>
+    <string name="ui_seguranca_oque_p2">Sur la fiche de chaque composé, l’application affiche la classification présente dans le paquet de données. Quand il n’y a pas de classification dans la donnée, l’application le dit et n’invente rien.</string>
+    <string name="ui_seguranca_pictogramas_titulo">Les neuf pictogrammes</string>
+    <string name="ui_seguranca_pictograma_linha">%1$s : %2$s</string>
+    <string name="ui_seguranca_sinal_titulo">Mention d’avertissement et mentions H</string>
+    <string name="ui_seguranca_sinal_perigo">Danger</string>
+    <string name="ui_seguranca_sinal_perigo_desc">pour les catégories les plus graves</string>
+    <string name="ui_seguranca_sinal_atencao">Attention</string>
+    <string name="ui_seguranca_sinal_atencao_desc">pour les catégories moins graves</string>
+    <string name="ui_seguranca_h2xx">Dangers physiques : explosifs, inflammables, comburants, gaz sous pression, corrosifs pour les métaux</string>
+    <string name="ui_seguranca_h3xx">Dangers pour la santé : toxicité aiguë, corrosion et irritation, sensibilisation, cancer, organes cibles</string>
+    <string name="ui_seguranca_h4xx">Dangers pour l’environnement : organismes aquatiques et couche d’ozone</string>
+    <string name="ui_seguranca_texto_frases">Texte des mentions : %1$s (%2$s).</string>
+    <string name="ui_seguranca_icsc_titulo">Fiches de sécurité (ICSC)</string>
+    <string name="ui_seguranca_icsc_texto">Les Fiches internationales de sécurité chimique (OIT/OMS) n’ont pas de licence de réutilisation ; l’application ne les copie donc pas. Sur la fiche de chaque composé, un bouton ouvre la recherche par CAS sur le site de l’OIT.</string>
+    <string name="ui_seguranca_icsc_botao">Site des fiches ICSC</string>
+    <string name="ui_seguranca_cuidados_titulo">Précautions générales</string>
+    <string name="ui_seguranca_cuidado1">Lisez l’étiquette et la FDS (fiche de données de sécurité du fabricant) avant d’utiliser un produit.</string>
+    <string name="ui_seguranca_cuidado2">Ne mélangez jamais des produits d’entretien ni des substances que vous ne connaissez pas : le mélange peut dégager des gaz toxiques.</string>
+    <string name="ui_seguranca_cuidado3">Portez des gants et des lunettes de protection, et travaillez dans un endroit ventilé quand l’étiquette l’indique.</string>
+    <string name="ui_seguranca_cuidado4">Conservez les produits dans leur emballage d’origine, hors de portée des enfants et des aliments.</string>
+    <string name="ui_seguranca_cuidado5">En cas d’accident ou d’intoxication, demandez immédiatement de l’aide.</string>
+    <string name="ui_seguranca_emergencias">Urgences au Brésil : SAMU 192, Bombeiros (pompiers) 193 et Disque-Intoxicação 0800 722 6001. En dehors du Brésil, contactez le service d’urgence local.</string>
+    <string name="ui_sobre_titulo">À propos des données</string>
+    <string name="ui_sobre_carregando">Chargement des données…</string>
+    <string name="ui_sobre_pacote_titulo">Paquet utilisé</string>
+    <string name="ui_sobre_versao">Version</string>
+    <string name="ui_sobre_gerado_em">Généré le</string>
+    <string name="ui_sobre_origem">Origine</string>
+    <string name="ui_sobre_elementos">Éléments</string>
+    <string name="ui_sobre_compostos">Composés</string>
+    <string name="ui_sobre_arquivos">Fichiers</string>
+    <string name="ui_sobre_assinatura">Le paquet est signé numériquement (ECDSA P-256). L’application n’accepte que les mises à jour dont la signature est valide, vérifie la somme de contrôle (SHA-256) de chaque fichier et ne revient jamais à une version plus ancienne.</string>
+    <string name="ui_sobre_atualizacao_titulo">Mise à jour</string>
+    <string name="ui_sobre_ultima_verificacao">Dernière vérification</string>
+    <string name="ui_sobre_ultima_versao">Dernière version téléchargée</string>
+    <string name="ui_sobre_verificando">Vérification…</string>
+    <string name="ui_sobre_atualizar_agora">Mettre à jour maintenant</string>
+    <string name="ui_sobre_fontes_titulo">Sources et licences</string>
+    <string name="ui_sobre_fonte_licenca">Licence : %1$s</string>
+    <string name="ui_sobre_fonte_uso">Usage : %1$s</string>
+    <string name="ui_sobre_fonte_acesso">Consulté le %1$s</string>
+    <string name="ui_sobre_abrir_site">Ouvrir le site</string>
+    <string name="ui_sobre_licencas">Licences : %1$s</string>
+    <string name="ui_sobre_app_titulo">Cette application</string>
+    <string name="ui_sobre_app_texto">Open source, licence MIT. Le dessin des molécules utilise SmilesDrawer (licence MIT). Sans publicité, sans connexion et sans analyse d’usage.</string>
+    <string name="ui_sobre_codigo_fonte">Voir le code source</string>
+    <string name="ui_privacidade_titulo">Confidentialité</string>
+    <string name="ui_privacidade_nada_sai_titulo">Dans cette version, rien ne quitte votre appareil</string>
+    <string name="ui_privacidade_nada_sai_texto">Vos questions sont interprétées et traitées sur l’appareil lui-même. Internet ne sert qu’à télécharger les mises à jour signées du paquet de données sur saibatudo.net.</string>
+    <string name="ui_privacidade_guardado_titulo">Ce qui reste enregistré sur l’appareil</string>
+    <string name="ui_privacidade_guardado_item1">Vos préférences : thème, taille du texte, niveau et économie de données.</string>
+    <string name="ui_privacidade_guardado_item2">L’historique des dernières questions (jusqu’à 30), uniquement pour que vous puissiez les réutiliser. Vous pouvez l’effacer ci-dessous.</string>
+    <string name="ui_privacidade_guardado_item3">Le paquet de données et les mises à jour téléchargées.</string>
+    <string name="ui_privacidade_apagar_historico">Effacer l’historique des questions</string>
+    <string name="ui_privacidade_sai_titulo">Ce qui quitte l’appareil</string>
+    <string name="ui_privacidade_sai_texto">Quand elle cherche une mise à jour, l’application envoie des requêtes HTTPS à saibatudo.net pour télécharger les fichiers de données. Comme pour tout accès à internet, le serveur voit l’adresse IP et la version de l’application. Aucune question, aucun identifiant et aucune donnée d’usage ne sont envoyés.</string>
+    <string name="ui_privacidade_nao_tem_titulo">Ce que l’application n’a pas</string>
+    <string name="ui_privacidade_nao_tem_texto">Pas de connexion, pas de publicité, pas d’analyse d’usage, pas de localisation, pas d’accès aux contacts, à la caméra ni au microphone.</string>
+    <string name="ui_privacidade_nuvem_titulo">IA dans le cloud</string>
+    <string name="ui_privacidade_nuvem_texto">Pas encore disponible. Si elle est proposée à l’avenir, elle sera facultative, uniquement avec votre consentement explicite et avec un avertissement sur ce qui serait envoyé.</string>
+    <string name="ui_privacidade_politica_completa">Politique de confidentialité complète</string>
+    <string name="ui_privacidade_relatar">Signaler un problème ou une erreur dans les données</string>
+    <string name="ui_config_titulo">Paramètres</string>
+    <string name="ui_config_tema_titulo">Thème</string>
+    <string name="ui_config_fonte_titulo">Taille du texte</string>
+    <string name="ui_config_fonte_exemplo">Exemple : H₂O a une masse molaire de %1$s g/mol.</string>
+    <string name="ui_config_nivel_titulo">Niveau des explications</string>
+    <string name="ui_config_economia_titulo">Économie de données</string>
+    <string name="ui_config_economia_descricao">Ne mettre à jour les données qu’en Wi-Fi ou sur un réseau sans forfait limité.</string>
+    <plurals name="ui_sobre_intervalo_dias">
+        <item quantity="one">L’application cherche de nouvelles données avec un intervalle de %1$d jour, en arrière-plan et à l’ouverture de l’application (si le délai est écoulé).</item>
+        <item quantity="many">L’application cherche de nouvelles données avec un intervalle de %1$d jours, en arrière-plan et à l’ouverture de l’application (si le délai est écoulé).</item>
+        <item quantity="other">L’application cherche de nouvelles données avec un intervalle de %1$d jours, en arrière-plan et à l’ouverture de l’application (si le délai est écoulé).</item>
+    </plurals>
+
+    <!-- 32_ui_fichas -->
+    <string name="ui_tabela_titulo">Tableau périodique</string>
+    <string name="ui_tabela_instrucao">Touchez un élément pour ouvrir la fiche. Touchez la légende pour mettre un groupe en évidence.</string>
+    <string name="ui_tabela_carregando">Chargement des données…</string>
+    <string name="ui_tabela_colorir_por">Colorier par</string>
+    <string name="ui_tabela_modo_categoria">Catégorie</string>
+    <string name="ui_tabela_modo_estado">État</string>
+    <string name="ui_tabela_modo_bloco">Bloc</string>
+    <string name="ui_tabela_bloco_n">Bloc %1$s</string>
+    <string name="ui_tabela_grupo_n">Groupe %1$d</string>
+    <string name="ui_tabela_periodo_n">Période %1$d</string>
+    <string name="ui_tabela_serie_lantanideos">Lanthanides</string>
+    <string name="ui_tabela_serie_actinideos">Actinides</string>
+    <string name="ui_tabela_serie_outros">Autres</string>
+    <string name="ui_tabela_serie_descricao">%1$s, éléments %2$d à %3$d, affichés sous le tableau</string>
+    <string name="ui_tabela_celula_massa">masse atomique %1$s</string>
+    <string name="ui_tabela_abrir_ficha">Ouvrir la fiche : %1$s</string>
+    <string name="ui_elemento_nao_encontrado">Élément introuvable dans le paquet de données.</string>
+    <string name="ui_elemento_descricao">%1$s, symbole %2$s, numéro atomique %3$d, %4$s</string>
+    <string name="ui_elemento_propriedades">Propriétés</string>
+    <string name="ui_elemento_sem_propriedades">Le paquet de données ne contient pas encore de propriétés pour cet élément.</string>
+    <string name="ui_elemento_incerteza_massa">Incertitude sur la masse atomique</string>
+    <string name="ui_elemento_dica_nivel">Pour voir toutes les propriétés, passez le niveau sur %1$s dans Paramètres.</string>
+    <string name="ui_elemento_categoria_desconhecida">La catégorie de cet élément est encore inconnue dans les données.</string>
+    <string name="ui_elemento_anterior">Précédent</string>
+    <string name="ui_elemento_proximo">Suivant</string>
+    <string name="ui_composto_nao_encontrado">Ce composé ne figure pas dans le paquet de données.</string>
+    <string name="ui_composto_tambem_conhecido">Aussi connu sous le nom de %1$s</string>
+    <string name="ui_composto_nome_pt_pendente">Le nom en portugais de ce composé n’a pas encore été relu ; j’affiche le nom IUPAC.</string>
+    <string name="ui_composto_estrutura_2d">Structure 2D</string>
+    <string name="ui_composto_molecula_descricao">%1$s, formule %2$s</string>
+    <string name="ui_composto_estrutura_nota">Dessinée sur l’appareil à partir du SMILES du paquet (SmilesDrawer, licence MIT).</string>
+    <string name="ui_composto_sem_propriedades">Le paquet de données ne contient pas encore de propriétés pour ce composé.</string>
+    <string name="ui_composto_massa_exata">Masse exacte</string>
+    <string name="ui_composto_classes">Classes</string>
+    <string name="ui_composto_seguranca">Sécurité (SGH)</string>
+    <string name="ui_composto_sem_ghs">Le paquet de données ne contient aucune classification SGH harmonisée pour ce composé. Cela ne signifie pas qu’il soit sûr.</string>
+    <string name="ui_composto_icsc">Fiche ICSC sur le site de l’OIT</string>
+    <string name="ui_composto_icsc_nota">Ouvre le site de l’OIT dans le navigateur ; l’application ne copie pas les fiches.</string>
+    <string name="ui_composto_entender_ghs">Comprendre le SGH et les pictogrammes</string>
+    <string name="ui_composto_definicao_chebi">Définition (ChEBI)</string>
+    <string name="ui_composto_chebi_atribuicao_id">ChEBI (%1$s), EMBL-EBI, licence %2$s. Texte original en anglais.</string>
+    <string name="ui_composto_chebi_atribuicao">ChEBI, EMBL-EBI, licence %1$s. Texte original en anglais.</string>
+    <string name="ui_composto_ver_chebi">Voir dans ChEBI</string>
+    <string name="ui_composto_identificadores">Identifiants</string>
+    <string name="ui_busca_rotulo">Nom, symbole, formule, CAS ou CID</string>
+    <string name="ui_busca_exemplo" tools:ignore="TypographyDashes">Ex. : éthanol, Fe, H2SO4, 64-17-5</string>
+    <string name="ui_busca_limpar">Effacer la recherche</string>
+    <string name="ui_busca_dica">Saisissez pour chercher parmi les éléments et les composés du paquet de données. Fonctionne sans internet.</string>
+    <string name="ui_busca_nada">Aucun résultat pour « %1$s ». Essayez le nom en anglais, la formule ou le numéro CAS.</string>
+    <string name="ui_busca_elemento_desc">Élément %1$s, %2$s</string>
+    <string name="ui_busca_composto_desc">Composé %1$s, %2$s</string>
+
+    <!-- 40_unidades -->
+    <string name="unidade_nome_k">kelvin</string>
+    <string name="unidade_nome_celsius">degré Celsius</string>
+    <string name="unidade_nome_fahrenheit">degré Fahrenheit</string>
+    <string name="unidade_nome_pa">pascal</string>
+    <string name="unidade_nome_kpa">kilopascal</string>
+    <string name="unidade_nome_bar">bar</string>
+    <string name="unidade_nome_atm">atmosphère normale</string>
+    <string name="unidade_nome_mmhg">millimètre de mercure</string>
+    <string name="unidade_nome_psi">livre-force par pouce carré</string>
+    <string name="unidade_nome_m3">mètre cube</string>
+    <string name="unidade_nome_l">litre</string>
+    <string name="unidade_nome_ml">millilitre</string>
+    <string name="unidade_nome_cm3">centimètre cube</string>
+    <string name="unidade_nome_dm3">décimètre cube</string>
+    <string name="unidade_nome_kg">kilogramme</string>
+    <string name="unidade_nome_g">gramme</string>
+    <string name="unidade_nome_mg">milligramme</string>
+    <string name="unidade_nome_t">tonne</string>
+    <string name="unidade_nome_lb">livre</string>
+    <string name="unidade_nome_oz">once</string>
+    <string name="unidade_nome_j">joule</string>
+    <string name="unidade_nome_kj">kilojoule</string>
+    <string name="unidade_nome_cal">calorie thermochimique</string>
+    <string name="unidade_nome_kcal">kilocalorie</string>
+    <string name="unidade_nome_ev">électronvolt</string>
+    <string name="unidade_nome_kwh">kilowattheure</string>
+    <string name="unidade_nome_mol">mole</string>
+    <string name="unidade_nome_mmol">millimole</string>
+    <string name="unidade_nome_mol_l">mole par litre</string>
+    <string name="unidade_nome_mmol_l">millimole par litre</string>
+    <string name="unidade_nome_umol_l">micromole par litre</string>
+    <string name="unidade_nome_kg_m3">kilogramme par mètre cube</string>
+    <string name="unidade_nome_g_cm3">gramme par centimètre cube</string>
+    <string name="unidade_nome_m">mètre</string>
+    <string name="unidade_nome_cm">centimètre</string>
+    <string name="unidade_nome_mm">millimètre</string>
+    <string name="unidade_nome_nm">nanomètre</string>
+    <string name="unidade_nome_pm">picomètre</string>
+    <string name="unidade_nome_angstrom">ångström</string>
+    <string name="unidade_nome_in">pouce</string>
+    <string name="unidade_nome_ft">pied</string>
+    <string name="unidade_nome_mi">mile</string>
+    <string name="unidade_nome_s">seconde</string>
+    <string name="unidade_nome_min">minute</string>
+    <string name="unidade_nome_h">heure</string>
+    <string name="unidade_nome_d">jour</string>
+
+    <!-- 41_classes -->
+    <string name="classe_acido">acide</string>
+    <string name="classe_acido_carboxilico">acide carboxylique</string>
+    <string name="classe_base">base</string>
+    <string name="classe_sal">sel</string>
+    <string name="classe_oxido">oxyde</string>
+    <string name="classe_hidroxido">hydroxyde</string>
+    <string name="classe_peroxido">peroxyde</string>
+    <string name="classe_oxidante">comburant</string>
+    <string name="classe_inorganico">composé inorganique</string>
+    <string name="classe_organico">composé organique</string>
+    <string name="classe_alcool">alcool</string>
+    <string name="classe_fenol">phénol</string>
+    <string name="classe_aldeido">aldéhyde</string>
+    <string name="classe_cetona">cétone</string>
+    <string name="classe_eter">éther</string>
+    <string name="classe_ester">ester</string>
+    <string name="classe_amina">amine</string>
+    <string name="classe_amida">amide</string>
+    <string name="classe_alcano">alcane</string>
+    <string name="classe_alqueno">alcène</string>
+    <string name="classe_alquino">alcyne</string>
+    <string name="classe_hidrocarboneto">hydrocarbure</string>
+    <string name="classe_aromatico">composé aromatique</string>
+    <string name="classe_heterociclico">composé hétérocyclique</string>
+    <string name="classe_halogenado">composé halogéné</string>
+    <string name="classe_carboidrato">glucide</string>
+    <string name="classe_aminoacido">acide aminé</string>
+    <string name="classe_lipidio">lipide</string>
+    <string name="classe_proteina">protéine</string>
+    <string name="classe_vitamina">vitamine</string>
+    <string name="classe_farmaco">médicament</string>
+    <string name="classe_solvente">solvant</string>
+    <string name="classe_polimero">polymère</string>
+    <string name="classe_gas">gaz</string>
+    <string name="classe_metal">métal</string>
+    <string name="classe_nitrocomposto">composé nitré</string>
+    <string name="classe_nitrila">nitrile</string>
+    <string name="classe_tiol">thiol</string>
+    <string name="classe_sulfonato">sulfonate</string>
+    <string name="classe_organometalico">composé organométallique</string>
+    <string name="classe_ionico">composé ionique</string>
+    <string name="classe_molecular">composé moléculaire</string>
+    <string name="classe_esteroide">stéroïde</string>
+    <string name="classe_alcaloide">alcaloïde</string>
 </resources>

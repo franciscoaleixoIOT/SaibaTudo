@@ -14,7 +14,7 @@ import org.junit.Test
 /** Intenções e entidades do NLU local, com o dicionário derivado do pacote de testes (fixture). */
 class NluTest {
 
-    private val d: Dicionario = runBlocking { Dicionario.criar(TestData.Fixture.pacote) }
+    private val d: Dicionario = dicionario(TestData.Fixture.pacote)
 
     private fun p(q: String, ctx: ParsedQuery? = null) = LocalNlu.parse(q, d, ctx)
 

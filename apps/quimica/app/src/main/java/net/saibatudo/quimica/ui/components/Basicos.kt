@@ -44,9 +44,12 @@ import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import net.saibatudo.quimica.R
 import net.saibatudo.quimica.data.model.Fonte
 import net.saibatudo.quimica.data.model.UnidadeDef
 import net.saibatudo.quimica.domain.Texto
+import net.saibatudo.quimica.domain.calc.UnidadeNomes
+import net.saibatudo.quimica.ui.LocalTextos
 
 /** Cartão padrão do app: superfície com borda fina. */
 @Composable
@@ -136,8 +139,9 @@ fun formulaAnotada(formula: String): AnnotatedString {
 
 @Composable
 fun FormulaTexto(formula: String, modifier: Modifier = Modifier, estilo: TextStyle = MaterialTheme.typography.titleLarge) {
+    val descricao = LocalTextos.current(R.string.ui_formula_desc, formula)
     Text(
-        formulaAnotada(formula), modifier = modifier.semantics { contentDescription = "Fórmula $formula" }, style = estilo,
+        formulaAnotada(formula), modifier = modifier.semantics { contentDescription = descricao }, style = estilo,
         color = MaterialTheme.colorScheme.onSurface
     )
 }
@@ -157,14 +161,15 @@ fun ChipsLinha(itens: List<String>, selecionado: String?, onClick: (String) -> U
 @Composable
 fun FontesView(fontes: List<Fonte>, onAbrirUrl: (String) -> Unit, modifier: Modifier = Modifier) {
     if (fontes.isEmpty()) return
+    val t = LocalTextos.current
     Column(modifier, verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text("Fonte" + if (fontes.size > 1) "s" else "", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(t(if (fontes.size > 1) R.string.ui_fontes else R.string.ui_fonte), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         fontes.forEach { f ->
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(f.rotulo(), Modifier.weight(1f), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 val url = f.url
                 if (url != null && url.startsWith("https://")) {
-                    TextButton(onClick = { onAbrirUrl(url) }) { Text("Abrir", style = MaterialTheme.typography.labelMedium) }
+                    TextButton(onClick = { onAbrirUrl(url) }) { Text(t(R.string.ui_abrir), style = MaterialTheme.typography.labelMedium) }
                 }
             }
         }
@@ -187,18 +192,19 @@ fun CampoNumero(
 /** Seletor de unidade (lista suspensa) entre as unidades de uma grandeza. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownUnidade(opcoes: List<UnidadeDef>, selecionada: UnidadeDef, onSelecionar: (UnidadeDef) -> Unit, modifier: Modifier = Modifier, rotulo: String = "Unidade") {
+fun DropdownUnidade(opcoes: List<UnidadeDef>, selecionada: UnidadeDef, onSelecionar: (UnidadeDef) -> Unit, modifier: Modifier = Modifier, rotulo: String? = null) {
+    val t = LocalTextos.current
     var aberto by remember { mutableStateOf(false) }
     ExposedDropdownMenuBox(expanded = aberto, onExpandedChange = { aberto = it }, modifier = modifier) {
         OutlinedTextField(
-            value = selecionada.simbolo, onValueChange = {}, readOnly = true, label = { Text(rotulo) }, singleLine = true,
+            value = selecionada.simbolo, onValueChange = {}, readOnly = true, label = { Text(rotulo ?: t(R.string.ui_unidade)) }, singleLine = true,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = aberto) },
             modifier = Modifier.menuAnchor(androidx.compose.material3.MenuAnchorType.PrimaryNotEditable).fillMaxWidth()
         )
         ExposedDropdownMenu(expanded = aberto, onDismissRequest = { aberto = false }) {
             opcoes.forEach { u ->
                 DropdownMenuItem(
-                    text = { Text(if (u.nome.isNullOrBlank()) u.simbolo else "${u.simbolo} — ${u.nome}") },
+                    text = { Text(UnidadeNomes.nome(u, t)?.let { nome -> "${u.simbolo} — $nome" } ?: u.simbolo) },
                     onClick = { onSelecionar(u); aberto = false }
                 )
             }

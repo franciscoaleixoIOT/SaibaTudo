@@ -1,5 +1,6 @@
 package net.saibatudo.quimica.ai.answer
 
+import net.saibatudo.quimica.R
 import net.saibatudo.quimica.ai.model.Acao
 import net.saibatudo.quimica.ai.model.Bloco
 import net.saibatudo.quimica.ai.model.Intent
@@ -19,7 +20,7 @@ import net.saibatudo.quimica.domain.Texto
 
 private fun AnswerBuilder.numerico(def: PropriedadeDef, e: Elemento): Double? = (Propriedades.bruto(def, e) as? Number)?.toDouble()
 
-private fun rotuloElemento(e: Elemento) = "${e.nome} (${e.simbolo})"
+private fun AnswerBuilder.rotuloElemento(e: Elemento) = "${nomeDe(e)} (${e.simbolo})"
 
 private val CATEGORIAS_METAL = setOf(
     CategoriaElemento.METAL_ALCALINO, CategoriaElemento.METAL_ALCALINO_TERROSO, CategoriaElemento.METAL_TRANSICAO,
@@ -27,17 +28,20 @@ private val CATEGORIAS_METAL = setOf(
 )
 
 internal suspend fun AnswerBuilder.tabelaPeriodica(q: ParsedQuery): Resposta {
-    val acoes = listOf<Acao>(Acao.AbrirTabela())
+    val acoes = listOf<Acao>(acaoTabela())
     var escopo: List<Elemento> = pacote.elementos
     val partes = mutableListOf<String>()
-    q.grupo?.let { g -> escopo = escopo.filter { it.grupo == g }; partes += "grupo $g" }
-    q.periodo?.let { p -> escopo = escopo.filter { it.periodo == p }; partes += "período $p" }
-    q.bloco?.let { b -> escopo = escopo.filter { it.bloco == b }; partes += "bloco $b" }
+    q.grupo?.let { g -> escopo = escopo.filter { it.grupo == g }; partes += t(R.string.resp_tab_grupo, g) }
+    q.periodo?.let { p -> escopo = escopo.filter { it.periodo == p }; partes += t(R.string.resp_tab_periodo, p) }
+    q.bloco?.let { b -> escopo = escopo.filter { it.bloco == b }; partes += t(R.string.resp_tab_bloco, b) }
     q.categoria?.let { id ->
-        if (id == "metal") { escopo = escopo.filter { it.categoria in CATEGORIAS_METAL }; partes += "metais" }
-        else { val c = CategoriaElemento.de(id); escopo = escopo.filter { it.categoria == c }; partes += c.rotulo.lowercase() }
+        if (id == "metal") { escopo = escopo.filter { it.categoria in CATEGORIAS_METAL }; partes += t(R.string.categoria_metal_plural) }
+        else { val c = CategoriaElemento.de(id); escopo = escopo.filter { it.categoria == c }; partes += t.minusNoMeio(t(c.rotulo)) }
     }
-    q.estado?.let { s -> escopo = escopo.filter { it.estadoPadrao.id == s }; partes += "estado ${pacote.elementos.firstOrNull { it.estadoPadrao.id == s }?.estadoPadrao?.rotulo?.lowercase() ?: s}" }
+    q.estado?.let { s ->
+        escopo = escopo.filter { it.estadoPadrao.id == s }
+        partes += t(R.string.resp_tab_estado, pacote.elementos.firstOrNull { it.estadoPadrao.id == s }?.estadoPadrao?.let { t(it.meio) } ?: s)
+    }
     val def = (q.extremo?.first ?: q.propriedade)?.let { dic.propriedade(it) }
     val temEscopo = partes.isNotEmpty()
     val fontes = escopo.flatMap { it.fontes }.distinctBy { it.nome }.take(2)
@@ -46,17 +50,22 @@ internal suspend fun AnswerBuilder.tabelaPeriodica(q: ParsedQuery): Resposta {
     if (q.extremo != null && def != null) {
         val menor = q.extremo.second == "min"
         val ordenados = escopo.mapNotNull { e -> numerico(def, e)?.let { e to it } }.sortedBy { if (menor) it.second else -it.second }
-        if (ordenados.isEmpty()) return semDado(q, "O pacote de dados não traz ${def.rotulo} para esses elementos.")
+        if (ordenados.isEmpty()) return semDado(q, t(R.string.resp_tab_sem_dado_props, def.rotulo))
         val topo = ordenados.take(3)
         val onde = if (temEscopo) " (${partes.joinToString(", ")})" else ""
         val primeiro = topo[0].first
         val blocos = listOf<Bloco>(
-            Bloco.Paragrafo("Entre os elementos do pacote com esse dado$onde, ${if (menor) "o menor" else "o maior"} valor de ${def.rotulo} é de ${rotuloElemento(primeiro)}: ${Propriedades.formatar(def, Propriedades.bruto(def, primeiro), un, nivel)?.curto}."),
-            Bloco.Lista(topo.map { (e, _) -> "${rotuloElemento(e)}: ${Propriedades.formatar(def, Propriedades.bruto(def, e), un, nivel)?.curto}" })
+            Bloco.Paragrafo(
+                t(
+                    if (menor) R.string.resp_tab_extremo_menor else R.string.resp_tab_extremo_maior,
+                    onde, def.rotulo, rotuloElemento(primeiro), Propriedades.formatar(t, def, Propriedades.bruto(def, primeiro), un, nivel)?.curto
+                )
+            ),
+            Bloco.Lista(topo.map { (e, _) -> "${rotuloElemento(e)}: ${Propriedades.formatar(t, def, Propriedades.bruto(def, e), un, nivel)?.curto}" })
         )
         return Resposta(
-            Intent.TABELA_PERIODICA, "${if (menor) "Menor" else "Maior"} ${def.rotulo}", blocos,
-            fontes = topo.flatMap { it.first.fontes }.distinctBy { it.nome }.take(2).ifEmpty { fontesDoPacote() }, acoes = acoes + Acao.AbrirElemento(primeiro.z, "Abrir ${primeiro.nome}")
+            Intent.TABELA_PERIODICA, t(if (menor) R.string.resp_tab_titulo_menor else R.string.resp_tab_titulo_maior, def.rotulo), blocos,
+            fontes = topo.flatMap { it.first.fontes }.distinctBy { it.nome }.take(2).ifEmpty { fontesDoPacote() }, acoes = acoes + acaoAbrir(primeiro)
         )
     }
 
@@ -64,9 +73,9 @@ internal suspend fun AnswerBuilder.tabelaPeriodica(q: ParsedQuery): Resposta {
     if (q.tendencia) {
         if (def == null) {
             return Resposta(
-                Intent.TABELA_PERIODICA, "Tendências periódicas",
-                listOf(Bloco.Paragrafo("De qual propriedade? Por exemplo: eletronegatividade, raio atômico ou energia de ionização.")),
-                acoes = acoes, sugestoes = listOf("Tendência da eletronegatividade ao longo do período 2"), entendida = false
+                Intent.TABELA_PERIODICA, t(R.string.resp_tab_tendencias_titulo),
+                listOf(Bloco.Paragrafo(t(R.string.resp_tab_qual_propriedade))),
+                acoes = acoes, sugestoes = listOf(t(R.string.sug_tendencia)), entendida = false
             )
         }
         val blocos = mutableListOf<Bloco>()
@@ -77,54 +86,54 @@ internal suspend fun AnswerBuilder.tabelaPeriodica(q: ParsedQuery): Resposta {
         val g = q.grupo ?: grupos.maxByOrNull { it.value.size }?.key
         if (p != null) {
             val seq = periodos[p].orEmpty().sortedBy { it.grupo }
-            if (seq.size >= 2) blocos += Bloco.Paragrafo("Ao longo do período $p (da esquerda para a direita), segundo os dados: " + descrever(def, seq))
+            if (seq.size >= 2) blocos += Bloco.Paragrafo(t(R.string.resp_tab_ao_longo_periodo, p, descrever(def, seq)))
         }
         if (g != null && q.periodo == null) {
             val seq = grupos[g].orEmpty().sortedBy { it.periodo }
-            if (seq.size >= 2) blocos += Bloco.Paragrafo("Descendo no grupo $g, segundo os dados: " + descrever(def, seq))
+            if (seq.size >= 2) blocos += Bloco.Paragrafo(t(R.string.resp_tab_descendo_grupo, g, descrever(def, seq)))
         }
-        if (blocos.isEmpty()) return semDado(q, "O pacote de dados não traz elementos suficientes com ${def.rotulo} para mostrar a tendência.")
-        return Resposta(Intent.TABELA_PERIODICA, "Tendência: ${def.rotulo}", blocos, fontes = fontes.ifEmpty { fontesDoPacote() }, acoes = acoes)
+        if (blocos.isEmpty()) return semDado(q, t(R.string.resp_tab_sem_tendencia, def.rotulo))
+        return Resposta(Intent.TABELA_PERIODICA, t(R.string.resp_tab_tendencia_titulo, def.rotulo), blocos, fontes = fontes.ifEmpty { fontesDoPacote() }, acoes = acoes)
     }
 
     if (temEscopo) {
-        if (escopo.isEmpty()) return semDado(q, "Não há elementos do pacote de dados para ${partes.joinToString(", ")}.")
-        val titulo = "Elementos: ${partes.joinToString(", ")}"
+        if (escopo.isEmpty()) return semDado(q, t(R.string.resp_tab_sem_elementos, partes.joinToString(", ")))
+        val titulo = t(R.string.resp_tab_elementos_titulo, partes.joinToString(", "))
         val linhas = escopo.sortedBy { it.z }.map { e ->
-            val extra = def?.let { d -> Propriedades.formatar(d, Propriedades.bruto(d, e), un, nivel)?.curto?.let { " – $it" } }.orEmpty()
+            val extra = def?.let { d -> Propriedades.formatar(t, d, Propriedades.bruto(d, e), un, nivel)?.curto?.let { " – $it" } }.orEmpty()
             "${rotuloElemento(e)}, Z = ${e.z}$extra"
         }
         return Resposta(
-            Intent.TABELA_PERIODICA, titulo, listOf(Bloco.Paragrafo("${escopo.size} elemento(s) no pacote de dados."), Bloco.Lista(linhas)),
-            fontes = fontes.ifEmpty { fontesDoPacote() }, acoes = acoes + escopo.take(3).map { Acao.AbrirElemento(it.z, "Abrir ${it.nome}") }
+            Intent.TABELA_PERIODICA, titulo, listOf(Bloco.Paragrafo(t.plural(R.plurals.resp_tab_n_elementos, escopo.size, escopo.size)), Bloco.Lista(linhas)),
+            fontes = fontes.ifEmpty { fontesDoPacote() }, acoes = acoes + escopo.take(3).map { acaoAbrir(it) }
         )
     }
 
     val porCategoria = pacote.elementos.groupBy { it.categoria }.entries.sortedBy { it.key.ordinal }
     return Resposta(
-        Intent.TABELA_PERIODICA, "Tabela periódica",
+        Intent.TABELA_PERIODICA, t(R.string.resp_tab_titulo),
         listOf(
-            Bloco.Paragrafo("A tabela do app tem ${pacote.elementos.size} elementos, organizados por grupo (colunas) e período (linhas), com cores por categoria."),
-            Bloco.Lista(porCategoria.map { (c, l) -> "${c.rotulo}: ${l.size}" })
+            Bloco.Paragrafo(t(R.string.resp_tab_descricao, pacote.elementos.size)),
+            Bloco.Lista(porCategoria.map { (c, l) -> "${t(c.rotulo)}: ${l.size}" })
         ),
-        fontes = fontesDoPacote(), acoes = acoes, sugestoes = listOf("Quais são os halogênios?", "Qual elemento é o mais eletronegativo?")
+        fontes = fontesDoPacote(), acoes = acoes, sugestoes = listOf(t(R.string.sug_halogenios), t(R.string.sug_mais_eletronegativo))
     )
 }
 
 /** Sequência "A v1 → B v2 → …" com os valores formatados, e a direção calculada dos próprios números. */
 private fun AnswerBuilder.descrever(def: PropriedadeDef, seq: List<Elemento>): String {
-    val sequencia = seq.joinToString(" → ") { "${it.simbolo} ${Propriedades.formatar(def, Propriedades.bruto(def, it), un, nivel)?.curto}" }
+    val sequencia = seq.joinToString(" → ") { "${it.simbolo} ${Propriedades.formatar(t, def, Propriedades.bruto(def, it), un, nivel)?.curto}" }
     val v = seq.mapNotNull { numerico(def, it) }
     if (v.size < 2) return sequencia
     val sobe = v.zipWithNext().count { (a, b) -> b > a }
     val desce = v.zipWithNext().count { (a, b) -> b < a }
     val passos = v.size - 1
     val resumo = when {
-        sobe == passos -> "O valor aumenta em todos os $passos passos."
-        desce == passos -> "O valor diminui em todos os $passos passos."
-        sobe > desce -> "O valor aumenta em $sobe dos $passos passos."
-        desce > sobe -> "O valor diminui em $desce dos $passos passos."
-        else -> "Não há tendência única nesta sequência."
+        sobe == passos -> t(R.string.resp_tab_aumenta_todos, passos)
+        desce == passos -> t(R.string.resp_tab_diminui_todos, passos)
+        sobe > desce -> t(R.string.resp_tab_aumenta_parcial, sobe, passos)
+        desce > sobe -> t(R.string.resp_tab_diminui_parcial, desce, passos)
+        else -> t(R.string.resp_tab_sem_tendencia_unica)
     }
     return "$sequencia. $resumo"
 }
@@ -139,12 +148,12 @@ private fun AnswerBuilder.descrever(def: PropriedadeDef, seq: List<Elemento>): S
 internal suspend fun AnswerBuilder.buscarConceito(q: ParsedQuery): Resposta {
     val tema = Texto.nlu(q.conceito.orEmpty())
     val palavras = LocalNlu.termosDeBusca(tema, dic.lexico).filter { it.length >= 3 }
-    fun corpoDe(t: Trecho) = if (t.idioma == Idiomas.PADRAO) t.textoPt ?: t.textoOriginal.orEmpty() else t.textoOriginal ?: t.textoPt.orEmpty()
-    fun pontos(t: Trecho): Int {
+    fun corpoDe(tr: Trecho) = if (tr.idioma == Idiomas.PADRAO) tr.textoPt ?: tr.textoOriginal.orEmpty() else tr.textoOriginal ?: tr.textoPt.orEmpty()
+    fun pontos(tr: Trecho): Int {
         var s = 0
-        val chaves = t.palavrasChave.map { Texto.nlu(it) }
-        val titulo = Texto.nlu(t.titulo.orEmpty() + " " + t.secao.orEmpty())
-        val corpo = Texto.nlu(corpoDe(t))
+        val chaves = tr.palavrasChave.map { Texto.nlu(it) }
+        val titulo = Texto.nlu(tr.titulo.orEmpty() + " " + tr.secao.orEmpty())
+        val corpo = Texto.nlu(corpoDe(tr))
         if (tema.isNotBlank()) {
             if (chaves.any { it == tema }) s += 10
             if (titulo.contains(tema)) s += 6
@@ -154,7 +163,7 @@ internal suspend fun AnswerBuilder.buscarConceito(q: ParsedQuery): Resposta {
             if (titulo.split(' ').contains(p)) s += 2
             if (corpo.split(' ').contains(p)) s += 1
         }
-        return if (t.idioma == idioma) s else s - 1
+        return if (tr.idioma == idioma) s else s - 1
     }
     fun melhorDe(trechos: List<Trecho>) = trechos.map { it to pontos(it) }.filter { it.second >= 3 }.maxByOrNull { it.second }?.first
     val melhor = melhorDe(pacote.trechos(idioma, palavras))
@@ -162,8 +171,8 @@ internal suspend fun AnswerBuilder.buscarConceito(q: ParsedQuery): Resposta {
         ?: melhorDe(pacote.trechos(idioma, null, reserva = true))
     if (melhor == null) {
         return Resposta(
-            Intent.CONCEITO, "Ainda não tenho um texto sobre isso",
-            listOf(Bloco.Paragrafo("Os textos de explicação do app vêm de fontes abertas e licenciadas, e ainda não há um trecho sobre${if (tema.isBlank()) " esse assunto" else " \"$tema\""}. Não vou responder de memória.")),
+            Intent.CONCEITO, t(R.string.resp_conceito_sem_titulo),
+            listOf(Bloco.Paragrafo(if (tema.isBlank()) t(R.string.resp_conceito_sem_texto_geral) else t(R.string.resp_conceito_sem_texto_tema, tema))),
             sugestoes = sugestoes(4), entendida = false
         )
     }
@@ -171,8 +180,8 @@ internal suspend fun AnswerBuilder.buscarConceito(q: ParsedQuery): Resposta {
     val blocos = mutableListOf<Bloco>(Bloco.Paragrafo(texto))
     // trecho em pt-BR cujo original é inglês e ainda sem tradução conta como inglês
     val idiomaDoTexto = if (melhor.idioma == Idiomas.PADRAO && melhor.textoPt == null && melhor.traducao?.contains("pendente", true) == true) "en" else melhor.idioma
-    if (idiomaDoTexto != idioma) blocos += Bloco.Aviso(Moldes.trechoEm(idiomaDoTexto, idioma))
-    else if (idioma == Idiomas.PADRAO && melhor.traducao?.contains("automática", true) == true) blocos += Bloco.Aviso("Tradução automática, ainda não revisada por uma pessoa.")
+    if (idiomaDoTexto != idioma) blocos += Bloco.Aviso(t(R.string.resp_trecho_em, t.nomeDoIdioma(idiomaDoTexto)))
+    else if (idioma == Idiomas.PADRAO && melhor.traducao?.contains("automática", true) == true) blocos += Bloco.Aviso(t(R.string.resp_traducao_automatica))
     val fonte = Fonte(
         nome = buildString { append(melhor.fonte); melhor.secao?.let { append(", ").append(it) } },
         url = melhor.url, licenca = melhor.licenca
@@ -197,11 +206,11 @@ internal suspend fun AnswerBuilder.correcoes(original: String): List<String> {
 }
 
 internal suspend fun AnswerBuilder.respostaNaoEntendi(q: ParsedQuery): Resposta {
-    val blocos = mutableListOf<Bloco>(Bloco.Paragrafo("Não entendi a pergunta. Tente citar um elemento, um composto ou uma fórmula, e o que você quer saber (propriedade, massa molar, estrutura, perigos ou um cálculo)."))
+    val blocos = mutableListOf<Bloco>(Bloco.Paragrafo(t(R.string.resp_nao_entendi_texto)))
     val sugeridas = correcoes(q.textoOriginal)
-    if (sugeridas.isNotEmpty()) blocos += Bloco.Paragrafo("Você quis dizer: ${sugeridas.first()}")
+    if (sugeridas.isNotEmpty()) blocos += Bloco.Paragrafo(t(R.string.resp_voce_quis_dizer, sugeridas.first()))
     val outras = sugestoes(6).filter { it !in sugeridas }
-    return Resposta(Intent.DESCONHECIDA, "Não entendi", blocos, sugestoes = (sugeridas.take(2) + outras).take(6), entendida = false)
+    return Resposta(Intent.DESCONHECIDA, t(R.string.resp_nao_entendi_titulo), blocos, sugestoes = (sugeridas.take(2) + outras).take(6), entendida = false)
 }
 
 /** Interpreta e responde sem gerar o fluxo de "não entendi" (usado para validar sugestões). */
@@ -214,32 +223,37 @@ internal suspend fun AnswerBuilder.responderSemRecursao(pergunta: String): Pair<
 
 /**
  * Perguntas que o app SABE responder, montadas dos dados do pacote e conferidas (cada uma é interpretada e respondida
- * antes de ser oferecida). Nunca sugere pergunta que cairia em "não entendi" ou em "sem dado".
+ * antes de ser oferecida). Nunca sugere pergunta que cairia em "não entendi" ou em "sem dado". Escritas no idioma das respostas.
  */
 suspend fun AnswerBuilder.sugestoes(max: Int = 6): List<String> {
     sugestoesCache?.let { return it.take(max) }
     val candidatas = mutableListOf<String>()
     val elementos = pacote.elementos
-    elementos.firstOrNull { it.pontoFusaoK != null }?.let { candidatas += "Qual o ponto de fusão de ${it.nome}?" }
-    candidatas += "Converter 25 °C para K"
+    elementos.firstOrNull { it.pontoFusaoK != null }?.let { candidatas += t(R.string.sug_fusao_de, nomeCru(it)) }
+    candidatas += t(R.string.sug_converter)
     val h = pacote.elemento("H")
     val o = pacote.elemento("O")
-    if (h != null && o != null) candidatas += "Balancear H2 + O2 -> H2O"
-    if (pacote.elemento("Ca") != null && h != null && o != null) candidatas += "Massa molar do Ca(OH)2"
-    elementos.firstOrNull { it.eletronegatividade != null && it.z > 8 }?.let { candidatas += "Qual a eletronegatividade de ${it.nome}?" }
-    // compostos do índice
+    if (h != null && o != null) candidatas += t(R.string.sug_balancear)
+    if (pacote.elemento("Ca") != null && h != null && o != null) candidatas += t(R.string.sug_massa_molar_caoh2)
+    elementos.firstOrNull { it.eletronegatividade != null && it.z > 8 }?.let { candidatas += t(R.string.sug_eletronegatividade_de, nomeCru(it)) }
+    // compostos do índice (uma pergunta de cada tipo)
+    var comEstrutura = false
+    var comPerigos = false
+    var comMassaMolar = false
     for (e in pacote.indice.entradas.take(60)) {
         val c = pacote.composto(e.cid) ?: continue
-        val nome = c.nomeExibicao
-        if (c.smiles != null && candidatas.none { it.startsWith("Desenhe") }) candidatas += "Desenhe a estrutura de $nome"
+        val nome = nomeCru(c)
+        if (c.smiles != null && !comEstrutura) { candidatas += t(R.string.sug_estrutura_de, nome); comEstrutura = true }
         val g = c.ghs
-        if (g != null && g.pictogramas.isNotEmpty() && candidatas.none { it.startsWith("Quais os perigos") }) candidatas += "Quais os perigos de $nome?"
-        if (c.massaMolar != null && candidatas.none { it.startsWith("Qual a massa molar de") }) candidatas += "Qual a massa molar de $nome?"
+        if (g != null && g.pictogramas.isNotEmpty() && !comPerigos) { candidatas += t(R.string.sug_perigos_de, nome); comPerigos = true }
+        if (c.massaMolar != null && !comMassaMolar) { candidatas += t(R.string.sug_massa_molar_de, nome); comMassaMolar = true }
         if (candidatas.size >= 14) break
     }
-    if (idioma == Idiomas.PADRAO) pacote.trechos(idioma).firstOrNull { !it.titulo.isNullOrBlank() }?.let { candidatas += "O que é ${it.titulo!!.lowercase()}?" }
-    if (pacote.elemento("Cl") != null && h != null) candidatas += "Qual o pH de HCl 0,01 mol/L?"
-    candidatas += "Quais são os halogênios?"
+    pacote.trechos(idioma).firstOrNull { !it.titulo.isNullOrBlank() }?.let {
+        candidatas += t(R.string.sug_o_que_e, if (idioma == Idiomas.PADRAO) it.titulo!!.lowercase() else t.minusNoMeio(it.titulo!!))
+    }
+    if (pacote.elemento("Cl") != null && h != null) candidatas += t(R.string.sug_ph_hcl)
+    candidatas += t(R.string.sug_halogenios)
     val validas = mutableListOf<String>()
     for (c in candidatas.distinct()) {
         val (_, r) = responderSemRecursao(c)

@@ -9,7 +9,7 @@ import org.junit.Test
 /** Busca de elementos e compostos por nome (PT/EN/IUPAC), símbolo, número atômico, fórmula, CAS e CID. */
 class BuscaTest {
 
-    private val d = runBlocking { Dicionario.criar(TestData.Fixture.pacote) }
+    private val d = dicionario(TestData.Fixture.pacote)
 
     private fun primeiro(q: String) = d.buscar(q).firstOrNull()
 

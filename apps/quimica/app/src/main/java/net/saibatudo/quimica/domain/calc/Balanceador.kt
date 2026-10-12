@@ -1,6 +1,8 @@
 package net.saibatudo.quimica.domain.calc
 
+import net.saibatudo.quimica.R
 import net.saibatudo.quimica.domain.Texto
+import net.saibatudo.quimica.domain.Textos
 import java.math.BigInteger
 
 /**
@@ -29,9 +31,9 @@ data class EquacaoBalanceada(val equacao: Equacao, val coeficientes: List<Int>) 
 }
 
 data class ResultadoBalanceamento(val balanceada: EquacaoBalanceada, val passos: List<String>) {
-    fun comoResultado(): ResultadoCalculo = ResultadoCalculo(
-        titulo = "Equação balanceada",
-        linhas = listOf(LinhaResultado("Equação", balanceada.texto(), destaque = true)),
+    fun comoResultado(t: Textos): ResultadoCalculo = ResultadoCalculo(
+        titulo = t(R.string.calc_bal_titulo),
+        linhas = listOf(LinhaResultado(t(R.string.calc_bal_linha_equacao), balanceada.texto(), destaque = true)),
         passos = passos
     )
 }
@@ -50,14 +52,14 @@ object Balanceador {
 
     fun interpretar(texto: String, simbolosValidos: Set<String>? = null): Equacao {
         val bruto = java.text.Normalizer.normalize(texto, java.text.Normalizer.Form.NFC).replace(Regex("[−–—]"), "-").trim()
-        if (bruto.isEmpty()) throw CalculoInvalido("Digite a equação, por exemplo: Fe + O2 -> Fe2O3")
-        val m = RX_SETA.find(bruto) ?: throw CalculoInvalido("Não encontrei a seta da reação. Escreva reagentes -> produtos, por exemplo: H2 + O2 -> H2O")
+        if (bruto.isEmpty()) throw CalculoInvalido(R.string.erro_equacao_digite)
+        val m = RX_SETA.find(bruto) ?: throw CalculoInvalido(R.string.erro_equacao_sem_seta)
         val esquerda = bruto.substring(0, m.range.first)
         val direita = bruto.substring(m.range.last + 1)
-        if (RX_SETA.containsMatchIn(direita)) throw CalculoInvalido("A equação tem mais de uma seta. Digite uma reação por vez.")
-        fun lado(l: String, nome: String): List<Especie> {
+        if (RX_SETA.containsMatchIn(direita)) throw CalculoInvalido(R.string.erro_equacao_varias_setas)
+        fun lado(l: String, faltam: Int): List<Especie> {
             val itens = dividirEspecies(l)
-            if (itens.isEmpty()) throw CalculoInvalido("Faltam os $nome da equação.")
+            if (itens.isEmpty()) throw CalculoInvalido(faltam)
             return itens.map { item ->
                 val c = RX_COEF.find(item.trim())
                 val corpo = c?.groupValues?.get(2)?.trim() ?: item.trim()
@@ -67,11 +69,11 @@ object Balanceador {
                     val f = FormulaQuimica.analisar(corpo, simbolosValidos)
                     Especie(f.texto, f)
                 } catch (e: CalculoInvalido) {
-                    throw CalculoInvalido("Substância \"$corpo\": ${e.message}")
+                    throw CalculoInvalido(R.string.erro_substancia, corpo, e)
                 }
             }
         }
-        return Equacao(lado(esquerda, "reagentes"), lado(direita, "produtos"))
+        return Equacao(lado(esquerda, R.string.erro_equacao_faltam_reagentes), lado(direita, R.string.erro_equacao_faltam_produtos))
     }
 
     /** Divide um lado da equação em substâncias, separando pelo "+" que não é carga elétrica ("Fe3+ + Cl-" tem duas substâncias). */
@@ -102,13 +104,13 @@ object Balanceador {
         return partes.map { it.trim() }.filter { it.isNotEmpty() }
     }
 
-    fun balancear(texto: String, simbolosValidos: Set<String>? = null): ResultadoBalanceamento =
-        balancear(interpretar(texto, simbolosValidos))
+    fun balancear(t: Textos, texto: String, simbolosValidos: Set<String>? = null): ResultadoBalanceamento =
+        balancear(t, interpretar(texto, simbolosValidos))
 
-    fun balancear(eq: Equacao): ResultadoBalanceamento {
+    fun balancear(t: Textos, eq: Equacao): ResultadoBalanceamento {
         val especies = eq.todas
         val n = especies.size
-        if (n > 26) throw CalculoInvalido("Equação grande demais (máximo de 26 espécies).")
+        if (n > 26) throw CalculoInvalido(R.string.erro_equacao_grande)
         val nr = eq.reagentes.size
         val elementos = LinkedHashSet<String>()
         especies.forEach { elementos += it.formula.contagem.keys }
@@ -147,17 +149,17 @@ object Balanceador {
         fun nomeEsp(i: Int) = if (especies[i].eletron) "e⁻" else Texto.formulaUnicode(especies[i].rotulo)
 
         val passos = mutableListOf<String>()
-        passos += "Espécies: " + especies.indices.joinToString(", ") { "${letras[it]} = ${nomeEsp(it)}" } + "."
-        passos += "Cada letra é o coeficiente da espécie. Conservar cada elemento" + (if (temCarga) " e a carga" else "") + " dá uma equação (átomos nos reagentes = átomos nos produtos):"
+        passos += t(R.string.calc_bal_especies, especies.indices.joinToString(", ") { "${letras[it]} = ${nomeEsp(it)}" })
+        passos += t(if (temCarga) R.string.calc_bal_cada_letra_carga else R.string.calc_bal_cada_letra)
         for ((r, nome) in linhasNome.withIndex()) {
             if (nome == "carga") {
                 // cargas podem ser negativas: escreve a soma com sinais (reagentes − produtos = 0)
                 val termos = (0 until n).filter { !original[r][it].ehZero }.map { original[r][it].num.toInt() to letras[it] }
-                passos += "Carga: " + termos.mapIndexed { i, (k, l) ->
+                passos += t(R.string.calc_bal_carga, termos.mapIndexed { i, (k, l) ->
                     val abs = kotlin.math.abs(k)
                     val corpo = if (abs == 1) "$l" else "$abs$l"
                     if (i == 0) (if (k < 0) "−$corpo" else corpo) else (if (k < 0) " − $corpo" else " + $corpo")
-                }.joinToString("") + " = 0"
+                }.joinToString(""))
                 continue
             }
             val esq = (0 until nr).filter { !original[r][it].ehZero }.joinToString(" + ") { termo(original[r][it], letras[it]) }
@@ -166,18 +168,17 @@ object Balanceador {
         }
 
         if (livres.isEmpty()) {
-            throw CalculoInvalido("Não existe combinação de coeficientes que conserve os átomos${if (temCarga) " e a carga" else ""}. Confira as fórmulas: todo elemento precisa aparecer nos dois lados.")
+            throw CalculoInvalido(if (temCarga) R.string.erro_bal_sem_combinacao_carga else R.string.erro_bal_sem_combinacao)
         }
         if (livres.size > 1) {
-            throw CalculoInvalido("Esta equação admite mais de uma solução independente (parece misturar duas ou mais reações). Separe-a em reações menores e balanceie uma de cada vez.")
+            throw CalculoInvalido(R.string.erro_bal_varias_solucoes)
         }
         val f = livres[0]
         val x = Array(n) { Racional.ZERO }
         x[f] = Racional.UM
         for ((i, pc) in pivotes.withIndex()) x[pc] = -m[i][f]
 
-        passos += "Resolvendo o sistema por eliminação de Gauss–Jordan (com frações exatas), ${letras[f]} fica livre: ${letras[f]} = 1 e " +
-            pivotes.joinToString(", ") { "${letras[it]} = ${x[it]}" } + "."
+        passos += t(R.string.calc_bal_resolvendo, letras[f], pivotes.joinToString(", ") { "${letras[it]} = ${x[it]}" })
 
         // menores inteiros
         var mmc = BigInteger.ONE
@@ -188,19 +189,19 @@ object Balanceador {
         if (inteiros.all { it.signum() <= 0 }) inteiros = inteiros.map { it.negate() }
         if (inteiros.any { it.signum() <= 0 }) {
             val ruins = inteiros.indices.filter { inteiros[it].signum() <= 0 }.joinToString(", ") { nomeEsp(it) }
-            throw CalculoInvalido("Não há coeficientes positivos que balanceiem esta equação (problema em: $ruins). Verifique se as espécies estão do lado certo e se nenhuma está sobrando.")
+            throw CalculoInvalido(R.string.erro_bal_sem_positivos, ruins)
         }
-        if (inteiros.any { it > BigInteger.valueOf(100_000) }) throw CalculoInvalido("Os coeficientes resultantes são grandes demais.")
+        if (inteiros.any { it > BigInteger.valueOf(100_000) }) throw CalculoInvalido(R.string.erro_bal_coef_grandes)
         val coef = inteiros.map { it.toInt() }
-        passos += "Multiplicando pelo menor número que elimina as frações e simplificando: " +
-            coef.indices.joinToString(", ") { "${letras[it]} = ${coef[it]}" } + "."
+        passos += t(R.string.calc_bal_multiplicando, coef.indices.joinToString(", ") { "${letras[it]} = ${coef[it]}" })
         val bal = EquacaoBalanceada(eq, coef)
-        passos += "Equação balanceada: ${bal.texto()}"
+        passos += t(R.string.calc_equacao_balanceada, bal.texto())
         // verificação
         for ((r, nome) in linhasNome.withIndex()) {
             val esq = (0 until nr).sumOf { (original[r][it].num.toLong() * coef[it]) }
             val dir = (nr until n).sumOf { (-original[r][it].num.toLong() * coef[it]) }
-            passos += "Verificação – ${if (nome == "carga") "carga" else nome}: $esq nos reagentes e $dir nos produtos" + if (esq == dir) " (conservado)." else " (ERRO)."
+            val rotulo = if (nome == "carga") t(R.string.calc_bal_rotulo_carga) else nome
+            passos += t(if (esq == dir) R.string.calc_bal_verificacao_ok else R.string.calc_bal_verificacao_erro, rotulo, esq, dir)
             check(esq == dir) { "falha interna na conservação de $nome" }
         }
         return ResultadoBalanceamento(bal, passos)

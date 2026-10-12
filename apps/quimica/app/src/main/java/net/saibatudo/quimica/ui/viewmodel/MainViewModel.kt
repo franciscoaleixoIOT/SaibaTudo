@@ -32,7 +32,10 @@ import net.saibatudo.quimica.data.prefs.UserPreferences
 import net.saibatudo.quimica.data.repository.EstadoDados
 import net.saibatudo.quimica.data.repository.Pacote
 import net.saibatudo.quimica.data.repository.QuimicaDataStore
+import net.saibatudo.quimica.R
+import net.saibatudo.quimica.domain.FonteDeTextos
 import net.saibatudo.quimica.domain.Idiomas
+import net.saibatudo.quimica.domain.Textos
 
 /** Telas do app. As cinco primeiras são as abas; as demais são empilhadas por cima. */
 sealed interface Tela {
@@ -76,6 +79,8 @@ class MainViewModel(
     private val dados: QuimicaDataStore,
     private val prefs: PreferencesStore,
     private val atualizacoes: UpdateCoordinator,
+    /** De onde vêm os textos (res/values-<idioma>/strings.xml no aparelho): o dicionário, as respostas e as telas leem daqui, no idioma do app. */
+    private val fonteDeTextos: FonteDeTextos,
     idiomaInicial: String = Idiomas.PADRAO
 ) : ViewModel() {
 
@@ -87,6 +92,12 @@ class MainViewModel(
     private val _sugestoes = MutableStateFlow<List<String>>(emptyList())
     private val _idioma = MutableStateFlow(Idiomas.normalizar(idiomaInicial) ?: Idiomas.PADRAO)
     private var contexto: ParsedQuery? = null
+
+    /** Os textos do app em [idioma] (as telas os recebem por `LocalTextos`). */
+    fun textos(idioma: String): Textos = Textos(idioma, fonteDeTextos)
+
+    /** Nome do composto no idioma do app (do dicionário em uso), ou null se o dicionário ainda não foi montado. */
+    fun nomeDoComposto(cid: Long): String? = dicionarioAtual?.second?.nomeDoComposto(cid)
 
     /** Dicionário e montador de respostas do pacote em uso; reconstruídos quando o pacote, o idioma ou o nível mudam. */
     @Volatile private var dicionarioAtual: Pair<Pacote, Dicionario>? = null
@@ -149,7 +160,7 @@ class MainViewModel(
         val idioma = _idioma.value
         construtor?.let { if (nivelDoConstrutor == nivel && dicionarioAtual?.first === pacote && it.dic.idioma == idioma) return it }
         val dic = dicionarioAtual?.takeIf { it.first === pacote && it.second.idioma == idioma }?.second
-            ?: withContext(Dispatchers.Default) { Dicionario.criar(pacote, idioma) }.also { dicionarioAtual = pacote to it }
+            ?: withContext(Dispatchers.Default) { Dicionario.criar(pacote, textos(idioma)) }.also { dicionarioAtual = pacote to it }
         return AnswerBuilder(pacote, dic, nivel).also { construtor = it; nivelDoConstrutor = nivel }
     }
 
@@ -229,11 +240,12 @@ class MainViewModel(
     companion object {
         private val META = setOf(Intent.AJUDA, Intent.SOBRE_DADOS, Intent.FONTES, Intent.RECUSA_PERIGO, Intent.DESCONHECIDA)
 
-        fun descreverResultado(r: UpdateResult): String = when (r) {
-            UpdateResult.UpToDate -> "Os dados já estão na versão mais recente."
-            is UpdateResult.Updated -> "Dados atualizados para a versão ${r.dataVersion}."
-            is UpdateResult.Skipped -> "Nada a fazer agora: ${r.motivo}."
-            is UpdateResult.Failed -> "Não foi possível atualizar: ${r.erro}."
+        /** Frase para o usuário sobre o resultado da atualização do pacote, no idioma de [t]. */
+        fun descreverResultado(r: UpdateResult, t: Textos): String = when (r) {
+            UpdateResult.UpToDate -> t(R.string.atualizacao_atual)
+            is UpdateResult.Updated -> t(R.string.atualizacao_atualizado, r.dataVersion)
+            is UpdateResult.Skipped -> t(R.string.atualizacao_ignorado, if (r.detalhe != null) t(r.motivo, r.detalhe) else t(r.motivo))
+            is UpdateResult.Failed -> t(R.string.atualizacao_falhou, r.motivo?.let { t(it) } ?: r.erro)
         }
     }
 }

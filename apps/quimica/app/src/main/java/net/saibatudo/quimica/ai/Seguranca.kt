@@ -1,11 +1,13 @@
 package net.saibatudo.quimica.ai
 
+import net.saibatudo.quimica.R
 import net.saibatudo.quimica.ai.nlu.lexico.Lexico
 import net.saibatudo.quimica.domain.Idiomas
 import net.saibatudo.quimica.domain.Texto
+import net.saibatudo.quimica.domain.Textos
 import java.text.Normalizer
 
-/** Categorias de recusa (mesmos ids de web/src/quimica/js/seguranca.js). */
+/** Categorias de recusa (mesmos ids de web/src/quimica/js/seguranca.js). O [rotulo] é só diagnóstico (nunca é exibido ao usuário). */
 enum class CategoriaRecusa(val rotulo: String) {
     EXPLOSIVOS("explosivos"),
     ARMAS_QUIMICAS("armas químicas"),
@@ -65,23 +67,10 @@ object Seguranca {
     /** Colada: só letras, sem repetições consecutivas ("exploosivo" vira "explosivo"). */
     private fun colada(s: String) = RX_REPETIDAS.replace(RX_NAO_LETRA.replace(s, ""), "$1")
 
-    // ---- mensagens -----------------------------------------------------------------------------------------------------------
+    // ---- mensagens (strings.xml, no idioma de [Textos]) ----------------------------------------------------------------------------
 
-    private const val MSG_PADRAO =
-        "Não posso ajudar com isso. O SaibaTudo Química não fornece instruções de síntese, purificação, ampliação de escala nem receitas caseiras de explosivos, armas químicas, drogas ilícitas, seus precursores ou outros reagentes perigosos, porque podem causar mortes e ferimentos graves."
-    private const val MSG_ALTERNATIVAS =
-        "Posso ajudar com segurança e conhecimento: perigos, equipamentos de proteção (EPI), armazenamento, descarte e primeiros socorros de uma substância; propriedades, fórmula, massa molar e estrutura; cálculos e conceitos de Química."
-    private const val MSG_DANO =
-        "Não posso ajudar com isso. Não oriento sobre como ferir, envenenar ou intoxicar pessoas ou animais. Se alguém corre perigo ou foi exposto a uma substância, procure imediatamente um serviço de emergência ou um centro de informação toxicológica da sua região."
-    private const val MSG_AUTOLESAO =
-        "Sinto muito que você esteja passando por isso. Não posso orientar sobre esse assunto, mas você não está sozinho(a): procure agora alguém de confiança e um serviço de emergência da sua região. O Centro de Valorização da Vida (CVV) conversa com qualquer pessoa, de forma gratuita e sigilosa, em https://cvv.org.br."
-
-    /** Perguntas de segurança legítimas, respondíveis pelo app (usadas como sugestões). */
-    val SUGESTOES_SEGURAS = listOf(
-        "Quais EPIs usar com ácido sulfúrico?",
-        "Primeiros socorros para respingo de soda cáustica no olho",
-        "Por que não misturar água sanitária com amoníaco?"
-    )
+    /** Perguntas de segurança legítimas, respondíveis pelo app (usadas como sugestões), no idioma de [t]. */
+    fun sugestoesSeguras(t: Textos): List<String> = listOf(t(R.string.sug_segura_epi), t(R.string.sug_segura_primeiros_socorros), t(R.string.sug_segura_misturar))
 
     // ---- avaliação -------------------------------------------------------------------------------------------------------------
 
@@ -149,15 +138,17 @@ object Seguranca {
     /** Avaliação no idioma ativo (ele + inglês + português). */
     fun avaliarNoIdioma(texto: String, idioma: String): AvaliacaoSeguranca = avaliar(texto, idiomasDaAvaliacao(idioma))
 
-    /** Resposta padrão de recusa. */
-    fun respostaRecusa(avaliacao: AvaliacaoSeguranca?): RespostaRecusa {
-        val principal = when (avaliacao?.categoria) {
-            CategoriaRecusa.DANO_A_PESSOAS -> MSG_DANO
-            CategoriaRecusa.AUTOLESAO -> MSG_AUTOLESAO
-            else -> MSG_PADRAO
-        }
+    /** Resposta padrão de recusa, no idioma de [t] (a recusa vale em todos os idiomas; o texto sai no idioma ativo). */
+    fun respostaRecusa(avaliacao: AvaliacaoSeguranca?, t: Textos): RespostaRecusa {
+        val principal = t(
+            when (avaliacao?.categoria) {
+                CategoriaRecusa.DANO_A_PESSOAS -> R.string.seg_recusa_dano
+                CategoriaRecusa.AUTOLESAO -> R.string.seg_recusa_autolesao
+                else -> R.string.seg_recusa_padrao
+            }
+        )
         val linhas = mutableListOf(principal)
-        if (avaliacao?.categoria != CategoriaRecusa.AUTOLESAO) linhas += MSG_ALTERNATIVAS
+        if (avaliacao?.categoria != CategoriaRecusa.AUTOLESAO) linhas += t(R.string.seg_recusa_alternativas)
         return RespostaRecusa(principal, linhas, avaliacao?.categoria)
     }
 }
