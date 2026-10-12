@@ -1,0 +1,127 @@
+# SaibaTudo IA — plano para substituir o Qwen da nuvem por uma IA própria dos apps
+
+> Pedido do mantenedor (12/10/2026): trocar a IA Qwen da nuvem por uma IA **com melhorias, voltada para os apps SaibaTudo e com o
+> nome SaibaTudo**, escolhendo a melhor base (Qwen, Gemma…). Este documento é o plano; nada aqui foi executado ainda.
+> Restrições que continuam valendo: treino **sempre local** (RTX 5060 Laptop, 8 GB), Modal só serve (teto US$ 30/mês), ZeroGPU do
+> Hugging Face (40 min de GPU/dia, conta PRO) para texto gerado, **nenhum número sai do modelo**, neutralidade eleitoral,
+> **congelamento de eleições 24–26/10/2026** (nada do app de eleições muda nesses dias), segredos só em `secrets/`.
+
+## 1. O que existe hoje (ponto de partida)
+
+| Peça | Base | Onde roda | Como foi treinada | Observação |
+| :-- | :-- | :-- | :-- | :-- |
+| NLU da nuvem (eleições, `v2.3-20261007`) | **Qwen2.5-1.5B-Instruct** + LoRA ("hybrid"), GGUF Q4_K_M | Modal (CPU, llama.cpp) | local, 3 h 30, dados de `backend/retrain` | 93,7 % de intenção no golden, 96,8 % em 435 perguntas reservadas |
+| Texto gerado (eleições, "ask") | **Qwen2.5-7B-Instruct** sem ajuste (prompt + verificador) | Space privado ZeroGPU; Modal L4 reserva | nenhum treino | 2–6 s por resposta; verificador descarta fatos que contradizem o app |
+| Química (fase 5, planejada) | Qwen2.5-1.5B (NLU) e Qwen3-4B (explicador) | idem | dataset de 66.066 pares (CC BY-SA), 20.538 exemplos de NLU, agora em 5 idiomas | ainda não treinada |
+| Ciclo e gate | `train_hybrid.py` → `merge_and_export.py` → `convert_local.py` (gate) → Modal/HF | local | — | gate: JSON ≥ 98 %, intenção ≥ 85 %, entidade ≥ 90 %, alucinação ≤ 5 %, catraca de 1 ponto |
+
+O que falta nessa arquitetura, e que o pedido resolve: (a) o texto gerado usa um modelo genérico sem treino de comportamento
+(fontes, rótulos, recusas, tom); (b) cada app tem/teria o seu NLU separado; (c) o nome exposto é de terceiro; (d) a química
+precisa de cinco idiomas e a eleição de um só.
+
+## 2. Escolha da base — critérios e comparação
+
+Critérios, na ordem que pesam aqui: **licença que permite renomear e distribuir como "SaibaTudo"** (sem obrigação de carregar a
+marca alheia no nome do produto), **português do Brasil forte** e os outros quatro idiomas da química, **tamanhos que cabem no
+treino local** (QLoRA 4-bit em 8 GB: até ~4B com `max_length` 1024; 7–8B só com `max_length` ≤ 512 e lote 1), **GGUF no
+llama.cpp** (o Modal serve assim), **saída JSON confiável** (o NLU usa gramática), **modo "sem raciocínio"** controlável (latência).
+
+| Base (famílias de 2025–26) | Licença | pt-BR / es-de-fr | Tamanhos úteis | Treino local 8 GB | Veredito |
+| :-- | :-- | :-- | :-- | :-- | :-- |
+| **Qwen3** (0.6B, 1.7B, 4B, 8B; `-Instruct-2507`) | **Apache 2.0** (todos os tamanhos) | muito bom (119 idiomas) | 1.7B (NLU), 4B (explicador), 8B (teto) | 1.7B e 4B: sim; 8B: apertado | **Recomendada.** Mesma família já em uso (ciclo, gate, GGUF prontos); renomear é livre, bastando a atribuição no *model card*. |
+| Gemma 3 (1B, 4B, 12B, 27B) / Gemma 3n | Termos próprios do Google (uso permitido, mas com política de uso que acompanha os derivados) | muito bom (140 idiomas) | 1B, 4B | 1B e 4B: sim | Boa alternativa técnica; a licença obriga a repassar restrições de uso aos derivados e dá menos liberdade de marca. Fica como **segunda opção** e como comparativo no benchmark. |
+| Llama 3.2 (1B, 3B) / Llama 4 | Licença Llama | bom em pt | 1B, 3B | sim | **Descartada para a marca:** a licença exige "Llama" no início do nome de qualquer derivado e o aviso "Built with Llama". |
+| Mistral (Ministral 3B/8B; Mistral Small 24B) | Ministral: licença de pesquisa (uso comercial sob contrato); Small: Apache 2.0 | bom | 24B não cabe | não | Descartada: os tamanhos pequenos não têm licença livre; o livre é grande demais. |
+| Phi-4-mini (3.8B) | MIT | pt fraco em relação aos demais | 3.8B | sim | Descartada pela qualidade em português. |
+| SmolLM3 (3B) / EuroLLM (1.7B, 9B) | Apache 2.0 | EuroLLM: bom em pt-PT/es/de/fr; SmolLM3: razoável | 1.7B, 3B | sim | Alternativas abertas para o **benchmark** do NLU; EuroLLM não tem pt-BR como foco. |
+| Modelos brasileiros (Tucano 1.1B/2.4B, Sabiá) | Tucano Apache 2.0 (base Llama-like treinada do zero em pt); Sabiá-3 só por API | Tucano: pt-BR forte, sem os outros idiomas | 1.1B, 2.4B | sim | Tucano entra no benchmark **do app de eleições** (só pt). Sabiá não serve: não é aberto. |
+
+**Decisão proposta:** família **Qwen3** como base da **SaibaTudo IA**, com Gemma 3 e Tucano medidos no mesmo benchmark para
+confirmar (ou derrubar) a escolha antes de treinar o modelo definitivo. Se Gemma 3 4B vencer o Qwen3 4B por margem clara em
+português (≥ 3 pontos no gate) o custo da licença passa a valer a pena e a decisão volta ao mantenedor.
+
+## 3. Arquitetura da SaibaTudo IA (dois modelos, um nome)
+
+Um só nome para o usuário ("SaibaTudo IA"), dois modelos por trás, porque as tarefas são opostas (interpretar em JSON a 1 s em
+CPU × escrever um texto curto com GPU):
+
+1. **SaibaTudo-NLU** (interpretador, base Qwen3-1.7B, LoRA → GGUF Q4_K_M, Modal CPU). **Um só modelo para todos os apps**: o
+   prompt leva `app` (`eleicoes2026`, `quimica`, …) e `idioma`; o conjunto de intenções é a união dos contratos
+   (`contracts/nlu_golden_cases.json` de cada app). Vantagem: um ciclo de treino, um serviço, um gate; o app de eleições só
+   troca de modelo depois de 27/10. Saída JSON com gramática, como hoje.
+2. **SaibaTudo-Explica** (texto gerado, base Qwen3-4B-Instruct-2507, QLoRA → GGUF Q4/Q5 ou bf16 no ZeroGPU). Treino de
+   **comportamento**, não de fatos: responde só com os trechos e dados que recebe, cita fonte e licença, rotula "pode conter
+   erros", recusa (neutralidade e segurança química) com os textos dos contratos, respeita o idioma pedido, não inventa número.
+   O verificador do servidor continua (defesa em profundidade). Alvo: substituir o Qwen2.5-7B com qualidade igual ou melhor e
+   metade do tempo de GPU (4B × 7B).
+3. **Opcional, fase posterior — SaibaTudo-NLU-mini** (Qwen3-0.6B, Q4 ≈ 400 MB) embarcado no Android para interpretar sem rede
+   quando o NLU por regras falhar. Só se o benchmark mostrar ganho real sobre as regras.
+
+Regras que não mudam: nenhum número vem do modelo; eleições nunca recomendam; fatos críticos vêm dos dados; captura de perguntas
+opt-in e filtrada; segredos em `secrets/`.
+
+## 4. Dados de treino (um corpus "SaibaTudo instruct")
+
+- **Formato único** (`backend/retrain/saibatudo/`): `{app, idioma, tarefa: "nlu"|"explica", entrada, contexto[], saida, fonte, licenca}`.
+- **NLU:** eleições (`backend/retrain/out-v2.3` + holdout) e química (`dataset/` → 20.538 exemplos de NLU, mais os golden
+  por idioma como **teste**, nunca treino). Regras já existentes: extras de "falhas do golden" são recusados; 20 % reservado.
+- **Explica:** pares do dataset de química (66.066, CC BY-SA 4.0, fontes licenciadas) reescritos como "trechos + pergunta →
+  resposta com fonte"; para eleições, respostas montadas **pelo app** (determinísticas, TSE) usadas como alvo de reescrita
+  neutra; **recusas** vindas dos contratos (`seguranca_cases.json`, `opiniao_cases.json`) em pt e, para química, nos 5 idiomas.
+  Nada dos livros protegidos (`LivrosQuimica`), nada de texto sem licença.
+- **Multilíngue:** só química treina em en/es/de/fr; eleições fica em pt-BR (regra do projeto).
+- **Qualidade:** dedupe por normalização, limite por intenção para não enviesar, revisão humana por amostra (o mantenedor).
+
+## 5. Avaliação (benchmark antes de escolher; gate antes de publicar)
+
+- `tools/benchmark_ia/` (novo, raiz): roda os **mesmos** golden e holdouts de todos os apps contra qualquer GGUF, mede intenção,
+  entidades, JSON válido, alucinação, latência (CPU Modal-equivalente) e tamanho; para o explicador mede aderência à fonte
+  (todo número da resposta existe nos trechos), idioma da resposta, recusas corretas, tamanho da resposta, e um painel de 50
+  perguntas por app avaliado às cegas pelo mantenedor (A × B, sem saber qual modelo).
+- Candidatos do benchmark: NLU — Qwen2.5-1.5B (atual, referência), Qwen3-1.7B, Gemma-3-1B, Tucano-2.4B (só eleições), SmolLM3-3B;
+  Explica — Qwen2.5-7B (atual), Qwen3-4B, Gemma-3-4B, Qwen3-8B (se couber no treino).
+- O gate existente (`convert_local.py`) passa a receber `--app` e `--idioma` e a **catraca** compara com o modelo em produção
+  de cada app. Nada sobe se perder para o atual.
+
+## 6. Serviço, publicação e marca
+
+- **Hugging Face:** repositórios privados `franciscoaleixo/SaibaTudo-NLU` e `franciscoaleixo/SaibaTudo-Explica`, revisões
+  imutáveis por versão (`v3.0-AAAAMMDD`). *Model card* com base, licença Apache 2.0 e aviso de atribuição ("baseado em Qwen3,
+  © Alibaba Cloud, Apache 2.0") — exigência da licença; na interface dos apps o nome é só **SaibaTudo IA**.
+- **Modal:** Volume `saibatudo-ia-models` com `current.json` por tarefa; a função `nlu` recebe `app`; `MODEL_VERSION` por app na
+  Vercel para invalidar cache. O Modal continua reserva do explicador.
+- **ZeroGPU:** Space `saibatudo-ia-explica` com o 4B em bf16 (cabe fácil) ou GGUF; mesma API do Space atual para a Vercel não
+  mudar; teto diário por app (`HF_ASK_DAILY_BUDGET`).
+- **Health:** `/api/health` passa a expor `ia: { nlu: "SaibaTudo-NLU v3.0", explica: "SaibaTudo-Explica v1.0" }` em cada app.
+- **Textos dos apps:** "Perguntar à IA na nuvem" vira "Perguntar à SaibaTudo IA"; a nota de rodapé "texto gerado, pode conter
+  erros" continua. Catálogos de i18n da química ganham a chave.
+
+## 7. Etapas e esforço (ordem recomendada)
+
+| # | Etapa | Entrega | Esforço local | Depende de |
+| :-- | :-- | :-- | :-- | :-- |
+| 1 | Benchmark das bases (NLU e Explica) | `tools/benchmark_ia/` + relatório `docs/BENCHMARK_IA_<data>.md` com a decisão | 1–2 dias de GPU (inferência) | — |
+| 2 | Corpus SaibaTudo instruct | `backend/retrain/saibatudo/` com validação e contagens por app/idioma | 1 dia | — |
+| 3 | SaibaTudo-NLU v3 (Qwen3-1.7B) | treino (~4 h), gate por app, publicação em paralelo ao atual (`MODEL_VERSION` só da química) | 1 noite | 1, 2 |
+| 4 | SaibaTudo-Explica v1 (Qwen3-4B QLoRA) | treino (6–10 h), avaliação às cegas, Space novo, Vercel apontando para ele na **química** | 2 noites | 1, 2 |
+| 5 | Troca no app de eleições | `MODEL_VERSION` e Space da eleição apontam para a SaibaTudo IA; textos "SaibaTudo IA" | 1 dia | 3, 4, **depois de 27/10** |
+| 6 | Ciclo contínuo | retreino mensal com captura opt-in revisada; painel noturno compara versões; `OPERACAO.md` atualizado | contínuo | 5 |
+| 7 | (opcional) NLU-mini no Android | Qwen3-0.6B Q4 embarcado, só se o benchmark justificar | 2 dias | 3 |
+
+Custos previstos: zero em treino (local); Modal dentro dos US$ 30 (o 1.7B em CPU custa como o 1.5B); ZeroGPU: o 4B gasta
+menos GPU que o 7B atual, então a cota de 40 min/dia rende mais respostas.
+
+## 8. Riscos e como tratar
+- **Qwen3 e "raciocínio":** o modo *thinking* aumenta latência e quebra JSON — treinar e servir com `enable_thinking=False`
+  (template) e teste no gate de "nenhum `<think>` na saída".
+- **Modelo único de NLU piorar um app:** a catraca por app bloqueia; se não passar, mantém-se um GGUF por app (mesma base).
+- **8 GB de VRAM:** 4B em QLoRA 4-bit com `max_length 1024` cabe; 8B só com 512 e lote 1 — o benchmark decide se vale.
+- **Licença Gemma, se vencer:** exigiria aceitar e repassar a política de uso proibido; decisão do mantenedor.
+- **Nome:** "SaibaTudo IA" é marca do projeto; o *model card* mantém a atribuição da base (Apache 2.0 exige aviso, não o nome).
+- **Congelamento:** eleições não muda entre 24 e 26/10; a química pode avançar nesse período.
+
+## 9. Decisões pedidas ao mantenedor
+1. Aprovar a família **Qwen3** como base (com Gemma 3 e Tucano no benchmark para confirmação) — ou pedir outra.
+2. Um só **SaibaTudo-NLU** para todos os apps (recomendado) ou um por app.
+3. Começar o benchmark (etapa 1) agora, em paralelo com o que resta da internacionalização (strings do Android).
+4. Nome final na interface: "SaibaTudo IA" (sugerido) ou outro.

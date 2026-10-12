@@ -34,5 +34,8 @@ continuam valendo dentro da pasta.
 7. **Assistente (caixa de pergunta e resposta):** todo app segue [`docs/PADRAO_ASSISTENTE.md`](docs/PADRAO_ASSISTENTE.md)
    (campo que cresce, limpo ao enviar, histórico com ↑/↓, contexto da conversa, origem e data dos dados, copiar, fechar,
    relatar, nuvem opt-in, acessibilidade). Melhoria num app → portar para os outros e atualizar o documento.
-8. **Windows:** `git config core.longpaths true` (alguns caminhos de química passam de 200 caracteres). Depois de usar o
+8. **IA dos apps:** plano para a **SaibaTudo IA** (substituir o Qwen genérico da nuvem por modelos próprios, base Qwen3, um NLU
+   para todos os apps e um explicador treinado em comportamento) em [`docs/PLANO_IA_SAIBATUDO.md`](docs/PLANO_IA_SAIBATUDO.md);
+   treino sempre local, gate antes de publicar, eleições só depois do congelamento.
+9. **Windows:** `git config core.longpaths true` (alguns caminhos de química passam de 200 caracteres). Depois de usar o
    WSL, `wsl --shutdown`.
