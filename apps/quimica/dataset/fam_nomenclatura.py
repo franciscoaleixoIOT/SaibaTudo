@@ -224,12 +224,14 @@ def gerar(ctx: Ctx):
         nm = nome[:1].lower() + nome[1:] if not nome[:2].isupper() else nome
         ents = {"compostos": [c["cid"]]}
         r = Resp()
+        r.lit(nm)  # nomes com dígitos ("mostarda nitrogenada 2", "1,1'-bi-2-naftol") não são números da resposta
         pergunta = renderizar(rng.choice(["Escreva a fórmula química do composto chamado {n}.", "Como se escreve {n} em fórmula química?",
                                           "Qual é a fórmula do composto {n}?", "Traduza {n} para fórmula."]), {"n": sup_composto_sem_artigo(ctx, c, False, True)}, rng)
         ctx.add(f"no-{c['cid']}-nome-formula", pergunta, f"O composto {nm} tem fórmula {f}.", r, "nomenclatura", "fundamental", ents,
                 fontes_do_registro(c, 1), "template:nomenclatura.nome_formula", FAM)
         if cont_form[f] == 1:
             r = Resp()
+            r.lit(nm)
             pergunta = renderizar(rng.choice(["Qual o nome do composto {f}?", "Dê o nome de {f}.", "Como se chama {f}?", "Nomeie o composto {f}."]), {"f": f}, rng)
             ctx.add(f"no-{c['cid']}-formula-nome", pergunta, f"O composto de fórmula {f} chama-se {nm}.", r, "nomenclatura", "fundamental", ents,
                     fontes_do_registro(c, 1), "template:nomenclatura.formula_nome", FAM)

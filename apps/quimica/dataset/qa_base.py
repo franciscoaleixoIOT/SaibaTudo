@@ -42,6 +42,15 @@ class Ctx:
                 self.avisos.append(f"pergunta repetida com resposta diferente: {pergunta!r} ({rid})")
             self.stats["duplicadas_descartadas"] += 1
             return False
+        # nomes das entidades citadas (nome, IUPAC, popular, sinônimos) são texto, não números: "1,1'-bi-2-naftol",
+        # "4-[(2-metil-hidrazinil)…]" e "mostarda nitrogenada 2" entravam no verificador como números não registrados
+        for cid in (entidades or {}).get("compostos", []) or []:
+            c = self.pac.comp_cid.get(cid)
+            if not c:
+                continue
+            for nome in (c.get("nome"), c.get("nomeIupac"), c.get("nomePopular"), *(c.get("sinonimos") or [])):
+                if nome and any(ch.isdigit() for ch in nome):
+                    r.lit(nome)
         try:
             fechado = r.fechar(resposta)
         except RespostaInconsistente as e:

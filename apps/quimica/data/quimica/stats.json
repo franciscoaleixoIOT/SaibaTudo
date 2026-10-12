@@ -1,5 +1,5 @@
 {
-  "geradoEm": "2026-10-11T04:20:03Z",
+  "geradoEm": "2026-10-12T07:17:13Z",
   "modo": "completo",
   "familias": {
     "elementos": {
@@ -148,13 +148,13 @@
         }
       ],
       "wikidataItens": 2893,
-      "wikidataAdicionados": 519,
+      "wikidataAdicionados": 1519,
       "lotesWikidataFalhos": []
     },
     "compostos": {
       "status": "ok",
-      "segundos": 35.3,
-      "compostos": 992,
+      "segundos": 0.9,
+      "compostos": 1990,
       "descartados": [],
       "duplicados": [
         {
@@ -196,15 +196,25 @@
           "cid": 24506,
           "nome": "Fosfato monopotássico",
           "igualA": 516951
+        },
+        {
+          "cid": 24204,
+          "nome": "Fosfato monossódico",
+          "igualA": 23672064
+        },
+        {
+          "cid": 14831,
+          "nome": "Sulfeto de cobre",
+          "igualA": 165914
         }
       ],
-      "casDesempatadosPeloPubchem": 4,
-      "comGhsHarmonizado": 322,
+      "casDesempatadosPeloPubchem": 6,
+      "comGhsHarmonizado": 485,
       "ghsFalhasDeRede": [],
-      "comCas": 977,
-      "comWikidata": 984,
-      "nomePtPendente": 0,
-      "comDefinicaoChebi": 736,
+      "comCas": 1973,
+      "comWikidata": 1982,
+      "nomePtPendente": 7,
+      "comDefinicaoChebi": 1323,
       "frasesHSemTextoPt": [
         "H350i",
         "H360D",
@@ -218,9 +228,9 @@
       ],
       "wikidataFalhas": [],
       "chebi": {
-        "solicitados": 964,
-        "encontrados": 963,
-        "comDefinicao": 778,
+        "solicitados": 1776,
+        "encontrados": 1775,
+        "comDefinicao": 1375,
         "falhas": []
       },
       "sinonimosDePubChem": "não coletados (política de campos calculados do PubChem)",
@@ -294,6 +304,31 @@
           "cid": 6292,
           "nome": "Methaqualone",
           "motivo": "droga de uso proscrito (Methaqualone)"
+        },
+        {
+          "cid": 98527,
+          "nome": "2C-B",
+          "motivo": "droga de uso proscrito (2C-B)"
+        },
+        {
+          "cid": 6717,
+          "nome": "Ácido lisérgico",
+          "motivo": "droga de uso proscrito (LSD)"
+        },
+        {
+          "cid": 1832,
+          "nome": "5-MeO-DMT",
+          "motivo": "droga de uso proscrito (5-MeO-DMT)"
+        },
+        {
+          "cid": 37165,
+          "nome": "Saxitoxina",
+          "motivo": "guerra química (Saxitoxina)"
+        },
+        {
+          "cid": 62156,
+          "nome": "Carfentanilo",
+          "motivo": "droga de uso proscrito (carfentanil)"
         }
       ]
     },
@@ -449,16 +484,16 @@
     "textosPorFonte": {
       "wikipedia-pt": 925,
       "wikibooks-pt": 258,
-      "chebi": 723,
+      "chebi": 1305,
       "gutenberg-14474": 235,
       "gold-book": 0
     },
     "elementos": 118,
-    "compostos": 978,
+    "compostos": 1971,
     "constantes": 59,
-    "textos": 2141,
-    "compostosComGhsHarmonizado": 322,
-    "compostosComCas": 963
+    "textos": 2723,
+    "compostosComGhsHarmonizado": 485,
+    "compostosComCas": 1954
   },
   "decisoes": [
     "OpenStax Chemistry 2e fora do pacote: CC BY-NC-SA 4.0 e cláusula contra IA generativa (nenhum clone, nenhum texto).",
@@ -483,18 +518,17 @@
     "icsc-oit"
   ],
   "http": {
-    "requisicoes": 6,
-    "doCache": 263,
+    "requisicoes": 2,
+    "doCache": 290,
     "revalidadas304": 0,
     "tentativasExtras": 0,
     "erros": 0,
     "cacheVencido": 0,
     "porHost": {
-      "www.ebi.ac.uk": 4,
       "goldbook.iupac.org": 2
     }
   },
-  "duracaoSegundos": 38.1,
-  "versao": "20261011T042003Z-107cf043a5c3",
+  "duracaoSegundos": 4.5,
+  "versao": "20261012T071713Z-977773cb4920",
   "erros": []
 }

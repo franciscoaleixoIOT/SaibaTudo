@@ -10,189 +10,206 @@
 {"q": "Me fale do elemento telúrio", "alvo": {"intent": "ELEMENTO", "elemento": "Te"}}
 {"q": "Mostre o elemento Te na tabela periódica", "alvo": {"intent": "ELEMENTO", "elemento": "Te"}}
 {"q": "Qual o simbolo do Flerovio?", "alvo": {"intent": "ELEMENTO", "elemento": "Fl"}}
-{"q": "Quem é FeO", "alvo": {"intent": "COMPOSTO", "composto": "FeO"}}
-{"q": "Resumo do PERÓXIDO DE BÁRIO", "alvo": {"intent": "COMPOSTO", "composto": "PERÓXIDO DE BÁRIO"}}
-{"q": "Mostre os dados do esteviosídeo", "alvo": {"intent": "COMPOSTO", "composto": "esteviosídeo"}}
-{"q": "oi, 1,3-Dihydroxybenzene", "alvo": {"intent": "COMPOSTO", "composto": "1,3-Dihydroxybenzene"}}
-{"q": "qual a ficha do verapamil?", "alvo": {"intent": "COMPOSTO", "composto": "verapamil"}}
-{"q": "uma dúvida: substância Kr rapidinho", "alvo": {"intent": "COMPOSTO", "composto": "Kr"}}
-{"q": "Qual a ficha do cloreto de cadmio?", "alvo": {"intent": "COMPOSTO", "composto": "cloreto de cadmio"}}
-{"q": "O que você sabe sobre C6H12O2?", "alvo": {"intent": "COMPOSTO", "composto": "C6H12O2"}}
-{"q": "O que você sabe sobre o hidroxido de bario", "alvo": {"intent": "COMPOSTO", "composto": "hidroxido de bario"}}
-{"q": "O que é o Óxido de ferro(II)?", "alvo": {"intent": "COMPOSTO", "composto": "Óxido de ferro(II)"}}
-{"q": "Ficha do éter metil terc-butílico", "alvo": {"intent": "COMPOSTO", "composto": "éter metil terc-butílico"}}
-{"q": "fale sobre CH2N2", "alvo": {"intent": "COMPOSTO", "composto": "CH2N2"}}
-{"q": "Informações sobre C8H11NO2", "alvo": {"intent": "COMPOSTO", "composto": "C8H11NO2"}}
-{"q": "Olá, fale sobre a claritromicina", "alvo": {"intent": "COMPOSTO", "composto": "claritromicina"}}
-{"q": "isocianato de metila", "alvo": {"intent": "COMPOSTO", "composto": "isocianato de metila"}}
-{"q": "substância benzimidazol", "alvo": {"intent": "COMPOSTO", "composto": "benzimidazol"}}
-{"q": "Ei, mosrte os dados da guanina", "alvo": {"intent": "COMPOSTO", "composto": "guanina"}}
-{"q": "substância Methyl 1,1-dimethylethyl ether", "alvo": {"intent": "COMPOSTO", "composto": "Methyl 1,1-dimethylethyl ether"}}
-{"q": "mostre os dados de C27H38N2O4", "alvo": {"intent": "COMPOSTO", "composto": "C27H38N2O4"}}
-{"q": "O que você sabe sobre o Ácido adípico?", "alvo": {"intent": "COMPOSTO", "composto": "Ácido adípico"}}
-{"q": "Resumo da amida de sódio", "alvo": {"intent": "COMPOSTO", "composto": "amida de sódio"}}
-{"q": "noradrenalina", "alvo": {"intent": "COMPOSTO", "composto": "noradrenalina"}}
-{"q": "Me fale do p-aminosalicylic acid", "alvo": {"intent": "COMPOSTO", "composto": "p-aminosalicylic acid"}}
-{"q": "Pode falar sobre FeO?", "alvo": {"intent": "COMPOSTO", "composto": "FeO"}}
-{"q": "informações sobre a cianamida", "alvo": {"intent": "COMPOSTO", "composto": "cianamida"}}
-{"q": "Composto Óxido de ferro(II)", "alvo": {"intent": "COMPOSTO", "composto": "Óxido de ferro(II)"}}
-{"q": "Qual a ficha do dopamine", "alvo": {"intent": "COMPOSTO", "composto": "dopamine"}}
-{"q": "Fale sobre CH3NO", "alvo": {"intent": "COMPOSTO", "composto": "CH3NO"}}
-{"q": "O que você sabe sobre C15H21NO2?", "alvo": {"intent": "COMPOSTO", "composto": "C15H21NO2"}}
-{"q": "uma dúvida: me fale da dopamina rapidinho", "alvo": {"intent": "COMPOSTO", "composto": "dopamina"}}
-{"q": "substância tetradecano", "alvo": {"intent": "COMPOSTO", "composto": "tetradecano"}}
-{"q": "ficha de C38H60O18", "alvo": {"intent": "COMPOSTO", "composto": "C38H60O18"}}
-{"q": "O que você sabe sobre a pirimetamina?", "alvo": {"intent": "COMPOSTO", "composto": "pirimetamina"}}
-{"q": "Uma dúvida: qual a ficha do éter dietílico?", "alvo": {"intent": "COMPOSTO", "composto": "éter dietílico"}}
-{"q": "Qual a ficha do alfa-pineno?", "alvo": {"intent": "COMPOSTO", "composto": "alfa-pineno"}}
-{"q": "O que é KClO4?", "alvo": {"intent": "COMPOSTO", "composto": "KClO4"}}
-{"q": "Pode falar sobre sorbato de potássio?", "alvo": {"intent": "COMPOSTO", "composto": "sorbato de potássio"}}
-{"q": "Mostre os dados do perclorato de potássio", "alvo": {"intent": "COMPOSTO", "composto": "perclorato de potássio"}}
-{"q": "Quem é o Ácido adípico por favor?", "alvo": {"intent": "COMPOSTO", "composto": "Ácido adípico"}}
-{"q": "Me conte sobre C6H7KO2", "alvo": {"intent": "COMPOSTO", "composto": "C6H7KO2"}}
-{"q": "O que é o butiraldeido?", "alvo": {"intent": "COMPOSTO", "composto": "butiraldeido"}}
-{"q": "substância C9H16O4", "alvo": {"intent": "COMPOSTO", "composto": "C9H16O4"}}
+{"q": "Fale sobre o etenol", "alvo": {"intent": "COMPOSTO", "composto": "etenol"}}
+{"q": "Quero saber sobre o ácido 4-aminossalicílico por favor", "alvo": {"intent": "COMPOSTO", "composto": "ácido 4-aminossalicílico"}}
+{"q": "Me dê um resumo do serzone", "alvo": {"intent": "COMPOSTO", "composto": "serzone"}}
+{"q": "Preciso saber quem é C14H22N2O2?", "alvo": {"intent": "COMPOSTO", "composto": "C14H22N2O2"}}
+{"q": "Preciso saber o que você sabe sobre o adipic acid dinitrile?", "alvo": {"intent": "COMPOSTO", "composto": "adipic acid dinitrile"}}
+{"q": "Mostre os dados do Danazol", "alvo": {"intent": "COMPOSTO", "composto": "Danazol"}}
+{"q": "me fale da O-Fenilenodiamina", "alvo": {"intent": "COMPOSTO", "composto": "O-Fenilenodiamina"}}
+{"q": "Ficha do decano", "alvo": {"intent": "COMPOSTO", "composto": "decano"}}
+{"q": "mostre os dados de C8H12N2", "alvo": {"intent": "COMPOSTO", "composto": "C8H12N2"}}
+{"q": "Me dê um resumo da Cianamida", "alvo": {"intent": "COMPOSTO", "composto": "Cianamida"}}
+{"q": "Ficha da nefazodona", "alvo": {"intent": "COMPOSTO", "composto": "nefazodona"}}
+{"q": "Me fale do acetato de butila rapidinho", "alvo": {"intent": "COMPOSTO", "composto": "acetato de butila"}}
+{"q": "Qual a ficha do Sulfeto de cobre pra mim?", "alvo": {"intent": "COMPOSTO", "composto": "Sulfeto de cobre"}}
+{"q": "qual a ficha do C6H12O2 pra mim?", "alvo": {"intent": "COMPOSTO", "composto": "C6H12O2"}}
+{"q": "Me conte sobre o sulfeto de cobre(II)", "alvo": {"intent": "COMPOSTO", "composto": "sulfeto de cobre(II)"}}
+{"q": "Pode falar sobre phenylacetylene pra mim?", "alvo": {"intent": "COMPOSTO", "composto": "phenylacetylene"}}
+{"q": "Por favor, o que você sabe sobre a amida de sódio", "alvo": {"intent": "COMPOSTO", "composto": "amida de sódio"}}
+{"q": "Quem é o decene?", "alvo": {"intent": "COMPOSTO", "composto": "decene"}}
+{"q": "amida de sódio", "alvo": {"intent": "COMPOSTO", "composto": "amida de sódio"}}
+{"q": "Pode falar sobre C13H19NO4S?", "alvo": {"intent": "COMPOSTO", "composto": "C13H19NO4S"}}
+{"q": "Por favor, qual a ficha do eter dietilico?", "alvo": {"intent": "COMPOSTO", "composto": "eter dietilico"}}
+{"q": "me fale de C3H2ClF5O", "alvo": {"intent": "COMPOSTO", "composto": "C3H2ClF5O"}}
+{"q": "Mostre os dados do tin(II) chloride por favor", "alvo": {"intent": "COMPOSTO", "composto": "tin(II) chloride"}}
+{"q": "Informações sobre C6H8N2", "alvo": {"intent": "COMPOSTO", "composto": "C6H8N2"}}
+{"q": "benzoxazol", "alvo": {"intent": "COMPOSTO", "composto": "benzoxazol"}}
+{"q": "Me fale do kclo4 por favor", "alvo": {"intent": "COMPOSTO", "composto": "kclo4"}}
+{"q": "Por favor, o que é o fenilacetileno?", "alvo": {"intent": "COMPOSTO", "composto": "fenilacetileno"}}
+{"q": "Ficha do ETHANEDIOIC ACID DIAMMONIUM SALT", "alvo": {"intent": "COMPOSTO", "composto": "ETHANEDIOIC ACID DIAMMONIUM SALT"}}
+{"q": "me conte sobre o n-amyl butyrate", "alvo": {"intent": "COMPOSTO", "composto": "n-amyl butyrate"}}
+{"q": "Mostre os dados da pirimetamina", "alvo": {"intent": "COMPOSTO", "composto": "pirimetamina"}}
+{"q": "Informações sobre a 1,4-Dioxina", "alvo": {"intent": "COMPOSTO", "composto": "1,4-Dioxina"}}
+{"q": "O que você sabe sobre a 1,4-Dioxina?", "alvo": {"intent": "COMPOSTO", "composto": "1,4-Dioxina"}}
+{"q": "Informações sobre o porfobilinogénio", "alvo": {"intent": "COMPOSTO", "composto": "porfobilinogénio"}}
+{"q": "Me dê um resumo da delavirdina", "alvo": {"intent": "COMPOSTO", "composto": "delavirdina"}}
+{"q": "substância TETRADECANO", "alvo": {"intent": "COMPOSTO", "composto": "TETRADECANO"}}
+{"q": "Quem é o brometo de ferro?", "alvo": {"intent": "COMPOSTO", "composto": "brometo de ferro"}}
+{"q": "pode falar sobre citosina?", "alvo": {"intent": "COMPOSTO", "composto": "citosina"}}
+{"q": "Composto rivastigmina", "alvo": {"intent": "COMPOSTO", "composto": "rivastigmina"}}
+{"q": "ei, resumo da tropicamida", "alvo": {"intent": "COMPOSTO", "composto": "tropicamida"}}
+{"q": "Me dê um resumo da naftifina", "alvo": {"intent": "COMPOSTO", "composto": "naftifina"}}
+{"q": "fale sobre o ISOCIANATO DE METILA pra mim", "alvo": {"intent": "COMPOSTO", "composto": "ISOCIANATO DE METILA"}}
+{"q": "Consulte a carga do Metilciclopentano", "alvo": {"intent": "PROPRIEDADE", "composto": "Metilciclopentano", "propriedade": "carga"}}
 {"q": "Pode me dizer o bloco do elemento Fl?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Fl", "propriedade": "bloco"}}
 {"q": "qual o bloco do fleróvio?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Fl", "propriedade": "bloco"}}
-{"q": "CAS da deferoxamina rapidinho?", "alvo": {"intent": "PROPRIEDADE", "composto": "deferoxamina", "propriedade": "cas"}}
-{"q": "qual o pka da amida de sódio", "alvo": {"intent": "PROPRIEDADE", "composto": "amida de sódio", "propriedade": "pka"}}
 {"q": "telúrio: massa específica", "alvo": {"intent": "PROPRIEDADE", "elemento": "Te", "propriedade": "densidadeKgm3"}}
 {"q": "em que período está o elemento Fl?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Fl", "propriedade": "periodo"}}
-{"q": "Pode me dizer o SMILES de C2H4O?", "alvo": {"intent": "PROPRIEDADE", "composto": "C2H4O", "propriedade": "smiles"}}
-{"q": "Peso molecular da sucralose", "alvo": {"intent": "PROPRIEDADE", "composto": "sucralose", "propriedade": "massaMolar"}}
+{"q": "alfa-pineno: pKa", "alvo": {"intent": "PROPRIEDADE", "composto": "alfa-pineno", "propriedade": "pka"}}
+{"q": "A que temperatura o meprobamato ferve?", "alvo": {"intent": "PROPRIEDADE", "composto": "meprobamato", "propriedade": "pontoEbulicaoK"}}
 {"q": "A que temperatura o fleróvio derrete?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Fl", "propriedade": "pontoFusaoK"}}
-{"q": "Aceptores de hidrogênio do perclorato de potassio", "alvo": {"intent": "PROPRIEDADE", "composto": "perclorato de potassio", "propriedade": "aceptoresH"}}
-{"q": "Butiraldeído: peso molecular", "alvo": {"intent": "PROPRIEDADE", "composto": "Butiraldeído", "propriedade": "massaMolar"}}
 {"q": "ei, a que temperatura o elemento Te derrete?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Te", "propriedade": "pontoFusaoK"}}
-{"q": "pirimetamina: ligações rotáveis", "alvo": {"intent": "PROPRIEDADE", "composto": "pirimetamina", "propriedade": "ligacoesRotaveis"}}
-{"q": "Qual é a densidade da formamida?", "alvo": {"intent": "PROPRIEDADE", "composto": "formamida", "propriedade": "densidadeKgm3"}}
+{"q": "Qual é a densidade do milnaciprano?", "alvo": {"intent": "PROPRIEDADE", "composto": "milnaciprano", "propriedade": "densidadeKgm3"}}
 {"q": "o telúrio é mais denso que a água?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Te", "propriedade": "densidadeKgm3"}}
-{"q": "Qual o SMILES do butiraldeido?", "alvo": {"intent": "PROPRIEDADE", "composto": "butiraldeido", "propriedade": "smiles"}}
-{"q": "Qual o CAS do óxido de ferro(II)?", "alvo": {"intent": "PROPRIEDADE", "composto": "óxido de ferro(II)", "propriedade": "cas"}}
-{"q": "Qual o SMILES do perclorato de potassio?", "alvo": {"intent": "PROPRIEDADE", "composto": "perclorato de potassio", "propriedade": "smiles"}}
-{"q": "Que tipo de elemento é o fleróvio?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Fl", "propriedade": "categoria"}}
-{"q": "Qual o SMILES do tetradecano?", "alvo": {"intent": "PROPRIEDADE", "composto": "tetradecano", "propriedade": "smiles"}}
-{"q": "sulfeto de cobre(II): ligações rotáveis", "alvo": {"intent": "PROPRIEDADE", "composto": "sulfeto de cobre(II)", "propriedade": "ligacoesRotaveis"}}
+{"q": "Em que período está o telúrio pra mim?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Te", "propriedade": "periodo"}}
+{"q": "qual o cas de C6H12O2?", "alvo": {"intent": "PROPRIEDADE", "composto": "C6H12O2", "propriedade": "cas"}}
+{"q": "benzimidazol: SMILES", "alvo": {"intent": "PROPRIEDADE", "composto": "benzimidazol", "propriedade": "smiles"}}
+{"q": "Consulte as ligações rotáveis do C10H16", "alvo": {"intent": "PROPRIEDADE", "composto": "C10H16", "propriedade": "ligacoesRotaveis"}}
+{"q": "Me diga o pKa de CH2N2", "alvo": {"intent": "PROPRIEDADE", "composto": "CH2N2", "propriedade": "pka"}}
+{"q": "Qual o pKa do .alpha.-pinene?", "alvo": {"intent": "PROPRIEDADE", "composto": ".alpha.-pinene", "propriedade": "pka"}}
+{"q": "Pode me dizer o período do elemento Te?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Te", "propriedade": "periodo"}}
+{"q": "oi, a que temperatura a Cianamida ferve?", "alvo": {"intent": "PROPRIEDADE", "composto": "Cianamida", "propriedade": "pontoEbulicaoK"}}
+{"q": "Qual o pKa do brometo de cobalto?", "alvo": {"intent": "PROPRIEDADE", "composto": "brometo de cobalto", "propriedade": "pka"}}
 {"q": "Quatnos prótons tem o telúrio?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Te", "propriedade": "numeroAtomico"}}
-{"q": "O oxigênio dissolve em água agora?", "alvo": {"intent": "PROPRIEDADE", "composto": "oxigênio", "propriedade": "solubilidade"}}
-{"q": "O tetradecano dissolve em água?", "alvo": {"intent": "PROPRIEDADE", "composto": "tetradecano", "propriedade": "solubilidade"}}
-{"q": "Pode me dizer o SMILES do barium peroxide?", "alvo": {"intent": "PROPRIEDADE", "composto": "barium peroxide", "propriedade": "smiles"}}
-{"q": "quero saber o número CAS do ÁCIDO 4-AMINOSSALICÍLICO", "alvo": {"intent": "PROPRIEDADE", "composto": "ÁCIDO 4-AMINOSSALICÍLICO", "propriedade": "cas"}}
-{"q": "Me diga o pKa do peróxido de bário", "alvo": {"intent": "PROPRIEDADE", "composto": "peróxido de bário", "propriedade": "pka"}}
-{"q": "Por favor, quero saber a fórmula do isocianato de metila", "alvo": {"intent": "PROPRIEDADE", "composto": "isocianato de metila", "propriedade": "formula"}}
+{"q": "A felodipina dissolve em água?", "alvo": {"intent": "PROPRIEDADE", "composto": "felodipina", "propriedade": "solubilidade"}}
+{"q": "Quem descobriu o elemento Te?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Te", "propriedade": "descoberta"}}
+{"q": "Qual é a solubilidade do oamyl butyrate?", "alvo": {"intent": "PROPRIEDADE", "composto": "oamyl butyrate", "propriedade": "solubilidade"}}
+{"q": "A nefazodona é solúvel em água?", "alvo": {"intent": "PROPRIEDADE", "composto": "nefazodona", "propriedade": "solubilidade"}}
 {"q": "Eletronegatividade do flerovio", "alvo": {"intent": "PROPRIEDADE", "elemento": "Fl", "propriedade": "eletronegatividade"}}
-{"q": "C7H7NO3: ponto de fusao", "alvo": {"intent": "PROPRIEDADE", "composto": "C7H7NO3", "propriedade": "pontoFusaoK"}}
-{"q": "Me diga: qual o SMILES do ESTEVIOSÍDEO?", "alvo": {"intent": "PROPRIEDADE", "composto": "ESTEVIOSÍDEO", "propriedade": "smiles"}}
-{"q": "Me diga o ponto de ebulição do Decano", "alvo": {"intent": "PROPRIEDADE", "composto": "Decano", "propriedade": "pontoEbulicaoK"}}
-{"q": "A massa atomica do telurio", "alvo": {"intent": "PROPRIEDADE", "elemento": "Te", "propriedade": "massaAtomica"}}
-{"q": "Preciso saber qual o SMILES da deferoxamina?", "alvo": {"intent": "PROPRIEDADE", "composto": "deferoxamina", "propriedade": "smiles"}}
+{"q": "Me ajuda: qual é o potencial de ionização do fleróvio?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Fl", "propriedade": "energiaIonizacaoKJmol"}}
+{"q": "o elemento Fl é sólido, líquido ou gasoso?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Fl", "propriedade": "estadoPadrao"}}
+{"q": "Em que estado físico o Telúrio se encontra?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Te", "propriedade": "estadoPadrao"}}
+{"q": "Solubilidade da l-threo-pentulose?", "alvo": {"intent": "PROPRIEDADE", "composto": "l-threo-pentulose", "propriedade": "solubilidade"}}
+{"q": "o elemento Te é um metal?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Te", "propriedade": "categoria"}}
 {"q": "Em que ano foi descoberto o elemento Fl?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Fl", "propriedade": "descoberta"}}
+{"q": "Consulte a temperatura de ebulição do isocianato de metila", "alvo": {"intent": "PROPRIEDADE", "composto": "isocianato de metila", "propriedade": "pontoEbulicaoK"}}
 {"q": "A que temperatura o elemento Te derrete agora", "alvo": {"intent": "PROPRIEDADE", "elemento": "Te", "propriedade": "pontoFusaoK"}}
-{"q": "A que temperatura C6H7KO2 ferve?", "alvo": {"intent": "PROPRIEDADE", "composto": "C6H7KO2", "propriedade": "pontoEbulicaoK"}}
-{"q": "Quero saber qual é o pKa do eter dietilico?", "alvo": {"intent": "PROPRIEDADE", "composto": "eter dietilico", "propriedade": "pka"}}
 {"q": "Ponto de fusao do telúrio?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Te", "propriedade": "pontoFusaoK"}}
-{"q": "A que temperatura o 1,4-butanedicarboxylic acid derrete?", "alvo": {"intent": "PROPRIEDADE", "composto": "1,4-butanedicarboxylic acid", "propriedade": "pontoFusaoK"}}
-{"q": "A solubilidade do zolpidem", "alvo": {"intent": "PROPRIEDADE", "composto": "zolpidem", "propriedade": "solubilidade"}}
-{"q": "Uma dúvida: Massa molecular do tetradecano", "alvo": {"intent": "PROPRIEDADE", "composto": "tetradecano", "propriedade": "massaMolar"}}
-{"q": "Quero saber a fórmula química do decano", "alvo": {"intent": "PROPRIEDADE", "composto": "decano", "propriedade": "formula"}}
-{"q": "Oi, qual o pKa da melatonina", "alvo": {"intent": "PROPRIEDADE", "composto": "melatonina", "propriedade": "pka"}}
-{"q": "Qual o CAS do pethidineter?", "alvo": {"intent": "PROPRIEDADE", "composto": "pethidineter", "propriedade": "cas"}}
-{"q": "Quero saber a solubilidade de C9H16O4", "alvo": {"intent": "PROPRIEDADE", "composto": "C9H16O4", "propriedade": "solubilidade"}}
-{"q": "Fórmula química do oxido de ferro(ii)", "alvo": {"intent": "PROPRIEDADE", "composto": "oxido de ferro(ii)", "propriedade": "formula"}}
-{"q": "Em que estado físico o telurio se encontra?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Te", "propriedade": "estadoPadrao"}}
+{"q": "Oi, quero saber a solubilidade do FeO", "alvo": {"intent": "PROPRIEDADE", "composto": "FeO", "propriedade": "solubilidade"}}
+{"q": "O carbon tetraiodide dissolve em água?", "alvo": {"intent": "PROPRIEDADE", "composto": "carbon tetraiodide", "propriedade": "solubilidade"}}
+{"q": "Que tipo de elemento é o FLERÓVIO?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Fl", "propriedade": "categoria"}}
+{"q": "qual o cas do sorbato de potassio?", "alvo": {"intent": "PROPRIEDADE", "composto": "sorbato de potassio", "propriedade": "cas"}}
+{"q": "Qual é a massa exata do efavirenz?", "alvo": {"intent": "PROPRIEDADE", "composto": "efavirenz", "propriedade": "massaExata"}}
+{"q": "Você sabe qual o pKa do Dimetoxietano?", "alvo": {"intent": "PROPRIEDADE", "composto": "Dimetoxietano", "propriedade": "pka"}}
+{"q": "Oi, O meprobamato é solúvel em água?", "alvo": {"intent": "PROPRIEDADE", "composto": "meprobamato", "propriedade": "solubilidade"}}
 {"q": "Gostaria de saber: quem descobriu o telúrio?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Te", "propriedade": "descoberta"}}
+{"q": "Qual é a massa exata do C9H10O3?", "alvo": {"intent": "PROPRIEDADE", "composto": "C9H10O3", "propriedade": "massaExata"}}
+{"q": "A que temperatura o ammonium oxalate derrete", "alvo": {"intent": "PROPRIEDADE", "composto": "ammonium oxalate", "propriedade": "pontoFusaoK"}}
+{"q": "Qual é a massa molar do Cadmium chloride?", "alvo": {"intent": "PROPRIEDADE", "composto": "Cadmium chloride", "propriedade": "massaMolar"}}
 {"q": "o fleróvio é sólido, líquido ou gasoso", "alvo": {"intent": "PROPRIEDADE", "elemento": "Fl", "propriedade": "estadoPadrao"}}
-{"q": "Consulte a solubilidade da formamida", "alvo": {"intent": "PROPRIEDADE", "composto": "formamida", "propriedade": "solubilidade"}}
+{"q": "Você sabe a que temperatura C10H24NO3PS derrete?", "alvo": {"intent": "PROPRIEDADE", "composto": "C10H24NO3PS", "propriedade": "pontoFusaoK"}}
+{"q": "Qual o SMILES do Ácido gentísico?", "alvo": {"intent": "PROPRIEDADE", "composto": "Ácido gentísico", "propriedade": "smiles"}}
+{"q": "Consulte a solubilidade do milnaciprano", "alvo": {"intent": "PROPRIEDADE", "composto": "milnaciprano", "propriedade": "solubilidade"}}
+{"q": "ei, qual o CAS do methanamide?", "alvo": {"intent": "PROPRIEDADE", "composto": "methanamide", "propriedade": "cas"}}
+{"q": "Qual o SMILES do C5H5N5O?", "alvo": {"intent": "PROPRIEDADE", "composto": "C5H5N5O", "propriedade": "smiles"}}
 {"q": "a que temperatura o elemento Te derrete?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Te", "propriedade": "pontoFusaoK"}}
-{"q": "Aceptores de hidrogênio do C6H10O4", "alvo": {"intent": "PROPRIEDADE", "composto": "C6H10O4", "propriedade": "aceptoresH"}}
+{"q": "C5H5N5O é solúvel em água agora?", "alvo": {"intent": "PROPRIEDADE", "composto": "C5H5N5O", "propriedade": "solubilidade"}}
+{"q": "Qual é a massa molecular do Phenylacetylene", "alvo": {"intent": "PROPRIEDADE", "composto": "Phenylacetylene", "propriedade": "massaMolar"}}
 {"q": "Quando o fleróvio foi descoberto?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Fl", "propriedade": "descoberta"}}
 {"q": "o telúrio é sólido, líquido ou gasoso?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Te", "propriedade": "estadoPadrao"}}
-{"q": "ei, em que grupo está o elemento Te?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Te", "propriedade": "grupo"}}
+{"q": "C22H28N6O3S: logP", "alvo": {"intent": "PROPRIEDADE", "composto": "C22H28N6O3S", "propriedade": "xlogp"}}
+{"q": "As ligações rotáveis da deferoxamina", "alvo": {"intent": "PROPRIEDADE", "composto": "deferoxamina", "propriedade": "ligacoesRotaveis"}}
+{"q": "A temperatura de fusão do monoxido de carbono", "alvo": {"intent": "PROPRIEDADE", "composto": "monoxido de carbono", "propriedade": "pontoFusaoK"}}
+{"q": "Qual é a carga do etopósido?", "alvo": {"intent": "PROPRIEDADE", "composto": "etopósido", "propriedade": "carga"}}
 {"q": "o telúrio é líquido?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Te", "propriedade": "estadoPadrao"}}
-{"q": "A fórmula molecular do C12H13ClN4", "alvo": {"intent": "PROPRIEDADE", "composto": "C12H13ClN4", "propriedade": "formula"}}
-{"q": "Me diga o número CAS de CdCl2", "alvo": {"intent": "PROPRIEDADE", "composto": "CdCl2", "propriedade": "cas"}}
 {"q": "Me diga: qual é a afinidade eletrônica do elemento Te", "alvo": {"intent": "PROPRIEDADE", "elemento": "Te", "propriedade": "afinidadeEletronicaKJmol"}}
-{"q": "Me diga os aceptores de hidrogênio do ácido 4-aminossalicílico", "alvo": {"intent": "PROPRIEDADE", "composto": "ácido 4-aminossalicílico", "propriedade": "aceptoresH"}}
-{"q": "a que temperatura C38H60O18 ferve?", "alvo": {"intent": "PROPRIEDADE", "composto": "C38H60O18", "propriedade": "pontoEbulicaoK"}}
+{"q": "Tellurium: ponto de ebulição pra mim", "alvo": {"intent": "PROPRIEDADE", "elemento": "Te", "propriedade": "pontoEbulicaoK"}}
+{"q": "consulte a fórmula da loratadina", "alvo": {"intent": "PROPRIEDADE", "composto": "loratadina", "propriedade": "formula"}}
+{"q": "Qual o CAS do Isocianato de metila por favor?", "alvo": {"intent": "PROPRIEDADE", "composto": "Isocianato de metila", "propriedade": "cas"}}
 {"q": "Quantos elétrons tem o Flerovium rapidinho?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Fl", "propriedade": "numeroAtomico"}}
-{"q": "O azelaic acid é solúvel em água?", "alvo": {"intent": "PROPRIEDADE", "composto": "azelaic acid", "propriedade": "solubilidade"}}
-{"q": "Quero saber o pKa do zolpidem", "alvo": {"intent": "PROPRIEDADE", "composto": "zolpidem", "propriedade": "pka"}}
-{"q": "Qual o pKa de C19H21N3O?", "alvo": {"intent": "PROPRIEDADE", "composto": "C19H21N3O", "propriedade": "pka"}}
-{"q": "Qual o pKa do Verapamil", "alvo": {"intent": "PROPRIEDADE", "composto": "Verapamil", "propriedade": "pka"}}
-{"q": "Qual é a fórmula molecular do CdCl2?", "alvo": {"intent": "PROPRIEDADE", "composto": "CdCl2", "propriedade": "formula"}}
+{"q": "Monóxido de carbono: TPSA", "alvo": {"intent": "PROPRIEDADE", "composto": "Monóxido de carbono", "propriedade": "tpsa"}}
+{"q": "me diga o ponto de ebulicao da Cianamida", "alvo": {"intent": "PROPRIEDADE", "composto": "Cianamida", "propriedade": "pontoEbulicaoK"}}
+{"q": "Qual o pKa do C19H21N3O?", "alvo": {"intent": "PROPRIEDADE", "composto": "C19H21N3O", "propriedade": "pka"}}
+{"q": "consulte os aceptores de hidrogênio da tropicamida", "alvo": {"intent": "PROPRIEDADE", "composto": "tropicamida", "propriedade": "aceptoresH"}}
+{"q": "Uma dúvida: a que temperatura a M-Fenilenodiamina derrete rapidinho", "alvo": {"intent": "PROPRIEDADE", "composto": "M-Fenilenodiamina", "propriedade": "pontoFusaoK"}}
+{"q": "Qual o pKa da Fenelzina", "alvo": {"intent": "PROPRIEDADE", "composto": "Fenelzina", "propriedade": "pka"}}
+{"q": "Qual é o ponto de fusao do ethyl para-hydroxybenzoate?", "alvo": {"intent": "PROPRIEDADE", "composto": "ethyl para-hydroxybenzoate", "propriedade": "pontoFusaoK"}}
+{"q": "ei, qual é a fórmula molecular do cloreto de guanidina rapidinho?", "alvo": {"intent": "PROPRIEDADE", "composto": "cloreto de guanidina", "propriedade": "formula"}}
 {"q": "O potencial de ionização do elemento Fl", "alvo": {"intent": "PROPRIEDADE", "elemento": "Fl", "propriedade": "energiaIonizacaoKJmol"}}
-{"q": "Doadores de hidrogênio da resorcina", "alvo": {"intent": "PROPRIEDADE", "composto": "resorcina", "propriedade": "doadoresH"}}
-{"q": "me diga a fórmula molecular do hidroxido de bario por favor", "alvo": {"intent": "PROPRIEDADE", "composto": "hidroxido de bario", "propriedade": "formula"}}
-{"q": "XLogP da petidina", "alvo": {"intent": "PROPRIEDADE", "composto": "petidina", "propriedade": "xlogp"}}
 {"q": "quem descobriu o flerovio?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Fl", "propriedade": "descoberta"}}
+{"q": "C10H24NO3PS é solúvel em água?", "alvo": {"intent": "PROPRIEDADE", "composto": "C10H24NO3PS", "propriedade": "solubilidade"}}
+{"q": "Ligações rotáveis da felodipina?", "alvo": {"intent": "PROPRIEDADE", "composto": "felodipina", "propriedade": "ligacoesRotaveis"}}
 {"q": "Pode me dizer o grupo do Telúrio?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Te", "propriedade": "grupo"}}
-{"q": "Uma dúvida: O coclor é solúvel em água", "alvo": {"intent": "PROPRIEDADE", "composto": "coclor", "propriedade": "solubilidade"}}
-{"q": "consulte os aceptores de hidrogênio do zolpidem", "alvo": {"intent": "PROPRIEDADE", "composto": "zolpidem", "propriedade": "aceptoresH"}}
+{"q": "Pode me dizer a carga da tropicamida?", "alvo": {"intent": "PROPRIEDADE", "composto": "tropicamida", "propriedade": "carga"}}
+{"q": "Uma dúvida: O ins no.202 é solúvel em água", "alvo": {"intent": "PROPRIEDADE", "composto": "ins no.202", "propriedade": "solubilidade"}}
+{"q": "pode me dizer a densidade do DIMETHYL CELLOSOLVE?", "alvo": {"intent": "PROPRIEDADE", "composto": "DIMETHYL CELLOSOLVE", "propriedade": "densidadeKgm3"}}
 {"q": "Uma dúvida: qual é a massa atomica do telúrio?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Te", "propriedade": "massaAtomica"}}
-{"q": "A loratadina dissolve em água?", "alvo": {"intent": "PROPRIEDADE", "composto": "loratadina", "propriedade": "solubilidade"}}
-{"q": "A que temperatura o ácido azelaico derrete", "alvo": {"intent": "PROPRIEDADE", "composto": "ácido azelaico", "propriedade": "pontoFusaoK"}}
+{"q": "Qual o pKa do hidróxido de bário?", "alvo": {"intent": "PROPRIEDADE", "composto": "hidróxido de bário", "propriedade": "pka"}}
+{"q": "Uma dúvida: qual é o ponto de ebulicao do isocianato de metila?", "alvo": {"intent": "PROPRIEDADE", "composto": "isocianato de metila", "propriedade": "pontoEbulicaoK"}}
+{"q": "quero saber os aceptores de hidrogênio do ácido azelaico", "alvo": {"intent": "PROPRIEDADE", "composto": "ácido azelaico", "propriedade": "aceptoresH"}}
+{"q": "Consulte o XLogP da 1,4-dioxina", "alvo": {"intent": "PROPRIEDADE", "composto": "1,4-dioxina", "propriedade": "xlogp"}}
 {"q": "Oi, o telúrio é mais denso que a água por favor?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Te", "propriedade": "densidadeKgm3"}}
-{"q": "qual o smiles de C25H48N6O8?", "alvo": {"intent": "PROPRIEDADE", "composto": "C25H48N6O8", "propriedade": "smiles"}}
+{"q": "A que temperatura o vg nervo agente derrete?", "alvo": {"intent": "PROPRIEDADE", "composto": "vg nervo agente", "propriedade": "pontoFusaoK"}}
 {"q": "Preciso saber o raio atômico do FLERÓVIO", "alvo": {"intent": "PROPRIEDADE", "elemento": "Fl", "propriedade": "raioAtomicoPm"}}
+{"q": "As ligações rotáveis da dopamina", "alvo": {"intent": "PROPRIEDADE", "composto": "dopamina", "propriedade": "ligacoesRotaveis"}}
+{"q": "Qual o CAS do monoxido de carbono?", "alvo": {"intent": "PROPRIEDADE", "composto": "monoxido de carbono", "propriedade": "cas"}}
+{"q": "Ponto de fusao da Probenecida?", "alvo": {"intent": "PROPRIEDADE", "composto": "Probenecida", "propriedade": "pontoFusaoK"}}
+{"q": "Qual o pKa do meprobamato pra mim", "alvo": {"intent": "PROPRIEDADE", "composto": "meprobamato", "propriedade": "pka"}}
 {"q": "Oi, o Fleróvio é líquido rapidinho?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Fl", "propriedade": "estadoPadrao"}}
-{"q": "Quero saber o SMILES do benzimidazol", "alvo": {"intent": "PROPRIEDADE", "composto": "benzimidazol", "propriedade": "smiles"}}
 {"q": "Oi, o elemento Fl é sólido, líquido ou gasoso?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Fl", "propriedade": "estadoPadrao"}}
 {"q": "Ei, em que período está o elemento Te?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Te", "propriedade": "periodo"}}
-{"q": "O xlogp do n-methyl-4-phenyl-4-carbethoxypiperidine pra mim", "alvo": {"intent": "PROPRIEDADE", "composto": "n-methyl-4-phenyl-4-carbethoxypiperidine", "propriedade": "xlogp"}}
+{"q": "A que temperatura o porfobilinogenio derrete?", "alvo": {"intent": "PROPRIEDADE", "composto": "porfobilinogenio", "propriedade": "pontoFusaoK"}}
+{"q": "Consulte a fórmula molecular do Dimetoxietano", "alvo": {"intent": "PROPRIEDADE", "composto": "Dimetoxietano", "propriedade": "formula"}}
 {"q": "categoria do elemento Fl em valor", "alvo": {"intent": "PROPRIEDADE", "elemento": "Fl", "propriedade": "categoria"}}
 {"q": "Preciso saber que tipo de elemento é o elemento Fl pra mim", "alvo": {"intent": "PROPRIEDADE", "elemento": "Fl", "propriedade": "categoria"}}
-{"q": "Me ajuda a calcular a massa molar do m-hydroxyphenol", "alvo": {"intent": "MASSA_MOLAR", "composto": "m-hydroxyphenol"}}
-{"q": "Oi, potassium trans,trans-sorbate massa molar", "alvo": {"intent": "MASSA_MOLAR", "composto": "potassium trans,trans-sorbate"}}
-{"q": "calcule a massa molar do composto acetato de butila", "alvo": {"intent": "MASSA_MOLAR", "composto": "acetato de butila"}}
-{"q": "calcule a massa molar do composto Criptônio", "alvo": {"intent": "MASSA_MOLAR", "composto": "Criptônio"}}
-{"q": "Qual o peso molecular do cloreto de cobre(II)?", "alvo": {"intent": "MASSA_MOLAR", "composto": "cloreto de cobre(II)"}}
-{"q": "Por favor, qual o peso molecular do C7H6N2?", "alvo": {"intent": "MASSA_MOLAR", "composto": "C7H6N2"}}
-{"q": "Me ajuda a calcular a massa molar do vinyl alcohol pra mim", "alvo": {"intent": "MASSA_MOLAR", "composto": "vinyl alcohol"}}
-{"q": "qual o peso molecular de Kr?", "alvo": {"intent": "MASSA_MOLAR", "composto": "Kr"}}
-{"q": "Qual o peso molecular do O2?", "alvo": {"intent": "MASSA_MOLAR", "composto": "O2"}}
-{"q": "Determine a massa molar do Oxigênio rapidinho", "alvo": {"intent": "MASSA_MOLAR", "composto": "Oxigênio"}}
-{"q": "MM do ÉTER DIETÍLICO", "alvo": {"intent": "MASSA_MOLAR", "composto": "ÉTER DIETÍLICO"}}
-{"q": "perclorato de potássio massa molar", "alvo": {"intent": "MASSA_MOLAR", "composto": "perclorato de potássio"}}
-{"q": "Ei, calcule a massa molar do composto Meprobamato pra mim", "alvo": {"intent": "MASSA_MOLAR", "composto": "Meprobamato"}}
-{"q": "Determine a massa molar do n-decane", "alvo": {"intent": "MASSA_MOLAR", "composto": "n-decane"}}
-{"q": "Qual a massa molar do C2H3NO?", "alvo": {"intent": "MASSA_MOLAR", "composto": "C2H3NO"}}
-{"q": "qual a massa de um mol do Normal-hexane?", "alvo": {"intent": "MASSA_MOLAR", "composto": "Normal-hexane"}}
-{"q": "Calcule a massa molar do composto sanval", "alvo": {"intent": "MASSA_MOLAR", "composto": "sanval"}}
-{"q": "Massa molar do hydroxyethylene", "alvo": {"intent": "MASSA_MOLAR", "composto": "hydroxyethylene"}}
-{"q": "Qual a massa molecular do butiraldeído?", "alvo": {"intent": "MASSA_MOLAR", "composto": "butiraldeído"}}
-{"q": "Qual a massa de um mol do liquid oxygen", "alvo": {"intent": "MASSA_MOLAR", "composto": "liquid oxygen"}}
-{"q": "qual é a massa em g/mol da Citosina?", "alvo": {"intent": "MASSA_MOLAR", "composto": "Citosina"}}
+{"q": "Quanto pesa um mol do éter dietílico?", "alvo": {"intent": "MASSA_MOLAR", "composto": "éter dietílico"}}
+{"q": "Quantos gramas tem um mol do etoposide?", "alvo": {"intent": "MASSA_MOLAR", "composto": "etoposide"}}
+{"q": "Me ajuda a calcular a massa molar da m-fenilenodiamina", "alvo": {"intent": "MASSA_MOLAR", "composto": "m-fenilenodiamina"}}
+{"q": "Qual o peso molecular do sorbato de potássio?", "alvo": {"intent": "MASSA_MOLAR", "composto": "sorbato de potássio"}}
+{"q": "Qual é a massa em g/mol do C15H22N2O?", "alvo": {"intent": "MASSA_MOLAR", "composto": "C15H22N2O"}}
+{"q": "qual a massa de um mol do p-dioxin", "alvo": {"intent": "MASSA_MOLAR", "composto": "p-dioxin"}}
+{"q": "Decano massa molar", "alvo": {"intent": "MASSA_MOLAR", "composto": "Decano"}}
+{"q": "Qual a massa molecular do criptônio?", "alvo": {"intent": "MASSA_MOLAR", "composto": "criptônio"}}
+{"q": "Qual a massa molecular do C9H10O3?", "alvo": {"intent": "MASSA_MOLAR", "composto": "C9H10O3"}}
+{"q": "Massa molar da cianamida rapidinho", "alvo": {"intent": "MASSA_MOLAR", "composto": "cianamida"}}
+{"q": "Quanto pesa um mol do butanoato de etila?", "alvo": {"intent": "MASSA_MOLAR", "composto": "butanoato de etila"}}
+{"q": "Pode me dizer qual a massa de um mol da formamida", "alvo": {"intent": "MASSA_MOLAR", "composto": "formamida"}}
+{"q": "determine a massa molar do zolpidem pra mim", "alvo": {"intent": "MASSA_MOLAR", "composto": "zolpidem"}}
+{"q": "Preciso da massa molar do isocianato de metila rapidinho", "alvo": {"intent": "MASSA_MOLAR", "composto": "isocianato de metila"}}
+{"q": "Me ajuda a calcular a massa molar do C38H60O18 rapidinho", "alvo": {"intent": "MASSA_MOLAR", "composto": "C38H60O18"}}
+{"q": "Calcule a massa molar da Resorcina", "alvo": {"intent": "MASSA_MOLAR", "composto": "Resorcina"}}
+{"q": "Qual o peso molecular de CH6ClN3 rapidinho?", "alvo": {"intent": "MASSA_MOLAR", "composto": "CH6ClN3"}}
+{"q": "uma dúvida: qual o peso molecular do cloreto de cadmio", "alvo": {"intent": "MASSA_MOLAR", "composto": "cloreto de cadmio"}}
+{"q": "quantos gramas tem um mol da Etossuximida", "alvo": {"intent": "MASSA_MOLAR", "composto": "Etossuximida"}}
+{"q": "massa molar de M-Fenilenodiamina", "alvo": {"intent": "MASSA_MOLAR", "composto": "M-Fenilenodiamina"}}
 {"q": "Por favor, quanto pesa um mol de N2O4 rapidinho?", "alvo": {"intent": "MASSA_MOLAR", "composto": "N2O4"}}
-{"q": "Qual a massa molar do benzimidazol", "alvo": {"intent": "MASSA_MOLAR", "composto": "benzimidazol"}}
-{"q": "etenol massa molar", "alvo": {"intent": "MASSA_MOLAR", "composto": "etenol"}}
-{"q": "Quantos gramas tem um mol da resorcina", "alvo": {"intent": "MASSA_MOLAR", "composto": "resorcina"}}
-{"q": "Calcule a massa molar de (NH4)2CO3", "alvo": {"intent": "MASSA_MOLAR", "composto": "(NH4)2CO3"}}
-{"q": "noradrenalina massa molar", "alvo": {"intent": "MASSA_MOLAR", "composto": "noradrenalina"}}
-{"q": "Quantos gramas tem um mol da Loratadina?", "alvo": {"intent": "MASSA_MOLAR", "composto": "Loratadina"}}
-{"q": "Por favor, mM da Dopamina", "alvo": {"intent": "MASSA_MOLAR", "composto": "Dopamina"}}
-{"q": "Por favor, determine a massa molar do alfa-pineno", "alvo": {"intent": "MASSA_MOLAR", "composto": "alfa-pineno"}}
+{"q": "Qual a massa de um mol da PETYDYNA?", "alvo": {"intent": "MASSA_MOLAR", "composto": "PETYDYNA"}}
+{"q": "Quero saber qual a massa molecular da adiponitrila?", "alvo": {"intent": "MASSA_MOLAR", "composto": "adiponitrila"}}
+{"q": "qual é a massa em g/mol do C7H6O4?", "alvo": {"intent": "MASSA_MOLAR", "composto": "C7H6O4"}}
+{"q": "Qual a massa molecular do meprobamato?", "alvo": {"intent": "MASSA_MOLAR", "composto": "meprobamato"}}
+{"q": "Calcule a massa molar de SrO por favor", "alvo": {"intent": "MASSA_MOLAR", "composto": "SrO"}}
+{"q": "Quantos gramas tem um mol do ácido adípico?", "alvo": {"intent": "MASSA_MOLAR", "composto": "ácido adípico"}}
+{"q": "Calcule a massa molar da silibinina", "alvo": {"intent": "MASSA_MOLAR", "composto": "silibinina"}}
+{"q": "Qual o peso molecular da Adiponitrila?", "alvo": {"intent": "MASSA_MOLAR", "composto": "Adiponitrila"}}
+{"q": "Quantos gramas tem um mol do MONÓXIDO DE CARBONO", "alvo": {"intent": "MASSA_MOLAR", "composto": "MONÓXIDO DE CARBONO"}}
+{"q": "Qual a massa molar do FeO pra mim?", "alvo": {"intent": "MASSA_MOLAR", "composto": "FeO"}}
+{"q": "Massa molar de CH3NO", "alvo": {"intent": "MASSA_MOLAR", "composto": "CH3NO"}}
+{"q": "karsil massa molar", "alvo": {"intent": "MASSA_MOLAR", "composto": "karsil"}}
+{"q": "Me ajuda a calcular a massa molar do éter di-isopropílico", "alvo": {"intent": "MASSA_MOLAR", "composto": "éter di-isopropílico"}}
+{"q": "Massa molar do n-decane", "alvo": {"intent": "MASSA_MOLAR", "composto": "n-decane"}}
 {"q": "Calcule a massa molar de BaO", "alvo": {"intent": "MASSA_MOLAR", "composto": "BaO"}}
 {"q": "Calcule a massa molar de LiOH", "alvo": {"intent": "MASSA_MOLAR", "composto": "LiOH"}}
-{"q": "MM da resorcina", "alvo": {"intent": "MASSA_MOLAR", "composto": "resorcina"}}
-{"q": "Determine a massa molar do Peróxido de bário", "alvo": {"intent": "MASSA_MOLAR", "composto": "Peróxido de bário"}}
+{"q": "Qual o peso molecular do deceno", "alvo": {"intent": "MASSA_MOLAR", "composto": "deceno"}}
 {"q": "Quanto pesa um mol de (NH4)2CO3", "alvo": {"intent": "MASSA_MOLAR", "composto": "(NH4)2CO3"}}
-{"q": "Massa molar de C7H6N2", "alvo": {"intent": "MASSA_MOLAR", "composto": "C7H6N2"}}
-{"q": "Me ajuda a calcular a massa molar do loratadine", "alvo": {"intent": "MASSA_MOLAR", "composto": "loratadine"}}
-{"q": "Preciso saber quanto pesa um mol do COPPER MONOSULFIDE?", "alvo": {"intent": "MASSA_MOLAR", "composto": "COPPER MONOSULFIDE"}}
-{"q": "Calclue a massa molar do composto C7H6N2", "alvo": {"intent": "MASSA_MOLAR", "composto": "C7H6N2"}}
 {"q": "massa molar de BaO", "alvo": {"intent": "MASSA_MOLAR", "composto": "BaO"}}
-{"q": "oi, prceiso da massa molar do éter metil terc-butílico", "alvo": {"intent": "MASSA_MOLAR", "composto": "éter metil terc-butílico"}}
-{"q": "Preciso da massa molar do noradrenalin", "alvo": {"intent": "MASSA_MOLAR", "composto": "noradrenalin"}}
-{"q": "Quanto pesa um mol do Kadmiumchlorid rapidinho?", "alvo": {"intent": "MASSA_MOLAR", "composto": "Kadmiumchlorid"}}
-{"q": "Massa molar do hydroxyethene", "alvo": {"intent": "MASSA_MOLAR", "composto": "hydroxyethene"}}
-{"q": "Oi, hidróxido de bário massa molar", "alvo": {"intent": "MASSA_MOLAR", "composto": "hidróxido de bário"}}
-{"q": "me ajuda a calcular a massa molar da formamida", "alvo": {"intent": "MASSA_MOLAR", "composto": "formamida"}}
+{"q": "mm do Éter di-isopropílico", "alvo": {"intent": "MASSA_MOLAR", "composto": "Éter di-isopropílico"}}
+{"q": "mm do porfobilinogénio", "alvo": {"intent": "MASSA_MOLAR", "composto": "porfobilinogénio"}}
+{"q": "quanto pesa um mol da resorcina?", "alvo": {"intent": "MASSA_MOLAR", "composto": "resorcina"}}
+{"q": "Uma dúvida: some as massas atômicas de N2O4", "alvo": {"intent": "MASSA_MOLAR", "composto": "N2O4"}}
+{"q": "Calcule a massa molar do etopósido", "alvo": {"intent": "MASSA_MOLAR", "composto": "etopósido"}}
+{"q": "Me ajuda a calcular a massa molar do citridic acid por favor", "alvo": {"intent": "MASSA_MOLAR", "composto": "citridic acid"}}
+{"q": "Calcule a massa molar da nefazodona", "alvo": {"intent": "MASSA_MOLAR", "composto": "nefazodona"}}
+{"q": "Qual a massa de um mol da M-Fenilenodiamina?", "alvo": {"intent": "MASSA_MOLAR", "composto": "M-Fenilenodiamina"}}
+{"q": "Qual é a massa em g/mol do cloreto de cobre(ii)?", "alvo": {"intent": "MASSA_MOLAR", "composto": "cloreto de cobre(ii)"}}
+{"q": "Massa molar do enflurano", "alvo": {"intent": "MASSA_MOLAR", "composto": "enflurano"}}
+{"q": "Determine a massa molar da dopamina", "alvo": {"intent": "MASSA_MOLAR", "composto": "dopamina"}}
 {"q": "uma dúvida: quanto pesa um mol de Cu2O?", "alvo": {"intent": "MASSA_MOLAR", "composto": "Cu2O"}}
-{"q": "Calcule a massa molar do composto Ácido azelaico", "alvo": {"intent": "MASSA_MOLAR", "composto": "Ácido azelaico"}}
-{"q": "Oi, determine a massa molar do butyral", "alvo": {"intent": "MASSA_MOLAR", "composto": "butyral"}}
-{"q": "Qual é a massa em g/mol do criptônio?", "alvo": {"intent": "MASSA_MOLAR", "composto": "criptônio"}}
+{"q": "uma dúvida: massa molar de butanoato de pentila", "alvo": {"intent": "MASSA_MOLAR", "composto": "butanoato de pentila"}}
+{"q": "Me ajuda a calcular a massa molar de CuS", "alvo": {"intent": "MASSA_MOLAR", "composto": "CuS"}}
 {"q": "Pode me dizer quanto pesa um mol de LiOH", "alvo": {"intent": "MASSA_MOLAR", "composto": "LiOH"}}
-{"q": "Preciso da massa molar da cianamida", "alvo": {"intent": "MASSA_MOLAR", "composto": "cianamida"}}
+{"q": "Preciso da massa molar da Citosina", "alvo": {"intent": "MASSA_MOLAR", "composto": "Citosina"}}
+{"q": "HNO3 + Ca(OH)2 = Ca(NO3)2 + H2O", "alvo": {"intent": "BALANCEAR", "equacao": "HNO3 + Ca(OH)2 = Ca(NO3)2 + H2O"}}
 {"q": "acerte os coeficientes de SiCl4 + H2O -> SiO2 + HCl", "alvo": {"intent": "BALANCEAR", "equacao": "SiCl4 + H2O -> SiO2 + HCl"}}
 {"q": "balanceie a equação KNO3 = KNO2 + O2", "alvo": {"intent": "BALANCEAR", "equacao": "KNO3 = KNO2 + O2"}}
 {"q": "Ajuste os coeficientes: Zn + H2SO4 → ZnSO4 + H2", "alvo": {"intent": "BALANCEAR", "equacao": "Zn + H2SO4 → ZnSO4 + H2"}}
@@ -227,7 +244,7 @@
 {"q": "H2CO3 -> H2O + CO2", "alvo": {"intent": "BALANCEAR", "equacao": "H2CO3 -> H2O + CO2"}}
 {"q": "Preciso balancear Sn + O2 -> SnO2", "alvo": {"intent": "BALANCEAR", "equacao": "Sn + O2 -> SnO2"}}
 {"q": "Me ajuda a balancear K + H2O -> KOH + H2", "alvo": {"intent": "BALANCEAR", "equacao": "K + H2O -> KOH + H2"}}
-{"q": "me ajuda: qual a equação CH3OH + O2 => CO2 + H2O balanceada?", "alvo": {"intent": "BALANCEAR", "equacao": "CH3OH + O2 => CO2 + H2O"}}
+{"q": "você sabe quanto de reagente é preciso para CH3OH + O2 => CO2 + H2O com 0,5 grama rapidinho?", "alvo": {"intent": "ESTEQUIOMETRIA", "quantidades": [{"valor": 0.5, "unidade": "g"}], "equacao": "CH3OH + O2 => CO2 + H2O"}}
 {"q": "você sabe quantas partículas há em 3 mols de Sorbato de potássio?", "alvo": {"intent": "ESTEQUIOMETRIA", "composto": "Sorbato de potássio", "quantidades": [{"valor": 3, "unidade": "mol"}]}}
 {"q": "Converta 100 mg de óxido de ferro(II) em mols", "alvo": {"intent": "ESTEQUIOMETRIA", "composto": "óxido de ferro(II)", "quantidades": [{"valor": 100, "unidade": "mg"}]}}
 {"q": "Quantos mols do produto se formam em H2CO3 -> H2O + CO2 com 2,5 milimols?", "alvo": {"intent": "ESTEQUIOMETRIA", "quantidades": [{"valor": 2.5, "unidade": "mmol"}], "equacao": "H2CO3 -> H2O + CO2"}}
@@ -274,10 +291,8 @@
 {"q": "Quantos mols de telurio há em 10 g?", "alvo": {"intent": "ESTEQUIOMETRIA", "elemento": "Te", "quantidades": [{"valor": 10, "unidade": "g"}]}}
 {"q": "converta 2 g de Cloreto de estanho(II) em mols", "alvo": {"intent": "ESTEQUIOMETRIA", "composto": "Cloreto de estanho(II)", "quantidades": [{"valor": 2, "unidade": "g"}]}}
 {"q": "na reação (NH4)2Cr2O7 → Cr2O3 + N2 + H2O, quantos gramas de produto se formam com 40 g do primeiro reagente?", "alvo": {"intent": "ESTEQUIOMETRIA", "quantidades": [{"valor": 40, "unidade": "g"}], "equacao": "(NH4)2Cr2O7 → Cr2O3 + N2 + H2O"}}
-{"q": "Calcule a concentração em g/L de 5g de SnCl2 em 250mL", "alvo": {"intent": "CONCENTRACAO", "composto": "SnCl2", "quantidades": [{"valor": 5, "unidade": "g"}, {"valor": 250, "unidade": "mL"}]}}
-{"q": "Quero diluir 0,01M para 0,001 mol/l, mantendo 5 l", "alvo": {"intent": "CONCENTRACAO", "quantidades": [{"valor": 0.01, "unidade": "mol/L"}, {"valor": 0.001, "unidade": "mol/L"}, {"valor": 5, "unidade": "L"}]}}
-{"q": "qual a concentração final ao diluir 100 mL de 0,25 M até 250 mililitros", "alvo": {"intent": "CONCENTRACAO", "quantidades": [{"valor": 100, "unidade": "mL"}, {"valor": 0.25, "unidade": "mol/L"}, {"valor": 250, "unidade": "mL"}]}}
-{"q": "Quero diluir 0,25 mols por litro para 0,1 mols por litro, mantendo 0,5 litro", "alvo": {"intent": "CONCENTRACAO", "quantidades": [{"valor": 0.25, "unidade": "mol/L"}, {"valor": 0.1, "unidade": "mol/L"}, {"valor": 0.5, "unidade": "L"}]}}
+{"q": "Quantos mL de solução 2M preciso para preparar 25 ml de 0,05M?", "alvo": {"intent": "CONCENTRACAO", "quantidades": [{"valor": 2, "unidade": "mol/L"}, {"valor": 25, "unidade": "mL"}, {"valor": 0.05, "unidade": "mol/L"}]}}
+{"q": "Qual a concentração final ao diluir 0,5 litro de 1 mol/l até 2 L agora?", "alvo": {"intent": "CONCENTRACAO", "quantidades": [{"valor": 0.5, "unidade": "L"}, {"valor": 1, "unidade": "mol/L"}, {"valor": 2, "unidade": "L"}]}}
 {"q": "Quantos gramas de sulfeto de cobre(ii) preciso para 2 litros de solução 0,05 mol/l?", "alvo": {"intent": "CONCENTRACAO", "composto": "sulfeto de cobre(ii)", "quantidades": [{"valor": 2, "unidade": "L"}, {"valor": 0.05, "unidade": "mol/L"}]}}
 {"q": "Qual o vloume final ao diluir 1000mL de solução 0,01 mols por litro até 0,001 mol/L?", "alvo": {"intent": "CONCENTRACAO", "quantidades": [{"valor": 1000, "unidade": "mL"}, {"valor": 0.01, "unidade": "mol/L"}, {"valor": 0.001, "unidade": "mol/L"}]}}
 {"q": "Quero diluir 0,5 mol/L para 0,2 mol/l, mantendo 10 mililitros", "alvo": {"intent": "CONCENTRACAO", "quantidades": [{"valor": 0.5, "unidade": "mol/L"}, {"valor": 0.2, "unidade": "mol/L"}, {"valor": 10, "unidade": "mL"}]}}
@@ -288,7 +303,7 @@
 {"q": "como calcular a concenrtação de uma solução?", "alvo": {"intent": "CONCENTRACAO"}}
 {"q": "ei, qual o vloume final ao diluir 200 mL de solçuão 0,01 mols por litro até 0,25 mols por litro?", "alvo": {"intent": "CONCENTRACAO", "quantidades": [{"valor": 200, "unidade": "mL"}, {"valor": 0.01, "unidade": "mol/L"}, {"valor": 0.25, "unidade": "mol/L"}]}}
 {"q": "Quantos mL de solução 0.25 mols por litro preciso para preparar 100 mL de 2 mol/L", "alvo": {"intent": "CONCENTRACAO", "quantidades": [{"valor": 0.25, "unidade": "mol/L"}, {"valor": 100, "unidade": "mL"}, {"valor": 2, "unidade": "mol/L"}]}}
-{"q": "preparo de sloução 1,5 mol/L de 1,4-butanedicarboxylic acid com 22,4 litros", "alvo": {"intent": "CONCENTRACAO", "composto": "1,4-butanedicarboxylic acid", "quantidades": [{"valor": 1.5, "unidade": "mol/L"}, {"valor": 22.4, "unidade": "L"}]}}
+{"q": "preparo de sloução 1,5 mol/L de molten adipic acid com 22,4 litros", "alvo": {"intent": "CONCENTRACAO", "composto": "molten adipic acid", "quantidades": [{"valor": 1.5, "unidade": "mol/L"}, {"valor": 22.4, "unidade": "L"}]}}
 {"q": "dissolvi 25 gramas de monóxido de carbono em 10mL. qual a concentração?", "alvo": {"intent": "CONCENTRACAO", "composto": "monóxido de carbono", "quantidades": [{"valor": 25, "unidade": "g"}, {"valor": 10, "unidade": "mL"}]}}
 {"q": "Que massa de óxido de ferro(II) é necessária para 10 litros a 1 molar?", "alvo": {"intent": "CONCENTRACAO", "composto": "óxido de ferro(II)", "quantidades": [{"valor": 10, "unidade": "L"}, {"valor": 1, "unidade": "mol/L"}]}}
 {"q": "como preparar 50 mililitros de solução 1,5 molar de sorbato de potássio", "alvo": {"intent": "CONCENTRACAO", "composto": "sorbato de potássio", "quantidades": [{"valor": 50, "unidade": "mL"}, {"valor": 1.5, "unidade": "mol/L"}]}}
@@ -314,7 +329,6 @@
 {"q": "qual a molaridade de 2 gramas de COPPER CHLORIDE em 5 litros?", "alvo": {"intent": "CONCENTRACAO", "composto": "COPPER CHLORIDE", "quantidades": [{"valor": 2, "unidade": "g"}, {"valor": 5, "unidade": "L"}]}}
 {"q": "Quero diluir 2 mol/l para 0,5 mol/l, mantendo 2 litros", "alvo": {"intent": "CONCENTRACAO", "quantidades": [{"valor": 2, "unidade": "mol/L"}, {"valor": 0.5, "unidade": "mol/L"}, {"valor": 2, "unidade": "L"}]}}
 {"q": "Diluçião de soluções", "alvo": {"intent": "CONCENTRACAO"}}
-{"q": "Concentração comum de 2,5 g de sulfeto de cobre(II) em 0,5 litro por favor", "alvo": {"intent": "CONCENTRACAO", "composto": "sulfeto de cobre(II)", "quantidades": [{"valor": 2.5, "unidade": "g"}, {"valor": 0.5, "unidade": "L"}]}}
 {"q": "Olá, pH de hidróxido de bário 0.01 mol/L", "alvo": {"intent": "PH", "composto": "hidróxido de bário", "quantidades": [{"valor": 0.01, "unidade": "mol/L"}]}}
 {"q": "Calcule o pH de cloreto de estanho(II)", "alvo": {"intent": "PH", "composto": "cloreto de estanho(II)"}}
 {"q": "Qual o pH de uma solução de sulfeto de cobre(II) a 0,05 mols por litro?", "alvo": {"intent": "PH", "composto": "sulfeto de cobre(II)", "quantidades": [{"valor": 0.05, "unidade": "mol/L"}]}}
@@ -337,7 +351,7 @@
 {"q": "Como calcular o pH de cloreto de cobre(II) 1,5 M rapidinho?", "alvo": {"intent": "PH", "composto": "cloreto de cobre(II)", "quantidades": [{"valor": 1.5, "unidade": "mol/L"}]}}
 {"q": "ei, calcule o pH de sorbato de potássio", "alvo": {"intent": "PH", "composto": "sorbato de potássio"}}
 {"q": "Calcule o pH de hidróxido de bário", "alvo": {"intent": "PH", "composto": "hidróxido de bário"}}
-{"q": "lei dos gases ideais: 0,25 mol a 500 kelvin em 0,25 litro", "alvo": {"intent": "GAS_IDEAL", "quantidades": [{"valor": 0.25, "unidade": "mol"}, {"valor": 500, "unidade": "K"}, {"valor": 0.25, "unidade": "L"}]}}
+{"q": "Quantos mols de gás há em 0,5 litro a 373 K e 1 atm?", "alvo": {"intent": "GAS_IDEAL", "quantidades": [{"valor": 0.5, "unidade": "L"}, {"valor": 373, "unidade": "K"}, {"valor": 1, "unidade": "atm"}]}}
 {"q": "Qual a pressão de 50 milimols de gás em 22,4L a 350 K", "alvo": {"intent": "GAS_IDEAL", "quantidades": [{"valor": 50, "unidade": "mmol"}, {"valor": 22.4, "unidade": "L"}, {"valor": 350, "unidade": "K"}]}}
 {"q": "Você sabe qual a pressão exercida por 0,5 mol de O2 em 5 L a 300 K?", "alvo": {"intent": "GAS_IDEAL", "composto": "O2", "quantidades": [{"valor": 0.5, "unidade": "mol"}, {"valor": 5, "unidade": "L"}, {"valor": 300, "unidade": "K"}]}}
 {"q": "Qual o volume de 0,5 mol de gás a 300 kelvin e 760 milímetros de mercúrio?", "alvo": {"intent": "GAS_IDEAL", "quantidades": [{"valor": 0.5, "unidade": "mol"}, {"valor": 300, "unidade": "K"}, {"valor": 760, "unidade": "mmHg"}]}}
@@ -429,102 +443,111 @@
 {"q": "Uma dúvida: preciso de 100 ml em litros", "alvo": {"intent": "CONVERSAO_UNIDADE", "quantidades": [{"valor": 100, "unidade": "mL"}], "unidadeDestino": "L"}}
 {"q": "Preciso de 25 kg em grama", "alvo": {"intent": "CONVERSAO_UNIDADE", "quantidades": [{"valor": 25, "unidade": "kg"}], "unidadeDestino": "g"}}
 {"q": "Converter 10 quilogramas em mg", "alvo": {"intent": "CONVERSAO_UNIDADE", "quantidades": [{"valor": 10, "unidade": "kg"}], "unidadeDestino": "mg"}}
-{"q": "quanto é 0,25 min em s?", "alvo": {"intent": "CONVERSAO_UNIDADE", "quantidades": [{"valor": 0.25, "unidade": "min"}], "unidadeDestino": "s"}}
-{"q": "Fórmula do carbamaldehyde", "alvo": {"intent": "NOMENCLATURA", "composto": "carbamaldehyde"}}
-{"q": "Quero saber qual o nome oficial do acido adipico?", "alvo": {"intent": "NOMENCLATURA", "composto": "acido adipico"}}
-{"q": "Qual o nome sistemático da DOPAMINA?", "alvo": {"intent": "NOMENCLATURA", "composto": "DOPAMINA"}}
-{"q": "Qual é a fórmula do composto noradrenalina?", "alvo": {"intent": "NOMENCLATURA", "composto": "noradrenalina"}}
+{"q": "Qual a nomenclatura de Ba(NO3)2 pra mim?", "alvo": {"intent": "NOMENCLATURA", "composto": "Ba(NO3)2"}}
+{"q": "Fórmula do milnacipranum", "alvo": {"intent": "NOMENCLATURA", "composto": "milnacipranum"}}
+{"q": "Como se escreve verapamil em fórmula?", "alvo": {"intent": "NOMENCLATURA", "composto": "verapamil"}}
 {"q": "pode me dizer como se chama (NH4)2CO3?", "alvo": {"intent": "NOMENCLATURA", "composto": "(NH4)2CO3"}}
-{"q": "Escreva a fórmula da resorcina", "alvo": {"intent": "NOMENCLATURA", "composto": "resorcina"}}
+{"q": "Qual o nome oficial de C18H19Cl2NO4 agora", "alvo": {"intent": "NOMENCLATURA", "composto": "C18H19Cl2NO4"}}
+{"q": "como se escreve M-Fenilenodiamina em fórmula?", "alvo": {"intent": "NOMENCLATURA", "composto": "M-Fenilenodiamina"}}
+{"q": "Qual a fórmula química do C6H10O2?", "alvo": {"intent": "NOMENCLATURA", "composto": "C6H10O2"}}
+{"q": "Escreva a fórmula do Carbon tetraiodide", "alvo": {"intent": "NOMENCLATURA", "composto": "Carbon tetraiodide"}}
+{"q": "uma dúvida: como se escreve melatonina em fórmula?", "alvo": {"intent": "NOMENCLATURA", "composto": "melatonina"}}
+{"q": "Escreva a fórmula do zolpidem", "alvo": {"intent": "NOMENCLATURA", "composto": "zolpidem"}}
 {"q": "Qual o nome de BaO?", "alvo": {"intent": "NOMENCLATURA", "composto": "BaO"}}
-{"q": "Escreva a fórmula de Kr", "alvo": {"intent": "NOMENCLATURA", "composto": "Kr"}}
-{"q": "Qual a fórmula de C10H16?", "alvo": {"intent": "NOMENCLATURA", "composto": "C10H16"}}
+{"q": "Como se chama o composto C6H4ClNO2?", "alvo": {"intent": "NOMENCLATURA", "composto": "C6H4ClNO2"}}
+{"q": "Qual o nome de N2O4?", "alvo": {"intent": "NOMENCLATURA", "composto": "N2O4"}}
+{"q": "Qual a fórmula do butiraldeído?", "alvo": {"intent": "NOMENCLATURA", "composto": "butiraldeído"}}
+{"q": "Olá, nome IUPAC da capsaicina", "alvo": {"intent": "NOMENCLATURA", "composto": "capsaicina"}}
 {"q": "Qual a nomenclatrua de BaO?", "alvo": {"intent": "NOMENCLATURA", "composto": "BaO"}}
-{"q": "Qual o nome sistemático da CIANAMIDA?", "alvo": {"intent": "NOMENCLATURA", "composto": "CIANAMIDA"}}
-{"q": "Qual o nome oficial do peróxido de bário?", "alvo": {"intent": "NOMENCLATURA", "composto": "peróxido de bário"}}
-{"q": "Escreva a fórmula do sorbato de potássio", "alvo": {"intent": "NOMENCLATURA", "composto": "sorbato de potássio"}}
-{"q": "como se chama o composto C18H27NO3?", "alvo": {"intent": "NOMENCLATURA", "composto": "C18H27NO3"}}
-{"q": "Fórmula do decano", "alvo": {"intent": "NOMENCLATURA", "composto": "decano"}}
-{"q": "escreva a fórmula da pirimetamina", "alvo": {"intent": "NOMENCLATURA", "composto": "pirimetamina"}}
-{"q": "nomenclatura do zolpidem", "alvo": {"intent": "NOMENCLATURA", "composto": "zolpidem"}}
+{"q": "você sabe qual a fórmula química do O-PHENYLENEDIAMINE?", "alvo": {"intent": "NOMENCLATURA", "composto": "O-PHENYLENEDIAMINE"}}
+{"q": "Qual o nome sistemático do éter metil terc-butílico?", "alvo": {"intent": "NOMENCLATURA", "composto": "éter metil terc-butílico"}}
+{"q": "Como se chama o composto C7H6N2?", "alvo": {"intent": "NOMENCLATURA", "composto": "C7H6N2"}}
+{"q": "Como se escreve sucralose em fórmula", "alvo": {"intent": "NOMENCLATURA", "composto": "sucralose"}}
+{"q": "Fórmula do C6H12O2", "alvo": {"intent": "NOMENCLATURA", "composto": "C6H12O2"}}
 {"q": "Nomeie HCl", "alvo": {"intent": "NOMENCLATURA", "composto": "HCl"}}
 {"q": "qual a nomenclatura de SnCl2?", "alvo": {"intent": "NOMENCLATURA", "composto": "SnCl2"}}
-{"q": "nomenclatura do acetato de butila", "alvo": {"intent": "NOMENCLATURA", "composto": "acetato de butila"}}
-{"q": "Escreva a fórmula da noradrenalina pra mim", "alvo": {"intent": "NOMENCLATURA", "composto": "noradrenalina"}}
-{"q": "Fórmula do C14H30", "alvo": {"intent": "NOMENCLATURA", "composto": "C14H30"}}
-{"q": "Fórmula do C12H13ClN4", "alvo": {"intent": "NOMENCLATURA", "composto": "C12H13ClN4"}}
-{"q": "Nomeie Na2CO3", "alvo": {"intent": "NOMENCLATURA", "composto": "Na2CO3"}}
-{"q": "Nome IUPAC da guanina", "alvo": {"intent": "NOMENCLATURA", "composto": "guanina"}}
+{"q": "Como se escreve peróxido de bário em fórmula?", "alvo": {"intent": "NOMENCLATURA", "composto": "peróxido de bário"}}
+{"q": "Dê o nome do composto SrO pra mim", "alvo": {"intent": "NOMENCLATURA", "composto": "SrO"}}
+{"q": "Como se escreve fenilacetileno em fómrula?", "alvo": {"intent": "NOMENCLATURA", "composto": "fenilacetileno"}}
+{"q": "preciso saber qual o nome de C10H16?", "alvo": {"intent": "NOMENCLATURA", "composto": "C10H16"}}
+{"q": "Nome IUPAC do vermelho 2G", "alvo": {"intent": "NOMENCLATURA", "composto": "vermelho 2G"}}
+{"q": "Como se lê Ba(NO3)2?", "alvo": {"intent": "NOMENCLATURA", "composto": "Ba(NO3)2"}}
 {"q": "Olá, dê o nome do composto Ba(NO3)2", "alvo": {"intent": "NOMENCLATURA", "composto": "Ba(NO3)2"}}
+{"q": "pode me dizer qual é a fórmula do composto ÁCIDO 4-AMINOSSALICÍLICO?", "alvo": {"intent": "NOMENCLATURA", "composto": "ÁCIDO 4-AMINOSSALICÍLICO"}}
+{"q": "Qual o nome de CH2N2?", "alvo": {"intent": "NOMENCLATURA", "composto": "CH2N2"}}
 {"q": "Qual a nomenclatura de N2O4", "alvo": {"intent": "NOMENCLATURA", "composto": "N2O4"}}
-{"q": "Como se chama o composto C10H22?", "alvo": {"intent": "NOMENCLATURA", "composto": "C10H22"}}
-{"q": "Qual o nome de CdCl2?", "alvo": {"intent": "NOMENCLATURA", "composto": "CdCl2"}}
-{"q": "Nomenclatura de C6H12O2", "alvo": {"intent": "NOMENCLATURA", "composto": "C6H12O2"}}
-{"q": "Como se escreve benzimidazol em fórumla", "alvo": {"intent": "NOMENCLATURA", "composto": "benzimidazol"}}
+{"q": "Qual a fórmula do cytosinimine?", "alvo": {"intent": "NOMENCLATURA", "composto": "cytosinimine"}}
 {"q": "Quero saber como se lê SnCl2?", "alvo": {"intent": "NOMENCLATURA", "composto": "SnCl2"}}
-{"q": "Qual o nome oficial do Éter metil terc-butílico?", "alvo": {"intent": "NOMENCLATURA", "composto": "Éter metil terc-butílico"}}
-{"q": "Como se escreve Óxido de ferro(II) em fórmula?", "alvo": {"intent": "NOMENCLATURA", "composto": "Óxido de ferro(II)"}}
-{"q": "Qual é a fórmula do composto claritromicina?", "alvo": {"intent": "NOMENCLATURA", "composto": "claritromicina"}}
-{"q": "preciso saber como se escreve pirimetamina em fórmula?", "alvo": {"intent": "NOMENCLATURA", "composto": "pirimetamina"}}
-{"q": "Qual a fórmula do CdCl2?", "alvo": {"intent": "NOMENCLATURA", "composto": "CdCl2"}}
-{"q": "Qual o nome de SnCl2?", "alvo": {"intent": "NOMENCLATURA", "composto": "SnCl2"}}
-{"q": "escreva a fórmula do esteviosídeo", "alvo": {"intent": "NOMENCLATURA", "composto": "esteviosídeo"}}
-{"q": "qual o nome de CH2N2", "alvo": {"intent": "NOMENCLATURA", "composto": "CH2N2"}}
-{"q": "Fórumla do monóxido de carbono", "alvo": {"intent": "NOMENCLATURA", "composto": "monóxido de carbono"}}
-{"q": "Qual a fórmula química do sulfeto de cobre(ii)?", "alvo": {"intent": "NOMENCLATURA", "composto": "sulfeto de cobre(ii)"}}
-{"q": "Frómula do sulfeto de cobre(II) pra mim", "alvo": {"intent": "NOMENCLATURA", "composto": "sulfeto de cobre(II)"}}
-{"q": "Uma dúvida: qual o nome sistemático do tetradecano", "alvo": {"intent": "NOMENCLATURA", "composto": "tetradecano"}}
-{"q": "Mostre a estrutura do cloreto de cádmio", "alvo": {"intent": "DESENHAR", "composto": "cloreto de cádmio"}}
-{"q": "Me mostra como é o ácido adípico", "alvo": {"intent": "DESENHAR", "composto": "ácido adípico"}}
-{"q": "Desenhar Meprobamato", "alvo": {"intent": "DESENHAR", "composto": "Meprobamato"}}
-{"q": "Olá, mostre a estrutura do tetradecano", "alvo": {"intent": "DESENHAR", "composto": "tetradecano"}}
-{"q": "Mostre a estrutura do T-BUTYL METHYL ETHER", "alvo": {"intent": "DESENHAR", "composto": "T-BUTYL METHYL ETHER"}}
-{"q": "Desenhe a estrutura do Benzimidazol", "alvo": {"intent": "DESENHAR", "composto": "Benzimidazol"}}
-{"q": "Faça o desenho da fórmula estrutural do Isocianato de metila", "alvo": {"intent": "DESENHAR", "composto": "Isocianato de metila"}}
-{"q": "Estrutura de C10H16", "alvo": {"intent": "DESENHAR", "composto": "C10H16"}}
-{"q": "Visualizar a estrutura do cyt", "alvo": {"intent": "DESENHAR", "composto": "cyt"}}
-{"q": "Estrutura da loratadina", "alvo": {"intent": "DESENHAR", "composto": "loratadina"}}
-{"q": "Por favor, fórumla estrutural do esteviosídeo", "alvo": {"intent": "DESENHAR", "composto": "esteviosídeo"}}
-{"q": "Visualizar a estrutura do daraprim", "alvo": {"intent": "DESENHAR", "composto": "daraprim"}}
-{"q": "Mostre a estrutura da capsaicina", "alvo": {"intent": "DESENHAR", "composto": "capsaicina"}}
-{"q": "Quero ver a estrutura molecular da melatonina", "alvo": {"intent": "DESENHAR", "composto": "melatonina"}}
-{"q": "Mostre a molécula de capsaicina", "alvo": {"intent": "DESENHAR", "composto": "capsaicina"}}
-{"q": "desenhar C9H16O4", "alvo": {"intent": "DESENHAR", "composto": "C9H16O4"}}
-{"q": "Estrutura química do sympathin E", "alvo": {"intent": "DESENHAR", "composto": "sympathin E"}}
-{"q": "Como é a molécula do peroxido de bario?", "alvo": {"intent": "DESENHAR", "composto": "peroxido de bario"}}
-{"q": "desenhar éter dietílico", "alvo": {"intent": "DESENHAR", "composto": "éter dietílico"}}
-{"q": "deesnhe a estrutrua do ácido azelaico", "alvo": {"intent": "DESENHAR", "composto": "ácido azelaico"}}
-{"q": "Desenhe a estrutura da petidina", "alvo": {"intent": "DESENHAR", "composto": "petidina"}}
+{"q": "Ei, qual a fórmula do C10H22?", "alvo": {"intent": "NOMENCLATURA", "composto": "C10H22"}}
+{"q": "Pode me dizer qual o nome oficial de C22H28N6O3S?", "alvo": {"intent": "NOMENCLATURA", "composto": "C22H28N6O3S"}}
+{"q": "Nomenclatura da etossuximida", "alvo": {"intent": "NOMENCLATURA", "composto": "etossuximida"}}
+{"q": "escreva a fórmula do p-nitrochlorobenzene", "alvo": {"intent": "NOMENCLATURA", "composto": "p-nitrochlorobenzene"}}
+{"q": "Qual é a fórmula do composto dimetoxietano?", "alvo": {"intent": "NOMENCLATURA", "composto": "dimetoxietano"}}
+{"q": "oi, fórmula de C15H21N3O2", "alvo": {"intent": "NOMENCLATURA", "composto": "C15H21N3O2"}}
+{"q": "oi, qual é a fórmula do composto ácido gentísico?", "alvo": {"intent": "NOMENCLATURA", "composto": "ácido gentísico"}}
+{"q": "mostre a molécula de 1,1,2-tricloro-1,2,2-trifluoroetano pra mim", "alvo": {"intent": "DESENHAR", "composto": "1,1,2-tricloro-1,2,2-trifluoroetano"}}
+{"q": "Desenhar Esteviosídeo", "alvo": {"intent": "DESENHAR", "composto": "Esteviosídeo"}}
+{"q": "Fórmula estrutural de C6H12O2", "alvo": {"intent": "DESENHAR", "composto": "C6H12O2"}}
+{"q": "Desenhar cianamida", "alvo": {"intent": "DESENHAR", "composto": "cianamida"}}
+{"q": "Desenhe o zolpidem", "alvo": {"intent": "DESENHAR", "composto": "zolpidem"}}
+{"q": "Oi, desenhar O2", "alvo": {"intent": "DESENHAR", "composto": "O2"}}
+{"q": "Quero ver a estrutura molecular do C6H5NO2", "alvo": {"intent": "DESENHAR", "composto": "C6H5NO2"}}
+{"q": "Olá, mostre a estrutura do 1,1,2-tricloro-1,2,2-trifluoroetano", "alvo": {"intent": "DESENHAR", "composto": "1,1,2-tricloro-1,2,2-trifluoroetano"}}
+{"q": "Mostre a molécula de Oxalato de amônio", "alvo": {"intent": "DESENHAR", "composto": "Oxalato de amônio"}}
+{"q": "desenhe a molécula de O-Fenilenodiamina", "alvo": {"intent": "DESENHAR", "composto": "O-Fenilenodiamina"}}
+{"q": "Estrutura do Meprobamato", "alvo": {"intent": "DESENHAR", "composto": "Meprobamato"}}
+{"q": "estrutura do óxido de ferro(II)", "alvo": {"intent": "DESENHAR", "composto": "óxido de ferro(II)"}}
+{"q": "ei, desenhe a molécula de cloreto de estanho(II)", "alvo": {"intent": "DESENHAR", "composto": "cloreto de estanho(II)"}}
+{"q": "estrutura do Rescriptor", "alvo": {"intent": "DESENHAR", "composto": "Rescriptor"}}
+{"q": "Estrutura química do monóxido de carbono", "alvo": {"intent": "DESENHAR", "composto": "monóxido de carbono"}}
+{"q": "Por favor, quero ver a estruutra molecluar do decano", "alvo": {"intent": "DESENHAR", "composto": "decano"}}
+{"q": "Desenhe o 1-oxa-3-azaindene", "alvo": {"intent": "DESENHAR", "composto": "1-oxa-3-azaindene"}}
+{"q": "Estrutura do benzoxazol por favor", "alvo": {"intent": "DESENHAR", "composto": "benzoxazol"}}
+{"q": "Mostre a molécula de zolpidem", "alvo": {"intent": "DESENHAR", "composto": "zolpidem"}}
+{"q": "Desenhar PERCLORATO DE POTÁSSIO", "alvo": {"intent": "DESENHAR", "composto": "PERCLORATO DE POTÁSSIO"}}
+{"q": "desenhar Peróxido de bário", "alvo": {"intent": "DESENHAR", "composto": "Peróxido de bário"}}
+{"q": "Visualizar a esturtura de C22H23ClN2O2", "alvo": {"intent": "DESENHAR", "composto": "C22H23ClN2O2"}}
+{"q": "Desenhe a estrutura do silymarin I", "alvo": {"intent": "DESENHAR", "composto": "silymarin I"}}
+{"q": "Me mostra como é C25H32ClN5O2", "alvo": {"intent": "DESENHAR", "composto": "C25H32ClN5O2"}}
+{"q": "Desenhe a estrutura de C14H19NO", "alvo": {"intent": "DESENHAR", "composto": "C14H19NO"}}
+{"q": "Mostre a estrutura da silibinina", "alvo": {"intent": "DESENHAR", "composto": "silibinina"}}
+{"q": "Estrutura de C7H6O4", "alvo": {"intent": "DESENHAR", "composto": "C7H6O4"}}
+{"q": "Oi, estrutura de C18H19Cl2NO4 rapidinho", "alvo": {"intent": "DESENHAR", "composto": "C18H19Cl2NO4"}}
+{"q": "faça o desenho da fórmula estrutural do deceno", "alvo": {"intent": "DESENHAR", "composto": "deceno"}}
+{"q": "ei, visualizar a estrutura do O3W", "alvo": {"intent": "DESENHAR", "composto": "O3W"}}
+{"q": "ei, como é a molécula da etoxiquina?", "alvo": {"intent": "DESENHAR", "composto": "etoxiquina"}}
+{"q": "Mostre a estrutura do decano", "alvo": {"intent": "DESENHAR", "composto": "decano"}}
+{"q": "Fórmula estrutural do ácido picolínico rapidinho", "alvo": {"intent": "DESENHAR", "composto": "ácido picolínico"}}
+{"q": "oi, faça o desenho da fórmlua estrutural do C2H4Br2", "alvo": {"intent": "DESENHAR", "composto": "C2H4Br2"}}
+{"q": "Estrutura química do Resorcin", "alvo": {"intent": "DESENHAR", "composto": "Resorcin"}}
+{"q": "Uma dúvida: mostre a estrutura da petidina", "alvo": {"intent": "DESENHAR", "composto": "petidina"}}
+{"q": "Fórmula estrutural do vg nervo agente", "alvo": {"intent": "DESENHAR", "composto": "vg nervo agente"}}
+{"q": "Qual precisa de mais energia para perder um elétron, Fl ou Cm?", "alvo": {"intent": "COMPARAR", "elemento": "Fl", "propriedade": "energiaIonizacaoKJmol"}}
+{"q": "Qual derrete a uma temperatura mais alta: fleróvio ou nióbio?", "alvo": {"intent": "COMPARAR", "elemento": "Fl", "propriedade": "pontoFusaoK"}}
 {"q": "qual é mais eletronegativo, fleróvio ou césio?", "alvo": {"intent": "COMPARAR", "elemento": "Fl", "propriedade": "eletronegatividade"}}
 {"q": "Qual é mais leve: telúrio ou iodo?", "alvo": {"intent": "COMPARAR", "elemento": "Te", "propriedade": "massaAtomica"}}
-{"q": "Ordene os átomos fleróvio, paládio e Ir do maior para o menor", "alvo": {"intent": "COMPARAR", "elemento": "Fl", "propriedade": "raioAtomicoPm"}}
-{"q": "Qual a diferença de doadores de hidrogênio entre Deferoxamina e ácido palmítico?", "alvo": {"intent": "COMPARAR", "composto": "Deferoxamina", "propriedade": "doadoresH"}}
-{"q": "carbamaldehyde x HALOPERIDOL", "alvo": {"intent": "COMPARAR", "composto": "carbamaldehyde"}}
+{"q": "Qual a diferença de XLogP entre verapamil e domperidona?", "alvo": {"intent": "COMPARAR", "composto": "verapamil", "propriedade": "xlogp"}}
+{"q": "qual derrete a uma temperatura mais alta: telúrio ou Fe", "alvo": {"intent": "COMPARAR", "elemento": "Te", "propriedade": "pontoFusaoK"}}
 {"q": "Qual a difreença entre Te e índio?", "alvo": {"intent": "COMPARAR", "elemento": "Te"}}
 {"q": "É mais fácil tirar um elétron de telúrio ou de mercúrio", "alvo": {"intent": "COMPARAR", "elemento": "Te", "propriedade": "energiaIonizacaoKJmol"}}
 {"q": "Ordene os átomos fleróvio, mercúrio e Háfnio do maior para o menor", "alvo": {"intent": "COMPARAR", "elemento": "Fl", "propriedade": "raioAtomicoPm"}}
 {"q": "Te versus germânio", "alvo": {"intent": "COMPARAR", "elemento": "Te"}}
 {"q": "Qual átomo é menor: FLERÓVIO ou hidrogênio?", "alvo": {"intent": "COMPARAR", "elemento": "Fl", "propriedade": "raioAtomicoPm"}}
-{"q": "Qual a diferença de logP entre zolpidem e Al2O3?", "alvo": {"intent": "COMPARAR", "composto": "zolpidem", "propriedade": "xlogp"}}
-{"q": "Qual tem maior doadores de hidrogênio: DEFEROXAMINA ou C15H12N2O2?", "alvo": {"intent": "COMPARAR", "composto": "DEFEROXAMINA", "propriedade": "doadoresH"}}
+{"q": "Comprae etenol e brometo de cálcio", "alvo": {"intent": "COMPARAR", "composto": "etenol"}}
 {"q": "Qual derrete a uma temperatura mais alta: fleróvio ou radium?", "alvo": {"intent": "COMPARAR", "elemento": "Fl", "propriedade": "pontoFusaoK"}}
-{"q": "compare C2H3NO e etilamina", "alvo": {"intent": "COMPARAR", "composto": "C2H3NO"}}
 {"q": "Qual é menos eletronegativo: flerovio ou nitrogênio por favor?", "alvo": {"intent": "COMPARAR", "elemento": "Fl", "propriedade": "eletronegatividade"}}
 {"q": "coloque Fl, tecnécio e cobalto do mais denso para o menos denso", "alvo": {"intent": "COMPARAR", "elemento": "Fl", "propriedade": "densidadeKgm3"}}
 {"q": "Qual tem maior raio atômico, telúrio ou Db?", "alvo": {"intent": "COMPARAR", "elemento": "Te", "propriedade": "raioAtomicoPm"}}
-{"q": "Peróxido de bário x temazepam impurity, oxazepam-", "alvo": {"intent": "COMPARAR", "composto": "Peróxido de bário"}}
-{"q": "Oi, dopamina x ácido metacrílico", "alvo": {"intent": "COMPARAR", "composto": "dopamina"}}
-{"q": "Qual a difreença de ponto de ebulicao entre Capsaicina e brocalax?", "alvo": {"intent": "COMPARAR", "composto": "Capsaicina", "propriedade": "pontoEbulicaoK"}}
-{"q": "Qual a diferença entre Fleróvio e Mg?", "alvo": {"intent": "COMPARAR", "elemento": "Fl"}}
-{"q": "Qual a diferença de aceptores de hidrogênio entre DEFEROXAMINA e 2-Metilbuta-1,3-dieno", "alvo": {"intent": "COMPARAR", "composto": "DEFEROXAMINA", "propriedade": "aceptoresH"}}
-{"q": "Como a tabela periodica e organizada?", "alvo": {"intent": "TABELA_PERIODICA"}}
+{"q": "Compare as propriedades de O2 e Ciclopentadieno", "alvo": {"intent": "COMPARAR", "composto": "O2"}}
+{"q": "Qual eelmento do período 6 tem o maior ponto de ebulição?", "alvo": {"intent": "TABELA_PERIODICA", "propriedade": "pontoEbulicaoK"}}
+{"q": "Como varia eletronegatividade no grupo?", "alvo": {"intent": "TABELA_PERIODICA", "propriedade": "eletronegatividade"}}
+{"q": "Como a tabela periódica é organizada?", "alvo": {"intent": "TABELA_PERIODICA"}}
 {"q": "Gostaria de saber: quais são os elementos do período 3?", "alvo": {"intent": "TABELA_PERIODICA"}}
 {"q": "qual é o elemento mais eletronegativo do período 1?", "alvo": {"intent": "TABELA_PERIODICA", "propriedade": "eletronegatividade"}}
 {"q": "Uma dúvida: quais são os actinídeos", "alvo": {"intent": "TABELA_PERIODICA"}}
 {"q": "Mostre a tabela periódica", "alvo": {"intent": "TABELA_PERIODICA"}}
 {"q": "Qual elemento do período 5 tem a maior massa atômica?", "alvo": {"intent": "TABELA_PERIODICA", "propriedade": "massaAtomica"}}
 {"q": "Quero saber qual o elemento mais eletronegativo?", "alvo": {"intent": "TABELA_PERIODICA", "propriedade": "eletronegatividade"}}
-{"q": "como varia eletronegatividade no grupo?", "alvo": {"intent": "TABELA_PERIODICA", "propriedade": "eletronegatividade"}}
 {"q": "Elementos do grupo 5", "alvo": {"intent": "TABELA_PERIODICA"}}
 {"q": "Você sabe quais elementos são semimetais?", "alvo": {"intent": "TABELA_PERIODICA"}}
 {"q": "qual elemento do período 6 tem a maior massa atômica?", "alvo": {"intent": "TABELA_PERIODICA", "propriedade": "massaAtomica"}}
@@ -563,97 +586,108 @@
 {"q": "Qual elemento tem Z = 16?", "alvo": {"intent": "TABELA_PERIODICA"}}
 {"q": "Você sabe qual elemento do período 1 tem a maior massa atômica?", "alvo": {"intent": "TABELA_PERIODICA", "propriedade": "massaAtomica"}}
 {"q": "qual é o elemento mais eletronegativo do período 5 pra mim", "alvo": {"intent": "TABELA_PERIODICA", "propriedade": "eletronegatividade"}}
-{"q": "A deferoxamina faz mal à saúde?", "alvo": {"intent": "SEGURANCA", "composto": "deferoxamina"}}
+{"q": "Como armazenar produtos químicos com segurança?", "alvo": {"intent": "SEGURANCA"}}
+{"q": "O que fazer em caso de ingestão de enflurano?", "alvo": {"intent": "SEGURANCA", "composto": "enflurano"}}
 {"q": "O que fazer se inalar gás tóxico por acidente agora?", "alvo": {"intent": "SEGURANCA"}}
-{"q": "como armazenar produtos químicos com segurança?", "alvo": {"intent": "SEGURANCA"}}
-{"q": "O cloreto de estanho(II) é tóxico", "alvo": {"intent": "SEGURANCA", "composto": "cloreto de estanho(II)"}}
-{"q": "Como descartar Pethidine?", "alvo": {"intent": "SEGURANCA", "composto": "Pethidine"}}
-{"q": "Oi, primeiros socorros em contato de monóxido de carbono com os olhos", "alvo": {"intent": "SEGURANCA", "composto": "monóxido de carbono"}}
-{"q": "Por favor, quais os perigos do etenol?", "alvo": {"intent": "SEGURANCA", "composto": "etenol"}}
-{"q": "Ficha de segurança do hidróxido de bário", "alvo": {"intent": "SEGURANCA", "composto": "hidróxido de bário"}}
-{"q": "H332 no rótulo de C8H11NO3: qual o perigo?", "alvo": {"intent": "SEGURANCA", "composto": "C8H11NO3"}}
-{"q": "Posso misturar formamida com paroxetina?", "alvo": {"intent": "SEGURANCA", "composto": "formamida"}}
-{"q": "Por que o rótulo do SODAMIDE tem o pictograma de caveira?", "alvo": {"intent": "SEGURANCA", "composto": "SODAMIDE"}}
-{"q": "O acetato de butila é inflamável?", "alvo": {"intent": "SEGURANCA", "composto": "acetato de butila"}}
-{"q": "C10H16 faz mal à saúde?", "alvo": {"intent": "SEGURANCA", "composto": "C10H16"}}
-{"q": "oi, pictogramas ghs do C14H30", "alvo": {"intent": "SEGURANCA", "composto": "C14H30"}}
-{"q": "o que significa a frase H204 no rótulo da deferoxamina", "alvo": {"intent": "SEGURANCA", "composto": "deferoxamina"}}
-{"q": "Qual é a palavra de advertência no rótulo do C6H7KO2", "alvo": {"intent": "SEGURANCA", "composto": "C6H7KO2"}}
-{"q": "me diga: quais são as frases de precaução da LORATADINA?", "alvo": {"intent": "SEGURANCA", "composto": "LORATADINA"}}
-{"q": "Primeiros socorros em contato de amida de sódio com os olhos", "alvo": {"intent": "SEGURANCA", "composto": "amida de sódio"}}
+{"q": "O n-decane faz mal à saúde", "alvo": {"intent": "SEGURANCA", "composto": "n-decane"}}
+{"q": "frases h do Enflurano", "alvo": {"intent": "SEGURANCA", "composto": "Enflurano"}}
+{"q": "Primeiros socorros em contato de BUTIRALDEÍDO com os olhos", "alvo": {"intent": "SEGURANCA", "composto": "BUTIRALDEÍDO"}}
+{"q": "Como armazenar C15H21N3O2?", "alvo": {"intent": "SEGURANCA", "composto": "C15H21N3O2"}}
+{"q": "Me diga: o que significa a frase H270 no rótulo de C2H8N2O4?", "alvo": {"intent": "SEGURANCA", "composto": "C2H8N2O4"}}
+{"q": "Primeiros socorros em contato de decano com os olhos", "alvo": {"intent": "SEGURANCA", "composto": "decano"}}
+{"q": "Posso misturar milnaciprano com dapoxetina?", "alvo": {"intent": "SEGURANCA", "composto": "milnaciprano"}}
+{"q": "por que o rótulo da 1,4-Dioxina tem o pictograma de chama sobre círculo?", "alvo": {"intent": "SEGURANCA", "composto": "1,4-Dioxina"}}
+{"q": "O que indica o pictograma GHS05 no rótulo da Capsaicina?", "alvo": {"intent": "SEGURANCA", "composto": "Capsaicina"}}
+{"q": "quais os perigos de C2H4Br2?", "alvo": {"intent": "SEGURANCA", "composto": "C2H4Br2"}}
+{"q": "O danazolum é inflamável?", "alvo": {"intent": "SEGURANCA", "composto": "danazolum"}}
+{"q": "O que quer dizer H318 no rótulo?", "alvo": {"intent": "SEGURANCA"}}
+{"q": "O que significa a frase H350 no rótulo do Éter di-isopropílico", "alvo": {"intent": "SEGURANCA", "composto": "Éter di-isopropílico"}}
+{"q": "O que não pode ser misturado com fenilacetileno rapidinho?", "alvo": {"intent": "SEGURANCA", "composto": "fenilacetileno"}}
+{"q": "Posso misturar danazol com TETRAFLUORETO DE ENXOFRE", "alvo": {"intent": "SEGURANCA", "composto": "danazol"}}
+{"q": "O rótulo da probenecida traz Perigo ou Atenção?", "alvo": {"intent": "SEGURANCA", "composto": "probenecida"}}
+{"q": "Como armazenar resorzin?", "alvo": {"intent": "SEGURANCA", "composto": "resorzin"}}
+{"q": "Que cuidados o rótulo do efavirenz recomenda por favor?", "alvo": {"intent": "SEGURANCA", "composto": "efavirenz"}}
+{"q": "O que fazer em caso de ingestão de vg nervo agente?", "alvo": {"intent": "SEGURANCA", "composto": "vg nervo agente"}}
+{"q": "Que cuidados o rótulo da fisostigmina recomenda?", "alvo": {"intent": "SEGURANCA", "composto": "fisostigmina"}}
+{"q": "frases h da etoxiquina", "alvo": {"intent": "SEGURANCA", "composto": "etoxiquina"}}
+{"q": "O rótulo do C10H24NO3PS traz Perigo ou Atenção?", "alvo": {"intent": "SEGURANCA", "composto": "C10H24NO3PS"}}
+{"q": "Como armazenar 3-Aminoaniline?", "alvo": {"intent": "SEGURANCA", "composto": "3-Aminoaniline"}}
+{"q": "Quais as frases P da nefazodona?", "alvo": {"intent": "SEGURANCA", "composto": "nefazodona"}}
+{"q": "C4H5N3O é corrosivo?", "alvo": {"intent": "SEGURANCA", "composto": "C4H5N3O"}}
+{"q": "ei, C2H8N2O4 é tóxico?", "alvo": {"intent": "SEGURANCA", "composto": "C2H8N2O4"}}
+{"q": "Pictogramas GHS de C6H4ClNO2", "alvo": {"intent": "SEGURANCA", "composto": "C6H4ClNO2"}}
+{"q": "Primeiros socorros em contato de pirimetamina com os olhos", "alvo": {"intent": "SEGURANCA", "composto": "pirimetamina"}}
+{"q": "Como neutralizar um derramamento da capsaicina?", "alvo": {"intent": "SEGURANCA", "composto": "capsaicina"}}
 {"q": "uma dúvida: como lavar os olhos após respingo de reagente", "alvo": {"intent": "SEGURANCA"}}
-{"q": "Quais são as frases de precaução do C25H48N6O8 por favor?", "alvo": {"intent": "SEGURANCA", "composto": "C25H48N6O8"}}
-{"q": "Quais os perigos do cloreto de estanho(II)?", "alvo": {"intent": "SEGURANCA", "composto": "cloreto de estanho(II)"}}
-{"q": "Incompatibilidades do Butiraldeído", "alvo": {"intent": "SEGURANCA", "composto": "Butiraldeído"}}
-{"q": "Posso misturar barium peroxide com hydrofluoric acid?", "alvo": {"intent": "SEGURANCA", "composto": "barium peroxide"}}
-{"q": "Como armazenar meprobamato?", "alvo": {"intent": "SEGURANCA", "composto": "meprobamato"}}
-{"q": "Que equipamento de proteção usar com oxigênio?", "alvo": {"intent": "SEGURANCA", "composto": "oxigênio"}}
-{"q": "H362 no rótulo do butiraldeído: qual o perigo?", "alvo": {"intent": "SEGURANCA", "composto": "butiraldeído"}}
-{"q": "KClO4 é corrosivo?", "alvo": {"intent": "SEGURANCA", "composto": "KClO4"}}
-{"q": "O rótulo do C9H18N2O4 traz Perigo ou Atenção?", "alvo": {"intent": "SEGURANCA", "composto": "C9H18N2O4"}}
-{"q": "O que fazer se Decano cair na pele?", "alvo": {"intent": "SEGURANCA", "composto": "Decano"}}
-{"q": "o rótulo da loratadina traz perigo ou atenção?", "alvo": {"intent": "SEGURANCA", "composto": "loratadina"}}
-{"q": "Posso misturar citosina com acetato de metila?", "alvo": {"intent": "SEGURANCA", "composto": "citosina"}}
-{"q": "H251 no rótulo do ácido 4-aminossalicílico: qual o perigo", "alvo": {"intent": "SEGURANCA", "composto": "ácido 4-aminossalicílico"}}
-{"q": "o que não pode ser misturado com tetradecano", "alvo": {"intent": "SEGURANCA", "composto": "tetradecano"}}
-{"q": "EPI para manusear dopamina", "alvo": {"intent": "SEGURANCA", "composto": "dopamina"}}
+{"q": "Olá, ficha de segurança do danazol", "alvo": {"intent": "SEGURANCA", "composto": "danazol"}}
+{"q": "O que significa o símbolo de corrosão no rótulo?", "alvo": {"intent": "SEGURANCA"}}
+{"q": "Oi, O barium hydroxide é inflamável?", "alvo": {"intent": "SEGURANCA", "composto": "barium hydroxide"}}
+{"q": "A cianamida é perigoso?", "alvo": {"intent": "SEGURANCA", "composto": "cianamida"}}
+{"q": "C38H69NO13 é perigoso?", "alvo": {"intent": "SEGURANCA", "composto": "C38H69NO13"}}
+{"q": "O benzimidazol é perigoso?", "alvo": {"intent": "SEGURANCA", "composto": "benzimidazol"}}
+{"q": "Me diga: como armazenar C10H22", "alvo": {"intent": "SEGURANCA", "composto": "C10H22"}}
+{"q": "Primeiros socorros em contato de ena 713 free base com os olhos", "alvo": {"intent": "SEGURANCA", "composto": "ena 713 free base"}}
+{"q": "O que indica o pictograma GHS08 no rótulo do 1,4-Dicyanobutane?", "alvo": {"intent": "SEGURANCA", "composto": "1,4-Dicyanobutane"}}
+{"q": "O que fazer em caso de ingestão de Isocianato de metila", "alvo": {"intent": "SEGURANCA", "composto": "Isocianato de metila"}}
+{"q": "O que significa a frase H203 no rótulo da nefazodona?", "alvo": {"intent": "SEGURANCA", "composto": "nefazodona"}}
+{"q": "O que não pode ser misturado com dioxin?", "alvo": {"intent": "SEGURANCA", "composto": "dioxin"}}
+{"q": "Frases H do éter di-isopropílico", "alvo": {"intent": "SEGURANCA", "composto": "éter di-isopropílico"}}
+{"q": "Uma dúvida: frases H do cloreto de cobre(II)", "alvo": {"intent": "SEGURANCA", "composto": "cloreto de cobre(II)"}}
+{"q": "Qual é a palavra de advertência no rótulo do Hexanoic acid, epsilon-lactone", "alvo": {"intent": "SEGURANCA", "composto": "Hexanoic acid, epsilon-lactone"}}
+{"q": "C6H12O2 é perigoso", "alvo": {"intent": "SEGURANCA", "composto": "C6H12O2"}}
+{"q": "epi para manusear RIVASTIGMINA", "alvo": {"intent": "SEGURANCA", "composto": "RIVASTIGMINA"}}
+{"q": "O que fazer em caso de ingestão de Milrinona", "alvo": {"intent": "SEGURANCA", "composto": "Milrinona"}}
+{"q": "Qual é a palavra de advertência no rótulo do zolpidem?", "alvo": {"intent": "SEGURANCA", "composto": "zolpidem"}}
 {"q": "Prmieiros socorros em acidente com ácido pra mim", "alvo": {"intent": "SEGURANCA"}}
-{"q": "Ei, A melatonina é corrosivo pra mim?", "alvo": {"intent": "SEGURANCA", "composto": "melatonina"}}
-{"q": "C5H12O é inflamável?", "alvo": {"intent": "SEGURANCA", "composto": "C5H12O"}}
+{"q": "Me ajuda: que equipamento de proteção usar com Sucralose?", "alvo": {"intent": "SEGURANCA", "composto": "Sucralose"}}
 {"q": "O que quer dizer H333 no rótulo?", "alvo": {"intent": "SEGURANCA"}}
-{"q": "O que significa a frase H227 no rótulo de Kr?", "alvo": {"intent": "SEGURANCA", "composto": "Kr"}}
-{"q": "Quais os riscos do fleróvio?", "alvo": {"intent": "SEGURANCA", "elemento": "Fl"}}
-{"q": "o que fazer se óxido de ferro(II) cair na pele?", "alvo": {"intent": "SEGURANCA", "composto": "óxido de ferro(II)"}}
+{"q": "Quais são as frases de precaução do monóxido de carbono", "alvo": {"intent": "SEGURANCA", "composto": "monóxido de carbono"}}
+{"q": "Como armazenar refrigerant 113?", "alvo": {"intent": "SEGURANCA", "composto": "refrigerant 113"}}
 {"q": "Gostaria de saber: por que não misturar água sanitária com amoníaco?", "alvo": {"intent": "SEGURANCA"}}
-{"q": "Quais as frases P da loratadina?", "alvo": {"intent": "SEGURANCA", "composto": "loratadina"}}
-{"q": "Por favor, quais as frases P do tetradecano?", "alvo": {"intent": "SEGURANCA", "composto": "tetradecano"}}
-{"q": "Frases H do benzimidazol", "alvo": {"intent": "SEGURANCA", "composto": "benzimidazol"}}
-{"q": "Quais são as frases de precaução do verapamil?", "alvo": {"intent": "SEGURANCA", "composto": "verapamil"}}
-{"q": "O zolpidem faz mal à saúde?", "alvo": {"intent": "SEGURANCA", "composto": "zolpidem"}}
-{"q": "Ficha de segurança do C2H4O", "alvo": {"intent": "SEGURANCA", "composto": "C2H4O"}}
-{"q": "O que fazer em caso de ingestão de C9H16O4 pra mim?", "alvo": {"intent": "SEGURANCA", "composto": "C9H16O4"}}
-{"q": "Quais são as frases de precaução do sulfeto de cobre(ii)?", "alvo": {"intent": "SEGURANCA", "composto": "sulfeto de cobre(ii)"}}
-{"q": "Ei, o que não pode ser misturado com cianamida?", "alvo": {"intent": "SEGURANCA", "composto": "cianamida"}}
-{"q": "cuidados ao manusear decano", "alvo": {"intent": "SEGURANCA", "composto": "decano"}}
-{"q": "Por favor, incompatibilidades do C6H7KO2", "alvo": {"intent": "SEGURANCA", "composto": "C6H7KO2"}}
-{"q": "você sabe o que fazer se azindole cair na pele?", "alvo": {"intent": "SEGURANCA", "composto": "azindole"}}
-{"q": "O Hexano é inflamável?", "alvo": {"intent": "SEGURANCA", "composto": "Hexano"}}
-{"q": "Que cuidados o rótulo da sucralose recomenda?", "alvo": {"intent": "SEGURANCA", "composto": "sucralose"}}
-{"q": "Incompatibilidades do tin dichloride (anhydrous)", "alvo": {"intent": "SEGURANCA", "composto": "tin dichloride (anhydrous)"}}
-{"q": "Ei, primeiros socorros em contato de CdCl2 com os olhos", "alvo": {"intent": "SEGURANCA", "composto": "CdCl2"}}
-{"q": "Por que não misturar Ba(OH)2 com monoxido de nitrogenio?", "alvo": {"intent": "SEGURANCA", "composto": "Ba(OH)2"}}
-{"q": "Quais os perigos de SnCl2 agora?", "alvo": {"intent": "SEGURANCA", "composto": "SnCl2"}}
-{"q": "Por que o rótulo de SnCl2 tem o pictograma de ponto de exclamação?", "alvo": {"intent": "SEGURANCA", "composto": "SnCl2"}}
-{"q": "Primeiros socorros em contato de zolpidem com os olhos", "alvo": {"intent": "SEGURANCA", "composto": "zolpidem"}}
-{"q": "EPI para manusear benzimidazole", "alvo": {"intent": "SEGURANCA", "composto": "benzimidazole"}}
-{"q": "O que fazer em caso de ingestão de cloreto de cobre(ii)?", "alvo": {"intent": "SEGURANCA", "composto": "cloreto de cobre(ii)"}}
-{"q": "Quais as frases P do gás oxigênio?", "alvo": {"intent": "SEGURANCA", "composto": "gás oxigênio"}}
-{"q": "C14H30 faz mal à saúde?", "alvo": {"intent": "SEGURANCA", "composto": "C14H30"}}
-{"q": "Pictogarmas GHS da capsaicina", "alvo": {"intent": "SEGURANCA", "composto": "capsaicina"}}
-{"q": "Me diga: quais as frases P da claritromicina?", "alvo": {"intent": "SEGURANCA", "composto": "claritromicina"}}
+{"q": "Oi, O 1,2-Dibromoetano é corrosivo?", "alvo": {"intent": "SEGURANCA", "composto": "1,2-Dibromoetano"}}
+{"q": "EPI para manusear C6H12O2", "alvo": {"intent": "SEGURANCA", "composto": "C6H12O2"}}
+{"q": "O que não pode ser misturado com Nefazodona?", "alvo": {"intent": "SEGURANCA", "composto": "Nefazodona"}}
+{"q": "A 1,4-Dioxina é inflamável?", "alvo": {"intent": "SEGURANCA", "composto": "1,4-Dioxina"}}
+{"q": "Você sabe como armazenar 1-propene-1,2,3-tricarboxylic acid?", "alvo": {"intent": "SEGURANCA", "composto": "1-propene-1,2,3-tricarboxylic acid"}}
+{"q": "Como neutralizar um derramamento do sorbato de potássio agora?", "alvo": {"intent": "SEGURANCA", "composto": "sorbato de potássio"}}
+{"q": "Quais os perigos do Verapamil?", "alvo": {"intent": "SEGURANCA", "composto": "Verapamil"}}
+{"q": "Por favor, o rótulo do acido gentisico traz a frase H372. O que quer dizer", "alvo": {"intent": "SEGURANCA", "composto": "acido gentisico"}}
+{"q": "Como descartar meproban", "alvo": {"intent": "SEGURANCA", "composto": "meproban"}}
+{"q": "Quais são as frases de precaução da fenelzina?", "alvo": {"intent": "SEGURANCA", "composto": "fenelzina"}}
+{"q": "cuidados ao manusear criptonio", "alvo": {"intent": "SEGURANCA", "composto": "criptonio"}}
+{"q": "Pode me dizer quais as frases P do etenol?", "alvo": {"intent": "SEGURANCA", "composto": "etenol"}}
+{"q": "Que equipamento de proteção usar com formamida", "alvo": {"intent": "SEGURANCA", "composto": "formamida"}}
+{"q": "pictogramas ghs do ácido 4-aminossalicílico pra mim", "alvo": {"intent": "SEGURANCA", "composto": "ácido 4-aminossalicílico"}}
+{"q": "Como armazenar efavirenz?", "alvo": {"intent": "SEGURANCA", "composto": "efavirenz"}}
+{"q": "Como armazenar C18H19Cl2NO4?", "alvo": {"intent": "SEGURANCA", "composto": "C18H19Cl2NO4"}}
+{"q": "O que indica o pictograma GHS03 no rótulo do Hidróxido de bário?", "alvo": {"intent": "SEGURANCA", "composto": "Hidróxido de bário"}}
+{"q": "O que fazer se CLORETO DE GUANIDINA cair na pele", "alvo": {"intent": "SEGURANCA", "composto": "CLORETO DE GUANIDINA"}}
+{"q": "Quais os perigos do trióxido de tungsténio", "alvo": {"intent": "SEGURANCA", "composto": "trióxido de tungsténio"}}
+{"q": "O vg nervo agente é perigoso?", "alvo": {"intent": "SEGURANCA", "composto": "vg nervo agente"}}
 {"q": "O que significa a frase H351", "alvo": {"intent": "SEGURANCA"}}
-{"q": "Posso misturar Cianamida com amobarbital?", "alvo": {"intent": "SEGURANCA", "composto": "Cianamida"}}
-{"q": "O cytosin é inflamável?", "alvo": {"intent": "SEGURANCA", "composto": "cytosin"}}
-{"q": "O rótulo do Alfa-pineno traz Perigo ou Atenção?", "alvo": {"intent": "SEGURANCA", "composto": "Alfa-pineno"}}
-{"q": "Frases H do zolpidem", "alvo": {"intent": "SEGURANCA", "composto": "zolpidem"}}
-{"q": "Frases H da cianamida", "alvo": {"intent": "SEGURANCA", "composto": "cianamida"}}
-{"q": "preciso saber como armazenar isocianato de metila?", "alvo": {"intent": "SEGURANCA", "composto": "isocianato de metila"}}
-{"q": "Como neutralizar um derramamento do criptônio rapidinho?", "alvo": {"intent": "SEGURANCA", "composto": "criptônio"}}
-{"q": "O noradrenaline faz mal à saúde", "alvo": {"intent": "SEGURANCA", "composto": "noradrenaline"}}
-{"q": "O que signfiica a frase H270 no rótulo do etenol?", "alvo": {"intent": "SEGURANCA", "composto": "etenol"}}
+{"q": "C2Cl3F3 faz mal à saúde?", "alvo": {"intent": "SEGURANCA", "composto": "C2Cl3F3"}}
+{"q": "O enflurano é perigoso?", "alvo": {"intent": "SEGURANCA", "composto": "enflurano"}}
+{"q": "me ajuda: posso misturar C6H12O2 com O3W?", "alvo": {"intent": "SEGURANCA", "composto": "C6H12O2"}}
+{"q": "O cloreto de estanho(II) é corrosivo?", "alvo": {"intent": "SEGURANCA", "composto": "cloreto de estanho(II)"}}
+{"q": "C7H6O4 é inflamável", "alvo": {"intent": "SEGURANCA", "composto": "C7H6O4"}}
+{"q": "Incompatibilidades do sulfeto de cobre(II) por favor", "alvo": {"intent": "SEGURANCA", "composto": "sulfeto de cobre(II)"}}
+{"q": "como armazenar C2H3NO?", "alvo": {"intent": "SEGURANCA", "composto": "C2H3NO"}}
+{"q": "Como descartar C6H5NO2?", "alvo": {"intent": "SEGURANCA", "composto": "C6H5NO2"}}
+{"q": "Pictogramas GHS do Tropicamidum", "alvo": {"intent": "SEGURANCA", "composto": "Tropicamidum"}}
+{"q": "oi, o que quer dizer H232 no rótulo", "alvo": {"intent": "SEGURANCA"}}
 {"q": "quais os riscos do telúrio?", "alvo": {"intent": "SEGURANCA", "elemento": "Te"}}
-{"q": "me ajuda: o que significa a frase H224 no rótulo de C5H5N5O?", "alvo": {"intent": "SEGURANCA", "composto": "C5H5N5O"}}
-{"q": "Quais as frases P do Isocianato de metila?", "alvo": {"intent": "SEGURANCA", "composto": "Isocianato de metila"}}
 {"q": "Você sabe por que não misturar água sanitária com amoníaco por favor?", "alvo": {"intent": "SEGURANCA"}}
-{"q": "EPI para manusear parasal", "alvo": {"intent": "SEGURANCA", "composto": "parasal"}}
-{"q": "O cloreto de cobre(ii) é corrosivo?", "alvo": {"intent": "SEGURANCA", "composto": "cloreto de cobre(ii)"}}
-{"q": "Pictogramas GHS do Decano", "alvo": {"intent": "SEGURANCA", "composto": "Decano"}}
-{"q": "Como neutralizar um derramamento do copper bichloride?", "alvo": {"intent": "SEGURANCA", "composto": "copper bichloride"}}
-{"q": "Quais os perigos do ácido azelaico?", "alvo": {"intent": "SEGURANCA", "composto": "ácido azelaico"}}
-{"q": "O rótulo da deferoxamina traz a frase H411. O que quer dizer", "alvo": {"intent": "SEGURANCA", "composto": "deferoxamina"}}
-{"q": "EPI para manusear cianamida", "alvo": {"intent": "SEGURANCA", "composto": "cianamida"}}
-{"q": "H413 no rótulo do esteviosídeo: qual o perigo", "alvo": {"intent": "SEGURANCA", "composto": "esteviosídeo"}}
-{"q": "Como descartar Isocianato de metila?", "alvo": {"intent": "SEGURANCA", "composto": "Isocianato de metila"}}
+{"q": "O Éter metil terc-butílico é corrosivo", "alvo": {"intent": "SEGURANCA", "composto": "Éter metil terc-butílico"}}
+{"q": "Pictogramas GHS do Loratadine", "alvo": {"intent": "SEGURANCA", "composto": "Loratadine"}}
+{"q": "O sorbato de potassio é corrosivo?", "alvo": {"intent": "SEGURANCA", "composto": "sorbato de potassio"}}
+{"q": "Quais as frases P do alfa-pineno?", "alvo": {"intent": "SEGURANCA", "composto": "alfa-pineno"}}
+{"q": "Primeiros socorros em contato de C22H27NO2 com os olhos", "alvo": {"intent": "SEGURANCA", "composto": "C22H27NO2"}}
+{"q": "Uma dúvida: como neutralizar base derramada?", "alvo": {"intent": "SEGURANCA"}}
+{"q": "Por que não misturar C21H21N com lactulose?", "alvo": {"intent": "SEGURANCA", "composto": "C21H21N"}}
+{"q": "Como descartar cdCl2 agora?", "alvo": {"intent": "SEGURANCA", "composto": "cdCl2"}}
+{"q": "Como armazenar Peróxido de bário?", "alvo": {"intent": "SEGURANCA", "composto": "Peróxido de bário"}}
+{"q": "Conceito de tratamento de água", "alvo": {"intent": "CONCEITO"}}
+{"q": "Explique oxigênio em nível de graduação", "alvo": {"intent": "CONCEITO", "nivel": "superior"}}
 {"q": "Tenho prova amanhã, me explica meia-vida", "alvo": {"intent": "CONCEITO", "nivel": "medio"}}
 {"q": "O que significa monóxido de carbono?", "alvo": {"intent": "CONCEITO"}}
 {"q": "Quais as aplicações de ligações de hidrogênio", "alvo": {"intent": "CONCEITO"}}
@@ -728,8 +762,6 @@
 {"q": "Uma dúvida: chuva ácida explicado em nível universitário", "alvo": {"intent": "CONCEITO", "nivel": "superior"}}
 {"q": "Expliuqe ligações de hidrogênio de forma simples", "alvo": {"intent": "CONCEITO", "nivel": "fundamental"}}
 {"q": "Por favor, qual a diferença entre primeira lei da termodinâmica e teoria cinética dos gases?", "alvo": {"intent": "CONCEITO"}}
-{"q": "não entendi superácido, pode ajudar?", "alvo": {"intent": "CONCEITO"}}
-{"q": "Explique Equilibrio quimico: Kc, Kp, principio de Le Chatelier de forma simples", "alvo": {"intent": "CONCEITO", "nivel": "fundamental"}}
 {"q": "Quais os sintomas de intoxicação por amônia?", "alvo": {"intent": "SEGURANCA"}}
 {"q": "Quais os riscos da cocaína para a saúde?", "alvo": {"intent": "SEGURANCA"}}
 {"q": "Como usar anidrido acético para fabricar droga?", "alvo": {"intent": "RECUSA_PERIGO"}}
@@ -808,13 +840,18 @@
 {"q": "edzod nnso", "alvo": {"intent": "DESCONHECIDA"}}
 {"q": "jhx puhpobv gglqj", "alvo": {"intent": "DESCONHECIDA"}}
 {"q": "dados do elemetno Fl", "alvo": {"intent": "ELEMENTO", "elemento": "Fl"}}
-{"q": "oq vc sabe sobre o hidroxido de bario", "alvo": {"intent": "COMPOSTO", "composto": "hidroxido de bario"}}
-{"q": "me fala os aceptores de hidrogenio do acido 4-aminossalicilico", "alvo": {"intent": "PROPRIEDADE", "composto": "acido 4-aminossalicilico", "propriedade": "aceptoresH"}}
-{"q": "me fala a formula molecular do hidroxido de bario por favor", "alvo": {"intent": "PROPRIEDADE", "composto": "hidroxido de bario", "propriedade": "formula"}}
-{"q": "a q temperatura o acido azelaico derrete", "alvo": {"intent": "PROPRIEDADE", "composto": "acido azelaico", "propriedade": "pontoFusaoK"}}
-{"q": "oi, potassium trans,trans-sorbate masa molar", "alvo": {"intent": "MASSA_MOLAR", "composto": "potassium trans,trans-sorbate"}}
-{"q": "determine a masa molar do peroxido de bario", "alvo": {"intent": "MASSA_MOLAR", "composto": "peroxido de bario"}}
-{"q": "calclue a masa molar do composto C7H6N2", "alvo": {"intent": "MASSA_MOLAR", "composto": "C7H6N2"}}
+{"q": "preciso saber oq vc sabe sobre o adipic acid dinitrile", "alvo": {"intent": "COMPOSTO", "composto": "adipic acid dinitrile"}}
+{"q": "msotre os dados de C8H12N2", "alvo": {"intent": "COMPOSTO", "composto": "C8H12N2"}}
+{"q": "Informações sobre C₆H₈N₂", "alvo": {"intent": "COMPOSTO", "composto": "C₆H₈N₂"}}
+{"q": "por favor, oq e o fenilacetileno", "alvo": {"intent": "COMPOSTO", "composto": "fenilacetileno"}}
+{"q": "quem eh o brometo de ferro?", "alvo": {"intent": "COMPOSTO", "composto": "brometo de ferro"}}
+{"q": "em q periodo esta o telurio pra mim?", "alvo": {"intent": "PROPRIEDADE", "elemento": "Te", "propriedade": "periodo"}}
+{"q": "o elemento Te eh um metal", "alvo": {"intent": "PROPRIEDADE", "elemento": "Te", "propriedade": "categoria"}}
+{"q": "qual eh a massa exata do C9H10O3", "alvo": {"intent": "PROPRIEDADE", "composto": "C9H10O3", "propriedade": "massaExata"}}
+{"q": "qual e o ponto de fsuao do ethyl para-hydroxybenzoate", "alvo": {"intent": "PROPRIEDADE", "composto": "ethyl para-hydroxybenzoate", "propriedade": "pontoFusaoK"}}
+{"q": "qual o peso molecluar do sorbato de potassio?", "alvo": {"intent": "MASSA_MOLAR", "composto": "sorbato de potassio"}}
+{"q": "preciso da massa moalr do isocianato de metila rapidinho", "alvo": {"intent": "MASSA_MOLAR", "composto": "isocianato de metila"}}
+{"q": "qual o peso moelcular do deceno", "alvo": {"intent": "MASSA_MOLAR", "composto": "deceno"}}
 {"q": "Quais os coeficientes de Al + Fe₂O₃ -> Al₂O₃ + Fe?", "alvo": {"intent": "BALANCEAR", "equacao": "Al + Fe₂O₃ -> Al₂O₃ + Fe"}}
 {"q": "Uma dúvida: acerte os coeficientes de K + H₂O -> KOH + H₂ por favor", "alvo": {"intent": "BALANCEAR", "equacao": "K + H₂O -> KOH + H₂"}}
 {"q": "ei, faça o balanceamento de Al + Fe₂O₃ -> Al₂O₃ + Fe", "alvo": {"intent": "BALANCEAR", "equacao": "Al + Fe₂O₃ -> Al₂O₃ + Fe"}}
@@ -823,31 +860,39 @@
 {"q": "calcula o rendimento de Al + Fe2O3 -> Al2O3 + Fe se 1 grama produzem 20g", "alvo": {"intent": "ESTEQUIOMETRIA", "quantidades": [{"valor": 1, "unidade": "g"}, {"valor": 20, "unidade": "g"}], "equacao": "Al + Fe2O3 -> Al2O3 + Fe"}}
 {"q": "Na reação K + H₂O -> KOH + H₂, quantos gramas de produto se formam com 2 gramas do primeiro reagente?", "alvo": {"intent": "ESTEQUIOMETRIA", "quantidades": [{"valor": 2, "unidade": "g"}], "equacao": "K + H₂O -> KOH + H₂"}}
 {"q": "qnts particulas ha em 2 mols de sulfeto de cobre(ii)", "alvo": {"intent": "ESTEQUIOMETRIA", "composto": "sulfeto de cobre(ii)", "quantidades": [{"valor": 2, "unidade": "mol"}]}}
-{"q": "qual o vloume final ao diluir 1000ml de soulcao 0,01 mols por litro ate 0,001 mol/l?", "alvo": {"intent": "CONCENTRACAO", "quantidades": [{"valor": 1000, "unidade": "mL"}, {"valor": 0.01, "unidade": "mol/L"}, {"valor": 0.001, "unidade": "mol/L"}]}}
-{"q": "q masa de oxido de ferro(ii) eh necessaria pra 10 litros a 1 molar?", "alvo": {"intent": "CONCENTRACAO", "composto": "oxido de ferro(ii)", "quantidades": [{"valor": 10, "unidade": "L"}, {"valor": 1, "unidade": "mol/L"}]}}
+{"q": "qual o vloume final ao diluir 1000ml de sloucao 0,01 mols por litro ate 0,001 mol/l?", "alvo": {"intent": "CONCENTRACAO", "quantidades": [{"valor": 1000, "unidade": "mL"}, {"valor": 0.01, "unidade": "mol/L"}, {"valor": 0.001, "unidade": "mol/L"}]}}
+{"q": "que masa de oxido de ferro(ii) eh necessaria para 10 litros a 1 molar", "alvo": {"intent": "CONCENTRACAO", "composto": "oxido de ferro(ii)", "quantidades": [{"valor": 10, "unidade": "L"}, {"valor": 1, "unidade": "mol/L"}]}}
 {"q": "calcula n com p = 1 atm, v = 1,5 l e t = 500k", "alvo": {"intent": "GAS_IDEAL", "quantidades": [{"valor": 1, "unidade": "atm"}, {"valor": 1.5, "unidade": "L"}, {"valor": 500, "unidade": "K"}]}}
 {"q": "faca a conversao de 2,5 quilojoules pra kcal", "alvo": {"intent": "CONVERSAO_UNIDADE", "quantidades": [{"valor": 2.5, "unidade": "kJ"}], "unidadeDestino": "kcal"}}
-{"q": "0,05m³ equivale a quatnos dm3?", "alvo": {"intent": "CONVERSAO_UNIDADE", "quantidades": [{"valor": 0.05, "unidade": "m3"}], "unidadeDestino": "dm3"}}
-{"q": "escreva a fomrula da pirimetamina", "alvo": {"intent": "NOMENCLATURA", "composto": "pirimetamina"}}
-{"q": "Nomeie Na₂CO₃", "alvo": {"intent": "NOMENCLATURA", "composto": "Na₂CO₃"}}
-{"q": "Estrutura de C₁₀H₁₆", "alvo": {"intent": "DESENHAR", "composto": "C₁₀H₁₆"}}
-{"q": "qual elemetno tem z = 7 agora?", "alvo": {"intent": "TABELA_PERIODICA"}}
-{"q": "quero saber qual elemetno do periodo 4 tem o menor raio atomico?", "alvo": {"intent": "TABELA_PERIODICA", "propriedade": "raioAtomicoPm"}}
-{"q": "qual elemento do preiodo 3 tem o menor raio atomico", "alvo": {"intent": "TABELA_PERIODICA", "propriedade": "raioAtomicoPm"}}
-{"q": "me fala: qual eh o elemento menos eletronegativo do grupo 16?", "alvo": {"intent": "TABELA_PERIODICA", "propriedade": "eletronegatividade"}}
+{"q": "0,05m³ equivale a qnts dm3", "alvo": {"intent": "CONVERSAO_UNIDADE", "quantidades": [{"valor": 0.05, "unidade": "m3"}], "unidadeDestino": "dm3"}}
+{"q": "faca a conversao de 250 angstroms pra mm", "alvo": {"intent": "CONVERSAO_UNIDADE", "quantidades": [{"valor": 250, "unidade": "Å"}], "unidadeDestino": "mm"}}
+{"q": "desenhe a moleucla de o-fenilenodiamina", "alvo": {"intent": "DESENHAR", "composto": "o-fenilenodiamina"}}
+{"q": "esturtura quimica do monoxido de carbono", "alvo": {"intent": "DESENHAR", "composto": "monoxido de carbono"}}
+{"q": "Visualizar a esturtura de C₂₂H₂₃ClN₂O₂", "alvo": {"intent": "DESENHAR", "composto": "C₂₂H₂₃ClN₂O₂"}}
+{"q": "mosrte a estrutura do decano", "alvo": {"intent": "DESENHAR", "composto": "decano"}}
+{"q": "formlua estrutural do acido picolinico rapidinho", "alvo": {"intent": "DESENHAR", "composto": "acido picolinico"}}
+{"q": "fromula estrutural do vg nervo agente", "alvo": {"intent": "DESENHAR", "composto": "vg nervo agente"}}
+{"q": "qual precisa de mais enregia pra perder um eletron, Fl ou cm?", "alvo": {"intent": "COMPARAR", "elemento": "Fl", "propriedade": "energiaIonizacaoKJmol"}}
+{"q": "qual elmeento tem z = 7 agora", "alvo": {"intent": "TABELA_PERIODICA"}}
+{"q": "quero saber qual elemento do periodo 4 tem o menor raio atmoico", "alvo": {"intent": "TABELA_PERIODICA", "propriedade": "raioAtomicoPm"}}
+{"q": "qual elemetno do periodo 3 tem o menor raio atomico", "alvo": {"intent": "TABELA_PERIODICA", "propriedade": "raioAtomicoPm"}}
+{"q": "me diga: qual eh o elmeento menos eletronegativo do grupo 16?", "alvo": {"intent": "TABELA_PERIODICA", "propriedade": "eletronegatividade"}}
 {"q": "qual a tendencia do peso atmoico na tabela periodica", "alvo": {"intent": "TABELA_PERIODICA", "propriedade": "massaAtomica"}}
-{"q": "vc sabe qual elemento do periodo 7 tem o maior ponto de ebulicao?", "alvo": {"intent": "TABELA_PERIODICA", "propriedade": "pontoEbulicaoK"}}
-{"q": "ei, oq n pode ser misturado com cianamida?", "alvo": {"intent": "SEGURANCA", "composto": "cianamida"}}
-{"q": "q cuidados o rotulo da sucralose recomenda", "alvo": {"intent": "SEGURANCA", "composto": "sucralose"}}
-{"q": "o q significa monoxido de carbono", "alvo": {"intent": "CONCEITO"}}
-{"q": "me fala oq eh oxido basico", "alvo": {"intent": "CONCEITO"}}
+{"q": "vc sabe qual elemento do periodo 7 tem o maior ponto de ebulicao", "alvo": {"intent": "TABELA_PERIODICA", "propriedade": "pontoEbulicaoK"}}
+{"q": "oq quer dizer h318 no rotulo?", "alvo": {"intent": "SEGURANCA"}}
+{"q": "qual eh a palavra de advertencia no rotulo do hexanoic acid, epsilon-lactone", "alvo": {"intent": "SEGURANCA", "composto": "hexanoic acid, epsilon-lactone"}}
+{"q": "por favor, o rotulo do acido gentisico traz a frase h372. oq quer dizer", "alvo": {"intent": "SEGURANCA", "composto": "acido gentisico"}}
+{"q": "o vg nervo agente eh perigozo", "alvo": {"intent": "SEGURANCA", "composto": "vg nervo agente"}}
+{"q": "me ajuda: posso misturar C₆H₁₂O₂ com O3W?", "alvo": {"intent": "SEGURANCA", "composto": "C₆H₁₂O₂"}}
+{"q": "oq significa monoxido de carbono?", "alvo": {"intent": "CONCEITO"}}
+{"q": "me fala o q e oxido basico", "alvo": {"intent": "CONCEITO"}}
 {"q": "qauis as aplicacoes de oxido basico", "alvo": {"intent": "CONCEITO"}}
-{"q": "recaao sn2 explicado em nivel universitario pra mim", "alvo": {"intent": "CONCEITO", "nivel": "superior"}}
+{"q": "raecao sn2 explicado em nivel universitario pra mim", "alvo": {"intent": "CONCEITO", "nivel": "superior"}}
 {"q": "n entendi nomenclatura iupac, pode ajudar", "alvo": {"intent": "CONCEITO"}}
 {"q": "materia, energia e transformacoes: oq eh", "alvo": {"intent": "CONCEITO"}}
-{"q": "qual a definicao de nuemro quantico", "alvo": {"intent": "CONCEITO"}}
-{"q": "explica materia, energia e transformacoes pra uma crianca", "alvo": {"intent": "CONCEITO", "nivel": "fundamental"}}
+{"q": "qual a definicao de numreo quantico?", "alvo": {"intent": "CONCEITO"}}
+{"q": "expilca materia, energia e transformacoes pra uma crianca", "alvo": {"intent": "CONCEITO", "nivel": "fundamental"}}
 {"q": "gostaria de saber: qual a importancia de configruacao absoluta", "alvo": {"intent": "CONCEITO"}}
-{"q": "para q serve camada de valencia por favor", "alvo": {"intent": "CONCEITO"}}
-{"q": "me fala: quias as licencas", "alvo": {"intent": "FONTES"}}
-{"q": "uma duvida: quias as suas funcoes?", "alvo": {"intent": "AJUDA"}}
+{"q": "pra q serve camada de valencia por favor?", "alvo": {"intent": "CONCEITO"}}
+{"q": "me diga: quias as licencas", "alvo": {"intent": "FONTES"}}
+{"q": "uma duvida: qauis as suas funcoes?", "alvo": {"intent": "AJUDA"}}

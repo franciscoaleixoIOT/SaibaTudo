@@ -261,12 +261,18 @@ def trocar_atomicamente(novo: Path, destino: Path):
     tinha = destino.exists()
     if tinha:
         os.replace(destino, antigo)
-    try:
-        os.replace(novo, destino)
-    except OSError:
-        if tinha:
-            os.replace(antigo, destino)
-        raise
+    # Windows: o antivírus ou um editor com a pasta aberta segura a árvore recém-escrita por alguns segundos e o rename dá
+    # "Acesso negado" (aconteceu no build de 2.000 compostos, 12/10/2026): tenta de novo antes de desfazer a troca
+    for tentativa in range(6):
+        try:
+            os.replace(novo, destino)
+            break
+        except OSError:
+            if tentativa == 5:
+                if tinha:
+                    os.replace(antigo, destino)
+                raise
+            time.sleep(2 * (tentativa + 1))
     if antigo.exists():
         shutil.rmtree(antigo, ignore_errors=True)
 

@@ -4,7 +4,7 @@
 
 ## 1. Pacote de dados (`data/quimica/`)
 - [x] **Pacote real assinado com o núcleo completo da lista fixa** (491 compostos, 1787 textos): `python pipeline/build.py --alvo 491 --assinar-com secrets/data_signing_key.pem` (o build sem limite, alvo 2000, continua válido para ampliar depois). `Pacote válido: 20261010T234125Z-...`.
-- [~] **Ampliar o núcleo de compostos** (11/10/2026): 491 → **978** (alvo 1.000 com `--pubchem-offline`, filtro de segurança e remoção de duplicatas). Para chegar a 2.000: rodar `python pipeline/build.py --alvo 2000 --assinar-com secrets/data_signing_key.pem` quando o PubChem liberar o IP (ele dá 429 por horas depois de ~1.000 consultas de GHS) e então subir o `--alvo` do `quimica-data-refresh.yml`. Pendentes do mesmo build: desempate de CAS do SnO₂ e do tetraborato (precisa dos sinônimos do PubChem).
+- [x] **Núcleo de compostos ampliado para 1.971** (12/10/2026; alvo 2.000 menos duplicatas e exclusões). O `quimica-data-refresh.yml` agora roda `--alvo 2000 --paciente` (timeout 300 min) e **nunca publica um pacote com menos compostos que o versionado**. Lições: o PubChem bloqueia o PUG View (GHS) por horas quando o próprio serviço está em `Black`; trocar o IP destrava na hora; `--pubchem-offline` refaz do cache em segundos; o rename atômico no Windows precisa de retentativas (antivírus/editor seguram a pasta).
 - [ ] Conferir `fontes.json` e `manifest.licencas` contra a seção 5 de `FONTES_E_LICENCAS.md` (nada de "CC BY 4.0" para OpenStax; Wikimedia e Gold Book CC BY-SA; ChEBI CC BY).
 - [x] `python -m unittest discover -s pipeline/tests` (83, verde).
 

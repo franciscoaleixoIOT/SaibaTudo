@@ -279,7 +279,8 @@ def numeros_do_texto(texto: str, ignorar=()) -> list:
     "H220" nem "H2S" de "GHS02", o que exporia números falsos)."""
     t = texto
     for s in sorted({x for x in ignorar if x}, key=len, reverse=True):
-        t = re.sub(r"(?<![\w])" + re.escape(s) + r"(?![\w])", " ", t)
+        # sem distinguir maiúsculas: o nome registrado pode vir em minúscula ("1,1'-bi-2-naftol") e no texto com maiúscula
+        t = re.sub(r"(?<![\w])" + re.escape(s) + r"(?![\w])", " ", t, flags=re.IGNORECASE)
     return [m.group(1) for m in NUM_RE.finditer(t)]
 
 

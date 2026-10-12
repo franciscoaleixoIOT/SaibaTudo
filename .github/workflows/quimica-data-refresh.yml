@@ -3,7 +3,8 @@ name: Química — Atualização semanal dos dados
 # Reconstrói, valida, assina e publica o pacote de dados de química SEM nova versão do app.
 # Cadência: toda semana (domingo 03:00 de Brasília = 06:00 UTC) e sob demanda. As fontes mudam devagar (PubChem, CODATA,
 # Wikidata, ChEBI, Wikipédia), por isso semanal; o pacote só é publicado se o build mudou algo (hash do manifesto).
-# Alvo de 1000 compostos (lista fixa + os mais populares do Wikidata): o alvo padrão de 2000 dispara o limite do PubChem (429).
+# Alvo de 2000 compostos em modo paciente (espera os bloqueios 429 do PubChem). Um pacote com MENOS compostos que o versionado nunca
+# é publicado: o PubChem bloqueia os runners do GitHub e um build parcial substituiria o pacote maior feito localmente.
 # Repositório único: segredos e variáveis com sufixo/prefixo QUIMICA (os sem sufixo são de eleições).
 # Como no app de eleições: testes de INTEGRIDADE bloqueiam a publicação; testes de COMPORTAMENTO só avisam.
 on:
@@ -34,7 +35,7 @@ defaults:
 jobs:
   atualizar:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 300
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_QUIMICA }}
@@ -68,12 +69,20 @@ jobs:
           mkdir -p secrets
           printf '%s' "${{ secrets.DATA_SIGNING_KEY_QUIMICA }}" > secrets/data_signing_key.pem
           ANTES=$(sha256sum data/quimica/manifest.json 2>/dev/null | cut -c1-64 || echo nenhum)
-          ARGS="--alvo 1000"
+          ARGS="--alvo 2000 --paciente"
           if [ "${{ inputs.rapido }}" = "true" ]; then ARGS="--rapido"; fi
           python pipeline/build.py --assinar-com secrets/data_signing_key.pem $ARGS
           python pipeline/sign.py verify data/quimica/manifest.json --public pipeline/data_signing_public.pem
           DEPOIS=$(sha256sum data/quimica/manifest.json | cut -c1-64)
-          echo "mudou=$([ "$ANTES" != "$DEPOIS" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          N_ANTES=$(git show HEAD:data/quimica/manifest.json 2>/dev/null | python -c "import json,sys; print(json.load(sys.stdin)['contagens']['compostos'])" 2>/dev/null || echo 0)
+          N_DEPOIS=$(python -c "import json; print(json.load(open('data/quimica/manifest.json'))['contagens']['compostos'])")
+          if [ "$N_DEPOIS" -lt "$N_ANTES" ]; then
+            echo "::warning::Pacote novo tem $N_DEPOIS compostos, menos que os $N_ANTES versionados: NAO sera publicado (restaurando o versionado)."
+            git checkout -- data/quimica
+            echo "mudou=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "mudou=$([ "$ANTES" != "$DEPOIS" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Remover a chave de assinatura
         if: always()
