@@ -185,6 +185,14 @@ class HttpCache:
         return Resposta(meta.get("status", 200), corpo, cab, url, True, meta.get("buscadoEm", 0.0))
 
     # ---- rede ----
+    def _avisar_throttling(self, host, controle):
+        """Registra (uma vez por faixa) o medidor do PubChem e a taxa nova, para o log do build mostrar quando ele aperta."""
+        faixa = "Black" if "Black" in controle else "Red" if "Red" in controle else "Yellow"
+        avisados = self.stats.setdefault("throttling", {})
+        if avisados.get(host) != faixa:
+            avisados[host] = faixa
+            self.log(f"  [http] {host}: X-Throttling-Control {faixa} ({controle}); taxa reduzida para {self.limitador.limites.get(host, self.limitador.padrao) / 2:.2f} req/s")
+
     def _requisitar(self, url, dados, cabecalhos, etag, last_mod):
         host = urllib.parse.urlparse(url).netloc
         h = {"User-Agent": USER_AGENT, "Accept-Encoding": "gzip"}
@@ -208,10 +216,16 @@ class HttpCache:
                     if cab.get("content-encoding", "").lower() == "gzip":
                         corpo = gzip.decompress(corpo)
                     controle = cab.get("x-throttling-control", "")  # PubChem: Green/Yellow/Red/Black
+                    # além da pausa, REDUZ a taxa do host pelo resto da execução: o bloqueio do IP (429 por horas) vinha depois de
+                    # ~450 consultas PUG View seguidas a 2 req/s, sem que a pausa pontual bastasse (12/10/2026)
                     if "Black" in controle or "Red" in controle:
-                        self.dormir(10)
+                        self._avisar_throttling(host, controle)
+                        self.limitador.reduzir(host, fator=0.5, minimo=0.25)
+                        self.dormir(30)
                     elif "Yellow" in controle:
-                        self.dormir(2)
+                        self._avisar_throttling(host, controle)
+                        self.limitador.reduzir(host, fator=0.5, minimo=0.5)
+                        self.dormir(5)
                     return r.status, corpo, cab
             except urllib.error.HTTPError as e:
                 cab = {k.lower(): v for k, v in (e.headers.items() if e.headers else [])}

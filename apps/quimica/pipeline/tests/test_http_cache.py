@@ -115,10 +115,24 @@ class HttpCacheTest(unittest.TestCase):
         self.assertEqual([x for x in self.rel.dormidos if x >= 30], [30, 60])
         self.assertLess(self.lim.limites["exemplo.org"], antes)
 
-    def test_pubchem_semaforo_vermelho_espera(self):
+    def test_pubchem_semaforo_vermelho_espera_e_reduz_a_taxa(self):
+        host = "pubchem.ncbi.nlm.nih.gov"
+        antes = self.lim.limites.get(host, self.lim.padrao)
         c = self.cliente(RespostaFalsa(corpo=b"ok", cab={"X-Throttling-Control": "Request Count status: Red (80%)"}))
-        c.get("https://pubchem.ncbi.nlm.nih.gov/rest/pug/x")
-        self.assertIn(10, self.rel.dormidos)
+        c.get(f"https://{host}/rest/pug/x")
+        self.assertIn(30, self.rel.dormidos)
+        self.assertEqual(self.lim.limites[host], max(0.25, antes * 0.5), "Red: metade da taxa pelo resto da execução")
+        self.assertEqual(c.stats["throttling"], {host: "Red"})
+
+    def test_pubchem_semaforo_amarelo_ja_desacelera(self):
+        host = "pubchem.ncbi.nlm.nih.gov"
+        antes = self.lim.limites.get(host, self.lim.padrao)
+        c = self.cliente(RespostaFalsa(corpo=b"ok", cab={"X-Throttling-Control": "Request Time status: Yellow (60%)"}),
+                         RespostaFalsa(corpo=b"ok", cab={"X-Throttling-Control": "Request Time status: Yellow (65%)"}))
+        c.get(f"https://{host}/rest/pug/a")
+        c.get(f"https://{host}/rest/pug/b")
+        self.assertIn(5, self.rel.dormidos)
+        self.assertEqual(self.lim.limites[host], max(0.5, antes * 0.25), "duas respostas Yellow: taxa dividida duas vezes (até o mínimo)")
 
     def test_erro_definitivo_levanta_e_404_e_resposta(self):
         c = self.cliente(http_erro(403))
