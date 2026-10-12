@@ -19,6 +19,19 @@
   ],
   "wikidata": "Q283",
   "nomeIupac": "oxidane",
+  "nomes": {
+   "pt-BR": "Água",
+   "en": "water",
+   "es": "agua"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "dihydrogen monoxide"
+   ],
+   "es": [
+    "óxido de hidrógeno"
+   ]
+  },
   "formula": "H2O",
   "formulaHill": "H2O",
   "massaMolar": 18.015,
@@ -61,6 +74,21 @@
    "gas"
   ],
   "nomeIupac": "carbon dioxide",
+  "nomes": {
+   "pt-BR": "Dióxido de carbono",
+   "en": "carbon dioxide",
+   "es": "dióxido de carbono"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "carbonic anhydride",
+    "carbonic acid gas"
+   ],
+   "es": [
+    "anhídrido carbónico",
+    "gas carbónico"
+   ]
+  },
   "formula": "CO2",
   "formulaHill": "CO2",
   "massaMolar": 44.009,
@@ -93,6 +121,23 @@
    "sal"
   ],
   "nomeIupac": "sodium chloride",
+  "nomes": {
+   "pt-BR": "Cloreto de sódio",
+   "en": "sodium chloride",
+   "es": "cloruro de sodio"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "table salt",
+    "halite",
+    "rock salt"
+   ],
+   "es": [
+    "sal de mesa",
+    "sal común",
+    "halita"
+   ]
+  },
   "formula": "NaCl",
   "formulaHill": "ClNa",
   "massaMolar": 58.44,
@@ -129,6 +174,22 @@
    "carboidrato"
   ],
   "nomeIupac": "(2R,3R,4S,5S,6R)-6-(hydroxymethyl)oxane-2,3,4,5-tetrol",
+  "nomes": {
+   "pt-BR": "Glicose",
+   "en": "glucose",
+   "es": "glucosa"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "dextrose",
+    "grape sugar",
+    "blood sugar"
+   ],
+   "es": [
+    "dextrosa",
+    "azúcar de uva"
+   ]
+  },
   "formula": "C6H12O6",
   "formulaHill": "C6H12O6",
   "massaMolar": 180.156,
@@ -182,6 +243,20 @@
    "licenca": "CC BY 4.0"
   },
   "nomeIupac": "acetic acid",
+  "nomes": {
+   "pt-BR": "Ácido acético",
+   "en": "acetic acid",
+   "es": "ácido acético"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "ethanoic acid",
+    "glacial acetic acid"
+   ],
+   "es": [
+    "ácido etanoico"
+   ]
+  },
   "formula": "C2H4O2",
   "formulaHill": "C2H4O2",
   "massaMolar": 60.052,
@@ -237,6 +312,20 @@
    "licenca": "CC BY 4.0"
   },
   "nomeIupac": "ethanol",
+  "nomes": {
+   "pt-BR": "Etanol",
+   "en": "ethanol",
+   "es": "etanol"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "ethyl alcohol",
+    "grain alcohol"
+   ],
+   "es": [
+    "alcohol etílico"
+   ]
+  },
   "formula": "C2H6O",
   "formulaHill": "C2H6O",
   "massaMolar": 46.069,
@@ -291,6 +380,19 @@
    "base"
   ],
   "nomeIupac": "azane",
+  "nomes": {
+   "pt-BR": "Amônia",
+   "en": "ammonia",
+   "es": "amoníaco"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "azane"
+   ],
+   "es": [
+    "amoniaco"
+   ]
+  },
   "formula": "NH3",
   "formulaHill": "H3N",
   "massaMolar": 17.031,
@@ -342,6 +444,21 @@
   ],
   "wikidata": "Q18216",
   "nomeIupac": "2-acetyloxybenzoic acid",
+  "nomes": {
+   "pt-BR": "Ácido acetilsalicílico",
+   "en": "acetylsalicylic acid",
+   "es": "ácido acetilsalicílico"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "aspirin",
+    "ASA"
+   ],
+   "es": [
+    "aspirina",
+    "AAS"
+   ]
+  },
   "formula": "C9H8O4",
   "formulaHill": "C9H8O4",
   "massaMolar": 180.159,
@@ -388,6 +505,21 @@
   ],
   "icscBuscaUrl": "https://chemicalsafety.ilo.org/dyn/icsc/showcard.listCards3?p_lang=pt&p_cas_number=7664-93-9",
   "nomeIupac": "sulfuric acid",
+  "nomes": {
+   "pt-BR": "Ácido sulfúrico",
+   "en": "sulfuric acid",
+   "es": "ácido sulfúrico"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "oil of vitriol",
+    "battery acid",
+    "sulphuric acid"
+   ],
+   "es": [
+    "aceite de vitriolo"
+   ]
+  },
   "formula": "H2SO4",
   "formulaHill": "H2O4S",
   "massaMolar": 98.072,
@@ -430,6 +562,21 @@
    "base_forte"
   ],
   "nomeIupac": "sodium hydroxide",
+  "nomes": {
+   "pt-BR": "Hidróxido de sódio",
+   "en": "sodium hydroxide",
+   "es": "hidróxido de sodio"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "caustic soda",
+    "lye"
+   ],
+   "es": [
+    "sosa cáustica",
+    "soda cáustica"
+   ]
+  },
   "formula": "NaOH",
   "formulaHill": "HNaO",
   "massaMolar": 39.997,
@@ -479,6 +626,21 @@
    "acido_forte"
   ],
   "nomeIupac": "chlorane",
+  "nomes": {
+   "pt-BR": "Ácido clorídrico",
+   "en": "hydrogen chloride",
+   "es": "cloruro de hidrógeno"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "hydrochloric acid",
+    "muriatic acid"
+   ],
+   "es": [
+    "ácido clorhídrico",
+    "ácido muriático"
+   ]
+  },
   "formula": "HCl",
   "formulaHill": "ClH",
   "massaMolar": 36.458,
@@ -528,6 +690,19 @@
    "gas"
   ],
   "nomeIupac": "methane",
+  "nomes": {
+   "pt-BR": "Metano",
+   "en": "methane",
+   "es": "metano"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "marsh gas"
+   ],
+   "es": [
+    "gas de los pantanos"
+   ]
+  },
   "formula": "CH4",
   "formulaHill": "CH4",
   "massaMolar": 16.043,
@@ -580,6 +755,20 @@
    "aromatico"
   ],
   "nomeIupac": "benzene",
+  "nomes": {
+   "pt-BR": "Benzeno",
+   "en": "benzene",
+   "es": "benceno"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "benzol",
+    "cyclohexatriene"
+   ],
+   "es": [
+    "benzol"
+   ]
+  },
   "formula": "C6H6",
   "formulaHill": "C6H6",
   "massaMolar": 78.114,
@@ -628,6 +817,20 @@
    "organoclorado"
   ],
   "nomeIupac": "carbonyl dichloride",
+  "nomes": {
+   "pt-BR": "Fosgênio",
+   "en": "phosgene",
+   "es": "fosgeno"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "carbonyl chloride",
+    "carbonyl dichloride"
+   ],
+   "es": [
+    "cloruro de carbonilo"
+   ]
+  },
   "formula": "COCl2",
   "formulaHill": "CCl2O",
   "massaMolar": 98.916,
@@ -673,6 +876,21 @@
    "oxidante"
   ],
   "nomeIupac": "sodium hypochlorite",
+  "nomes": {
+   "pt-BR": "Hipoclorito de sódio",
+   "en": "sodium hypochlorite",
+   "es": "hipoclorito de sodio"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "bleach",
+    "liquid bleach"
+   ],
+   "es": [
+    "lejía",
+    "lavandina"
+   ]
+  },
   "formula": "NaOCl",
   "formulaHill": "ClNaO",
   "massaMolar": 74.439,

@@ -4,9 +4,23 @@ Inventário das fontes efetivamente usadas pelo pacote (gera `fontes.json`, exib
 `manifest.licencas`). Política: docs/FONTES_E_LICENCAS.md §5.
 
 Campos: id, nome, mantenedor, url, licenca, uso (dados | textos | link), acessadoEm, atribuicao e a lista de permissão
-(`exibir`, `dataset`, `treino`: sim | cond. | nao), que o CI deve checar (FONTES_E_LICENCAS §4.7.3).
+(`exibir`, `dataset`, `treino`: sim | cond. | nao), que o CI deve checar (FONTES_E_LICENCAS §4.7.3). Fontes de texto trazem
+`idioma` (código do projeto); há uma entrada por fonte E idioma (`wikipedia-pt`, `wikipedia-en`, ... — docs/I18N.md §4).
 """
 import quimica_util as Q
+
+NOME_WIKIPEDIA = {"pt-BR": "Wikipédia em português", "en": "Wikipedia (en)", "es": "Wikipedia (es)", "de": "Wikipedia (de)",
+                  "fr": "Wikipedia (fr)"}
+_WIKI_LANG = {"pt-BR": "pt", "en": "en", "es": "es", "de": "de", "fr": "fr"}
+
+
+def _wikipedia(idioma):
+    lang = _WIKI_LANG[idioma]
+    return {"id": f"wikipedia-{lang}", "nome": NOME_WIKIPEDIA[idioma], "mantenedor": "Wikimedia Foundation",
+            "url": f"https://{lang}.wikipedia.org/", "licenca": "CC BY-SA 4.0", "uso": "textos", "idioma": idioma,
+            "atribuicao": "Introdução de cada artigo, com link permanente (oldid) e lista de autores no histórico do artigo; "
+                          "derivados ficam sob CC BY-SA 4.0." + ("" if idioma == "pt-BR" else f" Texto no idioma do artigo ({idioma}), sem tradução."),
+            "exibir": "sim", "dataset": "sim", "treino": "sim"}
 
 FONTES = [
     {"id": "pubchem", "nome": "PubChem (NCBI/NLM)", "mantenedor": "National Library of Medicine / NCBI (EUA)",
@@ -31,23 +45,19 @@ FONTES = [
                    "(Anexo VI) lida via PubChem; classificações notificadas (ECHA C&L) e NITE-CMC não são usadas.",
      "exibir": "sim", "dataset": "sim", "treino": "sim"},
     {"id": "chebi", "nome": "ChEBI", "mantenedor": "EMBL-EBI", "url": "https://www.ebi.ac.uk/chebi/",
-     "licenca": "CC BY 4.0", "uso": "textos",
+     "licenca": "CC BY 4.0", "uso": "textos", "idioma": "en",
      "atribuicao": "Malik, A. et al. (2025). ChEBI: re-engineered for a sustainable future. Nucleic Acids Research. "
                    "Definições em inglês, sem tradução.",
      "exibir": "sim", "dataset": "sim", "treino": "sim"},
-    {"id": "wikipedia-pt", "nome": "Wikipédia em português", "mantenedor": "Wikimedia Foundation",
-     "url": "https://pt.wikipedia.org/", "licenca": "CC BY-SA 4.0", "uso": "textos",
-     "atribuicao": "Introdução de cada artigo, com link permanente (oldid) e lista de autores no histórico do artigo; "
-                   "derivados ficam sob CC BY-SA 4.0.",
-     "exibir": "sim", "dataset": "sim", "treino": "sim"},
+    _wikipedia("pt-BR"), _wikipedia("en"), _wikipedia("es"), _wikipedia("de"), _wikipedia("fr"),
     {"id": "wikibooks-pt", "nome": "Wikilivros (Wikibooks) em português", "mantenedor": "Wikimedia Foundation",
-     "url": "https://pt.wikibooks.org/", "licenca": "CC BY-SA 4.0", "uso": "textos",
+     "url": "https://pt.wikibooks.org/", "licenca": "CC BY-SA 4.0", "uso": "textos", "idioma": "pt-BR",
      "atribuicao": "Livros 'Introdução à Química', 'Química Orgânica' e 'Química inorgânica', com link permanente (oldid); "
                    "derivados ficam sob CC BY-SA 4.0.",
      "exibir": "sim", "dataset": "sim", "treino": "sim"},
     {"id": "gutenberg-14474", "nome": "Project Gutenberg #14474 — The Chemical History of a Candle (Faraday, 1861)",
      "mantenedor": "Project Gutenberg", "url": "https://www.gutenberg.org/ebooks/14474", "licenca": "domínio público",
-     "uso": "textos", "atribuicao": "Michael Faraday (1861), editado por William Crookes. Texto histórico em inglês.",
+     "uso": "textos", "idioma": "en", "atribuicao": "Michael Faraday (1861), editado por William Crookes. Texto histórico em inglês.",
      "exibir": "sim", "dataset": "sim", "treino": "sim"},
     {"id": "icsc-oit", "nome": "ICSC — Fichas Internacionais de Segurança Química (OIT/OMS)", "mantenedor": "OIT/OMS (versão em português: ACT, Portugal)",
      "url": "https://chemicalsafety.ilo.org/dyn/icsc/showcard.home",

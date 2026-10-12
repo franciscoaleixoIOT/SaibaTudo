@@ -44,11 +44,15 @@ export function distancia(a, b, max = 2) {
 /** Primeira letra maiúscula. */
 export const capitalizar = (s) => (s ? s[0].toUpperCase() + s.slice(1) : s);
 
-/** Junta com vírgulas e "e": ["a", "b", "c"] → "a, b e c". */
-export function listar(itens) {
+let CONJUNCAO = ' e ';
+/** Conjunção da lista ("a, b e c"): definida por i18n/index.js a cada troca de idioma (" e ", " and ", " y ", " und ", " et "). */
+export function definirConjuncaoLista(c) { CONJUNCAO = typeof c === 'string' && c ? c : ' e '; }
+
+/** Junta com vírgulas e a conjunção do idioma: ["a", "b", "c"] → "a, b e c". */
+export function listar(itens, conjuncao = CONJUNCAO) {
   const l = itens.filter((x) => x != null && x !== '');
   if (l.length <= 1) return l.join('');
-  return `${l.slice(0, -1).join(', ')} e ${l[l.length - 1]}`;
+  return `${l.slice(0, -1).join(', ')}${conjuncao}${l[l.length - 1]}`;
 }
 
 /** Plural simples para contagens: plural(2, 'elemento', 'elementos'). */

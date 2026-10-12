@@ -9,6 +9,24 @@ from pathlib import Path
 
 csv.field_size_limit(50_000_000)
 
+# Idiomas do pacote (docs/I18N.md): BCP 47, português do Brasil é o padrão e a referência.
+IDIOMAS = ["pt-BR", "en", "es", "de", "fr"]
+IDIOMA_PADRAO = "pt-BR"
+# código do idioma -> código do projeto Wikimedia (<lang>.wikipedia.org) e do rótulo do Wikidata
+WIKI_POR_IDIOMA = {"pt-BR": "pt", "en": "en", "es": "es", "de": "de", "fr": "fr"}
+
+
+def normalizar_idiomas(texto_ou_lista):
+    """'en,es' | ['en', 'es'] -> lista ordenada como em IDIOMAS, sempre com pt-BR na frente. Levanta ValueError se houver código desconhecido."""
+    if isinstance(texto_ou_lista, str):
+        pedidos = [x.strip() for x in texto_ou_lista.split(",") if x.strip()]
+    else:
+        pedidos = list(texto_ou_lista or [])
+    desconhecidos = [x for x in pedidos if x not in IDIOMAS]
+    if desconhecidos:
+        raise ValueError(f"idiomas desconhecidos: {desconhecidos} (válidos: {IDIOMAS})")
+    return [i for i in IDIOMAS if i == IDIOMA_PADRAO or i in pedidos]
+
 PLACEHOLDERS = {"#NE", "#NULO", "#NULO#", "-1", "-2", "-3", "-4", "-5", "NÃO DIVULGÁVEL",
                 "Não divulgável", "#DIVULGA", ""}
 

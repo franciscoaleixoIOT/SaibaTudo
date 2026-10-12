@@ -35,6 +35,10 @@ LIMITES_POR_HOST = {
     "chemicalsafety.ilo.org": 1.0,
     "www.ilo.org": 1.0,
     "pt.wikipedia.org": 1.0,
+    "en.wikipedia.org": 1.0,
+    "es.wikipedia.org": 1.0,
+    "de.wikipedia.org": 1.0,
+    "fr.wikipedia.org": 1.0,
     "pt.wikibooks.org": 1.0,
     "www.ebi.ac.uk": 0.1,  # robots.txt do EBI: Crawl-delay 10
 }
@@ -94,7 +98,10 @@ class LimitadorTaxa:
         self._trava = threading.Lock()
 
     def intervalo(self, host):
-        return 1.0 / self.limites.get(host, self.padrao)
+        taxa = self.limites.get(host)
+        if taxa is None and host.endswith((".wikipedia.org", ".wikibooks.org", ".wikimedia.org")):
+            taxa = 1.0  # qualquer projeto Wikimedia: 1 req/s em série (API:Etiquette)
+        return 1.0 / (taxa if taxa is not None else self.padrao)
 
     def reduzir(self, host, fator=0.6, minimo=0.5):
         """Depois de um 429, reduz a taxa do host pelo resto da execução (nunca abaixo de `minimo` req/s)."""

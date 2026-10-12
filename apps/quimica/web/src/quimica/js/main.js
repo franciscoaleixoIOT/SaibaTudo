@@ -1,5 +1,6 @@
 // Ponto de entrada do PWA /quimica/.
 import { iniciarApp, toast } from './app.js';
+import { t } from './i18n/index.js';
 
 /** Service worker: somente em HTTPS (produção) ou localhost. */
 function registrarServiceWorker() {
@@ -9,7 +10,7 @@ function registrarServiceWorker() {
   // só avisa quando o controlador anterior era o service worker do próprio app
   let anterior = navigator.serviceWorker.controller?.scriptURL ?? '';
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (anterior.endsWith('/quimica/sw.js')) toast('Nova versão do app instalada. Feche e reabra (ou recarregue) para usá-la.');
+    if (anterior.endsWith('/quimica/sw.js')) toast(t('ui.app.novaVersao'));
     anterior = navigator.serviceWorker.controller?.scriptURL ?? '';
   });
   window.addEventListener('load', () => {

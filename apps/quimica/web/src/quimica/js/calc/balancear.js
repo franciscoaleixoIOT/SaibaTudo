@@ -2,6 +2,9 @@
 // (mais uma linha de carga, quando há íons ou elétrons), obtém o espaço nulo e escala para os menores inteiros positivos.
 import { Frac, mdc, mmc } from './frac.js';
 import { ErroFormula, SIMBOLOS_SET, formulaTex, formulaUnicode, normalizarEntrada, ordemHill, parseFormula } from './formula.js';
+import { t } from '../i18n/index.js';
+
+const T = (chave, params) => t(`respostas.calc.balancear.${chave}`, params);
 
 const RX_SETA = /\s*(?:<=>|<->|<-->|⇌|⇄|-->|->|→|⟶|⇒|=>|==|=)\s*/;
 const RX_ELETRON = /^e(?:\^?[-−]|⁻)$/;
@@ -56,16 +59,16 @@ const uniEspecie = (coef, e) => `${coef > 1 ? coef + ' ' : ''}${e.eletron ? 'e�
  */
 export function lerEquacao(texto, { simbolos = SIMBOLOS_SET } = {}) {
   const bruto = String(texto ?? '').normalize('NFC').replace(/[−–—]/g, '-').trim();
-  if (!bruto) throw new ErroFormula('Digite a equação, por exemplo: Fe + O2 -> Fe2O3');
+  if (!bruto) throw new ErroFormula(T('digite'));
   const m = RX_SETA.exec(bruto);
-  if (!m) throw new ErroFormula('Não encontrei a seta da reação. Escreva reagentes -> produtos, por exemplo: H2 + O2 -> H2O');
+  if (!m) throw new ErroFormula(T('semSeta'));
   const esquerda = bruto.slice(0, m.index);
   const direita = bruto.slice(m.index + m[0].length);
-  if (RX_SETA.test(direita)) throw new ErroFormula('A equação tem mais de uma seta. Digite uma reação por vez.');
+  if (RX_SETA.test(direita)) throw new ErroFormula(T('duasSetas'));
   let digitou = false;
   const lerLado = (lado, nome) => {
     const itens = dividirEspecies(lado);
-    if (itens.length === 0) throw new ErroFormula(`Faltam os ${nome} da equação`);
+    if (itens.length === 0) throw new ErroFormula(T('faltam', { lado: T(nome) }));
     return itens.map((item) => {
       const { coef, corpo } = separarCoeficiente(item);
       if (coef != null) digitou = true;
@@ -75,7 +78,7 @@ export function lerEquacao(texto, { simbolos = SIMBOLOS_SET } = {}) {
         const f = parseFormula(corpo, { simbolos });
         return { corpo: f.texto, eletron: false, atomos: f.atomos, carga: f.carga, coefDigitado: coef, parsed: f };
       } catch (e) {
-        if (e instanceof ErroFormula) throw new ErroFormula(`Substância "${corpo}": ${e.message}`, e.posicao);
+        if (e instanceof ErroFormula) throw new ErroFormula(T('substancia', { corpo, msg: e.message }), e.posicao);
         throw e;
       }
     });
@@ -127,7 +130,7 @@ export function balancear(texto, { simbolos = SIMBOLOS_SET } = {}) {
   }
   const especies = [...eq.reagentes.map((e) => ({ ...e, lado: 'r' })), ...eq.produtos.map((e) => ({ ...e, lado: 'p' }))];
   const n = especies.length;
-  if (n > 40) return { ok: false, erro: 'Equação grande demais (máximo de 40 substâncias).' };
+  if (n > 40) return { ok: false, erro: T('grande') };
   const elementos = ordemHill(new Set(especies.flatMap((e) => [...e.atomos.keys()])));
   const temCarga = especies.some((e) => e.carga !== 0);
   const linhas = elementos.map((el) => especies.map((e) => (e.lado === 'r' ? 1 : -1) * (e.atomos.get(el) ?? 0)));
@@ -137,18 +140,18 @@ export function balancear(texto, { simbolos = SIMBOLOS_SET } = {}) {
   for (const el of elementos) {
     const noR = especies.some((e) => e.lado === 'r' && e.atomos.has(el));
     const noP = especies.some((e) => e.lado === 'p' && e.atomos.has(el));
-    if (noR !== noP) return { ok: false, erro: `O elemento ${el} aparece só ${noR ? 'nos reagentes' : 'nos produtos'}: confira as fórmulas ou acrescente a substância que falta.` };
+    if (noR !== noP) return { ok: false, erro: T('soDeUmLado', { el, lado: noR ? 'r' : 'p' }) };
   }
 
   const { base } = espacoNulo(linhas, n);
-  if (base.length === 0) return { ok: false, erro: 'Não existe combinação de coeficientes que equilibre essa equação. Confira as fórmulas e as cargas.' };
+  if (base.length === 0) return { ok: false, erro: T('semCombinacao') };
   if (base.length > 1) {
-    return { ok: false, erro: 'A equação reúne mais de uma reação independente, então há várias maneiras de balanceá-la. Digite uma reação por vez.' };
+    return { ok: false, erro: T('varias') };
   }
   let v = base[0];
-  if (v.some((x) => x.zero)) return { ok: false, erro: 'Alguma substância ficaria com coeficiente zero: ela não participa da reação como escrita. Confira a equação.' };
+  if (v.some((x) => x.zero)) return { ok: false, erro: T('coefZero') };
   if (v.some((x) => x.sinal() < 0) && v.every((x) => x.sinal() <= 0)) v = v.map((x) => x.neg());
-  if (v.some((x) => x.sinal() < 0)) return { ok: false, erro: 'Os coeficientes não podem ser todos positivos: a equação, como escrita, não representa uma reação possível.' };
+  if (v.some((x) => x.sinal() < 0)) return { ok: false, erro: T('negativos') };
 
   // passos: valores com a variável livre = 1 → inteiros
   const fracs = v;
@@ -157,7 +160,7 @@ export function balancear(texto, { simbolos = SIMBOLOS_SET } = {}) {
   const g = inteiros.reduce((acc, x) => mdc(acc, x), 0n) || 1n;
   inteiros = inteiros.map((x) => x / g);
   const coefs = inteiros.map(Number);
-  if (coefs.some((c) => !Number.isSafeInteger(c) || c > 1e6)) return { ok: false, erro: 'Coeficientes grandes demais para esta equação.' };
+  if (coefs.some((c) => !Number.isSafeInteger(c) || c > 1e6)) return { ok: false, erro: T('coefGrandes') };
 
   const nome = (i) => NOME_VAR(i, n);
   const termos = (el, lado) => especies
@@ -171,35 +174,35 @@ export function balancear(texto, { simbolos = SIMBOLOS_SET } = {}) {
   const lhsLit = eq.reagentes.map((e, i) => `${nome(i)}\\,${e.eletron ? 'e^{-}' : formulaTex(e.corpo)}`).join(' + ');
   const rhsLit = eq.produtos.map((e, i) => `${nome(eq.reagentes.length + i)}\\,${e.eletron ? 'e^{-}' : formulaTex(e.corpo)}`).join(' + ');
   passos.push({
-    texto: 'Dê um coeficiente desconhecido a cada substância (letras) e escreva a equação com eles.',
+    texto: T('passo1'),
     tex: `${lhsLit} \\rightarrow ${rhsLit}`
   });
   const eqs = elementos.map((el) => ({ rot: `\\mathrm{${el}}`, tex: `${montar(termos(el, 'r'))} = ${montar(termos(el, 'p'))}` }));
-  if (temCarga) eqs.push({ rot: '\\text{carga}', tex: `${montar(termos('__carga__', 'r'))} = ${montar(termos('__carga__', 'p'))}` });
+  if (temCarga) eqs.push({ rot: `\\text{${T('carga')}}`, tex: `${montar(termos('__carga__', 'r'))} = ${montar(termos('__carga__', 'p'))}` });
   passos.push({
-    texto: `Para cada ${temCarga ? 'elemento (e para a carga elétrica)' : 'elemento'}, a quantidade de átomos tem de ser igual nos dois lados:`,
+    texto: T('passo2', { carga: temCarga }),
     tex: eqs.map((q) => `${q.rot}:\\; ${q.tex}`),
     lista: true
   });
   const fixado = fracs.map((x, i) => `${nome(i)} = ${texFrac(x)}`).join(',\\; ');
   passos.push({
-    texto: 'Resolva o sistema (eliminação de Gauss com frações exatas), escolhendo uma das incógnitas como 1:',
+    texto: T('passo3'),
     tex: fixado
   });
   if (denominadores !== 1n || g !== 1n) {
     passos.push({
-      texto: `${denominadores !== 1n ? `Multiplique tudo por ${denominadores} (o mínimo múltiplo comum dos denominadores)` : 'Divida pelo maior divisor comum'} para obter os menores números inteiros:`,
+      texto: T('passo4', { mmc: denominadores !== 1n, den: String(denominadores) }),
       tex: coefs.map((c, i) => `${nome(i)} = ${c}`).join(',\\; ')
     });
   } else {
-    passos.push({ texto: 'Os valores já são os menores números inteiros:', tex: coefs.map((c, i) => `${nome(i)} = ${c}`).join(',\\; ') });
+    passos.push({ texto: T('passo4Ja'), tex: coefs.map((c, i) => `${nome(i)} = ${c}`).join(',\\; ') });
   }
 
   const R = eq.reagentes.map((e, i) => ({ ...e, coef: coefs[i] }));
   const P = eq.produtos.map((e, i) => ({ ...e, coef: coefs[eq.reagentes.length + i] }));
   const equacao = `${R.map((e) => uniEspecie(e.coef, e)).join(' + ')} → ${P.map((e) => uniEspecie(e.coef, e)).join(' + ')}`;
   const equacaoTex = `${R.map((e) => texEspecie(e.coef, e)).join(' + ')} \\rightarrow ${P.map((e) => texEspecie(e.coef, e)).join(' + ')}`;
-  passos.push({ texto: 'Equação balanceada:', tex: equacaoTex, destaque: true });
+  passos.push({ texto: T('balanceada'), tex: equacaoTex, destaque: true });
 
   const verificacao = elementos.map((el) => {
     const esq = R.reduce((a, e) => a + e.coef * (e.atomos.get(el) ?? 0), 0);
@@ -212,7 +215,7 @@ export function balancear(texto, { simbolos = SIMBOLOS_SET } = {}) {
     verificacao.push({ elemento: 'carga', esquerda: esq, direita: dir, ok: esq === dir });
   }
   passos.push({
-    texto: 'Conferência (reagentes = produtos): ' + verificacao.map((x) => `${x.elemento === 'carga' ? 'carga' : x.elemento} ${x.esquerda} = ${x.direita}`).join('; ') + '.'
+    texto: T('conferencia') + verificacao.map((x) => `${x.elemento === 'carga' ? T('carga') : x.elemento} ${x.esquerda} = ${x.direita}`).join('; ') + '.'
   });
 
   return {

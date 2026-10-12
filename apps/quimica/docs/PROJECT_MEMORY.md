@@ -125,6 +125,17 @@ Lição: os agentes trabalharam em paralelo sobre o **contrato** (`DATA_CONTRACT
 - **Filtro de segurança (1d7ec3e):** ao completar o núcleo pela popularidade, ficam fora agentes de guerra química e drogas de uso proscrito (`pipeline/exclusoes.py`); a lista fixa e os medicamentos comuns ficam.
 - **Pendente** (ver `PENDENCIAS.md`): rótulo "raio de van der Waals" e escala da eletronegatividade no site/Android/dataset; energia de ionização (Ta, W, Os, Ir, Fr, Ac, Th) e afinidade eletrônica (15 elementos) desatualizadas no PubChem — rechecar em fonte aberta (Wikidata P2260 etc.); Bk (fusão), Tc/Mt (isótopo mais longevo), densidade de Tc/Cs/Am.
 
+## 6.f Internacionalização — etapas A, B e C (12/10/2026)
+Decisão do mantenedor: pt-BR padrão; en, es, de, fr com assistente completo; chinês depois; Eleições só em pt. Contrato em
+`docs/I18N.md`; estado em `PENDENCIAS.md` §12. Feito hoje: home em cinco idiomas no ar (`portal/`, proxy publicado); site com
+`js/i18n/` (catálogos), léxico compartilhado `contracts/lexico/<idioma>.json` gerado para `js/nlu/lex/` por `tools/gerar_lexico.py`
+(`--check` no teste), seletor de idioma, segurança nos cinco idiomas; pacote com nomes por idioma (Wikidata), GHS por idioma
+(EUR-Lex), Wikipédia en/es/de/fr e textos em lotes (`textos/index.json`; 2.742 → 56 arquivos). Build completo com PubChem do cache:
+`python pipeline/build.py --alvo 2000 --pubchem-offline --assinar-com secrets/data_signing_key.pem` (≈4 s com cache; a parte
+multilíngue custa ≈220 requisições a 1 req/s sem cache). Armadilha: apelidos do Wikidata podem ser palavras comuns ("PARA");
+`sinonimo_valido` e o dicionário do site descartam palavras funcionais dos cinco léxicos. Modelos dos subagentes por custo
+(pedido do mantenedor): haiku para o mecânico, sonnet para tradução/testes/portes, opus para arquitetura, fable só com o contexto inteiro.
+
 ## 7. Contas e segredos
 Vercel `saibatudo-quimica` (time `franciscoaleixo-9696`); GitHub `franciscoaleixoIOT`; Hugging Face `franciscoaleixo` (PRO, 40 min/dia de ZeroGPU); Modal `franciscoaleixo/main` (US$ 30/mês grátis; já usados pelo app de eleições, ~US$ 5/mês).
 `secrets/data_signing_key.pem` (nova, exclusiva deste app; pública em `pipeline/data_signing_public.pem`). Fazer backup offline. Nenhum outro segredo deste projeto existe ainda.

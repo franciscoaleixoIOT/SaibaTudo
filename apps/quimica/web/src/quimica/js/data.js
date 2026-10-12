@@ -2,6 +2,8 @@
 // manifesto, atualização com troca atômica. Fonte única: o próprio deploy (/quimica/data/). Funciona no navegador e no Node (fetchFn injetável).
 import { criarContexto } from './calc/contexto.js';
 import { chaveFormula } from './calc/formula.js';
+import { idiomaAtual } from './i18n/index.js';
+import { normalizarIdioma } from './i18n/idiomas.js';
 import { normalizar } from './texto.js';
 import { CHAVE_PUBLICA_B64, sha256Hex, subtleDisponivel, verificarManifesto } from './verify.js';
 
@@ -62,7 +64,7 @@ export function normalizarIndice(raw) {
   const novo = (cid, lote) => ({
     cid, lote: lote == null ? null : String(lote).replace(/^compostos\//, '').replace(/\.json$/, ''),
     nome: null, nomePopular: null, nomeIupac: null, sinonimos: [], formula: null, cas: null, massaMolar: null, icscBuscaUrl: null, nomePtPendente: false,
-    chaves: [], chavesF: []
+    nomes: null, sinonimosPorIdioma: null, chaves: [], chavesF: [], chavesPorIdioma: {}
   });
   const adicionar = (e) => {
     const cid = Number(e.cid);
@@ -78,11 +80,14 @@ export function normalizarIndice(raw) {
     if (typeof e.massaMolar === 'number') obj.massaMolar = e.massaMolar;
     obj.icscBuscaUrl = e.icscBuscaUrl ?? obj.icscBuscaUrl;
     obj.nomePtPendente = e.nomePtPendente === true || obj.nomePtPendente;
+    if (e.nomes && typeof e.nomes === 'object') obj.nomes = { ...(obj.nomes ?? {}), ...e.nomes };
+    if (e.sinonimosPorIdioma && typeof e.sinonimosPorIdioma === 'object') obj.sinonimosPorIdioma = { ...(obj.sinonimosPorIdioma ?? {}), ...e.sinonimosPorIdioma };
     return obj;
   };
-  const chave = (obj, nome) => {
+  const chave = (obj, nome, idioma = null) => {
     if (!obj || nome == null || nome === '') return;
     const k = normalizar(nome);
+    if (idioma) { const lista = (obj.chavesPorIdioma[idioma] ??= []); if (k && !lista.includes(k)) lista.push(k); return; }
     if (k && !obj.chaves.includes(k)) obj.chaves.push(k);
     const f = String(nome).trim();
     if (f && !/\s/.test(f)) { const kf = chaveFormula(f); if (kf && !obj.chavesF.includes(kf)) obj.chavesF.push(kf); }
@@ -101,6 +106,15 @@ export function normalizarIndice(raw) {
     if (nomes && typeof nomes === 'object') {
       const pares = Array.isArray(nomes) ? nomes.map((x) => (Array.isArray(x) ? x : [x?.nome ?? x?.n, x?.cid])) : Object.entries(nomes);
       for (const [nome, cid] of pares) chave(porCid.get(Number(cid)), nome);
+    }
+    // nomes por idioma (I18N.md §4): só as chaves que não estão em `nomes`; busca no idioma X = nomes ∪ nomesPorIdioma[X]
+    const porIdioma = raw.nomesPorIdioma;
+    if (porIdioma && typeof porIdioma === 'object' && !Array.isArray(porIdioma)) {
+      for (const [idioma, lista] of Object.entries(porIdioma)) {
+        const id = normalizarIdioma(idioma);
+        if (!id || !Array.isArray(lista)) continue;
+        for (const x of lista) { const [nome, cid] = Array.isArray(x) ? x : [x?.nome ?? x?.n, x?.cid]; chave(porCid.get(Number(cid)), nome, id); }
+      }
     }
   }
   return { entradas, porCid, temNomes: entradas.some((e) => e.nome != null) };
@@ -124,6 +138,7 @@ export class DataStore {
     this.assinatura = null;
     this.sig = { estado: 'indisponivel', detalhe: '' };
     this.origem = rotuloOrigem.indisponivel;
+    this.origemChave = 'indisponivel';
     this.elementos = [];
     this.porSimbolo = new Map();
     this.porZ = new Map();
@@ -228,6 +243,7 @@ export class DataStore {
       : subtleDisponivel() ? { estado: 'invalida', detalhe: 'A assinatura do manifesto não confere; usando os arquivos do próprio site.' }
         : { estado: 'indisponivel', detalhe: 'O navegador não oferece WebCrypto neste contexto (use HTTPS).' };
     this.origem = rotuloOrigem[this.sig.estado];
+    this.origemChave = this.sig.estado;
     const [elementos, regras, constantes, fontes, indice, ghs] = await Promise.all([
       this.carregar('elementos.json'),
       this._carregarOpcional('regras.json'),
@@ -246,13 +262,23 @@ export class DataStore {
     this.elementos = (Array.isArray(elementos) ? elementos : elementos?.elementos ?? []).filter((e) => e && e.simbolo && Number.isInteger(e.z)).sort((a, b) => a.z - b.z);
     this.porSimbolo = new Map(this.elementos.map((e) => [e.simbolo, e]));
     this.porZ = new Map(this.elementos.map((e) => [e.z, e]));
-    // frases H em português do pacote (ghs_frases.json, do Regulamento CLP) valem mais que as do aplicativo
+    // frases H do pacote (ghs_frases.json, do Regulamento CLP) valem mais que as do aplicativo: em pt-BR (`texto`) e por idioma
+    // (`textoPorIdioma` / `todasAsFrasesPorIdioma`, I18N.md §4), expostas em regras.frasesH e regras.frasesHPorIdioma
     const frases = {};
+    const porIdioma = {};
+    const guardar = (cod, idioma, t) => { const id = normalizarIdioma(idioma); if (id && typeof t === 'string' && t) (porIdioma[id] ??= {})[cod] = t; };
     for (const [cod, t] of Object.entries(ghs?.todasAsFrases ?? {})) if (typeof t === 'string') frases[cod] = t;
-    for (const [cod, v] of Object.entries(ghs?.frasesH ?? {})) { const t = typeof v === 'string' ? v : v?.texto; if (t) frases[cod] = t; }
+    for (const [cod, v] of Object.entries(ghs?.todasAsFrasesPorIdioma ?? {})) if (v && typeof v === 'object') for (const [idioma, t] of Object.entries(v)) guardar(cod, idioma, t);
+    for (const [cod, v] of Object.entries(ghs?.frasesH ?? {})) {
+      const t = typeof v === 'string' ? v : v?.texto;
+      if (t) frases[cod] = t;
+      if (v?.textoPorIdioma && typeof v.textoPorIdioma === 'object') for (const [idioma, tx] of Object.entries(v.textoPorIdioma)) guardar(cod, idioma, tx);
+    }
+    for (const cod of Object.keys(frases)) (porIdioma['pt-BR'] ??= {})[cod] ??= frases[cod];
     this.ghsFrases = ghs ?? null;
     this.fonteFrasesH = ghs?.fontes?.[0] ?? null;
-    this.regras = regras || Object.keys(frases).length ? { ...(regras ?? {}), ...(Object.keys(frases).length ? { frasesH: frases } : {}) } : null;
+    const extras = { ...(Object.keys(frases).length ? { frasesH: frases } : {}), ...(Object.keys(porIdioma).length ? { frasesHPorIdioma: porIdioma } : {}) };
+    this.regras = regras || Object.keys(extras).length ? { ...(regras ?? {}), ...extras } : null;
     this.constantes = constantes ?? null;
     this.fontes = fontes ?? null;
     this.indice = normalizarIndice(indice ?? {});
@@ -310,34 +336,64 @@ export class DataStore {
     const primeiro = this.indice.entradas.find((e) => e.lote === lotes[0]);
     await this.composto(primeiro.cid);
     return [...this._compostos.values()].filter((c) => this.indice.porCid.get(Number(c.cid))?.lote === lotes[0])
-      .sort((a, b) => String(a.nome ?? '').localeCompare(String(b.nome ?? ''), 'pt-BR')).slice(0, n);
+      .sort((a, b) => String(a.nome ?? '').localeCompare(String(b.nome ?? ''), idiomaAtual())).slice(0, n);
   }
 
   textosCaminhos() { return this.caminhos('textos/'); }
 
+  /** textos/index.json (I18N.md §4 "Textos em lotes"), ou null quando o pacote não o traz. */
+  async indiceDeTextos() {
+    if (this._indiceTextos === undefined) {
+      const bruto = await this._carregarOpcional('textos/index.json');
+      this._indiceTextos = bruto && Array.isArray(bruto.lotes) ? bruto : null;
+    }
+    return this._indiceTextos;
+  }
+
+  /** Idiomas de texto aceitos para um idioma pedido: ele próprio e, com reserva, inglês e depois português (nessa ordem de prioridade). */
+  static idiomasDeTexto(idioma, reserva) {
+    const id = normalizarIdioma(idioma) ?? 'pt-BR';
+    return reserva ? [...new Set([id, 'en', 'pt-BR'])] : [id];
+  }
+
   /**
-   * Trechos licenciados para o retrieval local de "O que é…?". Com `termos` (palavras da pergunta), carrega só os arquivos cujo NOME combina com algum
-   * termo; sem combinação carrega todos (os de textos/chebi/ ficam de fora: a definição do ChEBI já vem no registro do composto). Falhas individuais são ignoradas.
+   * Trechos licenciados para o retrieval local de "O que é…?", no idioma pedido (padrão: o ativo; `reserva` acrescenta inglês e português como
+   * reservas, sempre com `_idioma` em cada trecho para a interface rotular). Com `termos` (palavras da pergunta), carrega só os lotes/arquivos cuja
+   * chave ou título combina com algum termo; sem combinação carrega todos os do(s) idioma(s). Fontes: `textos/index.json` + lotes (quando existe) e,
+   * ainda, arquivos avulsos textos/<fonte>/<id>.json não listados no índice (formato antigo). Os de textos/chebi/ ficam de fora: a definição do
+   * ChEBI já vem no registro do composto. Falhas individuais são ignoradas.
    */
-  async textos(termos = null) {
-    const todos = this.textosCaminhos().filter((p) => !p.startsWith('textos/chebi/'));
-    const nome = (p) => normalizar(p.replace(/^textos\/[^/]+\//, '').replace(/\.json$/, ''));
+  async textos(termos = null, { idioma = idiomaAtual(), reserva = false } = {}) {
+    const idiomas = DataStore.idiomasDeTexto(idioma, reserva);
     const uteis = (termos ?? []).filter((x) => x.length >= 3);
-    const candidatos = uteis.length ? todos.filter((p) => uteis.some((x) => nome(p).includes(x))) : [];
-    const alvo = candidatos.length ? candidatos : todos;
+    const combina = (chaves) => !uteis.length || chaves.some((c) => uteis.some((x) => c.includes(x)));
     this._textosCache ??= new Map();
-    const fila = alvo.filter((p) => !this._textosCache.has(p));
+    const indice = await this.indiceDeTextos();
+    const lotes = (indice?.lotes ?? []).filter((l) => l?.caminho && this.arquivos.has(l.caminho) && !/^textos\/chebi\//.test(l.caminho) && String(l.fonte ?? '') !== 'chebi');
+    const emLote = new Set(lotes.map((l) => l.caminho));
+    const idiomaDoLote = (l) => normalizarIdioma(l.idioma) ?? 'pt-BR';
+    const chavesDoLote = (l) => (l.trechos ?? []).flatMap((x) => [normalizar(x.chave ?? ''), normalizar(x.titulo ?? '')]).filter(Boolean);
+    const lotesAlvo = lotes.filter((l) => idiomas.includes(idiomaDoLote(l)));
+    const lotesCand = uteis.length ? lotesAlvo.filter((l) => combina(chavesDoLote(l))) : lotesAlvo;
+    // arquivos avulsos (um trecho por arquivo), fora do índice
+    const avulsos = this.textosCaminhos().filter((p) => p !== 'textos/index.json' && !p.startsWith('textos/chebi/') && !emLote.has(p));
+    const nome = (p) => normalizar(p.replace(/^textos\/[^/]+\//, '').replace(/\.json$/, ''));
+    const avulsosCand = uteis.length ? avulsos.filter((p) => combina([nome(p)])) : avulsos;
+    const temCandidatos = lotesCand.length + avulsosCand.length > 0;
+    const final = temCandidatos ? [...lotesCand.map((l) => l.caminho), ...avulsosCand] : [...lotesAlvo.map((l) => l.caminho), ...avulsos];
+    const fila = final.filter((p) => !this._textosCache.has(p));
     const trabalhador = async () => {
       while (fila.length) {
         const p = fila.shift();
         try {
           const t = await this.carregar(p);
-          this._textosCache.set(p, (Array.isArray(t) ? t : [t]).filter((x) => x && typeof x === 'object').map((x) => ({ ...x, _path: p })));
+          this._textosCache.set(p, (Array.isArray(t) ? t : [t]).filter((x) => x && typeof x === 'object').map((x) => ({ ...x, _path: p, _idioma: normalizarIdioma(x.idioma) ?? 'pt-BR' })));
         } catch (e) { this._erro(e); this._textosCache.set(p, []); }
       }
     };
     await Promise.all(Array.from({ length: Math.min(CONCORRENCIA, fila.length) }, trabalhador));
-    return alvo.flatMap((p) => this._textosCache.get(p) ?? []);
+    const ordem = new Map(idiomas.map((i, k) => [i, k]));
+    return final.flatMap((p) => this._textosCache.get(p) ?? []).filter((x) => ordem.has(x._idioma)).sort((a, b) => ordem.get(a._idioma) - ordem.get(b._idioma));
   }
 
   // -------------------------------------------------------------------------------------------- atualização
@@ -360,14 +416,14 @@ export class DataStore {
 
   async _atualizar() {
     if (!this.manifest) throw new ErroDados('dados não iniciados');
-    if (!subtleDisponivel()) return { tipo: 'ignorado', motivo: 'verificação de assinatura indisponível (HTTPS necessário)' };
+    if (!subtleDisponivel()) return { tipo: 'ignorado', motivo: 'verificação de assinatura indisponível (HTTPS necessário)', motivoChave: 'semVerificacao' };
     const r = await this._lerManifesto('no-cache');
     if (!(await verificarManifesto(r.bytes, r.assinatura, this.chavePublica))) {
-      return { tipo: 'rejeitado', motivo: 'assinatura do manifesto INVÁLIDA — atualização rejeitada' };
+      return { tipo: 'rejeitado', motivo: 'assinatura do manifesto INVÁLIDA — atualização rejeitada', motivoChave: 'assinaturaInvalida' };
     }
     const novo = JSON.parse(dec.decode(r.bytes));
     validarManifesto(novo);
-    if (String(novo.generatedAt) < String(this.manifest.generatedAt)) return { tipo: 'ignorado', motivo: 'pacote remoto é mais antigo que o ativo (anti-rollback)' };
+    if (String(novo.generatedAt) < String(this.manifest.generatedAt)) return { tipo: 'ignorado', motivo: 'pacote remoto é mais antigo que o ativo (anti-rollback)', motivoChave: 'maisAntigo' };
     if (versaoDoManifesto(novo) === this.versao) return { tipo: 'atual' };
     const arquivosNovos = new Map(arquivosDoManifesto(novo).map((a) => [a.path, a]));
     const cacheNovo = new Map();
@@ -388,9 +444,11 @@ export class DataStore {
     this.assinatura = r.assinatura;
     this.sig = { estado: 'verificada', detalhe: '' };
     this.origem = 'atualização verificada (assinatura digital)';
+    this.origemChave = 'atualizada';
     this._cache = cacheNovo;
     this._compostos = new Map();
     this._textosCache = null;
+    this._indiceTextos = undefined;
     this._aplicar({
       elementos: cacheNovo.get('elementos.json')?.valor, regras: cacheNovo.get('regras.json')?.valor, constantes: cacheNovo.get('constantes.json')?.valor,
       fontes: cacheNovo.get('fontes.json')?.valor, indice: cacheNovo.get('compostos/index.json')?.valor, ghs: cacheNovo.get('ghs_frases.json')?.valor

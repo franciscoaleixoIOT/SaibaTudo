@@ -17,6 +17,8 @@ import sys
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(RAIZ / "pipeline"))
+from regras import PROPRIEDADES_I18N  # noqa: E402  (rótulos por idioma das propriedades, como no pacote real)
 SAIDA = RAIZ / "app" / "src" / "test" / "resources" / "data-quimica"
 HOJE = "2026-10-10"
 
@@ -24,6 +26,16 @@ FONTE_FIXTURE = {"nome": "Fixture de testes do app (valores conferidos; não é 
                  "url": "https://saibatudo.net/quimica/", "licenca": "uso em testes", "acessadoEm": HOJE}
 FONTE_PUBCHEM_TP = {"nome": "PubChem Periodic Table", "url": "https://pubchem.ncbi.nlm.nih.gov/periodic-table/",
                     "licenca": "domínio público (NIH)", "acessadoEm": HOJE}
+
+
+# nomes por idioma (docs/I18N.md §4): fixture com en e es (pt-BR = nome). Elementos: es/de como no Wikidata.
+ES_EL = {"H": "hidrógeno", "He": "helio", "C": "carbono", "N": "nitrógeno", "O": "oxígeno", "F": "flúor", "Na": "sodio", "S": "azufre", "Cl": "cloro", "Ca": "calcio", "Fe": "hierro", "Cu": "cobre", "Au": "oro", "Hg": "mercurio"}
+DE_EL = {"H": "Wasserstoff", "He": "Helium", "C": "Kohlenstoff", "N": "Stickstoff", "O": "Sauerstoff", "F": "Fluor", "Na": "Natrium", "S": "Schwefel", "Cl": "Chlor", "Ca": "Calcium", "Fe": "Eisen", "Cu": "Kupfer", "Au": "Gold", "Hg": "Quecksilber"}
+# cid -> (nome en, nome es, sinônimos en, sinônimos es)
+NOMES_CO = {"962": ["water", "agua", ["dihydrogen monoxide"], ["óxido de hidrógeno"]], "280": ["carbon dioxide", "dióxido de carbono", ["carbonic anhydride", "carbonic acid gas"], ["anhídrido carbónico", "gas carbónico"]], "5234": ["sodium chloride", "cloruro de sodio", ["table salt", "halite", "rock salt"], ["sal de mesa", "sal común", "halita"]], "313": ["hydrogen chloride", "cloruro de hidrógeno", ["hydrochloric acid", "muriatic acid"], ["ácido clorhídrico", "ácido muriático"]], "14798": ["sodium hydroxide", "hidróxido de sodio", ["caustic soda", "lye"], ["sosa cáustica", "soda cáustica"]], "222": ["ammonia", "amoníaco", ["azane"], ["amoniaco"]], "297": ["methane", "metano", ["marsh gas"], ["gas de los pantanos"]], "702": ["ethanol", "etanol", ["ethyl alcohol", "grain alcohol"], ["alcohol etílico"]], "5793": ["glucose", "glucosa", ["dextrose", "grape sugar", "blood sugar"], ["dextrosa", "azúcar de uva"]], "176": ["acetic acid", "ácido acético", ["ethanoic acid", "glacial acetic acid"], ["ácido etanoico"]], "2244": ["acetylsalicylic acid", "ácido acetilsalicílico", ["aspirin", "ASA"], ["aspirina", "AAS"]], "241": ["benzene", "benceno", ["benzol", "cyclohexatriene"], ["benzol"]], "180": ["acetone", "acetona", ["propanone", "dimethyl ketone"], ["propanona", "dimetilcetona"]], "784": ["hydrogen peroxide", "peróxido de hidrógeno", ["dioxidane"], ["agua oxigenada"]], "1118": ["sulfuric acid", "ácido sulfúrico", ["oil of vitriol", "battery acid", "sulphuric acid"], ["aceite de vitriolo"]], "10112": ["calcium carbonate", "carbonato de calcio", ["limestone", "calcite", "chalk"], ["caliza", "calcita"]], "23665760": ["sodium hypochlorite", "hipoclorito de sodio", ["bleach", "liquid bleach"], ["lejía", "lavandina"]], "1176": ["urea", "urea", ["carbamide"], ["carbamida"]], "516892": ["sodium bicarbonate", "bicarbonato de sodio", ["baking soda", "sodium hydrogen carbonate"], ["bicarbonato sódico"]], "14833": ["iron(III) oxide", "óxido de hierro(III)", ["ferric oxide", "hematite"], ["óxido férrico", "hematita"]], "6371": ["phosgene", "fosgeno", ["carbonyl chloride", "carbonyl dichloride"], ["cloruro de carbonilo"]], "24462": ["copper(II) sulfate", "sulfato de cobre(II)", ["cupric sulfate", "blue vitriol"], ["sulfato cúprico", "vitriolo azul"]], "14777": ["calcium hydroxide", "hidróxido de calcio", ["slaked lime", "hydrated lime"], ["cal apagada", "cal hidratada"]], "2519": ["caffeine", "cafeína", ["theine", "guaranine"], ["teína"]], "977": ["dioxygen", "dioxígeno", ["molecular oxygen", "oxygen gas"], ["oxígeno molecular"]], "24826": ["iron(III) sulfate", "sulfato de hierro(III)", ["ferric sulfate"], ["sulfato férrico"]]}
+# lote de textos em inglês + índice (textos em lotes); textos escritos para os testes
+LOTE_EN = [{"id": "wikipedia-en-mole-unit-001", "fonte": "Wikipedia (en)", "licenca": "CC BY-SA 4.0", "url": "https://en.wikipedia.org/wiki/Mole_(unit)", "urlArtigo": "https://en.wikipedia.org/wiki/Mole_(unit)", "capitulo": "Mole (unit)", "secao": "Introduction", "titulo": "Mole (unit)", "textoOriginal": "The mole is the SI unit of amount of substance. One mole contains exactly the Avogadro number of elementary entities, such as atoms, molecules or ions. (Test fixture text.)", "textoPt": None, "traducao": "não se aplica (texto no idioma do artigo; sem tradução)", "idioma": "en", "palavrasChave": ["mole", "amount of substance", "avogadro"], "entidades": {"elementos": [], "compostos": []}, "tipo": "conceito", "tema": "mol-massa-molar", "fontes": [{"nome": "Wikipedia (en): Mole (unit) (fixture de teste)", "url": "https://en.wikipedia.org/wiki/Mole_(unit)", "licenca": "CC BY-SA 4.0", "acessadoEm": "2026-10-10"}]}, {"id": "wikipedia-en-oxygen-001", "fonte": "Wikipedia (en)", "licenca": "CC BY-SA 4.0", "url": "https://en.wikipedia.org/wiki/Oxygen", "urlArtigo": "https://en.wikipedia.org/wiki/Oxygen", "capitulo": "Oxygen", "secao": "Introduction", "titulo": "Oxygen", "textoOriginal": "Oxygen is a chemical element with the symbol O and atomic number 8. It is a highly reactive nonmetal and an oxidising agent that readily forms oxides with most elements. (Test fixture text.)", "textoPt": None, "traducao": "não se aplica (texto no idioma do artigo; sem tradução)", "idioma": "en", "palavrasChave": ["oxygen", "O"], "entidades": {"elementos": ["O"], "compostos": []}, "tipo": "elemento", "fontes": [{"nome": "Wikipedia (en): Oxygen (fixture de teste)", "url": "https://en.wikipedia.org/wiki/Oxygen", "licenca": "CC BY-SA 4.0", "acessadoEm": "2026-10-10"}]}]
+INDEX_EN = {"versao": 1, "lotes": [{"caminho": "textos/wikipedia-en/lote-001.json", "fonte": "wikipedia-en", "idioma": "en", "trechos": [{"id": "wikipedia-en-mole-unit-001", "titulo": "Mole (unit)", "chave": "mole-unit", "entidades": {"elementos": [], "compostos": []}}, {"id": "wikipedia-en-oxygen-001", "titulo": "Oxygen", "chave": "oxygen", "entidades": {"elementos": ["O"], "compostos": []}}]}]}
 
 
 def f_pubchem(cid):
@@ -184,7 +196,8 @@ def main():
 
     elementos = []
     for (z, sim, nome, nome_en, massa, grupo, periodo, bloco, cat, conf, en, raio, ae, ei, pf, pe, dens, estado, ox, desc) in ELEMENTOS:
-        e = {"z": z, "simbolo": sim, "nome": nome, "nomeEn": nome_en, "massaAtomica": massa, "grupo": grupo, "periodo": periodo, "bloco": bloco,
+        e = {"z": z, "simbolo": sim, "nome": nome, "nomeEn": nome_en, "nomes": {"pt-BR": nome, "en": nome_en, "es": ES_EL[sim], "de": DE_EL[sim]},
+             "massaAtomica": massa, "grupo": grupo, "periodo": periodo, "bloco": bloco,
              "categoria": cat, "configuracaoEletronica": conf, "eletronegatividade": en, "raioAtomicoPm": raio}
         for chave, v in (("afinidadeEletronicaKJmol", ae), ("energiaIonizacaoKJmol", ei), ("pontoFusaoK", pf), ("pontoEbulicaoK", pe), ("densidadeKgm3", dens)):
             if v is not None:
@@ -204,6 +217,9 @@ def main():
             c["nomePopular"] = popular
         c["nomeIupac"] = iupac
         c["sinonimos"] = sins
+        n_en, n_es, s_en, s_es = NOMES_CO[str(cid)]
+        c["nomes"] = {"pt-BR": nome, "en": n_en, "es": n_es}
+        c["sinonimosPorIdioma"] = {"en": s_en, "es": s_es}
         c.update({"formula": formula, "formulaHill": hill, "massaMolar": mm, "massaExata": me, "smiles": smiles})
         if inchi:
             c["inchiKey"] = inchi
@@ -231,7 +247,10 @@ def main():
                                   for (i, n, s, v, u, inc) in CONSTANTES], arquivos)
 
     escrever("regras.json", {
-        "propriedades": [{"id": i, "rotulo": r, "campo": c, "alvo": a, "unidade": u, "sinonimos": s} for (i, r, c, a, u, s) in PROPRIEDADES],
+        "propriedades": [{"id": i, "rotulo": r, "campo": c, "alvo": a, "unidade": u, "sinonimos": s,
+                          "rotulos": {"pt-BR": r, **{k: PROPRIEDADES_I18N[i][k][0] for k in ("en", "es") if i in PROPRIEDADES_I18N}},
+                          "sinonimosPorIdioma": {"pt-BR": s, **{k: PROPRIEDADES_I18N[i][k][1] for k in ("en", "es") if i in PROPRIEDADES_I18N}}}
+                         for (i, r, c, a, u, s) in PROPRIEDADES],
         "unidades": [{"grandeza": g, "simbolo": s, "nome": n, "fator": f, "offset": o, "apelidos": ap} for (g, s, n, f, o, ap) in UNIDADES],
         "prefixosSi": [{"simbolo": "k", "nome": "quilo", "expoente": 3}, {"simbolo": "m", "nome": "mili", "expoente": -3}, {"simbolo": "c", "nome": "centi", "expoente": -2}],
         "reatividade": ["K", "Na", "Ca", "Mg", "Al", "Zn", "Fe", "Pb", "H", "Cu", "Ag", "Au"],
@@ -244,7 +263,8 @@ def main():
         {"id": "pubchem", "nome": "PubChem (NIH/NCBI) – campos calculados", "url": "https://pubchem.ncbi.nlm.nih.gov/", "licenca": "domínio público", "acessadoEm": HOJE, "uso": "elementos e compostos"},
         {"id": "codata", "nome": "CODATA 2022 (NIST)", "url": "https://physics.nist.gov/cuu/Constants/", "licenca": "domínio público", "acessadoEm": HOJE, "uso": "constantes"},
         {"id": "clp", "nome": "Regulamento CLP (UE), Anexo VI", "url": "https://eur-lex.europa.eu/", "licenca": "legislação da UE (reuso com atribuição)", "acessadoEm": HOJE, "uso": "classificação GHS harmonizada"},
-        {"id": "wikipedia-pt", "nome": "Wikipédia em português", "url": "https://pt.wikipedia.org/", "licenca": "CC BY-SA 4.0", "acessadoEm": HOJE, "uso": "textos de explicação"},
+        {"id": "wikipedia-pt", "nome": "Wikipédia em português", "url": "https://pt.wikipedia.org/", "licenca": "CC BY-SA 4.0", "acessadoEm": HOJE, "uso": "textos de explicação", "idioma": "pt-BR"},
+        {"id": "wikipedia-en", "nome": "Wikipedia (en)", "url": "https://en.wikipedia.org/", "licenca": "CC BY-SA 4.0", "acessadoEm": HOJE, "uso": "textos de explicação", "idioma": "en"},
         {"id": "gold-book", "nome": "IUPAC Gold Book", "url": "https://goldbook.iupac.org/", "licenca": "CC BY-SA 4.0", "acessadoEm": HOJE, "uso": "definições"},
         {"id": "chebi", "nome": "ChEBI (EMBL-EBI)", "url": "https://www.ebi.ac.uk/chebi/", "licenca": "CC BY 4.0", "acessadoEm": HOJE, "uso": "definições de compostos"},
         FONTE_FIXTURE | {"id": "fixture", "uso": "dados de teste do app"},
@@ -252,9 +272,13 @@ def main():
 
     for pasta, t in TEXTOS:
         escrever(f"textos/{pasta}/{t['id']}.json", t, arquivos)
+    # textos em lotes (docs/I18N.md §4): um lote em inglês e o índice; os arquivos por trecho acima continuam (legado aceito)
+    escrever("textos/wikipedia-en/lote-001.json", LOTE_EN, arquivos)
+    escrever("textos/index.json", INDEX_EN, arquivos)
 
     manifest = {
         "version": "2026.10.10-fixture", "generatedAt": "2026-10-10T12:00:00Z", "schemaVersion": 1,
+        "idiomas": ["pt-BR", "en", "es"],
         "files": dict(sorted(arquivos.items())),
         "sources": [{"id": "fixture", "nome": FONTE_FIXTURE["nome"], "url": FONTE_FIXTURE["url"], "licenca": "uso em testes", "acessadoEm": HOJE}],
         "licencas": [{"nome": "domínio público", "url": "https://www.ncbi.nlm.nih.gov/home/about/policies/"}, {"nome": "CC BY 4.0", "url": "https://creativecommons.org/licenses/by/4.0/deed.pt-br"}, {"nome": "CC BY-SA 4.0", "url": "https://creativecommons.org/licenses/by-sa/4.0/deed.pt-br"}],

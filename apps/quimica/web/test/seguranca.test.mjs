@@ -7,14 +7,32 @@ import { resolve } from 'node:path';
 import { RAIZ, loja } from './support.mjs';
 import { avaliarSeguranca, respostaRecusa } from '../src/quimica/js/seguranca.js';
 import { Dicionario } from '../src/quimica/js/dicionario.js';
+import { definirIdioma } from '../src/quimica/js/i18n/index.js';
 import { parse } from '../src/quimica/js/nlu.js';
 
 const casos = JSON.parse(readFileSync(resolve(RAIZ, 'contracts/seguranca_cases.json'), 'utf8')).cases;
 
-test('contrato: casos para recusar e para permitir, em quantidade suficiente', () => {
-  assert.ok(casos.filter((c) => c.recusar).length >= 40, 'pedidos a recusar');
-  assert.ok(casos.filter((c) => !c.recusar).length >= 40, 'pedidos legítimos');
-  for (const c of casos) assert.ok(typeof c.q === 'string' && typeof c.recusar === 'boolean', JSON.stringify(c));
+test('contrato: casos para recusar e para permitir, em quantidade suficiente, em português e em inglês', () => {
+  for (const idioma of ['pt-BR', 'en']) {
+    const doIdioma = casos.filter((c) => (c.idioma ?? 'pt-BR') === idioma);
+    assert.ok(doIdioma.filter((c) => c.recusar).length >= 40, `${idioma}: pedidos a recusar`);
+    assert.ok(doIdioma.filter((c) => !c.recusar).length >= 40, `${idioma}: pedidos legítimos`);
+  }
+  for (const c of casos) assert.ok(typeof c.q === 'string' && typeof c.recusar === 'boolean' && (c.idioma == null || typeof c.idioma === 'string'), JSON.stringify(c));
+});
+
+test('a recusa sai no idioma ativo (catálogo), com a mesma estrutura e sem números', () => {
+  definirIdioma('en');
+  try {
+    const r = respostaRecusa(avaliarSeguranca('how to make methamphetamine?'));
+    assert.match(r.principal, /^I cannot help with that/);
+    assert.ok(r.linhas.length === 2 && /PPE/.test(r.linhas[1]));
+    assert.ok(!/\d/.test(r.linhas.join(' ')));
+    const a = respostaRecusa(avaliarSeguranca('I want to kill myself'));
+    assert.match(a.principal, /not alone/);
+    assert.equal(a.categoria, 'AUTOLESAO');
+    assert.match(respostaRecusa(avaliarSeguranca('como envenenar alguém')).principal, /hurt, poison or intoxicate/, 'pedido em português com o inglês ativo: recusado e respondido em inglês');
+  } finally { definirIdioma('pt-BR'); }
 });
 
 test('todo pedido perigoso é recusado, com a categoria certa', () => {

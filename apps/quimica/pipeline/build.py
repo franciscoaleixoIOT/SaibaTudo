@@ -5,6 +5,11 @@ Orquestra a coleta, valida e publica o pacote de dados `data/quimica/` (DATA_CON
     python pipeline/build.py --assinar-com secrets/data_signing_key.pem        # build completo (leva ~30 min na 1ª vez)
     python pipeline/build.py --rapido --assinar-com secrets/data_signing_key.pem   # 300 compostos, textos reduzidos
     python pipeline/build.py --rapido --offline --cache pipeline/tests/fixtures/cache --out /tmp/pacote   # sem rede
+    python pipeline/build.py --idiomas pt-BR,en --sem-textos-idiomas ...   # só nomes/GHS multilíngues, sem Wikipédia en/es/de/fr
+
+Idiomas (docs/I18N.md §4): `--idiomas` (padrão: pt-BR,en,es,de,fr) controla `elementos[].nomes`, `compostos[].nomes`/
+`sinonimosPorIdioma`, `ghs_frases.json` por idioma, `regras.propriedades[].rotulos` e as pastas `textos/wikipedia-<lang>/`.
+Textos vão em LOTES (`textos/<fonte>/lote-NNN.json`, até 200 trechos, ordenados por id) com `textos/index.json`.
 
 Saída atômica: o pacote é montado em `<out>.novo`, validado e só então troca `<out>` (se a validação falhar, o pacote anterior
 continua intacto). `stats.json` fica ao lado do manifesto mas fora do manifesto (muda a cada execução).
@@ -12,6 +17,7 @@ continua intacto). `stats.json` fica ao lado do manifesto mas fora do manifesto 
 import argparse
 import json
 import os
+import re
 import shutil
 import sys
 import time
@@ -32,7 +38,8 @@ import quimica_util as Q  # noqa: E402
 import regras as R  # noqa: E402
 import exclusoes  # noqa: E402
 import selecao_compostos  # noqa: E402
-from common import dump_json, sha256_file  # noqa: E402
+import wikidata as W  # noqa: E402
+from common import IDIOMAS, WIKI_POR_IDIOMA, dump_json, normalizar_idiomas, sha256_file  # noqa: E402
 from http_cache import HttpCache, PASTA_CACHE  # noqa: E402
 from pubchem import PubChem  # noqa: E402
 from robots import Robots  # noqa: E402
@@ -44,6 +51,11 @@ SCHEMA_VERSION = 1
 BASE_URL = "https://saibatudo.net/quimica/data/"
 LICENCAS_TEXTO_PERMITIDAS = {"CC BY-SA 4.0", "CC BY 4.0", "domínio público"}
 PICTOGRAMAS_VALIDOS = {f"GHS0{i}" for i in range(1, 10)}
+LOTE_TEXTOS = 200  # trechos por arquivo em textos/<fonte>/lote-NNN.json
+INDEX_TEXTOS = "textos/index.json"
+INDEX_TEXTOS_VERSAO = 1
+# idioma (código do projeto) dos textos de cada fonte que não é Wikipédia em outro idioma
+IDIOMA_DA_FONTE = {"wikipedia-pt": "pt-BR", "wikibooks-pt": "pt-BR", "chebi": "en", "gutenberg-14474": "en"}
 
 # Decisões de fonte/licença que o pipeline aplica (docs/FONTES_E_LICENCAS.md §5); vão para stats.json
 DECISOES = [
@@ -54,6 +66,9 @@ DECISOES = [
     "Frases H/EUH em português: Anexo III do CLP consolidado (EUR-Lex/Cellar); combinadas ausentes viram junção dos textos oficiais.",
     "CAS: só do Wikidata (identificador, CC0), validado pelo dígito verificador; elementos não levam CAS (CAS do átomo != substância).",
     "Textos: Wikipédia pt e Wikilivros pt (CC BY-SA 4.0), ChEBI (CC BY 4.0), Faraday (domínio público). Gold Book: bloqueado por Cloudflare.",
+    "Idiomas (I18N §4): nomes de elementos/compostos por idioma só do Wikidata (CC0); textos em en/es/de/fr só da Wikipédia daquele "
+    "idioma (CC BY-SA 4.0), escolhidos pelo item do Wikidata (sitelinks) — nunca tradução automática; frases H por idioma do Anexo III do CLP.",
+    "Textos em lotes (textos/<fonte>/lote-NNN.json + textos/index.json) em vez de um arquivo por trecho (cota de upload da Vercel).",
     "APIs oficiais (PUG REST, WDQS, /w/api.php) são acessadas apesar do Disallow genérico do robots.txt, conforme robots.EXCECOES.",
 ]
 
@@ -64,13 +79,33 @@ def escrever_json(out: Path, rel: str, obj, indent=None):
     return rel
 
 
-def escrever_textos(out: Path, pasta: str, registros):
-    """Grava cada trecho em textos/<pasta>/<_arquivo>. Devolve os caminhos relativos."""
+def chave_do_trecho(r):
+    """`chave` do índice: slug do título (o que era o nome do arquivo sem `.json` e sem o contador `-NNN`)."""
+    if r.get("_chave"):
+        return r["_chave"]
+    base = (r.get("_arquivo") or r["id"]).rsplit("/", 1)[-1]
+    base = base[:-5] if base.endswith(".json") else base
+    return re.sub(r"-\d{3}$", "", base) or base
+
+
+def escrever_lotes(out: Path, pasta: str, registros, idioma, indice):
+    """Grava os trechos de uma fonte em textos/<pasta>/lote-NNN.json (listas de até LOTE_TEXTOS, ordenadas por id para o lote
+    de cada trecho ser estável entre builds) e acrescenta os lotes a `indice["lotes"]` (formato de docs/I18N.md §4).
+    Devolve os caminhos relativos gravados."""
     rels = []
-    for r in registros:
-        reg = {k: v for k, v in r.items() if not k.startswith("_")}
-        rels.append(escrever_json(out, f"textos/{pasta}/{r['_arquivo']}", reg))
+    ordenados = sorted(registros, key=lambda r: r["id"])
+    for i in range(0, len(ordenados), LOTE_TEXTOS):
+        parte = ordenados[i:i + LOTE_TEXTOS]
+        rel = f"textos/{pasta}/lote-{i // LOTE_TEXTOS + 1:03d}.json"
+        rels.append(escrever_json(out, rel, [{k: v for k, v in r.items() if not k.startswith("_")} for r in parte]))
+        indice["lotes"].append({"caminho": rel, "fonte": pasta, "idioma": idioma,
+                                "trechos": [{"id": r["id"], "titulo": r.get("titulo") or r.get("secao") or "", "chave": chave_do_trecho(r),
+                                             "entidades": r.get("entidades") or {"elementos": [], "compostos": []}} for r in parte]})
     return rels
+
+
+def novo_indice_textos():
+    return {"versao": INDEX_TEXTOS_VERSAO, "lotes": []}
 
 
 def registros_chebi(compostos, hoje):
@@ -81,7 +116,7 @@ def registros_chebi(compostos, hoje):
             continue
         num = d["chebiId"].split(":")[1]
         regs.append({
-            "_arquivo": f"{num}.json", "id": f"chebi-{num}", "fonte": "ChEBI", "licenca": d["licenca"],
+            "_arquivo": f"{num}.json", "_chave": coleta_wikimedia.slug(c["nome"]), "id": f"chebi-{num}", "fonte": "ChEBI", "licenca": d["licenca"],
             "url": coleta_chebi.URL_PAGINA.format(id=num), "capitulo": "", "secao": "Definição", "titulo": c["nome"],
             "textoOriginal": d["texto"], "textoPt": None, "traducao": "pendente", "idioma": "en",
             "palavrasChave": [c["nome"].lower(), c["formula"]], "entidades": {"elementos": [], "compostos": [c["cid"]]},
@@ -90,29 +125,44 @@ def registros_chebi(compostos, hoje):
     return regs
 
 
-def montar_ghs_frases(frases_h, compostos, hoje, info_clp):
-    """Dicionário H/EUH em português + pictogramas. Combinadas ausentes no CLP viram junção dos textos oficiais dos componentes."""
+def montar_ghs_frases(frases_h, compostos, hoje, info_clp, idiomas=None):
+    """Dicionário H/EUH + pictogramas + palavras de advertência. `frases_h` = {código: texto pt | {idioma: texto}}.
+
+    Compatibilidade: `frasesH[cod].texto`, `todasAsFrases`, `pictogramas` e `palavrasSinal` continuam em português (é o que o site e
+    o Android leem hoje). Por idioma (I18N §4): `frasesH[cod].textoPorIdioma`, `todasAsFrasesPorIdioma`, `pictogramasPorIdioma` e
+    `palavrasSinalPorIdioma`, sempre com pt-BR e os idiomas pedidos que o Anexo III trouxer. Combinadas ausentes no CLP viram
+    junção dos textos oficiais dos componentes, idioma a idioma."""
+    idiomas = list(idiomas or IDIOMAS)
+    multi = {cod: clp.por_idioma(v) for cod, v in frases_h.items()}
     usados = sorted({h for c in compostos for h in c.get("ghs", {}).get("frasesH", [])})
     dic, sem_texto = {}, []
     for cod in usados:
-        if cod in frases_h:
-            dic[cod] = {"texto": frases_h[cod]}
-        elif "+" in cod and all(p in frases_h for p in cod.split("+")):
-            dic[cod] = {"texto": "; ".join(frases_h[p].rstrip(".") for p in cod.split("+")),
+        if cod in multi:
+            dic[cod] = {"texto": multi[cod]["pt-BR"], "textoPorIdioma": multi[cod]}
+        elif "+" in cod and all(p in multi for p in cod.split("+")):
+            partes = cod.split("+")
+            comuns = [i for i in IDIOMAS if all(multi[p].get(i) for p in partes)]
+            por_idioma = {i: "; ".join(multi[p][i].rstrip(".") for p in partes) for i in comuns}
+            dic[cod] = {"texto": por_idioma["pt-BR"], "textoPorIdioma": por_idioma,
                         "derivado": "junção dos textos oficiais dos componentes (código combinado ausente no Anexo III)",
-                        "componentes": cod.split("+")}
+                        "componentes": partes}
         else:
             sem_texto.append(cod)
     return {"versao": 1,
-            "descricao": "Frases de perigo (H/EUH) em português do Regulamento (CE) n.º 1272/2008 (CLP), Anexo III, "
-                         "texto consolidado (EUR-Lex), para os códigos usados nas classificações harmonizadas do pacote.",
-            "frasesH": dic, "usadosSemTexto": sem_texto, "todasAsFrases": frases_h,
-            "pictogramas": clp.PICTOGRAMAS, "palavrasSinal": list(clp.PALAVRAS_SINAL),
+            "descricao": "Frases de perigo (H/EUH) do Regulamento (CE) n.º 1272/2008 (CLP), Anexo III, texto consolidado (EUR-Lex), "
+                         "para os códigos usados nas classificações harmonizadas do pacote; `texto` em português, "
+                         "`textoPorIdioma` nos idiomas do pacote (linhas PT/EN/ES/DE/FR da mesma tabela multilíngue).",
+            "idiomas": [i for i in IDIOMAS if i in idiomas],
+            "frasesH": dic, "usadosSemTexto": sem_texto,
+            "todasAsFrases": {cod: d["pt-BR"] for cod, d in multi.items()},
+            "todasAsFrasesPorIdioma": multi,
+            "pictogramas": clp.PICTOGRAMAS, "pictogramasPorIdioma": clp.pictogramas_por_idioma(idiomas),
+            "palavrasSinal": list(clp.PALAVRAS_SINAL), "palavrasSinalPorIdioma": clp.palavras_sinal_por_idioma(idiomas),
             "fontes": [Q.fonte(clp.NOME_FONTE, info_clp.get("url", clp.URL_EURLEX.format(celex="32008R1272")), clp.LICENCA, hoje)]}, sem_texto
 
 
 # ====================================================================================================== manifesto
-def montar_manifest(out: Path, rels, fontes_usadas, contagens, hoje, agora):
+def montar_manifest(out: Path, rels, fontes_usadas, contagens, hoje, agora, idiomas=None):
     arquivos = {}
     for rel in sorted(set(rels)):
         p = out / rel
@@ -127,10 +177,12 @@ def montar_manifest(out: Path, rels, fontes_usadas, contagens, hoje, agora):
         "sources": [{"id": f["id"], "nome": f["nome"], "url": f["url"], "licenca": f["licenca"], "uso": f["uso"],
                      "acessadoEm": f["acessadoEm"]} for f in fontes_usadas],
         "licencas": F.licencas(fontes_usadas),
+        "idiomas": [i for i in IDIOMAS if i in (idiomas or ["pt-BR"])],
         "contagens": contagens,
-        "atribuicao": "Dados: PubChem (NCBI/NLM) e CODATA 2022 (NIST), domínio público; Wikidata, CC0; textos da Wikipédia e do "
-                      "Wikilivros em português, CC BY-SA 4.0; ChEBI, CC BY 4.0; Faraday (Project Gutenberg #14474), domínio público; "
-                      "frases H do Regulamento CLP (EUR-Lex). Aplicativo independente.",
+        "atribuicao": "Dados: PubChem (NCBI/NLM) e CODATA 2022 (NIST), domínio público; Wikidata (nomes por idioma), CC0; textos da "
+                      "Wikipédia (português, inglês, espanhol, alemão e francês, cada trecho no idioma do artigo) e do Wikilivros em "
+                      "português, CC BY-SA 4.0; ChEBI, CC BY 4.0; Faraday (Project Gutenberg #14474), domínio público; "
+                      "frases H do Regulamento CLP (EUR-Lex), por idioma. Aplicativo independente.",
         "cliente": {"pollIntervalMinutes": 10080, "baseUrl": BASE_URL, "nlu": {"endpoint": "https://saibatudo.net/api/quimica/nlu"},
                     "ask": {"enabled": False}, "melhoria": {"enabled": False}},
     }
@@ -176,6 +228,9 @@ def validar(out: Path, previo=None, minimos=None):
                     erros.append(f"elemento {e['z']}: {k} inválido ({e[k]!r})")
             if "estadoPadrao" in e and e["estadoPadrao"] not in ("solido", "liquido", "gas"):
                 erros.append(f"elemento {e['z']}: estadoPadrao inválido")
+            if "nomes" in e and (not isinstance(e["nomes"], dict) or e["nomes"].get("pt-BR") != e.get("nome")
+                                 or not set(e["nomes"]) <= set(IDIOMAS)):
+                erros.append(f"elemento {e['z']}: nomes inválido ({e['nomes']!r})")
     except (OSError, KeyError, ValueError) as exc:
         erros.append(f"elementos.json inválido: {exc}")
         els = []
@@ -203,6 +258,11 @@ def validar(out: Path, previo=None, minimos=None):
                     erros.append(f"composto {c['cid']}: ghs inválido")
                 if "ghs" in c and "1272/2008" not in c["ghs"].get("fonte", ""):
                     erros.append(f"composto {c['cid']}: ghs só pode vir da classificação harmonizada (CLP)")
+                for campo in ("nomes", "sinonimosPorIdioma"):
+                    if campo in c and (not isinstance(c[campo], dict) or not set(c[campo]) <= set(IDIOMAS)):
+                        erros.append(f"composto {c['cid']}: {campo} inválido")
+                if "nomes" in c and "pt-BR" in c["nomes"] and c["nomes"]["pt-BR"] != c.get("nome"):
+                    erros.append(f"composto {c['cid']}: nomes.pt-BR diverge de nome")
     if total < mn["compostos"]:
         erros.append(f"compostos insuficientes: {total}")
     if previo and previo.get("contagens", {}).get("compostos") and total < 0.8 * previo["contagens"]["compostos"]:
@@ -225,27 +285,62 @@ def validar(out: Path, previo=None, minimos=None):
     except (OSError, KeyError, ValueError) as exc:
         erros.append(f"constantes.json inválido: {exc}")
 
-    # textos: licenças permitidas, ids únicos, campos
-    ids, n_textos = set(), 0
+    # textos: licenças permitidas, ids únicos, campos; lotes (listas de até LOTE_TEXTOS) ou um arquivo por trecho (legado)
+    ids, n_textos, ids_por_lote = set(), 0, {}
     for rel in m["files"]:
-        if not rel.startswith("textos/"):
+        if not rel.startswith("textos/") or rel == INDEX_TEXTOS:
             continue
-        t = ler(rel)
-        n_textos += 1
-        if t.get("id") in ids:
-            erros.append(f"texto com id duplicado {t.get('id')}")
-        ids.add(t.get("id"))
-        for k in ("id", "fonte", "licenca", "url", "textoOriginal", "traducao", "fontes"):
-            if not t.get(k):
-                erros.append(f"texto {t.get('id')}: campo obrigatório ausente {k}")
-        if t.get("licenca") not in LICENCAS_TEXTO_PERMITIDAS:
-            erros.append(f"texto {t.get('id')}: licença não permitida {t.get('licenca')!r}")
-        if "openstax" in (t.get("fonte", "") + t.get("id", "")).lower():
-            erros.append(f"texto {t.get('id')}: OpenStax não pode entrar")
-        if not 30 <= len(t.get("textoOriginal", "")) <= 1600 and not t["id"].startswith("chebi-"):
-            erros.append(f"texto {t.get('id')}: tamanho fora do esperado ({len(t.get('textoOriginal', ''))})")
+        conteudo = ler(rel)
+        itens = conteudo if isinstance(conteudo, list) else [conteudo]
+        if isinstance(conteudo, list) and len(conteudo) > LOTE_TEXTOS:
+            erros.append(f"{rel}: lote com {len(conteudo)} trechos (máximo {LOTE_TEXTOS})")
+        ids_por_lote[rel] = []
+        for t in itens:
+            n_textos += 1
+            if not isinstance(t, dict):
+                erros.append(f"{rel}: trecho não é objeto")
+                continue
+            if t.get("id") in ids:
+                erros.append(f"texto com id duplicado {t.get('id')}")
+            ids.add(t.get("id"))
+            ids_por_lote[rel].append(t.get("id"))
+            for k in ("id", "fonte", "licenca", "url", "textoOriginal", "traducao", "fontes"):
+                if not t.get(k):
+                    erros.append(f"texto {t.get('id')}: campo obrigatório ausente {k}")
+            if t.get("licenca") not in LICENCAS_TEXTO_PERMITIDAS:
+                erros.append(f"texto {t.get('id')}: licença não permitida {t.get('licenca')!r}")
+            if "openstax" in (t.get("fonte", "") + t.get("id", "")).lower():
+                erros.append(f"texto {t.get('id')}: OpenStax não pode entrar")
+            if not 30 <= len(t.get("textoOriginal", "")) <= 1600 and not str(t.get("id", "")).startswith("chebi-"):
+                erros.append(f"texto {t.get('id')}: tamanho fora do esperado ({len(t.get('textoOriginal', ''))})")
     if n_textos < mn["textos"]:
         erros.append(f"textos insuficientes: {n_textos}")
+    if INDEX_TEXTOS in m["files"]:  # o índice tem de descrever exatamente os lotes do manifesto
+        try:
+            idx = ler(INDEX_TEXTOS)
+            if idx.get("versao") != INDEX_TEXTOS_VERSAO or not isinstance(idx.get("lotes"), list):
+                erros.append(f"{INDEX_TEXTOS}: formato inválido")
+            else:
+                vistos = set()
+                for lote in idx["lotes"]:
+                    cam = lote.get("caminho")
+                    if cam not in ids_por_lote:
+                        erros.append(f"{INDEX_TEXTOS}: lote {cam!r} não está no manifesto")
+                        continue
+                    if not lote.get("fonte") or lote.get("idioma") not in IDIOMAS:
+                        erros.append(f"{INDEX_TEXTOS}: lote {cam} sem fonte/idioma válidos")
+                    if [t.get("id") for t in lote.get("trechos", [])] != ids_por_lote[cam]:
+                        erros.append(f"{INDEX_TEXTOS}: ids do lote {cam} divergem do arquivo")
+                    for t in lote.get("trechos", []):
+                        if not t.get("chave") or "titulo" not in t or not isinstance(t.get("entidades"), dict):
+                            erros.append(f"{INDEX_TEXTOS}: trecho {t.get('id')} sem titulo/chave/entidades")
+                            break
+                    vistos.add(cam)
+                faltam = [c for c in ids_por_lote if c not in vistos and ids_por_lote[c] and c.rsplit("/", 1)[-1].startswith("lote-")]
+                if faltam:
+                    erros.append(f"{INDEX_TEXTOS}: lotes fora do índice: {faltam[:5]}")
+        except (OSError, KeyError, ValueError, AttributeError) as exc:
+            erros.append(f"{INDEX_TEXTOS} inválido: {exc}")
 
     for rel in ("regras.json", "fontes.json", "ghs_frases.json"):
         if rel not in m["files"]:
@@ -305,7 +400,10 @@ def construir(opts, log=print):
     http = HttpCache(pasta=opts.cache, offline=opts.offline, log=log, **paciente)
     if paciente:
         http.limitador.reduzir('pubchem.ncbi.nlm.nih.gov', fator=0.5, minimo=0.5)
+    idiomas = normalizar_idiomas(getattr(opts, "idiomas", None) or IDIOMAS)
+    idiomas_textos = [] if getattr(opts, "sem_textos_idiomas", False) else [i for i in idiomas if i != "pt-BR"]
     stats = {"geradoEm": agora.strftime("%Y-%m-%dT%H:%M:%SZ"), "modo": "rapido" if opts.rapido else "completo",
+             "idiomas": idiomas, "idiomasTextos": idiomas_textos,
              "familias": {}, "contagens": {}, "decisoes": list(DECISOES), "avisos": []}
     out = Path(opts.out)
     novo = out.with_name(out.name + ".novo")
@@ -316,7 +414,8 @@ def construir(opts, log=print):
 
     try:
         log("== elementos")
-        elementos, st = tentar(stats, "elementos", lambda: coleta_elementos.coletar(http, hoje), log, obrigatoria=True)
+        elementos, st = tentar(stats, "elementos", lambda: coleta_elementos.coletar(http, hoje, idiomas), log, obrigatoria=True)
+        artigos_elementos = st.pop("_artigos", {})  # {QID: {idioma: título}} para a Wikipédia nos outros idiomas
         stats["familias"]["elementos"].update(st)
         rels.append(escrever_json(novo, "elementos.json", elementos))
 
@@ -326,7 +425,7 @@ def construir(opts, log=print):
         rels.append(escrever_json(novo, "constantes.json", {"constantes": constantes}))
 
         log("== frases H (CLP, EUR-Lex)")
-        r = tentar(stats, "clp", lambda: clp.coletar(http, hoje), log, vazio=({}, {}))
+        r = tentar(stats, "clp", lambda: clp.coletar(http, hoje, idiomas), log, vazio=({}, {}))
         frases_h, st_clp = r
         stats["familias"]["clp"].update(st_clp)
         if frases_h:
@@ -343,7 +442,8 @@ def construir(opts, log=print):
         compostos, meta, st_cmp = tentar(stats, "compostos",
                                          lambda: coleta_compostos.coletar(http, pubchem, selecao, hoje, frases_h, log=log,
                                                                                   pesos={e["simbolo"]: e["massaAtomica"] for e in elementos if e.get("massaAtomica")},
-                                                                                  qids_elementos=frozenset(e["wikidata"] for e in elementos if e.get("wikidata"))),
+                                                                                  qids_elementos=frozenset(e["wikidata"] for e in elementos if e.get("wikidata")),
+                                                                                  idiomas=idiomas),
                                          log, obrigatoria=True)
         stats["familias"]["compostos"].update(st_cmp)
         # segurança: fora do núcleo os agentes de guerra química e as drogas de uso proscrito que viriam pela popularidade
@@ -353,7 +453,7 @@ def construir(opts, log=print):
         if any("definicaoChebi" in c for c in compostos):
             fontes_usadas.add("chebi")
 
-        ghs_json, sem_texto = montar_ghs_frases(frases_h, compostos, hoje, st_clp)
+        ghs_json, sem_texto = montar_ghs_frases(frases_h, compostos, hoje, st_clp, idiomas)
         stats["familias"]["clp"]["codigosSemTextoPt"] = sem_texto
         rels.append(escrever_json(novo, "ghs_frases.json", ghs_json))
 
@@ -365,7 +465,7 @@ def construir(opts, log=print):
 
         log("== textos")
         nomes_en = {e["nomeEn"].lower(): e["simbolo"] for e in elementos}
-        n_textos = {}
+        n_textos, indice_textos = {}, novo_indice_textos()
         lim = None
         if opts.rapido or opts.limite_textos is not None:
             n = opts.limite_textos if opts.limite_textos is not None else 30
@@ -373,21 +473,39 @@ def construir(opts, log=print):
         if not opts.sem_wikimedia:
             regs, st = tentar(stats, "wikipedia", lambda: coleta_wikimedia.coletar_wikipedia(
                 http, elementos, compostos, meta, opts.topicos, hoje, limites=lim, log=log), log, vazio=([], {}))
+            conceitos, temas = st.pop("_conceitos", []), st.pop("_temas", {})
             stats["familias"]["wikipedia"].update(st)
             if regs:
-                rels += escrever_textos(novo, "wikipedia-pt", regs)
+                rels += escrever_lotes(novo, "wikipedia-pt", regs, "pt-BR", indice_textos)
                 fontes_usadas.add("wikipedia-pt")
             n_textos["wikipedia-pt"] = len(regs)
+            # os mesmos artigos nos outros idiomas, pelo item do Wikidata (elementos e compostos já trazem os títulos; os conceitos
+            # pedem uma leitura de sitelinks: ~1 chamada por 50 itens, uma vez para todos os idiomas)
+            if idiomas_textos:
+                titulos_conceitos = tentar(stats, "sitelinksConceitos",
+                                           lambda: W.entidades(http, [c["qid"] for c in conceitos], idiomas_textos, log=log), log, vazio={})
+                for idioma in idiomas_textos:
+                    lang = WIKI_POR_IDIOMA[idioma]
+                    titulos = {q: a.get(idioma) for q, a in artigos_elementos.items() if a.get(idioma)}
+                    titulos.update({m["qid"]: m["artigos"][idioma] for m in meta.values() if m.get("qid") and m.get("artigos", {}).get(idioma)})
+                    titulos.update({q: e["artigos"][idioma] for q, e in (titulos_conceitos or {}).items() if e.get("artigos", {}).get(idioma)})
+                    regs, st = tentar(stats, f"wikipedia-{lang}", lambda: coleta_wikimedia.coletar_wikipedia_idioma(
+                        http, idioma, elementos, compostos, meta, conceitos, titulos, temas, hoje, limites=lim, log=log), log, vazio=([], {}))
+                    stats["familias"][f"wikipedia-{lang}"].update(st)
+                    if regs:
+                        rels += escrever_lotes(novo, f"wikipedia-{lang}", regs, idioma, indice_textos)
+                        fontes_usadas.add(f"wikipedia-{lang}")
+                    n_textos[f"wikipedia-{lang}"] = len(regs)
             regs, st = tentar(stats, "wikilivros", lambda: coleta_wikimedia.coletar_wikilivros(
                 http, hoje, limite_paginas=(lim["conceitos"] // 2 if lim else None), log=log), log, vazio=([], {}))
             stats["familias"]["wikilivros"].update(st)
             if regs:
-                rels += escrever_textos(novo, "wikibooks-pt", regs)
+                rels += escrever_lotes(novo, "wikibooks-pt", regs, "pt-BR", indice_textos)
                 fontes_usadas.add("wikibooks-pt")
             n_textos["wikibooks-pt"] = len(regs)
         regs = registros_chebi(compostos, hoje)
         if regs:
-            rels += escrever_textos(novo, "chebi", regs)
+            rels += escrever_lotes(novo, "chebi", regs, "en", indice_textos)
         n_textos["chebi"] = len(regs)
 
         def faraday():
@@ -396,7 +514,7 @@ def construir(opts, log=print):
         regs, st = tentar(stats, "faraday", faraday, log, vazio=([], {}))
         stats["familias"]["faraday"].update(st)
         if regs:
-            rels += escrever_textos(novo, coleta_textos.FONTE_GUTENBERG_DIR, regs)
+            rels += escrever_lotes(novo, coleta_textos.FONTE_GUTENBERG_DIR, regs, "en", indice_textos)
             fontes_usadas.add("gutenberg-14474")
         n_textos["gutenberg-14474"] = len(regs)
 
@@ -416,15 +534,24 @@ def construir(opts, log=print):
         stats["familias"]["goldBook"].update(r)
         n_textos["gold-book"] = 0
         stats["contagens"]["textosPorFonte"] = n_textos
+        indice_textos["lotes"].sort(key=lambda l: l["caminho"])
+        rels.append(escrever_json(novo, INDEX_TEXTOS, indice_textos))
+        textos_por_idioma = {}
+        for lote in indice_textos["lotes"]:
+            textos_por_idioma[lote["idioma"]] = textos_por_idioma.get(lote["idioma"], 0) + len(lote["trechos"])
 
         log("== regras, fontes e manifesto")
-        rels.append(escrever_json(novo, "regras.json", R.montar(hoje)))
+        rels.append(escrever_json(novo, "regras.json", R.montar(hoje, idiomas)))
         usadas = F.gerar(fontes_usadas, hoje)
         rels.append(escrever_json(novo, "fontes.json", {"fontes": usadas}))
         contagens = {"elementos": len(elementos), "compostos": len(compostos), "constantes": len(constantes),
                      "textos": sum(n_textos.values()), "textosPorFonte": n_textos,
+                     "textosPorIdioma": {i: textos_por_idioma[i] for i in IDIOMAS if i in textos_por_idioma},
+                     "lotesDeTextos": len(indice_textos["lotes"]),
                      "compostosComGhsHarmonizado": sum(1 for c in compostos if "ghs" in c),
-                     "compostosComCas": sum(1 for c in compostos if "cas" in c)}
+                     "compostosComCas": sum(1 for c in compostos if "cas" in c),
+                     "compostosComNomePorIdioma": {i: sum(1 for c in compostos if i in c.get("nomes", {})) for i in idiomas},
+                     "elementosComNomePorIdioma": {i: sum(1 for e in elementos if i in e.get("nomes", {})) for i in idiomas}}
         stats["contagens"].update(contagens)
         previo = None
         if (out / "manifest.json").exists():
@@ -432,7 +559,7 @@ def construir(opts, log=print):
                 previo = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
             except ValueError:
                 previo = None
-        manifest = montar_manifest(novo, rels, usadas, contagens, hoje, agora)
+        manifest = montar_manifest(novo, rels, usadas, contagens, hoje, agora, idiomas)
         if opts.assinar_com:
             from sign import assinar
             assinar(novo / "manifest.json", Path(opts.assinar_com))
@@ -474,6 +601,10 @@ def main(argv=None):
     ap.add_argument("--limite-compostos", type=int, help="limita o núcleo a N compostos da lista fixa (testes)")
     ap.add_argument("--limite-textos", type=int, help="limita os textos da Wikimedia (testes)")
     ap.add_argument("--sem-wikimedia", action="store_true", help="não coleta Wikipédia/Wikilivros")
+    ap.add_argument("--idiomas", default=",".join(IDIOMAS),
+                    help="idiomas do pacote, separados por vírgula (pt-BR sempre entra); padrão: %(default)s")
+    ap.add_argument("--sem-textos-idiomas", action="store_true",
+                    help="não coleta a Wikipédia em en/es/de/fr (nomes, GHS e rótulos por idioma continuam)")
     ap.add_argument("--topicos", default=str(TOPICOS_PADRAO))
     ap.add_argument("--gutenberg-zip", help="zip local do HTML do Gutenberg #14474 (reserva se a web falhar)")
     ap.add_argument("--hoje", help="data de acesso AAAA-MM-DD (padrão: hoje, UTC)")

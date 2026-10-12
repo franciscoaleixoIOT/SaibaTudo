@@ -26,7 +26,8 @@
    "nome": "Wikipédia em português",
    "licenca": "CC BY-SA 4.0",
    "url": "https://pt.wikipedia.org/",
-   "uso": "textos"
+   "uso": "textos",
+   "idioma": "pt-BR"
   },
   {
    "id": "wikibooks-pt",
@@ -62,6 +63,14 @@
    "licenca": "CC BY 4.0",
    "url": "https://eur-lex.europa.eu/",
    "uso": "dados"
+  },
+  {
+   "id": "wikipedia-en",
+   "nome": "Wikipedia (en)",
+   "licenca": "CC BY-SA 4.0",
+   "url": "https://en.wikipedia.org/",
+   "uso": "textos",
+   "idioma": "en"
   }
  ]
 }

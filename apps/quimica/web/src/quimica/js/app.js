@@ -1,15 +1,18 @@
 // Aplicativo (SPA) de /quimica/: carrega o pacote de dados assinado, monta o motor local e navega entre as telas sem recarregar.
+// Idioma (docs/I18N.md §2): ?lang= → preferência → navegador → pt-BR; o seletor (globo na barra e Configurações) grava a preferência, limpa o
+// contexto da conversa e re-renderiza. As rotas (/quimica/tabela…) não mudam com o idioma.
 import { DataStore } from './data.js';
 import { Engine } from './engine.js';
 import { h, icon, anunciar } from './dom.js';
+import { aplicarIdiomaAoDocumento, definirIdioma, detectarIdioma, idiomaAtual, t } from './i18n/index.js';
 import { iniciarInstalacao } from './install.js';
-import { aplicarAparencia, carregar } from './prefs.js';
+import { aplicarAparencia, carregar, salvarIdioma } from './prefs.js';
 import { roteador, toast } from './ui/componentes.js';
 import { viewCalculadoras } from './ui/calculadoras.js';
 import { viewComposto, viewCompostos } from './ui/compostos.js';
-import { viewConfig } from './ui/config.js';
+import { seletorIdioma, viewConfig } from './ui/config.js';
 import { viewElemento } from './ui/elemento.js';
-import { viewInicio } from './ui/inicio.js';
+import { limparUltimaResposta, viewInicio } from './ui/inicio.js';
 import { viewSeguranca } from './ui/seguranca.js';
 import { viewSobreDados } from './ui/sobre.js';
 import { viewTabela } from './ui/tabela.js';
@@ -19,9 +22,10 @@ export { toast };
 const BASE = '/quimica/';
 const S = { store: null, engine: null, shell: null, primeira: true };
 
+/** Abas: rota, chave do rótulo no catálogo e ícone. */
 const ABAS = [
-  ['/quimica/', 'Início', 'sparkles'], ['/quimica/tabela', 'Tabela periódica', 'table'], ['/quimica/compostos', 'Compostos', 'molecule'],
-  ['/quimica/calculadoras', 'Calculadoras', 'calculator'], ['/quimica/seguranca', 'Segurança', 'shield']
+  ['/quimica/', 'inicio', 'sparkles'], ['/quimica/tabela', 'tabela', 'table'], ['/quimica/compostos', 'compostos', 'molecule'],
+  ['/quimica/calculadoras', 'calculadoras', 'calculator'], ['/quimica/seguranca', 'seguranca', 'shield']
 ];
 
 const ROTAS = [
@@ -48,24 +52,59 @@ export function resolverRota(pathname) {
 const raiz = () => document.getElementById('app');
 
 function viewNaoEncontrada() {
-  return { titulo: 'Página não encontrada', status: 404, node: h('div', null,
-    h('h1', { class: 'titulo-pagina', id: 'titulo-pagina', tabindex: '-1' }, 'Página não encontrada'),
-    h('p', { class: 'sub-pagina' }, 'Esse endereço não existe no SaibaTudo Química.'), h('a', { class: 'btn btn-primario', href: '/quimica/' }, 'Ir para o início')) };
+  return { titulo: t('ui.app.naoEncontrada.titulo'), status: 404, node: h('div', null,
+    h('h1', { class: 'titulo-pagina', id: 'titulo-pagina', tabindex: '-1' }, t('ui.app.naoEncontrada.titulo')),
+    h('p', { class: 'sub-pagina' }, t('ui.app.naoEncontrada.texto')), h('a', { class: 'btn btn-primario', href: '/quimica/' }, t('ui.app.naoEncontrada.inicio'))) };
+}
+
+/**
+ * Escolhe o idioma inicial (I18N.md §2) e aplica ao documento. `?lang=` grava a preferência. Devolve o idioma efetivo.
+ * @param {{url?: URL, prefs?: object, navegador?: readonly string[]}} [o] injetável para testes
+ */
+export function iniciarIdioma({ url = new URL(location.href), prefs = carregar(), navegador = globalThis.navigator?.languages ?? [] } = {}) {
+  const { idioma, origem } = detectarIdioma({ url, prefs, navegador });
+  definirIdioma(idioma);
+  if (origem === 'url' && prefs.idioma !== idioma) salvarIdioma(idioma);
+  aplicarIdiomaAoDocumento();
+  return idioma;
+}
+
+/** Troca o idioma em tempo de execução: grava a preferência, limpa o contexto da conversa, re-renderiza a casca e a tela atual. */
+export async function mudarIdioma(novo) {
+  const efetivo = definirIdioma(novo);
+  salvarIdioma(efetivo);
+  S.engine?.limparContexto();
+  limparUltimaResposta();
+  aplicarIdiomaAoDocumento();
+  // ?lang= na URL passa a refletir o idioma escolhido (compartilhável); o padrão fica sem parâmetro
+  try {
+    const url = new URL(location.href);
+    if (efetivo === 'pt-BR') url.searchParams.delete('lang'); else url.searchParams.set('lang', efetivo);
+    history.replaceState(history.state, '', url.pathname + url.search + url.hash);
+  } catch { /* sem history: segue */ }
+  if (S.shell) { montarShell(); avisoAssinatura(); }
+  await renderizar();
+  toast(t('ui.app.idiomaTrocado'));
+  return efetivo;
 }
 
 function montarShell() {
   const conteudo = h('main', { id: 'conteudo', class: 'conteudo', tabindex: '-1' });
-  const nav = h('nav', { class: 'abas', 'aria-label': 'Seções' }, h('ul', null, ABAS.map(([href, rotulo, ic]) => h('li', null, h('a', { href, 'data-aba': href }, icon(ic, 18), rotulo)))));
+  const nav = h('nav', { class: 'abas', 'aria-label': t('ui.app.secoes') }, h('ul', null, ABAS.map(([href, chave, ic]) => h('li', null, h('a', { href, 'data-aba': href }, icon(ic, 18), t(`ui.app.abas.${chave}`))))));
+  const idiomaEl = h('label', { class: 'appbar-idioma' }, h('span', { class: 'btn-icone claro', 'aria-hidden': 'true' }, icon('globe', 22)),
+    seletorIdioma({ id: 'sel-idioma-barra', classe: 'appbar-select', aoMudar: mudarIdioma, ariaLabel: t('ui.app.idioma') }));
   const topo = h('header', { class: 'appbar' },
-    h('a', { class: 'appbar-marca', href: '/quimica/', 'aria-label': 'SaibaTudo Química, início' },
+    h('a', { class: 'appbar-marca', href: '/quimica/', 'aria-label': t('ui.app.marcaAria') },
       h('img', { class: 'appbar-logo', src: '/quimica/brand/quimica-icon.svg', width: '38', height: '38', alt: '' }),
-      h('div', { class: 'appbar-textos' }, h('div', { class: 'appbar-titulo' }, 'SaibaTudo Química'), h('div', { class: 'appbar-sub' }, 'Dados abertos, cálculos no seu aparelho'))),
-    h('div', { class: 'appbar-acoes' }, h('a', { class: 'btn-icone claro', href: '/quimica/configuracoes', 'aria-label': 'Configurações', 'data-aba': '/quimica/configuracoes' }, icon('settings', 22))));
+      h('div', { class: 'appbar-textos' }, h('div', { class: 'appbar-titulo' }, t('ui.marca')), h('div', { class: 'appbar-sub' }, t('ui.app.marcaSub')))),
+    h('div', { class: 'appbar-acoes' }, idiomaEl, h('a', { class: 'btn-icone claro', href: '/quimica/configuracoes', 'aria-label': t('ui.app.configuracoes'), 'data-aba': '/quimica/configuracoes' }, icon('settings', 22))));
   const rodape = h('footer', { class: 'rodape' },
-    h('a', { href: '/quimica/sobre-os-dados' }, 'Sobre os dados'), h('a', { href: '/quimica/privacidade' }, 'Privacidade'), h('a', { href: '/quimica/configuracoes' }, 'Configurações'),
-    h('p', null, 'Projeto independente e de código aberto (MIT). Sem anúncios, login ou rastreadores.'));
+    h('a', { href: '/quimica/sobre-os-dados' }, t('ui.app.rodape.sobre')), h('a', { href: '/quimica/privacidade' }, t('ui.app.rodape.privacidade')), h('a', { href: '/quimica/configuracoes' }, t('ui.app.rodape.configuracoes')),
+    h('p', null, t('ui.app.rodape.projeto')));
   const aviso = h('div', { id: 'aviso-global' });
   raiz().replaceChildren(h('div', { class: 'app' }, topo, nav, aviso, conteudo, rodape));
+  const pular = document.querySelector('a.skip');
+  if (pular) pular.textContent = t('ui.html.pular');
   S.shell = { conteudo, nav, aviso };
 }
 
@@ -79,7 +118,7 @@ function marcarAba(pathname) {
 
 function avisoAssinatura() {
   const ruim = S.store.sig.estado === 'invalida';
-  S.shell.aviso.replaceChildren(...(ruim ? [h('p', { class: 'aviso-caixa', role: 'alert' }, icon('warning', 18), 'A assinatura digital do pacote de dados não confere. Os dados do próprio site continuam em uso, mas não foram autenticados: não confie em valores críticos.')] : []));
+  S.shell.aviso.replaceChildren(...(ruim ? [h('p', { class: 'aviso-caixa', role: 'alert' }, icon('warning', 18), t('ui.app.avisoAssinatura'))] : []));
 }
 
 export async function renderizar() {
@@ -88,12 +127,12 @@ export async function renderizar() {
   marcarAba(url.pathname);
   let r;
   try {
-    r = await rota.view({ store: S.store, engine: S.engine, params: rota.params, query: url.searchParams, navegar: irPara });
+    r = await rota.view({ store: S.store, engine: S.engine, params: rota.params, query: url.searchParams, navegar: irPara, mudarIdioma });
   } catch (e) {
-    r = { titulo: 'Erro', node: h('div', { class: 'tela-corpo' }, h('h1', { id: 'titulo-pagina', tabindex: '-1' }, 'Algo deu errado'), h('p', { class: 'mudo' }, `Não foi possível montar esta tela (${e instanceof Error ? e.message : String(e)}).`), h('a', { class: 'btn btn-primario', href: '/quimica/' }, 'Ir para o início')) };
+    r = { titulo: t('ui.app.erro.titulo'), node: h('div', { class: 'tela-corpo' }, h('h1', { id: 'titulo-pagina', tabindex: '-1' }, t('ui.app.erro.cabecalho')), h('p', { class: 'mudo' }, t('ui.app.erro.texto', { msg: e instanceof Error ? e.message : String(e) })), h('a', { class: 'btn btn-primario', href: '/quimica/' }, t('ui.app.erro.inicio'))) };
   }
   S.shell.conteudo.replaceChildren(r.node);
-  document.title = `${r.titulo} — SaibaTudo Química`;
+  document.title = t('ui.app.tituloJanela', { titulo: r.titulo });
   if (!S.primeira) {
     const alvo = (r.foco && S.shell.conteudo.querySelector(r.foco)) || S.shell.conteudo.querySelector('#titulo-pagina');
     if (url.hash && S.shell.conteudo.querySelector(url.hash)) S.shell.conteudo.querySelector(url.hash).scrollIntoView();
@@ -107,6 +146,8 @@ export function irPara(href, { substituir = false } = {}) {
   const url = new URL(href, location.origin);
   if (url.origin !== location.origin) { location.assign(href); return; }
   if (!resolverRota(url.pathname) && !url.pathname.startsWith(BASE)) { location.assign(href); return; }
+  // o idioma escolhido acompanha a navegação interna quando não é o padrão
+  if (idiomaAtual() !== 'pt-BR' && !url.searchParams.has('lang')) url.searchParams.set('lang', idiomaAtual());
   if (url.pathname + url.search + url.hash !== location.pathname + location.search + location.hash) history[substituir ? 'replaceState' : 'pushState']({}, '', url.pathname + url.search + url.hash);
   return renderizar();
 }
@@ -125,20 +166,21 @@ function interceptarLinks(e) {
 }
 
 function telaErro(msg) {
-  raiz().replaceChildren(h('div', { class: 'tela-corpo offline' }, h('h1', null, 'Não foi possível carregar os dados'),
-    h('p', { class: 'mudo' }, msg), h('p', null, h('button', { class: 'btn btn-primario', type: 'button', onClick: () => iniciarApp() }, 'Tentar de novo'))));
+  raiz().replaceChildren(h('div', { class: 'tela-corpo offline' }, h('h1', null, t('ui.app.erroDados.titulo')),
+    h('p', { class: 'mudo' }, msg), h('p', null, h('button', { class: 'btn btn-primario', type: 'button', onClick: () => iniciarApp() }, t('ui.app.erroDados.tentar')))));
 }
 
 export async function iniciarApp() {
   aplicarAparencia(carregar());
+  iniciarIdioma();
   iniciarInstalacao();
-  raiz().replaceChildren(h('div', { class: 'carregando', role: 'status' }, h('span', { class: 'spinner', 'aria-hidden': 'true' }), h('p', { class: 'mudo' }, 'Carregando SaibaTudo Química…')));
+  raiz().replaceChildren(h('div', { class: 'carregando', role: 'status' }, h('span', { class: 'spinner', 'aria-hidden': 'true' }), h('p', { class: 'mudo' }, t('ui.app.carregando'))));
   try {
     S.store = new DataStore();
     await S.store.iniciar();
     S.engine = new Engine({ store: S.store });
   } catch (e) {
-    telaErro(`${e instanceof Error ? e.message : String(e)}. Verifique a conexão; depois da primeira carga o aplicativo funciona offline.`);
+    telaErro(t('ui.app.erroDados.complemento', { msg: e instanceof Error ? e.message : String(e) }));
     return;
   }
   montarShell();
@@ -149,7 +191,7 @@ export async function iniciarApp() {
   // verificação de atualização em segundo plano (dois arquivos pequenos), sem travar a interface
   setTimeout(async () => {
     const r = await S.store.verificarAtualizacao().catch(() => null);
-    if (r?.tipo === 'atualizado') { avisoAssinatura(); toast('Dados atualizados. Recarregue a página para usar a versão nova em todas as telas.'); }
+    if (r?.tipo === 'atualizado') { avisoAssinatura(); toast(t('ui.app.dadosAtualizados')); }
   }, 4000);
 }
 

@@ -5,6 +5,8 @@ Coleta dos 118 elementos (DATA_CONTRACT §2).
 Fonte principal: PubChem Periodic Table (domínio público). Nomes em português: tabela fixa da SBQ (quimica_util).
 Complementos via Wikidata (CC0): descobridor, CAS, QID, rótulos (conferência dos nomes) e massa atômica convencional
 quando o PubChem a entrega com poucas casas (ex.: Li "7.0", Fe "55.84").
+Nomes por idioma (`nomes`, docs/I18N.md §4): pt-BR = tabela da SBQ (`nome`), en = `nomeEn` do PubChem; es/de/fr = rótulo do
+item do Wikidata (`wbgetentities`, CC0). Idioma sem rótulo = chave ausente (o cliente cai para o inglês e rotula).
 
 Unidades de saída (SI/contrato): K, kg/m³, pm, kJ/mol (eV x 96,485).
 """
@@ -13,6 +15,7 @@ from decimal import Decimal
 
 import quimica_util as Q
 import wikidata as W
+from common import IDIOMAS
 
 URL_PUBCHEM = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/periodictable/JSON"
 URL_PUBCHEM_PAGINA = "https://pubchem.ncbi.nlm.nih.gov/periodic-table/"
@@ -254,8 +257,43 @@ def montar_elemento(linha, wd, hoje, info=None):
     return e
 
 
-def coletar(http, hoje):
-    """Devolve (elementos, stats). Levanta exceção se o PubChem falhar (o Wikidata é opcional)."""
+def nomes_por_idioma(e, rotulos, idiomas):
+    """`nomes` do elemento: pt-BR e en do próprio registro; os demais do Wikidata (`rotulos` = {idioma: rótulo})."""
+    nomes = {"pt-BR": e["nome"], "en": e["nomeEn"]}
+    for idioma in idiomas:
+        if idioma in nomes:
+            continue
+        r = (rotulos or {}).get(idioma)
+        if r:
+            nomes[idioma] = r
+    return {i: nomes[i] for i in IDIOMAS if i in nomes and (i in idiomas or i in ("pt-BR", "en"))}
+
+
+def rotular(http, elementos, idiomas, stats, log=print):
+    """Preenche `nomes` (e devolve {QID: artigos por idioma} para a coleta da Wikipédia). Falha do Wikidata não derruba o build."""
+    qids = [e["wikidata"] for e in elementos if e.get("wikidata")]
+    try:
+        ents = W.entidades(http, qids, idiomas, log=log) if qids else {}
+        stats["rotulosWikidata"] = "ok"
+    except Exception as exc:  # noqa: BLE001
+        ents = {}
+        stats["rotulosWikidata"] = f"falhou: {exc}"
+    faltam = {i: 0 for i in idiomas if i not in ("pt-BR", "en")}
+    for e in elementos:
+        ent = ents.get(e.get("wikidata")) or {}
+        e["nomes"] = nomes_por_idioma(e, ent.get("rotulos"), idiomas)
+        for i in faltam:
+            if i not in e["nomes"]:
+                faltam[i] += 1
+    stats["nomesSemRotulo"] = faltam
+    return {q: ents[q].get("artigos", {}) for q in ents}
+
+
+def coletar(http, hoje, idiomas=None):
+    """Devolve (elementos, stats). Levanta exceção se o PubChem falhar (o Wikidata é opcional).
+    `idiomas`: códigos do projeto para `nomes` (padrão: todos de common.IDIOMAS); os títulos de artigo por idioma ficam em
+    `stats["_artigos"]` ({QID: {idioma: título}}) para a coleta da Wikipédia (chave com sublinhado: não vai para stats.json)."""
+    idiomas = list(idiomas or IDIOMAS)
     linhas = ler_pubchem(http)
     stats = {"pubchemLinhas": len(linhas), "wikidata": "ok", "nomesDivergentesWikidata": [], "massaDoWikidata": 0,
              "descobertaSemDescobridor": [], "semEstadoPadrao": []}
@@ -284,5 +322,6 @@ def coletar(http, hoje):
             stats["semEstadoPadrao"].append(z)
         elementos.append(e)
     elementos.sort(key=lambda x: x["z"])
+    stats["_artigos"] = rotular(http, elementos, idiomas, stats)
     stats["elementos"] = len(elementos)
     return elementos, stats

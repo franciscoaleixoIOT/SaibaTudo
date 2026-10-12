@@ -62,6 +62,15 @@ test('páginas HTML: lang pt-BR, viewport, sem script/estilo inline e todos os r
       assert.ok(existsSync(join(SRC, p)) || existsSync(join(SRC, p, 'index.html')), `${pagina}: recurso ausente ${p}`);
     }
   }
+  // política de privacidade em inglês: mesma casca, lang="en", sem recursos ausentes
+  const en = readFileSync(join(Q, 'privacidade/en.html'), 'utf8');
+  assert.match(en, /<html lang="en">/);
+  assert.ok(!/<script(?![^>]*\bsrc=)[^>]*>[^<]/i.test(en) && !/<style[\s>]/i.test(en) && !/\sstyle=/.test(en), 'privacidade/en.html: CSP');
+  for (const m of en.matchAll(/(?:href|src)="(\/[^"#?]*)"/g)) {
+    const p = m[1];
+    if (gerados(p) || rotasSpa.test(p) || p === '/quimica/privacidade/en') continue;
+    assert.ok(existsSync(join(SRC, p)) || existsSync(join(SRC, p, 'index.html')), `privacidade/en.html: recurso ausente ${p}`);
+  }
   const index = readFileSync(join(Q, 'index.html'), 'utf8');
   assert.match(index, /<link rel="canonical" href="https:\/\/saibatudo\.net\/quimica\/">/);
   assert.match(index, /<script type="module" src="\/quimica\/js\/main\.js">/);
@@ -133,6 +142,9 @@ test('SmilesDrawer vendorizado: sem estilo inline por atributo (a CSP bloqueia) 
 
 test('manifesto web: campos exigidos, escopo /quimica/, ícones (any e maskable) e atalhos coerentes e existentes', () => {
   const m = JSON.parse(readFileSync(join(Q, 'manifest.webmanifest'), 'utf8'));
+  const en = JSON.parse(readFileSync(join(Q, 'manifest.en.webmanifest'), 'utf8'));
+  assert.equal(en.lang, 'en');
+  assert.deepEqual([en.id, en.scope, en.display, en.theme_color, en.icons], [m.id, m.scope, m.display, m.theme_color, m.icons], 'manifesto en: mesmos ids, escopo e ícones');
   assert.equal(m.name, 'SaibaTudo Química');
   assert.equal(m.id, '/quimica/');
   assert.equal(m.scope, '/quimica/');

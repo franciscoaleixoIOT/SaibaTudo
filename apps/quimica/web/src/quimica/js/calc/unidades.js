@@ -1,6 +1,9 @@
 // Conversão de unidades. A tabela vem de `regras.json` (prefixos SI e unidades, ver docs/DATA_CONTRACT.md §6); se o pacote não
 // trouxer uma tabela utilizável, usa-se a tabela padrão abaixo (definições exatas do SI e de unidades legais) e a resposta diz isso.
 import { fmt, fmtTex } from '../formato.js';
+import { t } from '../i18n/index.js';
+
+const TU = (chave, params) => t(`respostas.calc.unidades.${chave}`, params);
 
 /** Prefixos SI (BIPM): símbolo → fator. */
 export const PREFIXOS_PADRAO = [
@@ -70,9 +73,9 @@ export function normalizarUnidades(regras) {
 export function tabelaDeUnidades(regras) {
   const doPacote = normalizarUnidades(regras);
   if (doPacote) {
-    return { ...doPacote, prefixos: doPacote.prefixos ?? PREFIXOS_PADRAO, origem: 'regras.json (pacote de dados assinado)', doPacote: true };
+    return { ...doPacote, prefixos: doPacote.prefixos ?? PREFIXOS_PADRAO, origem: 'regras.json (pacote de dados assinado)', origemChave: 'pacote', doPacote: true };
   }
-  return { grupos: UNIDADES_PADRAO, prefixos: PREFIXOS_PADRAO, origem: 'tabela padrão do aplicativo (definições do SI)', doPacote: false };
+  return { grupos: UNIDADES_PADRAO, prefixos: PREFIXOS_PADRAO, origem: 'tabela padrão do aplicativo (definições do SI)', origemChave: 'padrao', doPacote: false };
 }
 
 function acharItem(grupo, simbolo) {
@@ -106,14 +109,14 @@ export function acharUnidade(tabela, simbolo) {
  * @returns {{ok: true, valor: number, de: string, para: string, resultado: number, grupo: string, passos: object[], origem: string} | {ok: false, erro: string}}
  */
 export function converter(valor, de, para, tabela, grandeza = null) {
-  if (!Number.isFinite(valor)) return { ok: false, erro: 'Informe um número para converter.' };
+  if (!Number.isFinite(valor)) return { ok: false, erro: TU('informeNumero') };
   const A = acharUnidade(tabela, de).filter((x) => !grandeza || x.grupo === grandeza);
   const B = acharUnidade(tabela, para).filter((x) => !grandeza || x.grupo === grandeza);
-  if (A.length === 0) return { ok: false, erro: `Não conheço a unidade "${de}".` };
-  if (B.length === 0) return { ok: false, erro: `Não conheço a unidade "${para}".` };
+  if (A.length === 0) return { ok: false, erro: TU('naoConheco', { u: de }) };
+  if (B.length === 0) return { ok: false, erro: TU('naoConheco', { u: para }) };
   const comum = A.find((a) => B.some((b) => b.grupo === a.grupo));
   if (!comum) {
-    return { ok: false, erro: `"${de}" (${A[0].grupo}) e "${para}" (${B[0].grupo}) são grandezas diferentes: não dá para converter uma na outra.` };
+    return { ok: false, erro: TU('grandezasDiferentes', { de, gde: A[0].grupo, para, gpara: B[0].grupo }) };
   }
   const a = comum;
   const b = B.find((x) => x.grupo === a.grupo);
@@ -123,13 +126,13 @@ export function converter(valor, de, para, tabela, grandeza = null) {
   const baseNome = tabela.grupos[a.grupo].base;
   const passos = [];
   if (a.offset || b.offset) {
-    passos.push({ texto: `Converta para a unidade base da grandeza (${baseNome}): valor × fator + deslocamento.`, tex: `${fmtTex(valor)}\\,${unid(a.rotulo)} \\times ${fmtTex(a.fator)} + ${fmtTex(a.offset)} = ${fmtTex(emBase)}\\,${unid(baseNome)}` });
-    passos.push({ texto: `Converta da unidade base para ${para}: (valor − deslocamento) ÷ fator.`, tex: `\\dfrac{${fmtTex(emBase)} - ${fmtTex(b.offset)}}{${fmtTex(b.fator)}} = ${fmtTex(resultado)}\\,${unid(b.rotulo)}` });
+    passos.push({ texto: TU('passoBase', { base: baseNome }), tex: `${fmtTex(valor)}\\,${unid(a.rotulo)} \\times ${fmtTex(a.fator)} + ${fmtTex(a.offset)} = ${fmtTex(emBase)}\\,${unid(baseNome)}` });
+    passos.push({ texto: TU('passoDaBase', { para }), tex: `\\dfrac{${fmtTex(emBase)} - ${fmtTex(b.offset)}}{${fmtTex(b.fator)}} = ${fmtTex(resultado)}\\,${unid(b.rotulo)}` });
   } else {
-    passos.push({ texto: `1 ${a.rotulo} equivale a ${fmt(a.fator)} ${baseNome} e 1 ${b.rotulo} equivale a ${fmt(b.fator)} ${baseNome}.`, tex: `1\\,${unid(a.rotulo)} = ${fmtTex(a.fator)}\\,${unid(baseNome)} \\qquad 1\\,${unid(b.rotulo)} = ${fmtTex(b.fator)}\\,${unid(baseNome)}` });
-    passos.push({ texto: 'Multiplique pelo fator de conversão (razão entre as unidades):', tex: `${fmtTex(valor)}\\,${unid(a.rotulo)} \\times \\dfrac{${fmtTex(a.fator)}}{${fmtTex(b.fator)}} = ${fmtTex(resultado)}\\,${unid(b.rotulo)}` });
+    passos.push({ texto: TU('passoEquivale', { a: a.rotulo, fa: fmt(a.fator), b: b.rotulo, fb: fmt(b.fator), base: baseNome }), tex: `1\\,${unid(a.rotulo)} = ${fmtTex(a.fator)}\\,${unid(baseNome)} \\qquad 1\\,${unid(b.rotulo)} = ${fmtTex(b.fator)}\\,${unid(baseNome)}` });
+    passos.push({ texto: TU('passoFator'), tex: `${fmtTex(valor)}\\,${unid(a.rotulo)} \\times \\dfrac{${fmtTex(a.fator)}}{${fmtTex(b.fator)}} = ${fmtTex(resultado)}\\,${unid(b.rotulo)}` });
   }
-  return { ok: true, valor, de: a.rotulo, para: b.rotulo, resultado, grupo: a.grupo, passos, origem: tabela.origem };
+  return { ok: true, valor, de: a.rotulo, para: b.rotulo, resultado, grupo: a.grupo, passos, origem: tabela.origem, origemChave: tabela.origemChave ?? 'padrao' };
 }
 
 /** Lista [{grupo, unidades:[símbolos]}] para montar os seletores. */
@@ -140,12 +143,12 @@ export function listarUnidades(tabela) {
 /** Fator de uma unidade em relação à base do grupo (para as demais calculadoras). */
 export function paraBase(tabela, simbolo, grupo, valor) {
   const u = acharUnidade(tabela, simbolo).find((x) => x.grupo === grupo);
-  if (!u) throw new Error(`Unidade desconhecida: ${simbolo}`);
+  if (!u) throw new Error(TU('desconhecida', { u: simbolo }));
   return valor * u.fator + u.offset;
 }
 export function deBase(tabela, simbolo, grupo, valorBase) {
   const u = acharUnidade(tabela, simbolo).find((x) => x.grupo === grupo);
-  if (!u) throw new Error(`Unidade desconhecida: ${simbolo}`);
+  if (!u) throw new Error(TU('desconhecida', { u: simbolo }));
   return (valorBase - u.offset) / u.fator;
 }
 

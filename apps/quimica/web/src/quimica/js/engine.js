@@ -2,6 +2,7 @@
 // (A IA na nuvem é da fase 5 e ainda não está disponível: nada sai do aparelho.)
 import { AnswerBuilder } from './answers.js';
 import { Dicionario } from './dicionario.js';
+import { idiomaAtual } from './i18n/index.js';
 import { parse } from './nlu.js';
 import { avaliarSeguranca } from './seguranca.js';
 
@@ -14,10 +15,10 @@ export class Engine {
     this._ultimoContexto = null;
   }
 
-  /** Dicionário derivado dos dados; reconstruído quando o pacote muda. */
+  /** Dicionário derivado dos dados e do idioma ativo; reconstruído quando o pacote ou o idioma muda. */
   dicionario() {
-    if (!this._dic || this._rev !== this.store.rev) {
-      this._dic = new Dicionario(this.store);
+    if (!this._dic || this._rev !== this.store.rev || this._dic.idioma !== idiomaAtual()) {
+      this._dic = new Dicionario(this.store, idiomaAtual());
       this._rev = this.store.rev;
     }
     return this._dic;

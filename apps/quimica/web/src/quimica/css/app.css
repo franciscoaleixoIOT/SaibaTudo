@@ -34,6 +34,12 @@
 .appbar-titulo { font-family: var(--fonte-marca); font-weight: 600; font-size: 1.125rem; line-height: 1.15; color: #fff; }
 .appbar-sub { font-size: .75rem; color: var(--ouro); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .appbar-acoes { display: flex; align-items: center; gap: 2px; flex: none; }
+.appbar-idioma { display: inline-flex; align-items: center; gap: 0; color: #fff; }
+.appbar-idioma .btn-icone { pointer-events: none; }
+.appbar-select { max-width: 7.5rem; min-height: 36px; padding: 2px 6px; border: 1px solid rgba(255, 255, 255, .35); border-radius: 8px; background: transparent; color: #fff; font: inherit; font-size: .8125rem; }
+.appbar-select option { color: #0C2340; background: #fff; }
+.appbar-select:focus-visible { outline: 3px solid var(--foco); outline-offset: 2px; }
+@media (max-width: 420px) { .appbar-select { max-width: 5.5rem; } }
 
 .abas { background: var(--navy-2); position: sticky; top: 60px; z-index: 29; }
 .abas ul { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: thin; max-width: 1200px; margin: 0 auto; padding: 0 max(8px, env(safe-area-inset-left)); }

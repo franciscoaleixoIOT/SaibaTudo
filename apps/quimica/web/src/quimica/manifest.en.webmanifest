@@ -1,0 +1,44 @@
+{
+  "id": "/quimica/",
+  "name": "SaibaTudo Química",
+  "short_name": "Chemistry",
+  "description": "Periodic table, compounds with 2D structures, step-by-step calculators and chemical safety, with open data. Works offline and nothing leaves your device.",
+  "lang": "en",
+  "dir": "ltr",
+  "start_url": "/quimica/?source=pwa&lang=en",
+  "scope": "/quimica/",
+  "display": "standalone",
+  "theme_color": "#0C2340",
+  "background_color": "#0C2340",
+  "categories": ["education", "utilities", "science"],
+  "icons": [
+    { "src": "/quimica/brand/pwa-quimica-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/quimica/brand/pwa-quimica-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/quimica/brand/pwa-quimica-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/quimica/brand/pwa-quimica-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/quimica/brand/quimica-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Periodic table",
+      "short_name": "Table",
+      "description": "Interactive periodic table",
+      "url": "/quimica/tabela?source=shortcut&lang=en",
+      "icons": [{ "src": "/quimica/brand/pwa-quimica-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Calculators",
+      "short_name": "Calculators",
+      "description": "Molar mass, balancing, stoichiometry, pH and more",
+      "url": "/quimica/calculadoras?source=shortcut&lang=en",
+      "icons": [{ "src": "/quimica/brand/pwa-quimica-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Compounds",
+      "short_name": "Compounds",
+      "description": "Search compounds and see the 2D structure",
+      "url": "/quimica/compostos?source=shortcut&lang=en",
+      "icons": [{ "src": "/quimica/brand/pwa-quimica-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
+}

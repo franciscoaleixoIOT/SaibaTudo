@@ -189,5 +189,49 @@ class LimitadorTest(unittest.TestCase):
         self.assertAlmostEqual(sum(rel.dormidos), 4 / 2.0)  # continua igual: o outro host não esperou
 
 
+class WikidataEntidadesTest(unittest.TestCase):
+    def test_wbgetentities_parse_e_lotes(self):
+        import wikidata as W
+
+        class Resp:
+            status = 200
+
+            def __init__(self, d):
+                self._d = d
+
+            def json(self):
+                return self._d
+
+        chamadas = []
+
+        class Http:
+            def get(self, url, params=None, cabecalhos=None, **kw):
+                chamadas.append(params)
+                ids = params["ids"].split("|")
+                ents = {}
+                for q in ids:
+                    if q == "Q999999":
+                        ents[q] = {"missing": ""}
+                        continue
+                    ents[q] = {"labels": {"en": {"value": f"label-en-{q}"}, "pt": {"value": f"label-pt-{q}"}, "de": {"value": f"label-de-{q}"}},
+                               "aliases": {"en": [{"value": "a1"}, {"value": "a2"}], "pt": [{"value": "ap"}], "pt-br": [{"value": "apbr"}, {"value": "ap"}]},
+                               "sitelinks": {"enwiki": {"title": f"Art {q}"}, "dewiki": {"title": f"Art-de {q}"}, "ptwiki": {"title": f"Art-pt {q}"}}}
+                return Resp({"entities": ents})
+
+        qids = [f"Q{i}" for i in range(1, 61)] + ["Q999999"]
+        r = W.entidades(Http(), qids + ["Q5", None, ""], ["pt-BR", "en", "de"])
+        self.assertEqual(len(chamadas), 2)  # 61 ids -> 2 lotes de até 50, ids ordenados e sem repetição
+        self.assertEqual(chamadas[0]["ids"].split("|")[:3], ["Q1", "Q2", "Q3"])
+        self.assertEqual(chamadas[0]["languages"], "de|en|pt|pt-br")
+        self.assertEqual(chamadas[0]["sitefilter"], "dewiki|enwiki|ptwiki")
+        self.assertNotIn("Q999999", r)
+        e = r["Q5"]
+        self.assertEqual(e["rotulos"], {"pt-BR": "label-pt-Q5", "en": "label-en-Q5", "de": "label-de-Q5"})  # pt como reserva de pt-br
+        self.assertEqual(e["apelidos"]["pt-BR"], ["apbr", "ap"])  # pt-br + pt sem repetir
+        self.assertEqual(e["apelidos"]["en"], ["a1", "a2"])
+        self.assertNotIn("de", e["apelidos"])
+        self.assertEqual(e["artigos"], {"pt-BR": "Art-pt Q5", "en": "Art Q5", "de": "Art-de Q5"})
+
+
 if __name__ == "__main__":
     unittest.main()

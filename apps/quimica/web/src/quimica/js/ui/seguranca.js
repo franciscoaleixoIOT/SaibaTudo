@@ -1,62 +1,62 @@
 // Segurança: página explicativa (GHS, pictogramas, frases H, boas práticas) com links para fontes oficiais. Não copia fichas de segurança.
-import { ORIENTACAO_GERAL } from '../answers.js';
+import { orientacaoGeral } from '../answers.js';
 import { buscarCompostos } from '../busca.js';
 import { h, icon } from '../dom.js';
-import { FRASES_H, GRUPOS_FRASES_H, NOMES_PICTOGRAMA, CODIGOS_PICTOGRAMA, PICTOGRAMAS, urlPictograma } from '../perigos.js';
+import { idiomaAtual, nomeDoIdioma, t, tl } from '../i18n/index.js';
+import { nomeCompostoExibicao } from '../nomes.js';
+import { CODIGOS_PICTOGRAMA, FRASES_H, descricaoPictograma, fraseHInfo, gruposFrasesH, nomePictograma, urlPictograma } from '../perigos.js';
 import { normalizar } from '../texto.js';
 import { formulaEl, linkExterno, linkRota } from './componentes.js';
 import { comExibicao } from './compostos.js';
 
-const LINKS = [
-  ['Fichas Internacionais de Segurança Química (ICSC), OIT/OMS', 'https://chemicalsafety.ilo.org/dyn/icsc/showcard.home', 'Fichas por substância (o aplicativo não copia as fichas: só aponta para elas).'],
-  ['PubChem: classificação GHS dos compostos', 'https://pubchem.ncbi.nlm.nih.gov/ghs/', 'Explica a fonte da classificação usada neste aplicativo.'],
-  ['UNECE: transporte de mercadorias perigosas e GHS', 'https://unece.org/transport/dangerous-goods', 'Origem do Sistema Globalmente Harmonizado (GHS) da ONU.']
-];
-
 export function viewSeguranca({ store }) {
-  const filtro = h('input', { id: 'filtro-h', class: 'campo', type: 'search', placeholder: 'Filtrar por código ou palavra (ex.: H314, inflamável)', autocomplete: 'off' });
-  const lista = h('ul', { class: 'frases-h', 'aria-label': 'Frases de perigo (H)' });
-  const sem = h('p', { class: 'vazio', hidden: true }, 'Nenhuma frase encontrada.');
-  const frases = Object.entries(FRASES_H);
+  const idioma = idiomaAtual();
+  const filtro = h('input', { id: 'filtro-h', class: 'campo', type: 'search', placeholder: t('ui.seguranca.placeholderFiltro'), autocomplete: 'off' });
+  const lista = h('ul', { class: 'frases-h', 'aria-label': t('ui.componentes.frasesAria') });
+  const sem = h('p', { class: 'vazio', hidden: true }, t('ui.seguranca.nenhumaFrase'));
+  // frases H: as do pacote no idioma (ghs_frases.json, CLP) ou as pt-BR do app, rotuladas quando não estão no idioma
+  const codigos = [...new Set([...Object.keys(FRASES_H), ...Object.keys(store.regras?.frasesHPorIdioma?.[idioma] ?? {})])].sort();
+  const frases = codigos.map((c) => [c, fraseHInfo(c, store.regras, idioma)]).filter(([, i]) => i);
   function atualizarH() {
     const q = normalizar(filtro.value);
-    const achadas = frases.filter(([c, t]) => !q || normalizar(c).includes(q) || normalizar(t).includes(q));
-    lista.replaceChildren(...achadas.map(([c, t]) => h('li', null, h('span', { class: 'cod' }, c), h('span', null, t))));
+    const achadas = frases.filter(([c, i]) => !q || normalizar(c).includes(q) || normalizar(i.texto).includes(q));
+    lista.replaceChildren(...achadas.map(([c, i]) => h('li', null, h('span', { class: 'cod' }, c), h('span', { lang: i.idioma !== idioma ? i.idioma : null }, i.texto, i.idioma !== idioma ? h('span', { class: 'mudo mini' }, ` ${t('ui.componentes.fraseEmIdioma', { idioma: nomeDoIdioma(i.idioma) })}`) : null))));
     sem.hidden = achadas.length > 0;
   }
   filtro.addEventListener('input', atualizarH);
   atualizarH();
 
-  const busca = h('input', { id: 'busca-seg', class: 'campo', type: 'search', placeholder: 'Nome, fórmula ou CAS do composto', autocomplete: 'off' });
+  const busca = h('input', { id: 'busca-seg', class: 'campo', type: 'search', placeholder: t('ui.seguranca.placeholderBusca'), autocomplete: 'off' });
   const resultados = h('ul', { class: 'lista-resultados' });
   let seq = 0;
   busca.addEventListener('input', async () => {
     const meu = ++seq;
     const achados = await comExibicao(store, buscarCompostos(store.indice.entradas, busca.value, 8));
     if (meu !== seq) return;
-    resultados.replaceChildren(...achados.map((c) => h('li', null, linkRota(`/quimica/composto/${c.cid}#seguranca`, [h('strong', null, c.nome ?? c.nomeIupac, c.formula ? [' — ', formulaEl(c.formula)] : null), h('span', { class: 'sub' }, 'Ver perigos e pictogramas')], { class: 'item-res' }))));
+    resultados.replaceChildren(...achados.map((c) => h('li', null, linkRota(`/quimica/composto/${c.cid}#seguranca`, [h('strong', null, nomeCompostoExibicao(c), c.formula ? [' — ', formulaEl(c.formula)] : null), h('span', { class: 'sub' }, t('ui.seguranca.verPictogramas'))], { class: 'item-res' }))));
   });
 
+  const links = tl('ui.seguranca.links');
   const no = h('div', null,
-    h('h1', { class: 'titulo-pagina', id: 'titulo-pagina', tabindex: '-1' }, 'Segurança química'),
-    h('p', { class: 'sub-pagina' }, 'Como ler os avisos de perigo dos produtos químicos. O aplicativo mostra a classificação GHS dos compostos que estão no pacote de dados e leva você às fichas oficiais; ele não ensina a produzir substâncias perigosas.'),
-    h('p', { class: 'aviso-caixa' }, icon('shield', 18), 'Por segurança, o aplicativo recusa pedidos de síntese, purificação ou receitas caseiras de explosivos, armas químicas, drogas ilícitas e outros reagentes perigosos. Perguntas sobre perigos, EPI, armazenamento e primeiros socorros são respondidas.'),
-    h('section', { class: 'secao' }, h('h2', null, 'Ver os perigos de um composto'),
-      h('label', { class: 'sr-only', for: 'busca-seg' }, 'Buscar composto'), busca, resultados),
-    h('section', { class: 'secao' }, h('h2', null, 'Pictogramas do GHS'),
-      h('p', { class: 'sub-pagina' }, 'O GHS (Sistema Globalmente Harmonizado, da ONU) usa losangos de borda vermelha. Os desenhos abaixo são versões simplificadas, feitas para este aplicativo.'),
+    h('h1', { class: 'titulo-pagina', id: 'titulo-pagina', tabindex: '-1' }, t('ui.seguranca.titulo')),
+    h('p', { class: 'sub-pagina' }, t('ui.seguranca.intro')),
+    h('p', { class: 'aviso-caixa' }, icon('shield', 18), t('ui.seguranca.aviso')),
+    h('section', { class: 'secao' }, h('h2', null, t('ui.seguranca.verPerigos')),
+      h('label', { class: 'sr-only', for: 'busca-seg' }, t('ui.seguranca.buscar')), busca, resultados),
+    h('section', { class: 'secao' }, h('h2', null, t('ui.seguranca.pictogramas')),
+      h('p', { class: 'sub-pagina' }, t('ui.seguranca.pictogramasIntro')),
       h('ul', { class: 'ghs-pictos' }, CODIGOS_PICTOGRAMA.map((c) => h('li', { class: 'picto grande' },
-        h('img', { src: urlPictograma(c), alt: `${c}: ${NOMES_PICTOGRAMA[c]}`, width: '112', height: '112', loading: 'lazy' }),
-        h('strong', null, `${c} — ${NOMES_PICTOGRAMA[c]}`), h('span', null, PICTOGRAMAS[c]?.[1] ?? ''))))),
-    h('section', { class: 'secao' }, h('h2', null, 'Palavra de sinal'),
-      h('p', null, h('span', { class: 'sinal perigo' }, 'Perigo'), ' indica as categorias mais graves; ', h('span', { class: 'sinal atencao' }, 'Atenção'), ' indica as menos graves. Substâncias de menor perigo podem vir sem palavra de sinal.')),
-    h('section', { class: 'secao' }, h('h2', null, 'Como ler as frases H'),
-      h('p', null, 'Cada frase de perigo tem um código: a letra H e três algarismos. O primeiro algarismo diz o tipo de perigo:'),
-      h('ul', { class: 'lista-pontos' }, GRUPOS_FRASES_H.map((g) => h('li', null, h('strong', null, `${g.faixa}: ${g.titulo}`), `, ${g.descricao}`))),
-      h('p', { class: 'pequeno mudo' }, 'Códigos somados, como H302+H312, juntam as frases em uma só. Textos: UNECE GHS / ECHA CLP, em português.'),
-      h('label', { class: 'rotulo-campo', for: 'filtro-h' }, 'Procurar uma frase'), filtro, lista, sem),
-    h('section', { class: 'secao' }, h('h2', null, 'Boas práticas'), h('ul', { class: 'lista-pontos' }, ORIENTACAO_GERAL.map((t) => h('li', null, t)))),
-    h('section', { class: 'secao' }, h('h2', null, 'Fontes oficiais (links externos)'),
-      h('ul', { class: 'lista-pontos' }, LINKS.map(([nome, url, nota]) => h('li', null, linkExterno(url, nome), ` — ${nota}`)))));
-  return { titulo: 'Segurança química', node: no };
+        h('img', { src: urlPictograma(c), alt: `${c}: ${nomePictograma(c)}`, width: '112', height: '112', loading: 'lazy' }),
+        h('strong', null, `${c} — ${nomePictograma(c)}`), h('span', null, descricaoPictograma(c)))))),
+    h('section', { class: 'secao' }, h('h2', null, t('ui.seguranca.palavraSinal')),
+      h('p', null, h('span', { class: 'sinal perigo' }, t('ui.seguranca.perigo')), t('ui.seguranca.sinalTexto1'), h('span', { class: 'sinal atencao' }, t('ui.seguranca.atencao')), t('ui.seguranca.sinalTexto2'))),
+    h('section', { class: 'secao' }, h('h2', null, t('ui.seguranca.comoLer')),
+      h('p', null, t('ui.seguranca.frasesIntro')),
+      h('ul', { class: 'lista-pontos' }, gruposFrasesH().map((g) => h('li', null, h('strong', null, `${g.faixa}: ${g.titulo}`), `, ${g.descricao}`))),
+      h('p', { class: 'pequeno mudo' }, t('ui.seguranca.codigosSomados')),
+      h('label', { class: 'rotulo-campo', for: 'filtro-h' }, t('ui.seguranca.procurarFrase')), filtro, lista, sem),
+    h('section', { class: 'secao' }, h('h2', null, t('ui.seguranca.boasPraticas')), h('ul', { class: 'lista-pontos' }, orientacaoGeral().map((x) => h('li', null, x)))),
+    h('section', { class: 'secao' }, h('h2', null, t('ui.seguranca.fontesOficiais')),
+      h('ul', { class: 'lista-pontos' }, links.map(([nome, url, nota]) => h('li', null, linkExterno(url, nome), ` — ${nota}`)))));
+  return { titulo: t('ui.seguranca.titulo'), node: no };
 }

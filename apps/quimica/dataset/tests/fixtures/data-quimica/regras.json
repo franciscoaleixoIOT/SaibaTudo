@@ -914,7 +914,26 @@
    "sinonimos": [
     "número atômico",
     "z"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Número atômico",
+    "en": "Atomic number",
+    "es": "Número atómico"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "número atômico",
+     "z"
+    ],
+    "en": [
+     "atomic number",
+     "z"
+    ],
+    "es": [
+     "número atómico",
+     "z"
+    ]
+   }
   },
   "simbolo": {
    "nome": "Símbolo",
@@ -923,7 +942,23 @@
    "escopo": "elemento",
    "sinonimos": [
     "símbolo"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Símbolo",
+    "en": "Symbol",
+    "es": "Símbolo"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "símbolo"
+    ],
+    "en": [
+     "symbol"
+    ],
+    "es": [
+     "símbolo"
+    ]
+   }
   },
   "massa_atomica": {
    "nome": "Massa atômica",
@@ -933,7 +968,26 @@
    "sinonimos": [
     "massa atômica",
     "peso atômico"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Massa atômica",
+    "en": "Atomic mass",
+    "es": "Masa atómica"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "massa atômica",
+     "peso atômico"
+    ],
+    "en": [
+     "atomic mass",
+     "atomic weight"
+    ],
+    "es": [
+     "masa atómica",
+     "peso atómico"
+    ]
+   }
   },
   "grupo": {
    "nome": "Grupo",
@@ -943,7 +997,26 @@
    "sinonimos": [
     "grupo",
     "família"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Grupo",
+    "en": "Group",
+    "es": "Grupo"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "grupo",
+     "família"
+    ],
+    "en": [
+     "group",
+     "family"
+    ],
+    "es": [
+     "grupo",
+     "familia"
+    ]
+   }
   },
   "periodo": {
    "nome": "Período",
@@ -952,7 +1025,24 @@
    "escopo": "elemento",
    "sinonimos": [
     "período"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Período",
+    "en": "Period",
+    "es": "Período"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "período"
+    ],
+    "en": [
+     "period"
+    ],
+    "es": [
+     "período",
+     "periodo"
+    ]
+   }
   },
   "bloco": {
    "nome": "Bloco",
@@ -961,7 +1051,23 @@
    "escopo": "elemento",
    "sinonimos": [
     "bloco"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Bloco",
+    "en": "Block",
+    "es": "Bloque"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "bloco"
+    ],
+    "en": [
+     "block"
+    ],
+    "es": [
+     "bloque"
+    ]
+   }
   },
   "categoria": {
    "nome": "Categoria",
@@ -971,7 +1077,26 @@
    "sinonimos": [
     "categoria",
     "classificação"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Categoria",
+    "en": "Category",
+    "es": "Categoría"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "categoria",
+     "classificação"
+    ],
+    "en": [
+     "category",
+     "classification"
+    ],
+    "es": [
+     "categoría",
+     "clasificación"
+    ]
+   }
   },
   "configuracao_eletronica": {
    "nome": "Configuração eletrônica",
@@ -981,7 +1106,16 @@
    "sinonimos": [
     "configuração eletrônica",
     "distribuição eletrônica"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Configuração eletrônica"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "configuração eletrônica",
+     "distribuição eletrônica"
+    ]
+   }
   },
   "eletronegatividade": {
    "nome": "Eletronegatividade (Pauling)",
@@ -990,7 +1124,23 @@
    "escopo": "elemento",
    "sinonimos": [
     "eletronegatividade"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Eletronegatividade (Pauling)",
+    "en": "Electronegativity (Pauling)",
+    "es": "Electronegatividad (Pauling)"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "eletronegatividade"
+    ],
+    "en": [
+     "electronegativity"
+    ],
+    "es": [
+     "electronegatividad"
+    ]
+   }
   },
   "raio_atomico": {
    "nome": "Raio atômico",
@@ -999,7 +1149,25 @@
    "escopo": "elemento",
    "sinonimos": [
     "raio atômico"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Raio atômico",
+    "en": "Atomic radius (van der Waals)",
+    "es": "Radio atómico (van der Waals)"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "raio atômico"
+    ],
+    "en": [
+     "atomic radius",
+     "van der waals radius"
+    ],
+    "es": [
+     "radio atómico",
+     "radio de van der waals"
+    ]
+   }
   },
   "afinidade_eletronica": {
    "nome": "Afinidade eletrônica",
@@ -1009,7 +1177,16 @@
    "sinonimos": [
     "afinidade eletrônica",
     "eletroafinidade"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Afinidade eletrônica"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "afinidade eletrônica",
+     "eletroafinidade"
+    ]
+   }
   },
   "energia_ionizacao": {
    "nome": "Energia de ionização",
@@ -1019,7 +1196,16 @@
    "sinonimos": [
     "energia de ionização",
     "potencial de ionização"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Energia de ionização"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "energia de ionização",
+     "potencial de ionização"
+    ]
+   }
   },
   "ponto_fusao": {
    "nome": "Ponto de fusão",
@@ -1029,7 +1215,26 @@
    "sinonimos": [
     "ponto de fusão",
     "temperatura de fusão"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Ponto de fusão",
+    "en": "Melting point",
+    "es": "Punto de fusión"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "ponto de fusão",
+     "temperatura de fusão"
+    ],
+    "en": [
+     "melting point",
+     "melting temperature"
+    ],
+    "es": [
+     "punto de fusión",
+     "temperatura de fusión"
+    ]
+   }
   },
   "ponto_ebulicao": {
    "nome": "Ponto de ebulição",
@@ -1039,7 +1244,26 @@
    "sinonimos": [
     "ponto de ebulição",
     "temperatura de ebulição"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Ponto de ebulição",
+    "en": "Boiling point",
+    "es": "Punto de ebullición"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "ponto de ebulição",
+     "temperatura de ebulição"
+    ],
+    "en": [
+     "boiling point",
+     "boiling temperature"
+    ],
+    "es": [
+     "punto de ebullición",
+     "temperatura de ebullición"
+    ]
+   }
   },
   "densidade": {
    "nome": "Densidade",
@@ -1049,7 +1273,26 @@
    "sinonimos": [
     "densidade",
     "massa específica"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Densidade",
+    "en": "Density",
+    "es": "Densidad"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "densidade",
+     "massa específica"
+    ],
+    "en": [
+     "density",
+     "specific mass"
+    ],
+    "es": [
+     "densidad",
+     "masa específica"
+    ]
+   }
   },
   "estado_padrao": {
    "nome": "Estado físico padrão",
@@ -1059,7 +1302,16 @@
    "sinonimos": [
     "estado físico",
     "estado padrão"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Estado físico padrão"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "estado físico",
+     "estado padrão"
+    ]
+   }
   },
   "estados_oxidacao": {
    "nome": "Estados de oxidação",
@@ -1069,7 +1321,16 @@
    "sinonimos": [
     "estados de oxidação",
     "nox"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Estados de oxidação"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "estados de oxidação",
+     "nox"
+    ]
+   }
   },
   "ano_descoberta": {
    "nome": "Ano de descoberta",
@@ -1079,7 +1340,16 @@
    "sinonimos": [
     "ano de descoberta",
     "quando foi descoberto"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Ano de descoberta"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "ano de descoberta",
+     "quando foi descoberto"
+    ]
+   }
   },
   "descobridor": {
    "nome": "Descobridor",
@@ -1089,7 +1359,16 @@
    "sinonimos": [
     "descobridor",
     "quem descobriu"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Descobridor"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "descobridor",
+     "quem descobriu"
+    ]
+   }
   },
   "massa_molar": {
    "nome": "Massa molar",
@@ -1100,7 +1379,29 @@
     "massa molar",
     "massa molecular",
     "peso molecular"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Massa molar",
+    "en": "Molar mass",
+    "es": "Masa molar"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "massa molar",
+     "massa molecular",
+     "peso molecular"
+    ],
+    "en": [
+     "molar mass",
+     "molecular mass",
+     "molecular weight"
+    ],
+    "es": [
+     "masa molar",
+     "masa molecular",
+     "peso molecular"
+    ]
+   }
   },
   "massa_exata": {
    "nome": "Massa exata (monoisotópica)",
@@ -1110,7 +1411,16 @@
    "sinonimos": [
     "massa exata",
     "massa monoisotópica"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Massa exata (monoisotópica)"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "massa exata",
+     "massa monoisotópica"
+    ]
+   }
   },
   "formula": {
    "nome": "Fórmula",
@@ -1120,7 +1430,28 @@
    "sinonimos": [
     "fórmula",
     "fórmula molecular"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Fórmula",
+    "en": "Formula",
+    "es": "Fórmula"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "fórmula",
+     "fórmula molecular"
+    ],
+    "en": [
+     "formula",
+     "molecular formula",
+     "chemical formula"
+    ],
+    "es": [
+     "fórmula",
+     "fórmula molecular",
+     "fórmula química"
+    ]
+   }
   },
   "formula_hill": {
    "nome": "Fórmula de Hill",
@@ -1129,7 +1460,15 @@
    "escopo": "composto",
    "sinonimos": [
     "fórmula de hill"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Fórmula de Hill"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "fórmula de hill"
+    ]
+   }
   },
   "smiles": {
    "nome": "SMILES",
@@ -1138,7 +1477,23 @@
    "escopo": "composto",
    "sinonimos": [
     "smiles"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "SMILES",
+    "en": "SMILES",
+    "es": "SMILES"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "smiles"
+    ],
+    "en": [
+     "smiles"
+    ],
+    "es": [
+     "smiles"
+    ]
+   }
   },
   "inchikey": {
    "nome": "InChIKey",
@@ -1147,7 +1502,15 @@
    "escopo": "composto",
    "sinonimos": [
     "inchikey"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "InChIKey"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "inchikey"
+    ]
+   }
   },
   "nome_iupac": {
    "nome": "Nome IUPAC (PubChem)",
@@ -1157,7 +1520,16 @@
    "sinonimos": [
     "nome iupac",
     "nomenclatura iupac"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Nome IUPAC (PubChem)"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "nome iupac",
+     "nomenclatura iupac"
+    ]
+   }
   },
   "cas": {
    "nome": "Número CAS",
@@ -1167,7 +1539,27 @@
    "sinonimos": [
     "cas",
     "número cas"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Número CAS",
+    "en": "CAS number",
+    "es": "Número CAS"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "cas",
+     "número cas"
+    ],
+    "en": [
+     "cas",
+     "cas number",
+     "cas registry number"
+    ],
+    "es": [
+     "cas",
+     "número cas"
+    ]
+   }
   },
   "xlogp": {
    "nome": "XLogP",
@@ -1177,7 +1569,26 @@
    "sinonimos": [
     "xlogp",
     "logp"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "XLogP",
+    "en": "XLogP",
+    "es": "XLogP"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "xlogp",
+     "logp"
+    ],
+    "en": [
+     "xlogp",
+     "logp"
+    ],
+    "es": [
+     "xlogp",
+     "logp"
+    ]
+   }
   },
   "tpsa": {
    "nome": "Área de superfície polar topológica (TPSA)",
@@ -1186,7 +1597,24 @@
    "escopo": "composto",
    "sinonimos": [
     "tpsa"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Área de superfície polar topológica (TPSA)",
+    "en": "Topological polar surface area (TPSA)",
+    "es": "Área de superficie polar topológica (TPSA)"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "tpsa"
+    ],
+    "en": [
+     "tpsa",
+     "polar surface area"
+    ],
+    "es": [
+     "tpsa"
+    ]
+   }
   },
   "doadores_h": {
    "nome": "Doadores de ligação de hidrogênio",
@@ -1195,7 +1623,15 @@
    "escopo": "composto",
    "sinonimos": [
     "doadores de hidrogênio"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Doadores de ligação de hidrogênio"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "doadores de hidrogênio"
+    ]
+   }
   },
   "aceptores_h": {
    "nome": "Aceptores de ligação de hidrogênio",
@@ -1204,7 +1640,15 @@
    "escopo": "composto",
    "sinonimos": [
     "aceptores de hidrogênio"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Aceptores de ligação de hidrogênio"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "aceptores de hidrogênio"
+    ]
+   }
   },
   "ligacoes_rotaveis": {
    "nome": "Ligações rotáveis",
@@ -1213,7 +1657,15 @@
    "escopo": "composto",
    "sinonimos": [
     "ligações rotáveis"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Ligações rotáveis"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "ligações rotáveis"
+    ]
+   }
   },
   "carga": {
    "nome": "Carga",
@@ -1222,7 +1674,23 @@
    "escopo": "composto",
    "sinonimos": [
     "carga"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Carga",
+    "en": "Charge",
+    "es": "Carga"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "carga"
+    ],
+    "en": [
+     "charge"
+    ],
+    "es": [
+     "carga"
+    ]
+   }
   },
   "pictogramas_ghs": {
    "nome": "Pictogramas GHS (classificação harmonizada)",
@@ -1232,7 +1700,26 @@
    "sinonimos": [
     "pictogramas",
     "perigos"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Pictogramas GHS (classificação harmonizada)",
+    "en": "GHS pictograms (harmonised classification)",
+    "es": "Pictogramas GHS (clasificación armonizada)"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "pictogramas",
+     "perigos"
+    ],
+    "en": [
+     "pictograms",
+     "hazards"
+    ],
+    "es": [
+     "pictogramas",
+     "peligros"
+    ]
+   }
   },
   "frases_h": {
    "nome": "Frases de perigo H (classificação harmonizada)",
@@ -1242,7 +1729,26 @@
    "sinonimos": [
     "frases h",
     "advertências de perigo"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Frases de perigo H (classificação harmonizada)",
+    "en": "Hazard statements H (harmonised classification)",
+    "es": "Indicaciones de peligro H (clasificación armonizada)"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "frases h",
+     "advertências de perigo"
+    ],
+    "en": [
+     "h statements",
+     "hazard statements"
+    ],
+    "es": [
+     "frases h",
+     "indicaciones de peligro"
+    ]
+   }
   },
   "palavra_sinal": {
    "nome": "Palavra de advertência GHS",
@@ -1251,7 +1757,23 @@
    "escopo": "composto",
    "sinonimos": [
     "palavra de advertência"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Palavra de advertência GHS",
+    "en": "GHS signal word",
+    "es": "Palabra de advertencia GHS"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "palavra de advertência"
+    ],
+    "en": [
+     "signal word"
+    ],
+    "es": [
+     "palabra de advertencia"
+    ]
+   }
   }
  },
  "fontes": [

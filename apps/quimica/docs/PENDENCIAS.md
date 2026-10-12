@@ -148,10 +148,20 @@ CAS (desempate e item do elemento), duplicatas, carbono/arsênio sem fusão a 1 
 
 Decisão do mantenedor: pt-BR padrão; **en, es, de, fr** com assistente completo; chinês depois; Eleições só em português.
 Etapas (A–F em `I18N.md` §9):
-- [ ] **A** site: base de i18n, catálogos pt-BR/en, léxico `contracts/lexico/`, seletor, textos em lotes no cliente, testes.
-- [ ] **B** pipeline: `nomes` por idioma, GHS multilíngue (EUR-Lex), Wikipédia en/es/de/fr, `textos/index.json` + lotes, contrato.
-- [ ] **C** home: `/en/`, `/es/`, `/de/`, `/fr/` + `hreflang` + regras no proxy de eleições (valem após o próximo `eleicoes-data-refresh`).
-- [ ] **D** catálogos/léxicos es/de/fr + golden por idioma.
+- [x] **A** site (12/10): base de i18n (`js/i18n/`), catálogos pt-BR (referência) e en completos, léxico compartilhado
+      `contracts/lexico/<idioma>.json` → `tools/gerar_lexico.py` → `js/nlu/lex/`, seletor (globo + Configurações, `?lang=`),
+      textos em lotes no `data.js`, segurança nos cinco idiomas, golden 254 casos (pt-BR + en), segurança 272 casos.
+- [x] **B** pipeline (12/10): `nomes`/`sinonimosPorIdioma`, `index.nomesPorIdioma`, GHS `textoPorIdioma` (EUR-Lex), Wikipédia
+      en/es/de/fr via sitelinks, `textos/index.json` + 36 lotes (pacote: 2.742 → 56 arquivos, 15 MB), contrato reescrito.
+      Apelidos do Wikidata iguais a palavras funcionais ("PARA") são descartados (pipeline e dicionário do site).
+- [x] **C** home (12/10, no ar): `/en/`, `/es/`, `/de/`, `/fr/` + `hreflang` + regras no proxy de eleições publicadas.
+- [ ] **D** catálogos es/de/fr do site: hoje são **andaimes** (`copiaDe: 'en'`, herdam o inglês); léxicos es/de/fr escritos e
+      validados estruturalmente, **sem casos golden** nem revisão nativa. Traduzir os catálogos e escrever ≥ 60 golden por idioma.
+- [ ] API da nuvem (`api/`): regra de segurança e ancoragem lendo `contracts/lexico/` (em andamento em 12/10).
+- [ ] Android: `app/src/main/assets/quimica/` ainda é o snapshot antigo (um arquivo por trecho); atualizar com
+      `python app/tools/copiar_pacote_para_assets.py` quando o `BundleLoader` ler lotes (etapa E).
+- [ ] Pipeline, miúdos: `regras.nomenclatura` por idioma; H281/H351/EUH211 sem texto em algum idioma (formato da linha no
+      EUR-Lex); glicose (CID 5793) cai no item "D-glucopyranose" do Wikidata (sem es/de) — conferir o casamento do item.
 - [ ] **E** Android: `strings.xml` por idioma (~770 textos fixos), léxico gerado do mesmo JSON, lotes de textos, seletor.
 - [ ] **F** dataset e avaliação por idioma; retreino do NLU em nuvem com os cinco idiomas.
 - [ ] Revisão humana das traduções (catálogos marcados `revisao: pendente`); DeepL gratuito do mantenedor (5.000 palavras,

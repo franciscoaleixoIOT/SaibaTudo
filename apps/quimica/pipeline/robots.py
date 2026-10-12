@@ -15,6 +15,10 @@ from http_cache import USER_AGENT, CacheMiss, HttpErro
 # (host, prefixo de caminho) aceitos mesmo com Disallow no robots.txt, por serem a API oficial de programas.
 EXCECOES = (
     ("pt.wikipedia.org", "/w/api.php"),
+    ("en.wikipedia.org", "/w/api.php"),
+    ("es.wikipedia.org", "/w/api.php"),
+    ("de.wikipedia.org", "/w/api.php"),
+    ("fr.wikipedia.org", "/w/api.php"),
     ("pt.wikibooks.org", "/w/api.php"),
     ("www.wikidata.org", "/w/api.php"),
     ("query.wikidata.org", "/sparql"),  # endpoint SPARQL oficial, documentado para clientes automáticos

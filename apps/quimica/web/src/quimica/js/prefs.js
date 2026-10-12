@@ -1,17 +1,20 @@
-// Preferências (tema e tamanho do texto): ficam só neste navegador (localStorage). Nada é enviado a servidores.
+// Preferências (tema, tamanho do texto, idioma e histórico de perguntas): ficam só neste navegador (localStorage). Nada é enviado a servidores.
+import { normalizarIdioma } from './i18n/idiomas.js';
+
 const CHAVE = 'stq:prefs';
 
+/** Chaves das opções (os rótulos exibidos vêm do catálogo: ui.prefs.tema / ui.prefs.fonte). Os valores em português são os rótulos de referência. */
 export const TEMAS = { SISTEMA: 'Seguir o sistema', CLARO: 'Claro', ESCURO: 'Escuro' };
 export const FONTES = {
   PEQUENA: { rotulo: 'Pequena', fator: 0.9 }, NORMAL: { rotulo: 'Normal', fator: 1 },
   GRANDE: { rotulo: 'Grande', fator: 1.15 }, MUITO_GRANDE: { rotulo: 'Muito grande', fator: 1.3 }
 };
-export const PADRAO = Object.freeze({ tema: 'SISTEMA', tamanhoFonte: 'NORMAL', historicoPerguntas: Object.freeze([]) });
+/** `idioma` null = ainda não escolhido (vale a detecção: ?lang=, navegador, pt-BR). */
+export const PADRAO = Object.freeze({ tema: 'SISTEMA', tamanhoFonte: 'NORMAL', idioma: null, historicoPerguntas: Object.freeze([]) });
 export const MAX_HISTORICO = 50;
 
 let memoria = null; // fallback quando o armazenamento está bloqueado (modo privado etc.)
 
-/** Valida e completa as preferências lidas (valores inválidos voltam ao padrão). */
 /** Histórico de perguntas: só textos não vazios, sem espaços nas pontas, no máximo 300 caracteres e as últimas MAX_HISTORICO. */
 export function sanearHistorico(lista) {
   if (!Array.isArray(lista)) return [];
@@ -29,10 +32,13 @@ export function registrarPergunta(pergunta) {
   return novos;
 }
 
+/** Valida e completa as preferências lidas (valores inválidos voltam ao padrão). */
 export function sanear(b) {
   const o = b && typeof b === 'object' ? b : {};
   return {
-    historicoPerguntas: sanearHistorico(o.historicoPerguntas), tema: o.tema in TEMAS ? o.tema : PADRAO.tema, tamanhoFonte: o.tamanhoFonte in FONTES ? o.tamanhoFonte : PADRAO.tamanhoFonte };
+    historicoPerguntas: sanearHistorico(o.historicoPerguntas), tema: o.tema in TEMAS ? o.tema : PADRAO.tema, tamanhoFonte: o.tamanhoFonte in FONTES ? o.tamanhoFonte : PADRAO.tamanhoFonte,
+    idioma: normalizarIdioma(o.idioma)
+  };
 }
 
 export function carregar() {
@@ -45,6 +51,14 @@ export function carregar() {
 export function salvar(p) {
   memoria = p;
   try { localStorage.setItem(CHAVE, JSON.stringify(p)); } catch { /* sem armazenamento: vale só nesta sessão */ }
+}
+
+/** Grava só o idioma escolhido (mantendo as outras preferências). */
+export function salvarIdioma(idioma) {
+  const atual = carregar();
+  const novo = { ...atual, idioma: normalizarIdioma(idioma) };
+  salvar(novo);
+  return novo;
 }
 
 export function apagar() {

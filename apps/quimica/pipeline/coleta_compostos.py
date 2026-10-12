@@ -7,17 +7,23 @@ Fontes por campo (política de docs/FONTES_E_LICENCAS.md §5):
   propriedades (xlogp, tpsa, contagens, carga). Sem sinônimos nem depósitos de terceiros.
 - GHS: só a classificação harmonizada da UE (Regulamento 1272/2008, Anexo VI) lida do PUG View; `ghs.fonte` guarda o texto
   literal da fonte; as frases H em português estão em `ghs_frases.json` (Anexo III do CLP, EUR-Lex).
-- Wikidata (CC0): nome em português, rótulos/apelidos, CAS (identificador), fórmula convencional (P274), QID, ChEBI ID (P683).
+- Wikidata (CC0): nome em português, rótulos/apelidos, CAS (identificador), fórmula convencional (P274), QID, ChEBI ID (P683);
+  `nomes` e `sinonimosPorIdioma` (docs/I18N.md §4) pelos rótulos e apelidos do item em en/es/de/fr (`wbgetentities`), e os
+  títulos de artigo por idioma (sitelinks) para a coleta da Wikipédia. Composto sem item no Wikidata (ou sem rótulo no idioma)
+  fica sem `nomes[idioma]` — o cliente cai para `nomeIupac`/`nome` e rotula; `nomes["pt-BR"]` só quando há nome em português de verdade.
 - ChEBI (CC BY 4.0): `definicaoChebi` (texto em inglês) e nomes alternativos.
 - ICSC: nada é copiado; cada composto com CAS recebe `icscBuscaUrl` (link de busca por CAS no site da OIT, em português).
 """
+import json
 import re
+from pathlib import Path
 
 import coleta_chebi
 import coleta_icsc
 import pubchem as P
 import quimica_util as Q
 import wikidata as W
+from common import IDIOMAS
 from http_cache import CacheMiss, HttpErro
 
 LOTE_ARQUIVO = 200
@@ -158,13 +164,45 @@ def escolher_formula(declarada, wd_formulas, formula_pubchem):
 
 _CODIGO = re.compile(r"[A-Z0-9][A-Z0-9\-\s.,:/()]*")
 
+_LEXICO_DIR = Path(__file__).resolve().parent.parent / "contracts" / "lexico"
 
-def sinonimo_valido(s):
+
+def _palavras_funcionais():
+    """Palavras funcionais e de parada dos cinco idiomas (contracts/lexico/*.json), normalizadas; com reserva fixa se os
+    arquivos não existirem. Um apelido do Wikidata igual a uma delas ("PARA", apelido em inglês do 1,4-diclorobenzeno) faria
+    qualquer pergunta com essa palavra apontar para o composto errado."""
+    base = {"para", "por", "com", "sem", "the", "and", "for", "with", "from", "das", "der", "die", "und", "mit", "les", "des",
+            "pour", "avec", "con", "sin", "sobre", "entre", "como", "que", "este", "esta", "esse", "essa", "isso", "mais", "menos"}
+    for arq in sorted(_LEXICO_DIR.glob("*.json")) if _LEXICO_DIR.is_dir() else []:
+        try:
+            lex = json.loads(arq.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        for chave in ("stopPalavras", "palavrasFuncionais"):
+            base.update(Q.norm(x) for x in lex.get(chave, []) if isinstance(x, str))
+    return frozenset(x for x in base if x)
+
+
+PALAVRAS_FUNCIONAIS = _palavras_funcionais()
+
+
+def sinonimo_valido(s, formula=None):
+    """Nome aceitável como sinônimo: não é CAS, código de banco, fórmula do próprio composto, sequência de códigos/números nem
+    uma palavra funcional de algum idioma do pacote (ex.: "PARA")."""
     s = (s or "").strip()
     if not (2 <= len(s) <= 50):
         return False
-    if Q.cas_valido(s) or re.search(r"\d", s) and not re.search(r"[a-zà-ú]", s):
+    if Q.norm(s) in PALAVRAS_FUNCIONAIS:
         return False
+    plano = Q.sem_subscritos(s)
+    if Q.cas_valido(s) or re.search(r"\d", plano) and not re.search(r"[a-zà-ú]", plano):
+        return False
+    if formula:
+        try:
+            if Q.hill_igual(plano, formula):
+                return False
+        except (ValueError, TypeError):
+            pass
     if re.search(r"[<>&=]", s) or s.startswith(("[", "(")) or s.count("(") != s.count(")"):
         return False
     if s.upper().startswith(("CHEBI", "CHEMBL", "UNII", "DTXSID", "SCHEMBL", "NSC", "EINECS", "INCHI")):
@@ -172,13 +210,13 @@ def sinonimo_valido(s):
     return True
 
 
-def montar_sinonimos(exclui, *listas, maximo=10):
+def montar_sinonimos(exclui, *listas, maximo=10, formula=None):
     ja = {Q.norm(x) for x in exclui if x}
     out = []
     for lista in listas:
         for s in lista:
             n = Q.norm(s)
-            if n and n not in ja and sinonimo_valido(s):
+            if n and n not in ja and sinonimo_valido(s, formula):
                 ja.add(n)
                 out.append(s.strip())
                 if len(out) >= maximo:
@@ -187,8 +225,31 @@ def montar_sinonimos(exclui, *listas, maximo=10):
 
 
 # ------------------------------------------------------------------------------------------------ montagem
-def montar(sel, props, wd, ghs, chebi, hoje, pesos=None, sinonimos_pubchem=None):
-    """Monta o registro do contrato §3 (ou None se faltar o essencial)."""
+def nomes_por_idioma(c, ent, idiomas, sinonimos_chebi=(), formula=None):
+    """`nomes` e `sinonimosPorIdioma` do composto a partir da entidade do Wikidata (`ent` = saída de wikidata.entidades).
+
+    pt-BR: `nome` (só quando não é pendente) e apelidos pt/pt-br; en/es/de/fr: rótulo e apelidos do item (en também recebe os
+    sinônimos do ChEBI). Sem rótulo no idioma, a chave fica ausente (nunca se copia o IUPAC para `nomes.en`: o cliente faz isso
+    e rotula). Até 10 sinônimos por idioma, sem fórmulas, CAS ou códigos (sinonimo_valido), sem repetir o nome."""
+    ent = ent or {}
+    rot, ape = ent.get("rotulos") or {}, ent.get("apelidos") or {}
+    nomes, sin = {}, {}
+    excl_base = [c.get("nome"), c.get("nomePopular"), c.get("nomeIupac")]
+    for idioma in [i for i in IDIOMAS if i in idiomas]:
+        if idioma == "pt-BR":
+            if not c.get("nomePtPendente") and c.get("nome"):
+                nomes[idioma] = c["nome"]
+        elif rot.get(idioma):
+            nomes[idioma] = rot[idioma]
+        extras = list(sinonimos_chebi) if idioma == "en" else []
+        lista = montar_sinonimos(excl_base + [nomes.get(idioma)], ape.get(idioma, []), extras, formula=formula)
+        if lista:
+            sin[idioma] = lista
+    return nomes, sin
+
+
+def montar(sel, props, wd, ghs, chebi, hoje, pesos=None, sinonimos_pubchem=None, ent=None, idiomas=None):
+    """Monta o registro do contrato §3 (ou None se faltar o essencial). `ent`: entidade do Wikidata (rótulos por idioma)."""
     cid = sel["cid"]
     p = props
     if not p or not p.get("MolecularFormula") or not p.get("ConnectivitySMILES"):
@@ -215,9 +276,14 @@ def montar(sel, props, wd, ghs, chebi, hoje, pesos=None, sinonimos_pubchem=None)
     excl = [c["nome"], c.get("nomePopular"), iupac]
     sin = montar_sinonimos(excl, wd.get("apt", []), [Q.capitalizar(x) for x in (wd.get("pbr", []) + wd.get("ppt", []))
                                                       if Q.norm(x) != Q.norm(c["nome"])],
-                           ([en] if en else []), wd.get("aen", []), (chebi or {}).get("sinonimos", []))
+                           ([en] if en else []), wd.get("aen", []), (chebi or {}).get("sinonimos", []), formula=p["MolecularFormula"])
     if sin:
         c["sinonimos"] = sin
+    nomes, sin_idioma = nomes_por_idioma(c, ent, idiomas or IDIOMAS, (chebi or {}).get("sinonimos", []), formula=p["MolecularFormula"])
+    if nomes:
+        c["nomes"] = nomes
+    if sin_idioma:
+        c["sinonimosPorIdioma"] = sin_idioma
     c["formula"] = escolher_formula(sel.get("formulaDeclarada"), wd.get("formulas", []), p["MolecularFormula"])
     c["formulaHill"] = p["MolecularFormula"]
     mm, me = P.numero(p.get("MolecularWeight")), P.numero(p.get("ExactMass"))
@@ -267,12 +333,21 @@ def montar(sel, props, wd, ghs, chebi, hoje, pesos=None, sinonimos_pubchem=None)
 
 
 def coletar(http, pubchem, selecao, hoje, frases_h=None, com_ghs=True, com_chebi=True, log=print, pesos=None,
-            qids_elementos=frozenset()):
-    """Devolve (compostos, meta, stats). `meta[cid]` = {"sl", "ptwiki", "qid"} para a etapa de textos."""
+            qids_elementos=frozenset(), idiomas=None):
+    """Devolve (compostos, meta, stats). `meta[cid]` = {"sl", "ptwiki", "qid", "artigos": {idioma: título}} para a etapa de textos.
+    `idiomas`: códigos do projeto para `nomes`/`sinonimosPorIdioma` e para os títulos de artigo (padrão: common.IDIOMAS)."""
+    idiomas = list(idiomas or IDIOMAS)
     cids = [s["cid"] for s in selecao]
     props = pubchem.propriedades(cids)
     wd_por_cid, wd_falhas = enriquecer_wikidata(http, cids, log, excluir_qids=qids_elementos,
                                                 formulas_pubchem={c: p.get("MolecularFormula") for c, p in props.items() if p})
+    # rótulos, apelidos e artigos por idioma (wbgetentities, 50 itens por chamada); falha não derruba o build
+    try:
+        ents = W.entidades(http, [wd["qid"] for wd in wd_por_cid.values()], idiomas, log=log)
+        ents_status = "ok"
+    except Exception as exc:  # noqa: BLE001
+        ents, ents_status = {}, f"falhou: {exc}"
+        log(f"  [wikidata] rótulos por idioma falharam: {exc}")
 
     ghs_por_cid, ghs_falhas = {}, []
     if com_ghs:
@@ -315,13 +390,15 @@ def coletar(http, pubchem, selecao, hoje, frases_h=None, com_ghs=True, com_chebi
                 if str(x).isdigit() and int(x) in chebi_dados:
                     ch = dict(chebi_dados[int(x)], id=int(x))
                     break
-        c, motivo = montar(sel, props.get(cid), wd, ghs_por_cid.get(cid), ch, hoje, pesos=pesos, sinonimos_pubchem=sin_pc.get(cid))
+        ent = ents.get((wd or {}).get("qid"))
+        c, motivo = montar(sel, props.get(cid), wd, ghs_por_cid.get(cid), ch, hoje, pesos=pesos, sinonimos_pubchem=sin_pc.get(cid),
+                           ent=ent, idiomas=idiomas)
         if c is None:
             descartados.append({"cid": cid, "motivo": motivo})
             continue
         compostos.append(c)
         meta[cid] = {"sl": (wd or {}).get("sl", 0), "ptwiki": ((wd or {}).get("ptwiki") or [None])[0],
-                     "qid": (wd or {}).get("qid")}
+                     "qid": (wd or {}).get("qid"), "artigos": dict((ent or {}).get("artigos") or {})}
 
     compostos, duplicados = deduplicar(compostos, meta)
     if duplicados:
@@ -332,14 +409,22 @@ def coletar(http, pubchem, selecao, hoje, frases_h=None, com_ghs=True, com_chebi
              "nomePtPendente": sum(1 for c in compostos if c.get("nomePtPendente")),
              "comDefinicaoChebi": sum(1 for c in compostos if "definicaoChebi" in c),
              "frasesHSemTextoPt": faltam_h, "wikidataFalhas": wd_falhas, "chebi": chebi_stats,
+             "rotulosWikidata": ents_status,
+             "comNomePorIdioma": {i: sum(1 for c in compostos if i in c.get("nomes", {})) for i in idiomas},
+             "comArtigoPorIdioma": {i: sum(1 for m in meta.values() if i in m.get("artigos", {})) for i in idiomas},
              "sinonimosDePubChem": "não coletados (política de campos calculados do PubChem)"}
     return compostos, meta, stats
 
 
 # ------------------------------------------------------------------------------------------------ saída
 def para_lotes(compostos):
-    """[(nome_lote, lista), ...] com 200 por arquivo e o índice `{porCid, nomes}`."""
-    lotes, porcid, nomes = [], {}, set()
+    """[(nome_lote, lista), ...] com 200 por arquivo e o índice `{porCid, nomes, nomesPorIdioma}`.
+
+    `nomes`: pares [chave normalizada, cid] como sempre (nome pt, popular, IUPAC, sinônimos, fórmulas). `nomesPorIdioma[idioma]`
+    (en/es/de/fr): os pares de `nomes[idioma]` + `sinonimosPorIdioma[idioma]` que AINDA NÃO estão em `nomes` — a busca no idioma X
+    usa `nomes` ∪ `nomesPorIdioma[X]` sem baixar os lotes (sem a deduplicação o índice dobrava de tamanho: o inglês já está em
+    `sinonimos`). Só idiomas com alguma entrada."""
+    lotes, porcid, nomes, por_idioma = [], {}, set(), {}
     for i in range(0, len(compostos), LOTE_ARQUIVO):
         nome = f"lote-{i // LOTE_ARQUIVO + 1:03d}"
         parte = compostos[i:i + LOTE_ARQUIVO]
@@ -349,4 +434,13 @@ def para_lotes(compostos):
             for n in [c["nome"], c.get("nomePopular"), c.get("nomeIupac")] + c.get("sinonimos", []) + [c["formula"], c["formulaHill"]]:
                 if n:
                     nomes.add((Q.norm(n), c["cid"]))
-    return lotes, {"porCid": porcid, "nomes": [[n, cid] for n, cid in sorted(nomes)]}
+            for idioma in IDIOMAS:
+                if idioma == "pt-BR":
+                    continue
+                for n in [c.get("nomes", {}).get(idioma)] + c.get("sinonimosPorIdioma", {}).get(idioma, []):
+                    if n and (Q.norm(n), c["cid"]) not in nomes:
+                        por_idioma.setdefault(idioma, set()).add((Q.norm(n), c["cid"]))
+    indice = {"porCid": porcid, "nomes": [[n, cid] for n, cid in sorted(nomes)]}
+    if por_idioma:
+        indice["nomesPorIdioma"] = {i: [[n, cid] for n, cid in sorted(por_idioma[i] - nomes)] for i in IDIOMAS if i in por_idioma}
+    return lotes, indice

@@ -1,4 +1,5 @@
 // Respostas montadas SÓ dos dados do pacote assinado e de cálculos locais testados. Cada bloco traz a fonte; nada vem do modelo (origem 'LOCAL').
+// Todo texto passa pelo catálogo do idioma ativo (`t()`, docs/I18N.md §3); a tradução nunca introduz números: cada número vem do pacote ou do cálculo.
 // Formato de uma resposta: { intent, resolvida, origem, titulo, blocos[], directAnswer, fontes[], acoes[], sugestoes[], ... } (ver `montar`).
 import { balancear } from './calc/balancear.js';
 import { calcularConcentracao } from './calc/concentracao.js';
@@ -10,37 +11,25 @@ import { acharUnidade, converter, paraBase } from './calc/unidades.js';
 import { chaveFormula, formulaUnicode, tentarFormula } from './calc/formula.js';
 import { respostaRecusa } from './seguranca.js';
 import { fmt, fmtTex } from './formato.js';
-import { CATEGORIA_GRUPO_PLURAL, CLASSES_PT } from './ghs.js';
-import { lerNumero } from './formato.js';
+import { fmtData, idiomaAtual, nomeDoIdioma, t, tl } from './i18n/index.js';
 import { ligarQuantidades, termosDeBusca } from './nlu.js';
+import { exibirNome, minusNoMeio, nomeComposto as infoNomeComposto, nomeElemento as infoNomeElemento } from './nomes.js';
 import { descreverGhs, urlSegura } from './perigos.js';
-import { categoriaRotulo, estadoChave, estadoRotulo, formatarValor, valorBruto } from './propriedades.js';
-import { capitalizar, listar, normalizar, plural } from './texto.js';
+import { categoriaPlural, categoriaRotulo, classeRotulo, estadoChave, estadoRotulo, formatarValor, valorBruto } from './propriedades.js';
+import { capitalizar, listar, normalizar } from './texto.js';
 
+/** Fonte "este aplicativo" no idioma ativo (função: o idioma pode mudar em tempo de execução). */
+export const fonteApp = () => ({ nome: t('respostas.fontes.app'), licenca: 'MIT' });
+/** Compatibilidade (pt-BR). */
 export const FONTE_APP = { nome: 'SaibaTudo Química (este aplicativo)', licenca: 'MIT' };
-const FONTE_CALCULO = { nome: 'Cálculo local do aplicativo, com dados do pacote assinado' };
+const fonteCalculo = () => ({ nome: t('respostas.fontes.calculo') });
 
-export const SUGESTOES_PADRAO = [
-  'Qual é a massa molar da água?',
-  'Balancear Fe + O2 -> Fe2O3',
-  'pH de HCl 0,01 mol/L',
-  'Estrutura da aspirina',
-  'Perigos do ácido sulfúrico',
-  'Converter 5 atm em kPa',
-  'Quantos mols há em 18 g de água?',
-  'Ponto de fusão do ferro',
-  'Elementos do grupo 17',
-  'O que é um mol?',
-  'Por que não misturar água sanitária com amoníaco?'
-];
-
-export const ORIENTACAO_GERAL = [
-  'Leia o rótulo e a ficha de segurança (FISPQ) do produto antes de usar e siga as instruções do fabricante.',
-  'Use luvas e óculos de proteção compatíveis com o produto e trabalhe em local ventilado.',
-  'Não misture produtos químicos; guarde no recipiente original, bem fechado, longe de crianças, alimentos e fontes de calor.',
-  'Em contato com a pele ou os olhos, lave com água corrente em abundância; se inalar, vá para o ar livre; não provoque vômito sem orientação profissional.',
-  'Em qualquer intoxicação ou acidente, procure atendimento médico ou o centro de informação toxicológica da sua região, levando a embalagem do produto.'
-];
+/** Sugestões padrão no idioma ativo. `SUGESTOES_PADRAO` (pt-BR) fica por compatibilidade. */
+export const sugestoesPadrao = () => tl('respostas.sugestoes.padrao');
+export const SUGESTOES_PADRAO = tl('respostas.sugestoes.padrao', 'pt-BR');
+export const orientacaoGeral = () => tl('respostas.orientacaoGeral');
+export const ORIENTACAO_GERAL = tl('respostas.orientacaoGeral', 'pt-BR');
+const sug = (chave, params) => t(`respostas.sugestoes.${chave}`, params);
 
 const REGRAS_ACIDOS_BASES_PADRAO = [
   { formula: 'HCl', tipo: 'acido', n: 1 }, { formula: 'HBr', tipo: 'acido', n: 1 }, { formula: 'HI', tipo: 'acido', n: 1 }, { formula: 'HNO3', tipo: 'acido', n: 1 },
@@ -48,9 +37,10 @@ const REGRAS_ACIDOS_BASES_PADRAO = [
   { formula: 'LiOH', tipo: 'base', n: 1 }, { formula: 'Ca(OH)2', tipo: 'base', n: 2 }, { formula: 'Ba(OH)2', tipo: 'base', n: 2 }, { formula: 'Sr(OH)2', tipo: 'base', n: 2 }
 ];
 
-const minus = (s) => (s ? s[0].toLowerCase() + s.slice(1) : s);
-const fonteDe = (f) => (typeof f === 'string' ? { nome: f } : f && typeof f === 'object' ? { nome: f.nome ?? 'Pacote de dados', url: f.url, licenca: f.licenca } : FONTE_APP);
+const minus = (s) => minusNoMeio(s);
+const fonteDe = (f) => (typeof f === 'string' ? { nome: f } : f && typeof f === 'object' ? { nome: f.nome ?? t('respostas.fontes.pacote'), url: f.url, licenca: f.licenca } : fonteApp());
 const dado = (...fontes) => fontes.filter(Boolean).map(fonteDe);
+const origemUnidades = (tabela) => t(`respostas.unidades.origem.${tabela?.origemChave ?? 'padrao'}`);
 
 function textoDoBloco(b) {
   switch (b.tipo) {
@@ -61,8 +51,8 @@ function textoDoBloco(b) {
     case 'resultado': return [b.titulo, ...b.itens.map((i) => `${i.rotulo}: ${i.valor}${i.unidade ? ' ' + i.unidade : ''}${i.extra ? ` (${i.extra})` : ''}`)].filter(Boolean).join('\n');
     case 'passos': return [b.titulo, ...b.passos.map((p, i) => `${i + 1}. ${p.texto}`)].filter(Boolean).join('\n');
     case 'tabela': return [b.legenda, b.cabecalho.join(' | '), ...b.linhas.map((l) => l.join(' | '))].filter(Boolean).join('\n');
-    case 'ghs': return [b.titulo, b.palavraSinal ? `Palavra de sinal: ${b.palavraSinal}` : null, ...b.pictogramas.map((p) => `${p.codigo}: ${p.nome}`), ...b.frases.map((f) => `${f.codigo}: ${f.texto ?? ''}`)].filter(Boolean).join('\n');
-    case 'molecula': return `Estrutura 2D de ${b.nome}`;
+    case 'ghs': return [b.titulo, b.palavraSinal ? t('respostas.blocos.palavraSinal', { x: b.palavraSinal }) : null, ...b.pictogramas.map((p) => `${p.codigo}: ${p.nome}`), ...b.frases.map((f) => `${f.codigo}: ${f.texto ?? ''}`)].filter(Boolean).join('\n');
+    case 'molecula': return t('respostas.blocos.estrutura2d', { nome: b.nome });
     case 'equacao': return b.texto;
     case 'citacao': return `${b.texto}\n(${b.aviso ? b.aviso + ' ' : ''}${b.fonte?.nome ?? ''}${b.fonte?.licenca ? ', ' + b.fonte.licenca : ''})`;
     default: return '';
@@ -71,7 +61,7 @@ function textoDoBloco(b) {
 
 /** Monta a resposta final: texto plano, fontes agregadas (únicas), ações e sugestões. */
 function montar({ intent, titulo, blocos, acoes = [], sugestoes = [], resolvida = true, extra = {} }) {
-  const todos = blocos.map((b) => ({ ...b, fonte: b.fonte ?? FONTE_APP }));
+  const todos = blocos.map((b) => ({ ...b, fonte: b.fonte ?? fonteApp() }));
   const vistas = new Set();
   const fontes = [];
   for (const b of todos) {
@@ -81,20 +71,20 @@ function montar({ intent, titulo, blocos, acoes = [], sugestoes = [], resolvida 
     }
   }
   const directAnswer = [titulo, ...todos.map(textoDoBloco)].filter(Boolean).join('\n');
-  return { intent, resolvida, origem: 'LOCAL', titulo, blocos: todos, directAnswer, fontes, acoes, sugestoes: [...new Set(sugestoes)].slice(0, 6), ...extra };
+  return { intent, resolvida, origem: 'LOCAL', idioma: idiomaAtual(), titulo, blocos: todos, directAnswer, fontes, acoes, sugestoes: [...new Set(sugestoes)].slice(0, 6), ...extra };
 }
 
 const B = {
-  texto: (texto, fonte = FONTE_APP) => ({ tipo: 'texto', texto, fonte }),
-  aviso: (texto, fonte = FONTE_APP) => ({ tipo: 'aviso', texto, fonte }),
-  lista: (titulo, itens, fonte = FONTE_APP) => ({ tipo: 'lista', titulo, itens, fonte }),
+  texto: (texto, fonte = fonteApp()) => ({ tipo: 'texto', texto, fonte }),
+  aviso: (texto, fonte = fonteApp()) => ({ tipo: 'aviso', texto, fonte }),
+  lista: (titulo, itens, fonte = fonteApp()) => ({ tipo: 'lista', titulo, itens, fonte }),
   kv: (titulo, itens, fonte) => ({ tipo: 'kv', titulo, itens, fonte }),
-  resultado: (titulo, itens, fonte = FONTE_CALCULO) => ({ tipo: 'resultado', titulo, itens, fonte }),
-  passos: (titulo, passos, fonte = FONTE_CALCULO) => ({ tipo: 'passos', titulo, passos, fonte }),
+  resultado: (titulo, itens, fonte = fonteCalculo()) => ({ tipo: 'resultado', titulo, itens, fonte }),
+  passos: (titulo, passos, fonte = fonteCalculo()) => ({ tipo: 'passos', titulo, passos, fonte }),
   formula: (formula, fonte) => ({ tipo: 'formula', formula, fonte }),
   tabela: (legenda, cabecalho, linhas, fonte) => ({ tipo: 'tabela', legenda, cabecalho, linhas, fonte }),
   molecula: (smiles, nome, fonte) => ({ tipo: 'molecula', smiles, nome, fonte }),
-  equacao: (tex, texto, fonte = FONTE_CALCULO) => ({ tipo: 'equacao', tex, texto, fonte })
+  equacao: (tex, texto, fonte = fonteCalculo()) => ({ tipo: 'equacao', tex, texto, fonte })
 };
 
 const rota = (r, rotulo) => ({ rotulo, rota: r });
@@ -105,6 +95,7 @@ export class AnswerBuilder {
     this.store = store;
     this.dic = dic;
     this.ctx = store.ctx;
+    this.idioma = dic?.idioma ?? idiomaAtual();
   }
 
   async construir(p) {
@@ -134,18 +125,24 @@ export class AnswerBuilder {
       }
     } catch (e) {
       return montar({
-        intent: p.intent, resolvida: false, titulo: 'Não consegui montar essa resposta',
-        blocos: [B.aviso(`Ocorreu um problema ao ler os dados (${e instanceof Error ? e.message : String(e)}). Tente de novo ou use as telas do aplicativo.`)],
-        sugestoes: SUGESTOES_PADRAO.slice(0, 4)
+        intent: p.intent, resolvida: false, titulo: t('respostas.erro.titulo'),
+        blocos: [B.aviso(t('respostas.erro.texto', { msg: e instanceof Error ? e.message : String(e) }))],
+        sugestoes: sugestoesPadrao().slice(0, 4)
       });
     }
   }
 
   // ------------------------------------------------------------------------------------------------ utilidades
-  nomeComposto(c) { return c?.nome ?? c?.nomeIupac ?? String(c?.cid ?? ''); }
+  /** Nome do composto no idioma, rotulado quando é reserva (inglês/português). */
+  nomeComposto(c) { return exibirNome(infoNomeComposto(c, this.idioma)) || String(c?.cid ?? ''); }
+  /** Nome do elemento no idioma, rotulado quando é reserva. */
+  nomeElemento(e) { return exibirNome(infoNomeElemento(e, this.idioma)); }
+  /** Nome do elemento com inicial maiúscula (títulos) — a reserva mantém o rótulo. */
+  nomeElementoTitulo(e) { const i = infoNomeElemento(e, this.idioma); return exibirNome({ ...i, nome: capitalizar(i.nome) }); }
   rotaComposto(cid) { return `/quimica/composto/${cid}`; }
   rotaElemento(s) { return `/quimica/elemento/${encodeURIComponent(s)}`; }
   entradaComposto(cid) { return this.store.indice.porCid.get(Number(cid)) ?? null; }
+  fontePubchem(cid) { return { nome: t('respostas.fontes.pubchemCid', { cid }) }; }
 
   /** Compostos citados (registro completo, quando o lote existe) e elementos. */
   async entidades(p) {
@@ -156,58 +153,54 @@ export class AnswerBuilder {
   }
 
   /** Fonte das frases H: a do pacote (CLP/EUR-Lex em ghs_frases.json) ou, sem ela, o texto padrão do aplicativo. */
-  fonteFrases() { return this.store.fonteFrasesH ? fonteDe(this.store.fonteFrasesH) : { nome: 'Frases de perigo: UNECE GHS / ECHA CLP' }; }
+  fonteFrases() { return this.store.fonteFrasesH ? fonteDe(this.store.fonteFrasesH) : { nome: t('respostas.fontes.frasesPadrao') }; }
 
-  fonteRegras() { return fonteDe(this.store.regras?.fontes?.[0] ?? { nome: 'regras.json (pacote de dados assinado)' }); }
+  fonteRegras() { return fonteDe(this.store.regras?.fontes?.[0] ?? { nome: t('respostas.fontes.regras') }); }
 
   // ------------------------------------------------------------------------------------------------ meta
   recusa(p) {
     const r = respostaRecusa(p.seguranca);
-    const fonte = { nome: 'Política de segurança do aplicativo (regras locais)' };
+    const fonte = { nome: t('respostas.fontes.politica') };
     return montar({
-      intent: 'RECUSA_PERIGO', titulo: p.seguranca?.categoria === 'AUTOLESAO' ? 'Você não está sozinho(a)' : 'Não posso ajudar com esse pedido',
+      intent: 'RECUSA_PERIGO', titulo: p.seguranca?.categoria === 'AUTOLESAO' ? t('respostas.recusa.tituloAutolesao') : t('respostas.recusa.titulo'),
       blocos: r.linhas.map((l) => B.aviso(l, fonte)), resolvida: true,
-      sugestoes: p.seguranca?.categoria === 'AUTOLESAO' ? [] : ['Perigos do ácido sulfúrico', 'Por que não misturar água sanitária com amoníaco?', 'Qual é a massa molar da água?'],
+      sugestoes: p.seguranca?.categoria === 'AUTOLESAO' ? [] : [sug('perigosSulfurico'), sug('misturar'), sug('massaAgua')],
       extra: { categoriaRecusa: p.seguranca?.categoria ?? null }
     });
   }
 
   ajuda() {
     return montar({
-      intent: 'AJUDA', titulo: 'O que o SaibaTudo Química faz',
+      intent: 'AJUDA', titulo: t('respostas.ajuda.titulo'),
       blocos: [
-        B.texto('Eu respondo perguntas de Química com dados abertos e com cálculos feitos no seu aparelho: nada sai do seu celular ou computador.'),
-        B.lista('Você pode perguntar sobre', [
-          'elementos e a tabela periódica (propriedades, grupos, períodos)', 'compostos (fórmula, massa molar, estrutura 2D e perigos do GHS)',
-          'cálculos com passos: massa molar, balanceamento, estequiometria, concentração e diluição, pH, gás ideal e unidades',
-          'segurança: pictogramas, frases de perigo e como evitar misturas perigosas', 'conceitos básicos, com trechos de fontes abertas citadas'
-        ]),
-        B.aviso('Não ajudo com síntese, purificação ou receitas de explosivos, armas químicas, drogas ilícitas e outros reagentes perigosos.')
+        B.texto(t('respostas.ajuda.texto')),
+        B.lista(t('respostas.ajuda.podePerguntar'), tl('respostas.ajuda.itens')),
+        B.aviso(t('respostas.ajuda.aviso'))
       ],
-      acoes: [rota('/quimica/tabela', 'Tabela periódica'), rota('/quimica/calculadoras', 'Calculadoras')],
-      sugestoes: SUGESTOES_PADRAO.slice(0, 6)
+      acoes: [rota('/quimica/tabela', t('respostas.ajuda.tabela')), rota('/quimica/calculadoras', t('respostas.ajuda.calculadoras'))],
+      sugestoes: sugestoesPadrao().slice(0, 6)
     });
   }
 
   sobreDados() {
     const m = this.store.manifest;
     const fontesQtd = Array.isArray(this.store.fontes) ? this.store.fontes.length : (this.store.fontes?.fontes?.length ?? 0);
-    const sig = { verificada: 'verificada', invalida: 'NÃO verificada', indisponivel: 'não pôde ser verificada neste navegador' }[this.store.sig.estado];
+    const sig = t(`respostas.sobreDados.sig.${this.store.sig.estado}`);
     return montar({
-      intent: 'SOBRE_DADOS', titulo: 'Sobre os dados deste aplicativo',
+      intent: 'SOBRE_DADOS', titulo: t('respostas.sobreDados.titulo'),
       blocos: [
         B.kv(null, [
-          { rotulo: 'Versão do pacote de dados', valor: String(this.store.versao) },
-          { rotulo: 'Gerado em', valor: String(m?.generatedAt ?? '—') },
-          { rotulo: 'Assinatura digital (ECDSA P-256)', valor: sig },
-          { rotulo: 'Elementos no pacote', valor: String(this.store.elementos.length) },
-          { rotulo: 'Compostos no índice', valor: String(this.store.indice.entradas.length) },
-          ...(fontesQtd ? [{ rotulo: 'Fontes listadas', valor: String(fontesQtd) }] : [])
-        ], FONTE_APP),
-        B.texto('A lista completa de fontes, licenças e datas está na tela "Sobre os dados". Todo valor mostrado vem do pacote assinado ou de um cálculo local.')
+          { rotulo: t('respostas.sobreDados.versao'), valor: String(this.store.versao) },
+          { rotulo: t('respostas.sobreDados.geradoEm'), valor: String(m?.generatedAt ?? '—') },
+          { rotulo: t('respostas.sobreDados.assinatura'), valor: sig },
+          { rotulo: t('respostas.sobreDados.elementos'), valor: String(this.store.elementos.length) },
+          { rotulo: t('respostas.sobreDados.compostos'), valor: String(this.store.indice.entradas.length) },
+          ...(fontesQtd ? [{ rotulo: t('respostas.sobreDados.fontesListadas'), valor: String(fontesQtd) }] : [])
+        ], fonteApp()),
+        B.texto(t('respostas.sobreDados.texto'))
       ],
-      acoes: [rota('/quimica/sobre-os-dados', 'Ver todas as fontes e licenças')],
-      sugestoes: ['Quais as fontes?', 'Qual é a massa molar da água?']
+      acoes: [rota('/quimica/sobre-os-dados', t('respostas.sobreDados.acao'))],
+      sugestoes: [sug('fontes'), sug('massaAgua')]
     });
   }
 
@@ -215,23 +208,23 @@ export class AnswerBuilder {
     const lista = Array.isArray(this.store.fontes) ? this.store.fontes : this.store.fontes?.fontes ?? [];
     const itens = lista.filter((f) => f?.nome).map((f) => `${f.nome}${f.licenca ? ` — ${f.licenca}` : ''}`);
     return montar({
-      intent: 'FONTES', titulo: 'Fontes dos dados',
-      blocos: [itens.length ? B.lista('O pacote de dados usa', itens, FONTE_APP) : B.texto('A lista de fontes está na tela "Sobre os dados".')],
-      acoes: [rota('/quimica/sobre-os-dados', 'Sobre os dados')],
-      sugestoes: ['De onde vêm os dados?']
+      intent: 'FONTES', titulo: t('respostas.fontesResp.titulo'),
+      blocos: [itens.length ? B.lista(t('respostas.fontesResp.usa'), itens, fonteApp()) : B.texto(t('respostas.fontesResp.semLista'))],
+      acoes: [rota('/quimica/sobre-os-dados', t('respostas.fontesResp.acao'))],
+      sugestoes: [sug('origemDados')]
     });
   }
 
   naoEntendi(p) {
-    const sug = SUGESTOES_PADRAO;
+    const s = sugestoesPadrao();
     return montar({
-      intent: 'DESCONHECIDA', resolvida: false, titulo: 'Não entendi a pergunta',
+      intent: 'DESCONHECIDA', resolvida: false, titulo: t('respostas.naoEntendi.titulo'),
       blocos: [
-        B.texto(p.textoOriginal ? `Não entendi "${p.textoOriginal}". Tente citar um elemento, um composto, uma fórmula ou um cálculo, por exemplo:` : 'Escreva sua pergunta, por exemplo:'),
-        B.lista(null, sug.slice(0, 5))
+        B.texto(p.textoOriginal ? t('respostas.naoEntendi.comPergunta', { q: p.textoOriginal }) : t('respostas.naoEntendi.semPergunta')),
+        B.lista(null, s.slice(0, 5))
       ],
-      acoes: [rota('/quimica/tabela', 'Tabela periódica'), rota('/quimica/compostos', 'Buscar compostos'), rota('/quimica/calculadoras', 'Calculadoras')],
-      sugestoes: sug.slice(0, 6)
+      acoes: [rota('/quimica/tabela', t('respostas.naoEntendi.tabela')), rota('/quimica/compostos', t('respostas.naoEntendi.compostos')), rota('/quimica/calculadoras', t('respostas.naoEntendi.calculadoras'))],
+      sugestoes: s.slice(0, 6)
     });
   }
 
@@ -248,15 +241,17 @@ export class AnswerBuilder {
   elemento(p) {
     const e = this.store.porSimbolo.get(p.elemento);
     if (!e) return this.naoEntendi(p);
-    const fonte = dado(e.fontes?.[0])[0] ?? FONTE_APP;
-    const itens = [{ rotulo: 'Nome em inglês', valor: e.nomeEn ?? '—' }, ...this.itensDoElemento(e)].filter((i) => i.valor !== '—');
-    const sug = [`Ponto de fusão de ${minus(e.nome)}`, `Configuração eletrônica de ${minus(e.nome)}`].filter((_, i) => (i === 0 ? e.pontoFusaoK != null : !!e.configuracaoEletronica));
-    if (e.massaAtomica != null) sug.push(`Massa molar de ${minus(e.nome)}`);
+    const fonte = dado(e.fontes?.[0])[0] ?? fonteApp();
+    const nome = this.nomeElementoTitulo(e);
+    const nomeMeio = minus(infoNomeElemento(e, this.idioma).nome);
+    const itens = [...(this.idioma === 'en' ? [] : [{ rotulo: t('respostas.elemento.nomeEmIngles'), valor: e.nomes?.en ?? e.nomeEn ?? '—' }]), ...this.itensDoElemento(e)].filter((i) => i.valor !== '—');
+    const s = [sug('fusaoDe', { nome: nomeMeio }), sug('configuracaoDe', { nome: nomeMeio })].filter((_, i) => (i === 0 ? e.pontoFusaoK != null : !!e.configuracaoEletronica));
+    if (e.massaAtomica != null) s.push(sug('massaMolarDe', { nome: nomeMeio }));
     return montar({
-      intent: 'ELEMENTO', titulo: `${e.nome} (${e.simbolo}), elemento ${e.z}`,
+      intent: 'ELEMENTO', titulo: t('respostas.elemento.titulo', { nome, simbolo: e.simbolo, z: e.z }),
       blocos: [B.kv(null, itens, fonte)],
-      acoes: [rota(this.rotaElemento(e.simbolo), `Ficha completa de ${e.nome}`), rota('/quimica/tabela', 'Ver na tabela periódica')],
-      sugestoes: sug
+      acoes: [rota(this.rotaElemento(e.simbolo), t('respostas.elemento.ficha', { nome })), rota('/quimica/tabela', t('respostas.elemento.verTabela'))],
+      sugestoes: s
     });
   }
 
@@ -268,33 +263,33 @@ export class AnswerBuilder {
   }
 
   fichaResumida(c, p) {
-    const fonte = dado(c.fontes?.[0])[0] ?? { nome: `PubChem CID ${c.cid} (NCBI/NLM)` };
+    const fonte = dado(c.fontes?.[0])[0] ?? this.fontePubchem(c.cid);
     const nome = this.nomeComposto(c);
     const itens = [];
-    if (c.nomePopular && c.nomePopular !== c.nome) itens.push({ rotulo: 'Nome popular', valor: c.nomePopular });
-    if (c.nomeIupac) itens.push({ rotulo: 'Nome IUPAC', valor: c.nomeIupac });
-    if (c.formula) itens.push({ rotulo: 'Fórmula', valor: formulaUnicode(c.formula) });
-    if (c.massaMolar != null) itens.push({ rotulo: 'Massa molar', valor: formatarValor({ tipo: 'massaMolar' }, c.massaMolar, this.ctx).texto });
-    if (c.cas) itens.push({ rotulo: 'Número CAS', valor: c.cas });
-    itens.push({ rotulo: 'CID no PubChem', valor: String(c.cid) });
+    if (this.idioma === 'pt-BR' && c.nomePopular && c.nomePopular !== c.nome) itens.push({ rotulo: t('respostas.composto.nomePopular'), valor: c.nomePopular });
+    if (c.nomeIupac) itens.push({ rotulo: t('respostas.composto.nomeIupac'), valor: c.nomeIupac });
+    if (c.formula) itens.push({ rotulo: t('respostas.composto.formula'), valor: formulaUnicode(c.formula) });
+    if (c.massaMolar != null) itens.push({ rotulo: t('respostas.composto.massaMolar'), valor: formatarValor({ tipo: 'massaMolar' }, c.massaMolar, this.ctx).texto });
+    if (c.cas) itens.push({ rotulo: t('respostas.composto.cas'), valor: c.cas });
+    itens.push({ rotulo: t('respostas.composto.cid'), valor: String(c.cid) });
     for (const prop of this.dic.props.filter((x) => x.alvo === 'composto' && ['xlogp', 'doadoresH', 'aceptoresH', 'ligacoesRotaveis', 'carga', 'tpsa'].includes(x.id))) {
       const f = formatarValor(prop, valorBruto(prop, c), this.ctx);
       if (f) itens.push({ rotulo: capitalizar(prop.rotulo), valor: f.texto });
     }
-    if (c.classes?.length) itens.push({ rotulo: 'Classes', valor: listar(c.classes.map((x) => CLASSES_PT[x] ?? x.replace(/_/g, ' '))) });
+    if (c.classes?.length) itens.push({ rotulo: t('respostas.composto.classes'), valor: listar(c.classes.map(classeRotulo)) });
     const blocos = [B.kv(null, itens, fonte)];
     if (c.smiles) blocos.push(B.molecula(c.smiles, nome, fonte));
     const g = descreverGhs(c.ghs, this.store.regras);
-    if (g) blocos.push({ tipo: 'ghs', titulo: 'Perigos (GHS)', ...g, fonte: dado(c.ghs.fonte ? { nome: c.ghs.fonte } : fonte, this.fonteFrases()) });
+    if (g) blocos.push({ tipo: 'ghs', titulo: t('respostas.composto.perigosGhs'), ...g, fonte: dado(c.ghs.fonte ? { nome: c.ghs.fonte } : fonte, this.fonteFrases()) });
     const defin = this.definicaoChebi(c);
-    if (defin) blocos.push({ tipo: 'citacao', texto: defin.texto, aviso: 'Definição em inglês.', fonte: defin.fonte });
-    const sug = [`Massa molar de ${minus(nome)}`];
-    if (c.ghs) sug.push(`Perigos de ${minus(nome)}`);
+    if (defin) blocos.push({ tipo: 'citacao', texto: defin.texto, aviso: this.idioma === 'en' ? null : t('respostas.composto.definicaoIngles'), fonte: defin.fonte });
+    const s = [sug('massaMolarDe', { nome: minus(nome) })];
+    if (c.ghs) s.push(sug('perigosDe', { nome: minus(nome) }));
     return montar({
       intent: 'COMPOSTO', titulo: `${nome}${c.formula ? ` (${formulaUnicode(c.formula)})` : ''}`,
       blocos,
-      acoes: [rota(this.rotaComposto(c.cid), 'Ficha completa'), ...this.acoesIcsc(c)],
-      sugestoes: sug,
+      acoes: [rota(this.rotaComposto(c.cid), t('respostas.composto.ficha')), ...this.acoesIcsc(c)],
+      sugestoes: s,
       extra: { compostoCid: c.cid }
     });
   }
@@ -307,12 +302,12 @@ export class AnswerBuilder {
     if (!texto) return null;
     const id = typeof d === 'object' ? d.chebiId ?? d.chebi ?? d.id ?? null : null;
     const url = urlSegura(typeof d === 'object' ? d.url : null) ?? (id && /^(?:CHEBI:)?\d+$/i.test(String(id)) ? `https://www.ebi.ac.uk/chebi/searchId.do?chebiId=${/^\d+$/.test(String(id)) ? `CHEBI:${id}` : id}` : 'https://www.ebi.ac.uk/chebi/');
-    return { texto, id, fonte: { nome: id ? `ChEBI (${id})` : 'ChEBI (EMBL-EBI)', url, licenca: (typeof d === 'object' && d.licenca) || 'CC BY 4.0' } };
+    return { texto, id, fonte: { nome: id ? t('respostas.fontes.chebi', { id }) : t('respostas.fontes.chebiSem'), url, licenca: (typeof d === 'object' && d.licenca) || 'CC BY 4.0' } };
   }
 
   acoesIcsc(c, comNome = false) {
     const url = urlSegura(c.icscBuscaUrl ?? this.entradaComposto(c.cid)?.icscBuscaUrl);
-    return url ? [{ rotulo: comNome ? `Ficha ICSC de ${this.nomeComposto(c)} no site da OIT` : 'Ficha ICSC no site da OIT', url, externo: true }] : [];
+    return url ? [{ rotulo: comNome ? t('respostas.composto.icscDe', { nome: this.nomeComposto(c) }) : t('respostas.composto.icsc'), url, externo: true }] : [];
   }
 
   // ------------------------------------------------------------------------------------------------ propriedades
@@ -321,40 +316,41 @@ export class AnswerBuilder {
     const { compostos, elementos } = await this.entidades(p);
     if (!ids.length || (!compostos.length && !elementos.length)) {
       return montar({
-        intent: 'PROPRIEDADE', resolvida: false, titulo: 'De qual substância?',
-        blocos: [B.texto(ids.length ? `Diga de qual elemento ou composto você quer ${listar(ids.map((i) => this.dic.propPorId.get(i)?.rotulo ?? i))}. Por exemplo: "ponto de fusão do ferro".` : 'Diga qual propriedade e de qual elemento ou composto. Por exemplo: "densidade do ouro".')],
-        sugestoes: ['Ponto de fusão do ferro', 'Massa molar da água']
+        intent: 'PROPRIEDADE', resolvida: false, titulo: t('respostas.propriedade.deQual'),
+        blocos: [B.texto(ids.length ? t('respostas.propriedade.digaQualElemento', { props: listar(ids.map((i) => this.dic.propPorId.get(i)?.rotulo ?? i)) }) : t('respostas.propriedade.digaQualPropriedade'))],
+        sugestoes: [sug('fusaoFerro'), sug('massaMolarAgua')]
       });
     }
     const linhas = [];
     const ausentes = [];
     const fontes = [];
+    const nomeDe = (reg, alvo) => (alvo === 'composto' ? this.nomeComposto(reg) : this.nomeElemento(reg));
     for (const id of ids) {
       const prop = this.dic.propPorId.get(id);
       if (!prop) continue;
       const alvos = prop.alvo === 'composto' ? compostos : elementos;
       for (const reg of alvos) {
-        const nome = prop.alvo === 'composto' ? this.nomeComposto(reg) : reg.nome;
+        const nome = nomeDe(reg, prop.alvo);
         let f = formatarValor(prop, valorBruto(prop, reg), this.ctx);
         if (f && prop.id === 'formula') f = { texto: formulaUnicode(String(valorBruto(prop, reg))) };
-        if (f) { linhas.push({ rotulo: `${capitalizar(prop.rotulo)} de ${nome}`, valor: f.texto }); fontes.push(dado(reg.fontes?.[0])[0]); }
-        else ausentes.push(`${prop.rotulo} de ${nome}`);
+        if (f) { linhas.push({ rotulo: t('respostas.propriedade.de', { prop: capitalizar(prop.rotulo), nome }), valor: f.texto }); fontes.push(dado(reg.fontes?.[0])[0]); }
+        else ausentes.push(t('respostas.propriedade.de', { prop: prop.rotulo, nome }));
       }
       // propriedade de elemento perguntada para um composto (ou o contrário)
       const outros = prop.alvo === 'composto' ? elementos : compostos;
-      if (!alvos.length && outros.length) ausentes.push(`${prop.rotulo} (essa propriedade é de ${prop.alvo === 'composto' ? 'compostos' : 'elementos'}; ${outros.map((o) => o.nome ?? this.nomeComposto(o)).join(', ')} ${outros.length > 1 ? 'são' : 'é'} de outro tipo)`);
+      if (!alvos.length && outros.length) ausentes.push(t('respostas.propriedade.outroTipo', { prop: prop.rotulo, alvo: prop.alvo, outros: outros.map((o) => nomeDe(o, prop.alvo === 'composto' ? 'elemento' : 'composto')).join(', '), n: outros.length }));
     }
     const blocos = [];
-    if (linhas.length) blocos.push(B.kv(null, linhas, fontes.filter(Boolean).length ? fontes.filter(Boolean) : FONTE_APP));
-    if (ausentes.length) blocos.push(B.aviso(`O pacote de dados não tem: ${ausentes.join('; ')}.`));
+    if (linhas.length) blocos.push(B.kv(null, linhas, fontes.filter(Boolean).length ? fontes.filter(Boolean) : fonteApp()));
+    if (ausentes.length) blocos.push(B.aviso(t('respostas.propriedade.naoTem', { lista: ausentes.join('; ') })));
     const primeiro = elementos[0] ?? compostos[0];
     const acoes = elementos[0] && ids.some((i) => this.dic.propPorId.get(i)?.alvo === 'elemento')
-      ? [rota(this.rotaElemento(elementos[0].simbolo), `Ficha de ${elementos[0].nome}`)]
-      : compostos[0] ? [rota(this.rotaComposto(compostos[0].cid), `Ficha de ${this.nomeComposto(compostos[0])}`)] : [];
+      ? [rota(this.rotaElemento(elementos[0].simbolo), t('respostas.propriedade.fichaDe', { nome: this.nomeElemento(elementos[0]) }))]
+      : compostos[0] ? [rota(this.rotaComposto(compostos[0].cid), t('respostas.propriedade.fichaDe', { nome: this.nomeComposto(compostos[0]) }))] : [];
     return montar({
-      intent: 'PROPRIEDADE', titulo: linhas.length === 1 ? linhas[0].rotulo : `Propriedades de ${listar([...elementos.map((e) => e.nome), ...compostos.map((c) => this.nomeComposto(c))])}`,
+      intent: 'PROPRIEDADE', titulo: linhas.length === 1 ? linhas[0].rotulo : t('respostas.propriedade.propriedadesDe', { nomes: listar([...elementos.map((e) => this.nomeElemento(e)), ...compostos.map((c) => this.nomeComposto(c))]) }),
       blocos, acoes,
-      sugestoes: primeiro ? [elementos[0] ? `Densidade de ${minus(elementos[0].nome)}` : `Massa molar de ${minus(this.nomeComposto(compostos[0]))}`] : [],
+      sugestoes: primeiro ? [elementos[0] ? sug('densidadeDe', { nome: minus(this.nomeElemento(elementos[0])) }) : sug('massaMolarDe', { nome: minus(this.nomeComposto(compostos[0])) })] : [],
       extra: { alvoPropriedade: elementos.length ? 'elemento' : 'composto' }
     });
   }
@@ -368,45 +364,46 @@ export class AnswerBuilder {
       const e = elementos[0];
       const r = calcularMassaMolar(e.simbolo, this.ctx);
       if (r.ok) {
+        const nome = this.nomeElementoTitulo(e);
         return montar({
-          intent: 'MASSA_MOLAR', titulo: `Massa molar: ${e.nome} (${e.simbolo})`,
+          intent: 'MASSA_MOLAR', titulo: t('respostas.massaMolar.tituloElemento', { nome, simbolo: e.simbolo }),
           blocos: [
-            B.resultado(null, r.resultados.slice(0, 1).map((x) => ({ ...x, rotulo: `Massa molar de ${minus(e.nome)} (átomos)` })), dado(e.fontes?.[0])[0] ?? FONTE_CALCULO),
-            B.aviso('Para a substância simples molecular, como O₂ ou N₂, digite a fórmula: a massa molar é a do átomo vezes o número de átomos da molécula.')
+            B.resultado(null, r.resultados.slice(0, 1).map((x) => ({ ...x, rotulo: t('respostas.massaMolar.deAtomos', { nome: minus(this.nomeElemento(e)) }) })), dado(e.fontes?.[0])[0] ?? fonteCalculo()),
+            B.aviso(t('respostas.massaMolar.avisoMolecular'))
           ],
-          acoes: [rota(`/quimica/calculadoras/massa-molar?f=${encodeURIComponent(e.simbolo)}`, 'Abrir na calculadora')],
-          sugestoes: [`Massa molar de ${minus(e.nome)}`]
+          acoes: [rota(`/quimica/calculadoras/massa-molar?f=${encodeURIComponent(e.simbolo)}`, t('respostas.massaMolar.abrirCalculadora'))],
+          sugestoes: [sug('massaMolarDe', { nome: minus(this.nomeElemento(e)) })]
         });
       }
     }
     return montar({
-      intent: 'MASSA_MOLAR', resolvida: false, titulo: 'Massa molar de quê?',
-      blocos: [B.texto('Digite a fórmula ou o nome da substância. Por exemplo: "massa molar da água" ou "massa molar de Ca(OH)2".')],
-      acoes: [rota('/quimica/calculadoras/massa-molar', 'Calculadora de massa molar')],
-      sugestoes: ['Qual é a massa molar da água?']
+      intent: 'MASSA_MOLAR', resolvida: false, titulo: t('respostas.massaMolar.deQue'),
+      blocos: [B.texto(t('respostas.massaMolar.digite'))],
+      acoes: [rota('/quimica/calculadoras/massa-molar', t('respostas.massaMolar.calculadora'))],
+      sugestoes: [sug('massaAgua')]
     });
   }
 
   massaMolarDeFormula(formula, p, composto = null) {
     const r = calcularMassaMolar(formula, this.ctx);
     if (!r.ok) {
-      return montar({ intent: 'MASSA_MOLAR', resolvida: false, titulo: 'Não consegui calcular a massa molar', blocos: [B.aviso(r.erro)], sugestoes: ['Qual é a massa molar da água?'] });
+      return montar({ intent: 'MASSA_MOLAR', resolvida: false, titulo: t('respostas.massaMolar.naoConsegui'), blocos: [B.aviso(r.erro)], sugestoes: [sug('massaAgua')] });
     }
     const nome = composto ? this.nomeComposto(composto) : null;
     const blocos = [
-      B.resultado(null, r.resultados.slice(0, 1), r.fontes[0] ? fonteDe(r.fontes[0]) : FONTE_CALCULO),
-      B.passos('Como calcular', r.passos),
-      B.kv('Composição em massa', r.composicao.map((c) => ({ rotulo: `${c.nome} (${c.simbolo})`, valor: `${fmt(c.percentual, { sig: 4 })} %` })), FONTE_CALCULO)
+      B.resultado(null, r.resultados.slice(0, 1), r.fontes[0] ? fonteDe(r.fontes[0]) : fonteCalculo()),
+      B.passos(t('respostas.blocos.comoCalcular'), r.passos),
+      B.kv(t('respostas.massaMolar.composicao'), r.composicao.map((c) => ({ rotulo: `${c.nome} (${c.simbolo})`, valor: `${fmt(c.percentual, { sig: 4 })} %` })), fonteCalculo())
     ];
     if (composto?.massaMolar != null) {
-      blocos.push(B.kv('Valor de referência', [{ rotulo: 'PubChem informa', valor: `${fmt(composto.massaMolar, { sig: 8 })} g/mol` }], dado(composto.fontes?.[0])[0] ?? { nome: `PubChem CID ${composto.cid} (NCBI/NLM)` }));
+      blocos.push(B.kv(t('respostas.massaMolar.referencia'), [{ rotulo: t('respostas.massaMolar.pubchemInforma'), valor: `${fmt(composto.massaMolar, { sig: 8 })} g/mol` }], dado(composto.fontes?.[0])[0] ?? this.fontePubchem(composto.cid)));
     }
     if (r.notas.length) blocos.push(B.aviso(r.notas.join(' ')));
     return montar({
-      intent: 'MASSA_MOLAR', titulo: `Massa molar${nome ? `: ${nome}` : ''} (${r.formulaUnicode})`,
+      intent: 'MASSA_MOLAR', titulo: t('respostas.massaMolar.titulo', { nome, formula: r.formulaUnicode }),
       blocos,
-      acoes: [rota(`/quimica/calculadoras/massa-molar?f=${encodeURIComponent(r.formula)}`, 'Abrir na calculadora')],
-      sugestoes: composto ? [`Estrutura de ${minus(nome)}`] : []
+      acoes: [rota(`/quimica/calculadoras/massa-molar?f=${encodeURIComponent(r.formula)}`, t('respostas.massaMolar.abrirCalculadora'))],
+      sugestoes: composto ? [sug('estruturaDe', { nome: minus(nome) })] : []
     });
   }
 
@@ -414,28 +411,28 @@ export class AnswerBuilder {
   balancear(p) {
     if (!p.equacao) {
       return montar({
-        intent: 'BALANCEAR', titulo: 'Balanceamento de equações',
-        blocos: [B.texto('Digite a equação com os reagentes, uma seta e os produtos. Por exemplo: Fe + O2 -> Fe2O3. Íons também valem: Zn + Cu2+ -> Zn2+ + Cu.')],
-        acoes: [rota('/quimica/calculadoras/balanceamento', 'Abrir a calculadora')],
-        sugestoes: ['Balancear Fe + O2 -> Fe2O3']
+        intent: 'BALANCEAR', titulo: t('respostas.balancear.titulo'),
+        blocos: [B.texto(t('respostas.balancear.digite'))],
+        acoes: [rota('/quimica/calculadoras/balanceamento', t('respostas.balancear.abrir'))],
+        sugestoes: [sug('balancear')]
       });
     }
     const r = balancear(p.equacao, { simbolos: this.ctx.simbolos });
     if (!r.ok) {
       return montar({
-        intent: 'BALANCEAR', resolvida: false, titulo: 'Não consegui balancear', blocos: [B.aviso(r.erro)],
-        acoes: [rota(`/quimica/calculadoras/balanceamento?eq=${encodeURIComponent(p.equacao)}`, 'Ajustar na calculadora')], sugestoes: ['Balancear Fe + O2 -> Fe2O3']
+        intent: 'BALANCEAR', resolvida: false, titulo: t('respostas.balancear.naoConsegui'), blocos: [B.aviso(r.erro)],
+        acoes: [rota(`/quimica/calculadoras/balanceamento?eq=${encodeURIComponent(p.equacao)}`, t('respostas.balancear.ajustar'))], sugestoes: [sug('balancear')]
       });
     }
     return montar({
-      intent: 'BALANCEAR', titulo: 'Equação balanceada',
+      intent: 'BALANCEAR', titulo: t('respostas.balancear.balanceada'),
       blocos: [
         B.equacao(r.equacaoTex, r.equacao),
-        B.passos('Passo a passo', r.passos.slice(0, -1)),
-        ...(r.digitouCoeficientes ? [B.aviso('Os coeficientes digitados foram ignorados: o aplicativo balanceia a equação inteira.')] : [])
+        B.passos(t('respostas.blocos.passoAPasso'), r.passos.slice(0, -1)),
+        ...(r.digitouCoeficientes ? [B.aviso(t('respostas.balancear.coeficientesIgnorados'))] : [])
       ],
-      acoes: [rota(`/quimica/calculadoras/balanceamento?eq=${encodeURIComponent(p.equacao)}`, 'Abrir na calculadora')],
-      sugestoes: ['Quantos mols há em 18 g de água?'],
+      acoes: [rota(`/quimica/calculadoras/balanceamento?eq=${encodeURIComponent(p.equacao)}`, t('respostas.balancear.abrirNa'))],
+      sugestoes: [sug('molsAgua')],
       extra: { equacaoBalanceada: r.equacao }
     });
   }
@@ -452,22 +449,22 @@ export class AnswerBuilder {
 
   async estequiometria(p) {
     const dados = await this.quantidadesComEspecie(p.textoOriginal);
-    const acaoCalc = [rota('/quimica/calculadoras/estequiometria', 'Abrir a calculadora de estequiometria')];
+    const acaoCalc = [rota('/quimica/calculadoras/estequiometria', t('respostas.estequiometria.abrir'))];
     if (p.equacao) {
       if (!dados.length) {
         const unid = p.quantidades.filter((q) => q.unidade);
         return montar({
-          intent: 'ESTEQUIOMETRIA', resolvida: false, titulo: 'Faltam as quantidades',
-          blocos: [B.texto(unid.length ? 'Diga a quantidade de cada reagente com o nome ou a fórmula, por exemplo "4 g de H2 e 16 g de O2".' : 'Informe a quantidade de pelo menos um reagente, por exemplo "4 g de H2 e 16 g de O2".')],
-          acoes: acaoCalc, sugestoes: ['Quantos mols há em 18 g de água?']
+          intent: 'ESTEQUIOMETRIA', resolvida: false, titulo: t('respostas.estequiometria.faltam'),
+          blocos: [B.texto(unid.length ? t('respostas.estequiometria.digaCadaReagente') : t('respostas.estequiometria.informePeloMenos'))],
+          acoes: acaoCalc, sugestoes: [sug('molsAgua')]
         });
       }
       const r = calcularEstequiometria({ equacao: p.equacao, dados }, this.ctx);
-      if (!r.ok) return montar({ intent: 'ESTEQUIOMETRIA', resolvida: false, titulo: 'Não consegui calcular', blocos: [B.aviso(r.erro)], acoes: acaoCalc, sugestoes: [] });
+      if (!r.ok) return montar({ intent: 'ESTEQUIOMETRIA', resolvida: false, titulo: t('respostas.estequiometria.naoConsegui'), blocos: [B.aviso(r.erro)], acoes: acaoCalc, sugestoes: [] });
       return montar({
-        intent: 'ESTEQUIOMETRIA', titulo: `Estequiometria: ${r.equacao}`,
-        blocos: [B.resultado(null, r.resultados), B.passos('Passo a passo', r.passos), ...(r.notas.length ? [B.aviso(r.notas.join(' '))] : [])],
-        acoes: acaoCalc, sugestoes: ['Balancear Fe + O2 -> Fe2O3']
+        intent: 'ESTEQUIOMETRIA', titulo: t('respostas.estequiometria.titulo', { equacao: r.equacao }),
+        blocos: [B.resultado(null, r.resultados), B.passos(t('respostas.blocos.passoAPasso'), r.passos), ...(r.notas.length ? [B.aviso(r.notas.join(' '))] : [])],
+        acoes: acaoCalc, sugestoes: [sug('balancear')]
       });
     }
     // uma substância: massa ↔ mol ↔ partículas ↔ volume
@@ -478,32 +475,32 @@ export class AnswerBuilder {
     })();
     if (q) {
       const r = converterQuantidade({ formula: q.especie, valor: q.valor, unidade: q.unidade }, this.ctx);
-      if (!r.ok) return montar({ intent: 'ESTEQUIOMETRIA', resolvida: false, titulo: 'Não consegui calcular', blocos: [B.aviso(r.erro)], acoes: acaoCalc, sugestoes: [] });
+      if (!r.ok) return montar({ intent: 'ESTEQUIOMETRIA', resolvida: false, titulo: t('respostas.estequiometria.naoConsegui'), blocos: [B.aviso(r.erro)], acoes: acaoCalc, sugestoes: [] });
       return montar({
-        intent: 'ESTEQUIOMETRIA', titulo: `${fmt(q.valor, { sig: 6 })} ${q.unidade === 'particulas' ? 'partículas' : q.unidade} de ${formulaUnicode(r.formula)}`,
-        blocos: [B.resultado(null, r.resultados), B.passos('Passo a passo', r.passos), ...(r.notas.length ? [B.aviso(r.notas.join(' '))] : [])],
-        acoes: [rota(`/quimica/calculadoras/estequiometria?f=${encodeURIComponent(r.formula)}&v=${q.valor}&u=${encodeURIComponent(q.unidade)}`, 'Abrir na calculadora')],
-        sugestoes: ['Balancear Fe + O2 -> Fe2O3']
+        intent: 'ESTEQUIOMETRIA', titulo: t('respostas.estequiometria.tituloQuantidade', { valor: fmt(q.valor, { sig: 6 }), unidade: q.unidade === 'particulas' ? t('respostas.estequiometria.particulas') : q.unidade, formula: formulaUnicode(r.formula) }),
+        blocos: [B.resultado(null, r.resultados), B.passos(t('respostas.blocos.passoAPasso'), r.passos), ...(r.notas.length ? [B.aviso(r.notas.join(' '))] : [])],
+        acoes: [rota(`/quimica/calculadoras/estequiometria?f=${encodeURIComponent(r.formula)}&v=${q.valor}&u=${encodeURIComponent(q.unidade)}`, t('respostas.estequiometria.abrirNa'))],
+        sugestoes: [sug('balancear')]
       });
     }
     const mol = p.quantidades.find((x) => x.unidade && acharUnidade(this.ctx.unidades, x.unidade).some((u) => u.grupo === 'quantidade'));
     const vm = this.ctx.volumeMolarCNTP();
-    if (mol && vm && /\b(?:cntp|condicoes normais|volume)\b/.test(normalizar(p.textoOriginal))) {
+    if (mol && vm && this.dic.lex.pistas.cntp.test(normalizar(p.textoOriginal))) {
       const nMol = paraBase(this.ctx.unidades, mol.unidade, 'quantidade', mol.valor);
       const L = nMol * vm.valor * 1000;
       return montar({
-        intent: 'ESTEQUIOMETRIA', titulo: `Volume de ${fmt(mol.valor, { sig: 6 })} ${mol.unidade} de um gás ideal nas CNTP`,
+        intent: 'ESTEQUIOMETRIA', titulo: t('respostas.estequiometria.volumeTitulo', { valor: fmt(mol.valor, { sig: 6 }), unidade: mol.unidade }),
         blocos: [
-          B.resultado(null, [{ rotulo: 'Volume nas CNTP (0 °C e 1 atm)', valor: fmt(L, { sig: 6 }), unidade: 'L', destaque: true }, { rotulo: 'Volume molar (RT/P)', valor: fmt(vm.valor * 1000, { sig: 6 }), unidade: 'L/mol' }], { nome: 'Cálculo local com a constante R do pacote (CODATA)' }),
-          B.passos('Como calcular', [{ texto: 'Pela equação dos gases ideais, o volume molar é Vm = RT/P, com T = 0 °C e P = 1 atm; multiplique pela quantidade de matéria.', tex: `V = n\\dfrac{RT}{P} = ${fmtTex(nMol, { sig: 6 })} \\times ${fmtTex(vm.valor * 1000, { sig: 6 })}\\ \\mathrm{L/mol} = ${fmtTex(L, { sig: 6 })}\\ \\mathrm{L}` }])
+          B.resultado(null, [{ rotulo: t('respostas.estequiometria.volumeCntp'), valor: fmt(L, { sig: 6 }), unidade: 'L', destaque: true }, { rotulo: t('respostas.estequiometria.volumeMolar'), valor: fmt(vm.valor * 1000, { sig: 6 }), unidade: 'L/mol' }], { nome: t('respostas.fontes.constanteR') }),
+          B.passos(t('respostas.blocos.comoCalcular'), [{ texto: t('respostas.estequiometria.passoVolume'), tex: `V = n\\dfrac{RT}{P} = ${fmtTex(nMol, { sig: 6 })} \\times ${fmtTex(vm.valor * 1000, { sig: 6 })}\\ \\mathrm{L/mol} = ${fmtTex(L, { sig: 6 })}\\ \\mathrm{L}` }])
         ],
-        acoes: [rota('/quimica/calculadoras/gas-ideal', 'Abrir a calculadora de gás ideal')], sugestoes: ['Quantos mols há em 18 g de água?']
+        acoes: [rota('/quimica/calculadoras/gas-ideal', t('respostas.estequiometria.abrirGas'))], sugestoes: [sug('molsAgua')]
       });
     }
     return montar({
-      intent: 'ESTEQUIOMETRIA', resolvida: false, titulo: 'Estequiometria',
-      blocos: [B.texto('Para converter massa, mol, partículas e volume, diga a quantidade e a substância, por exemplo "quantos mols há em 18 g de água?". Para reagente limitante, escreva a equação e as quantidades.')],
-      acoes: acaoCalc, sugestoes: ['Quantos mols há em 18 g de água?']
+      intent: 'ESTEQUIOMETRIA', resolvida: false, titulo: t('respostas.estequiometria.tituloGeral'),
+      blocos: [B.texto(t('respostas.estequiometria.explicacao'))],
+      acoes: acaoCalc, sugestoes: [sug('molsAgua')]
     });
   }
 
@@ -516,7 +513,7 @@ export class AnswerBuilder {
   }
 
   async concentracao(p) {
-    const calc = [rota('/quimica/calculadoras/concentracao', 'Abrir a calculadora')];
+    const calc = [rota('/quimica/calculadoras/concentracao', t('respostas.concentracao.abrir'))];
     const q = p.quantidades.filter((x) => x.unidade);
     const grupoDe = (u) => acharUnidade(this.ctx.unidades, u)[0]?.grupo;
     const massas = q.filter((x) => grupoDe(x.unidade) === 'massa');
@@ -524,8 +521,9 @@ export class AnswerBuilder {
     const concs = q.filter((x) => x.unidade === 'g/L' || grupoDe(x.unidade) === 'concentracao');
     const formula = await this.formulaDoAlvo(p);
     const n = normalizar(p.textoOriginal);
+    const P = this.dic.lex.pistas;
     let entrada = null;
-    if (/\b(?:dilu\w*|c1v1|c1 v1)\b/.test(n) && concs.length >= 1 && volumes.length >= 1 && concs.length + volumes.length >= 3) {
+    if (P.diluicao.test(n) && concs.length >= 1 && volumes.length >= 1 && concs.length + volumes.length >= 3) {
       const unidadeC = concs[0].unidade;
       const unidadeV = volumes[0].unidade;
       entrada = { modo: 'diluicao', C1: concs[0].valor, V1: volumes[0].valor, C2: concs[1]?.valor ?? null, V2: volumes[1]?.valor ?? null, unidadeC, unidadeV };
@@ -535,22 +533,23 @@ export class AnswerBuilder {
       entrada = { modo: 'molaridade', formula, massa: massas[0], volume: volumes[0] };
     } else if (formula && concs.length === 1 && !volumes.length && !massas.length && (concs[0].unidade === 'g/L' || grupoDe(concs[0].unidade) === 'concentracao')) {
       entrada = { modo: 'gl-mol', formula, valor: concs[0].unidade === 'g/L' ? concs[0].valor : concs[0].valor * (acharUnidade(this.ctx.unidades, concs[0].unidade)[0]?.fator ?? 1000) / 1000, de: concs[0].unidade === 'g/L' ? 'g/L' : 'mol/L' };
-    } else if (!formula && massas.length >= 2 && /\bmassa|percent|porcent|titulo\b/.test(n)) {
+    } else if (!formula && massas.length >= 2 && P.percentualMassa.test(n)) {
       entrada = { modo: 'percentual-mm', soluto: massas[0], solucao: massas[1] };
     }
     if (!entrada) {
       return montar({
-        intent: 'CONCENTRACAO', resolvida: false, titulo: 'Concentração e diluição',
-        blocos: [B.texto('Diga os valores com unidades. Exemplos: "molaridade de 5,85 g de NaCl em 500 mL", "quantos gramas de NaOH para 250 mL de solução 0,1 mol/L" ou "diluir 100 mL de solução 2 mol/L para 0,5 mol/L".')],
-        acoes: calc, sugestoes: ['Molaridade de 5,85 g de NaCl em 500 mL']
+        intent: 'CONCENTRACAO', resolvida: false, titulo: t('respostas.concentracao.titulo'),
+        blocos: [B.texto(t('respostas.concentracao.diga'))],
+        acoes: calc, sugestoes: [sug('molaridade')]
       });
     }
     const r = calcularConcentracao(entrada, this.ctx);
-    if (!r.ok) return montar({ intent: 'CONCENTRACAO', resolvida: false, titulo: 'Não consegui calcular', blocos: [B.aviso(r.erro)], acoes: calc, sugestoes: [] });
+    if (!r.ok) return montar({ intent: 'CONCENTRACAO', resolvida: false, titulo: t('respostas.concentracao.naoConsegui'), blocos: [B.aviso(r.erro)], acoes: calc, sugestoes: [] });
+    const modos = t('respostas.concentracao.modos');
     return montar({
-      intent: 'CONCENTRACAO', titulo: MODO_TITULO[r.modo] ?? 'Concentração',
-      blocos: [B.resultado(null, r.resultados, r.fontes?.[0] ? fonteDe(r.fontes[0]) : FONTE_CALCULO), B.passos('Passo a passo', r.passos), ...(r.notas.length ? [B.aviso(r.notas.join(' '))] : [])],
-      acoes: calc, sugestoes: ['pH de HCl 0,01 mol/L']
+      intent: 'CONCENTRACAO', titulo: modos?.[r.modo] ?? t('respostas.concentracao.padrao'),
+      blocos: [B.resultado(null, r.resultados, r.fontes?.[0] ? fonteDe(r.fontes[0]) : fonteCalculo()), B.passos(t('respostas.blocos.passoAPasso'), r.passos), ...(r.notas.length ? [B.aviso(r.notas.join(' '))] : [])],
+      acoes: calc, sugestoes: [sug('phHcl')]
     });
   }
 
@@ -571,7 +570,7 @@ export class AnswerBuilder {
   }
 
   async ph(p) {
-    const calc = [rota('/quimica/calculadoras/ph', 'Abrir a calculadora de pH')];
+    const calc = [rota('/quimica/calculadoras/ph', t('respostas.ph.abrir'))];
     const q = p.quantidades.filter((x) => x.unidade);
     const grupoDe = (u) => acharUnidade(this.ctx.unidades, u)[0]?.grupo;
     const conc = q.find((x) => grupoDe(x.unidade) === 'concentracao');
@@ -590,13 +589,13 @@ export class AnswerBuilder {
     if (C == null && solto && !Object.keys(k).length && /\b(?:ph|poh)\b/.test(n)) {
       const poh = /\bpoh\b/.test(n);
       const r = calcularPH(poh ? { tipo: 'converter', pOH: solto.valor } : { tipo: 'converter', pH: solto.valor }, this.ctx);
-      if (r.ok) return this.respostaPh(r, `Conversões a partir de ${poh ? 'pOH' : 'pH'} = ${fmt(solto.valor)}`, calc);
+      if (r.ok) return this.respostaPh(r, t('respostas.ph.conversoes', { de: poh ? 'pOH' : 'pH', valor: fmt(solto.valor) }), calc);
     }
     if (C == null) {
       return montar({
-        intent: 'PH', resolvida: false, titulo: 'pH de uma solução',
-        blocos: [B.texto('Informe a concentração em mol/L e a substância. Exemplos: "pH de HCl 0,01 mol/L" ou "pH do ácido acético 0,1 mol/L com Ka 1,8e-5".')],
-        acoes: calc, sugestoes: ['pH de HCl 0,01 mol/L']
+        intent: 'PH', resolvida: false, titulo: t('respostas.ph.titulo'),
+        blocos: [B.texto(t('respostas.ph.informe'))],
+        acoes: calc, sugestoes: [sug('phHcl')]
       });
     }
     let entrada = null;
@@ -606,28 +605,28 @@ export class AnswerBuilder {
     else if (regra) entrada = { tipo: regra.tipo === 'acido' ? 'acido-forte' : 'base-forte', C, n: regra.n ?? 1 };
     if (!entrada) {
       return montar({
-        intent: 'PH', resolvida: false, titulo: 'Preciso de mais dados para o pH',
-        blocos: [B.texto(`${formula ? `Não tenho "${formatarFormulaTexto(formula)}" na lista de ácidos e bases fortes do pacote. ` : ''}Para ácidos e bases fracos, informe Ka (ou pKa) ou Kb (ou pKb); para fortes, escreva a fórmula, por exemplo HCl ou NaOH.`)],
-        acoes: calc, sugestoes: ['pH de HCl 0,01 mol/L']
+        intent: 'PH', resolvida: false, titulo: t('respostas.ph.maisDados'),
+        blocos: [B.texto(`${formula ? t('respostas.ph.naoTenho', { formula: formatarFormulaTexto(formula) }) : ''}${t('respostas.ph.fracos')}`)],
+        acoes: calc, sugestoes: [sug('phHcl')]
       });
     }
     const r = calcularPH(entrada, this.ctx);
-    if (r.ok && regra?.parcial) r.notas.unshift('Só a 1ª ionização é forte; a 2ª é parcial e foi ignorada (aproximação).');
-    if (!r.ok) return montar({ intent: 'PH', resolvida: false, titulo: 'Não consegui calcular o pH', blocos: [B.aviso(r.erro)], acoes: calc, sugestoes: [] });
-    const titulo = `pH ${fmt(r.pH, { casas: 2 })}${formula ? ` (${formulaUnicode(formula)} ${fmt(C, { sig: 4 })} mol/L)` : ''}`;
+    if (r.ok && regra?.parcial) r.notas.unshift(t('respostas.ph.parcial'));
+    if (!r.ok) return montar({ intent: 'PH', resolvida: false, titulo: t('respostas.ph.naoConsegui'), blocos: [B.aviso(r.erro)], acoes: calc, sugestoes: [] });
+    const titulo = t('respostas.ph.tituloResultado', { ph: fmt(r.pH, { casas: 2 }), formula: formula ? formulaUnicode(formula) : null, conc: fmt(C, { sig: 4 }) });
     return this.respostaPh(r, titulo, calc, regra ? this.fonteRegras() : null);
   }
 
   respostaPh(r, titulo, acoes, fonteRegra = null) {
     return montar({
       intent: 'PH', titulo,
-      blocos: [B.resultado(null, r.resultados, fonteRegra ? [FONTE_CALCULO, fonteRegra] : FONTE_CALCULO), B.passos('Passo a passo', r.passos), ...(r.notas.length ? [B.aviso(r.notas.join(' '))] : [])],
-      acoes, sugestoes: ['Quantos mols há em 18 g de água?']
+      blocos: [B.resultado(null, r.resultados, fonteRegra ? [fonteCalculo(), fonteRegra] : fonteCalculo()), B.passos(t('respostas.blocos.passoAPasso'), r.passos), ...(r.notas.length ? [B.aviso(r.notas.join(' '))] : [])],
+      acoes, sugestoes: [sug('molsAgua')]
     });
   }
 
   async gas(p) {
-    const calc = [rota('/quimica/calculadoras/gas-ideal', 'Abrir a calculadora de gás ideal')];
+    const calc = [rota('/quimica/calculadoras/gas-ideal', t('respostas.gas.abrir'))];
     const q = p.quantidades.filter((x) => x.unidade);
     const por = (g) => q.find((x) => acharUnidade(this.ctx.unidades, x.unidade).some((u) => u.grupo === g));
     const P = por('pressao'); const V = por('volume'); const T = por('temperatura'); const N = por('quantidade');
@@ -642,8 +641,8 @@ export class AnswerBuilder {
       if (rb.ok) {
         return montar({
           intent: 'GAS_IDEAL', titulo: `${rb.resultados[0].rotulo}: ${rb.resultados[0].valor} ${rb.unidade}`,
-          blocos: [B.resultado(null, rb.resultados, FONTE_CALCULO), B.passos('Passo a passo', rb.passos), B.aviso(rb.notas.join(' '))],
-          acoes: calc, sugestoes: ['Converter 5 atm em kPa']
+          blocos: [B.resultado(null, rb.resultados, fonteCalculo()), B.passos(t('respostas.blocos.passoAPasso'), rb.passos), B.aviso(rb.notas.join(' '))],
+          acoes: calc, sugestoes: [sug('converter')]
         });
       }
     }
@@ -653,20 +652,20 @@ export class AnswerBuilder {
     if (falta.length === 4 && !q.length) {
       const R = this.ctx.gasR();
       return montar({
-        intent: 'GAS_IDEAL', titulo: 'Gás ideal: PV = nRT',
+        intent: 'GAS_IDEAL', titulo: t('respostas.gas.tituloEquacao'),
         blocos: [
           B.equacao('PV = nRT', 'PV = nRT'),
-          B.lista('Na equação', ['P é a pressão, V é o volume, n é a quantidade de matéria (em mol) e T é a temperatura absoluta (em kelvin).', R ? `R é a constante universal dos gases: ${fmt(R.valor, { sig: 10 })} J/(mol·K), valor do pacote de dados (${R.fonte?.nome ?? 'CODATA'}).` : 'R é a constante universal dos gases.'], R ? dado(R.fonte)[0] ?? FONTE_APP : FONTE_APP),
-          B.texto('Informe três das quatro grandezas com unidades e eu calculo a quarta, com os passos.')
+          B.lista(t('respostas.gas.naEquacao'), [t('respostas.gas.variaveis'), R ? t('respostas.gas.constante', { valor: fmt(R.valor, { sig: 10 }), fonte: R.fonte?.nome ?? 'CODATA' }) : t('respostas.gas.constanteSem')], R ? dado(R.fonte)[0] ?? fonteApp() : fonteApp()),
+          B.texto(t('respostas.gas.informeTres'))
         ],
-        acoes: calc, sugestoes: ['Qual o volume de 2 mols de gás a 300 K e 1 atm?']
+        acoes: calc, sugestoes: [sug('volumeGas')]
       });
     }
     if (falta.length !== 1) {
       return montar({
-        intent: 'GAS_IDEAL', resolvida: false, titulo: 'Gás ideal (PV = nRT)',
-        blocos: [B.texto('Informe três das quatro grandezas (pressão, volume, quantidade de matéria e temperatura) com unidades. Exemplo: "qual o volume de 2 mols de gás a 300 K e 1 atm?".')],
-        acoes: calc, sugestoes: ['Qual o volume de 2 mols de gás a 300 K e 1 atm?']
+        intent: 'GAS_IDEAL', resolvida: false, titulo: t('respostas.gas.tituloFalta'),
+        blocos: [B.texto(t('respostas.gas.informeTresEx'))],
+        acoes: calc, sugestoes: [sug('volumeGas')]
       });
     }
     const alvo = falta[0];
@@ -677,26 +676,27 @@ export class AnswerBuilder {
     if (N) entrada.n = { valor: N.valor, unidade: N.unidade };
     else if (massa) { entrada.massa = { valor: massa.valor, unidade: massa.unidade }; entrada.formula = formula; }
     const r = calcularGas(entrada, this.ctx);
-    if (!r.ok) return montar({ intent: 'GAS_IDEAL', resolvida: false, titulo: 'Não consegui calcular', blocos: [B.aviso(r.erro)], acoes: calc, sugestoes: [] });
+    if (!r.ok) return montar({ intent: 'GAS_IDEAL', resolvida: false, titulo: t('respostas.gas.naoConsegui'), blocos: [B.aviso(r.erro)], acoes: calc, sugestoes: [] });
     return montar({
       intent: 'GAS_IDEAL', titulo: `${r.resultados[0].rotulo}: ${r.resultados[0].valor} ${r.resultados[0].unidade}`,
-      blocos: [B.resultado(null, r.resultados, r.fontes?.[0] ? fonteDe(r.fontes[0]) : FONTE_CALCULO), B.passos('Passo a passo', r.passos), B.aviso(r.notas.join(' '))],
-      acoes: calc, sugestoes: ['Converter 5 atm em kPa']
+      blocos: [B.resultado(null, r.resultados, r.fontes?.[0] ? fonteDe(r.fontes[0]) : fonteCalculo()), B.passos(t('respostas.blocos.passoAPasso'), r.passos), B.aviso(r.notas.join(' '))],
+      acoes: calc, sugestoes: [sug('converter')]
     });
   }
 
   conversao(p) {
     const q = p.quantidades.find((x) => x.unidade);
-    const calc = [rota('/quimica/calculadoras/unidades', 'Abrir o conversor de unidades')];
+    const calc = [rota('/quimica/calculadoras/unidades', t('respostas.conversao.abrir'))];
     if (!q || !p.unidadeDestino) {
-      return montar({ intent: 'CONVERSAO_UNIDADE', resolvida: false, titulo: 'Conversão de unidades', blocos: [B.texto('Diga o valor, a unidade e a unidade de destino. Exemplo: "converter 5 atm em kPa".')], acoes: calc, sugestoes: ['Converter 5 atm em kPa'] });
+      return montar({ intent: 'CONVERSAO_UNIDADE', resolvida: false, titulo: t('respostas.conversao.titulo'), blocos: [B.texto(t('respostas.conversao.diga'))], acoes: calc, sugestoes: [sug('converter')] });
     }
     const r = converter(q.valor, q.unidade, p.unidadeDestino, this.ctx.unidades);
-    if (!r.ok) return montar({ intent: 'CONVERSAO_UNIDADE', resolvida: false, titulo: 'Não consegui converter', blocos: [B.aviso(r.erro)], acoes: calc, sugestoes: ['Converter 5 atm em kPa'] });
+    if (!r.ok) return montar({ intent: 'CONVERSAO_UNIDADE', resolvida: false, titulo: t('respostas.conversao.naoConsegui'), blocos: [B.aviso(r.erro)], acoes: calc, sugestoes: [sug('converter')] });
+    const fonteTabela = { nome: t('respostas.fontes.tabelaUnidades', { origem: origemUnidades(this.ctx.unidades) }) };
     return montar({
       intent: 'CONVERSAO_UNIDADE', titulo: `${fmt(r.valor, { sig: 8 })} ${r.de} = ${fmt(r.resultado, { sig: 8 })} ${r.para}`,
-      blocos: [B.resultado(null, [{ rotulo: `${fmt(r.valor, { sig: 8 })} ${r.de} em ${r.para}`, valor: fmt(r.resultado, { sig: 8 }), unidade: r.para, destaque: true }], { nome: `Tabela de unidades: ${r.origem}` }), B.passos('Como converter', r.passos, { nome: `Tabela de unidades: ${r.origem}` })],
-      acoes: calc, sugestoes: ['Converter 5 atm em kPa']
+      blocos: [B.resultado(null, [{ rotulo: t('respostas.conversao.em', { valor: fmt(r.valor, { sig: 8 }), de: r.de, para: r.para }), valor: fmt(r.resultado, { sig: 8 }), unidade: r.para, destaque: true }], fonteTabela), B.passos(t('respostas.blocos.comoConverter'), r.passos, fonteTabela)],
+      acoes: calc, sugestoes: [sug('converter')]
     });
   }
 
@@ -706,23 +706,23 @@ export class AnswerBuilder {
     const c = compostos[0];
     if (!c) {
       return montar({
-        intent: 'NOMENCLATURA', resolvida: false, titulo: 'Nomenclatura',
-        blocos: [B.aviso(`${p.formulas?.length ? `Não encontrei "${p.formulas[0]}" entre os compostos do pacote.` : 'Não encontrei esse composto.'} Tente o nome comum ou a fórmula.`)],
-        acoes: [rota('/quimica/compostos', 'Buscar compostos')], sugestoes: ['Qual a fórmula do ácido sulfúrico?']
+        intent: 'NOMENCLATURA', resolvida: false, titulo: t('respostas.nomenclatura.titulo'),
+        blocos: [B.aviso(`${p.formulas?.length ? t('respostas.nomenclatura.naoEncontreiFormula', { formula: p.formulas[0] }) : t('respostas.nomenclatura.naoEncontrei')}${t('respostas.nomenclatura.tente')}`)],
+        acoes: [rota('/quimica/compostos', t('respostas.nomenclatura.buscar'))], sugestoes: [sug('formulaSulfurico')]
       });
     }
-    const fonte = dado(c.fontes?.[0])[0] ?? { nome: `PubChem CID ${c.cid} (NCBI/NLM)` };
+    const fonte = dado(c.fontes?.[0])[0] ?? this.fontePubchem(c.cid);
     const nome = this.nomeComposto(c);
-    const itens = [{ rotulo: 'Nome', valor: nome }];
-    if (c.nomePopular && c.nomePopular !== c.nome) itens.push({ rotulo: 'Nome popular', valor: c.nomePopular });
-    if (c.nomeIupac) itens.push({ rotulo: 'Nome IUPAC', valor: c.nomeIupac });
-    if (c.formula) itens.push({ rotulo: 'Fórmula', valor: formulaUnicode(c.formula) });
-    if (c.formulaHill && c.formulaHill !== c.formula) itens.push({ rotulo: 'Fórmula na notação de Hill', valor: formulaUnicode(c.formulaHill) });
-    if (c.nomePtPendente) itens.push({ rotulo: 'Observação', valor: 'O nome em português ainda está pendente; o nome mostrado é o IUPAC.' });
+    const itens = [{ rotulo: t('respostas.nomenclatura.nome'), valor: nome }];
+    if (this.idioma === 'pt-BR' && c.nomePopular && c.nomePopular !== c.nome) itens.push({ rotulo: t('respostas.nomenclatura.nomePopular'), valor: c.nomePopular });
+    if (c.nomeIupac) itens.push({ rotulo: t('respostas.nomenclatura.nomeIupac'), valor: c.nomeIupac });
+    if (c.formula) itens.push({ rotulo: t('respostas.nomenclatura.formula'), valor: formulaUnicode(c.formula) });
+    if (c.formulaHill && c.formulaHill !== c.formula) itens.push({ rotulo: t('respostas.nomenclatura.formulaHill'), valor: formulaUnicode(c.formulaHill) });
+    if (c.nomePtPendente && this.idioma === 'pt-BR') itens.push({ rotulo: t('respostas.nomenclatura.observacao'), valor: t('respostas.nomenclatura.ptPendente') });
     return montar({
       intent: 'NOMENCLATURA', titulo: `${nome}${c.formula ? ` — ${formulaUnicode(c.formula)}` : ''}`,
       blocos: [B.kv(null, itens, fonte)],
-      acoes: [rota(this.rotaComposto(c.cid), 'Ficha completa')], sugestoes: [`Estrutura de ${minus(nome)}`]
+      acoes: [rota(this.rotaComposto(c.cid), t('respostas.nomenclatura.ficha'))], sugestoes: [sug('estruturaDe', { nome: minus(nome) })]
     });
   }
 
@@ -731,14 +731,14 @@ export class AnswerBuilder {
     const c = compostos[0];
     if (!c) return this.naoEntendi(p);
     const nome = this.nomeComposto(c);
-    const fonte = dado(c.fontes?.[0])[0] ?? { nome: `PubChem CID ${c.cid} (NCBI/NLM)` };
+    const fonte = dado(c.fontes?.[0])[0] ?? this.fontePubchem(c.cid);
     if (!c.smiles) {
-      return montar({ intent: 'DESENHAR', resolvida: true, titulo: `Estrutura de ${nome}`, blocos: [B.aviso('O pacote de dados não tem o SMILES desse composto, então não consigo desenhar a estrutura.')], acoes: [rota(this.rotaComposto(c.cid), 'Ficha completa')], sugestoes: [] });
+      return montar({ intent: 'DESENHAR', resolvida: true, titulo: t('respostas.desenhar.estruturaDe', { nome }), blocos: [B.aviso(t('respostas.desenhar.semSmiles'))], acoes: [rota(this.rotaComposto(c.cid), t('respostas.desenhar.ficha'))], sugestoes: [] });
     }
     return montar({
-      intent: 'DESENHAR', titulo: `Estrutura 2D de ${nome}`,
-      blocos: [B.molecula(c.smiles, nome, fonte), B.kv(null, [{ rotulo: 'SMILES', valor: c.smiles }, ...(c.formula ? [{ rotulo: 'Fórmula', valor: formulaUnicode(c.formula) }] : [])], fonte)],
-      acoes: [rota(this.rotaComposto(c.cid), 'Ficha completa')], sugestoes: [`Massa molar de ${minus(nome)}`]
+      intent: 'DESENHAR', titulo: t('respostas.desenhar.estrutura2d', { nome }),
+      blocos: [B.molecula(c.smiles, nome, fonte), B.kv(null, [{ rotulo: t('respostas.desenhar.smiles'), valor: c.smiles }, ...(c.formula ? [{ rotulo: t('respostas.desenhar.formula'), valor: formulaUnicode(c.formula) }] : [])], fonte)],
+      acoes: [rota(this.rotaComposto(c.cid), t('respostas.desenhar.ficha'))], sugestoes: [sug('massaMolarDe', { nome: minus(nome) })]
     });
   }
 
@@ -747,32 +747,34 @@ export class AnswerBuilder {
     if (elementos.length >= 2 && !compostos.length) {
       const props = this.dic.props.filter((x) => x.alvo === 'elemento' && !['simbolo', 'descoberta'].includes(x.id));
       const linhas = props.map((pr) => [capitalizar(pr.rotulo), ...elementos.map((e) => formatarValor(pr, valorBruto(pr, e), this.ctx)?.curto ?? '—')]).filter((l) => l.slice(1).some((x) => x !== '—'));
+      const nomes = elementos.map((e) => this.nomeElementoTitulo(e));
       return montar({
-        intent: 'COMPARAR', titulo: `Comparação: ${listar(elementos.map((e) => e.nome))}`,
-        blocos: [B.tabela(null, ['Propriedade', ...elementos.map((e) => `${e.nome} (${e.simbolo})`)], linhas, dado(...elementos.map((e) => e.fontes?.[0]))[0] ?? FONTE_APP)],
-        acoes: elementos.map((e) => rota(this.rotaElemento(e.simbolo), `Ficha de ${e.nome}`)), sugestoes: []
+        intent: 'COMPARAR', titulo: t('respostas.comparar.titulo', { nomes: listar(nomes) }),
+        blocos: [B.tabela(null, [t('respostas.comparar.propriedade'), ...elementos.map((e, i) => `${nomes[i]} (${e.simbolo})`)], linhas, dado(...elementos.map((e) => e.fontes?.[0]))[0] ?? fonteApp())],
+        acoes: elementos.map((e, i) => rota(this.rotaElemento(e.simbolo), t('respostas.comparar.fichaDe', { nome: nomes[i] }))), sugestoes: []
       });
     }
     if (compostos.length >= 2 && !elementos.length) {
+      const L = t('respostas.comparar.linhas');
       const linhas = [
-        ['Fórmula', ...compostos.map((c) => (c.formula ? formulaUnicode(c.formula) : '—'))],
-        ['Massa molar', ...compostos.map((c) => (c.massaMolar != null ? `${fmt(c.massaMolar, { sig: 8 })} g/mol` : '—'))],
-        ['Número CAS', ...compostos.map((c) => c.cas ?? '—')],
-        ['Nome IUPAC', ...compostos.map((c) => c.nomeIupac ?? '—')],
-        ['XLogP', ...compostos.map((c) => (c.propriedades?.xlogp != null ? fmt(c.propriedades.xlogp, { sig: 5 }) : '—'))],
-        ['Palavra de sinal (GHS)', ...compostos.map((c) => descreverGhs(c.ghs)?.palavraSinal ?? '—')],
-        ['Pictogramas (GHS)', ...compostos.map((c) => (c.ghs?.pictogramas?.length ? c.ghs.pictogramas.join(', ') : '—'))]
+        [L.formula, ...compostos.map((c) => (c.formula ? formulaUnicode(c.formula) : '—'))],
+        [L.massaMolar, ...compostos.map((c) => (c.massaMolar != null ? `${fmt(c.massaMolar, { sig: 8 })} g/mol` : '—'))],
+        [L.cas, ...compostos.map((c) => c.cas ?? '—')],
+        [L.nomeIupac, ...compostos.map((c) => c.nomeIupac ?? '—')],
+        [L.xlogp, ...compostos.map((c) => (c.propriedades?.xlogp != null ? fmt(c.propriedades.xlogp, { sig: 5 }) : '—'))],
+        [L.sinal, ...compostos.map((c) => descreverGhs(c.ghs)?.palavraSinal ?? '—')],
+        [L.pictogramas, ...compostos.map((c) => (c.ghs?.pictogramas?.length ? c.ghs.pictogramas.join(', ') : '—'))]
       ].filter((l) => l.slice(1).some((x) => x !== '—'));
       return montar({
-        intent: 'COMPARAR', titulo: `Comparação: ${listar(compostos.map((c) => this.nomeComposto(c)))}`,
-        blocos: [B.tabela(null, ['', ...compostos.map((c) => this.nomeComposto(c))], linhas, dado(...compostos.map((c) => c.fontes?.[0]))[0] ?? FONTE_APP)],
-        acoes: compostos.map((c) => rota(this.rotaComposto(c.cid), `Ficha de ${this.nomeComposto(c)}`)), sugestoes: []
+        intent: 'COMPARAR', titulo: t('respostas.comparar.titulo', { nomes: listar(compostos.map((c) => this.nomeComposto(c))) }),
+        blocos: [B.tabela(null, ['', ...compostos.map((c) => this.nomeComposto(c))], linhas, dado(...compostos.map((c) => c.fontes?.[0]))[0] ?? fonteApp())],
+        acoes: compostos.map((c) => rota(this.rotaComposto(c.cid), t('respostas.comparar.fichaDe', { nome: this.nomeComposto(c) }))), sugestoes: []
       });
     }
     return montar({
-      intent: 'COMPARAR', resolvida: false, titulo: 'Comparar',
-      blocos: [B.texto('Compare itens do mesmo tipo: dois elementos ("compare sódio e cloro") ou dois compostos ("diferença entre etanol e ácido acético").')],
-      sugestoes: ['Compare sódio e cloro']
+      intent: 'COMPARAR', resolvida: false, titulo: t('respostas.comparar.tituloGeral'),
+      blocos: [B.texto(t('respostas.comparar.explicacao'))],
+      sugestoes: [sug('compareNaCl')]
     });
   }
 
@@ -791,41 +793,42 @@ export class AnswerBuilder {
   }
 
   tabela(p) {
-    const fonte = dado(this.store.elementos.find((e) => e.fontes?.length)?.fontes[0])[0] ?? FONTE_APP;
-    const acao = [rota('/quimica/tabela', 'Abrir a tabela periódica')];
+    const fonte = dado(this.store.elementos.find((e) => e.fontes?.length)?.fontes[0])[0] ?? fonteApp();
+    const acao = [rota('/quimica/tabela', t('respostas.tabela.abrir'))];
     const prop = p.propriedade ? this.dic.propPorId.get(p.propriedade) : null;
     const propEl = prop?.alvo === 'elemento' ? prop : null;
+    const nomeTit = (e) => this.nomeElementoTitulo(e);
     if (p.extremo) {
       const [id, dir] = p.extremo;
       const pr = this.dic.propPorId.get(id);
       const com = this.store.elementos.map((e) => ({ e, v: valorBruto(pr, e) })).filter((x) => typeof x.v === 'number' && Number.isFinite(x.v));
-      if (!com.length) return montar({ intent: 'TABELA_PERIODICA', resolvida: true, titulo: capitalizar(pr.rotulo), blocos: [B.aviso(`O pacote não tem ${pr.rotulo} para os elementos carregados.`)], acoes: acao, sugestoes: [] });
+      if (!com.length) return montar({ intent: 'TABELA_PERIODICA', resolvida: true, titulo: capitalizar(pr.rotulo), blocos: [B.aviso(t('respostas.tabela.naoTemProp', { prop: pr.rotulo }))], acoes: acao, sugestoes: [] });
       com.sort((a, b) => (dir === 'max' ? b.v - a.v : a.v - b.v) || a.e.z - b.e.z);
       const top = com.slice(0, 5);
       return montar({
-        intent: 'TABELA_PERIODICA', titulo: `${dir === 'max' ? 'Maior' : 'Menor'} ${pr.rotulo} no pacote: ${top[0].e.nome} (${top[0].e.simbolo})`,
-        blocos: [B.tabela(`Entre os ${com.length} elementos com esse dado no pacote`, ['Elemento', 'Símbolo', capitalizar(pr.rotulo)], top.map((x) => [x.e.nome, x.e.simbolo, formatarValor(pr, x.v, this.ctx).curto]), fonte)],
-        acoes: acao, sugestoes: ['Elementos do grupo 17']
+        intent: 'TABELA_PERIODICA', titulo: t('respostas.tabela.extremo', { dir, prop: pr.rotulo, nome: nomeTit(top[0].e), simbolo: top[0].e.simbolo }),
+        blocos: [B.tabela(t('respostas.tabela.entreOs', { n: com.length }), [t('respostas.tabela.elemento'), t('respostas.tabela.simbolo'), capitalizar(pr.rotulo)], top.map((x) => [nomeTit(x.e), x.e.simbolo, formatarValor(pr, x.v, this.ctx).curto]), fonte)],
+        acoes: acao, sugestoes: [sug('grupo17')]
       });
     }
     if (p.tendencia && propEl) return this.tendencia(p, propEl, fonte, acao);
     const lista = this.filtrarElementos(p);
     const criterios = [];
-    if (p.grupo != null) criterios.push(`grupo ${p.grupo}`);
-    if (p.periodo != null) criterios.push(`período ${p.periodo}`);
-    if (p.bloco) criterios.push(`bloco ${p.bloco}`);
-    if (p.categoria) criterios.push(p.categoria === 'metal' ? 'metais' : CATEGORIA_GRUPO_PLURAL[p.categoria] ?? categoriaRotulo(p.categoria));
-    if (p.estado) criterios.push(`estado ${estadoRotulo(p.estado)}`);
-    const titulo = criterios.length ? `Elementos: ${criterios.join(', ')}` : 'Tabela periódica';
+    if (p.grupo != null) criterios.push(t('respostas.tabela.grupo', { g: p.grupo }));
+    if (p.periodo != null) criterios.push(t('respostas.tabela.periodo', { p: p.periodo }));
+    if (p.bloco) criterios.push(t('respostas.tabela.bloco', { b: p.bloco }));
+    if (p.categoria) criterios.push(categoriaPlural(p.categoria));
+    if (p.estado) criterios.push(t('respostas.tabela.estado', { estado: estadoRotulo(p.estado) }));
+    const titulo = criterios.length ? t('respostas.tabela.elementos', { criterios: criterios.join(', ') }) : t('respostas.tabela.titulo');
     if (!criterios.length) {
       return montar({
         intent: 'TABELA_PERIODICA', titulo,
-        blocos: [B.texto(`O pacote tem ${this.store.elementos.length} ${plural(this.store.elementos.length, 'elemento', 'elementos')} organizados por grupo, período e bloco, com cores por categoria. Toque num elemento para ver a ficha completa.`)],
-        acoes: acao, sugestoes: ['Elementos do grupo 17', 'Elementos do período 3']
+        blocos: [B.texto(t('respostas.tabela.pacoteTem', { n: this.store.elementos.length }))],
+        acoes: acao, sugestoes: [sug('grupo17'), sug('periodo3')]
       });
     }
     if (!lista.length) {
-      return montar({ intent: 'TABELA_PERIODICA', titulo, blocos: [B.aviso('Nenhum elemento do pacote atende a esses critérios.')], acoes: acao, sugestoes: ['Elementos do grupo 17'] });
+      return montar({ intent: 'TABELA_PERIODICA', titulo, blocos: [B.aviso(t('respostas.tabela.nenhum'))], acoes: acao, sugestoes: [sug('grupo17')] });
     }
     const colProp = propEl ?? this.dic.propPorId.get('massaAtomica');
     const qs = new URLSearchParams();
@@ -835,9 +838,9 @@ export class AnswerBuilder {
     if (p.categoria && p.categoria !== 'metal') qs.set('categoria', p.categoria);
     if (p.estado) qs.set('estado', p.estado);
     return montar({
-      intent: 'TABELA_PERIODICA', titulo: `${titulo} (${lista.length})`,
-      blocos: [B.tabela(null, ['Nº', 'Símbolo', 'Nome', capitalizar(colProp.rotulo)], lista.map((e) => [String(e.z), e.simbolo, e.nome, formatarValor(colProp, valorBruto(colProp, e), this.ctx)?.curto ?? '—']), fonte)],
-      acoes: [rota(`/quimica/tabela?${qs}`, 'Destacar na tabela periódica')], sugestoes: ['Elemento mais eletronegativo']
+      intent: 'TABELA_PERIODICA', titulo: t('respostas.tabela.comContagem', { titulo, n: lista.length }),
+      blocos: [B.tabela(null, [t('respostas.tabela.numero'), t('respostas.tabela.simbolo'), t('respostas.tabela.nome'), capitalizar(colProp.rotulo)], lista.map((e) => [String(e.z), e.simbolo, nomeTit(e), formatarValor(colProp, valorBruto(colProp, e), this.ctx)?.curto ?? '—']), fonte)],
+      acoes: [rota(`/quimica/tabela?${qs}`, t('respostas.tabela.destacar'))], sugestoes: [sug('maisEletronegativo')]
     });
   }
 
@@ -852,14 +855,15 @@ export class AnswerBuilder {
     const melhor = (mapa, prefer) => (prefer != null && (mapa.get(prefer)?.length ?? 0) >= 2 ? prefer : [...mapa].filter(([, l]) => l.length >= 2).sort((a, b) => b[1].length - a[1].length || a[0] - b[0])[0]?.[0] ?? null);
     const per = melhor(porPeriodo, p.periodo);
     const gr = melhor(porGrupo, p.grupo);
+    const nomeTit = (e) => this.nomeElementoTitulo(e);
     const blocos = [];
-    if (per != null) blocos.push(B.tabela(`Período ${per}, da esquerda para a direita (número atômico crescente)`, ['Elemento', 'Grupo', capitalizar(pr.rotulo)], porPeriodo.get(per).sort((a, b) => a.z - b.z).map((e) => [`${e.nome} (${e.simbolo})`, String(e.grupo ?? '—'), formatarValor(pr, valorBruto(pr, e), this.ctx).curto]), fonte));
-    if (gr != null) blocos.push(B.tabela(`Grupo ${gr}, de cima para baixo (período crescente)`, ['Elemento', 'Período', capitalizar(pr.rotulo)], porGrupo.get(gr).sort((a, b) => a.periodo - b.periodo).map((e) => [`${e.nome} (${e.simbolo})`, String(e.periodo), formatarValor(pr, valorBruto(pr, e), this.ctx).curto]), fonte));
-    if (!blocos.length) blocos.push(B.aviso(`O pacote não tem ${pr.rotulo} para elementos suficientes de um mesmo período ou grupo.`));
+    if (per != null) blocos.push(B.tabela(t('respostas.tabela.periodoLegenda', { p: per }), [t('respostas.tabela.elemento'), t('respostas.tabela.colGrupo'), capitalizar(pr.rotulo)], porPeriodo.get(per).sort((a, b) => a.z - b.z).map((e) => [`${nomeTit(e)} (${e.simbolo})`, String(e.grupo ?? '—'), formatarValor(pr, valorBruto(pr, e), this.ctx).curto]), fonte));
+    if (gr != null) blocos.push(B.tabela(t('respostas.tabela.grupoLegenda', { g: gr }), [t('respostas.tabela.elemento'), t('respostas.tabela.colPeriodo'), capitalizar(pr.rotulo)], porGrupo.get(gr).sort((a, b) => a.periodo - b.periodo).map((e) => [`${nomeTit(e)} (${e.simbolo})`, String(e.periodo), formatarValor(pr, valorBruto(pr, e), this.ctx).curto]), fonte));
+    if (!blocos.length) blocos.push(B.aviso(t('respostas.tabela.naoTemSuficiente', { prop: pr.rotulo })));
     return montar({
-      intent: 'TABELA_PERIODICA', titulo: `Tendência: ${pr.rotulo}`,
-      blocos: [B.texto('Valores do pacote de dados ao longo de um período e de um grupo; compare as linhas para ver a tendência.'), ...blocos],
-      acoes: acao, sugestoes: ['Elemento mais eletronegativo']
+      intent: 'TABELA_PERIODICA', titulo: t('respostas.tabela.tendencia', { prop: pr.rotulo }),
+      blocos: [B.texto(t('respostas.tabela.tendenciaTexto')), ...blocos],
+      acoes: acao, sugestoes: [sug('maisEletronegativo')]
     });
   }
 
@@ -867,7 +871,7 @@ export class AnswerBuilder {
   incompatibilidade(a, b) {
     const lista = this.store.regras?.incompatibilidades;
     if (!Array.isArray(lista)) return null;
-    const nomes = (c) => [c.nome, c.nomePopular, c.nomeIupac, ...(c.sinonimos ?? [])].filter(Boolean).map(normalizar);
+    const nomes = (c) => [c.nome, c.nomePopular, c.nomeIupac, ...(c.sinonimos ?? []), ...Object.values(c.nomes ?? {})].filter(Boolean).map(normalizar);
     const na = nomes(a);
     const nb = nomes(b);
     const tem = (ns, alvo) => ns.some((n) => n === normalizar(alvo) || n.includes(normalizar(alvo)) || normalizar(alvo).includes(n));
@@ -877,11 +881,11 @@ export class AnswerBuilder {
   blocoGhs(c) {
     const g = descreverGhs(c.ghs, this.store.regras);
     const nome = this.nomeComposto(c);
-    const fonteC = dado(c.fontes?.[0])[0] ?? { nome: `PubChem CID ${c.cid} (NCBI/NLM)` };
+    const fonteC = dado(c.fontes?.[0])[0] ?? this.fontePubchem(c.cid);
     if (!g) {
-      return B.aviso(`O pacote não traz classificação de perigo GHS (harmonizada) para ${nome}. Isso não quer dizer que seja inofensivo: consulte a ficha de segurança do produto.`, fonteC);
+      return B.aviso(t('respostas.seguranca.semGhs', { nome }), fonteC);
     }
-    return { tipo: 'ghs', titulo: `Perigos de ${nome} (GHS)`, ...g, fonte: dado(c.ghs.fonte ? { nome: c.ghs.fonte } : fonteC, this.fonteFrases()) };
+    return { tipo: 'ghs', titulo: t('respostas.seguranca.perigosDe', { nome }), ...g, fonte: dado(c.ghs.fonte ? { nome: c.ghs.fonte } : fonteC, this.fonteFrases()) };
   }
 
   async seguranca(p) {
@@ -891,38 +895,41 @@ export class AnswerBuilder {
     if (p.mistura && compostos.length >= 2) {
       const reg = this.incompatibilidade(compostos[0], compostos[1]);
       const nomes = compostos.slice(0, 2).map((c) => this.nomeComposto(c));
-      if (reg) blocos.push(B.aviso(`Não misture ${nomes[0]} com ${nomes[1]}. ${reg.motivo}`, this.fonteRegras()));
-      else blocos.push(B.aviso(`Não misture ${nomes[0]} com ${nomes[1]}: misturar produtos químicos pode gerar calor, gases tóxicos ou outras reações perigosas. Veja os perigos de cada um abaixo e nunca misture produtos de limpeza.`));
+      // o `motivo` das incompatibilidades do pacote é texto em pt-BR (regras.json); fora do pt-BR fica a orientação geral do app
+      if (reg && (this.idioma === 'pt-BR' || reg.motivoPorIdioma?.[this.idioma])) blocos.push(B.aviso(t('respostas.seguranca.naoMisture', { a: nomes[0], b: nomes[1], motivo: reg.motivoPorIdioma?.[this.idioma] ?? reg.motivo }), this.fonteRegras()));
+      else blocos.push(B.aviso(t('respostas.seguranca.naoMistureGeral', { a: nomes[0], b: nomes[1] })));
     }
     for (const c of compostos.slice(0, 3)) {
       blocos.push(this.blocoGhs(c));
       acoes.push(...this.acoesIcsc(c, compostos.length > 1));
     }
     for (const e of elementos.slice(0, 2)) {
-      blocos.push(B.aviso(`O pacote traz a classificação de perigo (GHS) apenas de compostos, não do elemento ${e.nome}. Os perigos dependem da forma química (por exemplo, o vapor do metal ou um sal): consulte a ficha de segurança do produto.`, dado(e.fontes?.[0])[0] ?? FONTE_APP));
+      blocos.push(B.aviso(t('respostas.seguranca.elementoSemGhs', { nome: this.nomeElemento(e) }), dado(e.fontes?.[0])[0] ?? fonteApp()));
     }
-    blocos.push(B.lista('Orientação geral de segurança', ORIENTACAO_GERAL, { nome: 'Orientação geral do aplicativo (não é dado de uma substância específica)' }));
+    blocos.push(B.lista(t('respostas.seguranca.orientacao'), orientacaoGeral(), { nome: t('respostas.fontes.orientacaoGeral') }));
     if (!compostos.length && !elementos.length) {
-      blocos.unshift(B.texto('Não identifiquei a substância. Diga o nome ou a fórmula para ver os perigos do GHS, ou siga a orientação geral abaixo.'));
+      blocos.unshift(B.texto(t('respostas.seguranca.naoIdentifiquei')));
     }
-    acoes.push(rota('/quimica/seguranca', 'Como ler pictogramas e frases H'));
-    const alvo = compostos[0] ? this.nomeComposto(compostos[0]) : elementos[0]?.nome;
+    acoes.push(rota('/quimica/seguranca', t('respostas.seguranca.comoLer')));
+    const alvo = compostos[0] ? this.nomeComposto(compostos[0]) : elementos[0] ? this.nomeElementoTitulo(elementos[0]) : null;
     return montar({
-      intent: 'SEGURANCA', titulo: alvo ? `Segurança: ${p.mistura && compostos[1] ? `${this.nomeComposto(compostos[0])} e ${this.nomeComposto(compostos[1])}` : alvo}` : 'Segurança química',
+      intent: 'SEGURANCA', titulo: alvo ? t('respostas.seguranca.titulo', { alvo: p.mistura && compostos[1] ? `${this.nomeComposto(compostos[0])}${t('respostas.seguranca.eConector')}${this.nomeComposto(compostos[1])}` : alvo }) : t('respostas.seguranca.tituloGeral'),
       blocos, acoes,
-      sugestoes: ['Por que não misturar água sanitária com amoníaco?', 'Perigos do ácido sulfúrico'],
+      sugestoes: [sug('misturar'), sug('perigosSulfurico')],
       extra: { compostoCid: compostos[0]?.cid ?? null }
     });
   }
 
   // ------------------------------------------------------------------------------------------------ conceitos (trechos licenciados)
   async conceito(p) {
-    const termos = termosDeBusca(p.conceito || p.textoOriginal);
+    const termos = termosDeBusca(p.conceito || p.textoOriginal, this.dic.lex);
     const chave = normalizar(p.conceito || '');
-    const pontuar = (textos) => textos.map((t) => {
-      const kws = (t.palavrasChave ?? []).map(normalizar);
-      const titulo = normalizar(t.titulo ?? '');
-      const corpo = normalizar(t.textoPt ?? t.textoOriginal ?? '');
+    const idioma = this.idioma;
+    const corpoDe = (x) => x.textoPt ?? x.textoOriginal ?? ''; // em pt-BR a tradução; nos outros idiomas o texto do artigo (textoPt é null)
+    const pontuar = (textos) => textos.map((x) => {
+      const kws = (x.palavrasChave ?? []).map(normalizar);
+      const titulo = normalizar(x.titulo ?? '');
+      const corpo = normalizar(x._idioma === 'pt-BR' ? corpoDe(x) : x.textoOriginal ?? x.textoPt ?? '');
       let s = 0;
       let cobertos = 0;
       if (chave && kws.includes(chave)) s += 6;
@@ -934,46 +941,49 @@ export class AnswerBuilder {
         if (corpo.split(' ').includes(termo)) { s += 1; achou = true; }
         if (achou) cobertos++;
       }
-      // texto em inglês só entra se for o único jeito de responder (a interface é em português)
-      return { t, s: t.idioma === 'en' ? s - 1 : s, cobertura: termos.length ? cobertos / termos.length : 0 };
+      // texto em outro idioma só entra se for o único jeito de responder (a interface está no idioma ativo)
+      return { t: x, s: x._idioma === idioma ? s : s - 1, cobertura: termos.length ? cobertos / termos.length : 0 };
     }).filter((x) => x.s >= 3 && x.cobertura >= 0.6).sort((a, b) => b.s - a.s).slice(0, 2);
-    // primeiro só os arquivos cujo nome combina com a pergunta; se nada servir, todos os trechos
-    let pontuados = pontuar(await this.store.textos(termos));
-    if (!pontuados.length) pontuados = pontuar(await this.store.textos());
+    // primeiro só os lotes/arquivos cujo nome combina com a pergunta, no idioma ativo; depois com as reservas (inglês, português); se nada servir, todos
+    let pontuados = pontuar(await this.store.textos(termos, { idioma }));
+    if (!pontuados.length) pontuados = pontuar(await this.store.textos(termos, { idioma, reserva: true }));
+    if (!pontuados.length) pontuados = pontuar(await this.store.textos(null, { idioma, reserva: true }));
     if (!pontuados.length) {
       return montar({
-        intent: 'CONCEITO', resolvida: false, titulo: 'Ainda não tenho um texto sobre isso',
-        blocos: [B.texto(`Não encontrei, entre os trechos licenciados do pacote de dados, uma explicação sobre "${p.conceito || p.textoOriginal}". Os dados de elementos, compostos e as calculadoras continuam disponíveis.`)],
-        sugestoes: SUGESTOES_PADRAO.slice(0, 4)
+        intent: 'CONCEITO', resolvida: false, titulo: t('respostas.conceito.semTexto'),
+        blocos: [B.texto(t('respostas.conceito.naoEncontrei', { termo: p.conceito || p.textoOriginal }))],
+        sugestoes: sugestoesPadrao().slice(0, 4)
       });
     }
-    const blocos = pontuados.map(({ t }) => {
-      const automatica = /autom[aá]tic/i.test(t.traducao ?? '') && !/sem tradu/i.test(t.traducao ?? '');
-      const ingles = t.idioma === 'en' || (!t.textoPt && /pendente/i.test(t.traducao ?? ''));
-      const corte = cortarEmFrase(t.textoPt || t.textoOriginal || '', 900);
+    const blocos = pontuados.map(({ t: x }) => {
+      const emPt = x._idioma === 'pt-BR';
+      const automatica = emPt && /autom[aá]tic/i.test(x.traducao ?? '') && !/sem tradu/i.test(x.traducao ?? '') && !!x.textoPt;
+      const textoBase = emPt ? (x.textoPt || x.textoOriginal || '') : (x.textoOriginal || x.textoPt || '');
+      // trecho em pt-BR cujo original é inglês e ainda sem tradução
+      const idiomaDoTexto = emPt && !x.textoPt && /pendente/i.test(x.traducao ?? '') ? 'en' : x._idioma;
+      const corte = cortarEmFrase(textoBase, 900);
+      const aviso = idiomaDoTexto !== idioma ? t('respostas.fontes.trechoEm', { idioma: nomeDoIdioma(idiomaDoTexto) }) : automatica && idioma === 'pt-BR' ? t('respostas.conceito.traducaoAutomatica') : null;
       return {
-        tipo: 'citacao', texto: corte.texto, truncado: corte.truncado,
-        aviso: automatica ? 'Tradução automática, ainda não revisada por uma pessoa.' : ingles ? 'Texto em inglês (ainda sem tradução).' : null,
-        fonte: { nome: `${t.fonte}${t.titulo ? `: ${t.titulo}` : ''}`, url: urlSegura(t.url) ?? undefined, licenca: t.licenca }
+        tipo: 'citacao', texto: corte.texto, truncado: corte.truncado, idiomaTexto: idiomaDoTexto,
+        aviso,
+        fonte: { nome: `${x.fonte}${x.titulo ? `: ${x.titulo}` : ''}`, url: urlSegura(x.url) ?? undefined, licenca: x.licenca }
       };
     });
     return montar({
-      intent: 'CONCEITO', titulo: capitalizar(pontuados[0].t.titulo ?? p.conceito ?? 'Conceito'), blocos,
-      acoes: [], sugestoes: ['Quantos mols há em 18 g de água?', 'pH de HCl 0,01 mol/L']
+      intent: 'CONCEITO', titulo: capitalizar(pontuados[0].t.titulo ?? p.conceito ?? t('respostas.conceito.padrao')), blocos,
+      acoes: [], sugestoes: [sug('molsAgua'), sug('phHcl')]
     });
   }
 }
 
-const MODO_TITULO = {
-  molaridade: 'Molaridade da solução', massa: 'Massa de soluto necessária', 'gl-mol': 'Conversão g/L ↔ mol/L', 'percentual-mm': 'Percentual em massa', 'percentual-mv': 'Percentual massa/volume', diluicao: 'Diluição'
-};
-
 const formatarFormulaTexto = (f) => (tentarFormula(f) ? formulaUnicode(f) : f);
 
 function cortarEmFrase(texto, max) {
-  const t = String(texto).replace(/\s+/g, ' ').trim();
-  if (t.length <= max) return { texto: t, truncado: false };
-  const corte = t.lastIndexOf('. ', max);
-  return { texto: `${t.slice(0, corte > max * 0.5 ? corte + 1 : max).trim()}${corte > max * 0.5 ? '' : '…'}`, truncado: true };
+  const x = String(texto).replace(/\s+/g, ' ').trim();
+  if (x.length <= max) return { texto: x, truncado: false };
+  const corte = x.lastIndexOf('. ', max);
+  return { texto: `${x.slice(0, corte > max * 0.5 ? corte + 1 : max).trim()}${corte > max * 0.5 ? '' : '…'}`, truncado: true };
 }
 
+/** Data do pacote no formato do idioma ativo, para a linha "origem + data dos dados" da interface. */
+export const dataDoPacote = (store) => fmtData(store?.manifest?.generatedAt);

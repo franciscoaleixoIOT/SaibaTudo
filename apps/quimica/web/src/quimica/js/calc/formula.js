@@ -1,6 +1,10 @@
 // Fórmulas químicas: leitura (parênteses, hidratos "·5H2O", cargas), notação de Hill, massa molar e representações
 // (Unicode, TeX para o KaTeX, tokens sub/sobrescrito para a interface). Sem DOM, sem dados embutidos além da lista de símbolos IUPAC.
 
+import { t } from '../i18n/index.js';
+
+const T = (chave, params) => t(`respostas.calc.formula.${chave}`, params);
+
 /** Símbolos dos 118 elementos (IUPAC), para validar a escrita das fórmulas; as propriedades vêm do pacote de dados. */
 export const SIMBOLOS = ('H He Li Be B C N O F Ne Na Mg Al Si P S Cl Ar K Ca Sc Ti V Cr Mn Fe Co Ni Cu Zn Ga Ge As Se Br Kr Rb Sr Y Zr Nb Mo Tc Ru Rh Pd Ag Cd In Sn Sb Te I Xe ' +
   'Cs Ba La Ce Pr Nd Pm Sm Eu Gd Tb Dy Ho Er Tm Yb Lu Hf Ta W Re Os Ir Pt Au Hg Tl Pb Bi Po At Rn Fr Ra Ac Th Pa U Np Pu Am Cm Bk Cf Es Fm Md No Lr ' +
@@ -66,8 +70,8 @@ function lerContagem(s, i) {
   while (j < s.length && s.charCodeAt(j) >= 48 && s.charCodeAt(j) <= 57) j++;
   if (j === i) return { n: 1, i, explicito: false };
   const n = Number(s.slice(i, j));
-  if (!Number.isSafeInteger(n) || n < 1) throw new ErroFormula(`Quantidade inválida "${s.slice(i, j)}"`, i);
-  if (n > 100000) throw new ErroFormula('Quantidade grande demais', i);
+  if (!Number.isSafeInteger(n) || n < 1) throw new ErroFormula(T('quantidadeInvalida', { x: s.slice(i, j) }), i);
+  if (n > 100000) throw new ErroFormula(T('quantidadeGrande'), i);
   return { n, i: j, explicito: true };
 }
 
@@ -80,13 +84,13 @@ function lerGrupo(s, i, aninhado, simbolos) {
   while (i < s.length) {
     const c = s[i];
     if (c === ')') {
-      if (!aninhado) throw new ErroFormula('Parêntese ")" sem "(" correspondente', i);
+      if (!aninhado) throw new ErroFormula(T('fechaSemAbre'), i);
       return { atomos, i };
     }
     if (c === '(') {
       const interno = lerGrupo(s, i + 1, true, simbolos);
-      if (s[interno.i] !== ')') throw new ErroFormula('Parêntese "(" sem ")" correspondente', i);
-      if (interno.atomos.size === 0) throw new ErroFormula('Parênteses vazios', i);
+      if (s[interno.i] !== ')') throw new ErroFormula(T('abreSemFecha'), i);
+      if (interno.atomos.size === 0) throw new ErroFormula(T('vazios'), i);
       const q = lerContagem(s, interno.i + 1);
       somar(atomos, interno.atomos, q.n);
       i = q.i;
@@ -95,17 +99,17 @@ function lerGrupo(s, i, aninhado, simbolos) {
       let simbolo;
       if (dois && simbolos.has(dois)) simbolo = dois;
       else if (simbolos.has(c)) simbolo = c;
-      else throw new ErroFormula(`"${dois ?? c}" não é símbolo de elemento`, i);
+      else throw new ErroFormula(T('naoSimbolo', { x: dois ?? c }), i);
       const q = lerContagem(s, i + simbolo.length);
       atomos.set(simbolo, (atomos.get(simbolo) ?? 0) + q.n);
       i = q.i;
     } else if (c >= 'a' && c <= 'z') {
-      throw new ErroFormula(`Letra minúscula "${c}" fora de lugar (símbolos começam com maiúscula, como em "Na" e "Cl")`, i);
+      throw new ErroFormula(T('minuscula', { c }), i);
     } else {
-      throw new ErroFormula(`Caractere inesperado "${c}"`, i);
+      throw new ErroFormula(T('inesperado', { c }), i);
     }
   }
-  if (aninhado) throw new ErroFormula('Parêntese "(" sem ")" correspondente', i);
+  if (aninhado) throw new ErroFormula(T('abreSemFecha'), i);
   return { atomos, i };
 }
 
@@ -128,16 +132,16 @@ export function formulaHill(atomos) {
  */
 export function parseFormula(texto, { simbolos = SIMBOLOS_SET } = {}) {
   const norm = normalizarEntrada(texto);
-  if (!norm) throw new ErroFormula('Fórmula vazia');
+  if (!norm) throw new ErroFormula(T('vazia'));
   const { corpo, carga } = separarCarga(norm);
-  if (!corpo) throw new ErroFormula('Fórmula vazia');
+  if (!corpo) throw new ErroFormula(T('vazia'));
   const partes = [];
   const total = new Map();
   let deslocamento = 0;
   for (const bruta of corpo.split('·')) {
     const q = lerContagem(bruta, 0);
     const resto = bruta.slice(q.i);
-    if (!resto) throw new ErroFormula('Parte vazia (confira o "·" do hidrato)', deslocamento);
+    if (!resto) throw new ErroFormula(T('parteVazia'), deslocamento);
     let atomos;
     try {
       atomos = lerGrupo(resto, 0, false, simbolos).atomos;

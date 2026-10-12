@@ -4,32 +4,32 @@
  "schemaVersion": 1,
  "files": {
   "compostos/index.json": {
-   "bytes": 3495,
-   "sha256": "cf8e9fa7400792459ff655d87dd7b85361266dbcf1665cf066538aad3fd0847b"
+   "bytes": 5636,
+   "sha256": "0ea20ca98db0941b31da5f6c7ce1e82fad726d63f7acb8658e09842d2ccf60f3"
   },
   "compostos/lote-001.json": {
-   "bytes": 15125,
-   "sha256": "26627bf4dc63906c3d60d5700052b74294eefcff1333267a3218438e5d0682b9"
+   "bytes": 18580,
+   "sha256": "17ea87d446c0d0c553b73f026e8fcb2b8e121a8b919605fe9cbf5fa6188a727b"
   },
   "constantes.json": {
    "bytes": 703,
    "sha256": "f016e3d346490dfa3a8faa9ce00b38edc0d8daa0fb4228cc85497d1856b68f84"
   },
   "elementos.json": {
-   "bytes": 11458,
-   "sha256": "95eed33033da5d2baf5d0eb827fa2c0f2f1b7b5870952c68f8257b4c091bc13e"
+   "bytes": 12850,
+   "sha256": "527f582ee9371a72d02b0c634c713824634e0fffdee1d069022846cef9cd26ec"
   },
   "fontes.json": {
-   "bytes": 4311,
-   "sha256": "8429aea41212905fd1d6fe2698095bff7b4f60f244b98f01d62d248589566622"
+   "bytes": 6357,
+   "sha256": "bd60dfa824cd51ad1bba0ef5fceb6b2ad4879394d21f67a0d343e6596c4084f0"
   },
   "ghs_frases.json": {
-   "bytes": 7518,
-   "sha256": "1662cea159bcc0fc7793faa0e0a73bcb690cad8c91c91493511c4adc166cd8d0"
+   "bytes": 20607,
+   "sha256": "5209ce6563469b650973555efea15ed0f517df4b5101b390afac744c0ce8c549"
   },
   "regras.json": {
-   "bytes": 23653,
-   "sha256": "e4e7700dec8e5b1374af2503408524b0509d08298cf39f047b37a0e9c0b46f27"
+   "bytes": 41348,
+   "sha256": "37821cd9c7d60d6394cddfed90578586f72fb257412cfaa6252d75bcc2e73926"
   },
   "textos/chebi/16236.json": {
    "bytes": 682,
@@ -38,6 +38,14 @@
   "textos/gold-book/E01990.json": {
    "bytes": 846,
    "sha256": "f5ea64f0da2185c204d5a1c6e2d822da3981252aa1753cb5dc40f29e557bcf8b"
+  },
+  "textos/index.json": {
+   "bytes": 532,
+   "sha256": "e7ba714933a4c1c3ba0073e20031747e588380be38166a465a329b22ad47ff73"
+  },
+  "textos/wikipedia-en/lote-001.json": {
+   "bytes": 1950,
+   "sha256": "f7c606e81c984d51afeb53293e928e1661c1bcda06355694611e246005a3b1c2"
   },
   "textos/wikipedia-pt/mol.json": {
    "bytes": 959,
@@ -93,6 +101,38 @@
    "id": "wikipedia-pt",
    "nome": "Wikipédia em português",
    "url": "https://pt.wikipedia.org/",
+   "licenca": "CC BY-SA 4.0",
+   "uso": "textos",
+   "acessadoEm": "2026-10-10"
+  },
+  {
+   "id": "wikipedia-en",
+   "nome": "Wikipedia (en)",
+   "url": "https://en.wikipedia.org/",
+   "licenca": "CC BY-SA 4.0",
+   "uso": "textos",
+   "acessadoEm": "2026-10-10"
+  },
+  {
+   "id": "wikipedia-es",
+   "nome": "Wikipedia (es)",
+   "url": "https://es.wikipedia.org/",
+   "licenca": "CC BY-SA 4.0",
+   "uso": "textos",
+   "acessadoEm": "2026-10-10"
+  },
+  {
+   "id": "wikipedia-de",
+   "nome": "Wikipedia (de)",
+   "url": "https://de.wikipedia.org/",
+   "licenca": "CC BY-SA 4.0",
+   "uso": "textos",
+   "acessadoEm": "2026-10-10"
+  },
+  {
+   "id": "wikipedia-fr",
+   "nome": "Wikipedia (fr)",
+   "url": "https://fr.wikipedia.org/",
    "licenca": "CC BY-SA 4.0",
    "uso": "textos",
    "acessadoEm": "2026-10-10"
@@ -157,6 +197,10 @@
    "licenca": "CC BY-SA 4.0",
    "fontes": [
     "wikipedia-pt",
+    "wikipedia-en",
+    "wikipedia-es",
+    "wikipedia-de",
+    "wikipedia-fr",
     "wikibooks-pt"
    ]
   },
@@ -173,11 +217,27 @@
    ]
   }
  ],
+ "idiomas": [
+  "pt-BR",
+  "en",
+  "es"
+ ],
  "contagens": {
   "elementos": 14,
   "compostos": 15,
   "constantes": 3,
-  "textos": 4
+  "textos": 6,
+  "textosPorFonte": {
+   "wikipedia-pt": 2,
+   "gold-book": 1,
+   "chebi": 1,
+   "wikipedia-en": 2
+  },
+  "textosPorIdioma": {
+   "pt-BR": 3,
+   "en": 3
+  },
+  "lotesDeTextos": 1
  },
  "atribuicao": "Pacote MÍNIMO de teste (fixture): não é dado oficial.",
  "cliente": {

@@ -2,30 +2,35 @@
  "version": "2026.10.10-fixture",
  "generatedAt": "2026-10-10T12:00:00Z",
  "schemaVersion": 1,
+ "idiomas": [
+  "pt-BR",
+  "en",
+  "es"
+ ],
  "files": {
   "compostos/index.json": {
    "bytes": 4348,
    "sha256": "5d1fb16cf6e23b53a566bead0abcbee2065e6a060d1224ef14902c5fd2390d72"
   },
   "compostos/lote-001.json": {
-   "bytes": 24714,
-   "sha256": "04178526b8b98cc0302702f9bb5a4f70e195cf805d2d62fc9bcf3a8c91714d4d"
+   "bytes": 29333,
+   "sha256": "5baa05854060c2d6398bcce88da40803407d230dfeddb357abab980cf458e22e"
   },
   "constantes.json": {
    "bytes": 2000,
    "sha256": "d116c8438326b9c346b7ad6b93d7f60a8984089430bb0930e9d5188f9260ad51"
   },
   "elementos.json": {
-   "bytes": 9418,
-   "sha256": "0e8fea24ecbc0ee2840b674246342bd788bd5516d1331445974784607faa2344"
+   "bytes": 10424,
+   "sha256": "701a64aa41dc5c81597ed2ef261f6ca9668375497b299a5f3daacf7a2d27046b"
   },
   "fontes.json": {
-   "bytes": 1471,
-   "sha256": "2ca0837557b91370658ff0290c9ceea2709d2a4a822be35c36bf026077e26afa"
+   "bytes": 1700,
+   "sha256": "98120d37736853d319ca6b4a1003b160e4619fe436ab306facc9537bfbf74cb3"
   },
   "regras.json": {
-   "bytes": 6329,
-   "sha256": "e26d96ea9322f54d4a3797d72d9e47ba47486580e595c4a5a70ae8dea66574b8"
+   "bytes": 9053,
+   "sha256": "b433f8ddd84f26ad6a5f1daa2f0b765881711c4e76e29d6af9c09955d4c94799"
   },
   "textos/chebi/chebi-acid.json": {
    "bytes": 510,
@@ -34,6 +39,14 @@
   "textos/gold-book/gold-book-molar-mass.json": {
    "bytes": 489,
    "sha256": "5bcb5b8bd1fc0825f802c2cdad52c8dcd76661970e0e6b3bfb28d7f2af2d9dec"
+  },
+  "textos/index.json": {
+   "bytes": 532,
+   "sha256": "e7ba714933a4c1c3ba0073e20031747e588380be38166a465a329b22ad47ff73"
+  },
+  "textos/wikipedia-en/lote-001.json": {
+   "bytes": 1950,
+   "sha256": "f7c606e81c984d51afeb53293e928e1661c1bcda06355694611e246005a3b1c2"
   },
   "textos/wikipedia-pt/wikipedia-pt-mol.json": {
    "bytes": 709,

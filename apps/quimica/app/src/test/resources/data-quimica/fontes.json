@@ -29,7 +29,17 @@
   "url": "https://pt.wikipedia.org/",
   "licenca": "CC BY-SA 4.0",
   "acessadoEm": "2026-10-10",
-  "uso": "textos de explicação"
+  "uso": "textos de explicação",
+  "idioma": "pt-BR"
+ },
+ {
+  "id": "wikipedia-en",
+  "nome": "Wikipedia (en)",
+  "url": "https://en.wikipedia.org/",
+  "licenca": "CC BY-SA 4.0",
+  "acessadoEm": "2026-10-10",
+  "uso": "textos de explicação",
+  "idioma": "en"
  },
  {
   "id": "gold-book",

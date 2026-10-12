@@ -82,6 +82,31 @@ class ClpTest(unittest.TestCase):
         self.assertNotIn("H999", f)  # anexo II fica de fora
         self.assertEqual(len(f), 4)
 
+    def test_parse_anexo_iii_multilingue(self):
+        f = clp.parse_anexo_iii_multi(XHTML_CLP)
+        self.assertEqual(f["H200"], {"en": "Unstable explosives.", "pt-BR": "Explosivo instável."})  # só as línguas pedidas; DE/ES/FR ausentes
+        self.assertEqual(f["H225"], {"pt-BR": "Líquido e vapor facilmente inflamáveis."})
+        self.assertEqual(f["H300+H310+H330"], {"pt-BR": "Mortal por ingestão, contacto com a pele ou inalação"})
+        xhtml_de = ("<p>ANEXO III</p><p>H200</p><p>Língua</p><p>SV</p><p>Instabilt explosivt.</p><p>DE</p><p>Instabil, explosiv.</p>"
+                    "<p>PT</p><p>Explosivo instável.</p><p>EN</p><p>Unstable explosives.</p><p>ANEXO IV</p>")
+        so_de = clp.parse_anexo_iii_multi(xhtml_de, ["pt-BR", "de"])
+        self.assertEqual(so_de["H200"], {"de": "Instabil, explosiv.", "pt-BR": "Explosivo instável."})  # SV e EN ignorados, não viram texto
+        self.assertEqual(clp.parse_anexo_iii_multi(xhtml_de)["H200"]["en"], "Unstable explosives.")
+        self.assertEqual(clp.LINGUA_JO, {"PT": "pt-BR", "EN": "en", "ES": "es", "DE": "de", "FR": "fr"})
+
+    def test_rotulos_por_idioma_dos_pictogramas_e_palavras_de_advertencia(self):
+        p = clp.pictogramas_por_idioma(["pt-BR", "en", "fr"])
+        self.assertEqual(sorted(p), [f"GHS0{i}" for i in range(1, 10)])
+        self.assertEqual(p["GHS06"], {"pt-BR": clp.PICTOGRAMAS["GHS06"], "en": "Skull and crossbones (acute toxicity)",
+                                      "fr": "Tête de mort sur deux tibias (toxicité aiguë)"})
+        for cod in clp.PICTOGRAMAS:  # todos os pictogramas têm os quatro idiomas
+            self.assertEqual(set(clp.PICTOGRAMAS_POR_IDIOMA[cod]), {"en", "es", "de", "fr"}, cod)
+        self.assertEqual(clp.palavras_sinal_por_idioma(["pt-BR", "es"]), {"Perigo": {"pt-BR": "Perigo", "es": "Peligro"},
+                                                                          "Atenção": {"pt-BR": "Atenção", "es": "Atención"}})
+        self.assertEqual(clp.texto_pt({"pt-BR": "a", "en": "b"}), "a")
+        self.assertEqual(clp.texto_pt("a"), "a")
+        self.assertEqual(clp.por_idioma("a"), {"pt-BR": "a"})
+
     def test_sem_anexo_levanta(self):
         with self.assertRaises(ValueError):
             clp.parse_anexo_iii("<html></html>")
@@ -113,6 +138,10 @@ class CompostoTest(unittest.TestCase):
     WD = {"qid": "Q4118", "sl": 100, "pbr": ["ácido sulfúrico"], "ppt": [], "pen": ["sulfuric acid"],
           "apt": ["vitríolo", "ácido sulfúrico"], "aen": ["battery acid"], "cas": ["7664-93-9", "000-00-0"],
           "formulas": ["H₂SO₄"], "chebi": ["26836"], "ptwiki": ["Ácido sulfúrico"]}
+    ENT = {"rotulos": {"pt-BR": "ácido sulfúrico", "en": "sulfuric acid", "es": "ácido sulfúrico", "de": "Schwefelsäure", "fr": "acide sulfurique"},
+           "apelidos": {"pt-BR": ["vitríolo"], "en": ["battery acid", "H₂SO₄", "sulphuric acid", "7664-93-9", "CHEBI:26836"],
+                        "de": ["Dihydrogensulfat", "Vitriolöl"], "fr": ["acide sulfurique", "huile de vitriol"]},
+           "artigos": {"en": "Sulfuric acid", "de": "Schwefelsäure", "fr": "Acide sulfurique"}}
 
     def test_montar(self):
         sel = {"cid": 1118, "classes": ["acido"], "origem": "wikidata"}
@@ -133,9 +162,55 @@ class CompostoTest(unittest.TestCase):
         self.assertIn("oil of vitriol", c["sinonimos"])
         self.assertNotIn("CHEBI:26836", c["sinonimos"])
         self.assertNotIn("ácido sulfúrico", [s.lower() for s in c["sinonimos"]])  # não repete o nome
+        self.assertEqual(c["nomes"], {"pt-BR": "Ácido sulfúrico"})  # sem entidade do Wikidata (ent=None): só o português; nada de IUPAC em `en`
+        self.assertEqual(c["sinonimosPorIdioma"], {"en": ["oil of vitriol"]})  # ChEBI (inglês)
         nomes_fontes = [f["nome"] for f in c["fontes"]]
         self.assertEqual(nomes_fontes[0], "PubChem CID 1118")
         self.assertTrue(any("1272/2008" in n for n in nomes_fontes) and "Wikidata" in nomes_fontes)
+
+    def test_nomes_e_sinonimos_por_idioma(self):
+        sel = {"cid": 1118, "classes": ["acido"], "origem": "wikidata"}
+        ch = {"id": 26836, "definicao": "Um oxiácido de enxofre.", "sinonimos": ["oil of vitriol", "CHEBI:26836"]}
+        c, _ = CCP.montar(sel, self.PROPS, self.WD, None, ch, "2026-10-10", ent=self.ENT)
+        self.assertEqual(c["nomes"], {"pt-BR": "Ácido sulfúrico", "en": "sulfuric acid", "es": "ácido sulfúrico", "de": "Schwefelsäure",
+                                      "fr": "acide sulfurique"})
+        sin = c["sinonimosPorIdioma"]
+        self.assertEqual(sin["pt-BR"], ["vitríolo"])
+        self.assertEqual(sin["en"], ["battery acid", "sulphuric acid", "oil of vitriol"])  # sem fórmula, CAS nem código; ChEBI entra em en
+        self.assertEqual(sin["de"], ["Dihydrogensulfat", "Vitriolöl"])
+        self.assertEqual(sin["fr"], ["huile de vitriol"])  # não repete o rótulo
+        self.assertNotIn("es", sin)  # idioma sem apelidos = chave ausente
+        # só os idiomas pedidos
+        c2, _ = CCP.montar(sel, self.PROPS, self.WD, None, ch, "2026-10-10", ent=self.ENT, idiomas=["pt-BR", "en"])
+        self.assertEqual(set(c2["nomes"]), {"pt-BR", "en"})
+        # nome em português pendente: nomes.pt-BR ausente (o IUPAC não é nome em português)
+        wd = dict(self.WD, pbr=[], ppt=[])
+        c3, _ = CCP.montar(sel, self.PROPS, wd, None, None, "2026-10-10", ent=self.ENT)
+        self.assertTrue(c3["nomePtPendente"])
+        self.assertNotIn("pt-BR", c3["nomes"])
+        self.assertEqual(c3["nomes"]["en"], "sulfuric acid")
+        # a fórmula do próprio composto nunca é sinônimo (nem com subscritos); outra fórmula não é barrada por esta regra
+        self.assertFalse(CCP.sinonimo_valido("H₂SO₄", "H2O4S"))
+        self.assertFalse(CCP.sinonimo_valido("HCl", "ClH"))
+        self.assertTrue(CCP.sinonimo_valido("PVC", "C2H3Cl"))
+        # palavras funcionais de qualquer idioma nunca são sinônimo ("PARA" é apelido en do 1,4-diclorobenzeno no Wikidata)
+        for palavra in ("PARA", "para", "The", "und", "pour", "con"):
+            self.assertFalse(CCP.sinonimo_valido(palavra, "C6H4Cl2"), palavra)
+        self.assertTrue(CCP.sinonimo_valido("PDCB", "C6H4Cl2"))
+        self.assertTrue(CCP.sinonimo_valido("oil of vitriol", "H2O4S"))
+
+    def test_indice_com_nomes_por_idioma(self):
+        compostos = [{"cid": 1, "nome": "Água", "formula": "H2O", "formulaHill": "H2O", "sinonimos": ["aqua", "Dihydrogenmonoxid"],
+                      "nomes": {"pt-BR": "Água", "en": "water", "de": "Wasser"},
+                      "sinonimosPorIdioma": {"en": ["dihydrogen monoxide", "aqua"], "de": ["Dihydrogenmonoxid"]}},
+                     {"cid": 2, "nome": "X", "formula": "H2", "formulaHill": "H2"}]
+        _, idx = CCP.para_lotes(compostos)
+        # só o que ainda não está em `nomes` (aqua e Dihydrogenmonoxid já estão lá pelos sinônimos legados)
+        self.assertEqual(idx["nomesPorIdioma"], {"en": [["dihydrogen monoxide", 1], ["water", 1]], "de": [["wasser", 1]]})
+        self.assertIn(["aqua", 1], idx["nomes"])
+        self.assertNotIn("pt-BR", idx["nomesPorIdioma"])  # o português já está em `nomes`
+        _, idx2 = CCP.para_lotes([compostos[1]])
+        self.assertNotIn("nomesPorIdioma", idx2)
 
     def test_sem_nome_em_portugues_marca_pendente(self):
         wd = dict(self.WD, pbr=[], ppt=[], cas=[], chebi=[])

@@ -12,8 +12,14 @@
 // Tolerância a grafias alteradas: o texto é dobrado (acentos, caixa), "leet" (m3t4nf3t4m1n4), letras separadas (s i n t e s e),
 // letras repetidas, palavras partidas (explo sivo) e variações fonéticas (k/c, z/s, ph/f, h mudo) são normalizados nos DOIS lados
 // (texto e termos das regras); palavras longas toleram um erro de digitação. Aceita também os pedidos mais comuns em inglês.
+//
+// Todos os idiomas: além das regras em português acima (com tolerância fonética), `avaliarPedido` aplica SEMPRE os padrões de recusa do
+// léxico compartilhado (contracts/lexico/<idioma>.json, bloco `seguranca`) de pt-BR, en, es, de e fr — a mesma lógica do site
+// (web/src/quimica/js/seguranca.js): autolesão primeiro; depois ação + alvo, com as exceções de contexto seguro; por fim a versão "colada".
+// Basta UMA das duas camadas recusar. O idioma da interface não chega à API e não deve importar: um pedido perigoso é recusado em qualquer língua.
 
 import { editDistanceAtMost1, fold } from './ground.js';
+import { colada as colar, segurancaPorIdioma } from './lexico.js';
 
 export const RECUSA_PADRAO = 'Não posso ajudar com isso: o pedido envolve a produção, a purificação ou a obtenção de substâncias perigosas ou ilícitas '
   + '(explosivos, armas químicas, drogas ou venenos). Posso explicar os perigos, os equipamentos de proteção, os primeiros socorros, '
@@ -22,7 +28,7 @@ export const RECUSA_PADRAO = 'Não posso ajudar com isso: o pedido envolve a pro
 // ---------------------------------------------------------------- normalização
 
 // Zero-width, soft hyphen e BOM (montado por código: sem caracteres invisíveis no arquivo)
-const CONTROLES_INVISIVEIS = new RegExp(`[${[0x200b, 0x200c, 0x200d, 0x200e, 0x200f, 0x2060, 0xfeff, 0xad].map((c) => String.fromCodePoint(c)).join('')}]`, 'g');
+const CONTROLES_INVISIVEIS = new RegExp(`[${[0x200b, 0x200c, 0x200d, 0x200e, 0x200f, 0x202a, 0x202b, 0x202c, 0x202d, 0x202e, 0x2060, 0xfeff, 0xad].map((c) => String.fromCodePoint(c)).join('')}]`, 'g');
 const LEET = { 0: 'o', 1: 'i', 3: 'e', 4: 'a', 5: 's', 7: 't' };
 
 /** Variações fonéticas: aplicadas ao texto e aos termos das regras (por isso as regras são escritas em português normal). */
@@ -169,17 +175,21 @@ const PALAVRAS_BOMBA = ['bomba', 'bomb'].map(fonetica);
 const BOMBA_BENIGNA = compilar([
   'atomica', 'nuclear', 'suja', // armas nucleares são da categoria cbrn
   'de banho', 'de chocolate', 'de agua', 'de ar', 'de calor', 'de vacuo', 'de insulina', 'de combustivel', 'de gasolina',
-  'de bicicleta', 'de aquario', 'de piscina', 'de cabelo', 'de sorvete', 'de creme', 'hidraulica', 'submersa', 'peristaltica', 'centrifuga',
+  'de bain', 'de bicicleta', 'de aquario', 'de piscina', 'de cabelo', 'de sorvete', 'de creme', 'hidraulica', 'submersa', 'peristaltica', 'centrifuga',
   'calorimetrica', 'calorimeter', 'calorimeters',
 ]);
 
 /** "bomba" só conta se a(s) palavra(s) seguinte(s) não a tornam inofensiva (bomba de banho, de água, de chocolate...). */
+// Em inglês o modificador vem ANTES: "bath bomb", "glitter bomb", "seed bomb" (inofensivos). Comparados pela mesma fonética dos tokens.
+const BOMBA_BENIGNA_ANTES = compilar(['bath', 'glitter', 'seed', 'cherry', 'jam', 'fizzy', 'fizz', 'chocolate', 'cheese', 'flour', 'water', 'photo']).flatMap((t) => t.palavras);
+
 function bombaPerigosa(p) {
   for (let i = 0; i < p.tokens2.length; i++) {
     const tk = p.tokens2[i];
     if (!PALAVRAS_BOMBA.some((b) => tk === b || tk === `${b}s`)) continue;
     const inicio = p.tokens2.slice(i + 1, i + 4);
-    const benigna = BOMBA_BENIGNA.some((b) => b.palavras.every((pal, j) => inicio[j] !== undefined && palavraBate(inicio[j], pal)));
+    const benigna = BOMBA_BENIGNA.some((b) => b.palavras.every((pal, j) => inicio[j] !== undefined && palavraBate(inicio[j], pal)))
+      || (i > 0 && BOMBA_BENIGNA_ANTES.some((b) => palavraBate(p.tokens2[i - 1], b)));
     if (!benigna) return true;
   }
   return false;
@@ -207,10 +217,12 @@ const ACAO_FORTE = compilar([
 ]);
 
 // Verbos genéricos: só valem junto de um alvo e SEM contexto de proteção ("como fazer a descontaminação do sarin" passa).
+// ("make"/"making" não estão aqui: a fonética deles ('mase') bate com "masse" (fr) e "Quelle est la masse molaire du TNT ?" era recusada;
+// o inglês é coberto pelo léxico compartilhado, que casa "make" sem fonética.)
 const ACAO_GENERICA = compilar([
   'como fazer', 'como faco', 'como se faz', 'como faz', 'fazer', 'preparar', 'preparo', 'obter', 'conseguir', 'criar', 'construir',
   'montar', 'misturar', 'ensine', 'ensina', 'tutorial', 'proporcao', 'proporcoes', 'quanto de', 'quantidade para', 'comprar', 'adquirir',
-  'sem receita', 'escondido', 'reagentes', 'how to', 'make', 'making',
+  'sem receita', 'escondido', 'reagentes', 'how to',
 ]);
 
 // Contexto que descreve o PERIGO, o EFEITO, a DEFESA ou o PEDIDO DE AJUDA: não é pedido de produção. Não pode ser usado como camuflagem.
@@ -266,11 +278,8 @@ const PRODUCAO_DE_REAGENTE = compilar([
 ]);
 const CASEIRO = compilar(['em casa', 'caseir*', 'artesanal', 'na cozinha', 'no quintal', 'na garagem', 'sem laboratorio', 'at home', 'homemade']);
 
-/**
- * Avalia o texto da PERGUNTA do usuário. Devolve { recusar, categoria, regra }.
- *   regra: 'alvo+acao_forte' | 'alvo+acao_generica' | 'dano_a_pessoa' | 'autolesao' | 'mistura_gas' | 'droga_dose_recreativa' | 'reagente_caseiro'
- */
-export function avaliarPedido(texto) {
+/** Regras próprias da API (termos em português normal, com tolerância fonética e a um erro de digitação). Ver `avaliarPedido`. */
+export function avaliarRegrasProprias(texto) {
   const p = preparar(texto);
   if (!p.v1) return { recusar: false, categoria: null, regra: null };
 
@@ -294,6 +303,167 @@ export function avaliarPedido(texto) {
     return { recusar: true, categoria: 'reagente_caseiro', regra: 'reagente_caseiro' };
   }
   return { recusar: false, categoria: null, regra: null };
+}
+
+// ---------------------------------------------------------------- léxico compartilhado (todos os idiomas)
+
+const MAPA_CATEGORIAS = Object.freeze({
+  EXPLOSIVOS: 'explosivo',
+  ARMAS_QUIMICAS: 'arma_quimica',
+  DROGAS: 'droga',
+  PRECURSORES: 'precursor',
+  REAGENTES_CASEIROS: 'reagente_caseiro',
+  DANO_A_PESSOAS: 'dano_a_pessoa',
+  AUTOLESAO: 'autolesao',
+});
+
+const LEET_LEXICO = { 0: 'o', 1: 'i', 3: 'e', 4: 'a', 5: 's', 7: 't', 8: 'b', '@': 'a', $: 's', '!': 'i', '|': 'l', '€': 'e' };
+const LETRAS_SEM_DECOMPOSICAO = { ß: 'ss', æ: 'ae', œ: 'oe', ø: 'o', đ: 'd', ł: 'l' };
+const leetLexico = (s) => s.replace(/[01345789@$!|€]/g, (c) => LEET_LEXICO[c] ?? c);
+const espacado = (s) => s.replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
+
+/** Texto como o léxico o espera: minúsculo, sem acentos nem invisíveis (ß, æ, œ, ø, đ, ł viram letras ASCII, o que o site deixa cair). */
+function limparLexico(texto) {
+  return String(texto ?? '')
+    .normalize('NFKD')
+    .replace(CONTROLES_INVISIVEIS, '')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[ßæœøđł]/g, (c) => LETRAS_SEM_DECOMPOSICAO[c]);
+}
+
+/** Visões do pedido para o léxico: normal, com "leet" resolvido e, para cada uma, a versão com letras soltas reunidas ("c o c a i n e"). */
+function visoesLexico(texto) {
+  const base = limparLexico(texto);
+  const reunida = preparar(texto).v1;
+  return [...new Set([espacado(base), espacado(leetLexico(base)), reunida, espacado(leetLexico(reunida))].filter(Boolean))];
+}
+
+// ---- exceções da API ao léxico (o léxico é mais grosso que as regras em português: estas frases são conteúdo legítimo) ----
+// Cada uma remove uma FRASE ou uma PALAVRA do texto antes do teste; nenhuma delas "salva" o pedido inteiro, então uma ação forte
+// (receita, passo a passo, sintetizar...) ou outro alvo na mesma frase continua recusando. Propostas de ajuste ao léxico: ver README.
+
+// "Como fazer para parar de usar crack?": o verbo "fazer" aqui é de quem quer largar o vício. Exige o verbo de parar logo depois.
+const FAZER_INOFENSIVO = new RegExp(`\\b(?:${[
+  '(?:(?:como|o que) )?(?:(?:eu )?(?:posso|devo|tenho que|preciso) )?fa(?:zer|co|z) (?:para|pra) (?:parar|largar|deixar|abandonar|sair|me livrar|se livrar)',
+  '(?:(?:como|que) )?(?:(?:yo )?(?:puedo|debo|tengo que|necesito) )?(?:hacer|hago|hace) para (?:dejar|parar|abandonar|salir|librarme|liberarme)',
+  '(?:(?:comment|que) )?(?:(?:je )?(?:puis|peux|dois) )?(?:faire|fais|fait) pour (?:arreter|cesser|quitter|sortir|me liberer|me debarrasser)',
+  'was (?:kann|soll|muss) ich (?:tun|machen),? (?:um|damit)(?: \\w+){0,3} (?:aufzuh(?:oe|o)ren|aufh(?:oe|o)ren|loszukommen|auszusteigen)',
+  '(?:what|how) (?:can|should|do|could|would) (?:i|we|you) (?:do|make) (?:to|so that) (?:stop|quit|give up|kick|get off)',
+].join('|')})\\b`, 'g');
+
+// Pergunta sobre a lei ("qual a lei sobre produção de drogas?"): os substantivos de produção (que o espanhol e o francês pegam em "producao")
+// deixam de ser ação. Verbos ("produzir", "fazer", "how to make"), receita e passo a passo continuam sendo.
+const ENQUADRAMENTO_JURIDICO = /\b(?:lei|leis|legislacao|law|laws|legislation|ley|leyes|legislacion|gesetz\w*|strafrecht|rechtslage|loi|lois)\b/;
+const PRODUCAO_SUBSTANTIVO = /\b(?:producao|production|produccion|produktion|fabricacao|fabricacion|fabrication|herstellung|manufatura|manufacturing|elaboracao|elaboracion)\b/g;
+
+// Nomes de rua de drogas que também são palavras comuns do inglês ("ice", "speed", "crack", "weed", "hash", "spice", "coke"): a expressão
+// inofensiva conhecida é removida antes do teste ("how to make ice cubes", "how to make crackers"). Só combinações inequívocas; "how to make ice"
+// ou "how to make speed" continuam recusados (na dúvida, recusa).
+const COLOCACOES_INOFENSIVAS = new RegExp(`\\b(?:${[
+  'dry ice', 'ice (?:cubes?|cream|packs?|water|bath|age|sheets?|crystals?|point|melt\\w*|tea|machine|makers?|skat\\w+|hockey)',
+  'speed (?:of|limit|up)', '(?:reaction|wind|rate) speed',
+  'crackers?', 'cracking',
+  'weed (?:killers?|control|barrier|whackers?|eaters?)', 'weeding',
+  'hash (?:functions?|tables?|tags?|codes?|values?|maps?|rate)', 'hashing', 'hashtags?',
+  'spice (?:mix|rack|blend|cabinet|cake)s?',
+  'coke (?:oven|plant|battery)s?', 'coking coal', 'petroleum coke',
+].join('|')})\\b`, 'g');
+
+// ---- complementos da API (lacunas do léxico compartilhado, vistas em testes; ver README) ----
+// Regras acrescentadas SÓ do lado da API, em OU com as do léxico. Quando o léxico ganhar estas formas, os complementos viram redundantes.
+// ação: verbo separável do alemão ("Wie stelle ich Sprengstoff her?": o léxico só tem "herstell*"), "elaborar" (es, pt) e "élaborer" (fr)
+const COMPLEMENTO_ACAO = /\bstell(?:e|st|t|en)\b(?: \w+){0,6} her\b|\belabor(?:ar|o|a|an|ando|acao)\b|\belaborer\b/;
+// "Wie baue/mache ich eine Bombe?": na ordem natural do alemão o pronome fica entre o verbo e o artigo, e o léxico exige o artigo logo depois do verbo.
+const COMPLEMENTO_FAZER_BOMBA = /\b(?:bau|mach|stell|konstruier|bast|erzeug|produzier|fertig)\w*(?: (?:ich|man|wir|du))? (?:eine?n? |die )?(?:bombe|bomben|sprengsatz|sprengsatze)\b/;
+// dano a pessoas em alemão: "Welches Gift tötet unauffällig?" (verbo de matar + discrição, em qualquer ordem)
+const COMPLEMENTO_DANO = new RegExp(`\\b(?:(?:vergift|tot|umbring|ermord)\\w*|gift\\w*)\\b.{0,40}\\b(?:unauffallig|spurlos|ohne spuren|unentdeckt|nicht nachweisbar)\\w*|\\b(?:unauffallig|spurlos|ohne spuren|unentdeckt)\\w*\\b.{0,40}\\b(?:vergift|tot|umbring|ermord)\\w*`);
+
+// Cloro gasoso por eletrólise de salmoura (indústria cloro-álcali) fora de um contexto caseiro: química de aula, não arma.
+const ELETROLISE_INDUSTRIAL = /\b(?:eletroli\w+|electroli\w+|electroly\w+|elektroly\w+|cloro ?alcali|chlor ?alk\w+|chlor ?alcali|salmoura|salmuera|brine|saumure|salzlake)\b/;
+const CLORO_GASOSO = /\b(?:gas(?:es)? (?:de )?cloro|cloro gasoso|cloro em gas|cloro gaseoso|chlorine gas(?:es)?|gaseous chlorine|chlorgas|gaz (?:de )?chlore|chlore gazeux)\b/g;
+
+// "fazer uma bomba de banho": o léxico (inglês) casa o verbo + "bomba" sem olhar o que vem depois; vale a mesma lista de bombas inofensivas das regras em português
+// (sem as três primeiras entradas, 'atomica', 'nuclear' e 'suja', que são armas).
+const BOMBA_BENIGNA_LEXICO = BOMBA_BENIGNA.slice(3);
+function fazerBombaPerigosa(S, vc) {
+  for (const m of vc.matchAll(S.fazerBombaG)) {
+    const seguinte = vc.slice(m.index + m[0].length).split(' ').filter(Boolean).slice(0, 4).map(fonetica);
+    const benigna = BOMBA_BENIGNA_LEXICO.some((b) => b.palavras.every((pal, j) => seguinte[j] !== undefined && palavraBate(seguinte[j], pal)));
+    if (!benigna) return true;
+  }
+  return false;
+}
+
+/**
+ * Aplica as exceções ao texto `v` (uma visão normalizada): devolve `vc` (para ação e alvos) e `vArmas` (vc sem "cloro gasoso" quando o contexto é
+ * eletrólise industrial e não caseiro).
+ */
+function neutralizar(S, v, casa) {
+  // "o que fazer se...", "fazer o descarte..." (léxico) e "como fazer para parar de usar..." (API) não são pedidos de produção
+  let vc = v.replace(S.tirarFazerSeguro, ' ').replace(FAZER_INOFENSIVO, ' ').replace(COLOCACOES_INOFENSIVAS, ' ');
+  if (ENQUADRAMENTO_JURIDICO.test(v)) vc = vc.replace(PRODUCAO_SUBSTANTIVO, ' ');
+  const industrial = !casa && ELETROLISE_INDUSTRIAL.test(v);
+  return { vc, vArmas: industrial ? vc.replace(CLORO_GASOSO, ' ') : vc };
+}
+
+const recusaLexico = (categoria, motivo, idioma) => ({ recusar: true, categoria: MAPA_CATEGORIAS[categoria] ?? categoria.toLowerCase(), regra: `lexico:${motivo}`, idioma });
+
+/**
+ * Aplica os padrões de recusa do léxico compartilhado nos cinco idiomas (mesma lógica de web/src/quimica/js/seguranca.js).
+ * Devolve { recusar, categoria, regra, idioma? }.
+ */
+export function avaliarPorLexico(texto, lexicos = segurancaPorIdioma()) {
+  const base = limparLexico(texto);
+  if (!base.trim()) return { recusar: false, categoria: null, regra: null };
+  const visoes = visoesLexico(texto);
+  const v1 = visoes[0] ?? '';
+
+  // autolesão primeiro, em todos os idiomas: o app responde com acolhimento, mesmo sem "ação"
+  for (const S of lexicos) for (const v of visoes) if (S.alvoAutolesao.test(v)) return recusaLexico('AUTOLESAO', 'autolesao', S.idioma);
+
+  for (const S of lexicos) {
+    for (const v of visoes) {
+      const incidente = S.contextoSeguro.test(v);
+      const casa = S.casa.test(v);
+      const { vc, vArmas } = neutralizar(S, v, casa);
+      const acao = S.acao.test(vc) || COMPLEMENTO_ACAO.test(vc);
+      // dano a pessoas: o alvo já contém a ação
+      if (S.alvoDano.test(v) || COMPLEMENTO_DANO.test(v)) return recusaLexico('DANO_A_PESSOAS', 'dano', S.idioma);
+      if (fazerBombaPerigosa(S, vc) || COMPLEMENTO_FAZER_BOMBA.test(vc)) return recusaLexico('EXPLOSIVOS', 'bomba', S.idioma);
+      // alvos graves: a recusa vale mesmo com palavras de "segurança" na frase (não há como produzir "com segurança")
+      if (acao && S.alvoExplosivos.test(vc)) return recusaLexico('EXPLOSIVOS', 'explosivos', S.idioma);
+      if (acao && S.alvoArmas.test(vArmas)) return recusaLexico('ARMAS_QUIMICAS', 'armas', S.idioma);
+      if (acao && S.alvoDrogas.test(vc)) return recusaLexico('DROGAS', 'drogas', S.idioma);
+      if (acao && S.precursoresNomes.test(vc) && (S.alvoDrogas.test(vc) || S.precursoresAcao.test(vc))) return recusaLexico('PRECURSORES', 'precursores', S.idioma);
+      // receitas caseiras com reagentes perigosos: "em casa" + produzir; fica de fora quem trata de descarte, EPI, incidente etc.
+      if (!incidente && acao && casa && S.perigososCaseiros.test(vc)) return recusaLexico('REAGENTES_CASEIROS', 'caseiro', S.idioma);
+    }
+  }
+
+  // versão colada: tolera "explo sivo", "e x p l o s i v o", "exploosivo"
+  for (const S of lexicos) {
+    const vl = espacado(leetLexico(base));
+    const c = colar(neutralizar(S, vl, S.casa.test(vl)).vArmas);
+    if (c.length >= 8 && !S.contextoSeguro.test(v1) && S.coladaAcoes.some((a) => c.includes(a))) {
+      for (const [cat, alvos] of Object.entries(S.coladaAlvos)) {
+        if (alvos.some((a) => c.includes(a))) return recusaLexico(cat, 'disfarce', S.idioma);
+      }
+    }
+  }
+  return { recusar: false, categoria: null, regra: null };
+}
+
+/**
+ * Avalia o texto da PERGUNTA do usuário, em qualquer idioma. Devolve { recusar, categoria, regra }.
+ *   regra: 'alvo+acao_forte' | 'alvo+acao_generica' | 'dano_a_pessoa' | 'autolesao' | 'mistura_gas' | 'droga_dose_recreativa' | 'reagente_caseiro'
+ *          (regras próprias, em português) ou 'lexico:<motivo>' (léxico compartilhado; traz também `idioma`).
+ * Recusa se QUALQUER uma das duas camadas recusar.
+ */
+export function avaliarPedido(texto) {
+  const propria = avaliarRegrasProprias(texto);
+  if (propria.recusar) return propria;
+  return avaliarPorLexico(texto);
 }
 
 export const pedidoPerigoso = (texto) => avaliarPedido(texto).recusar;

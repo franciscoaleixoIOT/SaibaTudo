@@ -33,7 +33,20 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Água",
+   "en": "water",
+   "es": "agua"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "dihydrogen monoxide"
+   ],
+   "es": [
+    "óxido de hidrógeno"
+   ]
+  }
  },
  {
   "cid": 280,
@@ -73,7 +86,22 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Dióxido de carbono",
+   "en": "carbon dioxide",
+   "es": "dióxido de carbono"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "carbonic anhydride",
+    "carbonic acid gas"
+   ],
+   "es": [
+    "anhídrido carbónico",
+    "gas carbónico"
+   ]
+  }
  },
  {
   "cid": 5234,
@@ -101,7 +129,24 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Cloreto de sódio",
+   "en": "sodium chloride",
+   "es": "cloruro de sodio"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "table salt",
+    "halite",
+    "rock salt"
+   ],
+   "es": [
+    "sal de mesa",
+    "sal común",
+    "halita"
+   ]
+  }
  },
  {
   "cid": 313,
@@ -143,7 +188,22 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Ácido clorídrico",
+   "en": "hydrogen chloride",
+   "es": "cloruro de hidrógeno"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "hydrochloric acid",
+    "muriatic acid"
+   ],
+   "es": [
+    "ácido clorhídrico",
+    "ácido muriático"
+   ]
+  }
  },
  {
   "cid": 14798,
@@ -183,7 +243,22 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Hidróxido de sódio",
+   "en": "sodium hydroxide",
+   "es": "hidróxido de sodio"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "caustic soda",
+    "lye"
+   ],
+   "es": [
+    "sosa cáustica",
+    "soda cáustica"
+   ]
+  }
  },
  {
   "cid": 222,
@@ -229,7 +304,20 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Amônia",
+   "en": "ammonia",
+   "es": "amoníaco"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "azane"
+   ],
+   "es": [
+    "amoniaco"
+   ]
+  }
  },
  {
   "cid": 297,
@@ -269,7 +357,20 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Metano",
+   "en": "methane",
+   "es": "metano"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "marsh gas"
+   ],
+   "es": [
+    "gas de los pantanos"
+   ]
+  }
  },
  {
   "cid": 702,
@@ -318,7 +419,21 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Etanol",
+   "en": "ethanol",
+   "es": "etanol"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "ethyl alcohol",
+    "grain alcohol"
+   ],
+   "es": [
+    "alcohol etílico"
+   ]
+  }
  },
  {
   "cid": 5793,
@@ -346,7 +461,23 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Glicose",
+   "en": "glucose",
+   "es": "glucosa"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "dextrose",
+    "grape sugar",
+    "blood sugar"
+   ],
+   "es": [
+    "dextrosa",
+    "azúcar de uva"
+   ]
+  }
  },
  {
   "cid": 176,
@@ -386,7 +517,21 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Ácido acético",
+   "en": "acetic acid",
+   "es": "ácido acético"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "ethanoic acid",
+    "glacial acetic acid"
+   ],
+   "es": [
+    "ácido etanoico"
+   ]
+  }
  },
  {
   "cid": 2244,
@@ -436,7 +581,22 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Ácido acetilsalicílico",
+   "en": "acetylsalicylic acid",
+   "es": "ácido acetilsalicílico"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "aspirin",
+    "ASA"
+   ],
+   "es": [
+    "aspirina",
+    "AAS"
+   ]
+  }
  },
  {
   "cid": 241,
@@ -481,7 +641,21 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Benzeno",
+   "en": "benzene",
+   "es": "benceno"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "benzol",
+    "cyclohexatriene"
+   ],
+   "es": [
+    "benzol"
+   ]
+  }
  },
  {
   "cid": 180,
@@ -523,7 +697,22 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Acetona",
+   "en": "acetone",
+   "es": "acetona"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "propanone",
+    "dimethyl ketone"
+   ],
+   "es": [
+    "propanona",
+    "dimetilcetona"
+   ]
+  }
  },
  {
   "cid": 784,
@@ -567,7 +756,20 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Peróxido de hidrogênio",
+   "en": "hydrogen peroxide",
+   "es": "peróxido de hidrógeno"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "dioxidane"
+   ],
+   "es": [
+    "agua oxigenada"
+   ]
+  }
  },
  {
   "cid": 1118,
@@ -605,7 +807,22 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Ácido sulfúrico",
+   "en": "sulfuric acid",
+   "es": "ácido sulfúrico"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "oil of vitriol",
+    "battery acid",
+    "sulphuric acid"
+   ],
+   "es": [
+    "aceite de vitriolo"
+   ]
+  }
  },
  {
   "cid": 10112,
@@ -633,7 +850,23 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Carbonato de cálcio",
+   "en": "calcium carbonate",
+   "es": "carbonato de calcio"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "limestone",
+    "calcite",
+    "chalk"
+   ],
+   "es": [
+    "caliza",
+    "calcita"
+   ]
+  }
  },
  {
   "cid": 23665760,
@@ -674,7 +907,22 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Hipoclorito de sódio",
+   "en": "sodium hypochlorite",
+   "es": "hipoclorito de sodio"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "bleach",
+    "liquid bleach"
+   ],
+   "es": [
+    "lejía",
+    "lavandina"
+   ]
+  }
  },
  {
   "cid": 1176,
@@ -701,7 +949,20 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Ureia",
+   "en": "urea",
+   "es": "urea"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "carbamide"
+   ],
+   "es": [
+    "carbamida"
+   ]
+  }
  },
  {
   "cid": 516892,
@@ -729,7 +990,21 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Bicarbonato de sódio",
+   "en": "sodium bicarbonate",
+   "es": "bicarbonato de sodio"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "baking soda",
+    "sodium hydrogen carbonate"
+   ],
+   "es": [
+    "bicarbonato sódico"
+   ]
+  }
  },
  {
   "cid": 14833,
@@ -757,6 +1032,21 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Óxido de ferro(III)",
+   "en": "iron(III) oxide",
+   "es": "óxido de hierro(III)"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "ferric oxide",
+    "hematite"
+   ],
+   "es": [
+    "óxido férrico",
+    "hematita"
+   ]
+  }
  }
 ]

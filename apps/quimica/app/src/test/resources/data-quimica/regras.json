@@ -10,7 +10,29 @@
     "massa molar",
     "massa molecular",
     "peso molecular"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Massa molar",
+    "en": "Molar mass",
+    "es": "Masa molar"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "massa molar",
+     "massa molecular",
+     "peso molecular"
+    ],
+    "en": [
+     "molar mass",
+     "molecular mass",
+     "molecular weight"
+    ],
+    "es": [
+     "masa molar",
+     "masa molecular",
+     "peso molecular"
+    ]
+   }
   },
   {
    "id": "massaAtomica",
@@ -21,7 +43,26 @@
    "sinonimos": [
     "massa atomica",
     "peso atomico"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Massa atômica",
+    "en": "Atomic mass",
+    "es": "Masa atómica"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "massa atomica",
+     "peso atomico"
+    ],
+    "en": [
+     "atomic mass",
+     "atomic weight"
+    ],
+    "es": [
+     "masa atómica",
+     "peso atómico"
+    ]
+   }
   },
   {
    "id": "pontoFusaoK",
@@ -33,7 +74,27 @@
     "ponto de fusao",
     "temperatura de fusao",
     "fusao"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Ponto de fusão",
+    "en": "Melting point",
+    "es": "Punto de fusión"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "ponto de fusao",
+     "temperatura de fusao",
+     "fusao"
+    ],
+    "en": [
+     "melting point",
+     "melting temperature"
+    ],
+    "es": [
+     "punto de fusión",
+     "temperatura de fusión"
+    ]
+   }
   },
   {
    "id": "pontoEbulicaoK",
@@ -45,7 +106,27 @@
     "ponto de ebulicao",
     "temperatura de ebulicao",
     "ebulicao"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Ponto de ebulição",
+    "en": "Boiling point",
+    "es": "Punto de ebullición"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "ponto de ebulicao",
+     "temperatura de ebulicao",
+     "ebulicao"
+    ],
+    "en": [
+     "boiling point",
+     "boiling temperature"
+    ],
+    "es": [
+     "punto de ebullición",
+     "temperatura de ebullición"
+    ]
+   }
   },
   {
    "id": "densidadeKgm3",
@@ -56,7 +137,26 @@
    "sinonimos": [
     "densidade",
     "massa especifica"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Densidade",
+    "en": "Density",
+    "es": "Densidad"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "densidade",
+     "massa especifica"
+    ],
+    "en": [
+     "density",
+     "specific mass"
+    ],
+    "es": [
+     "densidad",
+     "masa específica"
+    ]
+   }
   },
   {
    "id": "eletronegatividade",
@@ -66,7 +166,23 @@
    "unidade": null,
    "sinonimos": [
     "eletronegatividade"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Eletronegatividade",
+    "en": "Electronegativity (Pauling)",
+    "es": "Electronegatividad (Pauling)"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "eletronegatividade"
+    ],
+    "en": [
+     "electronegativity"
+    ],
+    "es": [
+     "electronegatividad"
+    ]
+   }
   },
   {
    "id": "raioAtomicoPm",
@@ -77,7 +193,26 @@
    "sinonimos": [
     "raio atomico",
     "raio"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "Raio atômico",
+    "en": "Atomic radius (van der Waals)",
+    "es": "Radio atómico (van der Waals)"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "raio atomico",
+     "raio"
+    ],
+    "en": [
+     "atomic radius",
+     "van der waals radius"
+    ],
+    "es": [
+     "radio atómico",
+     "radio de van der waals"
+    ]
+   }
   },
   {
    "id": "xlogp",
@@ -89,7 +224,27 @@
     "xlogp",
     "logp",
     "lipofilicidade"
-   ]
+   ],
+   "rotulos": {
+    "pt-BR": "XLogP",
+    "en": "XLogP",
+    "es": "XLogP"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "xlogp",
+     "logp",
+     "lipofilicidade"
+    ],
+    "en": [
+     "xlogp",
+     "logp"
+    ],
+    "es": [
+     "xlogp",
+     "logp"
+    ]
+   }
   }
  ],
  "unidades": [

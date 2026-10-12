@@ -4,6 +4,12 @@
   "simbolo": "H",
   "nome": "Hidrogênio",
   "nomeEn": "Hydrogen",
+  "nomes": {
+   "pt-BR": "Hidrogênio",
+   "en": "Hydrogen",
+   "es": "hidrógeno",
+   "de": "Wasserstoff"
+  },
   "massaAtomica": 1.008,
   "massaAtomicaIncerteza": null,
   "grupo": 1,
@@ -41,6 +47,12 @@
   "simbolo": "He",
   "nome": "Hélio",
   "nomeEn": "Helium",
+  "nomes": {
+   "pt-BR": "Hélio",
+   "en": "Helium",
+   "es": "helio",
+   "de": "Helium"
+  },
   "massaAtomica": 4.0026,
   "massaAtomicaIncerteza": null,
   "grupo": 18,
@@ -74,6 +86,12 @@
   "simbolo": "C",
   "nome": "Carbono",
   "nomeEn": "Carbon",
+  "nomes": {
+   "pt-BR": "Carbono",
+   "en": "Carbon",
+   "es": "carbono",
+   "de": "Kohlenstoff"
+  },
   "massaAtomica": 12.011,
   "massaAtomicaIncerteza": null,
   "grupo": 14,
@@ -114,6 +132,12 @@
   "simbolo": "N",
   "nome": "Nitrogênio",
   "nomeEn": "Nitrogen",
+  "nomes": {
+   "pt-BR": "Nitrogênio",
+   "en": "Nitrogen",
+   "es": "nitrógeno",
+   "de": "Stickstoff"
+  },
   "massaAtomica": 14.007,
   "massaAtomicaIncerteza": null,
   "grupo": 15,
@@ -156,6 +180,12 @@
   "simbolo": "O",
   "nome": "Oxigênio",
   "nomeEn": "Oxygen",
+  "nomes": {
+   "pt-BR": "Oxigênio",
+   "en": "Oxygen",
+   "es": "oxígeno",
+   "de": "Sauerstoff"
+  },
   "massaAtomica": 15.999,
   "massaAtomicaIncerteza": null,
   "grupo": 16,
@@ -196,6 +226,12 @@
   "simbolo": "F",
   "nome": "Flúor",
   "nomeEn": "Fluorine",
+  "nomes": {
+   "pt-BR": "Flúor",
+   "en": "Fluorine",
+   "es": "flúor",
+   "de": "Fluor"
+  },
   "massaAtomica": 18.998,
   "massaAtomicaIncerteza": null,
   "grupo": 17,
@@ -232,6 +268,12 @@
   "simbolo": "Na",
   "nome": "Sódio",
   "nomeEn": "Sodium",
+  "nomes": {
+   "pt-BR": "Sódio",
+   "en": "Sodium",
+   "es": "sodio",
+   "de": "Natrium"
+  },
   "massaAtomica": 22.99,
   "massaAtomicaIncerteza": null,
   "grupo": 1,
@@ -269,6 +311,12 @@
   "simbolo": "S",
   "nome": "Enxofre",
   "nomeEn": "Sulfur",
+  "nomes": {
+   "pt-BR": "Enxofre",
+   "en": "Sulfur",
+   "es": "azufre",
+   "de": "Schwefel"
+  },
   "massaAtomica": 32.06,
   "massaAtomicaIncerteza": null,
   "grupo": 16,
@@ -308,6 +356,12 @@
   "simbolo": "Cl",
   "nome": "Cloro",
   "nomeEn": "Chlorine",
+  "nomes": {
+   "pt-BR": "Cloro",
+   "en": "Chlorine",
+   "es": "cloro",
+   "de": "Chlor"
+  },
   "massaAtomica": 35.45,
   "massaAtomicaIncerteza": null,
   "grupo": 17,
@@ -351,6 +405,12 @@
   "simbolo": "Ca",
   "nome": "Cálcio",
   "nomeEn": "Calcium",
+  "nomes": {
+   "pt-BR": "Cálcio",
+   "en": "Calcium",
+   "es": "calcio",
+   "de": "Calcium"
+  },
   "massaAtomica": 40.078,
   "massaAtomicaIncerteza": null,
   "grupo": 2,
@@ -387,6 +447,12 @@
   "simbolo": "Fe",
   "nome": "Ferro",
   "nomeEn": "Iron",
+  "nomes": {
+   "pt-BR": "Ferro",
+   "en": "Iron",
+   "es": "hierro",
+   "de": "Eisen"
+  },
   "massaAtomica": 55.845,
   "massaAtomicaIncerteza": null,
   "grupo": 8,
@@ -426,6 +492,12 @@
   "simbolo": "Cu",
   "nome": "Cobre",
   "nomeEn": "Copper",
+  "nomes": {
+   "pt-BR": "Cobre",
+   "en": "Copper",
+   "es": "cobre",
+   "de": "Kupfer"
+  },
   "massaAtomica": 63.546,
   "massaAtomicaIncerteza": null,
   "grupo": 11,
@@ -461,6 +533,12 @@
   "simbolo": "Au",
   "nome": "Ouro",
   "nomeEn": "Gold",
+  "nomes": {
+   "pt-BR": "Ouro",
+   "en": "Gold",
+   "es": "oro",
+   "de": "Gold"
+  },
   "massaAtomica": 196.97,
   "massaAtomicaIncerteza": null,
   "grupo": 11,
@@ -497,6 +575,12 @@
   "simbolo": "Hg",
   "nome": "Mercúrio",
   "nomeEn": "Mercury",
+  "nomes": {
+   "pt-BR": "Mercúrio",
+   "en": "Mercury",
+   "es": "mercurio",
+   "de": "Quecksilber"
+  },
   "massaAtomica": 200.59,
   "massaAtomicaIncerteza": null,
   "grupo": 12,

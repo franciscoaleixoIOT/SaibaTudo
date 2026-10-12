@@ -4,6 +4,12 @@
   "simbolo": "H",
   "nome": "Hidrogênio",
   "nomeEn": "Hydrogen",
+  "nomes": {
+   "pt-BR": "Hidrogênio",
+   "en": "Hydrogen",
+   "es": "hidrógeno",
+   "de": "Wasserstoff"
+  },
   "massaAtomica": 1.008,
   "grupo": 1,
   "periodo": 1,
@@ -46,6 +52,12 @@
   "simbolo": "C",
   "nome": "Carbono",
   "nomeEn": "Carbon",
+  "nomes": {
+   "pt-BR": "Carbono",
+   "en": "Carbon",
+   "es": "carbono",
+   "de": "Kohlenstoff"
+  },
   "massaAtomica": 12.011,
   "grupo": 14,
   "periodo": 2,
@@ -89,6 +101,12 @@
   "simbolo": "N",
   "nome": "Nitrogênio",
   "nomeEn": "Nitrogen",
+  "nomes": {
+   "pt-BR": "Nitrogênio",
+   "en": "Nitrogen",
+   "es": "nitrógeno",
+   "de": "Stickstoff"
+  },
   "massaAtomica": 14.007,
   "grupo": 15,
   "periodo": 2,
@@ -136,6 +154,12 @@
   "simbolo": "O",
   "nome": "Oxigênio",
   "nomeEn": "Oxygen",
+  "nomes": {
+   "pt-BR": "Oxigênio",
+   "en": "Oxygen",
+   "es": "oxígeno",
+   "de": "Sauerstoff"
+  },
   "massaAtomica": 15.999,
   "grupo": 16,
   "periodo": 2,
@@ -181,6 +205,12 @@
   "simbolo": "Na",
   "nome": "Sódio",
   "nomeEn": "Sodium",
+  "nomes": {
+   "pt-BR": "Sódio",
+   "en": "Sodium",
+   "es": "sodio",
+   "de": "Natrium"
+  },
   "massaAtomica": 22.99,
   "grupo": 1,
   "periodo": 3,
@@ -223,6 +253,12 @@
   "simbolo": "S",
   "nome": "Enxofre",
   "nomeEn": "Sulfur",
+  "nomes": {
+   "pt-BR": "Enxofre",
+   "en": "Sulfur",
+   "es": "azufre",
+   "de": "Schwefel"
+  },
   "massaAtomica": 32.06,
   "grupo": 16,
   "periodo": 3,
@@ -263,6 +299,12 @@
   "simbolo": "Cl",
   "nome": "Cloro",
   "nomeEn": "Chlorine",
+  "nomes": {
+   "pt-BR": "Cloro",
+   "en": "Chlorine",
+   "es": "cloro",
+   "de": "Chlor"
+  },
   "massaAtomica": 35.45,
   "grupo": 17,
   "periodo": 3,
@@ -308,6 +350,12 @@
   "simbolo": "Ca",
   "nome": "Cálcio",
   "nomeEn": "Calcium",
+  "nomes": {
+   "pt-BR": "Cálcio",
+   "en": "Calcium",
+   "es": "calcio",
+   "de": "Calcium"
+  },
   "massaAtomica": 40.078,
   "grupo": 2,
   "periodo": 4,
@@ -348,6 +396,12 @@
   "simbolo": "Fe",
   "nome": "Ferro",
   "nomeEn": "Iron",
+  "nomes": {
+   "pt-BR": "Ferro",
+   "en": "Iron",
+   "es": "hierro",
+   "de": "Eisen"
+  },
   "massaAtomica": 55.845,
   "grupo": 8,
   "periodo": 4,
@@ -386,6 +440,12 @@
   "simbolo": "Cu",
   "nome": "Cobre",
   "nomeEn": "Copper",
+  "nomes": {
+   "pt-BR": "Cobre",
+   "en": "Copper",
+   "es": "cobre",
+   "de": "Kupfer"
+  },
   "massaAtomica": 63.546,
   "grupo": 11,
   "periodo": 4,

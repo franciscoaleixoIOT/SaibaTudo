@@ -9,6 +9,19 @@
    "H2O",
    "óxido de hidrogênio"
   ],
+  "nomes": {
+   "pt-BR": "Água",
+   "en": "water",
+   "es": "agua"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "dihydrogen monoxide"
+   ],
+   "es": [
+    "óxido de hidrógeno"
+   ]
+  },
   "formula": "H2O",
   "formulaHill": "H2O",
   "massaMolar": 18.015,
@@ -56,6 +69,21 @@
    "anidrido carbônico",
    "carbon dioxide"
   ],
+  "nomes": {
+   "pt-BR": "Dióxido de carbono",
+   "en": "carbon dioxide",
+   "es": "dióxido de carbono"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "carbonic anhydride",
+    "carbonic acid gas"
+   ],
+   "es": [
+    "anhídrido carbónico",
+    "gas carbónico"
+   ]
+  },
   "formula": "CO2",
   "formulaHill": "CO2",
   "massaMolar": 44.009,
@@ -111,6 +139,23 @@
    "NaCl",
    "halita"
   ],
+  "nomes": {
+   "pt-BR": "Cloreto de sódio",
+   "en": "sodium chloride",
+   "es": "cloruro de sodio"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "table salt",
+    "halite",
+    "rock salt"
+   ],
+   "es": [
+    "sal de mesa",
+    "sal común",
+    "halita"
+   ]
+  },
   "formula": "NaCl",
   "formulaHill": "ClNa",
   "massaMolar": 58.44,
@@ -155,6 +200,21 @@
    "cloreto de hidrogênio",
    "hydrogen chloride"
   ],
+  "nomes": {
+   "pt-BR": "Ácido clorídrico",
+   "en": "hydrogen chloride",
+   "es": "cloruro de hidrógeno"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "hydrochloric acid",
+    "muriatic acid"
+   ],
+   "es": [
+    "ácido clorhídrico",
+    "ácido muriático"
+   ]
+  },
   "formula": "HCl",
   "formulaHill": "ClH",
   "massaMolar": 36.46,
@@ -213,6 +273,21 @@
    "sodium hydroxide",
    "lixívia"
   ],
+  "nomes": {
+   "pt-BR": "Hidróxido de sódio",
+   "en": "sodium hydroxide",
+   "es": "hidróxido de sodio"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "caustic soda",
+    "lye"
+   ],
+   "es": [
+    "sosa cáustica",
+    "soda cáustica"
+   ]
+  },
   "formula": "NaOH",
   "formulaHill": "HNaO",
   "massaMolar": 39.997,
@@ -268,6 +343,19 @@
    "methane",
    "gás do lixo"
   ],
+  "nomes": {
+   "pt-BR": "Metano",
+   "en": "methane",
+   "es": "metano"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "marsh gas"
+   ],
+   "es": [
+    "gas de los pantanos"
+   ]
+  },
   "formula": "CH4",
   "formulaHill": "CH4",
   "massaMolar": 16.043,
@@ -328,6 +416,20 @@
    "ethyl alcohol",
    "C2H5OH"
   ],
+  "nomes": {
+   "pt-BR": "Etanol",
+   "en": "ethanol",
+   "es": "etanol"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "ethyl alcohol",
+    "grain alcohol"
+   ],
+   "es": [
+    "alcohol etílico"
+   ]
+  },
   "formula": "C2H6O",
   "formulaHill": "C2H6O",
   "massaMolar": 46.07,
@@ -395,6 +497,22 @@
    "D-glicose",
    "D-glucose"
   ],
+  "nomes": {
+   "pt-BR": "Glicose",
+   "en": "glucose",
+   "es": "glucosa"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "dextrose",
+    "grape sugar",
+    "blood sugar"
+   ],
+   "es": [
+    "dextrosa",
+    "azúcar de uva"
+   ]
+  },
   "formula": "C6H12O6",
   "formulaHill": "C6H12O6",
   "massaMolar": 180.16,
@@ -440,6 +558,21 @@
    "aspirin",
    "acetylsalicylic acid"
   ],
+  "nomes": {
+   "pt-BR": "Ácido acetilsalicílico",
+   "en": "acetylsalicylic acid",
+   "es": "ácido acetilsalicílico"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "aspirin",
+    "ASA"
+   ],
+   "es": [
+    "aspirina",
+    "AAS"
+   ]
+  },
   "formula": "C9H8O4",
   "formulaHill": "C9H8O4",
   "massaMolar": 180.16,
@@ -499,6 +632,21 @@
    "vitríolo",
    "ácido de bateria"
   ],
+  "nomes": {
+   "pt-BR": "Ácido sulfúrico",
+   "en": "sulfuric acid",
+   "es": "ácido sulfúrico"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "oil of vitriol",
+    "battery acid",
+    "sulphuric acid"
+   ],
+   "es": [
+    "aceite de vitriolo"
+   ]
+  },
   "formula": "H2SO4",
   "formulaHill": "H2O4S",
   "massaMolar": 98.08,
@@ -553,6 +701,19 @@
    "nh3",
    "ammonia"
   ],
+  "nomes": {
+   "pt-BR": "Amônia",
+   "en": "ammonia",
+   "es": "amoníaco"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "azane"
+   ],
+   "es": [
+    "amoniaco"
+   ]
+  },
   "formula": "NH3",
   "formulaHill": "H3N",
   "massaMolar": 17.031,
@@ -596,6 +757,20 @@
    "benzene",
    "C6H6"
   ],
+  "nomes": {
+   "pt-BR": "Benzeno",
+   "en": "benzene",
+   "es": "benceno"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "benzol",
+    "cyclohexatriene"
+   ],
+   "es": [
+    "benzol"
+   ]
+  },
   "formula": "C6H6",
   "formulaHill": "C6H6",
   "massaMolar": 78.11,
@@ -664,6 +839,21 @@
    "copper sulfate",
    "sulfato de cobre"
   ],
+  "nomes": {
+   "pt-BR": "Sulfato de cobre(II)",
+   "en": "copper(II) sulfate",
+   "es": "sulfato de cobre(II)"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "cupric sulfate",
+    "blue vitriol"
+   ],
+   "es": [
+    "sulfato cúprico",
+    "vitriolo azul"
+   ]
+  },
   "formula": "CuSO4",
   "formulaHill": "CuO4S",
   "massaMolar": 159.6,
@@ -720,6 +910,22 @@
    "calcita",
    "calcium carbonate"
   ],
+  "nomes": {
+   "pt-BR": "Carbonato de cálcio",
+   "en": "calcium carbonate",
+   "es": "carbonato de calcio"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "limestone",
+    "calcite",
+    "chalk"
+   ],
+   "es": [
+    "caliza",
+    "calcita"
+   ]
+  },
   "formula": "CaCO3",
   "formulaHill": "CCaO3",
   "massaMolar": 100.09,
@@ -761,6 +967,21 @@
    "ca(oh)2",
    "calcium hydroxide"
   ],
+  "nomes": {
+   "pt-BR": "Hidróxido de cálcio",
+   "en": "calcium hydroxide",
+   "es": "hidróxido de calcio"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "slaked lime",
+    "hydrated lime"
+   ],
+   "es": [
+    "cal apagada",
+    "cal hidratada"
+   ]
+  },
   "formula": "Ca(OH)2",
   "formulaHill": "CaH2O2",
   "massaMolar": 74.09,
@@ -815,6 +1036,21 @@
    "acetone",
    "removedor de esmalte"
   ],
+  "nomes": {
+   "pt-BR": "Acetona",
+   "en": "acetone",
+   "es": "acetona"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "propanone",
+    "dimethyl ketone"
+   ],
+   "es": [
+    "propanona",
+    "dimetilcetona"
+   ]
+  },
   "formula": "C3H6O",
   "formulaHill": "C3H6O",
   "massaMolar": 58.08,
@@ -878,6 +1114,20 @@
    "acetic acid",
    "ch3cooh"
   ],
+  "nomes": {
+   "pt-BR": "Ácido acético",
+   "en": "acetic acid",
+   "es": "ácido acético"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "ethanoic acid",
+    "glacial acetic acid"
+   ],
+   "es": [
+    "ácido etanoico"
+   ]
+  },
   "formula": "C2H4O2",
   "formulaHill": "C2H4O2",
   "massaMolar": 60.05,
@@ -936,6 +1186,20 @@
    "caffeine",
    "trimetilxantina"
   ],
+  "nomes": {
+   "pt-BR": "Cafeína",
+   "en": "caffeine",
+   "es": "cafeína"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "theine",
+    "guaranine"
+   ],
+   "es": [
+    "teína"
+   ]
+  },
   "formula": "C8H10N4O2",
   "formulaHill": "C8H10N4O2",
   "massaMolar": 194.19,
@@ -993,6 +1257,20 @@
    "oxygen",
    "dioxygen"
   ],
+  "nomes": {
+   "pt-BR": "Oxigênio (gás)",
+   "en": "dioxygen",
+   "es": "dioxígeno"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "molecular oxygen",
+    "oxygen gas"
+   ],
+   "es": [
+    "oxígeno molecular"
+   ]
+  },
   "formula": "O2",
   "formulaHill": "O2",
   "massaMolar": 31.998,
@@ -1048,6 +1326,19 @@
    "ferric sulfate",
    "iron(III) sulfate"
   ],
+  "nomes": {
+   "pt-BR": "Sulfato de ferro(III)",
+   "en": "iron(III) sulfate",
+   "es": "sulfato de hierro(III)"
+  },
+  "sinonimosPorIdioma": {
+   "en": [
+    "ferric sulfate"
+   ],
+   "es": [
+    "sulfato férrico"
+   ]
+  },
   "formula": "Fe2(SO4)3",
   "formulaHill": "Fe2O12S3",
   "massaMolar": 399.9,

@@ -65,6 +65,59 @@ class WikimediaTest(unittest.TestCase):
         self.assertEqual(r["entidades"], {"elementos": ["H"], "compostos": []})
         self.assertEqual(r["fontes"][0]["licenca"], "CC BY-SA 4.0")
 
+    def test_registro_em_outro_idioma(self):
+        pg = {"title": "Oxygen", "pageid": 22303, "fullurl": "https://en.wikipedia.org/wiki/Oxygen", "revisions": [{"revid": 1234}],
+              "extract": "Oxygen is a chemical element with the symbol O. " * 12}
+        regs, _ = WM.registros_pagina(pg, "en.wikipedia.org", WM.NOME_WP_POR_IDIOMA["en"], "wikipedia-en", "2026-10-10", usados=set(),
+                                      entidades={"elementos": ["O"], "compostos": []}, idioma="en", extra={"tipo": "elemento", "tema": "t1"})
+        r = regs[0]
+        self.assertEqual(r["id"], "wikipedia-en-oxygen-001")
+        self.assertEqual(r["_chave"], "oxygen")
+        self.assertEqual((r["fonte"], r["idioma"], r["licenca"]), ("Wikipedia (en)", "en", "CC BY-SA 4.0"))
+        self.assertEqual(r["url"], "https://en.wikipedia.org/w/index.php?title=Oxygen&oldid=1234")
+        self.assertEqual(r["urlArtigo"], "https://en.wikipedia.org/wiki/Oxygen")
+        self.assertIsNone(r["textoPt"])
+        self.assertIn("sem tradução", r["traducao"])
+        self.assertEqual(r["secao"], "Introduction")
+        self.assertEqual(r["tema"], "t1")
+        self.assertEqual(r["fontes"][0]["url"], "https://en.wikipedia.org/wiki/Oxygen")
+        self.assertEqual(WM.api_wikipedia("de"), "https://de.wikipedia.org/w/api.php")
+        self.assertEqual(WM.api_wikipedia("pt-BR"), WM.API_WP)
+
+    def test_coleta_em_outro_idioma_usa_sitelinks(self):
+        """Sem rede: `paginas_intro` é substituída por um dicionário fixo; a seleção vem dos títulos por QID."""
+        extract = "Sauerstoff ist ein chemisches Element mit dem Symbol O. " * 10
+        paginas = {"Sauerstoff": {"title": "Sauerstoff", "pageid": 1, "revisions": [{"revid": 9}], "extract": extract},
+                   "Wasser": {"title": "Wasser", "pageid": 2, "revisions": [{"revid": 8}], "extract": extract.replace("Sauerstoff", "Wasser")},
+                   "Mol": {"title": "Mol", "pageid": 3, "revisions": [{"revid": 7}], "extract": extract.replace("Sauerstoff", "Das Mol")},
+                   "Begriffsklärung": {"title": "Begriffsklärung", "pageid": 4, "pageprops": {"disambiguation": ""}, "extract": extract}}
+        pedidos = []
+        orig = WM.paginas_intro
+        WM.paginas_intro = lambda http, titulos, idioma="pt-BR": (pedidos.append((idioma, list(titulos))), {t: paginas.get(t) for t in titulos})[1]
+        try:
+            elementos = [{"z": 8, "simbolo": "O", "nome": "Oxigênio", "nomeEn": "Oxygen", "wikidata": "Q629", "nomes": {"de": "Sauerstoff"}},
+                         {"z": 1, "simbolo": "H", "nome": "Hidrogênio", "nomeEn": "Hydrogen", "wikidata": "Q556"}]
+            compostos = [{"cid": 962, "nome": "Água", "formula": "H2O", "nomes": {"de": "Wasser"}}, {"cid": 5, "nome": "Z", "formula": "Z"}]
+            meta = {962: {"qid": "Q283", "sl": 200, "artigos": {"de": "Wasser"}}, 5: {"qid": "Q5", "sl": 1, "artigos": {}}}
+            conceitos = [{"qid": "Q41509", "chave": "mol", "tituloPt": "Mol"}, {"qid": "Q9", "chave": "x", "tituloPt": "X"}]
+            titulos = {"Q629": "Sauerstoff", "Q283": "Wasser", "Q41509": "Mol", "Q9": "Begriffsklärung"}
+            temas = {"Q41509": {"tema": "mol-massa-molar", "temas": ["mol-massa-molar"]}}
+            regs, st = WM.coletar_wikipedia_idioma(None, "de", elementos, compostos, meta, conceitos, titulos, temas, "2026-10-10", log=lambda m: None)
+        finally:
+            WM.paginas_intro = orig
+        self.assertEqual(pedidos, [("de", ["Begriffsklärung", "Mol", "Sauerstoff", "Wasser"])])  # títulos ordenados, um lote, no wiki certo
+        self.assertEqual((st["elementos"], st["compostos"], st["conceitos"]), (1, 1, 1))
+        self.assertEqual(st["semArtigoNoIdioma"], 1)  # Q556 sem sitelink de
+        self.assertEqual([d["qid"] for d in st["descartados"]], ["Q9"])  # desambiguação
+        por_id = {r["id"]: r for r in regs}
+        self.assertEqual(sorted(por_id), ["wikipedia-de-mol-001", "wikipedia-de-sauerstoff-001", "wikipedia-de-wasser-001"])
+        self.assertEqual(por_id["wikipedia-de-sauerstoff-001"]["entidades"], {"elementos": ["O"], "compostos": []})
+        self.assertEqual(por_id["wikipedia-de-sauerstoff-001"]["palavrasChave"], ["sauerstoff", "O"])
+        self.assertEqual(por_id["wikipedia-de-wasser-001"]["entidades"], {"elementos": [], "compostos": [962]})
+        self.assertEqual(por_id["wikipedia-de-mol-001"]["tema"], "mol-massa-molar")
+        self.assertEqual(por_id["wikipedia-de-mol-001"]["tipo"], "conceito")
+        self.assertTrue(all(r["idioma"] == "de" and r["fonte"] == "Wikipedia (de)" and r["textoPt"] is None for r in regs))
+
     def test_slug_unico(self):
         usados = set()
         a, _ = WM.registros_pagina(PAGINA, "pt.wikipedia.org", WM.NOME_WP, "wikipedia-pt", "2026-10-10", usados=usados)

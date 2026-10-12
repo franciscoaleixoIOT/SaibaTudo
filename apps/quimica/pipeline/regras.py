@@ -8,6 +8,7 @@ e o IUPAC Green Book; o texto das regras de ensino é nosso. Nenhum trecho de ob
 Fatores: valor da unidade expresso na unidade base da grandeza (base = valor 1).
 """
 import quimica_util as Q
+from common import IDIOMAS
 
 SCHEMA = 1
 
@@ -170,7 +171,109 @@ PROPRIEDADES = {
 }
 
 
-def montar(hoje=None):
+# Rótulos e sinônimos das propriedades em en/es/de/fr (docs/I18N.md §8: termos fixos de química, não são texto criativo; a
+# tradução inicial é de agente e fica marcada "revisao": "pendente" em `propriedades.revisao`). pt-BR vem de PROPRIEDADES.
+# id -> {idioma: (rótulo, [sinônimos])}
+PROPRIEDADES_I18N = {
+    "numeroAtomico": {"en": ("Atomic number", ["atomic number", "z"]), "es": ("Número atómico", ["número atómico", "z"]),
+                      "de": ("Ordnungszahl", ["ordnungszahl", "kernladungszahl", "z"]), "fr": ("Numéro atomique", ["numéro atomique", "z"])},
+    "simbolo": {"en": ("Symbol", ["symbol"]), "es": ("Símbolo", ["símbolo"]), "de": ("Symbol", ["symbol", "elementsymbol"]),
+                "fr": ("Symbole", ["symbole"])},
+    "massaAtomica": {"en": ("Atomic mass", ["atomic mass", "atomic weight"]), "es": ("Masa atómica", ["masa atómica", "peso atómico"]),
+                     "de": ("Atommasse", ["atommasse", "atomgewicht"]), "fr": ("Masse atomique", ["masse atomique", "poids atomique"])},
+    "grupo": {"en": ("Group", ["group", "family"]), "es": ("Grupo", ["grupo", "familia"]), "de": ("Gruppe", ["gruppe", "hauptgruppe"]),
+              "fr": ("Groupe", ["groupe", "famille"])},
+    "periodo": {"en": ("Period", ["period"]), "es": ("Período", ["período", "periodo"]), "de": ("Periode", ["periode"]),
+                "fr": ("Période", ["période"])},
+    "bloco": {"en": ("Block", ["block"]), "es": ("Bloque", ["bloque"]), "de": ("Block", ["block"]), "fr": ("Bloc", ["bloc"])},
+    "categoria": {"en": ("Category", ["category", "classification"]), "es": ("Categoría", ["categoría", "clasificación"]),
+                  "de": ("Kategorie", ["kategorie", "einteilung"]), "fr": ("Catégorie", ["catégorie", "classification"])},
+    "configuracaoEletronica": {"en": ("Electron configuration", ["electron configuration", "electronic configuration"]),
+                               "es": ("Configuración electrónica", ["configuración electrónica"]),
+                               "de": ("Elektronenkonfiguration", ["elektronenkonfiguration"]),
+                               "fr": ("Configuration électronique", ["configuration électronique"])},
+    "eletronegatividade": {"en": ("Electronegativity (Pauling)", ["electronegativity"]), "es": ("Electronegatividad (Pauling)", ["electronegatividad"]),
+                           "de": ("Elektronegativität (Pauling)", ["elektronegativität"]), "fr": ("Électronégativité (Pauling)", ["électronégativité"])},
+    "raioAtomicoPm": {"en": ("Atomic radius (van der Waals)", ["atomic radius", "van der waals radius"]),
+                      "es": ("Radio atómico (van der Waals)", ["radio atómico", "radio de van der waals"]),
+                      "de": ("Atomradius (Van-der-Waals)", ["atomradius", "van-der-waals-radius"]),
+                      "fr": ("Rayon atomique (van der Waals)", ["rayon atomique", "rayon de van der waals"])},
+    "afinidadeEletronicaKJmol": {"en": ("Electron affinity", ["electron affinity"]), "es": ("Afinidad electrónica", ["afinidad electrónica"]),
+                                 "de": ("Elektronenaffinität", ["elektronenaffinität"]), "fr": ("Affinité électronique", ["affinité électronique"])},
+    "energiaIonizacaoKJmol": {"en": ("Ionization energy", ["ionization energy", "ionisation energy", "ionization potential"]),
+                              "es": ("Energía de ionización", ["energía de ionización", "potencial de ionización"]),
+                              "de": ("Ionisierungsenergie", ["ionisierungsenergie", "ionisationsenergie"]),
+                              "fr": ("Énergie d'ionisation", ["énergie d'ionisation", "potentiel d'ionisation"])},
+    "pontoFusaoK": {"en": ("Melting point", ["melting point", "melting temperature"]), "es": ("Punto de fusión", ["punto de fusión", "temperatura de fusión"]),
+                    "de": ("Schmelzpunkt", ["schmelzpunkt", "schmelztemperatur"]), "fr": ("Point de fusion", ["point de fusion", "température de fusion"])},
+    "pontoEbulicaoK": {"en": ("Boiling point", ["boiling point", "boiling temperature"]), "es": ("Punto de ebullición", ["punto de ebullición", "temperatura de ebullición"]),
+                       "de": ("Siedepunkt", ["siedepunkt", "siedetemperatur"]), "fr": ("Point d'ébullition", ["point d'ébullition", "température d'ébullition"])},
+    "densidadeKgm3": {"en": ("Density", ["density", "specific mass"]), "es": ("Densidad", ["densidad", "masa específica"]),
+                      "de": ("Dichte", ["dichte"]), "fr": ("Densité", ["densité", "masse volumique"])},
+    "estadoPadrao": {"en": ("Standard physical state", ["physical state", "standard state", "state of matter"]),
+                     "es": ("Estado físico estándar", ["estado físico", "estado estándar"]),
+                     "de": ("Aggregatzustand (Standardbedingungen)", ["aggregatzustand", "standardzustand"]),
+                     "fr": ("État physique standard", ["état physique", "état standard"])},
+    "estadosOxidacao": {"en": ("Oxidation states", ["oxidation states", "oxidation numbers"]), "es": ("Estados de oxidación", ["estados de oxidación", "números de oxidación"]),
+                        "de": ("Oxidationsstufen", ["oxidationsstufen", "oxidationszahlen"]), "fr": ("États d'oxydation", ["états d'oxydation", "nombres d'oxydation"])},
+    "descoberta": {"en": ("Discovery", ["discovery", "who discovered", "when was it discovered", "discovered"]),
+                   "es": ("Descubrimiento", ["descubrimiento", "quién descubrió", "cuándo fue descubierto", "descubrió"]),
+                   "de": ("Entdeckung", ["entdeckung", "wer entdeckte", "wann wurde entdeckt", "entdeckt"]),
+                   "fr": ("Découverte", ["découverte", "qui a découvert", "quand a été découvert", "découvert"])},
+    "massaMolar": {"en": ("Molar mass", ["molar mass", "molecular mass", "molecular weight"]), "es": ("Masa molar", ["masa molar", "masa molecular", "peso molecular"]),
+                   "de": ("Molare Masse", ["molare masse", "molmasse", "molekülmasse", "molekulargewicht"]),
+                   "fr": ("Masse molaire", ["masse molaire", "masse moléculaire", "poids moléculaire"])},
+    "massaExata": {"en": ("Exact mass (monoisotopic)", ["exact mass", "monoisotopic mass"]), "es": ("Masa exacta (monoisotópica)", ["masa exacta", "masa monoisotópica"]),
+                   "de": ("Exakte Masse (monoisotopisch)", ["exakte masse", "monoisotopische masse"]), "fr": ("Masse exacte (monoisotopique)", ["masse exacte", "masse monoisotopique"])},
+    "formula": {"en": ("Formula", ["formula", "molecular formula", "chemical formula"]), "es": ("Fórmula", ["fórmula", "fórmula molecular", "fórmula química"]),
+                "de": ("Formel", ["formel", "summenformel", "molekülformel", "chemische formel"]), "fr": ("Formule", ["formule", "formule moléculaire", "formule chimique"])},
+    "formulaHill": {"en": ("Hill formula", ["hill formula"]), "es": ("Fórmula de Hill", ["fórmula de hill"]), "de": ("Hill-Formel", ["hill-formel"]),
+                    "fr": ("Formule de Hill", ["formule de hill"])},
+    "smiles": {"en": ("SMILES", ["smiles"]), "es": ("SMILES", ["smiles"]), "de": ("SMILES", ["smiles"]), "fr": ("SMILES", ["smiles"])},
+    "inchiKey": {"en": ("InChIKey", ["inchikey"]), "es": ("InChIKey", ["inchikey"]), "de": ("InChIKey", ["inchikey"]), "fr": ("InChIKey", ["inchikey"])},
+    "nomeIupac": {"en": ("IUPAC name (PubChem)", ["iupac name", "iupac nomenclature"]), "es": ("Nombre IUPAC (PubChem)", ["nombre iupac", "nomenclatura iupac"]),
+                  "de": ("IUPAC-Name (PubChem)", ["iupac-name", "iupac-nomenklatur"]), "fr": ("Nom IUPAC (PubChem)", ["nom iupac", "nomenclature iupac"])},
+    "cas": {"en": ("CAS number", ["cas", "cas number", "cas registry number"]), "es": ("Número CAS", ["cas", "número cas"]),
+            "de": ("CAS-Nummer", ["cas", "cas-nummer"]), "fr": ("Numéro CAS", ["cas", "numéro cas"])},
+    "xlogp": {"en": ("XLogP", ["xlogp", "logp"]), "es": ("XLogP", ["xlogp", "logp"]), "de": ("XLogP", ["xlogp", "logp"]), "fr": ("XLogP", ["xlogp", "logp"])},
+    "tpsa": {"en": ("Topological polar surface area (TPSA)", ["tpsa", "polar surface area"]), "es": ("Área de superficie polar topológica (TPSA)", ["tpsa"]),
+             "de": ("Topologische polare Oberfläche (TPSA)", ["tpsa"]), "fr": ("Surface polaire topologique (TPSA)", ["tpsa"])},
+    "doadoresH": {"en": ("Hydrogen bond donors", ["hydrogen bond donors", "h-bond donors"]), "es": ("Donantes de enlace de hidrógeno", ["donantes de hidrógeno"]),
+                  "de": ("Wasserstoffbrücken-Donatoren", ["wasserstoffbrückendonatoren", "h-donatoren"]), "fr": ("Donneurs de liaison hydrogène", ["donneurs d'hydrogène"])},
+    "aceptoresH": {"en": ("Hydrogen bond acceptors", ["hydrogen bond acceptors", "h-bond acceptors"]), "es": ("Aceptores de enlace de hidrógeno", ["aceptores de hidrógeno"]),
+                   "de": ("Wasserstoffbrücken-Akzeptoren", ["wasserstoffbrückenakzeptoren", "h-akzeptoren"]), "fr": ("Accepteurs de liaison hydrogène", ["accepteurs d'hydrogène"])},
+    "ligacoesRotaveis": {"en": ("Rotatable bonds", ["rotatable bonds"]), "es": ("Enlaces rotables", ["enlaces rotables"]),
+                         "de": ("Drehbare Bindungen", ["drehbare bindungen", "rotierbare bindungen"]), "fr": ("Liaisons rotatives", ["liaisons rotatives"])},
+    "carga": {"en": ("Charge", ["charge"]), "es": ("Carga", ["carga"]), "de": ("Ladung", ["ladung"]), "fr": ("Charge", ["charge"])},
+    "pictogramas_ghs": {"en": ("GHS pictograms (harmonised classification)", ["pictograms", "hazards"]),
+                        "es": ("Pictogramas GHS (clasificación armonizada)", ["pictogramas", "peligros"]),
+                        "de": ("GHS-Piktogramme (harmonisierte Einstufung)", ["piktogramme", "gefahren"]),
+                        "fr": ("Pictogrammes SGH (classification harmonisée)", ["pictogrammes", "dangers"])},
+    "frases_h": {"en": ("Hazard statements H (harmonised classification)", ["h statements", "hazard statements"]),
+                 "es": ("Indicaciones de peligro H (clasificación armonizada)", ["frases h", "indicaciones de peligro"]),
+                 "de": ("Gefahrenhinweise H (harmonisierte Einstufung)", ["h-sätze", "gefahrenhinweise"]),
+                 "fr": ("Mentions de danger H (classification harmonisée)", ["mentions h", "mentions de danger"])},
+    "palavra_sinal": {"en": ("GHS signal word", ["signal word"]), "es": ("Palabra de advertencia GHS", ["palabra de advertencia"]),
+                      "de": ("GHS-Signalwort", ["signalwort"]), "fr": ("Mention d'avertissement SGH", ["mention d'avertissement"])},
+}
+
+
+def propriedades(idiomas=None):
+    """Tabela `propriedades` do regras.json: campos de sempre (nome, unidade, origem, escopo, sinonimos — pt-BR) mais `rotulos`
+    e `sinonimosPorIdioma` ({idioma: ...}) para os idiomas pedidos (pt-BR sempre). Quem não tem tradução fica sem a chave."""
+    idiomas = [i for i in IDIOMAS if i in (idiomas or IDIOMAS) or i == "pt-BR"]
+    out = {}
+    for pid, (nome, un, orig, esc, sin) in PROPRIEDADES.items():
+        rot, sin_i = {"pt-BR": nome}, {"pt-BR": list(sin)}
+        for idioma in idiomas:
+            tr = PROPRIEDADES_I18N.get(pid, {}).get(idioma)
+            if tr:
+                rot[idioma], sin_i[idioma] = tr[0], list(tr[1])
+        out[pid] = {"nome": nome, "unidade": un, "origem": orig, "escopo": esc, "sinonimos": sin, "rotulos": rot, "sinonimosPorIdioma": sin_i}
+    return out
+
+
+def montar(hoje=None, idiomas=None):
     hoje = hoje or Q.hoje_iso()
     fontes = [
         Q.fonte("Autoria própria do SaibaTudo Química (regras de ensino de química geral)",
@@ -192,7 +295,7 @@ def montar(hoje=None):
         "acidosFortes": ACIDOS_FORTES,
         "basesFortes": BASES_FORTES,
         "nomenclatura": NOMENCLATURA,
-        "propriedades": {pid: {"nome": nome, "unidade": un, "origem": orig, "escopo": esc, "sinonimos": sin}
-                         for pid, (nome, un, orig, esc, sin) in PROPRIEDADES.items()},
+        "propriedades": propriedades(idiomas),
+        "propriedadesRevisao": {"pt-BR": "humana", **{i: "pendente" for i in IDIOMAS if i != "pt-BR" and i in (idiomas or IDIOMAS)}},
         "fontes": fontes,
     }

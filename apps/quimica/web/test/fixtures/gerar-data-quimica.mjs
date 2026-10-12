@@ -17,8 +17,11 @@ const OUT = join(aqui, 'data-quimica');
 rmSync(OUT, { recursive: true, force: true });
 
 const FIXTURE = { nome: 'Fixture de teste (valores de referência: PubChem Periodic Table)', url: 'https://pubchem.ncbi.nlm.nih.gov/periodic-table/', licenca: 'domínio público (NIH)', acessadoEm: '2026-10-10' };
+// nomes por idioma (docs/I18N.md §4): pt-BR = nome, en = nomeEn, es/de como no Wikidata (fixture com 2 idiomas além do inglês)
+const ES_EL = {"H": "hidrógeno", "He": "helio", "C": "carbono", "N": "nitrógeno", "O": "oxígeno", "F": "flúor", "Na": "sodio", "S": "azufre", "Cl": "cloro", "Ca": "calcio", "Fe": "hierro", "Cu": "cobre", "Au": "oro", "Hg": "mercurio"};
+const DE_EL = {"H": "Wasserstoff", "He": "Helium", "C": "Kohlenstoff", "N": "Stickstoff", "O": "Sauerstoff", "F": "Fluor", "Na": "Natrium", "S": "Schwefel", "Cl": "Chlor", "Ca": "Calcium", "Fe": "Eisen", "Cu": "Kupfer", "Au": "Gold", "Hg": "Quecksilber"};
 const el = (z, simbolo, nome, nomeEn, massaAtomica, grupo, periodo, bloco, categoria, configuracaoEletronica, o) => ({
-  z, simbolo, nome, nomeEn, massaAtomica, massaAtomicaIncerteza: null, grupo, periodo, bloco, categoria, configuracaoEletronica, ...o, fontes: [FIXTURE]
+  z, simbolo, nome, nomeEn, nomes: { 'pt-BR': nome, en: nomeEn, es: ES_EL[simbolo], de: DE_EL[simbolo] }, massaAtomica, massaAtomicaIncerteza: null, grupo, periodo, bloco, categoria, configuracaoEletronica, ...o, fontes: [FIXTURE]
 });
 const elementos = [
   el(1, 'H', 'Hidrogênio', 'Hydrogen', 1.008, 1, 1, 's', 'nao_metal', '1s1', { eletronegatividade: 2.2, raioAtomicoPm: 120, afinidadeEletronicaKJmol: 72.8, energiaIonizacaoKJmol: 1312.0, pontoFusaoK: 13.99, pontoEbulicaoK: 20.271, densidadeKgm3: 0.08988, estadoPadrao: 'gas', estadosOxidacao: [-1, 1], descoberta: { ano: 1766, por: 'Henry Cavendish' } }),
@@ -38,8 +41,12 @@ const elementos = [
 ];
 
 const PUBCHEM = (cid) => ({ nome: `PubChem CID ${cid} (fixture de teste)`, url: `https://pubchem.ncbi.nlm.nih.gov/compound/${cid}`, licenca: 'domínio público (NIH)', acessadoEm: '2026-10-10' });
+// cid -> [nome en, nome es, sinônimos en, sinônimos es] (rótulos e apelidos como no Wikidata; fixture)
+const NOMES_CO = {"962": ["water", "agua", ["dihydrogen monoxide"], ["óxido de hidrógeno"]], "280": ["carbon dioxide", "dióxido de carbono", ["carbonic anhydride", "carbonic acid gas"], ["anhídrido carbónico", "gas carbónico"]], "5234": ["sodium chloride", "cloruro de sodio", ["table salt", "halite", "rock salt"], ["sal de mesa", "sal común", "halita"]], "313": ["hydrogen chloride", "cloruro de hidrógeno", ["hydrochloric acid", "muriatic acid"], ["ácido clorhídrico", "ácido muriático"]], "14798": ["sodium hydroxide", "hidróxido de sodio", ["caustic soda", "lye"], ["sosa cáustica", "soda cáustica"]], "222": ["ammonia", "amoníaco", ["azane"], ["amoniaco"]], "297": ["methane", "metano", ["marsh gas"], ["gas de los pantanos"]], "702": ["ethanol", "etanol", ["ethyl alcohol", "grain alcohol"], ["alcohol etílico"]], "5793": ["glucose", "glucosa", ["dextrose", "grape sugar", "blood sugar"], ["dextrosa", "azúcar de uva"]], "176": ["acetic acid", "ácido acético", ["ethanoic acid", "glacial acetic acid"], ["ácido etanoico"]], "2244": ["acetylsalicylic acid", "ácido acetilsalicílico", ["aspirin", "ASA"], ["aspirina", "AAS"]], "241": ["benzene", "benceno", ["benzol", "cyclohexatriene"], ["benzol"]], "180": ["acetone", "acetona", ["propanone", "dimethyl ketone"], ["propanona", "dimetilcetona"]], "784": ["hydrogen peroxide", "peróxido de hidrógeno", ["dioxidane"], ["agua oxigenada"]], "1118": ["sulfuric acid", "ácido sulfúrico", ["oil of vitriol", "battery acid", "sulphuric acid"], ["aceite de vitriolo"]], "10112": ["calcium carbonate", "carbonato de calcio", ["limestone", "calcite", "chalk"], ["caliza", "calcita"]], "23665760": ["sodium hypochlorite", "hipoclorito de sodio", ["bleach", "liquid bleach"], ["lejía", "lavandina"]], "1176": ["urea", "urea", ["carbamide"], ["carbamida"]], "516892": ["sodium bicarbonate", "bicarbonato de sodio", ["baking soda", "sodium hydrogen carbonate"], ["bicarbonato sódico"]], "14833": ["iron(III) oxide", "óxido de hierro(III)", ["ferric oxide", "hematite"], ["óxido férrico", "hematita"]], "6371": ["phosgene", "fosgeno", ["carbonyl chloride", "carbonyl dichloride"], ["cloruro de carbonilo"]], "24462": ["copper(II) sulfate", "sulfato de cobre(II)", ["cupric sulfate", "blue vitriol"], ["sulfato cúprico", "vitriolo azul"]], "14777": ["calcium hydroxide", "hidróxido de calcio", ["slaked lime", "hydrated lime"], ["cal apagada", "cal hidratada"]], "2519": ["caffeine", "cafeína", ["theine", "guaranine"], ["teína"]], "977": ["dioxygen", "dioxígeno", ["molecular oxygen", "oxygen gas"], ["oxígeno molecular"]], "24826": ["iron(III) sulfate", "sulfato de hierro(III)", ["ferric sulfate"], ["sulfato férrico"]]};
 const co = (cid, nome, formula, formulaHill, massaMolar, smiles, inchiKey, cas, nomeIupac, extra = {}) => ({
-  cid, nome, ...extra, nomeIupac, sinonimos: extra.sinonimos ?? [], formula, formulaHill, massaMolar, smiles, inchiKey, cas, fontes: [PUBCHEM(cid)]
+  cid, nome, ...extra, nomeIupac, sinonimos: extra.sinonimos ?? [],
+  nomes: { 'pt-BR': nome, en: NOMES_CO[cid][0], es: NOMES_CO[cid][1] }, sinonimosPorIdioma: { en: NOMES_CO[cid][2], es: NOMES_CO[cid][3] },
+  formula, formulaHill, massaMolar, smiles, inchiKey, cas, fontes: [PUBCHEM(cid)]
 });
 const GHS = (pictogramas, palavraSinal, frasesH) => ({ pictogramas, palavraSinal, frasesH, fonte: 'PubChem (ECHA C&L) — fixture de teste' });
 const compostos = [
@@ -81,14 +88,23 @@ ACETICO.definicaoChebi = { texto: 'A monocarboxylic acid that is methane in whic
 
 const ghsUsados = [...new Set(compostos.flatMap((c) => c.ghs?.frasesH ?? []))].sort();
 const ghsPt = py('import ghs_pt\nprint(json.dumps({"frases": ghs_pt.FRASES_H, "pict": {k: list(v) for k, v in ghs_pt.PICTOGRAMAS.items()}}, ensure_ascii=False))');
+// textos oficiais em inglês e espanhol das frases usadas (como o pipeline extrai do Anexo III multilíngue; fixture com 2 idiomas além do português)
+const H_EN = {"H220": "Extremely flammable gas.", "H221": "Flammable gas.", "H225": "Highly flammable liquid and vapour.", "H226": "Flammable liquid and vapour.", "H270": "May cause or intensify fire; oxidiser.", "H280": "Contains gas under pressure; may explode if heated.", "H290": "May be corrosive to metals.", "H302": "Harmful if swallowed.", "H304": "May be fatal if swallowed and enters airways.", "H314": "Causes severe skin burns and eye damage.", "H315": "Causes skin irritation.", "H318": "Causes serious eye damage.", "H319": "Causes serious eye irritation.", "H330": "Fatal if inhaled.", "H331": "Toxic if inhaled.", "H335": "May cause respiratory irritation.", "H336": "May cause drowsiness or dizziness.", "H340": "May cause genetic defects.", "H350": "May cause cancer.", "H372": "Causes damage to organs through prolonged or repeated exposure.", "H400": "Very toxic to aquatic life.", "H410": "Very toxic to aquatic life with long lasting effects."};
+const H_ES = {"H220": "Gas extremadamente inflamable.", "H221": "Gas inflamable.", "H225": "Líquido y vapores muy inflamables.", "H226": "Líquido y vapores inflamables.", "H270": "Puede provocar o agravar un incendio; comburente.", "H280": "Contiene gas a presión; peligro de explosión en caso de calentamiento.", "H290": "Puede ser corrosivo para los metales.", "H302": "Nocivo en caso de ingestión.", "H304": "Puede ser mortal en caso de ingestión y penetración en las vías respiratorias.", "H314": "Provoca quemaduras graves en la piel y lesiones oculares graves.", "H315": "Provoca irritación cutánea.", "H318": "Provoca lesiones oculares graves.", "H319": "Provoca irritación ocular grave.", "H330": "Mortal en caso de inhalación.", "H331": "Tóxico en caso de inhalación.", "H335": "Puede irritar las vías respiratorias.", "H336": "Puede provocar somnolencia o vértigo.", "H340": "Puede provocar defectos genéticos.", "H350": "Puede provocar cáncer.", "H372": "Provoca daños en los órganos tras exposiciones prolongadas o repetidas.", "H400": "Muy tóxico para los organismos acuáticos.", "H410": "Muy tóxico para los organismos acuáticos, con efectos nocivos duraderos."};
+const porIdioma = (c) => ({ 'pt-BR': ghsPt.frases[c], ...(H_EN[c] ? { en: H_EN[c] } : {}), ...(H_ES[c] ? { es: H_ES[c] } : {}) });
+const clpI18n = py('import clp\nprint(json.dumps({"pict": clp.pictogramas_por_idioma(["pt-BR", "en", "es"]), "sinal": clp.palavras_sinal_por_idioma(["pt-BR", "en", "es"])}, ensure_ascii=False))');
 const ghsFrases = {
   versao: 1,
-  descricao: 'Frases de perigo (H/EUH) em português do Regulamento (CE) n.º 1272/2008 (CLP), Anexo III (fixture de teste, textos de dataset/ghs_pt.py).',
-  frasesH: Object.fromEntries(ghsUsados.map((c) => [c, { texto: ghsPt.frases[c] }])),
+  descricao: 'Frases de perigo (H/EUH) do Regulamento (CE) n.º 1272/2008 (CLP), Anexo III (fixture de teste, textos de dataset/ghs_pt.py; `texto` em português, `textoPorIdioma` em pt-BR/en/es).',
+  idiomas: ['pt-BR', 'en', 'es'],
+  frasesH: Object.fromEntries(ghsUsados.map((c) => [c, { texto: ghsPt.frases[c], textoPorIdioma: porIdioma(c) }])),
   usadosSemTexto: [],
   todasAsFrases: ghsPt.frases,
+  todasAsFrasesPorIdioma: Object.fromEntries(Object.keys(ghsPt.frases).map((c) => [c, porIdioma(c)])),
   pictogramas: ghsPt.pict,
+  pictogramasPorIdioma: clpI18n.pict,
   palavrasSinal: ['Perigo', 'Atenção'],
+  palavrasSinalPorIdioma: clpI18n.sinal,
   fontes: [{ nome: 'Regulamento (CE) n.º 1272/2008 (CLP) — EUR-Lex', url: 'https://eur-lex.europa.eu/legal-content/PT/TXT/?uri=CELEX:32008R1272', licenca: 'reutilização livre da legislação (EUR-Lex)', acessadoEm: HOJE }]
 };
 
@@ -97,9 +113,15 @@ const norm = (s) => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toL
 const LOTE = 'lote-001';
 const nomesSet = new Set();
 for (const c of compostos) for (const n of [c.nome, c.nomePopular, c.nomeIupac, ...(c.sinonimos ?? []), c.formula, c.formulaHill]) if (n) nomesSet.add(`${norm(n)}\u0000${c.cid}`);
+// nomes por idioma (I18N.md §4): só as chaves de en/es/de/fr que ainda não estão em `nomes` (o cliente busca em nomes ∪ nomesPorIdioma[idioma])
+const nomesPorIdioma = {};
+for (const c of compostos) for (const [idioma, lista] of Object.entries({ en: [c.nomes?.en, ...(c.sinonimosPorIdioma?.en ?? [])], es: [c.nomes?.es, ...(c.sinonimosPorIdioma?.es ?? [])] })) {
+  for (const n of lista) { const k = norm(n); if (k && !nomesSet.has(`${k}\u0000${c.cid}`)) (nomesPorIdioma[idioma] ??= new Set()).add(`${k}\u0000${c.cid}`); }
+}
 const indice = {
   porCid: Object.fromEntries(compostos.map((c) => [String(c.cid), LOTE])),
   nomes: [...nomesSet].sort().map((x) => { const [n, cid] = x.split('\u0000'); return [n, Number(cid)]; }),
+  nomesPorIdioma: Object.fromEntries(Object.entries(nomesPorIdioma).map(([i, s]) => [i, [...s].sort().map((x) => { const [n, cid] = x.split('\u0000'); return [n, Number(cid)]; })])),
   lotes: [LOTE]
 };
 
@@ -112,6 +134,8 @@ const constantes = {
 };
 
 const FONTE_TESTE = { nome: 'Fixture de teste (texto escrito para os testes)', acessadoEm: HOJE };
+const LOTE_EN = [{"id": "wikipedia-en-mole-unit-001", "fonte": "Wikipedia (en)", "licenca": "CC BY-SA 4.0", "url": "https://en.wikipedia.org/wiki/Mole_(unit)", "urlArtigo": "https://en.wikipedia.org/wiki/Mole_(unit)", "capitulo": "Mole (unit)", "secao": "Introduction", "titulo": "Mole (unit)", "textoOriginal": "The mole is the SI unit of amount of substance. One mole contains exactly the Avogadro number of elementary entities, such as atoms, molecules or ions. (Test fixture text.)", "textoPt": null, "traducao": "não se aplica (texto no idioma do artigo; sem tradução)", "idioma": "en", "palavrasChave": ["mole", "amount of substance", "avogadro"], "entidades": {"elementos": [], "compostos": []}, "tipo": "conceito", "tema": "mol-massa-molar", "fontes": [{"nome": "Wikipedia (en): Mole (unit) (fixture de teste)", "url": "https://en.wikipedia.org/wiki/Mole_(unit)", "licenca": "CC BY-SA 4.0", "acessadoEm": "2026-10-10"}]}, {"id": "wikipedia-en-oxygen-001", "fonte": "Wikipedia (en)", "licenca": "CC BY-SA 4.0", "url": "https://en.wikipedia.org/wiki/Oxygen", "urlArtigo": "https://en.wikipedia.org/wiki/Oxygen", "capitulo": "Oxygen", "secao": "Introduction", "titulo": "Oxygen", "textoOriginal": "Oxygen is a chemical element with the symbol O and atomic number 8. It is a highly reactive nonmetal and an oxidising agent that readily forms oxides with most elements. (Test fixture text.)", "textoPt": null, "traducao": "não se aplica (texto no idioma do artigo; sem tradução)", "idioma": "en", "palavrasChave": ["oxygen", "O"], "entidades": {"elementos": ["O"], "compostos": []}, "tipo": "elemento", "fontes": [{"nome": "Wikipedia (en): Oxygen (fixture de teste)", "url": "https://en.wikipedia.org/wiki/Oxygen", "licenca": "CC BY-SA 4.0", "acessadoEm": "2026-10-10"}]}];
+const INDEX_EN = {"versao": 1, "lotes": [{"caminho": "textos/wikipedia-en/lote-001.json", "fonte": "wikipedia-en", "idioma": "en", "trechos": [{"id": "wikipedia-en-mole-unit-001", "titulo": "Mole (unit)", "chave": "mole-unit", "entidades": {"elementos": [], "compostos": []}}, {"id": "wikipedia-en-oxygen-001", "titulo": "Oxygen", "chave": "oxygen", "entidades": {"elementos": ["O"], "compostos": []}}]}]};
 const REF_TEXTO = (id, fonte, licenca, url, titulo, textoPt, palavrasChave, extra = {}) => ({
   id, fonte, licenca, url, capitulo: '', secao: titulo, titulo, textoOriginal: textoPt, textoPt, traducao: 'sem tradução (texto original em português)', idioma: 'pt', palavrasChave,
   entidades: { elementos: [], compostos: [] }, fontes: [{ ...FONTE_TESTE, nome: `${fonte} (fixture de teste)`, url, licenca }], ...extra
@@ -121,6 +145,9 @@ const textos = [
   { dir: 'wikipedia-pt', arq: 'ph.json', t: REF_TEXTO('wikipedia-pt-ph', 'Wikipédia em português', 'CC BY-SA 4.0', 'https://pt.wikipedia.org/wiki/PH', 'pH', 'O pH de uma solução é o logaritmo decimal negativo da atividade dos íons hidrogênio, que equivale aproximadamente à sua concentração.', ['ph', 'acidez', 'logaritmo', 'íons hidrogênio']) },
   { dir: 'gold-book', arq: 'E01990.json', t: REF_TEXTO('gold-book-eletronegatividade', 'IUPAC Gold Book', 'CC BY-SA 4.0', 'https://doi.org/10.1351/goldbook.E01990', 'Eletronegatividade', 'Eletronegatividade é a tendência de um átomo de atrair elétrons para si numa ligação química.', ['eletronegatividade', 'ligação química'], { traducao: 'automática, revisada: não' }) },
   // registro de definição do ChEBI (em inglês, sem tradução): fica fora do retrieval de conceitos, como no pipeline
+  // lote em inglês (textos em lotes, docs/I18N.md §4): lista JSON + textos/index.json; textos escritos para os testes
+  { dir: 'wikipedia-en', arq: 'lote-001.json', t: LOTE_EN },
+  { dir: '', arq: 'index.json', t: INDEX_EN },
   { dir: 'chebi', arq: '16236.json', t: { id: 'chebi-16236', fonte: 'ChEBI', licenca: 'CC BY 4.0', url: 'https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:16236', capitulo: '', secao: 'Definição', titulo: 'Etanol', textoOriginal: ETANOL.definicaoChebi.texto, textoPt: null, traducao: 'pendente', idioma: 'en', palavrasChave: ['etanol', 'C2H6O'], entidades: { elementos: [], compostos: [702] }, fontes: [{ nome: 'ChEBI CHEBI:16236', url: 'https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:16236', licenca: 'CC BY 4.0', acessadoEm: HOJE }] } }
 ];
 
@@ -134,7 +161,7 @@ const arquivos = {
   'ghs_frases.json': json(ghsFrases),
   'compostos/index.json': json(indice),
   [`compostos/${LOTE}.json`]: json(compostos),
-  ...Object.fromEntries(textos.map((x) => [`textos/${x.dir}/${x.arq}`, json(x.t)]))
+  ...Object.fromEntries(textos.map((x) => [x.dir ? `textos/${x.dir}/${x.arq}` : `textos/${x.arq}`, json(x.t)]))
 };
 const files = {};
 for (const [p, conteudo] of Object.entries(arquivos).sort(([a], [b]) => (a < b ? -1 : 1))) {
@@ -152,7 +179,9 @@ const manifesto = {
   files,
   sources: fontes.map((f) => ({ id: f.id, nome: f.nome, url: f.url, licenca: f.licenca, uso: f.uso, acessadoEm: f.acessadoEm })),
   licencas: Object.entries(licencas).map(([licenca, ids]) => ({ licenca, fontes: ids })),
-  contagens: { elementos: elementos.length, compostos: compostos.length, constantes: constantes.constantes.length, textos: textos.length },
+  idiomas: ['pt-BR', 'en', 'es'],
+  contagens: { elementos: elementos.length, compostos: compostos.length, constantes: constantes.constantes.length, textos: textos.length - 2 + LOTE_EN.length,
+    textosPorFonte: { 'wikipedia-pt': 2, 'gold-book': 1, chebi: 1, 'wikipedia-en': LOTE_EN.length }, textosPorIdioma: { 'pt-BR': 3, en: 1 + LOTE_EN.length }, lotesDeTextos: 1 },
   atribuicao: 'Pacote MÍNIMO de teste (fixture): não é dado oficial.',
   cliente: { pollIntervalMinutes: 10080, baseUrl: '/quimica/data/', nlu: { endpoint: '/quimica/api/nlu' }, ask: { enabled: false }, melhoria: { enabled: false } }
 };

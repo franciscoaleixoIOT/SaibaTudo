@@ -34,7 +34,13 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Hidrogênio",
+   "en": "Hydrogen",
+   "es": "hidrógeno",
+   "de": "Wasserstoff"
+  }
  },
  {
   "z": 2,
@@ -67,7 +73,13 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Hélio",
+   "en": "Helium",
+   "es": "helio",
+   "de": "Helium"
+  }
  },
  {
   "z": 6,
@@ -110,7 +122,13 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Carbono",
+   "en": "Carbon",
+   "es": "carbono",
+   "de": "Kohlenstoff"
+  }
  },
  {
   "z": 7,
@@ -152,7 +170,13 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Nitrogênio",
+   "en": "Nitrogen",
+   "es": "nitrógeno",
+   "de": "Stickstoff"
+  }
  },
  {
   "z": 8,
@@ -192,7 +216,13 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Oxigênio",
+   "en": "Oxygen",
+   "es": "oxígeno",
+   "de": "Sauerstoff"
+  }
  },
  {
   "z": 11,
@@ -229,7 +259,13 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Sódio",
+   "en": "Sodium",
+   "es": "sodio",
+   "de": "Natrium"
+  }
  },
  {
   "z": 16,
@@ -271,7 +307,13 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Enxofre",
+   "en": "Sulfur",
+   "es": "azufre",
+   "de": "Schwefel"
+  }
  },
  {
   "z": 17,
@@ -314,7 +356,13 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Cloro",
+   "en": "Chlorine",
+   "es": "cloro",
+   "de": "Chlor"
+  }
  },
  {
   "z": 20,
@@ -351,7 +399,13 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Cálcio",
+   "en": "Calcium",
+   "es": "calcio",
+   "de": "Calcium"
+  }
  },
  {
   "z": 26,
@@ -393,6 +447,12 @@
     "licenca": "domínio público (NIH)",
     "acessadoEm": "2026-10-10"
    }
-  ]
+  ],
+  "nomes": {
+   "pt-BR": "Ferro",
+   "en": "Iron",
+   "es": "hierro",
+   "de": "Eisen"
+  }
  }
 ]

@@ -1,0 +1,32 @@
+{
+ "versao": 1,
+ "lotes": [
+  {
+   "caminho": "textos/wikipedia-en/lote-001.json",
+   "fonte": "wikipedia-en",
+   "idioma": "en",
+   "trechos": [
+    {
+     "id": "wikipedia-en-mole-unit-001",
+     "titulo": "Mole (unit)",
+     "chave": "mole-unit",
+     "entidades": {
+      "elementos": [],
+      "compostos": []
+     }
+    },
+    {
+     "id": "wikipedia-en-oxygen-001",
+     "titulo": "Oxygen",
+     "chave": "oxygen",
+     "entidades": {
+      "elementos": [
+       "O"
+      ],
+      "compostos": []
+     }
+    }
+   ]
+  }
+ ]
+}

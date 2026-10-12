@@ -143,7 +143,7 @@ test('textos licenciados vêm sob demanda e trazem fonte, licença e URL', async
   const s2 = await lojaNova(DADOS, fetchDeDisco(DADOS, BASE, contador));
   const so = await s2.textos(['mol']);
   assert.deepEqual(so.map((t) => t._path), ['textos/wikipedia-pt/mol.json']);
-  assert.equal(contador.filter((p) => p.startsWith('textos/')).length, 1);
+  assert.equal(contador.filter((p) => p.startsWith('textos/') && p !== 'textos/index.json').length, 1, 'só o arquivo que combina (além do índice de textos)');
   assert.equal((await s2.textos(['inexistente'])).length, textos.length, 'sem combinação de nome, carrega todos');
 });
 

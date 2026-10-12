@@ -1,0 +1,68 @@
+[
+ {
+  "id": "wikipedia-en-mole-unit-001",
+  "fonte": "Wikipedia (en)",
+  "licenca": "CC BY-SA 4.0",
+  "url": "https://en.wikipedia.org/wiki/Mole_(unit)",
+  "urlArtigo": "https://en.wikipedia.org/wiki/Mole_(unit)",
+  "capitulo": "Mole (unit)",
+  "secao": "Introduction",
+  "titulo": "Mole (unit)",
+  "textoOriginal": "The mole is the SI unit of amount of substance. One mole contains exactly the Avogadro number of elementary entities, such as atoms, molecules or ions. (Test fixture text.)",
+  "textoPt": null,
+  "traducao": "não se aplica (texto no idioma do artigo; sem tradução)",
+  "idioma": "en",
+  "palavrasChave": [
+   "mole",
+   "amount of substance",
+   "avogadro"
+  ],
+  "entidades": {
+   "elementos": [],
+   "compostos": []
+  },
+  "tipo": "conceito",
+  "tema": "mol-massa-molar",
+  "fontes": [
+   {
+    "nome": "Wikipedia (en): Mole (unit) (fixture de teste)",
+    "url": "https://en.wikipedia.org/wiki/Mole_(unit)",
+    "licenca": "CC BY-SA 4.0",
+    "acessadoEm": "2026-10-10"
+   }
+  ]
+ },
+ {
+  "id": "wikipedia-en-oxygen-001",
+  "fonte": "Wikipedia (en)",
+  "licenca": "CC BY-SA 4.0",
+  "url": "https://en.wikipedia.org/wiki/Oxygen",
+  "urlArtigo": "https://en.wikipedia.org/wiki/Oxygen",
+  "capitulo": "Oxygen",
+  "secao": "Introduction",
+  "titulo": "Oxygen",
+  "textoOriginal": "Oxygen is a chemical element with the symbol O and atomic number 8. It is a highly reactive nonmetal and an oxidising agent that readily forms oxides with most elements. (Test fixture text.)",
+  "textoPt": null,
+  "traducao": "não se aplica (texto no idioma do artigo; sem tradução)",
+  "idioma": "en",
+  "palavrasChave": [
+   "oxygen",
+   "O"
+  ],
+  "entidades": {
+   "elementos": [
+    "O"
+   ],
+   "compostos": []
+  },
+  "tipo": "elemento",
+  "fontes": [
+   {
+    "nome": "Wikipedia (en): Oxygen (fixture de teste)",
+    "url": "https://en.wikipedia.org/wiki/Oxygen",
+    "licenca": "CC BY-SA 4.0",
+    "acessadoEm": "2026-10-10"
+   }
+  ]
+ }
+]

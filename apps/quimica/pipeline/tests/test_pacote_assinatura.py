@@ -112,13 +112,127 @@ class ValidacaoTest(unittest.TestCase):
         self.assertTrue(any("queda anormal" in e for e in erros))
 
 
+class TextosEmLotesTest(unittest.TestCase):
+    def pacote(self, **kw):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        raiz = Path(tmp.name)
+        montar_pacote(raiz, **kw)
+        return raiz
+
+    def regs(self, n, fonte="wikipedia-en", idioma="en"):
+        out = []
+        for i in range(n):
+            t = texto(i, id=f"{fonte}-artigo-{i:03d}", fonte="Wikipedia (en)", idioma=idioma, textoPt=None, titulo=f"Artigo {i}")
+            t["_arquivo"] = f"artigo-{i:03d}.json"
+            t["entidades"] = {"elementos": ["O"], "compostos": []}
+            out.append(t)
+        return out
+
+    def test_escrever_lotes_divide_ordena_e_indexa(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            raiz = Path(tmp)
+            idx = build.novo_indice_textos()
+            regs = list(reversed(self.regs(450)))  # fora de ordem: a saída tem de ser ordenada por id
+            rels = build.escrever_lotes(raiz, "wikipedia-en", regs, "en", idx)
+            self.assertEqual(rels, ["textos/wikipedia-en/lote-001.json", "textos/wikipedia-en/lote-002.json", "textos/wikipedia-en/lote-003.json"])
+            lote1 = json.loads((raiz / rels[0]).read_text(encoding="utf-8"))
+            self.assertEqual(len(lote1), 200)
+            self.assertEqual(lote1[0]["id"], "wikipedia-en-artigo-000")
+            self.assertFalse(any(k.startswith("_") for k in lote1[0]))  # chaves internas não vão para o pacote
+            self.assertEqual(len(json.loads((raiz / rels[2]).read_text(encoding="utf-8"))), 50)
+            self.assertEqual(idx["versao"], 1)
+            self.assertEqual([l["caminho"] for l in idx["lotes"]], rels)
+            l1 = idx["lotes"][0]
+            self.assertEqual((l1["fonte"], l1["idioma"]), ("wikipedia-en", "en"))
+            self.assertEqual(l1["trechos"][0], {"id": "wikipedia-en-artigo-000", "titulo": "Artigo 0", "chave": "artigo",
+                                                "entidades": {"elementos": ["O"], "compostos": []}})
+
+    def test_chave_do_trecho(self):
+        self.assertEqual(build.chave_do_trecho({"id": "x", "_chave": "oxygen"}), "oxygen")
+        self.assertEqual(build.chave_do_trecho({"id": "x", "_arquivo": "acido-sulfurico-003.json"}), "acido-sulfurico")
+        self.assertEqual(build.chave_do_trecho({"id": "x", "_arquivo": "lecture-1-012.json"}), "lecture-1")
+        self.assertEqual(build.chave_do_trecho({"id": "gutenberg-14474-preface-001"}), "gutenberg-14474-preface")
+
+    def test_validar_aceita_lotes_e_exige_indice_coerente(self):
+        idx = build.novo_indice_textos()
+        regs = self.regs(5)
+        raiz = self.pacote(textos=[], extras={})
+        # monta de novo com lotes + índice (montar_pacote grava um arquivo por trecho; aqui acrescentamos lotes)
+        with tempfile.TemporaryDirectory() as tmp:
+            raiz = Path(tmp)
+            rels = build.escrever_lotes(raiz, "wikipedia-en", regs, "en", idx)
+            extras = {"textos/index.json": idx}
+            montar_pacote(raiz, textos=[texto(9)], extras=extras)
+            # o manifesto de montar_pacote não conhece os lotes: reconstrói com eles
+            m = json.loads((raiz / "manifest.json").read_text(encoding="utf-8"))
+            for rel in rels:
+                p = raiz / rel
+                m["files"][rel] = {"bytes": p.stat().st_size, "sha256": build.sha256_file(p)}
+            dump_json(raiz / "manifest.json", m, indent=2)
+            self.assertEqual(build.validar(raiz, minimos=MIN), [])
+            # índice que aponta para lote inexistente
+            idx2 = dict(idx, lotes=idx["lotes"] + [{"caminho": "textos/wikipedia-fr/lote-001.json", "fonte": "wikipedia-fr", "idioma": "fr", "trechos": []}])
+            dump_json(raiz / "textos/index.json", idx2)
+            p = raiz / "textos/index.json"
+            m["files"]["textos/index.json"] = {"bytes": p.stat().st_size, "sha256": build.sha256_file(p)}
+            dump_json(raiz / "manifest.json", m, indent=2)
+            erros = build.validar(raiz, minimos=MIN)
+            self.assertTrue(any("não está no manifesto" in e for e in erros), erros)
+            # lote maior que o permitido
+            grande = self.regs(201)
+            build.escrever_json(raiz, "textos/wikipedia-en/lote-001.json", [{k: v for k, v in r.items() if not k.startswith("_")} for r in grande])
+            p = raiz / "textos/wikipedia-en/lote-001.json"
+            m["files"]["textos/wikipedia-en/lote-001.json"] = {"bytes": p.stat().st_size, "sha256": build.sha256_file(p)}
+            dump_json(raiz / "manifest.json", m, indent=2)
+            erros = build.validar(raiz, minimos=MIN)
+            self.assertTrue(any("máximo 200" in e for e in erros), erros)
+
+    def test_validar_nomes_por_idioma(self):
+        els = [elemento(z) for z in range(1, 119)]
+        els[0]["nomes"] = {"pt-BR": "El1", "en": "Hydrogen", "de": "Wasserstoff"}
+        els[1]["nomes"] = {"pt-BR": "outro"}  # diverge de nome
+        els[2]["nomes"] = {"pt-BR": "El3", "xx": "?"}  # idioma desconhecido
+        erros = build.validar(self.pacote(elementos=els), minimos=MIN)
+        self.assertEqual(len([e for e in erros if "nomes inválido" in e]), 2, erros)
+        cps = [composto(i) for i in range(1, 15)]
+        cps[0]["nomes"] = {"en": "water"}  # sem pt-BR é permitido (nomePtPendente)
+        cps[1]["nomes"] = {"pt-BR": "x"}
+        cps[2]["sinonimosPorIdioma"] = {"zz": ["a"]}
+        erros = build.validar(self.pacote(compostos=cps), minimos=MIN)
+        self.assertTrue(any("nomes.pt-BR diverge" in e for e in erros))
+        self.assertTrue(any("sinonimosPorIdioma inválido" in e for e in erros))
+        self.assertFalse(any("composto 1:" in e for e in erros), erros)
+
+    def test_montar_ghs_frases_multilingue(self):
+        frases = {"H300": {"pt-BR": "Mortal por ingestão.", "en": "Fatal if swallowed.", "de": "Lebensgefahr bei Verschlucken."},
+                  "H310": {"pt-BR": "Mortal em contacto com a pele.", "en": "Fatal in contact with skin."},
+                  "H225": "Líquido e vapor facilmente inflamáveis."}  # forma antiga (str) ainda aceita
+        comp = [composto(1, ghs={"frasesH": ["H300+H310", "H225", "H999"], "pictogramas": ["GHS06"], "fonte": "1272/2008"})]
+        g, sem = build.montar_ghs_frases(frases, comp, "2026-10-10", {}, ["pt-BR", "en", "de"])
+        self.assertEqual(sem, ["H999"])
+        self.assertEqual(g["frasesH"]["H225"], {"texto": frases["H225"], "textoPorIdioma": {"pt-BR": frases["H225"]}})
+        comb = g["frasesH"]["H300+H310"]
+        self.assertEqual(comb["texto"], "Mortal por ingestão; Mortal em contacto com a pele")
+        self.assertEqual(comb["textoPorIdioma"], {"pt-BR": "Mortal por ingestão; Mortal em contacto com a pele",
+                                                  "en": "Fatal if swallowed; Fatal in contact with skin"})  # de só em um componente: fora
+        self.assertEqual(comb["componentes"], ["H300", "H310"])
+        self.assertEqual(g["idiomas"], ["pt-BR", "en", "de"])
+        self.assertEqual(g["todasAsFrases"]["H300"], "Mortal por ingestão.")
+        self.assertEqual(g["todasAsFrasesPorIdioma"]["H300"]["de"], "Lebensgefahr bei Verschlucken.")
+        self.assertEqual(set(g["pictogramasPorIdioma"]["GHS01"]), {"pt-BR", "en", "de"})
+        self.assertEqual(g["palavrasSinalPorIdioma"]["Atenção"], {"pt-BR": "Atenção", "en": "Warning", "de": "Achtung"})
+        self.assertEqual(g["palavrasSinal"], ["Perigo", "Atenção"])
+
+
 class ManifestoEAssinaturaTest(unittest.TestCase):
     def test_manifesto_segue_o_contrato_e_assinatura_confere(self):
         with tempfile.TemporaryDirectory() as tmp:
             raiz = Path(tmp) / "pacote"
             m = montar_pacote(raiz)
-            for k in ("version", "generatedAt", "schemaVersion", "files", "sources", "licencas", "cliente"):
+            for k in ("version", "generatedAt", "schemaVersion", "files", "sources", "licencas", "cliente", "idiomas"):
                 self.assertIn(k, m)
+            self.assertEqual(m["idiomas"], ["pt-BR"])  # montar_pacote não passa idiomas
             self.assertEqual(m["schemaVersion"], 1)
             self.assertEqual(m["cliente"]["pollIntervalMinutes"], 10080)
             self.assertEqual(m["cliente"]["baseUrl"], "https://saibatudo.net/quimica/data/")
@@ -161,7 +275,17 @@ class RegrasEFontesTest(unittest.TestCase):
         self.assertIn("HCl", [a["formula"] for a in r["acidosFortes"]])
         self.assertIn("NaOH", [b["formula"] for b in r["basesFortes"]])
         for pid, p in r["propriedades"].items():
-            self.assertEqual(set(p), {"nome", "unidade", "origem", "escopo", "sinonimos"}, pid)
+            self.assertEqual(set(p), {"nome", "unidade", "origem", "escopo", "sinonimos", "rotulos", "sinonimosPorIdioma"}, pid)
+            self.assertEqual(p["rotulos"]["pt-BR"], p["nome"])
+            self.assertEqual(p["sinonimosPorIdioma"]["pt-BR"], p["sinonimos"])
+            self.assertEqual(set(p["rotulos"]), {"pt-BR", "en", "es", "de", "fr"}, pid)  # toda propriedade traduzida
+            self.assertEqual(set(p["sinonimosPorIdioma"]), {"pt-BR", "en", "es", "de", "fr"}, pid)
+            for i, lst in p["sinonimosPorIdioma"].items():
+                self.assertTrue(lst and all(isinstance(x, str) and x.strip() for x in lst), (pid, i, lst))
+        self.assertEqual(r["propriedades"]["pontoFusaoK"]["rotulos"]["fr"], "Point de fusion")
+        self.assertEqual(r["propriedadesRevisao"], {"pt-BR": "humana", "en": "pendente", "es": "pendente", "de": "pendente", "fr": "pendente"})
+        so_en = R.montar("2026-10-10", ["pt-BR", "en"])["propriedades"]["massaMolar"]
+        self.assertEqual(set(so_en["rotulos"]), {"pt-BR", "en"})
         self.assertIn("massaMolar", r["propriedades"])
         self.assertTrue(any("Green Book" in f["nome"] for f in r["fontes"]))
 
@@ -177,6 +301,12 @@ class RegrasEFontesTest(unittest.TestCase):
         self.assertEqual(F.POR_ID["icsc-oit"]["treino"], "nao")
         self.assertEqual(F.POR_ID["chebi"]["licenca"], "CC BY 4.0")
         self.assertEqual(F.POR_ID["wikipedia-pt"]["licenca"], "CC BY-SA 4.0")
+        for lang, idioma in (("pt", "pt-BR"), ("en", "en"), ("es", "es"), ("de", "de"), ("fr", "fr")):  # uma fonte por idioma
+            f = F.POR_ID[f"wikipedia-{lang}"]
+            self.assertEqual((f["licenca"], f["idioma"], f["uso"]), ("CC BY-SA 4.0", idioma, "textos"))
+            self.assertEqual(f["url"], f"https://{lang}.wikipedia.org/")
+        self.assertEqual(F.POR_ID["wikipedia-en"]["nome"], "Wikipedia (en)")
+        self.assertEqual(F.POR_ID["chebi"]["idioma"], "en")
         self.assertEqual(F.POR_ID["wikidata"]["licenca"], "CC0")
         self.assertEqual({lic["licenca"] for lic in F.licencas(todas)} >= {"CC0", "CC BY 4.0", "CC BY-SA 4.0", "domínio público"}, True)
 

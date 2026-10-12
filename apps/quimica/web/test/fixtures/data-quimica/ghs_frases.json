@@ -1,57 +1,147 @@
 {
  "versao": 1,
- "descricao": "Frases de perigo (H/EUH) em português do Regulamento (CE) n.º 1272/2008 (CLP), Anexo III (fixture de teste, textos de dataset/ghs_pt.py).",
+ "descricao": "Frases de perigo (H/EUH) do Regulamento (CE) n.º 1272/2008 (CLP), Anexo III (fixture de teste, textos de dataset/ghs_pt.py; `texto` em português, `textoPorIdioma` em pt-BR/en/es).",
+ "idiomas": [
+  "pt-BR",
+  "en",
+  "es"
+ ],
  "frasesH": {
   "H220": {
-   "texto": "Gás extremamente inflamável."
+   "texto": "Gás extremamente inflamável.",
+   "textoPorIdioma": {
+    "pt-BR": "Gás extremamente inflamável.",
+    "en": "Extremely flammable gas.",
+    "es": "Gas extremadamente inflamable."
+   }
   },
   "H221": {
-   "texto": "Gás inflamável."
+   "texto": "Gás inflamável.",
+   "textoPorIdioma": {
+    "pt-BR": "Gás inflamável.",
+    "en": "Flammable gas.",
+    "es": "Gas inflamable."
+   }
   },
   "H225": {
-   "texto": "Líquido e vapores altamente inflamáveis."
+   "texto": "Líquido e vapores altamente inflamáveis.",
+   "textoPorIdioma": {
+    "pt-BR": "Líquido e vapores altamente inflamáveis.",
+    "en": "Highly flammable liquid and vapour.",
+    "es": "Líquido y vapores muy inflamables."
+   }
   },
   "H226": {
-   "texto": "Líquido e vapores inflamáveis."
+   "texto": "Líquido e vapores inflamáveis.",
+   "textoPorIdioma": {
+    "pt-BR": "Líquido e vapores inflamáveis.",
+    "en": "Flammable liquid and vapour.",
+    "es": "Líquido y vapores inflamables."
+   }
   },
   "H280": {
-   "texto": "Contém gás sob pressão; pode explodir sob a ação do calor."
+   "texto": "Contém gás sob pressão; pode explodir sob a ação do calor.",
+   "textoPorIdioma": {
+    "pt-BR": "Contém gás sob pressão; pode explodir sob a ação do calor.",
+    "en": "Contains gas under pressure; may explode if heated.",
+    "es": "Contiene gas a presión; peligro de explosión en caso de calentamiento."
+   }
   },
   "H290": {
-   "texto": "Pode ser corrosivo para os metais."
+   "texto": "Pode ser corrosivo para os metais.",
+   "textoPorIdioma": {
+    "pt-BR": "Pode ser corrosivo para os metais.",
+    "en": "May be corrosive to metals.",
+    "es": "Puede ser corrosivo para los metales."
+   }
   },
   "H302": {
-   "texto": "Nocivo se ingerido."
+   "texto": "Nocivo se ingerido.",
+   "textoPorIdioma": {
+    "pt-BR": "Nocivo se ingerido.",
+    "en": "Harmful if swallowed.",
+    "es": "Nocivo en caso de ingestión."
+   }
   },
   "H304": {
-   "texto": "Pode ser fatal se ingerido e penetrar nas vias respiratórias."
+   "texto": "Pode ser fatal se ingerido e penetrar nas vias respiratórias.",
+   "textoPorIdioma": {
+    "pt-BR": "Pode ser fatal se ingerido e penetrar nas vias respiratórias.",
+    "en": "May be fatal if swallowed and enters airways.",
+    "es": "Puede ser mortal en caso de ingestión y penetración en las vías respiratorias."
+   }
   },
   "H314": {
-   "texto": "Provoca queimaduras graves na pele e lesões oculares graves."
+   "texto": "Provoca queimaduras graves na pele e lesões oculares graves.",
+   "textoPorIdioma": {
+    "pt-BR": "Provoca queimaduras graves na pele e lesões oculares graves.",
+    "en": "Causes severe skin burns and eye damage.",
+    "es": "Provoca quemaduras graves en la piel y lesiones oculares graves."
+   }
   },
   "H315": {
-   "texto": "Provoca irritação à pele."
+   "texto": "Provoca irritação à pele.",
+   "textoPorIdioma": {
+    "pt-BR": "Provoca irritação à pele.",
+    "en": "Causes skin irritation.",
+    "es": "Provoca irritación cutánea."
+   }
   },
   "H319": {
-   "texto": "Provoca irritação ocular grave."
+   "texto": "Provoca irritação ocular grave.",
+   "textoPorIdioma": {
+    "pt-BR": "Provoca irritação ocular grave.",
+    "en": "Causes serious eye irritation.",
+    "es": "Provoca irritación ocular grave."
+   }
   },
   "H330": {
-   "texto": "Fatal se inalado."
+   "texto": "Fatal se inalado.",
+   "textoPorIdioma": {
+    "pt-BR": "Fatal se inalado.",
+    "en": "Fatal if inhaled.",
+    "es": "Mortal en caso de inhalación."
+   }
   },
   "H331": {
-   "texto": "Tóxico se inalado."
+   "texto": "Tóxico se inalado.",
+   "textoPorIdioma": {
+    "pt-BR": "Tóxico se inalado.",
+    "en": "Toxic if inhaled.",
+    "es": "Tóxico en caso de inhalación."
+   }
   },
   "H335": {
-   "texto": "Pode provocar irritação das vias respiratórias."
+   "texto": "Pode provocar irritação das vias respiratórias.",
+   "textoPorIdioma": {
+    "pt-BR": "Pode provocar irritação das vias respiratórias.",
+    "en": "May cause respiratory irritation.",
+    "es": "Puede irritar las vías respiratorias."
+   }
   },
   "H340": {
-   "texto": "Pode provocar defeitos genéticos."
+   "texto": "Pode provocar defeitos genéticos.",
+   "textoPorIdioma": {
+    "pt-BR": "Pode provocar defeitos genéticos.",
+    "en": "May cause genetic defects.",
+    "es": "Puede provocar defectos genéticos."
+   }
   },
   "H350": {
-   "texto": "Pode provocar câncer."
+   "texto": "Pode provocar câncer.",
+   "textoPorIdioma": {
+    "pt-BR": "Pode provocar câncer.",
+    "en": "May cause cancer.",
+    "es": "Puede provocar cáncer."
+   }
   },
   "H400": {
-   "texto": "Muito tóxico para os organismos aquáticos."
+   "texto": "Muito tóxico para os organismos aquáticos.",
+   "textoPorIdioma": {
+    "pt-BR": "Muito tóxico para os organismos aquáticos.",
+    "en": "Very toxic to aquatic life.",
+    "es": "Muy tóxico para los organismos acuáticos."
+   }
   }
  },
  "usadosSemTexto": [],
@@ -136,6 +226,289 @@
   "H413": "Pode provocar efeitos nocivos prolongados para os organismos aquáticos.",
   "H420": "Prejudica a saúde pública e o meio ambiente por destruir o ozônio na camada superior da atmosfera."
  },
+ "todasAsFrasesPorIdioma": {
+  "H200": {
+   "pt-BR": "Explosivo instável."
+  },
+  "H201": {
+   "pt-BR": "Explosivo; perigo de explosão em massa."
+  },
+  "H202": {
+   "pt-BR": "Explosivo; perigo grave de projeção."
+  },
+  "H203": {
+   "pt-BR": "Explosivo; perigo de incêndio, de sopro ou de projeção."
+  },
+  "H204": {
+   "pt-BR": "Perigo de incêndio ou de projeção."
+  },
+  "H205": {
+   "pt-BR": "Perigo de explosão em massa em caso de incêndio."
+  },
+  "H206": {
+   "pt-BR": "Perigo de incêndio, de sopro ou de projeção; risco acrescido de explosão se o agente de insensibilização for reduzido."
+  },
+  "H207": {
+   "pt-BR": "Perigo de incêndio ou de projeção; risco acrescido de explosão se o agente de insensibilização for reduzido."
+  },
+  "H208": {
+   "pt-BR": "Perigo de incêndio; risco acrescido de explosão se o agente de insensibilização for reduzido."
+  },
+  "H220": {
+   "pt-BR": "Gás extremamente inflamável.",
+   "en": "Extremely flammable gas.",
+   "es": "Gas extremadamente inflamable."
+  },
+  "H221": {
+   "pt-BR": "Gás inflamável.",
+   "en": "Flammable gas.",
+   "es": "Gas inflamable."
+  },
+  "H222": {
+   "pt-BR": "Aerossol extremamente inflamável."
+  },
+  "H223": {
+   "pt-BR": "Aerossol inflamável."
+  },
+  "H224": {
+   "pt-BR": "Líquido e vapores extremamente inflamáveis."
+  },
+  "H225": {
+   "pt-BR": "Líquido e vapores altamente inflamáveis.",
+   "en": "Highly flammable liquid and vapour.",
+   "es": "Líquido y vapores muy inflamables."
+  },
+  "H226": {
+   "pt-BR": "Líquido e vapores inflamáveis.",
+   "en": "Flammable liquid and vapour.",
+   "es": "Líquido y vapores inflamables."
+  },
+  "H227": {
+   "pt-BR": "Líquido combustível."
+  },
+  "H228": {
+   "pt-BR": "Sólido inflamável."
+  },
+  "H229": {
+   "pt-BR": "Recipiente pressurizado: pode romper-se se aquecido."
+  },
+  "H230": {
+   "pt-BR": "Pode reagir explosivamente, mesmo na ausência de ar."
+  },
+  "H231": {
+   "pt-BR": "Pode reagir explosivamente, mesmo na ausência de ar, a pressão e/ou temperatura elevadas."
+  },
+  "H232": {
+   "pt-BR": "Pode inflamar-se espontaneamente se exposto ao ar."
+  },
+  "H240": {
+   "pt-BR": "Pode explodir sob a ação do calor."
+  },
+  "H241": {
+   "pt-BR": "Pode incendiar-se ou explodir sob a ação do calor."
+  },
+  "H242": {
+   "pt-BR": "Pode incendiar-se sob a ação do calor."
+  },
+  "H250": {
+   "pt-BR": "Inflama-se espontaneamente em contato com o ar."
+  },
+  "H251": {
+   "pt-BR": "Sujeito a autoaquecimento; pode inflamar-se."
+  },
+  "H252": {
+   "pt-BR": "Sujeito a autoaquecimento em grandes quantidades; pode inflamar-se."
+  },
+  "H260": {
+   "pt-BR": "Em contato com a água libera gases inflamáveis que podem inflamar-se espontaneamente."
+  },
+  "H261": {
+   "pt-BR": "Em contato com a água libera gases inflamáveis."
+  },
+  "H270": {
+   "pt-BR": "Pode provocar ou agravar um incêndio; comburente.",
+   "en": "May cause or intensify fire; oxidiser.",
+   "es": "Puede provocar o agravar un incendio; comburente."
+  },
+  "H271": {
+   "pt-BR": "Pode provocar incêndio ou explosão; muito comburente."
+  },
+  "H272": {
+   "pt-BR": "Pode agravar um incêndio; comburente."
+  },
+  "H280": {
+   "pt-BR": "Contém gás sob pressão; pode explodir sob a ação do calor.",
+   "en": "Contains gas under pressure; may explode if heated.",
+   "es": "Contiene gas a presión; peligro de explosión en caso de calentamiento."
+  },
+  "H281": {
+   "pt-BR": "Contém gás refrigerado; pode provocar queimaduras ou lesões criogênicas."
+  },
+  "H290": {
+   "pt-BR": "Pode ser corrosivo para os metais.",
+   "en": "May be corrosive to metals.",
+   "es": "Puede ser corrosivo para los metales."
+  },
+  "H300": {
+   "pt-BR": "Fatal se ingerido."
+  },
+  "H301": {
+   "pt-BR": "Tóxico se ingerido."
+  },
+  "H302": {
+   "pt-BR": "Nocivo se ingerido.",
+   "en": "Harmful if swallowed.",
+   "es": "Nocivo en caso de ingestión."
+  },
+  "H303": {
+   "pt-BR": "Pode ser nocivo se ingerido."
+  },
+  "H304": {
+   "pt-BR": "Pode ser fatal se ingerido e penetrar nas vias respiratórias.",
+   "en": "May be fatal if swallowed and enters airways.",
+   "es": "Puede ser mortal en caso de ingestión y penetración en las vías respiratorias."
+  },
+  "H305": {
+   "pt-BR": "Pode ser nocivo se ingerido e penetrar nas vias respiratórias."
+  },
+  "H310": {
+   "pt-BR": "Fatal em contato com a pele."
+  },
+  "H311": {
+   "pt-BR": "Tóxico em contato com a pele."
+  },
+  "H312": {
+   "pt-BR": "Nocivo em contato com a pele."
+  },
+  "H313": {
+   "pt-BR": "Pode ser nocivo em contato com a pele."
+  },
+  "H314": {
+   "pt-BR": "Provoca queimaduras graves na pele e lesões oculares graves.",
+   "en": "Causes severe skin burns and eye damage.",
+   "es": "Provoca quemaduras graves en la piel y lesiones oculares graves."
+  },
+  "H315": {
+   "pt-BR": "Provoca irritação à pele.",
+   "en": "Causes skin irritation.",
+   "es": "Provoca irritación cutánea."
+  },
+  "H316": {
+   "pt-BR": "Provoca irritação moderada à pele."
+  },
+  "H317": {
+   "pt-BR": "Pode provocar reações alérgicas na pele."
+  },
+  "H318": {
+   "pt-BR": "Provoca lesões oculares graves.",
+   "en": "Causes serious eye damage.",
+   "es": "Provoca lesiones oculares graves."
+  },
+  "H319": {
+   "pt-BR": "Provoca irritação ocular grave.",
+   "en": "Causes serious eye irritation.",
+   "es": "Provoca irritación ocular grave."
+  },
+  "H320": {
+   "pt-BR": "Provoca irritação ocular."
+  },
+  "H330": {
+   "pt-BR": "Fatal se inalado.",
+   "en": "Fatal if inhaled.",
+   "es": "Mortal en caso de inhalación."
+  },
+  "H331": {
+   "pt-BR": "Tóxico se inalado.",
+   "en": "Toxic if inhaled.",
+   "es": "Tóxico en caso de inhalación."
+  },
+  "H332": {
+   "pt-BR": "Nocivo se inalado."
+  },
+  "H333": {
+   "pt-BR": "Pode ser nocivo se inalado."
+  },
+  "H334": {
+   "pt-BR": "Pode provocar sintomas de alergia ou asma ou dificuldades respiratórias se inalado."
+  },
+  "H335": {
+   "pt-BR": "Pode provocar irritação das vias respiratórias.",
+   "en": "May cause respiratory irritation.",
+   "es": "Puede irritar las vías respiratorias."
+  },
+  "H336": {
+   "pt-BR": "Pode provocar sonolência ou vertigem.",
+   "en": "May cause drowsiness or dizziness.",
+   "es": "Puede provocar somnolencia o vértigo."
+  },
+  "H340": {
+   "pt-BR": "Pode provocar defeitos genéticos.",
+   "en": "May cause genetic defects.",
+   "es": "Puede provocar defectos genéticos."
+  },
+  "H341": {
+   "pt-BR": "Suspeito de provocar defeitos genéticos."
+  },
+  "H350": {
+   "pt-BR": "Pode provocar câncer.",
+   "en": "May cause cancer.",
+   "es": "Puede provocar cáncer."
+  },
+  "H351": {
+   "pt-BR": "Suspeito de provocar câncer."
+  },
+  "H360": {
+   "pt-BR": "Pode prejudicar a fertilidade ou o feto."
+  },
+  "H361": {
+   "pt-BR": "Suspeito de prejudicar a fertilidade ou o feto."
+  },
+  "H362": {
+   "pt-BR": "Pode ser nocivo às crianças alimentadas com leite materno."
+  },
+  "H370": {
+   "pt-BR": "Provoca danos aos órgãos."
+  },
+  "H371": {
+   "pt-BR": "Pode provocar danos aos órgãos."
+  },
+  "H372": {
+   "pt-BR": "Provoca danos aos órgãos por exposição prolongada ou repetida.",
+   "en": "Causes damage to organs through prolonged or repeated exposure.",
+   "es": "Provoca daños en los órganos tras exposiciones prolongadas o repetidas."
+  },
+  "H373": {
+   "pt-BR": "Pode provocar danos aos órgãos por exposição prolongada ou repetida."
+  },
+  "H400": {
+   "pt-BR": "Muito tóxico para os organismos aquáticos.",
+   "en": "Very toxic to aquatic life.",
+   "es": "Muy tóxico para los organismos acuáticos."
+  },
+  "H401": {
+   "pt-BR": "Tóxico para os organismos aquáticos."
+  },
+  "H402": {
+   "pt-BR": "Nocivo para os organismos aquáticos."
+  },
+  "H410": {
+   "pt-BR": "Muito tóxico para os organismos aquáticos, com efeitos prolongados.",
+   "en": "Very toxic to aquatic life with long lasting effects.",
+   "es": "Muy tóxico para los organismos acuáticos, con efectos nocivos duraderos."
+  },
+  "H411": {
+   "pt-BR": "Tóxico para os organismos aquáticos, com efeitos prolongados."
+  },
+  "H412": {
+   "pt-BR": "Nocivo para os organismos aquáticos, com efeitos prolongados."
+  },
+  "H413": {
+   "pt-BR": "Pode provocar efeitos nocivos prolongados para os organismos aquáticos."
+  },
+  "H420": {
+   "pt-BR": "Prejudica a saúde pública e o meio ambiente por destruir o ozônio na camada superior da atmosfera."
+  }
+ },
  "pictogramas": {
   "GHS01": [
    "bomba explodindo",
@@ -174,10 +547,69 @@
    "perigo para o ambiente aquático"
   ]
  },
+ "pictogramasPorIdioma": {
+  "GHS01": {
+   "pt-BR": "Bomba explodindo (explosivo)",
+   "en": "Exploding bomb (explosive)",
+   "es": "Bomba explotando (explosivo)"
+  },
+  "GHS02": {
+   "pt-BR": "Chama (inflamável)",
+   "en": "Flame (flammable)",
+   "es": "Llama (inflamable)"
+  },
+  "GHS03": {
+   "pt-BR": "Chama sobre círculo (comburente)",
+   "en": "Flame over circle (oxidising)",
+   "es": "Llama sobre círculo (comburente)"
+  },
+  "GHS04": {
+   "pt-BR": "Botijão de gás (gás sob pressão)",
+   "en": "Gas cylinder (gas under pressure)",
+   "es": "Bombona de gas (gas a presión)"
+  },
+  "GHS05": {
+   "pt-BR": "Corrosão (corrosivo)",
+   "en": "Corrosion (corrosive)",
+   "es": "Corrosión (corrosivo)"
+  },
+  "GHS06": {
+   "pt-BR": "Caveira e tíbias cruzadas (toxicidade aguda)",
+   "en": "Skull and crossbones (acute toxicity)",
+   "es": "Calavera y tibias cruzadas (toxicidad aguda)"
+  },
+  "GHS07": {
+   "pt-BR": "Ponto de exclamação (irritante, nocivo)",
+   "en": "Exclamation mark (irritant, harmful)",
+   "es": "Signo de exclamación (irritante, nocivo)"
+  },
+  "GHS08": {
+   "pt-BR": "Perigo para a saúde (sistêmico)",
+   "en": "Health hazard (systemic)",
+   "es": "Peligro para la salud (sistémico)"
+  },
+  "GHS09": {
+   "pt-BR": "Meio ambiente (perigoso para o ambiente aquático)",
+   "en": "Environment (hazardous to the aquatic environment)",
+   "es": "Medio ambiente (peligroso para el medio ambiente acuático)"
+  }
+ },
  "palavrasSinal": [
   "Perigo",
   "Atenção"
  ],
+ "palavrasSinalPorIdioma": {
+  "Perigo": {
+   "pt-BR": "Perigo",
+   "en": "Danger",
+   "es": "Peligro"
+  },
+  "Atenção": {
+   "pt-BR": "Atenção",
+   "en": "Warning",
+   "es": "Atención"
+  }
+ },
  "fontes": [
   {
    "nome": "Regulamento (CE) n.º 1272/2008 (CLP) — EUR-Lex",

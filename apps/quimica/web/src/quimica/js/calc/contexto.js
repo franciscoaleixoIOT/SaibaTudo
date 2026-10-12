@@ -2,6 +2,7 @@
 // Nenhum valor numérico é embutido aqui, exceto convenções documentadas (CNTP e pKw a 25 °C), usadas só quando o pacote não as traz.
 import { SIMBOLOS_SET } from './formula.js';
 import { paraBase, tabelaDeUnidades } from './unidades.js';
+import { t } from '../i18n/index.js';
 
 const CONSTANTES = {
   R: { ids: ['r', 'rgas', 'constantedosgases', 'gasconstant', 'molargasconstant'], nome: /constante\s+(universal\s+)?(molar\s+)?dos\s+gases|molar\s+gas\s+constant|gas\s+constant/i },
@@ -59,7 +60,7 @@ export function criarContexto({ elementos = [], constantes = null, regras = null
     if (r && /J/.test(r.unidade || 'J')) { rCache = r; return r; }
     const na = constante('NA');
     const kb = constante('kB');
-    rCache = na && kb ? { chave: 'R', valor: na.valor * kb.valor, unidade: 'J mol^-1 K^-1', nome: 'Constante universal dos gases (N_A × k_B)', simbolo: 'R', exata: true, fonte: kb.fonte, derivada: true } : null;
+    rCache = na && kb ? { chave: 'R', valor: na.valor * kb.valor, unidade: 'J mol^-1 K^-1', nome: t('respostas.unidades.constanteRDerivada'), simbolo: 'R', exata: true, fonte: kb.fonte, derivada: true } : null;
     return rCache;
   }
 
@@ -77,9 +78,10 @@ export function criarContexto({ elementos = [], constantes = null, regras = null
 
   const regrasPKw = Number(regras?.agua?.pKw ?? regras?.pKw ?? regras?.constantes?.pKw);
   const kwCons = constante('Kw');
-  const pKw = Number.isFinite(regrasPKw) ? { valor: regrasPKw, origem: 'regras.json (pacote de dados)' }
-    : kwCons ? { valor: -Math.log10(kwCons.valor), origem: 'constantes.json (pacote de dados)' }
-      : { valor: 14, origem: 'convenção a 25 °C (produto iônico da água, pH + pOH = 14)' };
+  // `origem` é uma chave do catálogo (respostas.unidades.pKw.*), resolvida no idioma ativo por ph.js
+  const pKw = Number.isFinite(regrasPKw) ? { valor: regrasPKw, origem: 'regras' }
+    : kwCons ? { valor: -Math.log10(kwCons.valor), origem: 'constantes' }
+      : { valor: 14, origem: 'convencao' };
 
   const fonteElemento = elementos.find((e) => e.fontes?.length)?.fontes[0] ?? null;
 

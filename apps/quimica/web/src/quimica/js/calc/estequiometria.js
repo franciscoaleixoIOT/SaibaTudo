@@ -4,6 +4,9 @@ import { arredondar, fmt, fmtTex } from '../formato.js';
 import { balancear } from './balancear.js';
 import { ErroFormula, formulaTex, formulaUnicode, massaMolar, parseFormula } from './formula.js';
 import { acharUnidade, paraBase } from './unidades.js';
+import { t } from '../i18n/index.js';
+
+const T = (chave, params) => t(`respostas.calc.estequiometria.${chave}`, params);
 
 const PARTICULAS = /^(part[ií]culas?|mol[eé]culas?|[aá]tomos?|[ií]ons?|unidades?|entidades?|f[oó]rmulas?|un\.?)$/i;
 const fm = (x, sig = 6) => fmt(x, { sig });
@@ -20,7 +23,7 @@ export const tipoDeUnidade = (unidade, ctx) => {
 
 function massaDaFormula(f, ctx) {
   const mm = massaMolar(f, ctx.massaDe);
-  if (mm.faltando.length) throw new ErroFormula(`O pacote de dados não tem a massa atômica de: ${mm.faltando.join(', ')}.`);
+  if (mm.faltando.length) throw new ErroFormula(T('semMassa', { lista: mm.faltando.join(', ') }));
   return arredondar(mm.total, 6);
 }
 
@@ -31,7 +34,7 @@ function paraMol({ valor, unidade }, M, ctx, rotulo) {
   if (tipo === 'massa') {
     const g = paraBase(ctx.unidades, unidade, 'massa', valor) * 1000;
     const n = g / M;
-    return { mol: n, tipo, passo: { texto: `Massa → mol${rotulo ? ` de ${rotulo}` : ''}: divida a massa (em g) pela massa molar (${fm(M)} g/mol).`, tex: `n = \\dfrac{m}{M} = \\dfrac{${ft(g)}\\ \\mathrm{g}}{${ft(M)}\\ \\mathrm{g/mol}} = ${ft(n)}\\ \\mathrm{mol}` } };
+    return { mol: n, tipo, passo: { texto: T('massaParaMol', { rotulo, M: fm(M) }), tex: `n = \\dfrac{m}{M} = \\dfrac{${ft(g)}\\ \\mathrm{g}}{${ft(M)}\\ \\mathrm{g/mol}} = ${ft(n)}\\ \\mathrm{mol}` } };
   }
   if (tipo === 'quantidade') {
     const n = paraBase(ctx.unidades, unidade, 'quantidade', valor);
@@ -39,18 +42,18 @@ function paraMol({ valor, unidade }, M, ctx, rotulo) {
   }
   if (tipo === 'volume') {
     const vm = ctx.volumeMolarCNTP();
-    if (!vm) throw new ErroFormula('Faltam R ou as condições padrão no pacote de dados para calcular o volume molar nas CNTP.');
+    if (!vm) throw new ErroFormula(T('semVolumeMolar'));
     const L = paraBase(ctx.unidades, unidade, 'volume', valor) * 1000;
     const vmL = vm.valor * 1000;
     const n = L / vmL;
-    return { mol: n, tipo, passo: { texto: `Volume (gás ideal, CNTP: 0 °C e 1 atm) → mol: divida pelo volume molar Vm = RT/P = ${fm(vmL)} L/mol.`, tex: `n = \\dfrac{V}{V_m} = \\dfrac{${ft(L)}\\ \\mathrm{L}}{${ft(vmL)}\\ \\mathrm{L/mol}} = ${ft(n)}\\ \\mathrm{mol}` } };
+    return { mol: n, tipo, passo: { texto: T('volumeParaMol', { vm: fm(vmL) }), tex: `n = \\dfrac{V}{V_m} = \\dfrac{${ft(L)}\\ \\mathrm{L}}{${ft(vmL)}\\ \\mathrm{L/mol}} = ${ft(n)}\\ \\mathrm{mol}` } };
   }
   if (tipo === 'particulas') {
-    if (!NA) throw new ErroFormula('A constante de Avogadro não está no pacote de dados (constantes.json).');
+    if (!NA) throw new ErroFormula(T('semAvogadro'));
     const n = valor / NA.valor;
-    return { mol: n, tipo, passo: { texto: 'Partículas → mol: divida pelo número de Avogadro.', tex: `n = \\dfrac{N}{N_A} = \\dfrac{${ft(valor)}}{${ft(NA.valor, 9)}\\ \\mathrm{mol^{-1}}} = ${ft(n)}\\ \\mathrm{mol}` } };
+    return { mol: n, tipo, passo: { texto: T('particulasParaMol'), tex: `n = \\dfrac{N}{N_A} = \\dfrac{${ft(valor)}}{${ft(NA.valor, 9)}\\ \\mathrm{mol^{-1}}} = ${ft(n)}\\ \\mathrm{mol}` } };
   }
-  throw new ErroFormula(`Unidade não reconhecida: "${unidade}". Use g, mg, kg, mol, mmol, L, mL ou partículas.`);
+  throw new ErroFormula(T('unidadeNaoReconhecida', { u: unidade }));
 }
 
 /** Tudo que se obtém de uma quantidade de matéria (mol) de uma substância. */
@@ -75,27 +78,27 @@ export function converterQuantidade(e, ctx) {
     if (err instanceof ErroFormula) return { ok: false, erro: err.message };
     throw err;
   }
-  if (!Number.isFinite(e.valor) || e.valor < 0) return { ok: false, erro: 'Informe uma quantidade válida (número maior ou igual a zero).' };
+  if (!Number.isFinite(e.valor) || e.valor < 0) return { ok: false, erro: T('quantidadeInvalida') };
   try {
     const M = massaDaFormula(f, ctx);
-    const passos = [{ texto: `Massa molar de ${formulaUnicode(f.texto)} (soma das massas atômicas do pacote de dados):`, tex: `M = ${ft(M)}\\ \\mathrm{g/mol}` }];
+    const passos = [{ texto: T('massaMolarDe', { formula: formulaUnicode(f.texto) }), tex: `M = ${ft(M)}\\ \\mathrm{g/mol}` }];
     const base = paraMol(e, M, ctx, formulaUnicode(f.texto));
     if (base.passo) passos.push(base.passo);
     const eq = equivalentes(base.mol, M, ctx);
     const NA = ctx.avogadro();
     const vm = ctx.volumeMolarCNTP();
-    if (base.tipo !== 'massa') passos.push({ texto: 'mol → massa: multiplique pela massa molar.', tex: `m = nM = ${ft(eq.mol)} \\times ${ft(M)} = ${ft(eq.massa)}\\ \\mathrm{g}` });
-    if (NA && base.tipo !== 'particulas') passos.push({ texto: 'mol → partículas: multiplique pelo número de Avogadro.', tex: `N = nN_A = ${ft(eq.mol)} \\times ${ft(NA.valor, 9)} = ${ft(eq.particulas)}` });
-    if (vm && base.tipo !== 'volume') passos.push({ texto: `mol → volume nas CNTP (0 °C e 1 atm, gás ideal): multiplique pelo volume molar ${fm(vm.valor * 1000)} L/mol.`, tex: `V = nV_m = ${ft(eq.mol)} \\times ${ft(vm.valor * 1000)} = ${ft(eq.volumeL)}\\ \\mathrm{L}` });
+    if (base.tipo !== 'massa') passos.push({ texto: T('molParaMassa'), tex: `m = nM = ${ft(eq.mol)} \\times ${ft(M)} = ${ft(eq.massa)}\\ \\mathrm{g}` });
+    if (NA && base.tipo !== 'particulas') passos.push({ texto: T('molParaParticulas'), tex: `N = nN_A = ${ft(eq.mol)} \\times ${ft(NA.valor, 9)} = ${ft(eq.particulas)}` });
+    if (vm && base.tipo !== 'volume') passos.push({ texto: T('molParaVolume', { vm: fm(vm.valor * 1000) }), tex: `V = nV_m = ${ft(eq.mol)} \\times ${ft(vm.valor * 1000)} = ${ft(eq.volumeL)}\\ \\mathrm{L}` });
     const resultados = [
-      { rotulo: 'Quantidade de matéria', valor: fm(eq.mol), unidade: 'mol', destaque: base.tipo !== 'quantidade' },
-      { rotulo: 'Massa', valor: fm(eq.massa), unidade: 'g' },
-      ...(eq.particulas != null ? [{ rotulo: 'Número de partículas', valor: fm(eq.particulas), unidade: '' }] : []),
-      ...(eq.volumeL != null ? [{ rotulo: 'Volume nas CNTP (se for um gás ideal)', valor: fm(eq.volumeL), unidade: 'L' }] : [])
+      { rotulo: T('quantidade'), valor: fm(eq.mol), unidade: 'mol', destaque: base.tipo !== 'quantidade' },
+      { rotulo: T('massa'), valor: fm(eq.massa), unidade: 'g' },
+      ...(eq.particulas != null ? [{ rotulo: T('particulas'), valor: fm(eq.particulas), unidade: '' }] : []),
+      ...(eq.volumeL != null ? [{ rotulo: T('volumeCntp'), valor: fm(eq.volumeL), unidade: 'L' }] : [])
     ];
     return {
       ok: true, formula: f.texto, massaMolar: M, ...eq, resultados, passos,
-      notas: ['O volume vale só para gases ideais nas CNTP adotadas (0 °C e 1 atm); sólidos e líquidos não seguem essa conversão.'],
+      notas: [T('notaVolume')],
       fontes: fontesDe(ctx, NA)
     };
   } catch (err) {
@@ -105,8 +108,8 @@ export function converterQuantidade(e, ctx) {
 }
 
 function fontesDe(ctx, NA) {
-  const f = [ctx.fonteElemento ?? { nome: 'Massas atômicas do pacote de dados (elementos.json)' }];
-  if (NA) f.push(NA.fonte ? { nome: NA.fonte.nome ?? String(NA.fonte), url: NA.fonte.url, licenca: NA.fonte.licenca } : { nome: 'Constantes do pacote de dados (constantes.json)' });
+  const f = [ctx.fonteElemento ?? { nome: t('respostas.fontes.massasAtomicas') }];
+  if (NA) f.push(NA.fonte ? { nome: NA.fonte.nome ?? String(NA.fonte), url: NA.fonte.url, licenca: NA.fonte.licenca } : { nome: t('respostas.fontes.constantes') });
   return f;
 }
 
@@ -120,31 +123,31 @@ export function calcularEstequiometria(entrada, ctx) {
   const eq = balancear(entrada.equacao, { simbolos: ctx.simbolos });
   if (!eq.ok) return { ok: false, erro: eq.erro };
   const especies = [...eq.reagentes.map((e) => ({ ...e, lado: 'reagente' })), ...eq.produtos.map((e) => ({ ...e, lado: 'produto' }))];
-  if (especies.some((e) => e.eletron)) return { ok: false, erro: 'Reações com elétrons (semirreações) não têm massa: use equações completas.' };
+  if (especies.some((e) => e.eletron)) return { ok: false, erro: T('semirreacoes') };
   const dados = entrada.dados ?? [];
-  if (dados.length === 0) return { ok: false, erro: 'Informe a quantidade de pelo menos uma substância.' };
+  if (dados.length === 0) return { ok: false, erro: T('informePeloMenos') };
   const rend = entrada.rendimento == null || Number.isNaN(entrada.rendimento) ? 100 : entrada.rendimento;
-  if (!(rend > 0 && rend <= 100)) return { ok: false, erro: 'O rendimento deve estar entre 0 e 100 %.' };
+  if (!(rend > 0 && rend <= 100)) return { ok: false, erro: T('rendimento') };
   try {
     for (const e of especies) {
       e.M = massaDaFormula(e.parsed, ctx);
     }
-    const passos = [{ texto: 'Equação balanceada (os coeficientes dão a proporção em mol):', tex: eq.equacaoTex }];
+    const passos = [{ texto: T('passoEquacao'), tex: eq.equacaoTex }];
     const dadosEsp = dados.map((d) => {
       let idx = typeof d.especie === 'number' ? d.especie : -1;
       if (idx < 0) {
         const alvo = parseFormula(String(d.especie), { simbolos: ctx.simbolos });
         const k = `${alvo.hill}|${alvo.carga}`;
         idx = especies.findIndex((e) => chaveEspecie(e) === k);
-        if (idx < 0) throw new ErroFormula(`A substância "${d.especie}" não aparece na equação.`);
+        if (idx < 0) throw new ErroFormula(T('naoAparece', { x: d.especie }));
       }
-      if (!Number.isFinite(d.valor) || d.valor < 0) throw new ErroFormula('Informe quantidades válidas (números maiores ou iguais a zero).');
+      if (!Number.isFinite(d.valor) || d.valor < 0) throw new ErroFormula(T('quantidadesValidas'));
       return { ...d, idx };
     });
-    if (new Set(dadosEsp.map((d) => d.idx)).size !== dadosEsp.length) throw new ErroFormula('Cada substância deve ser informada uma só vez.');
+    if (new Set(dadosEsp.map((d) => d.idx)).size !== dadosEsp.length) throw new ErroFormula(T('umaVez'));
     const informadas = dadosEsp.map((d) => ({ ...d, e: especies[d.idx] }));
     if (informadas.length > 1 && informadas.some((d) => d.e.lado === 'produto')) {
-      throw new ErroFormula('Com mais de uma quantidade, informe só reagentes (o reagente limitante é escolhido entre eles). Para partir de um produto, informe apenas ele.');
+      throw new ErroFormula(T('soReagentes'));
     }
     // 1. tudo em mol
     const molIni = informadas.map((d) => {
@@ -158,13 +161,13 @@ export function calcularEstequiometria(entrada, ctx) {
     const xi = lim.razao;
     if (razoes.length > 1) {
       passos.push({
-        texto: 'Divida a quantidade de matéria de cada reagente pelo seu coeficiente: o menor quociente indica o reagente limitante.',
+        texto: T('passoRazoes'),
         tex: razoes.map((d) => `\\dfrac{n(${formulaTex(d.e.formula)})}{${d.e.coef}} = \\dfrac{${ft(d.mol)}}{${d.e.coef}} = ${ft(d.razao)}`),
         lista: true
       });
-      passos.push({ texto: `Reagente limitante: ${formulaUnicode(lim.e.formula)}.`, tex: `\\xi = ${ft(xi)}\\ \\mathrm{mol}`, destaque: true });
+      passos.push({ texto: T('limitante', { formula: formulaUnicode(lim.e.formula) }), tex: `\\xi = ${ft(xi)}\\ \\mathrm{mol}`, destaque: true });
     } else {
-      passos.push({ texto: `Há uma só quantidade informada (${formulaUnicode(lim.e.formula)}): a extensão da reação é n ÷ coeficiente.`, tex: `\\xi = \\dfrac{${ft(lim.mol)}}{${lim.e.coef}} = ${ft(xi)}\\ \\mathrm{mol}`, destaque: true });
+      passos.push({ texto: T('umaQuantidade', { formula: formulaUnicode(lim.e.formula) }), tex: `\\xi = \\dfrac{${ft(lim.mol)}}{${lim.e.coef}} = ${ft(xi)}\\ \\mathrm{mol}`, destaque: true });
     }
     // 3. resultado por substância
     const NA = ctx.avogadro();
@@ -194,37 +197,37 @@ export function calcularEstequiometria(entrada, ctx) {
       }
       return info;
     });
-    const produtos = tabela.filter((t) => t.lado === 'produto');
+    const produtos = tabela.filter((x) => x.lado === 'produto');
     passos.push({
-      texto: `Use os coeficientes como razão em mol: n = coeficiente × ξ${rend < 100 ? ` × rendimento (${fm(rend)} %)` : ''}.`,
+      texto: T('passoCoeficientes', { rend: rend < 100 ? fm(rend) : null }),
       tex: produtos.map((p) => `n(${formulaTex(p.formula)}) = ${p.coef} \\times ${ft(xi)}${rend < 100 ? ` \\times ${ft(rend / 100)}` : ''} = ${ft(p.formadoMol)}\\ \\mathrm{mol}`),
       lista: true
     });
     passos.push({
-      texto: 'Converta para massa (m = n × M):',
+      texto: T('passoMassa'),
       tex: produtos.map((p) => `m(${formulaTex(p.formula)}) = ${ft(p.formadoMol)} \\times ${ft(p.massaMolar)} = ${ft(p.formadoG)}\\ \\mathrm{g}`),
       lista: true, destaque: true
     });
-    const sobras = tabela.filter((t) => t.lado === 'reagente' && t.informado && t.sobraMol > 1e-12 * Math.max(1, t.inicialMol));
+    const sobras = tabela.filter((x) => x.lado === 'reagente' && x.informado && x.sobraMol > 1e-12 * Math.max(1, x.inicialMol));
     if (sobras.length) {
       passos.push({
-        texto: 'O que sobra dos reagentes em excesso (inicial − consumido):',
+        texto: T('sobra'),
         tex: sobras.map((s) => `${formulaTex(s.formula)}:\\; ${ft(s.inicialMol)} - ${ft(s.consumidoMol)} = ${ft(s.sobraMol)}\\ \\mathrm{mol} \\;(${ft(s.sobraG)}\\ \\mathrm{g})`),
         lista: true
       });
     }
     const resultados = [
-      ...(razoes.length > 1 ? [{ rotulo: 'Reagente limitante', valor: formulaUnicode(lim.e.formula), unidade: '', destaque: true }] : []),
-      ...produtos.map((p) => ({ rotulo: `${formulaUnicode(p.formula)} formado`, valor: fm(p.formadoG), unidade: 'g', destaque: true, extra: `${fm(p.formadoMol)} mol` })),
-      ...sobras.map((s) => ({ rotulo: `${formulaUnicode(s.formula)} em excesso (sobra)`, valor: fm(s.sobraG), unidade: 'g', extra: `${fm(s.sobraMol)} mol` })),
-      ...tabela.filter((t) => t.lado === 'reagente' && !t.informado).map((t) => ({ rotulo: `${formulaUnicode(t.formula)} necessário`, valor: fm(t.necessarioG), unidade: 'g', extra: `${fm(t.necessarioMol)} mol` }))
+      ...(razoes.length > 1 ? [{ rotulo: T('reagenteLimitante'), valor: formulaUnicode(lim.e.formula), unidade: '', destaque: true }] : []),
+      ...produtos.map((p) => ({ rotulo: T('formado', { formula: formulaUnicode(p.formula) }), valor: fm(p.formadoG), unidade: 'g', destaque: true, extra: `${fm(p.formadoMol)} mol` })),
+      ...sobras.map((s) => ({ rotulo: T('emExcesso', { formula: formulaUnicode(s.formula) }), valor: fm(s.sobraG), unidade: 'g', extra: `${fm(s.sobraMol)} mol` })),
+      ...tabela.filter((x) => x.lado === 'reagente' && !x.informado).map((x) => ({ rotulo: T('necessario', { formula: formulaUnicode(x.formula) }), valor: fm(x.necessarioG), unidade: 'g', extra: `${fm(x.necessarioMol)} mol` }))
     ];
     return {
       ok: true, equacao: eq.equacao, equacaoTex: eq.equacaoTex, balanceamento: eq, limitante: razoes.length > 1 ? lim.e.formula : null,
       xi, rendimento: rend, tabela, resultados, passos,
       notas: [
-        ...(eq.digitouCoeficientes ? ['Os coeficientes digitados foram ignorados: o aplicativo balanceia a equação.'] : []),
-        'Volume e partículas dos produtos aparecem na tabela; o volume vale só para gases ideais nas CNTP (0 °C e 1 atm).'
+        ...(eq.digitouCoeficientes ? [T('coeficientesIgnorados')] : []),
+        T('notaTabela')
       ],
       fontes: fontesDe(ctx, NA)
     };

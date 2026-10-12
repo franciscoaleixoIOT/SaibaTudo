@@ -7,32 +7,42 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { DADOS, DADOS_REAIS, RAIZ, loja } from './support.mjs';
 import { Dicionario } from '../src/quimica/js/dicionario.js';
+import { IDIOMAS } from '../src/quimica/js/i18n/index.js';
 import { INTENTS, parse } from '../src/quimica/js/nlu.js';
 import { CHAVES_GOLDEN, avaliavel, falhasDoCaso } from './contrato.mjs';
 
 const golden = JSON.parse(readFileSync(resolve(RAIZ, 'contracts/nlu_golden_cases.json'), 'utf8'));
+const idiomaDe = (c) => c.idioma ?? 'pt-BR';
+/** Roda todos os casos, cada um com o dicionário (léxico + nomes) do seu idioma. */
 async function rodar(dir) {
   const store = await loja(dir);
-  const dic = new Dicionario(store);
+  const dics = new Map();
   let puladas = 0;
   const falhas = [];
   for (const c of golden.cases) {
     if (!avaliavel(c, store)) { puladas++; continue; }
-    const p = parse(c.q, dic);
+    const idioma = idiomaDe(c);
+    if (!dics.has(idioma)) dics.set(idioma, new Dicionario(store, idioma));
+    const p = parse(c.q, dics.get(idioma));
     for (const f of falhasDoCaso(c, p, store)) falhas.push(`"${c.q}" → ${p.intent}: ${f}`);
     if (p.intent !== c.intent && !falhas.some((x) => x.startsWith(`"${c.q}"`))) falhas.push(`"${c.q}": intenção esperada ${c.intent}, veio ${p.intent}`);
   }
   return { falhas, puladas, total: golden.cases.length };
 }
 
-test('contrato dos casos de referência: pelo menos 60 casos, só intenções e chaves conhecidas, cobrindo todas as intenções', () => {
+test('contrato dos casos de referência: pelo menos 60 casos POR IDIOMA (pt-BR e en), só intenções e chaves conhecidas, cobrindo todas as intenções em cada idioma', () => {
   assert.ok(golden.cases.length >= 60, `casos: ${golden.cases.length}`);
   for (const c of golden.cases) {
     assert.ok(INTENTS.includes(c.intent), `${c.q}: intenção desconhecida ${c.intent}`);
-    for (const k of Object.keys(c)) assert.ok(k === 'q' || CHAVES_GOLDEN.includes(k), `${c.q}: chave não verificada ${k}`);
+    for (const k of Object.keys(c)) assert.ok(k === 'q' || k === 'idioma' || CHAVES_GOLDEN.includes(k), `${c.q}: chave não verificada ${k}`);
+    if (c.idioma) assert.ok(IDIOMAS.includes(c.idioma), `${c.q}: idioma desconhecido ${c.idioma}`);
   }
-  const usadas = new Set(golden.cases.map((c) => c.intent));
-  for (const i of INTENTS) assert.ok(usadas.has(i), `nenhum caso para ${i}`);
+  for (const idioma of ['pt-BR', 'en']) {
+    const casos = golden.cases.filter((c) => idiomaDe(c) === idioma);
+    assert.ok(casos.length >= 60, `${idioma}: ${casos.length} casos (mínimo 60)`);
+    const usadas = new Set(casos.map((c) => c.intent));
+    for (const i of INTENTS) assert.ok(usadas.has(i), `${idioma}: nenhum caso para ${i}`);
+  }
 });
 
 test('todos os casos de referência do NLU (golden cases) com o pacote de teste', async () => {

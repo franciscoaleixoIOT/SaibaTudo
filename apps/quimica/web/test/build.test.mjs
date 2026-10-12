@@ -26,7 +26,7 @@ const vercel = JSON.parse(readFileSync(join(RAIZ, 'vercel.json'), 'utf8'));
 const jsDe = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? jsDe(join(dir, e.name)) : e.name.endsWith('.js') ? [join(dir, e.name)] : []);
 
 test('estrutura de dist: tudo sob /quimica/ (páginas, manifesto, service worker, marca, fonte, bibliotecas e dados)', () => {
-  for (const p of ['index.html', 'offline.html', 'privacidade/index.html', 'manifest.webmanifest', 'sw.js', 'css/base.css', 'css/app.css', 'js/main.js', 'js/nlu.js', 'js/seguranca.js',
+  for (const p of ['index.html', 'offline.html', 'privacidade/index.html', 'privacidade/en.html', 'manifest.webmanifest', 'manifest.en.webmanifest', 'js/i18n/index.js', 'js/i18n/catalogos/en.js', 'js/nlu/lex/en.js', 'sw.js', 'css/base.css', 'css/app.css', 'js/main.js', 'js/nlu.js', 'js/seguranca.js',
     'js/answers.js', 'js/engine.js', 'js/data.js', 'js/verify.js', 'js/calc/balancear.js', 'js/ui/calculadoras.js', 'js/build-info.js', 'js/theme-init.js',
     'vendor/katex/katex.min.js', 'vendor/katex/katex.min.css', 'vendor/katex/LICENSE', 'vendor/katex/fonts/KaTeX_Main-Regular.woff2', 'vendor/smiles-drawer/smiles-drawer.min.js', 'vendor/smiles-drawer/LICENSE',
     'vendor/ghs/ghs05.svg', 'vendor/VENDOR.md', 'fonts/poppins-semibold.woff', 'fonts/OFL.txt',
@@ -53,7 +53,7 @@ test('service worker gerado: versão e listas de pré-cache preenchidas, URLs li
   assert.ok(new RegExp(`export const BUILD = "${versao}"`).test(ler('js/build-info.js')));
   assert.match(ler('js/build-info.js'), /DATA_VERSION = "fixture-1"/);
   const pre = JSON.parse(/const PRECACHE = (\[[\s\S]*?\]);/.exec(sw)[1]);
-  for (const u of ['/quimica/', '/quimica/offline', '/quimica/privacidade', '/quimica/js/main.js', '/quimica/css/app.css', '/quimica/manifest.webmanifest', '/quimica/vendor/katex/katex.min.js',
+  for (const u of ['/quimica/', '/quimica/offline', '/quimica/privacidade', '/quimica/privacidade/en', '/quimica/manifest.en.webmanifest', '/quimica/js/i18n/catalogos/en.js', '/quimica/js/nlu/lex/en.js', '/quimica/js/main.js', '/quimica/css/app.css', '/quimica/manifest.webmanifest', '/quimica/vendor/katex/katex.min.js',
     '/quimica/vendor/katex/katex.min.css', '/quimica/vendor/smiles-drawer/smiles-drawer.min.js', '/quimica/vendor/ghs/ghs01.svg', '/quimica/vendor/katex/fonts/KaTeX_Main-Regular.woff2', '/quimica/fonts/poppins-semibold.woff', '/quimica/brand/quimica-icon.svg']) {
     assert.ok(pre.includes(u), `pré-cache sem ${u}`);
   }
@@ -85,14 +85,16 @@ test('o bundle minificado funciona: casos de referência do NLU, respostas e cá
   const { BASE, fetchDeDisco } = await import('./support.mjs');
   const store = new DataStore({ baseUrl: BASE, fetchFn: fetchDeDisco() });
   await store.iniciar();
-  const dic = new Dicionario(store);
+  const dics = new Map();
   const golden = JSON.parse(readFileSync(join(RAIZ, 'contracts/nlu_golden_cases.json'), 'utf8')).cases;
   const falhas = [];
   let n = 0;
   for (const c of golden) {
     if (c.elemento && !store.porSimbolo.has(c.elemento)) continue;
     if (typeof c.composto === 'number' && !store.indice.porCid.has(c.composto)) continue;
-    const p = parse(c.q, dic);
+    const idioma = c.idioma ?? 'pt-BR';
+    if (!dics.has(idioma)) dics.set(idioma, new Dicionario(store, idioma));
+    const p = parse(c.q, dics.get(idioma));
     n++;
     if (p.intent !== c.intent) falhas.push(`${c.q}: ${p.intent} ≠ ${c.intent}`);
     for (const k of ['elemento', 'propriedade', 'equacao', 'unidadeDestino', 'grupo', 'periodo', 'bloco', 'categoria', 'estado']) {

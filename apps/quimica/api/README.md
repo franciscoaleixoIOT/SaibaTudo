@@ -82,8 +82,38 @@ Reverter a versão do modelo: `docs/MODELO.md` §9.
 
 ## Testes
 `cd api && npm test` (`node:test`, sem rede). Cobrem: normalização e ancoragem (≥ 40 casos), segurança (casos de `test/seguranca_cases_api.json` e de `contracts/seguranca_cases.json`),
-fidelidade, golden compartilhado (`contracts/nlu_golden_cases.json`: o "modelo perfeito" não perde entidade), handlers (503 desligado, CORS, validação, limites por IP/instalação/Redis, cache,
+segurança e ancoragem em **todos os idiomas** (`seguranca_idiomas`, `ground_idiomas`, `lexico`: cópias do léxico em dia),
+fidelidade, golden compartilhado (`contracts/nlu_golden_cases.json`: o "modelo perfeito" não perde entidade, sem tolerância; os casos sem a entidade que a intenção exige — o golden
+não traz `composto` quando o composto não está no pacote — devem virar `DESCONHECIDA`), handlers (503 desligado, CORS, validação, limites por IP/instalação/Redis, cache,
 orçamento, coalescência, falhas do Modal, caminho Hugging Face → Modal → falha, verificador), health e adaptador Node. Não há modo mock: nada responde "como se fosse o modelo".
+
+## Idiomas: como a API usa o léxico compartilhado
+O site e o app falam pt-BR (padrão), en, es, de e fr. A **fonte da verdade** dos padrões de interpretação e de segurança é `contracts/lexico/<idioma>.json`
+(um arquivo por idioma; regex como texto, sem flags; o texto chega minúsculo, sem acento, só `[a-z0-9]` e espaços). A API **não recebe o idioma da interface**
+(o corpo é só `q`, `v`, `client`, `iid`), então aplica **sempre os cinco** em tudo o que decide segurança ou confere evidência.
+
+- **Cópias geradas.** A Vercel não leva `contracts/` (`.vercelignore`) e a função só enxerga o que o bundler rastreia pelos `import`. Por isso a API importa
+  `_lib/lexico/<idioma>.js` (mesmo formato dos léxicos do site) e `_lib/lexico/nomes-elementos.js` (nomes de elementos em es/de/fr, de `data/quimica/elementos.json`).
+  Mudou um contrato ou os nomes? `cd api && node _lib/lexico/sincronizar.mjs` (e `--check` para só conferir). `test/lexico.test.mjs` falha se as cópias estiverem defasadas.
+  Nunca edite os gerados nem o contrato por aqui. `_lib/lexico.js` compila a seção `seguranca` do mesmo jeito que o site (`web/.../nlu/lex/index.js`).
+- **Segurança (`_lib/seguranca.js`).** `avaliarPedido` recusa se **qualquer** de duas camadas recusar: (1) as regras próprias em português (alvo + ação forte/genérica, proteção,
+  tolerância fonética e a um erro de digitação); (2) `avaliarPorLexico`, a mesma lógica de `web/src/quimica/js/seguranca.js` nos cinco idiomas: autolesão primeiro, depois ação + alvo
+  (explosivos, armas, drogas, precursores), dano a pessoas, reagente caseiro e a versão "colada"; as visões do texto são a normal, a com "leet" resolvido e a com letras soltas
+  reunidas (`c.o.c.a.i.n.e`). Só do lado da API (o léxico é mais grosso que as regras em português): lista de bombas inofensivas (banho, chocolate...), "como fazer para parar de
+  usar…", pergunta sobre a lei (substantivo "produção/production" não é ação), cloro gasoso por eletrólise de salmoura fora de contexto caseiro, nomes de rua do inglês em
+  expressões comuns ("ice cubes", "crackers", "weed killer", "hash function"), e três complementos do alemão/espanhol (abaixo). Essas exceções **removem uma frase ou palavra**
+  antes do teste e nunca salvam o pedido inteiro: receita, passo a passo ou outro alvo na mesma frase continuam recusando (`test/seguranca_idiomas.test.mjs`).
+- **Ancoragem (`_lib/vocab-i18n.js` → `ground.js`).** As formas em português de `vocab.js` seguem como eram; somam-se as formas de propriedade do léxico (todos os idiomas, palavra ou
+  expressão inteira, mínimo 3 letras), as expressões de extremo (`heaviest`, `mais eletronegativo`), as de nível, as unidades por extenso (`degrees celsius`, `Liter`) e os nomes de
+  elemento em es/de/fr. Nomes de 2 letras ficam de fora (o "or" francês é a conjunção inglesa: "ouro" em francês cai no NLU local). "cloruro de sodio"/"chlorure de sodium" não ancoram `Na`.
+- **O texto gerado** (`respostaViolaSeguranca`, usado pelo verificador de fidelidade) **continua com os verbos de procedimento em português** (e alguns em inglês): resposta em outro
+  idioma que descreva passos de produção só é pega pelo "alvo + ação forte + sem recusa" e pela presença do alvo; ampliar exige uma lista de imperativos por idioma que o léxico não tem.
+
+**Lacunas do contrato (para quem mantém `contracts/lexico/*.json`; a API cobre com complementos locais, o site não):**
+`de`: o verbo separável (`Wie stelle ich Sprengstoff her?`), a inversão sujeito-verbo em `fazerBomba` (`Wie baue ich eine Bombe?`) e `alvoDano` para `Welches Gift tötet unauffällig?`;
+`es`: falta `elaborar` em `acao`; `pt-BR`: `tirarFazerSeguro` não cobre `como fazer para parar de usar crack`, e `gás cloro` é arma mesmo por eletrólise de salmoura (cloro-álcali);
+`en`/`de`: `fazerBomba` casa "fazer uma bomba de banho" (só pt/es/fr têm a exceção genérica `bomba de …`); `en`: `ice`, `speed`, `crack`, `weed`, `hash`, `spice`, `coke` em `alvoDrogas`/colada
+recusam "how to make ice cubes/crackers/weed killer" (o site também); `es`/`fr`: `produc*`/`production` em `acao` casam o substantivo português "produção" ("qual a lei sobre produção de drogas?").
 
 ## Pontos a reconciliar com o resto do projeto
 - **Ids de propriedade (unificado em 10/10/2026).** Cliente, modelo, golden e `regras.propriedades` usam o **mesmo** id: o nome do campo do contrato, com unidade

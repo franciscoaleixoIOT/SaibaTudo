@@ -1,4 +1,6 @@
-// Instalação do PWA: `beforeinstallprompt` quando disponível; instruções para iPhone/iPad e demais navegadores.
+// Instalação do PWA: `beforeinstallprompt` quando disponível; instruções para iPhone/iPad e demais navegadores (textos do catálogo do idioma).
+import { t, tl } from './i18n/index.js';
+
 let evento = null;
 const ouvintes = new Set();
 
@@ -36,18 +38,6 @@ export async function instalar() {
 
 /** Passo a passo por plataforma, para quando não há prompt automático. */
 export function instrucoes() {
-  if (ehIos()) {
-    return {
-      titulo: 'Instalar no iPhone ou iPad',
-      passos: ['Abra esta página no Safari.', 'Toque em Compartilhar (o quadrado com a seta para cima).', 'Escolha "Adicionar à Tela de Início" e confirme em "Adicionar".']
-    };
-  }
-  return {
-    titulo: 'Instalar o aplicativo',
-    passos: [
-      'No Chrome ou Edge (Windows, Mac, Linux, Android), use o botão "Instalar app" desta página ou o ícone de instalar na barra de endereço.',
-      'No menu do navegador, escolha "Instalar SaibaTudo Química" (ou "Adicionar à tela inicial").',
-      'Depois de instalado, o app abre em janela própria e funciona também sem internet (com os dados já carregados).'
-    ]
-  };
+  const chave = ehIos() ? 'ios' : 'geral';
+  return { titulo: t(`ui.install.${chave}.titulo`), passos: tl(`ui.install.${chave}.passos`) };
 }

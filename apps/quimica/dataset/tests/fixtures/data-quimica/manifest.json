@@ -5,5 +5,24 @@
  "fixture": true,
  "files": {},
  "sources": [],
- "licencas": []
+ "licencas": [],
+ "idiomas": [
+  "pt-BR",
+  "en",
+  "es"
+ ],
+ "contagens": {
+  "textosPorFonte": {
+   "wikipedia-pt": 2,
+   "wikibooks-pt": 1,
+   "chebi": 1,
+   "gold-book": 1,
+   "gutenberg-14474": 1,
+   "wikipedia-en": 2
+  },
+  "textosPorIdioma": {
+   "pt-BR": 3,
+   "en": 4
+  }
+ }
 }

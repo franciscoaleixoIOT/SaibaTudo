@@ -57,14 +57,24 @@ test('golden: o modelo perfeito não perde elemento, propriedade, equação, fó
 test('golden: a intenção do modelo perfeito sobrevive quando a entidade exigida existe no texto', (t) => {
   if (!existsSync(URL_GOLDEN)) return t.skip('contracts/nlu_golden_cases.json ainda não existe');
   const falhas = [];
+  const semEntidade = [];
   for (const c of carregar()) {
     if (!c.q || !c.q.trim() || typeof c.composto === 'number') continue;
-    const r = normalizeModelOutput(saidaPerfeita(c), { question: c.q });
+    const perfeita = saidaPerfeita(c);
+    const r = normalizeModelOutput(perfeita, { question: c.q });
+    // O golden registra só a intenção quando o composto não está no pacote de dados (ex.: "qual a massa molar da nitroglicerina?" não traz
+    // `composto`). Não há "modelo perfeito" com entidade para esses casos, e a nuvem sem entidade numa intenção que a exige DEVE virar
+    // DESCONHECIDA (o cliente cai no NLU local). Não é perda de ancoragem: detecta-se pela saída perfeita SEM a pergunta já falhar o requisito.
+    if (c.intent !== 'DESCONHECIDA' && normalizeModelOutput(perfeita).nlu.intent === 'DESCONHECIDA') {
+      semEntidade.push(c.q);
+      if (r.nlu.intent !== 'DESCONHECIDA') falhas.push(`${c.q}: sem entidade no golden, devia virar DESCONHECIDA e virou ${r.nlu.intent}`);
+      continue;
+    }
+    // sem tolerância: toda intenção do golden com a entidade exigida presente tem de sobreviver à ancoragem
     if (r.nlu.intent !== c.intent) falhas.push(`${c.q}: ${c.intent} -> ${r.nlu.intent} (dropped: ${r.dropped})`);
   }
-  // BALANCEAR sem equação e afins viram DESCONHECIDA de propósito; o golden marca esses casos com null
-  const aceitas = falhas.filter((f) => !/equacao: null/.test(f));
-  assert.ok(aceitas.length <= 3, `intenções perdidas:\n${aceitas.join('\n')}`);
+  assert.deepEqual(falhas, [], `intenções perdidas:\n${falhas.join('\n')}`);
+  assert.ok(semEntidade.length <= 5, `casos do golden sem a entidade que a intenção exige: ${semEntidade.join(' | ')}`);
 });
 
 test('golden: os pedidos RECUSA_PERIGO do golden são barrados pela regra antes do modelo', (t) => {

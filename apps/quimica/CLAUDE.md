@@ -3,11 +3,14 @@
 > **Repositório único (11/10/2026).** Este app vive em `apps/quimica/` do repositório `franciscoaleixoIOT/SaibaTudo`
 > (o antigo `SaibaTudo-Quimica` foi incorporado com todo o histórico e arquivado). Rode os comandos daqui. Workflows na
 > raiz: `.github/workflows/quimica-*.yml`; segredos `DATA_SIGNING_KEY_QUIMICA`, `VERCEL_PROJECT_ID_QUIMICA` e
-> `VERCEL_TOKEN_TIME` (token do time inteiro — **falta criar**; sem ele a atualização semanal gera e assina o pacote, mas
-> não publica). O app de eleições, que era o molde, está em `../eleicoes2026/`. Guia da raiz: [`../../CLAUDE.md`](../../CLAUDE.md).
+> `VERCEL_TOKEN_TIME` (token do time inteiro, criado em 11/10; publica este app e a home). O app de eleições, que era o molde, está em `../eleicoes2026/`. Guia da raiz: [`../../CLAUDE.md`](../../CLAUDE.md).
 
 Segundo app do ecossistema SaibaTudo (o primeiro é o **SaibaTudo Eleições 2026**, em `../eleicoes2026`, que é o **molde**: mesma estrutura, mesmos padrões de teste,
-mesmo pipeline de publicação; leia o `CLAUDE.md` e o `docs/PROJECT_MEMORY.md` de lá quando precisar de um padrão). Tudo o que o usuário lê é em **português do Brasil**.
+mesmo pipeline de publicação; leia o `CLAUDE.md` e o `docs/PROJECT_MEMORY.md` de lá quando precisar de um padrão).
+**Idiomas (12/10/2026):** português do Brasil é o padrão; o app fala também **inglês, espanhol, alemão e francês** — todo texto que o
+usuário lê passa pelos catálogos (`web/src/quimica/js/i18n/catalogos/`), todo padrão do interpretador vem do léxico compartilhado
+(`contracts/lexico/<idioma>.json`, gerado para o site por `tools/gerar_lexico.py`) e dados no idioma vêm do pacote (nunca tradução no
+cliente). Contrato completo: [`docs/I18N.md`](docs/I18N.md). Nunca escreva texto fixo em português no código do site.
 
 **Leia antes de codar:** `docs/ARCHITECTURE.md` (princípios, fluxo, modelo, desenho), `docs/DATA_CONTRACT.md` (esquemas), `docs/FONTES_E_LICENCAS.md` (o que pode entrar),
 `docs/PLANO.md` (fases e divisão por agente).

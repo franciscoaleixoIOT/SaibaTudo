@@ -5,8 +5,9 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { DADOS, DADOS_REAIS, RAIZ, loja, lojaNova } from './support.mjs';
 import { Engine } from '../src/quimica/js/engine.js';
-import { SUGESTOES_PADRAO } from '../src/quimica/js/answers.js';
+import { SUGESTOES_PADRAO, sugestoesPadrao } from '../src/quimica/js/answers.js';
 import { fmt } from '../src/quimica/js/formato.js';
+import { definirIdioma, t } from '../src/quimica/js/i18n/index.js';
 import { falhasDoCaso } from './contrato.mjs';
 import { validarTexDaResposta } from './tex.mjs';
 
@@ -33,7 +34,7 @@ test('todo caso de referência do NLU gera uma resposta bem formada, com fonte e
   const e = await motor();
   const store = e.store;
   let n = 0;
-  for (const c of golden) {
+  for (const c of golden.filter((x) => !x.idioma)) {
     if (c.elemento && !store.porSimbolo.has(c.elemento)) continue;
     if (typeof c.composto === 'number' && !store.indice.porCid.has(c.composto)) continue;
     const r = await e.responder(c.q);
@@ -267,11 +268,79 @@ test('perguntas como as pessoas digitam no celular (minúsculas, sem acento, cur
   }
 });
 
+test('EM INGLÊS: todo caso golden en gera resposta bem formada no idioma; sugestões respondíveis; números com ponto decimal; nomes do pacote rotulados quando são reserva', async () => {
+  definirIdioma('en');
+  try {
+    const e = await motor();
+    const store = e.store;
+    let n = 0;
+    for (const c of golden.filter((x) => x.idioma === 'en')) {
+      if (c.elemento && !store.porSimbolo.has(c.elemento)) continue;
+      if (typeof c.composto === 'number' && !store.indice.porCid.has(c.composto)) continue;
+      const r = await e.responder(c.q);
+      validarResposta(r, c.q);
+      assert.equal(r.intent, c.intent, c.q);
+      assert.equal(r.idioma, 'en');
+      e.limparContexto();
+      n++;
+    }
+    assert.ok(n >= 60, `casos en exercitados: ${n}`);
+    const R = async (q) => { const r = await e.responder(q); validarResposta(r, q); e.limparContexto(); return r; };
+    assert.match((await R('what is the molar mass of water?')).directAnswer, /18\.015 g\/mol/);
+    assert.match((await R('Balance Fe + O2 -> Fe2O3')).directAnswer, /4 Fe \+ 3 O₂ → 2 Fe₂O₃/);
+    assert.match((await R('pH of HCl 0.01 mol/L')).titulo, /^pH 2\.00/);
+    assert.match((await R('melting point of iron')).directAnswer, /1,811 K \(1,537\.85 °C\)/);
+    assert.match((await R('melting point of iron')).titulo, /^Melting point of iron$/i);
+    assert.match((await R('convert 5 atm to kPa')).titulo, /5 atm = 506\.625 kPa/);
+    assert.match((await R('how many mL are in 2.5 L?')).titulo, /2,500 mL/);
+    const fe = await R('tell me about iron');
+    assert.match(fe.titulo, /^Iron \(Fe\), element 26$/);
+    assert.ok(fe.blocos[0].itens.some((i) => i.rotulo === 'Melting point'), 'rótulos de propriedade em inglês');
+    assert.ok(!fe.blocos[0].itens.some((i) => i.rotulo === 'Name in English'), 'sem "nome em inglês" quando a interface já está em inglês');
+    const w = await R('water');
+    assert.match(w.titulo, /^water \(H₂O\)/);
+    const s = await R('what are the hazards of sulfuric acid?');
+    const g = s.blocos.find((b) => b.tipo === 'ghs');
+    assert.equal(g.palavraSinal, 'Danger');
+    assert.equal(g.frases.find((f) => f.codigo === 'H314').texto, 'Causes severe skin burns and eye damage.', 'frase H do pacote em inglês');
+    assert.equal(g.pictogramas[0].nome, 'Corrosive');
+    const rec = await R('how to make methamphetamine?');
+    assert.equal(rec.intent, 'RECUSA_PERIGO');
+    assert.match(rec.directAnswer, /I cannot help/);
+    const tab = await R('elements in group 17');
+    assert.match(tab.directAnswer, /Chlorine/);
+    const ne = await R('capital of France');
+    assert.equal(ne.intent, 'DESCONHECIDA');
+    assert.match(ne.directAnswer, /I did not understand/);
+    // todas as sugestões em inglês (padrão e geradas) têm resposta resolvida
+    const fila = [...sugestoesPadrao()];
+    assert.notDeepEqual(fila, SUGESTOES_PADRAO);
+    const vistas = new Set();
+    const falhas = [];
+    while (fila.length && vistas.size < 150) {
+      const q = fila.shift();
+      if (vistas.has(q)) continue;
+      vistas.add(q);
+      const r = await e.responder(q);
+      e.limparContexto();
+      if (!r.resolvida) falhas.push(`${q} → ${r.intent}: ${r.directAnswer.slice(0, 100)}`);
+      assert.ok(!/[àáâãçéêíóôõú]/.test(r.titulo) || /Água|água/.test(r.titulo) === false, `título com português em inglês: ${r.titulo}`);
+      for (const sg of r.sugestoes) if (!vistas.has(sg)) fila.push(sg);
+    }
+    assert.deepEqual(falhas, []);
+    // mudança de idioma limpa o contexto: "and gold?" sem contexto não resolve propriedade
+    await e.responder('melting point of iron');
+    definirIdioma('pt-BR');
+    e.limparContexto();
+    assert.equal((await e.responder('e o ponto de ebulição?')).resolvida, false);
+  } finally { definirIdioma('pt-BR'); }
+});
+
 test('com o pacote REAL (se existir): sugestões respondidas e golden cases com respostas bem formadas', { skip: DADOS_REAIS ? false : 'sem pacote real em data/quimica' }, async () => {
   const e = await motor(DADOS_REAIS);
   for (const q of SUGESTOES_PADRAO) { const r = await e.responder(q); validarResposta(r, q); assert.equal(r.resolvida, true, q); e.limparContexto(); }
   const store = await loja(DADOS_REAIS);
-  for (const c of golden) {
+  for (const c of golden.filter((x) => !x.idioma)) {
     const r = await e.responder(c.q);
     if (!c.q.trim()) continue;
     validarResposta(r, c.q);

@@ -1,22 +1,12 @@
-// Dicionário do NLU, derivado do pacote de dados: elementos (nomes PT e EN, símbolos), compostos (nome, popular, IUPAC, sinônimos, fórmula, CAS, CID),
-// propriedades (sinônimos) e leitura de fórmulas digitadas ("H2O", "ca(oh)2", "nacl"). Nada é embutido além do vocabulário de unidades.
+// Dicionário do NLU, derivado do pacote de dados e do idioma: elementos (nomes no idioma, em inglês e em português, símbolos), compostos (nomes por
+// idioma, popular, IUPAC, sinônimos por idioma, fórmula, CAS, CID), propriedades (sinônimos do léxico + do pacote) e leitura de fórmulas digitadas
+// ("H2O", "ca(oh)2", "nacl"). Nada é embutido além do vocabulário do léxico do idioma (contracts/lexico/<idioma>.json).
 import { SIMBOLOS_SET, chaveFormula, tentarFormula } from './calc/formula.js';
+import { idiomaAtual } from './i18n/index.js';
+import { LEXICOS_BRUTOS, lexico } from './nlu/lex/index.js';
+import { nomeElemento, todosOsNomes } from './nomes.js';
 import { tabelaDePropriedades } from './propriedades.js';
 import { distancia, normalizar } from './texto.js';
-
-/** Palavras do português que coincidem com símbolos (só valem no meio da frase, com a inicial maiúscula já no texto original). */
-const SIMBOLOS_AMBIGUOS = new Set(['Na', 'No', 'Os', 'As', 'Se', 'Ar', 'Si', 'In', 'At', 'Be', 'Am', 'Ta', 'Re', 'Ge', 'Pa', 'Mo', 'Ho', 'Er', 'Ra', 'Ca', 'Co', 'Ir', 'La', 'Li', 'Lu', 'Mi', 'Y']);
-/** Siglas e interjeições que formam "fórmulas" válidas por acaso. */
-const NAO_FORMULAS = new Set(['OK', 'SOS', 'PH', 'HOHO', 'IN', 'AS', 'BIS', 'PIS', 'SP', 'CIP', 'OH']);
-const STOP_PALAVRAS = new Set(['de', 'da', 'do', 'dos', 'das', 'e', 'o', 'a', 'os', 'as', 'um', 'uma', 'em', 'no', 'na', 'que', 'para', 'por', 'com', 'ao', 'se']);
-/** Palavras funcionais do português que NÃO valem aproximação por erro de digitação (ex.: "sobre" não é "cobre"). */
-const PALAVRAS_FUNCIONAIS = new Set([...STOP_PALAVRAS,
-  'sobre', 'entre', 'como', 'onde', 'quando', 'qual', 'quais', 'mais', 'menos', 'muito', 'pouco', 'tudo', 'nada',
-  'tambem', 'porque', 'entao', 'assim', 'ainda', 'depois', 'antes', 'agora', 'sempre', 'nunca', 'seja', 'foi', 'ser',
-  'sao', 'esta', 'estao', 'tem', 'ter', 'fale', 'fala', 'diga', 'mostre', 'explique', 'explica', 'quimica', 'favor',
-  'gostaria', 'queria', 'poderia', 'pode', 'quero', 'preciso',
-  'fontes', 'fonte', 'dados', 'ajuda', 'licenca', 'licencas', 'informacao', 'informacoes', 'versao', 'referencia',
-  'referencias', 'offline', 'gratis', 'gratuito']);
 
 /** Tokens do texto original separados por espaço, sem pontuação final (preserva parênteses internos). */
 export function tokensOriginais(texto) {
@@ -31,36 +21,49 @@ export function tokensOriginais(texto) {
   }).filter(Boolean);
 }
 
+/** Palavras funcionais/de parada de todos os idiomas do léxico, normalizadas: um sinônimo do pacote igual a uma delas ("PARA",
+ *  apelido en do 1,4-diclorobenzeno no Wikidata) nunca vira nome de composto, senão qualquer pergunta com "para" acha o composto. */
+const PALAVRAS_FUNCIONAIS = new Set(Object.values(LEXICOS_BRUTOS).flatMap((l) => [...(l.stopPalavras ?? []), ...(l.palavrasFuncionais ?? [])]).map(normalizar));
+
 export class Dicionario {
-  /** @param {import('./data.js').DataStore} store */
-  constructor(store) {
+  /**
+   * @param {import('./data.js').DataStore} store
+   * @param {string} [idioma] idioma do dicionário (padrão: o ativo). Nomes do idioma têm prioridade; inglês (IUPAC) vale em todos; português é a última reserva.
+   */
+  constructor(store, idioma = idiomaAtual()) {
     this.rev = store.rev;
+    this.idioma = idioma;
+    this.lex = lexico(idioma);
     this.elementos = store.elementos;
     this.porSimbolo = store.porSimbolo;
     this.entradas = store.indice.entradas;
-    this.props = tabelaDePropriedades(store.regras);
+    this.props = tabelaDePropriedades(store.regras, idioma);
     this.unidades = store.ctx.unidades;
 
-    // elementos: nome → símbolo
+    // elementos: nome → símbolo (nomes do idioma primeiro, depois inglês e português; `sinonimos` legados por último)
     const nomesEl = new Map();
     for (const e of this.elementos) {
-      for (const n of [e.nome, e.nomeEn, ...(Array.isArray(e.sinonimos) ? e.sinonimos : [])]) {
-        const k = normalizar(n);
+      for (const nm of [...todosOsNomes(e, idioma), ...(Array.isArray(e.sinonimos) ? e.sinonimos : [])]) {
+        const k = normalizar(nm);
         if (k.length >= 3 && !nomesEl.has(k)) nomesEl.set(k, e.simbolo);
       }
     }
     this.nomesElemento = [...nomesEl].map(([chave, simbolo]) => ({ chave, simbolo })).sort((a, b) => b.chave.length - a.chave.length);
     this.nomesElementoMap = nomesEl;
 
-    // compostos: nome → cid, em ordem de prioridade. Um termo que é, ele mesmo, nome de ELEMENTO (ex.: "oxigênio",
-    // que no pacote é também O2) fica para o matcher de elementos; a forma molecular continua acessível por "gás X", "O2" etc.
+    // compostos: nome → cid, em ordem de prioridade (idioma ativo, inglês, português, chaves do índice). Um termo que é, ele mesmo, nome de ELEMENTO
+    // (ex.: "oxigênio"/"oxygen", que no pacote é também O2) fica para o matcher de elementos; a forma molecular continua acessível por "gás X", "O2" etc.
     const nomesCo = new Map();
-    const passes = [(e) => [e.nome], (e) => [e.nomePopular], (e) => e.sinonimos ?? [], (e) => [e.nomeIupac], (e) => e.chaves ?? []];
+    const passes = [
+      (e) => [e.nomes?.[idioma]], (e) => e.sinonimosPorIdioma?.[idioma] ?? [], (e) => (idioma === 'pt-BR' ? [e.nome, e.nomePopular] : []), (e) => (idioma === 'pt-BR' ? e.sinonimos ?? [] : []),
+      (e) => [e.nomes?.en, e.nomeIupac], (e) => e.sinonimosPorIdioma?.en ?? [], (e) => e.sinonimos ?? [], (e) => [e.nome, e.nomePopular],
+      (e) => e.chavesPorIdioma?.[idioma] ?? [], (e) => e.chaves ?? [], (e) => (idioma !== 'en' ? e.chavesPorIdioma?.en ?? [] : [])
+    ];
     for (const pega of passes) {
       for (const e of this.entradas) {
-        for (const n of pega(e)) {
-          const k = normalizar(n);
-          if (k.length >= 3 && !/^\d+$/.test(k) && !nomesCo.has(k) && !nomesEl.has(k)) nomesCo.set(k, e.cid);
+        for (const nm of pega(e)) {
+          const k = normalizar(nm);
+          if (k.length >= 3 && !/^\d+$/.test(k) && !PALAVRAS_FUNCIONAIS.has(k) && !nomesCo.has(k) && !nomesEl.has(k)) nomesCo.set(k, e.cid);
         }
       }
     }
@@ -80,7 +83,7 @@ export class Dicionario {
       if (e.cas) this.casParaCid.set(String(e.cas), e.cid);
     }
 
-    // propriedades: sinônimo → id, mais longos primeiro
+    // propriedades: sinônimo → id, mais longos primeiro (sinônimos do léxico do idioma + rótulo + sinônimos do pacote)
     const sin = [];
     for (const p of this.props) for (const s of [p.rotulo, ...(p.sinonimos ?? [])]) {
       const k = normalizar(s);
@@ -90,8 +93,11 @@ export class Dicionario {
     this.propPorId = new Map(this.props.map((p) => [p.id, p]));
   }
 
-  nomeDoElemento(simbolo) { return this.porSimbolo.get(simbolo)?.nome ?? simbolo; }
+  /** Nome do elemento para exibição no idioma do dicionário (reserva em inglês/português, rotulada pela interface). */
+  nomeDoElemento(simbolo) { const e = this.porSimbolo.get(simbolo); return e ? nomeElemento(e, this.idioma).nome : simbolo; }
   entrada(cid) { return this.porCid.get(Number(cid)) ?? null; }
+  /** Nome de exibição de uma entrada do índice (quando o índice traz nomes). */
+  nomeDaEntrada(cid) { const e = this.entrada(cid); return e ? e.nomes?.[this.idioma] ?? (this.idioma === 'pt-BR' ? e.nome : null) ?? e.nomes?.en ?? e.nomeIupac ?? e.nome : null; }
 
   /** Segmenta "nacl" em símbolos (única segmentação válida); devolve a fórmula com a caixa correta ou null. */
   recuperarCaixa(token) {
@@ -137,16 +143,16 @@ export class Dicionario {
     // 1) cabeçalhos explícitos: CID e CAS
     for (const m of texto.matchAll(/\bCID\s*[:#]?\s*(\d{1,9})\b/gi)) {
       const e = this.porCid.get(Number(m[1]));
-      if (e) achados.push({ tipo: 'composto', cid: e.cid, nome: e.nome, via: 'cid', pos: m.index / Math.max(texto.length, 1) });
+      if (e) achados.push({ tipo: 'composto', cid: e.cid, nome: this.nomeDaEntrada(e.cid), via: 'cid', pos: m.index / Math.max(texto.length, 1) });
     }
     for (const m of texto.matchAll(/\b(\d{2,7}-\d{2}-\d)\b/g)) {
       const cid = this.casParaCid.get(m[1]);
-      if (cid) achados.push({ tipo: 'composto', cid, nome: this.entrada(cid)?.nome, via: 'cas', pos: m.index / Math.max(texto.length, 1) });
+      if (cid) achados.push({ tipo: 'composto', cid, nome: this.nomeDaEntrada(cid), via: 'cas', pos: m.index / Math.max(texto.length, 1) });
     }
 
     // 2) nomes de compostos (mais longos primeiro) e de elementos
     for (const { chave, cid } of this.nomesComposto) {
-      procurar(chave, (i) => achados.push({ tipo: 'composto', cid, nome: this.entrada(cid)?.nome, via: 'nome', pos: i / Math.max(n.length, 1) }));
+      procurar(chave, (i) => achados.push({ tipo: 'composto', cid, nome: this.nomeDaEntrada(cid), via: 'nome', pos: i / Math.max(n.length, 1) }));
     }
     for (const { chave, simbolo } of this.nomesElemento) {
       procurar(chave, (i) => achados.push({ tipo: 'elemento', simbolo, nome: this.nomeDoElemento(simbolo), via: 'nome', pos: i / Math.max(n.length, 1) }));
@@ -156,10 +162,11 @@ export class Dicionario {
     const toks = tokensOriginais(texto);
     const total = Math.max(toks.length, 1);
     const unico = toks.length === 1;
+    const { naoFormulas, simbolosAmbiguos, stopPalavras } = this.lex;
     toks.forEach((t, idx) => {
       const pos = idx / total;
       if (!/^[A-Za-z0-9()·.*+^\-−₀-₉⁰-⁹⁺⁻]+$/.test(t) || !/[A-Za-z]/.test(t)) return;
-      if (NAO_FORMULAS.has(t.toUpperCase())) return;
+      if (naoFormulas.has(t.toUpperCase())) return;
       const temDigito = /\d/.test(t);
       const properCase = /^[A-Z(]/.test(t);
       const f = properCase ? tentarFormula(t) : null;
@@ -168,8 +175,8 @@ export class Dicionario {
       // A) fórmula conhecida do índice
       if (cid != null) {
         const minuscula = /^[a-z0-9()]+$/.test(t);
-        const aceita = temDigito || (f && nEl >= 2) || (minuscula && t.length >= 3 && !STOP_PALAVRAS.has(t) && this.recuperarCaixa(t) != null);
-        if (aceita) { achados.push({ tipo: 'composto', cid, nome: this.entrada(cid)?.nome, via: 'formula', texto: t, pos }); return; }
+        const aceita = temDigito || (f && nEl >= 2) || (minuscula && t.length >= 3 && !stopPalavras.has(t) && this.recuperarCaixa(t) != null);
+        if (aceita) { achados.push({ tipo: 'composto', cid, nome: this.nomeDaEntrada(cid), via: 'formula', texto: t, pos }); return; }
       }
       // B) fórmula bem escrita fora do índice
       if (f) {
@@ -180,7 +187,7 @@ export class Dicionario {
         } else {
           // C) símbolo de um elemento
           const s = [...f.atomos.keys()][0];
-          const ambiguo = s.length === 2 && SIMBOLOS_AMBIGUOS.has(s) && idx === 0 && !unico;
+          const ambiguo = s.length === 2 && simbolosAmbiguos.has(s) && idx === 0 && !unico;
           if (!ambiguo && (s.length === 2 || unico || this.cueElemento(texto))) {
             achados.push({ tipo: 'elemento', simbolo: s, nome: this.nomeDoElemento(s), via: 'simbolo', pos });
             return;
@@ -219,22 +226,23 @@ export class Dicionario {
     // uma fórmula que o índice conhece é o composto (sem duplicar)
     for (const f of [...formulas]) {
       const cid = this.formulaParaCid.get(chaveFormula(f.texto));
-      if (cid && !vistosCo.has(cid)) { vistosCo.add(cid); compostos.push({ tipo: 'composto', cid, nome: this.entrada(cid)?.nome, via: 'formula', texto: f.texto, pos: f.pos }); formulas.splice(formulas.indexOf(f), 1); }
+      if (cid && !vistosCo.has(cid)) { vistosCo.add(cid); compostos.push({ tipo: 'composto', cid, nome: this.nomeDaEntrada(cid), via: 'formula', texto: f.texto, pos: f.pos }); formulas.splice(formulas.indexOf(f), 1); }
       else if (cid) formulas.splice(formulas.indexOf(f), 1);
     }
     return { elementos, compostos, formulas, tudo: achados.sort((a, b) => a.pos - b.pos) };
   }
 
-  cueElemento(texto) { return /\b(elemento|s[ií]mbolo|s[ií]mbolo qu[ií]mico)\b/i.test(texto); }
+  cueElemento(texto) { return this.lex.pistas.cueElemento.test(normalizar(texto)); }
 
   /** Erro de digitação em nomes (distância de edição 1 ou 2): "oxigenio" → "oxigênio", "acido sulfuico". */
   aproximar(n) {
     const palavras = n.split(' ').filter(Boolean);
+    const funcionais = this.lex.palavrasFuncionais;
     let melhor = null;
     for (let tam = 3; tam >= 1; tam--) {
       for (let i = 0; i + tam <= palavras.length; i++) {
         const frase = palavras.slice(i, i + tam).join(' ');
-        if (frase.length < 5 || palavras.slice(i, i + tam).every((p) => PALAVRAS_FUNCIONAIS.has(p))) continue;
+        if (frase.length < 5 || palavras.slice(i, i + tam).every((p) => funcionais.has(p))) continue;
         // frases com mais de uma palavra só aproximam com 1 edição (evita "ácido fraco" → "ácido úrico")
         const lim = frase.length >= 10 && tam === 1 ? 2 : 1;
         const cand = [
@@ -249,7 +257,7 @@ export class Dicionario {
           const c = melhor.c;
           return c.tipo === 'elemento'
             ? { tipo: 'elemento', simbolo: c.simbolo, nome: this.nomeDoElemento(c.simbolo), via: 'aproximado', pos: melhor.pos }
-            : { tipo: 'composto', cid: c.cid, nome: this.entrada(c.cid)?.nome, via: 'aproximado', pos: melhor.pos };
+            : { tipo: 'composto', cid: c.cid, nome: this.nomeDaEntrada(c.cid), via: 'aproximado', pos: melhor.pos };
         }
       }
     }
@@ -277,4 +285,3 @@ export class Dicionario {
     return out.filter((p) => (vistos.has(p.id) ? false : vistos.add(p.id)));
   }
 }
-

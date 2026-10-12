@@ -374,6 +374,220 @@
    1118
   ]
  ],
+ "nomesPorIdioma": {
+  "en": [
+   [
+    "acetylsalicylic acid",
+    2244
+   ],
+   [
+    "ammonia",
+    222
+   ],
+   [
+    "asa",
+    2244
+   ],
+   [
+    "aspirin",
+    2244
+   ],
+   [
+    "battery acid",
+    1118
+   ],
+   [
+    "bleach",
+    23665760
+   ],
+   [
+    "blood sugar",
+    5793
+   ],
+   [
+    "carbonic acid gas",
+    280
+   ],
+   [
+    "carbonic anhydride",
+    280
+   ],
+   [
+    "carbonyl chloride",
+    6371
+   ],
+   [
+    "caustic soda",
+    14798
+   ],
+   [
+    "cyclohexatriene",
+    241
+   ],
+   [
+    "dihydrogen monoxide",
+    962
+   ],
+   [
+    "ethanoic acid",
+    176
+   ],
+   [
+    "ethyl alcohol",
+    702
+   ],
+   [
+    "glacial acetic acid",
+    176
+   ],
+   [
+    "glucose",
+    5793
+   ],
+   [
+    "grain alcohol",
+    702
+   ],
+   [
+    "grape sugar",
+    5793
+   ],
+   [
+    "halite",
+    5234
+   ],
+   [
+    "hydrochloric acid",
+    313
+   ],
+   [
+    "hydrogen chloride",
+    313
+   ],
+   [
+    "liquid bleach",
+    23665760
+   ],
+   [
+    "lye",
+    14798
+   ],
+   [
+    "marsh gas",
+    297
+   ],
+   [
+    "muriatic acid",
+    313
+   ],
+   [
+    "oil of vitriol",
+    1118
+   ],
+   [
+    "phosgene",
+    6371
+   ],
+   [
+    "rock salt",
+    5234
+   ],
+   [
+    "sulphuric acid",
+    1118
+   ],
+   [
+    "table salt",
+    5234
+   ],
+   [
+    "water",
+    962
+   ]
+  ],
+  "es": [
+   [
+    "aceite de vitriolo",
+    1118
+   ],
+   [
+    "acido clorhidrico",
+    313
+   ],
+   [
+    "alcohol etilico",
+    702
+   ],
+   [
+    "anhidrido carbonico",
+    280
+   ],
+   [
+    "azucar de uva",
+    5793
+   ],
+   [
+    "benceno",
+    241
+   ],
+   [
+    "cloruro de carbonilo",
+    6371
+   ],
+   [
+    "cloruro de hidrogeno",
+    313
+   ],
+   [
+    "cloruro de sodio",
+    5234
+   ],
+   [
+    "dextrosa",
+    5793
+   ],
+   [
+    "fosgeno",
+    6371
+   ],
+   [
+    "gas de los pantanos",
+    297
+   ],
+   [
+    "glucosa",
+    5793
+   ],
+   [
+    "halita",
+    5234
+   ],
+   [
+    "lavandina",
+    23665760
+   ],
+   [
+    "lejia",
+    23665760
+   ],
+   [
+    "oxido de hidrogeno",
+    962
+   ],
+   [
+    "sal comun",
+    5234
+   ],
+   [
+    "sal de mesa",
+    5234
+   ],
+   [
+    "sosa caustica",
+    14798
+   ]
+  ]
+ },
  "lotes": [
   "lote-001"
  ]

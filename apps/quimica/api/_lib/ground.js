@@ -8,6 +8,9 @@
 import {
   APELIDOS_UNIDADE, COMPOSTOS_COMUNS, FORMAS_PROPRIEDADE, NIVEIS_FORMAS, NOMES_ALTERNATIVOS, NOMES_ELEMENTOS, SIMBOLO_SET,
 } from './vocab.js';
+import {
+  EXTREMOS_POR_PROPRIEDADE, FORMAS_PROPRIEDADE_LEXICO, NIVEIS_LEXICO, NOMES_ELEMENTOS_OUTROS, UNIDADES_LEXICO,
+} from './vocab-i18n.js';
 
 // ---------------------------------------------------------------- texto
 
@@ -82,7 +85,9 @@ function simboloNoTexto(simbolo, raw) {
   return false;
 }
 
-const RX_ANION_ANTES = /(?:eto|ato|ito|ido|ureto|ilo)$/; // "cloreto de sódio": o nome do elemento faz parte do nome do composto
+// "cloreto de sódio", "cloruro de sodio", "chlorure de sodium", "chlorure d'argent": o nome do elemento faz parte do nome do composto
+const RX_ANION_ANTES = /(?:eto|ato|ito|ido|ureto|ilo|uro|ure)$/;
+const LIGACOES_DE_COMPOSTO = new Set(['de', 'do', 'du', 'des', 'd']);
 
 function nomeNoTexto(nomes, raw) {
   const toks = tokens(raw);
@@ -93,7 +98,7 @@ function nomeNoTexto(nomes, raw) {
       if (!bate) continue;
       const ant1 = toks[i - 1];
       const ant2 = toks[i - 2];
-      if ((ant1 === 'de' || ant1 === 'do') && ant2 && RX_ANION_ANTES.test(ant2)) continue; // parte do nome de um composto
+      if (LIGACOES_DE_COMPOSTO.has(ant1) && ant2 && RX_ANION_ANTES.test(ant2)) continue; // parte do nome de um composto
       return true;
     }
   }
@@ -103,7 +108,7 @@ function nomeNoTexto(nomes, raw) {
 /** O elemento (símbolo canônico, ex.: "Fe") tem evidência na pergunta? */
 export function groundElemento(simbolo, raw) {
   if (!SIMBOLO_SET.has(simbolo)) return false;
-  const nomes = [...(NOMES_ELEMENTOS[simbolo] ?? []), ...(NOMES_ALTERNATIVOS[simbolo] ?? [])].map(fold);
+  const nomes = [...(NOMES_ELEMENTOS[simbolo] ?? []), ...(NOMES_ALTERNATIVOS[simbolo] ?? []), ...(NOMES_ELEMENTOS_OUTROS[simbolo] ?? [])].map(fold);
   return nomeNoTexto(nomes, raw) || simboloNoTexto(simbolo, raw);
 }
 
@@ -167,14 +172,21 @@ export function groundComposto(valor, raw) {
 
 // ---------------------------------------------------------------- propriedade, nível
 
+/**
+ * A propriedade tem evidência na pergunta? Vale a forma em português de vocab.js (início de palavra), a forma do léxico de QUALQUER idioma
+ * (palavra ou expressão inteira) e as expressões de extremo do léxico ("heaviest", "mais eletronegativo").
+ */
 export function groundPropriedade(id, raw) {
   const n = fold(raw);
-  return (FORMAS_PROPRIEDADE[id] ?? []).some((forma) => contemFrase(n, forma));
+  return (FORMAS_PROPRIEDADE[id] ?? []).some((forma) => contemFrase(n, forma))
+    || (FORMAS_PROPRIEDADE_LEXICO[id] ?? []).some((forma) => contemFrase(n, forma, { fim: true }))
+    || (EXTREMOS_POR_PROPRIEDADE[id] ?? []).some((rx) => rx.test(n));
 }
 
 export function groundNivel(nivel, raw) {
   const n = fold(raw);
-  return (NIVEIS_FORMAS[nivel] ?? []).some((forma) => contemFrase(n, forma, { fim: true }));
+  return (NIVEIS_FORMAS[nivel] ?? []).some((forma) => contemFrase(n, forma, { fim: true }))
+    || (NIVEIS_LEXICO[nivel] ?? []).some((rx) => rx.test(n));
 }
 
 // ---------------------------------------------------------------- números e unidades
@@ -217,14 +229,27 @@ const ORDEM_APELIDOS = Object.entries(APELIDOS_UNIDADE)
   .flatMap(([unidade, apelidos]) => apelidos.map((a) => [fold(a), unidade]))
   .sort((a, b) => b[0].length - a[0].length);
 
-/** Unidade que começa em `resto` (dobrado, sem espaços iniciais): o apelido MAIS LONGO vence ("mol/L" antes de "mol"). */
+/** Unidade escrita por extenso em qualquer idioma ("degrees celsius", "litres", "grad celsius"): a expressão MAIS LONGA de até 4 palavras vence. */
+function unidadeDoLexico(resto) {
+  const inicio = /^[a-z]+(?: [a-z]+){0,3}/.exec(resto);
+  if (!inicio) return null;
+  const palavras = inicio[0].split(' ');
+  for (let n = palavras.length; n >= 1; n--) {
+    const frase = palavras.slice(0, n).join(' ');
+    const achada = UNIDADES_LEXICO.find((u) => u.rx.test(frase));
+    if (achada) return achada.simbolo;
+  }
+  return null;
+}
+
+/** Unidade que começa em `resto` (dobrado, sem espaços iniciais): o apelido MAIS LONGO vence ("mol/L" antes de "mol"); depois, o léxico. */
 function unidadeNoInicio(resto, restoOriginal) {
   // "0,1 M" (molar) só vale com M maiúsculo isolado; em minúsculas "m" é metro
   if (/^M(?![A-Za-z0-9])/.test(restoOriginal)) return 'mol/L';
   for (const [apelido, unidade] of ORDEM_APELIDOS) {
     if (resto.startsWith(apelido) && !/[a-z0-9]/.test(resto[apelido.length] ?? '')) return unidade;
   }
-  return null;
+  return unidadeDoLexico(resto);
 }
 
 /** Duas cópias do texto com os MESMOS índices: sem acentos com a caixa original, e em minúsculas. */
