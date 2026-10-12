@@ -192,8 +192,9 @@ Etapas (A–F em `I18N.md` §9):
       EUR-Lex); glicose (CID 5793) cai no item "D-glucopyranose" do Wikidata (sem es/de) — conferir o casamento do item.
 - [ ] **E** Android: `strings.xml` por idioma (~770 textos fixos), léxico gerado do mesmo JSON, lotes de textos, seletor.
 - [ ] **F** dataset e avaliação por idioma; retreino do NLU em nuvem com os cinco idiomas.
-- [ ] Revisão humana das traduções (catálogos marcados `revisao: pendente`); DeepL gratuito do mantenedor (5.000 palavras,
-      chave em `secrets/deepl_api_key.txt`, nunca no Git) serve só para conferência por amostragem.
+- [ ] Revisão humana das traduções (catálogos marcados `revisao: pendente`). **Conferência com o DeepL feita em 12/10**
+      (`REVISAO_DEEPL_2026-10-12.md`: 771 textos × 4 idiomas, nenhum parâmetro errado, divergências concentradas em
+      terminologia em que o catálogo está certo); chave em `secrets/deepl_api_key.txt` (cota de 500.000 caracteres/mês, 133 mil usados).
 - [ ] Pacote completo multilíngue: rodar o build cheio (Wikipédia ×4) e medir tamanho e quantidade de arquivos antes de publicar
       (cota de upload da Vercel — `tools/vercel_cota.py --minimo N`).
 
