@@ -34,7 +34,8 @@ def _web_ids():
 
 def _app_ids():
     txt = (RAIZ / "app" / "src" / "main" / "java" / "net" / "saibatudo" / "quimica" / "domain" / "Propriedades.kt").read_text(encoding="utf-8")
-    return [(m.group(1), m.group(2)) for m in re.finditer(r'p\("([^"]+)", "[^"]*", "[^"]*", "([^"]+)"', txt)]
+    # forma atual: Padrao("id", R.string.rotulo, "alvo", "campo", ...); forma antiga: p("id", "rótulo", "alvo", "campo", ...)
+    return [(m.group(1), m.group(2)) for m in re.finditer(r'(?:Padrao|p)\("([^"]+)", (?:R\.string\.\w+|"[^"]*"), "[^"]*", "([^"]+)"', txt)]
 
 
 class TestVocabParidade(unittest.TestCase):
