@@ -9,14 +9,17 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -63,10 +66,10 @@ fun OnboardingScreen(onConcluir: (uf: String?, iaNuvem: Boolean) -> Unit) {
     var uf by rememberSaveable { mutableStateOf<String?>(null) }
     var iaNuvem by remember { mutableStateOf(false) }
 
+    Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
     ) {
         // Cabeçalho escuro sob a barra de status (ícones claros legíveis nos dois temas)
@@ -167,6 +170,10 @@ fun OnboardingScreen(onConcluir: (uf: String?, iaNuvem: Boolean) -> Unit) {
                 Text("Pular e usar as configurações padrão")
             }
         }
+    }
+    // Véu da barra de status: com a exibição de ponta a ponta (Android 15+), o conteúdo claro rola por baixo da barra, cujos
+    // ícones são claros (TopAppBar escura nas outras telas); o véu escuro mantém o relógio e os ícones legíveis ao rolar.
+    Spacer(Modifier.fillMaxWidth().windowInsetsTopHeight(WindowInsets.statusBars).background(NavyAccent))
     }
 }
 

@@ -1,9 +1,9 @@
 <resources>
-    <!-- Tema-base de janela (a UI é 100% Jetpack Compose; o tema Compose é definido em SaibaTudoTheme). -->
+    <!-- Tema-base de janela (a UI é 100% Jetpack Compose; o tema Compose é definido em SaibaTudoTheme).
+         Sem statusBarColor/navigationBarColor: no Android 15 (SDK 35) essas APIs foram descontinuadas e o Play as aponta;
+         as barras transparentes vêm de enableEdgeToEdge() na MainActivity (compatível com versões anteriores). -->
     <style name="Theme.SaibaTudo" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:windowBackground">@color/window_background</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">false</item>
     </style>
 </resources>

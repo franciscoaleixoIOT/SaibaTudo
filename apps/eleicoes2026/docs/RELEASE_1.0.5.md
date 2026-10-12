@@ -14,12 +14,16 @@ dentro de frases) mais:
    (`values`, `values-night`, `values-v31`); as barras transparentes continuam vindo de `enableEdgeToEdge()` na
    `MainActivity`, que vale também para versões anteriores. O conteúdo já respeitava os recuos (Scaffold/TopAppBar do
    Material 3 e `statusBarsPadding`/`navigationBarsPadding` no onboarding).
+3. **Tela de boas-vindas no Android 15:** ao rolar, o conteúdo claro passava por baixo da barra de status (ícones claros) e o
+   relógio ficava ilegível — visto no emulador Pixel 9/API 35. Agora há um véu escuro fixo com a altura da barra de status
+   (`windowInsetsTopHeight(WindowInsets.statusBars)`) sobre o conteúdo rolável.
 
 ## Como foi testado
 - `./gradlew :app:testDebugUnitTest :app:lintRelease :app:bundleRelease :app:assembleRelease`: 103 testes, lint limpo,
   `tools/verificar_release.py` OK (classes do R8 presentes).
-- **Falta, e só você pode fazer:** instalar o release num aparelho com Android 15 (ou o emulador API 35) e conferir que
-  nada fica sob a barra de status/navegação nas telas principal, configurações, sobre os dados e onboarding; depois enviar
+- **Testado em 12/10/2026 nos emuladores Pixel 9 (Android 15, API 35) e Medium Phone (Android 16, API 36)**, com o APK de
+  release assinado: onboarding (topo e rolado), tela principal, diálogo de resultados, configurações e a resposta de
+  "deputado mais votado". **Falta, e só você pode fazer:** conferir num aparelho real se quiser e enviar
   `app/build/outputs/bundle/release/app-release.aab` ao teste fechado. A Play deve mostrar **6 (1.0.5)**.
 
 ## Notas da versão (texto para o console)
