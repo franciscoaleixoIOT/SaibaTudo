@@ -8,3 +8,10 @@ node_modules/
 Thumbs.db
 /secrets/
 .gradle/
+# Benchmark da SaibaTudo IA: saídas brutas e logs ficam fora do Git; o resumo, as tabelas e o painel às cegas podem ser versionados
+/tools/benchmark_ia/out/*
+!/tools/benchmark_ia/out/resumo.json
+!/tools/benchmark_ia/out/tabelas.md
+!/tools/benchmark_ia/out/cegas.md
+!/tools/benchmark_ia/out/cegas_chave.json
+__pycache__/

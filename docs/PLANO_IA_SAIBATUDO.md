@@ -1,7 +1,8 @@
 # SaibaTudo IA — plano para substituir o Qwen da nuvem por uma IA própria dos apps
 
 > Pedido do mantenedor (12/10/2026): trocar a IA Qwen da nuvem por uma IA **com melhorias, voltada para os apps SaibaTudo e com o
-> nome SaibaTudo**, escolhendo a melhor base (Qwen, Gemma…). Este documento é o plano; nada aqui foi executado ainda.
+> nome SaibaTudo**, escolhendo a melhor base (Qwen, Gemma…). Este documento é o plano; a **etapa 1 (benchmark) foi executada em 12/10/2026** — resultado em
+> [`BENCHMARK_IA_2026-10-12.md`](BENCHMARK_IA_2026-10-12.md); as demais etapas não começaram.
 > Restrições que continuam valendo: treino **sempre local** (RTX 5060 Laptop, 8 GB), Modal só serve (teto US$ 30/mês), ZeroGPU do
 > Hugging Face (40 min de GPU/dia, conta PRO) para texto gerado, **nenhum número sai do modelo**, neutralidade eleitoral,
 > **congelamento de eleições 24–26/10/2026** (nada do app de eleições muda nesses dias), segredos só em `secrets/`.
@@ -86,6 +87,14 @@ opt-in e filtrada; segredos em `secrets/`.
 - Candidatos do benchmark: NLU — Qwen2.5-1.5B (atual, referência), Qwen3-1.7B, **Granite-3.3-2B**, Gemma-3-1B, Phi-4-mini
   (controle), Tucano-2.4B (só eleições), SmolLM3-3B; Explica — Qwen2.5-7B (atual), Qwen3-4B, **Granite-3.3-8B**, Gemma-3-4B,
   Qwen3-8B (se couber no treino).
+- **Resultado da etapa 1 (12/10/2026, [`BENCHMARK_IA_2026-10-12.md`](BENCHMARK_IA_2026-10-12.md)):** candidatos medidos **sem treino**
+  (few-shot + gramática) contra o v2.3 ajustado. NLU: **Qwen3.5-2B** recomendado (72,6 % de intenção média sem treino contra 66,1 % do
+  Qwen3-1.7B, 82–85 % na química em todos os cinco idiomas, mesmo custo de CPU ~0,85 s p50); **Qwen3.5-4B** como reserva (76,0 %;
+  química 89–94 %; 2× mais lento em CPU). Explicador: **Qwen3-4B-Instruct-2507** mantido (100 % de fidelidade e idioma, o mais rápido,
+  o que menos inventa citação); Qwen3.5-4B empatado tecnicamente. Granite 3.3, Phi-4-mini e SmolLM3 ficaram atrás em intenção, JSON
+  nativo e latência; Gemma 3 não foi medida (licença não aceita pelo mantenedor, HTTP 403); Tucano-2b4 ficou sem número (saída
+  incoerente nos dois runtimes). A família continua **Qwen, Apache 2.0**. Riscos novos do Qwen3.5 (arquitetura híbrida: treino sem os
+  kernels `flash-linear-attention`/`causal-conv1d` usa a implementação lenta) → treino-teste curto antes da etapa 3.
 - O gate existente (`convert_local.py`) passa a receber `--app` e `--idioma` e a **catraca** compara com o modelo em produção
   de cada app. Nada sobe se perder para o atual.
 
@@ -106,13 +115,13 @@ opt-in e filtrada; segredos em `secrets/`.
 
 | # | Etapa | Entrega | Esforço local | Depende de |
 | :-- | :-- | :-- | :-- | :-- |
-| 1 | Benchmark das bases (NLU e Explica) | `tools/benchmark_ia/` + relatório `docs/BENCHMARK_IA_<data>.md` com a decisão | 1–2 dias de GPU (inferência) | — |
+| 1 | Benchmark das bases (NLU e Explica) — **feito em 12/10/2026** | `tools/benchmark_ia/` + [`BENCHMARK_IA_2026-10-12.md`](BENCHMARK_IA_2026-10-12.md) | 79 min de GPU/CPU, ~2 h de relógio | — |
 | 2 | Corpus SaibaTudo instruct | `backend/retrain/saibatudo/` com validação e contagens por app/idioma | 1 dia | — |
-| 3 | SaibaTudo-NLU v3 (Qwen3-1.7B) | treino (~4 h), gate por app, publicação em paralelo ao atual (`MODEL_VERSION` só da química) | 1 noite | 1, 2 |
-| 4 | SaibaTudo-Explica v1 (Qwen3-4B QLoRA) | treino (6–10 h), avaliação às cegas, Space novo, Vercel apontando para ele na **química** | 2 noites | 1, 2 |
+| 3 | SaibaTudo-NLU v3 (**Qwen3.5-2B**, conforme o benchmark; Qwen3-1.7B se o treino do híbrido não couber; Qwen3.5-4B se a química não passar em en/es/de/fr) | treino (~4 h), gate por app, publicação em paralelo ao atual (`MODEL_VERSION` só da química) | 1 noite | 1, 2 |
+| 4 | SaibaTudo-Explica v1 (Qwen3-4B-Instruct-2507 QLoRA, confirmado pelo benchmark) | treino (6–10 h), avaliação às cegas, Space novo, Vercel apontando para ele na **química** | 2 noites | 1, 2 |
 | 5 | Troca no app de eleições | `MODEL_VERSION` e Space da eleição apontam para a SaibaTudo IA; textos "SaibaTudo IA" | 1 dia | 3, 4, **depois de 27/10** |
 | 6 | Ciclo contínuo | retreino mensal com captura opt-in revisada; painel noturno compara versões; `OPERACAO.md` atualizado | contínuo | 5 |
-| 7 | (opcional) NLU-mini no Android | Qwen3-0.6B Q4 embarcado, só se o benchmark justificar | 2 dias | 3 |
+| 7 | (opcional) NLU-mini no Android | Qwen3.5-0.8B Q4 embarcado (57,8 % sem treino, 508 MB, 0,5 s em CPU), só se o treino o levar ao gate | 2 dias | 3 |
 
 Custos previstos: zero em treino (local); Modal dentro dos US$ 30 (o 1.7B em CPU custa como o 1.5B); ZeroGPU: o 4B gasta
 menos GPU que o 7B atual, então a cota de 40 min/dia rende mais respostas.
@@ -127,7 +136,10 @@ menos GPU que o 7B atual, então a cota de 40 min/dia rende mais respostas.
 - **Congelamento:** eleições não muda entre 24 e 26/10; a química pode avançar nesse período.
 
 ## 9. Decisões pedidas ao mantenedor
-1. Aprovar a família **Qwen3** como base (com Gemma 3 e Tucano no benchmark para confirmação) — ou pedir outra.
+1. Aprovar as bases indicadas pelo benchmark: **Qwen3.5-2B** para o NLU (reserva Qwen3.5-4B) e **Qwen3-4B-Instruct-2507** para o
+   explicador — ou pedir outra. Gemma 3 só entraria se o mantenedor aceitasse a licença no Hugging Face.
 2. Um só **SaibaTudo-NLU** para todos os apps (recomendado) ou um por app.
-3. Começar o benchmark (etapa 1) agora, em paralelo com o que resta da internacionalização (strings do Android).
+3. ~~Começar o benchmark (etapa 1)~~ — feito em 12/10/2026. Próximo: etapa 2 (corpus) e treino-teste do Qwen3.5-2B.
+5. Preencher o painel às cegas (`tools/benchmark_ia/out/cegas.md`, 20 itens, Qwen2.5-7B × Qwen3.5-4B) antes de abrir
+   `out/cegas_chave.json`.
 4. Nome final na interface: "SaibaTudo IA" (sugerido) ou outro.
