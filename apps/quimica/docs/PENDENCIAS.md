@@ -87,6 +87,25 @@ Diagnóstico sobre o pacote e o dataset reais (números em `PROJECT_MEMORY.md` �
 - [ ] Deploy: se a cota da Vercel voltar a estourar, ligar o repositório ao projeto (Git integration) ou usar lotes de textos (8.1).
 - [ ] Monitoramento: `quimica-data-freshness.yml` já alerta por idade (240 h); acrescentar alerta de **divergência de números** entre pacote novo e anterior (ex.: massa molar mudou > 0,5 %) antes de assinar.
 
+## 8.4 Paridade do assistente com o app de Eleições (`docs/PADRAO_ASSISTENTE.md`, 12/10/2026)
+Feito na web em 12/10: campo que cresce (1–3 linhas, Enter envia), campo limpo ao enviar, histórico de perguntas com cartão ▲▼ e
+teclas ↑/↓ (prefs, só no navegador), estados do envio (X, enviar desabilitado, spinner, chips desabilitados), origem + data dos
+dados na resposta, copiar resposta, fechar resposta, relatar problema (issue com a pergunta no título), anúncio "Analisando…".
+- [ ] **Android (química):** limpar o campo ao enviar; setas ▲▼ no histórico (hoje só lista "Perguntas recentes"); campo multilinha
+      sem `
+`; "Relatar problema"; mostrar origem + data dos dados. Molde: `apps/eleicoes2026/app/.../ui/components/SearchBarAi.kt`,
+      `HistoricoPerguntas.kt`, `Dialogos.kt:68-101`.
+- [ ] **Contexto da conversa mais amplo** (web e Android): herdar quantidade/unidade em cálculos ("e em gramas?", "e para 2 mol?"),
+      equação anterior ("balanceie de novo com O3"), e limpar o contexto ao fechar a resposta/trocar de tela (`engine.limparContexto`
+      existe e ninguém chama). Molde: `resolverContinuacao` em eleições.
+- [ ] **Chips da home mudam a cada resposta** (hoje são 11 fixos) e "Limpar histórico" nas configurações.
+- [ ] **IA na nuvem** (botão, consentimento, `askLigado` do manifesto) e **"Ajudar a melhorar o app"** (endpoint novo com filtro de dado
+      pessoal; sem filtro político aqui, mas nunca capturar texto de pedido perigoso) — fase 5, depois do modelo.
+- [ ] **Relatar problema com diálogo e `/api/report`** (hoje é link para a issue) — copiar `apps/eleicoes2026/api/report.js`.
+- [ ] **Nível (fundamental/médio/superior) na web** como preferência que muda o motor (o Android já tem; `nlu.nivelDe` existe e é ignorado).
+- [ ] Instalar PWA na barra (não só em configurações) com instruções para iOS; economia de dados; checagem de dados ao voltar o foco.
+- [ ] Eleições web: mover o foco para o título da resposta (como Química faz).
+
 ## 9. Decisões pedidas ao mantenedor (10/10/2026, noite)
 1. **LibreTexts *Química 1e/2e (OpenStax)* em português** rotulado CC BY 4.0 (edição de 2019, licença irrevogável) × decisão atual de respeitar a vontade da OpenStax (NC-SA + anti-IA nas edições novas). Usar ou manter só link? Hoje: só link.
 2. **Monetização:** CIAAW, OpenStax, PhET e o plano Hobby da Vercel só valem para uso não comercial. Confirmar que o app segue gratuito e sem anúncios (hoje sim).

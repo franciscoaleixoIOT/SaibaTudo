@@ -752,6 +752,13 @@ function renderBusca() {
   trocar($('#sugestoes'), S.sugestoes.map((s) => h('button', { type: 'button', class: 'chip sug', disabled: S.iaProcessando, onClick: () => perguntar(s) }, icon('sparkles', 14), s)));
 }
 
+/** Copia a resposta em texto plano (texto, fonte e aviso de origem). Padrão dos apps SaibaTudo. */
+async function copiarResposta(r) {
+  const origem = ORIGEM_ROTULO[r.origem] ?? ORIGEM_ROTULO.LOCAL;
+  const texto = `${r.directAnswer ?? ''}\n\n${r.fonte ?? ''}\nResposta da IA (${origem}) — SaibaTudo Eleições 2026, https://saibatudo.net/eleicoes2026/`;
+  try { await navigator.clipboard.writeText(texto.trim()); toast('Resposta copiada.'); } catch { toast('Não foi possível copiar neste navegador.'); }
+}
+
 function renderResposta() {
   const box = $('#resposta');
   if (!box) return;
@@ -774,7 +781,9 @@ function renderResposta() {
     h('div', { class: 'chips resp-acoes' },
       h('button', { type: 'button', class: 'btn btn-ouro peq', onClick: () => abrirDialogo({ tipo: 'urna', inicial: citados[0] ?? null }) }, icon('ballot', 16), 'Simulador educativo'),
       (r.suggestedQuestions ?? []).map((s) => h('button', { type: 'button', class: 'chip sug', onClick: () => perguntar(s) }, s))),
-    h('button', { type: 'button', class: 'btn btn-texto peq', onClick: () => abrirDialogo({ tipo: 'relato' }) }, icon('flag', 14), 'Relatar problema nesta resposta'));
+    h('div', { class: 'chips resp-rodape' },
+      h('button', { type: 'button', class: 'btn btn-texto peq', onClick: () => copiarResposta(r) }, icon('copy', 14), 'Copiar resposta'),
+      h('button', { type: 'button', class: 'btn btn-texto peq', onClick: () => abrirDialogo({ tipo: 'relato' }) }, icon('flag', 14), 'Relatar problema nesta resposta')));
   trocar(box, cartao);
 }
 

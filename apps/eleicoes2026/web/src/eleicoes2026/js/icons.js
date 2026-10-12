@@ -5,6 +5,7 @@ const I = {
   x: '<path d="M18 6 6 18M6 6l12 12"/>',
   check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
   checkCircle: '<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>',
+  copy: '<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>',
   flag: '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
   settings: '<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',
   cloud: '<path d="M7 19a5 5 0 0 1-.5-9.97A6 6 0 0 1 18 9.5a4.75 4.75 0 0 1-.5 9.5z"/>',

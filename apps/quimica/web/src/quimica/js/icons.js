@@ -2,6 +2,8 @@
 const I = {
   chevUp: '<path d="m6 15 6-6 6 6"/>',
   chevDown: '<path d="m6 9 6 6 6-6"/>',
+  copy: '<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>',
+  flag: '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
   search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
   send: '<path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/>',
   x: '<path d="M18 6 6 18M6 6l12 12"/>',

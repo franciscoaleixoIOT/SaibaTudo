@@ -31,5 +31,8 @@ continuam valendo dentro da pasta.
    workflows disparados (`gh run list --limit 10`). **Push com mais de 300 arquivos** (ex.: pacote de dados regerado): o GitHub
    só avalia os filtros de caminho nos primeiros 300 e pode não disparar o workflow de outro projeto do mesmo commit —
    separe o commit de dados do de código, ou rode o workflow à mão (`gh workflow run <arquivo>.yml`).
-7. **Windows:** `git config core.longpaths true` (alguns caminhos de química passam de 200 caracteres). Depois de usar o
+7. **Assistente (caixa de pergunta e resposta):** todo app segue [`docs/PADRAO_ASSISTENTE.md`](docs/PADRAO_ASSISTENTE.md)
+   (campo que cresce, limpo ao enviar, histórico com ↑/↓, contexto da conversa, origem e data dos dados, copiar, fechar,
+   relatar, nuvem opt-in, acessibilidade). Melhoria num app → portar para os outros e atualizar o documento.
+8. **Windows:** `git config core.longpaths true` (alguns caminhos de química passam de 200 caracteres). Depois de usar o
    WSL, `wsl --shutdown`.

@@ -109,6 +109,11 @@ textarea.auto-altura { resize: none; overflow-y: hidden; line-height: 1.4; overf
 .lista-pontos { padding-left: 18px; list-style: disc; font-size: .875rem; }
 .lista-pontos li { margin: 4px 0; }
 .resp-acoes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.resp-corpo { flex: 1; min-width: 0; }
+.resp-origem { margin-top: 2px; }
+.resp-rodape { margin-top: 10px; }
+.mini-btn.envia:disabled { color: var(--outline); cursor: default; }
+.spinner.mini { width: 18px; height: 18px; margin: 0 6px; }
 .resp-sugestoes { margin-top: 12px; }
 .resp-sugestoes .rot { font-size: .75rem; font-weight: 700; color: var(--txt2); margin-bottom: 4px; }
 .resp-fontes { margin-top: 12px; font-size: .75rem; color: var(--txt2); }
