@@ -22,7 +22,7 @@
 | IA generativa (texto gerado) | **Ligada desde 07/10.** Space privado `franciscoaleixo/saibatudo-qwen7b` no ZeroGPU do Hugging Face (principal), Modal L4 como reserva (15/dia). Só roda quando a pessoa toca em "Gerar explicação com IA". |
 | Captura de perguntas ("Ajudar a melhorar o app") | Servidor ligado desde 06/10, Redis no Upstash. No app é **opt-in, desligado por padrão**. Filtro de dado pessoal e de opinião política no aparelho e no servidor. |
 | Política de privacidade | **Versão 1.4** (07/10/2026), em `docs/PRIVACIDADE.md` e `web/src/privacidade/index.html` (devem ser idênticas). |
-| Android | Teste fechado na Play em andamento. A **1.0.3 (versionCode 4)** já foi enviada à Play; a **1.0.4 (versionCode 5)** corrige a busca de candidato por nome e está pronta para enviar (`docs/RELEASE_1.0.4.md`). Falta testar o release num aparelho. |
+| Android | Teste fechado na Play em andamento. A **1.0.3 (versionCode 4)** foi enviada à Play; a **1.0.4 (versionCode 5)** foi gerada mas não publicada; a **1.0.5 (versionCode 6)** (12/10/2026) traz a 1.0.4 + "deputado mais votado" + ponta a ponta do Android 15 sem `statusBarColor`/`navigationBarColor` (apontados pelo Play Console). AAB assinado em `app/build/outputs/bundle/release/`; falta testar num aparelho e enviar (`docs/RELEASE_1.0.5.md`). |
 | CI | `eleicoes-web-ci.yml`, `eleicoes-android-ci.yml`, `eleicoes-data-refresh.yml` verdes no commit `cc804a3` (09/10). |
 | Custos | Dentro dos US$ 30/mês grátis do Modal (§8). Cobrado até agora: **US$ 0**. |
 
