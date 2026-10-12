@@ -1,6 +1,7 @@
 {
   "name": "saibatudo-portal",
   "private": true,
+  "type": "module",
   "description": "Home de saibatudo.net (projeto Vercel saibatudo-portal)",
   "scripts": {
     "build": "node build.mjs",

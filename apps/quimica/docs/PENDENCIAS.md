@@ -144,6 +144,21 @@ CAS (desempate e item do elemento), duplicatas, carbono/arsênio sem fusão a 1 
 - [ ] Frases P (precaução) não estão no pacote: as respostas dizem isso e remetem à FDS/FISPQ. Primeiros socorros e "qual é
       mais ácido" dependem de fonte nova (HSDB/NIOSH via PubChem; pKa do Wikidata — §8.1).
 
+## 12. Internacionalização (12/10/2026) — contrato em `I18N.md`
+
+Decisão do mantenedor: pt-BR padrão; **en, es, de, fr** com assistente completo; chinês depois; Eleições só em português.
+Etapas (A–F em `I18N.md` §9):
+- [ ] **A** site: base de i18n, catálogos pt-BR/en, léxico `contracts/lexico/`, seletor, textos em lotes no cliente, testes.
+- [ ] **B** pipeline: `nomes` por idioma, GHS multilíngue (EUR-Lex), Wikipédia en/es/de/fr, `textos/index.json` + lotes, contrato.
+- [ ] **C** home: `/en/`, `/es/`, `/de/`, `/fr/` + `hreflang` + regras no proxy de eleições (valem após o próximo `eleicoes-data-refresh`).
+- [ ] **D** catálogos/léxicos es/de/fr + golden por idioma.
+- [ ] **E** Android: `strings.xml` por idioma (~770 textos fixos), léxico gerado do mesmo JSON, lotes de textos, seletor.
+- [ ] **F** dataset e avaliação por idioma; retreino do NLU em nuvem com os cinco idiomas.
+- [ ] Revisão humana das traduções (catálogos marcados `revisao: pendente`); DeepL gratuito do mantenedor (5.000 palavras,
+      chave em `secrets/deepl_api_key.txt`, nunca no Git) serve só para conferência por amostragem.
+- [ ] Pacote completo multilíngue: rodar o build cheio (Wikipédia ×4) e medir tamanho e quantidade de arquivos antes de publicar
+      (cota de upload da Vercel — `tools/vercel_cota.py --minimo N`).
+
 ## Pendente com o mantenedor (resumo)
 1. ~~`VERCEL_TOKEN_TIME`~~ criado em 11/10.
 2. Origem da chave `apikey-sabetudo.txt`.

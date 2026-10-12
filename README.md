@@ -15,8 +15,9 @@ oficiais. Tudo é publicado em **https://saibatudo.net**.
   app não importa arquivos de outro. Os comandos de cada app rodam de dentro da pasta (`cd apps/<app>`).
 - **Deploy independente.** Cada projeto publica no próprio projeto da Vercel, pelos próprios workflows
   (`.github/workflows/<app>-*.yml` e `portal-ci.yml`), que rodam dentro da pasta e só disparam quando ela muda.
-- **Um domínio.** saibatudo.net fica no projeto de eleições, que encaminha a home (`/`, `/portal/*`) ao projeto do portal e
-  `/quimica/*` ao de química (proxy). Os contratos entre eles ficam em `tests/rotas.test.mjs`.
+- **Um domínio.** saibatudo.net fica no projeto de eleições, que encaminha a home (`/`, `/portal/*` e as versões em outros
+  idiomas `/en/`, `/es/`, `/de/`, `/fr/`) ao projeto do portal e `/quimica/*` ao de química (proxy). Os contratos entre eles
+  ficam em `tests/rotas.test.mjs`.
   Os endereços públicos não mudaram com a reorganização.
 - **Segredos do GitHub:** os de eleições não têm sufixo (`DATA_SIGNING_KEY`, `VERCEL_PROJECT_ID`…); os de química têm
   `_QUIMICA` (`DATA_SIGNING_KEY_QUIMICA`, `VERCEL_PROJECT_ID_QUIMICA`) e as variáveis, prefixo `QUIMICA_`.

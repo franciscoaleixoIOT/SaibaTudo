@@ -15,6 +15,18 @@
 .btn-tema:hover { background: rgb(255 255 255 / .12); }
 @media (max-width: 640px) { .topo-nav { display: none; } .btn-tema { margin-left: auto; } }
 
+/* Seletor de idiomas (links; sem JS) e aviso "esta página existe em…" (home.js, só em /) */
+.idiomas { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 2px 2px; padding: 6px 16px 0; background: var(--navy); color: #CBD5E1; font-size: .8125rem; --foco: #FFD166; }
+.idiomas-ic { display: inline-flex; margin-right: 6px; opacity: .8; }
+.idiomas a { color: #CBD5E1; text-decoration: none; padding: 0 10px; min-height: 40px; display: inline-flex; align-items: center; border-radius: 10px; font-weight: 600; }
+.idiomas a:hover { background: rgb(255 255 255 / .12); color: #fff; }
+.idiomas a[aria-current="page"] { color: #fff; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 2px; text-decoration-color: var(--ouro); }
+.aviso-idioma { display: flex; justify-content: center; align-items: center; gap: 8px; padding: 6px 16px; background: var(--sec-c); color: var(--on-sec-c); font-size: .875rem; }
+.aviso-idioma a { color: inherit; font-weight: 600; min-height: 36px; display: inline-flex; align-items: center; }
+.aviso-fechar { background: transparent; border: 0; color: inherit; cursor: pointer; min-width: 36px; min-height: 36px; border-radius: 8px; font-size: 1.25rem; line-height: 1; }
+.aviso-fechar:hover { background: rgb(0 0 0 / .08); }
+.selo-idioma { vertical-align: top; margin-left: 4px; margin-bottom: 6px; }
+
 main:focus { outline: none; }
 .hero { background: var(--navy); color: #fff; padding: 28px 16px 44px; text-align: center; }
 .hero-in { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 12px; }

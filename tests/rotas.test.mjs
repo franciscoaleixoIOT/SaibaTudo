@@ -1,17 +1,29 @@
 // Contratos entre os projetos do repositório único, no mesmo domínio (saibatudo.net):
-// a home (portal/, Vercel saibatudo-portal), o dono do domínio (apps/eleicoes2026/vercel.json) e os apps servidos por proxy.
-// Roda na raiz: node --test "tests/*.test.mjs"
-import test from 'node:test';
+// a home (portal/, Vercel saibatudo-portal, em cinco idiomas), o dono do domínio (apps/eleicoes2026/vercel.json) e os apps
+// servidos por proxy. Roda na raiz: node --test "tests/*.test.mjs"
+import test, { after, before } from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { IDIOMAS, ORIGEM, PADRAO, caminho, pasta } from '../portal/src/portal/i18n/index.js';
 
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const eleicoes = JSON.parse(readFileSync(join(RAIZ, 'apps/eleicoes2026/vercel.json'), 'utf8'));
 const por = Object.fromEntries(eleicoes.rewrites.map((r) => [r.source, r.destination]));
 const PORTAL = 'https://saibatudo-portal.vercel.app';
 const QUIMICA = 'https://saibatudo-quimica.vercel.app';
+const OUTROS = IDIOMAS.filter((i) => i !== PADRAO);
+/** Páginas do próprio projeto de eleições (não precisam de regra de proxy). */
+const PROPRIOS = ['/eleicoes2026/', '/privacidade', '/sobre-os-dados'];
+
+// A home é gerada no build (uma página por idioma): os testes de links e números olham o resultado, não só o molde.
+const tmp = mkdtempSync(join(tmpdir(), 'st-rotas-'));
+const pagina = (idioma) => readFileSync(join(tmp, ...pasta(idioma).split('/').filter(Boolean), 'index.html'), 'utf8');
+before(() => { execFileSync(process.execPath, [join(RAIZ, 'portal/build.mjs')], { env: { ...process.env, OUT_DIR: tmp }, encoding: 'utf8' }); });
+after(() => { try { rmSync(tmp, { recursive: true, force: true }); } catch { /* Windows */ } });
 
 test('a home vem do portal (proxy) e eleições não gera mais os arquivos da home', () => {
   for (const [origem, destino] of [['/', `${PORTAL}/`], ['/sw.js', `${PORTAL}/sw.js`], ['/manifest.webmanifest', `${PORTAL}/manifest.webmanifest`],
@@ -19,6 +31,19 @@ test('a home vem do portal (proxy) e eleições não gera mais os arquivos da ho
   for (const p of ['portal/src/index.html', 'portal/src/sw.js', 'portal/src/manifest.webmanifest']) assert.ok(existsSync(join(RAIZ, p)), p);
   // o sistema de arquivos vem antes das regras na Vercel: um index.html na raiz do site de eleições esconderia a home do portal
   for (const p of ['index.html', 'sw.js', 'manifest.webmanifest']) assert.ok(!existsSync(join(RAIZ, 'apps/eleicoes2026/web/src', p)), `eleições não pode ter ${p}`);
+});
+
+test('home em cinco idiomas: as três formas do endereço de cada idioma (/en, /en/, /en/*) vão ao portal, e eleições não tem pasta com esse nome', () => {
+  assert.deepEqual(IDIOMAS, ['pt-BR', 'en', 'es', 'de', 'fr']);
+  for (const i of OUTROS) {
+    assert.equal(por[`/${i}`], `${PORTAL}/${i}/`, `/${i}`);
+    assert.equal(por[`/${i}/`], `${PORTAL}/${i}/`, `/${i}/`);
+    assert.equal(por[`/${i}/:path*`], `${PORTAL}/${i}/:path*`, `/${i}/:path*`);
+    assert.ok(!existsSync(join(RAIZ, 'apps/eleicoes2026/web/src', i)), `eleições não pode ter a pasta web/src/${i}`);
+    assert.ok(existsSync(join(tmp, i, 'index.html')), `o build do portal não gerou /${i}/`);
+  }
+  // nenhuma regra de idioma se mistura com as rotas de eleições (que ficam sob /eleicoes2026/ e /data/)
+  for (const r of eleicoes.rewrites) if (/^\/(en|es|de|fr)(\/|$)/.test(r.source)) assert.ok(r.destination.startsWith(`${PORTAL}/`), r.source);
 });
 
 test('cada cartão da home tem rota: app do próprio domínio de eleições ou regra exata de proxy (a barra final é literal)', async () => {
@@ -32,26 +57,46 @@ test('química: as três formas do endereço vão ao projeto de química', () =>
   assert.equal(por['/quimica/:path*'], `${QUIMICA}/quimica/:path*`);
 });
 
-test('o service worker da home (escopo /) não intercepta nenhum app servido por proxy', () => {
+test('o service worker da home (escopo /) não intercepta nenhum app servido por proxy, mas atende as páginas da própria home', () => {
   const sw = readFileSync(join(RAIZ, 'portal/src/sw.js'), 'utf8');
-  const prefixos = [...new Set(eleicoes.rewrites.map((r) => r.source).filter((s) => /^\/[a-z0-9-]+\/:path\*$/.test(s)).map((s) => s.split('/')[1]))]
-    .filter((p) => p !== 'portal');
-  assert.ok(prefixos.includes('quimica'));
-  for (const p of prefixos) assert.ok(sw.includes(`p.startsWith('/${p}/')`), `portal/src/sw.js precisa ignorar /${p}/`);
+  const regras = eleicoes.rewrites.filter((r) => /^\/[a-zA-Z0-9-]+\/:path\*$/.test(r.source)).map((r) => [r.source.split('/')[1], r.destination]);
+  const apps = [...new Set(regras.filter(([, d]) => !d.startsWith(`${PORTAL}/`)).map(([p]) => p))];
+  const daHome = [...new Set(regras.filter(([, d]) => d.startsWith(`${PORTAL}/`)).map(([p]) => p))];
+  assert.ok(apps.includes('quimica'));
+  for (const p of apps) assert.ok(sw.includes(`p.startsWith('/${p}/')`), `portal/src/sw.js precisa ignorar /${p}/`);
+  assert.ok(daHome.includes('portal') && OUTROS.every((i) => daHome.includes(i)), 'portal e idiomas vão ao portal');
+  for (const p of daHome) assert.ok(!sw.includes(`p.startsWith('/${p}/')`), `portal/src/sw.js não deve ignorar /${p}/ (é da home)`);
 });
 
-test('todo link da home para um app tem rota (próprio de eleições ou proxy exato), inclusive os cartões fixos', () => {
-  const html = readFileSync(join(RAIZ, 'portal/src/index.html'), 'utf8');
-  const PROPRIOS = ['/', '/eleicoes2026/', '/privacidade', '/sobre-os-dados'];
-  const links = [...html.matchAll(/href="(\/[^"#?]*)"/g)].map((m) => m[1]).filter((u) => !u.startsWith('/portal/') && u !== '/manifest.webmanifest');
-  assert.ok(links.includes('/quimica/') && links.includes('/eleicoes2026/'), 'a home leva aos dois apps');
-  for (const u of links) assert.ok(PROPRIOS.includes(u) || por[u], `link da home sem rota: ${u}`);
+test('todo link das cinco páginas da home tem rota (próprio de eleições, página da home ou proxy exato); química recebe ?lang= fora do português', () => {
+  const inicio = IDIOMAS.map(caminho);
+  for (const idioma of IDIOMAS) {
+    const html = pagina(idioma);
+    assert.ok(html.includes(`<html lang="${idioma}">`), `${idioma}: <html lang>`);
+    for (const i of IDIOMAS) assert.ok(html.includes(`<link rel="alternate" hreflang="${i}" href="${ORIGEM}${caminho(i)}">`), `${idioma}: hreflang ${i}`);
+    assert.ok(html.includes(`<link rel="alternate" hreflang="x-default" href="${ORIGEM}/">`), `${idioma}: x-default`);
+    const links = [...html.matchAll(/href="(\/[^"#]*)"/g)].map((m) => m[1]).filter((u) => !u.startsWith('/portal/') && u !== '/manifest.webmanifest');
+    const esperadoQuimica = idioma === PADRAO ? '/quimica/' : `/quimica/?lang=${idioma}`;
+    assert.ok(links.includes(esperadoQuimica) && links.includes('/eleicoes2026/'), `${idioma}: a home leva aos dois apps`);
+    for (const u of links) {
+      const p = u.split(/[?#]/)[0];
+      assert.ok(PROPRIOS.includes(p) || inicio.includes(p) || por[p], `${idioma}: link da home sem rota: ${u}`);
+      if (p === '/quimica/') assert.equal(u, esperadoQuimica, `${idioma}: link de química`);
+    }
+    for (const i of OUTROS) if (i !== idioma) assert.ok(links.includes(caminho(i)), `${idioma}: seletor sem ${caminho(i)}`);
+  }
 });
 
-test('os números do app de química citados na home batem com o pacote publicado (data-num ↔ manifest.contagens)', () => {
-  const html = readFileSync(join(RAIZ, 'portal/src/index.html'), 'utf8');
+test('os números do app de química citados na home batem com o pacote publicado (NUMEROS_QUIMICA ↔ manifest.contagens) nas cinco páginas', async () => {
+  const { NUMEROS_QUIMICA } = await import(pathToFileURL(join(RAIZ, 'portal/src/portal/apps.js')).href);
   const contagens = JSON.parse(readFileSync(join(RAIZ, 'apps/quimica/data/quimica/manifest.json'), 'utf8')).contagens;
-  const nums = [...html.matchAll(/<span data-num="([A-Za-z]+)">(\d+)<\/span>/g)];
-  assert.ok(nums.length >= 3, 'a home cita elementos, compostos e compostos com GHS');
-  for (const [, chave, valor] of nums) assert.equal(Number(valor), contagens[chave], `home diz ${valor} ${chave}; o pacote tem ${contagens[chave]}`);
+  const chaves = Object.keys(NUMEROS_QUIMICA);
+  assert.ok(chaves.length >= 3 && ['elementos', 'compostos', 'compostosComGhsHarmonizado'].every((k) => chaves.includes(k)), 'a home cita elementos, compostos e compostos com GHS');
+  for (const k of chaves) assert.equal(NUMEROS_QUIMICA[k], contagens[k], `home diz ${NUMEROS_QUIMICA[k]} ${k}; o pacote tem ${contagens[k]}`);
+  for (const idioma of IDIOMAS) {
+    const fmt = new Intl.NumberFormat(idioma);
+    const nums = [...pagina(idioma).matchAll(/<span data-num="([A-Za-z]+)">([^<]+)<\/span>/g)];
+    assert.deepEqual(nums.map((m) => m[1]).sort(), chaves.sort(), `${idioma}: data-num`);
+    for (const [, k, v] of nums) assert.equal(v, fmt.format(contagens[k]), `${idioma}: ${k}`);
+  }
 });

@@ -2,9 +2,11 @@
  * A home é um projeto próprio (portal/), servido em saibatudo.net/ pelo proxy do projeto de eleições.
  * Nunca intercepta /api/*, /data/*, /quimica/* (outro projeto, servido por proxy, com service worker e dados assinados
  * próprios: cache-primeiro aqui prenderia JS e dados antigos), as navegações de /eleicoes2026/ (o app tem o próprio service
- * worker) nem outros métodos além de GET. */
+ * worker) nem outros métodos além de GET. As páginas por idioma (/, /en/, /es/, /de/, /fr/) são páginas da home: rede primeiro,
+ * cache se offline. */
 const VERSAO = /*__BUILD__*/ 'dev';
 const PRECACHE = /*__PRECACHE__*/ [];
+const PAGINAS_IDIOMA = /*__IDIOMAS__*/ []; // versões traduzidas da home ('/en/', …): mesma regra que '/'
 const CACHE = `st-site-${VERSAO}`;
 
 self.addEventListener('install', (event) => {
@@ -38,12 +40,14 @@ self.addEventListener('fetch', (event) => {
 /** Páginas: rede primeiro (conteúdo sempre atual), cache se estiver offline. */
 async function redeOuCache(event, req) {
   const c = await caches.open(CACHE);
+  const url = new URL(req.url);
   try {
     const r = await fetch(req);
     if (r.ok) event.waitUntil(c.put(req, r.clone()));
     return r;
   } catch {
-    return (await c.match(req, { ignoreSearch: true })) || (await c.match('/')) || Response.error();
+    const idioma = PAGINAS_IDIOMA.find((pg) => url.pathname === pg || url.pathname === pg.slice(0, -1));
+    return (await c.match(req, { ignoreSearch: true })) || (idioma && (await c.match(idioma))) || (await c.match('/')) || Response.error();
   }
 }
 

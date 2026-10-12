@@ -29,6 +29,54 @@
       "destination": "https://saibatudo-portal.vercel.app/portal/:path*"
     },
     {
+      "source": "/en",
+      "destination": "https://saibatudo-portal.vercel.app/en/"
+    },
+    {
+      "source": "/en/",
+      "destination": "https://saibatudo-portal.vercel.app/en/"
+    },
+    {
+      "source": "/en/:path*",
+      "destination": "https://saibatudo-portal.vercel.app/en/:path*"
+    },
+    {
+      "source": "/es",
+      "destination": "https://saibatudo-portal.vercel.app/es/"
+    },
+    {
+      "source": "/es/",
+      "destination": "https://saibatudo-portal.vercel.app/es/"
+    },
+    {
+      "source": "/es/:path*",
+      "destination": "https://saibatudo-portal.vercel.app/es/:path*"
+    },
+    {
+      "source": "/de",
+      "destination": "https://saibatudo-portal.vercel.app/de/"
+    },
+    {
+      "source": "/de/",
+      "destination": "https://saibatudo-portal.vercel.app/de/"
+    },
+    {
+      "source": "/de/:path*",
+      "destination": "https://saibatudo-portal.vercel.app/de/:path*"
+    },
+    {
+      "source": "/fr",
+      "destination": "https://saibatudo-portal.vercel.app/fr/"
+    },
+    {
+      "source": "/fr/",
+      "destination": "https://saibatudo-portal.vercel.app/fr/"
+    },
+    {
+      "source": "/fr/:path*",
+      "destination": "https://saibatudo-portal.vercel.app/fr/:path*"
+    },
+    {
       "source": "/quimica",
       "destination": "https://saibatudo-quimica.vercel.app/quimica/"
     },
