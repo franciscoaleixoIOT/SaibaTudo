@@ -120,7 +120,10 @@ Ordenado por fidelidade, idioma, recusas e latência (GPU, 110 prompts cada).
   idiomas) o 4B novo já é preferido sem treino; no contexto sintético de eleições o 7B atual ainda escreve melhor — é o comportamento
   que a etapa 4 (treino de comportamento) deve fechar, e Eleições só troca depois de 27/10. O painel preenchido está no histórico do Git
   (commit que registra este parágrafo); um **segundo painel**, Qwen2.5-7B × **Qwen3-4B-Instruct-2507** (o explicador escolhido), foi gerado
-  em seguida no mesmo `out/cegas.md` para o mantenedor preencher.
+  em seguida no mesmo `out/cegas.md` e **também preenchido em 12/10/2026: 16 × 4 para o Qwen3-4B-2507** — química **8 × 2** (venceu
+  pt-BR, en, fr e um item de es e de de) e eleições **8 × 2**, inclusive sobre o contexto sintético em que o Qwen3.5-4B havia perdido.
+  Os dois painéis juntos confirmam a escolha do **Qwen3-4B-Instruct-2507** como base do explicador (§1): é preferido pelo mantenedor nos
+  dois apps, é o mais rápido e o que menos inventa citação. Os painéis preenchidos estão no histórico do Git de `out/cegas.md`.
 
 ## 5. Licenças e marca "SaibaTudo"
 
@@ -179,6 +182,5 @@ os pesos são os mesmos da Qwen. Para o treino (etapas 3–4) parte-se dos safet
    painel às cegas preferir o Qwen3.5.
 3. **Prompt da química:** trocar o id de exemplo da regra 3 por um marcador que não pareça id real (ou citar só "quando houver trechos")
    e incluir no treino exemplos sem trecho que não citam nada.
-4. **Painel às cegas:** o 1º (7B × Qwen3.5-4B) foi preenchido em 12/10 (ver §4); falta o 2º (7B × Qwen3-4B-2507), já gerado em
-   `out/cegas.md` — preencher antes de abrir `cegas_chave.json`.
+4. **Painel às cegas:** os dois painéis (7B × Qwen3.5-4B e 7B × Qwen3-4B-2507) foram preenchidos em 12/10 (ver §4). Feito.
 5. Gemma: só se o mantenedor aceitar a licença (os números do Qwen3.5 tornam improvável uma vitória "por ≥ 3 pontos" que justifique o custo de licença).

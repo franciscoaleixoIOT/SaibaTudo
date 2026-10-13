@@ -16,7 +16,7 @@ Para cada item, leia a pergunta e o material enviado ao modelo e marque a melhor
 
 ### Resposta A
 
-O poliéster é amplamente utilizado na produção de roupas devido à sua resistência, resistência a rugas e rasgos, além de reduzir o encolhimento [wikipedia-pt-poliester-001]. Ele também é usado em misturas com fibras naturais para criar tecidos com propriedades combinadas. As fibras sintéticas de poliéster possuem alta resistência à água, ao vento e ao meio ambiente [wikipedia-pt-poliester-001].
+O poliéster é usado principalmente em roupas, devido à sua resistência à água, ao vento e ao meio ambiente. É comum ser misturado com fibras naturais, como o algodão, para produzir tecidos mais fortes, resistentes a rugas e rasgos e com menor encolhimento. Também é usado por sua alta resistência às condições ambientais em comparação com fibras vegetais. [wikipedia-pt-poliester-001]
 
 ### Resposta B
 
@@ -48,9 +48,13 @@ O moscóvio (Mc) tem número atômico 115 e está localizado no grupo 15 e no pe
 
 ### Resposta B
 
-O moscóvio (Mc) é um elemento químico com símbolo Mc e número atômico 115, o que significa que cada átomo possui 115 prótons no núcleo [openstax-chem2e-3.1-001]. Sua massa atômica é de aproximadamente 290,19598 u [openstax-chem2e-3.1-001]. Na tabela periódica, ele está localizado no grupo 15 e no período 7 [openstax-chem2e-3.1-001]. As informações fornecidas limitam-se a esses dados estruturais e de massa, sem detalhes sobre propriedades físicas ou químicas específicas como estado físico ou reatividade.
+O símbolo químico do moscóvio é Mc e seu número atômico é 115.  
+Ele está localizado no grupo 15 e no período 7 da tabela periódica.  
+Cada átomo de moscóvio possui 115 prótons no núcleo.  
+A massa atômica do moscóvio é de 290,19598 u.  
+As propriedades detalhadas não estão disponíveis nos trechos fornecidos. [PubChem]
 
-**Escolha:** [ ] A  [X] B  [ ] empate — comentário: 
+**Escolha:** [ ] A  [B] B  [ ] empate — comentário: 
 
 ---
 
@@ -67,7 +71,7 @@ O moscóvio (Mc) é um elemento químico com símbolo Mc e número atômico 115,
 
 ### Resposta A
 
-Based on the provided text, enzymes are substances with widespread practical applications in industry and everyday life. They act as catalysts to produce antibiotics and complex molecules while breaking down stains like protein, starch, and fat in washing powders [wikipedia-en-enzyme-004]. Enzymes such as papain are also used in meat tenderizers to hydrolyze proteins, which improves texture and digestibility [wikipedia-en-enzyme-004]. Their specific nature and high efficiency make them indispensable in both biological systems and commercial processes [wikipedia-en-enzyme-004]. The text does not provide a formal scientific definition of what an enzyme is beyond these functional descriptions.
+An enzyme is a biological molecule that acts as a catalyst to speed up chemical reactions in living organisms and industrial processes. Enzymes are highly specific and efficient, targeting particular substrates to produce desired outcomes. They are used in various applications such as antibiotic production, cleaning products, and food processing. Examples include papain, which breaks down proteins in meat tenderizers. [wikipedia-en-enzyme-004]
 
 ### Resposta B
 
@@ -92,7 +96,7 @@ Tellurium-bearing compounds were first discovered in 1782 in a gold mine in Klei
 
 ### Resposta A
 
-Tellurium (Te) is a brittle, mildly toxic, rare silver-white metalloid with atomic number 52 [wikipedia-en-tellurium-001]. It is chemically related to selenium and sulfur, all of which are chalcogens [wikipedia-en-tellurium-001]. The element is often found as elemental crystals but is extremely rare in Earth's crust due to its volatile hydride losing it to space during planetary formation [wikipedia-en-tellurium-001]. Tellurium was first discovered in 1782 and named by Martin Heinrich Klaproth after the Latin word for 'earth' [wikipedia-en-tellurium-001]. It is normally extracted as a by-product of copper and lead production rather than from gold telluride minerals [wikipedia-en-tellurium-001].
+Tellurium is a chemical element with the symbol Te and atomic number 52. It is a brittle, mildly toxic metalloid. It is chemically related to selenium and sulfur, which are all part of the chalcogen group. Tellurium is rare in Earth's crust, comparable to platinum, due to its volatile hydride formation during Earth's early formation. It is typically extracted as a by-product of copper and lead production. [wikipedia-en-tellurium-001]
 
 ### Resposta B
 
@@ -125,9 +129,9 @@ El ácido pícrico, también conocido como trinitrofenol, es un explosivo que se
 
 ### Resposta B
 
-El ácido pícrico es el nombre común del trinitrofenol (TNP), un compuesto con fórmula C6H2OH(NO2)3 que actúa como explosivo y carga aumentadora [wikipedia-es-acido-picrico-001]. Su denominación de "ácido" surge porque sus grupos nitro estabilizan la base conjugada, facilitando la disociación del hidrógeno del grupo OH y formando una solución ácida [wikipedia-es-acido-picrico-001]. Este compuesto también se utiliza en anatomía como un fijador simple para muestras histológicas [wikipedia-es-acido-picrico-001]. Es importante manejarlo con precaución debido a la peligrosidad de sus sales de picrato, que son inestables [wikipedia-es-acido-picrico-001].
+Ácido pícrico, también conocido como trinitrofenol, es un compuesto químico que presenta grupos nitro unidos a un anel fenólico, lo que le confiere propiedades ácidas debido a la facilidad con que el hidrógeno del grupo OH se disocia [wikipedia-es-acido-picrico-001]. Es un explosivo utilizado como carga aumentadora en otros materiales menos sensibles [wikipedia-es-acido-picrico-001]. Su nombre proviene de su carácter ácido, ya que el grupo OH se disocia fácilmente gracias a la estabilización del anión conjugado por los grupos nitro [wikipedia-es-acido-picrico-001]. También se emplea en anatomía como fijador de muestras histológicas [wikipedia-es-acido-picrico-001].
 
-**Escolha:** [X] A  [ ] B  [ ] empate — comentário: 
+**Escolha:** [ ] A  [X] B  [ ] empate — comentário: 
 
 ---
 
@@ -177,7 +181,11 @@ Si ocurre una exposición accidental, buscar atención médica inmediatamente. [
 
 ### Resposta B
 
-El O-fenilenodiamina presenta toxicidad aguda fatal por ingestión, contacto con la piel o inhalación [openstax-chem2e-3.1-001]. Es nocivo para los organismos acuáticos y sus efectos pueden ser duraderos [openstax-chem2e-3.1-001]. Puede causar irritación ocular grave, reacciones alérgicas cutáneas y es sospechoso de provocar cáncer y anomalías genéticas [openstax-chem2e-3.1-001]. No se dispone de frases de precaución ni de una ficha de seguridad completa en los datos proporcionados. Para manipularlo con seguridad, se requiere el uso de equipos de protección personal adecuados y medidas de descontaminación inmediata en caso de exposición. Se debe evitar la inhalación, el contacto con la piel y la ingestión, y gestionar cualquier derrame según protocolos de descarte seguro.
+El compuesto C6H8N2 presenta varios peligros según la clasificación GHS: es tóxico por ingestión (H301), nocivo para la piel (H312), puede provocar reacciones alérgicas cutáneas (H317), causa irritación grave en los ojos (H319) y es nocivo por inalación (H332). También se sospecha que puede causar anomalías genéticas (H341) y cáncer (H351), y es muy tóxico para organismos acuáticos (H400 y H410).  
+
+No se proporcionan frases de precaución (P) ni datos completos de seguridad, por lo que no se puede indicar cómo manipularlo con seguridad. Se recomienda evitar cualquier contacto directo, usar equipo de protección adecuado y realizar el manejo en un entorno bien ventilado, sin embargo, estos procedimientos no están especificados en los datos disponibles.  
+
+[contexto]
 
 **Escolha:** [X] A  [ ] B  [ ] empate — comentário: 
 
@@ -196,13 +204,13 @@ El O-fenilenodiamina presenta toxicidad aguda fatal por ingestión, contacto con
 
 ### Resposta A
 
-Lanthan ist ein chemisches Element mit dem Symbol La und der Ordnungszahl 57 [wikipedia-de-lanthan-001]. Es zählt zu den Übergangsmetallen sowie den Metallen der Seltenen Erden [wikipedia-de-lanthan-001]. Im Periodensystem befindet es sich in der 6. Periode und der 3. Nebengruppe (Scandiumgruppe) [wikipedia-de-lanthan-001]. Oft wird es auch zu den Lanthanoiden gezählt, obwohl seine f-Schale unbesetzt ist [wikipedia-de-lanthan-001].
+Lanthan ist ein chemisches Element mit dem Symbol La und der Ordnungszahl 57. Es gehört zu den Metallen der Seltenen Erden und wird häufig zu den Lanthanoiden gezählt. Es befindet sich in der 6. Periode und der 3. Nebengruppe des Periodensystems. Obwohl die f-Schale von Lanthan unbesetzt ist, wird es als Lanthanoid betrachtet [wikipedia-de-lanthan-001].
 
 ### Resposta B
 
 Lanthan ist ein chemisches Element mit dem Symbol La und der Ordnungszahl 57. Es gehört zu den Übergangsmetallen sowie den Metallen der Seltenen Erden. In der Periodensystem steht es in der 6. Periode und der 3. Nebengruppe, oder der 3. IUPAC-Gruppe. Manchmal wird es auch zu den Lanthanoiden gezählt, obwohl die f-Schale des Elements unbesetzt ist. [wikipedia-de-lanthan-001]
 
-**Escolha:** [X] A  [ ] B  [ ] empate — comentário: 
+**Escolha:** [ ] A  [X] B  [ ] empate — comentário: 
 
 ---
 
@@ -225,7 +233,7 @@ Die industrielle Anwendung der Chemie rief auch immer größere Umweltschäden h
 
 ### Resposta A
 
-Die Geschichte der Chemie beschreibt die Entwicklung von Erkenntnissen über Aufbau, Eigenschaften und Umwandlung von Stoffen [wikipedia-de-geschichte-der-chemie-001]. Zu Beginn der Neuzeit verband sich dies mit mittelalterlicher Alchemie, die aus arabischen Quellen nach Europa kam [wikipedia-de-geschichte-der-chemie-001]. Ab Ende des 18. Jahrhunderts wurde Chemie zu einer exakten Naturwissenschaft, die im 19. Jahrhundert zur chemischen Industrie führte [wikipedia-de-geschichte-der-chemie-001]. Die industrielle Anwendung verursachte jedoch ab etwa 1970 große Umweltschäden und förderte eine Umweltbewegung für nachhaltiges Handeln [wikipedia-de-geschichte-der-chemie-001]. Die Chemie nutzt verschiedene Technologien zur Stoffumwandlung in ihren zahlreichen Sparten mit unterschiedlichen Forschungszielen [wikipedia-de-geschichte-der-chemie-001].
+Die Geschichte der Chemie befasst sich mit der Entwicklung der Erkenntnisse über den Aufbau, die Eigenschaften, die Umwandlung und die Produktion von chemischen Stoffen. Anfangs verband sich die chemische Praxis mit der alchemistischen Tradition, die über arabischsprachige Gelehrte nach Europa weitergegeben wurde. Ab Ende des 18. Jahrhunderts entwickelte sich die Chemie zu einer exakten Naturwissenschaft. Im 19. Jahrhundert lieferte sie zahlreiche praktisch verwertbare Ergebnisse, die zur Gründung einer chemischen Industrie führten. Die industrielle Anwendung führte zu umweltbedingten Schäden und förderte ab 1970 eine Umweltbewegung für nachhaltiges Handeln. [wikipedia-de-geschichte-der-chemie-001]
 
 ### Resposta B
 
@@ -254,7 +262,7 @@ Le mécanisme de la catalyse proposé par Yves Chauvin, met en […]
 
 ### Resposta A
 
-La métathèse des alcènes consiste à échanger des groupements alkylidène entre deux molécules d'alcène [wikipedia-fr-metathese-chimie-002]. Ce processus est généralement catalysé par des complexes de métaux de transition comme le nickel, le tungstène, le molybdène ou le ruthénium [wikipedia-fr-metathese-chimie-002]. Un exemple concret est la cyclodimérisation de l'éthylène en cyclobutane utilisant un catalyseur à base de nickel [wikipedia-fr-metathese-chimie-002]. Le mécanisme proposé par Yves Chauvin implique la formation d'un intermédiaire métallacyclobutane lors de la réaction entre l'alcène et un carbène [wikipedia-fr-metathese-chimie-002]. Les premiers catalyseurs utilisaient des acides de Lewis, mais ils sont limités car ils tolèrent peu de groupes fonctionnels et nécessitent des températures élevées [wikipedia-fr-metathese-chimie-002].
+La métathèse est une réaction chimique où deux chaînes alkylidène (groupes carbène portant des chaînes alkyle) sont échangées entre deux alcènes. Elle utilise généralement des complexes de métaux de transition comme le nickel, le ruthénium ou le tungstène en tant que catalyseurs. Un exemple classique est la cyclodimérisation de l'éthylène en cyclobutane. Le mécanisme implique un intermédiaire appelé métallacyclobutane formé par la réaction d’un alcène avec un carbène [wikipedia-fr-metathese-chimie-002].
 
 ### Resposta B
 
@@ -287,7 +295,15 @@ O pacote não traz f […]
 
 ### Resposta A
 
-Le 1,1-dichloroéthane est classé comme inflammable (pictogramme GHS02) et nocif par ingestion (frase H302). Il provoque une irritation oculaire grave (H319) et des irritations respiratoires (H335), tout en étant toxique pour les organismes aquatiques (H412). La manipulation nécessite un équipement de protection individuelle adapté, comme des gants et des lunettes de sécurité. Il faut travailler dans un endroit bien ventilé pour éviter l'accumulation de vapeurs irritantes. En cas d'exposition, il est crucial de consulter immédiatement un médecin ou les services d'urgence. Les informations précises sur les procédures de manipulation sécurisée ne sont pas disponibles dans les extraits fournis.
+Le 1,1-dicloroéthane est un liquide et un vapor facilement inflammable [Frase H225].  
+Il peut provoquer une irritation grave des yeux [Frase H319].  
+Il est nocif par ingestion [Frase H302] et peut irriter les voies respiratoires [Frase H335].  
+Il est toxique pour les organismes aquatiques avec des effets durables [Frase H412].  
+
+Le manipule en sécurité nécessite une ventilation adéquate, des vêtements de protection et des gants, éviter tout contact avec la peau ou les yeux.  
+L’information sur les mesures de précaution (P) n’est pas disponible dans le pacote [pacote non fourni].  
+
+*Note : La manipulation doit être effectuée dans un environnement contrôlé avec des équipements de protection appropriés, et toute exposition doit être immédiatement traitée par des mesures de premiers secours.*
 
 ### Resposta B
 
@@ -319,12 +335,13 @@ Tânia Provisória venceu a eleição para governador no Rio Grande do Sul em 1�
 
 ### Resposta B
 
-- **Vencedor:** Tânia Provisória  
-- **Percentual de votos válidos:** 57,02%  
-- **Número de votos:** 4.236.222  
-- **Fonte:** TSE — Divulgação de Candidaturas e Contas Eleitorais (dados abertos), atualizado em 11/10/2026.
+Quem venceu a eleição para governador do Rio Grande do Sul foi **Tânia Provisória**.
 
-**Escolha:** [X] A  [ ] B  [ ] empate — comentário: 
+Ela foi eleita no 1º turno, com **57,02% dos votos válidos** (4.236.222 votos), superando os outros candidatos.
+
+Fonte: TSE — Divulgação de Candidaturas e Contas Eleitorais (dados abertos), atualizado em 11/10/2026.
+
+**Escolha:** [] A  [X] B  [ ] empate — comentário: 
 
 ---
 
@@ -345,10 +362,11 @@ O segundo turno ocorrerá em 25/10/2026.
 
 ### Resposta B
 
-*   **Presidente:** O segundo turno ocorre em **25 de outubro de 2026**, das 8h às 17h, em Brasília.
-*   **Governador:** O segundo turno ocorre em **25 de outubro de 2026**, das 8h às 17h, no estado onde a candidatura ocorreu.
-*   **Senadores e Deputados:** Não há segundo turno; são eleitos em turno único.
-*   **Condição para o segundo turno:** Só ocorre se nenhum candidato obtiver mais de 50% dos votos válidos no primeiro turno.
+O segundo turno das eleições de 2026 ocorrerá em **25 de outubro de 2026**, das 8h às 17h (horário de Brasília).
+
+Esse turno **apenas ocorre** para os cargos de **Presidente da República** e **Governador**, quando **nenhum candidato obtém mais de 50% dos votos válidos no primeiro turno**.
+
+Para outros cargos, como Senadores e Deputados, a eleição é realizada em **único turno**, sem segundo turno.
 
 **Escolha:** [ ] A  [X] B  [ ] empate — comentário: 
 
@@ -371,11 +389,17 @@ Sim, haverá 2º turno para Governador em Ceará entre Paulo Imaginário e Nilo 
 
 ### Resposta A
 
-- **Vencedor:** Não houve vencedor no 1º turno.
-- **Regra Aplicada:** Segundo o contexto, Paulo Imaginário (42,68%) e Nilo Suposto (30,53%) não ultrapassaram a maioria absoluta (50%).
-- **Consequência:** A eleição para Governador em Ceará será resolvida no 2º turno.
-- **Data do 2º Turno:** 25 de outubro de 2026.
-- **Candidatos no 2º Turno:** Paulo Imaginário e Nilo Suposto.
+A eleição para governador do Ceará em 2026 não foi decidida no 1º turno.
+
+De acordo com os dados da apuração do 1º turno (04/10/2026):
+
+- Paulo Imaginário: 42,68% dos votos válidos  
+- Nilo Suposto: 30,53% dos votos válidos  
+- João Genérico: 26,79% dos votos válidos  
+
+Como **nenhum candidato atingiu mais de 50% dos votos válidos**, haverá **segundo turno** entre Paulo Imaginário e Nilo Suposto, previsto para **25/10/2026**.
+
+Portanto, **não há vencedor definido ainda**. A eleição para governador do Ceará em 2026 será decidida no segundo turno.
 
 ### Resposta B
 
@@ -407,10 +431,11 @@ Fonte: TSE — Divulgação de Candidaturas e Contas Eleitorais (dados abertos),
 
 ### Resposta B
 
-*   **Valor gasto:** R$ 555.984,12 (despesas contratadas).
-*   **Fonte:** TSE — Divulgação de Candidaturas e Contas Eleitorais (dados abertos), atualizado em 11/10/2026.
+Ana Exemplo declarou despesas contratadas no valor de R$ 555.984,12 durante sua campanha.
 
-**Escolha:** [ ] A  [ ] B  [X] empate — comentário: 
+Fonte: TSE — Divulgação de Candidaturas e Contas Eleitorais (dados abertos), atualizado em 11/10/2026.
+
+**Escolha:** [ ] A  [X] B  [ ] empate — comentário: 
 
 ---
 
@@ -434,12 +459,11 @@ Sim, haverá segundo turno para governador no Pará entre Íris Ilustrativa e Di
 
 ### Resposta B
 
-*   **Sim**, haverá segundo turno.
-*   **Candidatos:** Íris Ilustrativa e Diego Teste.
-*   **Motivo:** Nenhum candidato obteve mais de 50% dos votos válidos no primeiro turno.
-*   **Data do 2º turno:** 25 de outubro de 2026.
+Sim, haverá segundo turno para governador no Pará em 25/10/2026.
 
-**Escolha:** [X] A  [ ] B  [ ] empate — comentário: 
+O segundo turno ocorrerá entre Íris Ilustrativa (43,48%) e Diego Teste (27,08%), pois nenhum candidato atingiu mais de 50% dos votos válidos no 1º turno.
+
+**Escolha:** [ ] A  [X] B  [ ] empate — comentário: 
 
 ---
 
@@ -462,14 +486,18 @@ Candidaturas a Senador em Pernambuco (PE) — 6 candidaturas:
 
 ### Resposta A
 
-- **Diego Teste** (PEP, nº 364): Candidatura indeferida com recurso.
-- **Nilo Suposto** (PEP, nº 590): Candidatura deferida.
-- **Quênia Fictio** (PEP, nº 329): Candidatura deferida.
-- **Paulo Imaginário** (PAL, nº 821): Candidatura indeferida.
-- **Marta Esboço** (PEP, nº 539): Candidatura indeferida com recurso.
-- **Olga Inventada** (PBE, nº 593): Candidatura deferida.
+Os candidatos a senador em Pernambuco (PE) com candidaturas **deferidas** são:
 
-*Nota: Senadores são eleitos em turno único. Não há segundo turno para este cargo.*
+- **Nilo Suposto (PEP, nº 590)**  
+- **Quênia Fictio (PEP, nº 329)**  
+- **Paulo Imaginário (PAL, nº 821)**  
+- **Olga Inventada (PBE, nº 593)**
+
+Candidaturas **indeferidas com recurso**:
+- Diego Teste (PEP, nº 364)  
+- Marta Esboço (PEP, nº 539)
+
+*Observação: A situação das candidaturas está conforme o registro no TSE (LC 64/90). A votação para Senador em Pernambuco ocorrerá em 04/10/2026, em turno único. Não há segundo turno para este cargo.*
 
 ### Resposta B
 
@@ -478,7 +506,7 @@ Candidaturas a Senador em Pernambuco (PE) — 6 candidaturas:
 - Paulo Imaginário (PAL, nº 821)
 - Olga Inventada (PBE, nº 593)
 
-**Escolha:** [ ] A  [X] B  [ ] empate — comentário: 
+**Escolha:** [X] A  [ ] B  [ ] empate — comentário: 
 
 ---
 
@@ -503,10 +531,12 @@ O aplicativo mostra só o registro das pesquisas; não mostra percentuais.
 
 ### Resposta B
 
-- **Pesquisa CE-11818/2026**: Instituto Beta, 1852 entrevistas, divulgação a partir de 14/09/2026.
-- **Pesquisa CE-12022/2026**: Instituto Alfa, 1195 entrevistas, divulgação a partir de 08/09/2026.
+As pesquisas eleitorais registradas para governador no Ceará (CE) são:
 
-*Nota: O aplicativo não exibe os percentuais ou nomes dos candidatos nessas pesquisas.*
+- **Registro CE-11818/2026**: Instituto Beta, 1.852 entrevistas, divulgação a partir de 14/09/2026  
+- **Registro CE-12022/2026**: Instituto Alfa, 1.195 entrevistas, divulgação a partir de 08/09/2026  
+
+Os percentuais não estão disponíveis no contexto fornecido.
 
 **Escolha:** [ ] A  [X] B  [ ] empate — comentário: 
 
@@ -534,16 +564,13 @@ Fonte: TSE — Divulgação de Candidaturas e Contas Eleitorais (dados abertos),
 
 ### Resposta A
 
-*   **Nome:** Gabriela Simulada
-*   **Cargo:** Deputado Federal (MG)
-*   **Partido:** PAL
-*   **Número:** 8183
-*   **Idade:** 62 anos
-*   **Ocupação:** Médica
-*   **Situação da candidatura:** Deferida
-*   **Bens declarados:** R$ 1.949.687,23
-*   **Histórico eleitoral:** Já eleito(a) 1 vez (vereador)
-*   **Fonte:** TSE — Divulgação de Candidaturas e Contas Eleitorais (dados abertos), atualizado em 11/10/2026.
+Gabriela Simulada é candidata a Deputado Federal no estado de Minas Gerais (MG), com o partido PAL e número 8183.
+
+Ela tem 62 anos, é médica e já foi eleita antes como vereadora.
+
+A candidatura está deferida e os bens declarados somam R$ 1.949.687,23.
+
+Fonte: TSE — Divulgação de Candidaturas e Contas Eleitorais (dados abertos), atualizado em 11/10/2026.
 
 ### Resposta B
 
@@ -575,10 +602,11 @@ Fonte: TSE — Divulgação de Candidaturas e Contas Eleitorais (dados abertos),
 
 ### Resposta B
 
-*   **Valor gasto:** R$ 3.966.334,44 (despesas contratadas).
-*   **Fonte:** TSE — Divulgação de Candidaturas e Contas Eleitorais (dados abertos), atualizado em 11/10/2026.
+Bruno Modelo declarou despesas contratadas no valor de R$ 3.966.334,44 na sua campanha.
 
-**Escolha:** [X] A  [ ] B  [ ] empate — comentário: 
+Fonte: TSE — Divulgação de Candidaturas e Contas Eleitorais (dados abertos), atualizado em 11/10/2026.
+
+**Escolha:** [ ] A  [X] B  [ ] empate — comentário: 
 
 ---
 
@@ -602,9 +630,14 @@ Sim, haverá segundo turno para governador em Ceará entre Fábio Hipótese e An
 
 ### Resposta B
 
-*   **Sim**, haverá segundo turno.
-*   **Candidatos:** Fábio Hipótese e Ana Exemplo.
-*   **Motivo:** Nenhum candidato obteve mais de 50% dos votos válidos no primeiro turno.
-*   **Data do 2º turno:** 25/10/2026.
+Sim, haverá segundo turno para governador no Ceará.  
 
-**Escolha:** [X] A  [ ] B  [ ] empate — comentário: 
+Isso ocorre porque nenhum candidato atingiu mais de 50% dos votos válidos no 1º turno.  
+
+Os candidatos envolvidos no segundo turno serão:  
+- Fábio Hipótese (38,52%)  
+- Ana Exemplo (26,41%)  
+
+O segundo turno ocorrerá em 25/10/2026, das 8h às 17h (Brasília).
+
+**Escolha:** [ ] A  [X] B  [ ] empate — comentário: 

@@ -1,106 +1,106 @@
 {
  "atual": "qwen2.5-7b",
- "candidato": "qwen3.5-4b",
+ "candidato": "qwen3-4b-2507",
  "itens": {
   "item-01": {
    "id": "q-pt-conceito-ct-uso-wikipedia-pt-poliester-001-5-h4",
-   "A": "qwen3.5-4b",
+   "A": "qwen3-4b-2507",
    "B": "qwen2.5-7b"
   },
   "item-02": {
    "id": "q-pt-BR-el-Mc",
    "A": "qwen2.5-7b",
-   "B": "qwen3.5-4b"
+   "B": "qwen3-4b-2507"
   },
   "item-03": {
    "id": "q-en-wiki-wikipedia-en-enzyme-004",
-   "A": "qwen3.5-4b",
+   "A": "qwen3-4b-2507",
    "B": "qwen2.5-7b"
   },
   "item-04": {
    "id": "q-en-wiki-wikipedia-en-tellurium-001",
-   "A": "qwen3.5-4b",
+   "A": "qwen3-4b-2507",
    "B": "qwen2.5-7b"
   },
   "item-05": {
    "id": "q-es-wiki-wikipedia-es-acido-picrico-001",
    "A": "qwen2.5-7b",
-   "B": "qwen3.5-4b"
+   "B": "qwen3-4b-2507"
   },
   "item-06": {
    "id": "q-es-seg-se-7243-ambiente",
    "A": "qwen2.5-7b",
-   "B": "qwen3.5-4b"
+   "B": "qwen3-4b-2507"
   },
   "item-07": {
    "id": "q-de-wiki-wikipedia-de-lanthan-001",
-   "A": "qwen3.5-4b",
+   "A": "qwen3-4b-2507",
    "B": "qwen2.5-7b"
   },
   "item-08": {
    "id": "q-de-wiki-wikipedia-de-geschichte-der-chemie-001",
-   "A": "qwen3.5-4b",
+   "A": "qwen3-4b-2507",
    "B": "qwen2.5-7b"
   },
   "item-09": {
    "id": "q-fr-wiki-wikipedia-fr-metathese-chimie-002",
-   "A": "qwen3.5-4b",
+   "A": "qwen3-4b-2507",
    "B": "qwen2.5-7b"
   },
   "item-10": {
    "id": "q-fr-seg-se-6365-saude",
-   "A": "qwen3.5-4b",
+   "A": "qwen3-4b-2507",
    "B": "qwen2.5-7b"
   },
   "item-11": {
    "id": "e-resultados-17",
    "A": "qwen2.5-7b",
-   "B": "qwen3.5-4b"
+   "B": "qwen3-4b-2507"
   },
   "item-12": {
    "id": "e-regras-34",
    "A": "qwen2.5-7b",
-   "B": "qwen3.5-4b"
+   "B": "qwen3-4b-2507"
   },
   "item-13": {
    "id": "e-resultados-22",
-   "A": "qwen3.5-4b",
+   "A": "qwen3-4b-2507",
    "B": "qwen2.5-7b"
   },
   "item-14": {
    "id": "e-contas-37",
    "A": "qwen2.5-7b",
-   "B": "qwen3.5-4b"
+   "B": "qwen3-4b-2507"
   },
   "item-15": {
    "id": "e-segundo_turno-24",
    "A": "qwen2.5-7b",
-   "B": "qwen3.5-4b"
+   "B": "qwen3-4b-2507"
   },
   "item-16": {
    "id": "e-listar-03",
-   "A": "qwen3.5-4b",
+   "A": "qwen3-4b-2507",
    "B": "qwen2.5-7b"
   },
   "item-17": {
    "id": "e-pesquisas-33",
    "A": "qwen2.5-7b",
-   "B": "qwen3.5-4b"
+   "B": "qwen3-4b-2507"
   },
   "item-18": {
    "id": "e-perfil-06",
-   "A": "qwen3.5-4b",
+   "A": "qwen3-4b-2507",
    "B": "qwen2.5-7b"
   },
   "item-19": {
    "id": "e-contas-38",
    "A": "qwen2.5-7b",
-   "B": "qwen3.5-4b"
+   "B": "qwen3-4b-2507"
   },
   "item-20": {
    "id": "e-segundo_turno-26",
    "A": "qwen2.5-7b",
-   "B": "qwen3.5-4b"
+   "B": "qwen3-4b-2507"
   }
  }
 }
