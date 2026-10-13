@@ -124,7 +124,9 @@ def _same_quantidades(esperado, obtido) -> bool:
 
 
 def carregar_cids(pasta) -> dict:
-    """{cid: [nomes e fórmulas]} de data/quimica/compostos/*.json (docs/DATA_CONTRACT.md §3). Vazio se a pasta não existir."""
+    """{cid: [nomes e fórmulas]} de data/quimica/compostos/*.json (docs/DATA_CONTRACT.md §3), incluindo os nomes e sinônimos POR IDIOMA
+    (`nomes.{en,es,de,fr}` e `sinonimosPorIdioma`): o modelo copia o composto como está na pergunta, e a pergunta pode vir em qualquer
+    idioma do app. Vazio se a pasta não existir."""
     saida = {}
     pasta = Path(pasta)
     if not pasta.exists():
@@ -140,7 +142,15 @@ def carregar_cids(pasta) -> dict:
             if not isinstance(c, dict) or not isinstance(c.get("cid"), int):
                 continue
             nomes = [c.get(k) for k in ("nome", "nomePopular", "nomeIupac", "formula", "formulaHill")] + list(c.get("sinonimos") or [])
-            saida[c["cid"]] = [n for n in nomes if isinstance(n, str) and n.strip()]
+            por_idioma = c.get("nomes") if isinstance(c.get("nomes"), dict) else {}
+            nomes += list(por_idioma.values())
+            for lista in (c.get("sinonimosPorIdioma") or {}).values():
+                nomes += list(lista or [])
+            vistos = []
+            for n in nomes:
+                if isinstance(n, str) and n.strip() and n not in vistos:
+                    vistos.append(n)
+            saida[c["cid"]] = vistos
     return saida
 
 

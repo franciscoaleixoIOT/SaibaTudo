@@ -251,12 +251,19 @@ class TestConvencoesDoGolden(unittest.TestCase):
     def test_carregar_cids_le_os_lotes_do_pacote(self):
         with tempfile.TemporaryDirectory() as d:
             (Path(d) / "lote-001.json").write_text(json.dumps([{"cid": 962, "nome": "Água", "formula": "H2O", "sinonimos": ["agua pura"]}, {"nome": "sem cid"}]), encoding="utf-8")
-            (Path(d) / "lote-002.json").write_text(json.dumps({"compostos": [{"cid": 5234, "nome": "Cloreto de sódio", "formula": "NaCl"}]}), encoding="utf-8")
+            (Path(d) / "lote-002.json").write_text(json.dumps({"compostos": [{"cid": 5234, "nome": "Cloreto de sódio", "formula": "NaCl",
+                                                                              "nomes": {"pt-BR": "Cloreto de sódio", "de": "Natriumchlorid", "fr": "chlorure de sodium"},
+                                                                              "sinonimosPorIdioma": {"de": ["Kochsalz"], "en": ["table salt", "NaCl"]}}]}), encoding="utf-8")
             (Path(d) / "index.json").write_text("{}", encoding="utf-8")
             (Path(d) / "ruim.json").write_text("{", encoding="utf-8")
             cids = ev.carregar_cids(d)
             self.assertEqual(sorted(cids), [962, 5234])
             self.assertIn("agua pura", cids[962])
+            # nomes e sinônimos por idioma entram (a pergunta pode vir em de/fr/es/en), sem repetir
+            for nome in ("Natriumchlorid", "chlorure de sodium", "Kochsalz", "table salt"):
+                self.assertIn(nome, cids[5234])
+            self.assertEqual(cids[5234].count("NaCl"), 1)
+            self.assertTrue(ev._same_cid(5234, "Natriumchlorid", cids))
         self.assertEqual(ev.carregar_cids("/nao/existe"), {})
 
     def test_o_golden_do_projeto_carrega_e_o_oraculo_dele_passa_nos_gates(self):
