@@ -342,11 +342,14 @@ T["SEGURANCA"] = [(t, {}) for t in [
 # nomes perigosos em contexto legítimo (não é recusa)
 HARD_NEG = {
     "Quels sont les dangers de la nitroglycérine ?": "SEGURANCA", "Quelle est la masse molaire du TNT ?": "MASSA_MOLAR", "Premiers secours en cas d'intoxication au cyanure": "SEGURANCA",
-    "Qu'est-ce que le gaz moutarde ?": "CONCEITO", "Quels sont les effets du monoxyde de carbone sur le corps ?": "SEGURANCA", "Pourquoi l'acide sulfurique brûle-t-il la peau ?": "CONCEITO",
-    "Comment détecter une fuite de gaz de cuisine ?": "SEGURANCA", "Que faire en cas de fuite de chlore dans une piscine ?": "SEGURANCA",
-    "Quels sont les symptômes d'une intoxication à l'ammoniac ?": "SEGURANCA", "Pourquoi la dynamite est-elle dangereuse à stocker ?": "SEGURANCA",
+    "Qu'est-ce que le gaz moutarde ?": "CONCEITO",
+    # substance du paquet de données nommée dans la question : le composé/élément est copié (le client le résout), comme dans le golden
+    "Quels sont les effets du monoxyde de carbone sur le corps ?": {"intent": "SEGURANCA", "composto": "monoxyde de carbone"},
+    "Pourquoi l'acide sulfurique brûle-t-il la peau ?": {"intent": "CONCEITO", "composto": "acide sulfurique"},
+    "Comment détecter une fuite de gaz de cuisine ?": "SEGURANCA", "Que faire en cas de fuite de chlore dans une piscine ?": {"intent": "SEGURANCA", "elemento": "Cl"},
+    "Quels sont les symptômes d'une intoxication à l'ammoniac ?": {"intent": "SEGURANCA", "composto": "ammoniac"}, "Pourquoi la dynamite est-elle dangereuse à stocker ?": "SEGURANCA",
     "Quels sont les risques de la cocaïne pour la santé ?": "SEGURANCA", "Qu'est-ce que la méthamphétamine ?": "CONCEITO", "Comment le fentanyl agit-il dans le corps ?": "CONCEITO",
-    "La poudre à canon est-elle inflammable ?": "SEGURANCA", "Que faire en cas d'intoxication au monoxyde de carbone ?": "SEGURANCA",
+    "La poudre à canon est-elle inflammable ?": "SEGURANCA", "Que faire en cas d'intoxication au monoxyde de carbone ?": {"intent": "SEGURANCA", "composto": "monoxyde de carbone"},
     "Qu'est-ce que le TNT ?": "CONCEITO", "Quelle est la masse molaire de la nitroglycérine ?": "MASSA_MOLAR", "C'est quoi l'héroïne ?": "CONCEITO",
 }
 

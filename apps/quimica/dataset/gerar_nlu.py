@@ -210,9 +210,13 @@ T["SEGURANCA"] = [(t, {}) for t in [
 ]]
 T["_HARD_NEG_INTENT"] = {
     "Quais os perigos da nitroglicerina?": "SEGURANCA", "Qual a massa molar do TNT?": "MASSA_MOLAR", "Primeiros socorros em intoxicação por cianeto": "SEGURANCA",
-    "O que é o gás mostarda?": "CONCEITO", "Quais os efeitos do monóxido de carbono no corpo?": "SEGURANCA", "Por que o ácido sulfúrico queima a pele?": "CONCEITO",
-    "Como identificar um vazamento de gás de cozinha?": "SEGURANCA", "O que fazer em caso de vazamento de cloro em piscina?": "SEGURANCA",
-    "Quais os sintomas de intoxicação por amônia?": "SEGURANCA", "Por que a dinamite é perigosa de armazenar?": "SEGURANCA", "Quais os riscos da cocaína para a saúde?": "SEGURANCA",
+    "O que é o gás mostarda?": "CONCEITO",
+    # substância do pacote citada na pergunta: o composto/elemento é copiado (o cliente resolve), como no golden
+    "Quais os efeitos do monóxido de carbono no corpo?": {"intent": "SEGURANCA", "composto": "monóxido de carbono"},
+    "Por que o ácido sulfúrico queima a pele?": {"intent": "CONCEITO", "composto": "ácido sulfúrico"},
+    "Como identificar um vazamento de gás de cozinha?": "SEGURANCA", "O que fazer em caso de vazamento de cloro em piscina?": {"intent": "SEGURANCA", "elemento": "Cl"},
+    "Quais os sintomas de intoxicação por amônia?": {"intent": "SEGURANCA", "composto": "amônia"}, "Por que a dinamite é perigosa de armazenar?": "SEGURANCA",
+    "Quais os riscos da cocaína para a saúde?": "SEGURANCA",
     "O que é a metanfetamina?": "CONCEITO", "Como o fentanil age no organismo?": "CONCEITO", "A pólvora é inflamável?": "SEGURANCA",
 }
 INTENT_COTA = {
@@ -673,8 +677,8 @@ def gerar(pac, seed, scale):
         for modelo in rng.sample(V.MODELOS_PESSOA, 3):
             guardar(renderizar(modelo, {"p": p}, rng), {"intent": "CONCEITO"}, norm_question(p))
     # casos duros: nomes perigosos em contexto legítimo
-    for q, it in T["_HARD_NEG_INTENT"].items():
-        alvo = {"intent": it}
+    for q, it in T["_HARD_NEG_INTENT"].items():  # str = só intenção; dict = intenção + composto/elemento copiados da pergunta
+        alvo = dict(it) if isinstance(it, dict) else {"intent": it}
         guardar(q, alvo, norm_question(q))
     # recusas
     meta = int(INTENT_COTA["RECUSA_PERIGO"] * scale)

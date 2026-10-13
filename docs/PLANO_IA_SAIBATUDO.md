@@ -137,6 +137,34 @@ menos GPU que o 7B atual, então a cota de 40 min/dia rende mais respostas.
 
 ## 9. Decisões pedidas ao mantenedor
 
+> **Etapa 3 — NLU v3 (Qwen3.5-2B, corpus único) treinado e avaliado em 13/10/2026.** Treino completo em 7 h 38 (6.888 passos, 2 épocas,
+> 55.099 exemplos, receita de `ia/treino/README.md`; interrompido no passo 755 por falta de memória do sistema e retomado do checkpoint 500),
+> exportado para GGUF (Q4_K_M 1,2 GB; Q8_0 1,9 GB) e avaliado em CPU com o `eval_golden` e a gramática de produção de **cada app**
+> (`ia/treino/avaliar_gguf.py --app`). Resultado do Q4_K_M (gate: JSON 100 % com gramática e ≥ 98 % sem, intenção ≥ 85 %, cada entidade ≥ 90 %,
+> alucinação ≤ 5 %):
+>
+> | App / conjunto | JSON (com / sem gramática) | Intenção | Entidades | Veredito |
+> | :-- | :-- | :-- | :-- | :-- |
+> | Química, golden 723 (pt 145 · en 108 · es 137 · de 150 · fr 183) | 99,9 % / 99,4 % | **97,4 %** (95,9 a 98,1 por idioma) | elemento 95,3 · propriedade 98,3 · equação 100 · unidade 100 · **composto 88,3 %** (pt 88,2 · en 77,5 · es 94 · de 96 · fr 88,4) | **reprovado só em `composto`** (gate 90 %) |
+> | Química, holdout 1.807 (nunca treinado) | 100 % | 99,8 % | ≥ 99,1 % em todas | ok nos 5 idiomas |
+> | Eleições, golden 114 | 100 % / 100 % | **95,6 %** (v2.3: 93,9 % no mesmo avaliador) | 100 % em todas | reprovado por **1 caso**: "deputado mais votado" → cargo `DEPUTADO_DISTRITAL` (3 casos com cargo null → 33 %) |
+> | Eleições, holdout 435 | 100 % | 96,1 % (v2.3: 96,3 %) | ≥ 96,6 % | ok |
+>
+> O único JSON inválido com gramática é o caso em branco do golden (`"   "`), que o serviço rejeita antes do modelo. Latência em CPU (8 threads):
+> 1,8 s com gramática na química (0,9 s sem; a gramática GBNF da química dobra o tempo), 1,3 s nas eleições (v2.3: ~0,7 s). Nenhum `<think>` vazou.
+>
+> **Diagnóstico do `composto`:** dos 31 erros, 23 são o modelo deixando de copiar o composto em perguntas com nomes **populares** ("ponto de
+> ebulição da água", "hazards of sulfuric acid", "Was ist Kochsalz?", "hcl", "queima de 16 g de metano"): o corpus sorteava os 1.971 compostos
+> por igual (quase nunca "água", "soda cáustica", "bleach") e os "casos duros" dos geradores ensinavam "perigos do X" **sem** composto. Outros
+> 6 são "o que é a amônia?" → CONCEITO (65 exemplos de "o que é {composto}" contra 3.052 de CONCEITO). Antes de medir, o avaliador da
+> química só conhecia nomes em português: corrigido para os nomes por idioma do pacote (`eval_golden.carregar_cids`), o que levou `composto`
+> de 61 % para 88 % sem gerar de novo (`ia/treino/repontuar_eval.py`).
+>
+> **Correção (v3.1, em andamento em 13/10):** gerador focado `ia/corpus/quimica_populares.py` (compostos do dia a dia nos 5 idiomas, +8.764
+> exemplos), casos duros com o composto/elemento copiado quando a substância está no pacote (5 geradores), corpus remontado (69.090) e
+> **treino de continuação** a partir do LoRA v3 (`--lora_init`, 19.280 exemplos = novos + revisão estratificada, 1 época, lr 1e-4, ~1,3 h).
+> Depois: gate completo de novo nos dois apps. A publicação continua condicionada ao gate (química primeiro; eleições só depois de 27/10).
+
 > **Decidido em 12/10/2026 (noite):** o mantenedor aprovou seguir com o **Qwen3.5-2B** como interpretador **único de todos os apps**
 > (Qwen3.5-4B de reserva se a química não passar no gate em en/es/de/fr) e deu o nome **"SaibaTudo.IA"** à IA (confirmado em 12/10; o nome fica numa constante única). Em andamento: etapa 2 (corpus único, `ia/corpus/`) e etapa 3a
 > (treino-teste curto do Qwen3.5-2B, `ia/treino/`). A pasta `ia/` na raiz reúne o que é da SaibaTudo.IA e lê os apps sem alterá-los.

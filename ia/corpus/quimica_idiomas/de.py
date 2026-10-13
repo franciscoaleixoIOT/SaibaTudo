@@ -307,9 +307,12 @@ T["SEGURANCA"] = [(t, {}) for t in [
 # nomes perigosos em contexto legítimo (não é recusa)
 HARD_NEG = {
     "Welche Gefahren gehen von Nitroglycerin aus?": "SEGURANCA", "Wie hoch ist die molare Masse von TNT?": "MASSA_MOLAR", "Erste Hilfe bei einer Cyanidvergiftung": "SEGURANCA",
-    "Was ist Senfgas?": "CONCEITO", "Welche Wirkung hat Kohlenmonoxid auf den Körper?": "SEGURANCA", "Warum verätzt Schwefelsäure die Haut?": "CONCEITO",
-    "Wie erkenne ich ein Gasleck in der Küche?": "SEGURANCA", "Was tun, wenn am Schwimmbad Chlor austritt?": "SEGURANCA",
-    "Was sind die Symptome einer Ammoniakvergiftung?": "SEGURANCA", "Warum ist es gefährlich, Dynamit zu lagern?": "SEGURANCA",
+    "Was ist Senfgas?": "CONCEITO",
+    # Stoff aus dem Datenpaket in der Frage: Verbindung/Element wird kopiert (der Client löst auf), wie im Golden
+    "Welche Wirkung hat Kohlenmonoxid auf den Körper?": {"intent": "SEGURANCA", "composto": "Kohlenmonoxid"},
+    "Warum verätzt Schwefelsäure die Haut?": {"intent": "CONCEITO", "composto": "Schwefelsäure"},
+    "Wie erkenne ich ein Gasleck in der Küche?": "SEGURANCA", "Was tun, wenn am Schwimmbad Chlor austritt?": {"intent": "SEGURANCA", "elemento": "Cl"},
+    "Was sind die Symptome einer Ammoniakvergiftung?": {"intent": "SEGURANCA", "composto": "Ammoniak"}, "Warum ist es gefährlich, Dynamit zu lagern?": "SEGURANCA",
     "Welche Gesundheitsrisiken hat Kokain?": "SEGURANCA", "Was ist Methamphetamin?": "CONCEITO", "Wie wirkt Fentanyl im Körper?": "CONCEITO",
     "Ist Schießpulver brennbar?": "SEGURANCA", "Wie hoch ist die Molmasse von Nitroglycerin?": "MASSA_MOLAR", "Wie giftig ist Blausäure?": "SEGURANCA",
     "Was ist Sarin?": "CONCEITO", "Erste Hilfe bei Chlorgasvergiftung": "SEGURANCA",

@@ -79,8 +79,18 @@ def problemas(idioma: str) -> list:
         if a - b:
             erros.append(f"T[{k}] sem moldes com propriedade estática {sorted(a - b)}")
     for q, it in mod.HARD_NEG.items():
-        if it not in nlu_core.INTENTS:
+        alvo = it if isinstance(it, dict) else {"intent": it}
+        if alvo.get("intent") not in nlu_core.INTENTS:
             erros.append(f"HARD_NEG intenção inválida {it}")
+        for k, v in alvo.items():  # entidade do caso duro: só composto/elemento e copiados da pergunta
+            if k == "intent":
+                continue
+            if k not in ("composto", "elemento"):
+                erros.append(f"HARD_NEG entidade inesperada {k} em {q!r}")
+            elif k == "composto" and v not in q:
+                erros.append(f"HARD_NEG composto {v!r} não está na pergunta {q!r}")
+            elif k == "elemento" and v not in nlu_core.SIMBOLOS:
+                erros.append(f"HARD_NEG elemento {v!r} não é símbolo em {q!r}")
     # propriedades: ids do contrato e forma reconhecível pelo léxico do idioma
     formas_lex = {pid: [fold(f) for f in fs] for pid, fs in lex["propriedades"].items()}
     for tabela_nome in ("PROP_ELEMENTO", "PROP_COMPOSTO"):

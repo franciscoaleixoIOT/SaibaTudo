@@ -369,11 +369,15 @@ T["SEGURANCA"] = _mezcla([(t, {}) for t in [
 # nombres peligrosos en contexto legítimo (no es rechazo)
 HARD_NEG = {
     "¿Cuáles son los peligros de la nitroglicerina?": "SEGURANCA", "¿Cuál es la masa molar del TNT?": "MASSA_MOLAR", "Primeros auxilios en una intoxicación por cianuro": "SEGURANCA",
-    "¿Qué es el gas mostaza?": "CONCEITO", "¿Qué efectos tiene el monóxido de carbono en el cuerpo?": "SEGURANCA", "¿Por qué el ácido sulfúrico quema la piel?": "CONCEITO",
-    "¿Cómo detecto una fuga de gas de cocina?": "SEGURANCA", "¿Qué hacer si hay una fuga de cloro en una piscina?": "SEGURANCA",
-    "¿Cuáles son los síntomas de una intoxicación por amoniaco?": "SEGURANCA", "¿Por qué es peligroso almacenar dinamita?": "SEGURANCA",
+    "¿Qué es el gas mostaza?": "CONCEITO",
+    # sustancia del paquete nombrada en la pregunta: el compuesto/elemento se copia (el cliente lo resuelve), como en el golden
+    "¿Qué efectos tiene el monóxido de carbono en el cuerpo?": {"intent": "SEGURANCA", "composto": "monóxido de carbono"},
+    "¿Por qué el ácido sulfúrico quema la piel?": {"intent": "CONCEITO", "composto": "ácido sulfúrico"},
+    "¿Cómo detecto una fuga de gas de cocina?": "SEGURANCA", "¿Qué hacer si hay una fuga de cloro en una piscina?": {"intent": "SEGURANCA", "elemento": "Cl"},
+    "¿Cuáles son los síntomas de una intoxicación por amoniaco?": {"intent": "SEGURANCA", "composto": "amoniaco"}, "¿Por qué es peligroso almacenar dinamita?": "SEGURANCA",
     "¿Qué riesgos tiene la cocaína para la salud?": "SEGURANCA", "¿Qué es la metanfetamina?": "CONCEITO", "¿Cómo actúa el fentanilo en el cuerpo?": "CONCEITO",
-    "¿Es inflamable la pólvora?": "SEGURANCA", "¿Qué es el TNT y por qué explota?": "CONCEITO", "¿Qué hago si inhalo monóxido de carbono?": "SEGURANCA",
+    "¿Es inflamable la pólvora?": "SEGURANCA", "¿Qué es el TNT y por qué explota?": "CONCEITO",
+    "¿Qué hago si inhalo monóxido de carbono?": {"intent": "SEGURANCA", "composto": "monóxido de carbono"},
     "Qué hacer en una intoxicación por cianuro": "SEGURANCA", "¿Qué es el sarín?": "CONCEITO",
 }
 

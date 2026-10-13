@@ -38,6 +38,21 @@ Receita (igual à do v2.3, só muda a base e o template): QLoRA 4-bit NF4 com du
 lote 2 × acúmulo 8, lr 2e-4 cosseno com 25 passos de aquecimento, `max_length` 256, `paged_adamw_8bit`, gradient checkpointing, bf16.
 Carrega só a parte de linguagem (`Qwen3_5ForCausalLM`; visão e MTP do checkpoint ficam de fora).
 
+## Continuação de um treino (correção dirigida, sem repetir as 7,6 h)
+Quando o gate reprova por um padrão que falta no corpus, corrige-se o gerador, remonta-se o corpus e treina-se **a partir do LoRA já
+treinado** só com o que mudou mais uma amostra de revisão:
+
+| Etapa | Comando |
+| :-- | :-- |
+| guardar o corpus anterior | `mkdir ia/corpus/out/v3 && cp ia/corpus/out/{train,val}.json ia/corpus/out/v3/` (antes de remontar) |
+| mistura novos + revisão | `$PY -I ia/treino/misturar_continuacao.py --novo ia/corpus/out/train.json --antigo ia/corpus/out/v3/train.json --out <out>/train_cont.json --revisao 1.2` |
+| continuar o LoRA | `$PY -I -u ia/treino/treinar_nlu.py --dataset <out>/train_cont.json --lora_init <treino anterior>/final --lr 1e-4 --epochs 1 --batch_size 2 --grad_accum 8 --out <out>` |
+| repontuar sem gerar | `$PY -I ia/treino/repontuar_eval.py --app quimica --eval <out>/eval_quimica_q4.json --out <out>/eval_quimica_q4_repontuado.json` (quando só o avaliador do app mudou) |
+
+`--lora_init` carrega o adaptador com `PeftModel.from_pretrained(..., is_trainable=True)` (r/alpha vêm do `adapter_config.json`); o
+agendamento de lr recomeça (cosseno, 25 passos de aquecimento). A revisão é estratificada por app e idioma na proporção do corpus atual,
+só com exemplos que o LoRA já viu com o mesmo rótulo; rótulos que mudaram entram como novos.
+
 ## Gate do NLU único
 O mesmo GGUF é avaliado com o `eval_golden` e a gramática de produção de **cada app** (`--app quimica` e `--app eleicoes`), no golden e no
 holdout que nunca treinou, e o resultado é recortado por idioma (`idioma` do caso; ausente = pt-BR). Limiares (iguais nos dois apps):

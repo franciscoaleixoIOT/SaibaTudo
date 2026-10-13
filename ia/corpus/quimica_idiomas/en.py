@@ -245,9 +245,13 @@ T["SEGURANCA"] = [(t, {}) for t in [
 # nomes perigosos em contexto legítimo (não é recusa)
 HARD_NEG = {
     "What are the hazards of nitroglycerin?": "SEGURANCA", "What is the molar mass of TNT?": "MASSA_MOLAR", "First aid for cyanide poisoning": "SEGURANCA",
-    "What is mustard gas?": "CONCEITO", "What are the effects of carbon monoxide on the body?": "SEGURANCA", "Why does sulfuric acid burn the skin?": "CONCEITO",
-    "How do I detect a cooking gas leak?": "SEGURANCA", "What to do if chlorine leaks at a swimming pool?": "SEGURANCA",
-    "What are the symptoms of ammonia poisoning?": "SEGURANCA", "Why is dynamite dangerous to store?": "SEGURANCA", "What are the health risks of cocaine?": "SEGURANCA",
+    "What is mustard gas?": "CONCEITO",
+    # substance from the data package named in the question: compound/element is copied (the client resolves it), as in the golden
+    "What are the effects of carbon monoxide on the body?": {"intent": "SEGURANCA", "composto": "carbon monoxide"},
+    "Why does sulfuric acid burn the skin?": {"intent": "CONCEITO", "composto": "sulfuric acid"},
+    "How do I detect a cooking gas leak?": "SEGURANCA", "What to do if chlorine leaks at a swimming pool?": {"intent": "SEGURANCA", "elemento": "Cl"},
+    "What are the symptoms of ammonia poisoning?": {"intent": "SEGURANCA", "composto": "ammonia"}, "Why is dynamite dangerous to store?": "SEGURANCA",
+    "What are the health risks of cocaine?": "SEGURANCA",
     "What is methamphetamine?": "CONCEITO", "How does fentanyl act in the body?": "CONCEITO", "Is gunpowder flammable?": "SEGURANCA",
 }
 

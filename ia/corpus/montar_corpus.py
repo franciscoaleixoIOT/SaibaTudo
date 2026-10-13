@@ -161,6 +161,14 @@ def multilingue():
     return mod
 
 
+def populares():
+    """Gerador focado dos compostos do dia a dia (5 idiomas), somado ao corpus desde o v3.1 (gate do v3: `composto` omitido no golden)."""
+    spec = importlib.util.spec_from_file_location("quimica_populares", AQUI / "quimica_populares.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
 # ---------------------------------------------------------------------------------------------------------
 # Validação dos rótulos pelo contrato de cada app
 # ---------------------------------------------------------------------------------------------------------
@@ -258,6 +266,30 @@ def carregar_quimica(bq, ml, stats, idiomas, escala) -> tuple:
     return treino, holdout_casos
 
 
+def carregar_populares(bq, pop, stats, idiomas, escala) -> tuple:
+    """Compostos do dia a dia nos 5 idiomas (quimica_populares.py), pelo mesmo construtor/filtro do app. Fica FORA do teto por intenção da
+    química pt (o teto é para o gerador base; estes exemplos são a correção do gate do v3). escala 0 desliga."""
+    treino, holdout_casos = [], []
+    if escala <= 0:
+        return treino, holdout_casos
+    dc = bq.dc
+    filtro = dc.FiltroDeContrato(dc.perguntas_dos_contratos(QUIMICA / "contracts"))
+    comum, pacote = pop._dataset()
+    pac = pacote.localizar(None)
+    if pac.eh_fixture:
+        raise SystemExit("pacote data/quimica ausente: o gerador de compostos populares caiu na fixture de teste")
+    for idioma in ["pt-BR"] + list(idiomas):
+        regs, st_pop = pop.gerar_idioma(pac, idioma, SEED, escala, (comum, pacote))
+        tr, _ho, casos, desc, st = bq.construir(regs, filtro)
+        stats["quimica_build"][f"populares/{idioma}"] = {**{k: v for k, v in st.items() if not k.startswith("intent_")}, "descartados": len(desc),
+                                                         "gerador": {k: v for k, v in st_pop.items() if k != "por_intencao"}}
+        for ex in tr:
+            treino.append({"app": "quimica", "idioma": idioma, "entrada": ex["input"], "saida": ex["output"], "intent": ex["intent"],
+                           "fonte": pop.FONTE, "licenca": pop.LICENCA, "origem": "template", "divisao": "treino"})
+        holdout_casos += [{**c, "idioma": idioma} for c in casos]
+    return treino, holdout_casos
+
+
 def limitar_por_intencao(regs, teto: int, stats, rotulo: str):
     """Teto de exemplos por intenção (escolha estável por hash da pergunta), para um app/idioma não enviesar o modelo."""
     if not teto:
@@ -295,18 +327,26 @@ def montar(args) -> dict:
                "quimica": qcore.SYSTEM_PROMPT + ((" " + LINHA_IDIOMA_QUIMICA) if args.linha_idioma_quimica else "")}
 
     e_tr, e_va, e_hold = carregar_eleicoes(ecore, stats)
-    q_tr, q_hold = carregar_quimica(bq, ml, stats, [i for i in args.idiomas.split(",") if i], args.escala)
+    idiomas = [i for i in args.idiomas.split(",") if i]
+    q_tr, q_hold = carregar_quimica(bq, ml, stats, idiomas, args.escala)
     pt = [r for r in q_tr if r["idioma"] == "pt-BR"]
     resto = [r for r in q_tr if r["idioma"] != "pt-BR"]
     pt = limitar_por_intencao(pt, args.teto_intencao_quimica_pt, stats, "quimica/pt-BR")
-    q_tr, q_va = separar_val(pt + resto, args.val_pct_quimica)
+    p_tr, p_hold = carregar_populares(bq, populares(), stats, idiomas, args.escala_populares)  # fora do teto: correção do gate do v3
+    q_hold += p_hold
+    q_tr, q_va = separar_val(pt + resto + p_tr, args.val_pct_quimica)
 
     # filtro de teste (todos os apps), validade do rótulo, duplicatas e conflitos
     filtro = FiltroDeTeste(perguntas_de(TESTES_ELEICOES + TESTES_QUIMICA) + [c["q"] for c in e_hold])
+    # holdout da química: cada gerador já separa por entidade, mas dois geradores podem produzir a MESMA pergunta (um no treino, outro no
+    # holdout); o texto exato do holdout nunca treina (só exato: a quase-igualdade removeria metade dos moldes)
+    holdout_quimica_exato = {chave_texto(c["q"]) for c in q_hold}
     validos = {"eleicoes2026": lambda s: rotulo_valido_eleicoes(ecore, s), "quimica": lambda s: rotulo_valido_quimica(qcore, s)}
     vistos, finais = {}, []
     for r in e_tr + e_va + q_tr + q_va:
         v = filtro.veredito(r["entrada"])
+        if not v and r["app"] == "quimica" and chave_texto(r["entrada"]) in holdout_quimica_exato:
+            v = "holdout_exato"
         if v:
             stats["removidos_por_teste"][f"{r['app']}/{r['idioma']}/{v}"] += 1
             continue
@@ -361,7 +401,8 @@ def montar(args) -> dict:
 
     cont = contagens(corpus, finais)
     cont["config"] = {"teto_intencao_quimica_pt": args.teto_intencao_quimica_pt, "val_pct_quimica": args.val_pct_quimica, "idiomas_estrangeiros": args.idiomas,
-                      "escala_estrangeiros": args.escala, "linha_idioma_quimica": bool(args.linha_idioma_quimica), "seed": SEED, "jaccard_quase_igual": JACCARD_QUASE_IGUAL}
+                      "escala_estrangeiros": args.escala, "escala_populares": args.escala_populares, "linha_idioma_quimica": bool(args.linha_idioma_quimica),
+                      "seed": SEED, "jaccard_quase_igual": JACCARD_QUASE_IGUAL}
     cont["prompts"] = prompts
     cont["filtros"] = {k: (dict(sorted(v.items())) if isinstance(v, Counter) else v) for k, v in stats.items()}
     (OUT / "contagens.json").write_text(json.dumps(cont, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -400,6 +441,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--idiomas", default="en,es,de,fr", help="idiomas estrangeiros da química")
     ap.add_argument("--escala", type=float, default=1.0, help="escala das cotas do gerador multilíngue")
+    ap.add_argument("--escala-populares", type=float, default=1.0, help="escala das cotas do gerador de compostos do dia a dia (5 idiomas; 0 desliga)")
     ap.add_argument("--teto-intencao-quimica-pt", type=int, default=2400, help="teto por intenção na química pt (0 = sem teto)")
     ap.add_argument("--val-pct-quimica", type=float, default=3.0, help="%% do lado de treino da química que vira val.json")
     ap.add_argument("--linha-idioma-quimica", action="store_true", help="acrescenta ao prompt da química a linha de idioma PROPOSTA (não está em produção)")

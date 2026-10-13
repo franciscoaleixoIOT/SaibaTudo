@@ -539,8 +539,8 @@ def gerar_idioma(pac, idioma: str, seed: int = 2026, escala: float = 1.0, ds=Non
     for p in mod.PESSOAS:
         for modelo in rng.sample(mod.MODELOS_PESSOA, min(3, len(mod.MODELOS_PESSOA))):
             guardar(renderizar(modelo, {"p": p}, rng, mod), {"intent": "CONCEITO"}, "p:" + fold(p))
-    for q, it in mod.HARD_NEG.items():
-        guardar(q, {"intent": it}, None)
+    for q, it in mod.HARD_NEG.items():  # str = só intenção; dict = intenção + composto/elemento copiados da pergunta
+        guardar(q, dict(it) if isinstance(it, dict) else {"intent": it}, None)
     # recusas (só nomes e formas de pedir)
     meta = int(COTA["RECUSA_PERIGO"] * escala)
     cats = sorted(mod.ALVOS_RECUSA)

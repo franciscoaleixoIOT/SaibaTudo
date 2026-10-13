@@ -133,6 +133,8 @@ def main():
     ap.add_argument("--save_steps", type=int, default=200)
     ap.add_argument("--seed", type=int, default=2026)
     ap.add_argument("--resume", default=None, help="pasta checkpoint-N de um treino interrompido (mesmo dataset e hiperparametros): retoma de la")
+    ap.add_argument("--lora_init", default=None,
+                    help="pasta final/ de um LoRA ja treinado: continua o treino a partir dele (novo dataset, novo agendamento de lr); r/alpha vem do adapter_config")
     a = ap.parse_args()
 
     import torch
@@ -179,8 +181,13 @@ def main():
     model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=gc,
                                             gradient_checkpointing_kwargs={"use_reentrant": False})
     alvo = a.target if a.target == "all-linear" else [x.strip() for x in a.target.split(",") if x.strip()]
-    lora = LoraConfig(r=a.lora_r, lora_alpha=a.lora_alpha, lora_dropout=0.05, bias="none", task_type="CAUSAL_LM", target_modules=alvo)
-    model = get_peft_model(model, lora)
+    if a.lora_init:
+        from peft import PeftModel
+        model = PeftModel.from_pretrained(model, a.lora_init, is_trainable=True)
+        print(f"LoRA inicial carregado de {a.lora_init} (continuacao)")
+    else:
+        lora = LoraConfig(r=a.lora_r, lora_alpha=a.lora_alpha, lora_dropout=0.05, bias="none", task_type="CAUSAL_LM", target_modules=alvo)
+        model = get_peft_model(model, lora)
     model.print_trainable_parameters()
     modulos = sorted({n.split(".")[-1] for n, m in model.named_modules() if hasattr(m, "lora_A") and isinstance(getattr(m, "lora_A"), torch.nn.ModuleDict)})
     print(f"Módulos com LoRA: {modulos}")
