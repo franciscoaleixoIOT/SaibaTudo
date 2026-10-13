@@ -34,10 +34,12 @@ POINTERS = {"nlu": "current.json", "ask": "ask-current.json"}
 
 
 def montar_ponteiro(meta: dict, agora: str) -> dict:
-    """Conteúdo do ponteiro: o que o serviço precisa para achar e conferir o arquivo (versão, nome, formato, sha256)."""
+    """Conteúdo do ponteiro: o que o serviço precisa para achar e conferir o arquivo (versão, nome, formato, sha256) e para montar o
+    prompt como no treino (prompt_suffix; base_model só informativo)."""
     arquivo = meta.get("file", conv.ARQUIVO_PRODUCAO)
     return {
         "version": meta["version"], "file": arquivo, "format": meta.get("format"), "target": meta.get("target"),
+        "prompt_suffix": meta.get("prompt_suffix") or "", "base_model": meta.get("base_model"),
         "sha256": (meta.get("files") or {}).get(arquivo, {}).get("sha256"), "promoted_at": agora,
     }
 
@@ -48,9 +50,11 @@ def plano_promocao(alvo: str, ponteiro_local: Path, modal_cmd: str = "python -m 
 
 
 def ponteiro_de_rollback(version: str, target: str) -> dict:
-    """Rollback para uma versão que já está no Volume mas não tem meta.json nesta máquina: assume o arquivo de produção padrão."""
+    """Rollback para uma versão que já está no Volume mas não tem meta.json nesta máquina: assume o arquivo de produção padrão e, no NLU,
+    o sufixo do Qwen3.5 (todas as versões publicadas da química são v3+; para um modelo Qwen2.5 use --prompt-suffix "")."""
     conv.validar_versao(version, target)
-    return {"version": version, "file": conv.ARQUIVO_PRODUCAO, "format": "v1" if target == "nlu" else "ask-v1", "target": target}
+    return {"version": version, "file": conv.ARQUIVO_PRODUCAO, "format": "v1" if target == "nlu" else "ask-v1", "target": target,
+            "prompt_suffix": conv.core.THINK_VAZIO if target == "nlu" else ""}
 
 
 def main(argv=None) -> int:

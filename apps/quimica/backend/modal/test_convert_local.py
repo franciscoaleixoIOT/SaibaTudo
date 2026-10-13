@@ -128,5 +128,44 @@ class TestPromocao(unittest.TestCase):
         self.assertFalse(gravado.get("promoted", False))
 
 
+class TestQwen35(unittest.TestCase):
+    """SaibaTudo-NLU v3+ (base Qwen3.5, treinado em ia/treino/): versão com minor e sufixo do prompt no meta.json e no ponteiro."""
+
+    def meta(self, **extra):
+        return conv.montar_meta(
+            target="nlu", version="nlu-v3.1-20261013", origem="continuação do v3", llama_ref="b11575", llama_sha="def", aprovado=True,
+            motivos=[], gate_notes=[], limites={}, segundos=0, criado_em="2026-10-13T12:00:00Z", train_meta=None,
+            arquivos={"model-Q4_K_M.gguf": {"bytes": 10, "sha256": "ff"}}, **extra,
+        )
+
+    def test_versao_com_minor_e_continuacao(self):
+        self.assertEqual(conv.validar_versao("nlu-v3.1-20261013", "nlu"), "nlu-v3.1-20261013")
+        for ruim in ("nlu-v3.-20261013", "nlu-v3.1.2-20261013", "nlu-v3,1-20261013"):
+            with self.assertRaises(SystemExit, msg=ruim):
+                conv.validar_versao(ruim, "nlu")
+
+    def test_meta_guarda_sufixo_e_base(self):
+        m = self.meta(prompt_suffix=conv.core.THINK_VAZIO, base_model="Qwen/Qwen3.5-2B", convertido_por="ia/treino/exportar_gguf.py")
+        self.assertEqual((m["prompt_suffix"], m["base_model"]), (conv.core.THINK_VAZIO, "Qwen/Qwen3.5-2B"))
+        self.assertEqual(m["converted_localmente"], "ia/treino/exportar_gguf.py")
+        self.assertEqual(self.meta()["prompt_suffix"], "")  # Qwen2.5: sem sufixo
+        with self.assertRaises(ValueError):
+            self.meta(prompt_suffix="<think>")
+
+    def test_ponteiro_copia_o_sufixo(self):
+        p = promover.montar_ponteiro(self.meta(prompt_suffix=conv.core.THINK_VAZIO, base_model="Qwen/Qwen3.5-2B"), "2026-10-13T12:00:00Z")
+        self.assertEqual((p["prompt_suffix"], p["base_model"]), (conv.core.THINK_VAZIO, "Qwen/Qwen3.5-2B"))
+        legado = promover.montar_ponteiro({"version": "nlu-v1-20261101", "target": "nlu"}, "2026-10-13T12:00:00Z")
+        self.assertEqual(legado["prompt_suffix"], "")
+
+    def test_rollback_assume_qwen35_no_nlu(self):
+        self.assertEqual(promover.ponteiro_de_rollback("nlu-v3-20261012", "nlu")["prompt_suffix"], conv.core.THINK_VAZIO)
+        self.assertEqual(promover.ponteiro_de_rollback("ask-v1-20261101", "ask")["prompt_suffix"], "")
+
+    def test_sufixos_conhecidos(self):
+        self.assertEqual(conv.core.SUFIXOS_PROMPT, ("", conv.core.THINK_VAZIO))
+        self.assertTrue(conv.core.THINK_VAZIO.startswith("<think>") and conv.core.THINK_VAZIO.endswith("</think>" + chr(10) * 2))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

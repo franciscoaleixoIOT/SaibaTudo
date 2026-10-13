@@ -7,13 +7,13 @@ e o deploy são a fase 5 de verdade (§11).
 | | NLU (interpretação) | Explicador (`ask`) |
 | :-- | :-- | :-- |
 | Papel | pergunta -> JSON `{intent, elemento, composto, propriedade, quantidades, equacao, nivel, unidadeDestino}` | explica um conceito a partir de **trechos licenciados** + dados que o app já mostrou |
-| Base | `Qwen/Qwen2.5-1.5B-Instruct` | `Qwen/Qwen3-4B-Instruct-2507` |
+| Base | **`Qwen/Qwen3.5-2B`** (SaibaTudo-NLU único de todos os apps, treinado em `ia/treino/` — §13; o `Qwen2.5-1.5B` do plano original nunca foi publicado) | `Qwen/Qwen3-4B-Instruct-2507` |
 | Treino | QLoRA 4-bit, `max_length 256`, 3 épocas | QLoRA 4-bit, `max_length 1024`, lote 1 × acúmulo 16, 2 épocas |
-| Versão | `nlu-v1-AAAAMMDD` (imutável) | `ask-v1-AAAAMMDD` (imutável) |
+| Versão | `nlu-v3.1-AAAAMMDD` (imutável; minor = continuação de treino) | `ask-v1-AAAAMMDD` (imutável) |
 | Serve em | Modal, CPU, GGUF Q4_K_M + gramática GBNF (`backend/modal/nlu_app.py`) | **Space ZeroGPU do HF** (`backend/hf_space_quimica`); reserva Modal L4 (`ask_app.py`) |
 | Repositório HF | `franciscoaleixo/SaibaTudo-Quimica-NLU` | `franciscoaleixo/SaibaTudo-Quimica-Ask` |
 | Volume do Modal | `saibatudo-quimica-models` (ponteiro `current.json`) | o mesmo Volume (ponteiro `ask-current.json`) |
-| Gates (bloqueiam) | `eval_golden.py`: JSON ≥ 98 %, intenção ≥ 85 %, cada entidade ≥ 90 %, alucinação ≤ 5 %, holdout, catraca ≤ 1 ponto, Q4×Q8 ≤ 3 pontos | `eval_seguranca.py`: 0 % de resposta útil a pedido perigoso e ≥ 95 % de resposta aos legítimos · `eval_fidelidade.py`: ≥ 98 % das explicações sem número fora dos trechos |
+| Gates (bloqueiam) | `eval_golden.py` (via `ia/treino/avaliar_gguf.py --app quimica`, golden e holdout, **por idioma**): JSON ≥ 98 %, intenção ≥ 85 %, cada entidade ≥ 90 %, alucinação ≤ 5 %, holdout, catraca ≤ 1 ponto, Q4×Q8 ≤ 3 pontos | `eval_seguranca.py`: 0 % de resposta útil a pedido perigoso e ≥ 95 % de resposta aos legítimos · `eval_fidelidade.py`: ≥ 98 % das explicações sem número fora dos trechos |
 
 Regras que não mudam: o modelo **não fornece fatos** (números vêm do pacote assinado ou de cálculo local); os casos de `contracts/` **nunca treinam**; pedido perigoso é recusado
 **por regra antes do modelo** (`api/_lib/seguranca.js`) e o texto gerado passa pelo verificador do servidor (`api/_lib/fidelidade.js`); dataset gerado da *fixture* não treina.
@@ -139,3 +139,34 @@ O `deploy` pode ser feito antes de promover (os contêineres só sobem quando ho
 `api/` (rotas e `_lib/`: `vocab`, `ground`, `normalize`, `seguranca`, `fidelidade`, handlers) · `backend/modal/` (`nlu_core.py`, `ask_core.py`, `nlu_app.py`, `ask_app.py`, `convert_local.py`, `promover.py`, `eval_golden.py`, `eval_seguranca.py`, `eval_fidelidade.py`, `eval_ask_common.py`, `gbnf_mini.py`) ·
 `backend/hf_space_quimica/` · `backend/retrain/` (`build_nlu_dataset.py`, `build_ask_dataset.py`, `dataset_common.py`) · `ai_model/` (`scripts/train_hybrid.py`, `merge_and_export.py`, `treino_utils.py`, cartões dos modelos).
 Testes: `cd api && npm test` · `python -m unittest discover -s backend/modal -p "test_*.py"` · `python -m unittest discover -s backend/retrain -p "test_*.py"` · `python -m unittest discover -s ai_model/scripts -p "test_*.py"`.
+
+## 13. SaibaTudo-NLU (Qwen3.5-2B): o fluxo real do NLU a partir de 13/10/2026
+O interpretador em nuvem deste app é o **NLU único** da SaibaTudo.IA (`docs/PLANO_IA_SAIBATUDO.md` §9 da raiz): um só modelo, treinado em
+`ia/treino/` sobre o corpus unificado de `ia/corpus/` (química em pt-BR, en, es, de, fr + eleições), avaliado com o `eval_golden.py` e a gramática
+**deste** app. Para o NLU, as seções 3 a 5 acima (treino/fusão/conversão com `train_hybrid.py` e `convert_local.py`, base Qwen2.5) ficam como
+histórico; o explicador (`ask`) continua nelas.
+
+| Etapa | Onde | Comando (da raiz; `$PY` = Python do treino) |
+| :-- | :-- | :-- |
+| treino / continuação | `ia/treino/` | `treinar_nlu.py` (`--lora_init` para continuar de um LoRA) — ver `ia/treino/README.md` |
+| exportar GGUF | `ia/treino/` | `exportar_gguf.py --lora <out>/final --out <out>/gguf --q8` (llama.cpp **b11575**, `--no-mtp`) |
+| gate | `ia/treino/` | `avaliar_gguf.py --app quimica --gguf <Q4> --holdout --out <out>/eval_quimica_q4.json` e `--gguf <Q8> --sem_livre --out <out>/eval_quimica_q8.json` (e o mesmo com `--app eleicoes`: o modelo é um só) |
+| empacotar | `ia/treino/` | `empacotar_versao.py --app quimica --version nlu-v3.1-AAAAMMDD --gguf <Q4> --eval <q4.json> --eval-q8 <q8.json> --train-meta <out>/final/train_meta.json --origem "..."` → `ai_model/output/gguf/<versão>/{model-Q4_K_M.gguf, meta.json, eval.json}`; `passed` só se os gates do app, **cada idioma**, o template e a ausência de `<think>` passarem |
+| enviar e servir | este app | §7: `MSYS_NO_PATHCONV=1 python -m modal volume put saibatudo-quimica-models ai_model/output/gguf/<versão>/<arquivo> /<versão>/<arquivo>` para os três arquivos; `python -m modal deploy backend/modal/nlu_app.py` |
+| promover | este app | §8: `python backend/modal/promover.py --version <versão>` (exige `passed`), depois `MODEL_VERSION`, `MODAL_ENDPOINT`, `MODAL_KEY`, `MODAL_SECRET` na Vercel e `gh workflow run quimica-data-refresh.yml` |
+
+**Prompt igual no treino, no gate e no serviço.** O Qwen3.5 responde sem raciocínio: o template põe um bloco de raciocínio vazio no início do turno
+do assistente (`nlu_core.THINK_VAZIO`). O `meta.json` grava `prompt_suffix` e `base_model`; `promover.py` copia os dois para o ponteiro
+(`current.json`) e `nlu_app.py` envia `nlu_core.build_prompt(q) + prompt_suffix` (ponteiro sem o campo = sufixo vazio, Qwen2.5). `avaliar_gguf.py`
+confere que o template gravado no GGUF, o do tokenizer e essa string são idênticos (`template.gguf_template_igual_servico`), e o empacotador reprova se não forem.
+
+**Pergunta inválida no golden** (`"   "` → `DESCONHECIDA`): o serviço a recusa antes do modelo (proxy 400 → NLU local → `DESCONHECIDA`), por isso
+`eval_golden.evaluate` não chama o modelo nesses casos e conta a resposta do sistema (`cases[].servico`).
+
+**Primeira versão publicada:** não há catraca (nenhum NLU treinado esteve em produção na química antes); a partir da segunda, `--previous-eval
+ai_model/output/gguf/<anterior>/eval.json --previous-version <anterior>` no empacotador. Rollback: §9 (`promover.py --rollback` assume o sufixo do
+Qwen3.5; para um modelo Qwen2.5 seria preciso editar o ponteiro).
+
+**Eleições:** o mesmo GGUF passa pelo gate de lá (`--app eleicoes`), mas a publicação segue o `convert_gguf.py`/Volume `saibatudo-nlu-models` do app
+de eleições e só depois do congelamento (27/10).
+

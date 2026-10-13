@@ -32,6 +32,7 @@ publica nada: nada de Modal, Vercel, Hugging Face Space nem `MODEL_VERSION`. Sa�
 | mesclar + GGUF | `$PY -I ia/treino/exportar_gguf.py --lora <out>/final --out <out>/gguf [--q8]` | `mesclado/`, `*-bf16.gguf`, `*-Q4_K_M.gguf` (`*-Q8_0.gguf`) |
 | latência CPU comparada | `$PY -I ia/treino/latencia_cpu.py --n 30 --gguf v2.3=<gguf> --gguf novo=<gguf>:qwen35` | prompt / livre / gramática, p50 e p90 |
 | avaliar (gate, CPU) | `$PY -I ia/treino/avaliar_gguf.py --app quimica\|eleicoes --gguf <gguf> --threads 8 [--holdout] [--sem_livre] [--baseline <eval_q8.json>] --out <out>/eval_<app>_q4.json` | métricas do `eval_golden` **do app** (golden com/sem gramática e, com `--holdout`, os casos reservados de `ia/corpus/out/holdout_<app>.json`), tudo também **por idioma**, template, latência, `<think>`; um processo por app |
+| empacotar para o app | `$PY -I ia/treino/empacotar_versao.py --app quimica --version nlu-v3.1-AAAAMMDD --gguf <Q4_K_M.gguf> --eval <out>/eval_quimica_q4.json --eval-q8 <out>/eval_quimica_q8.json --train-meta <out>/final/train_meta.json --origem "..."` | `apps/quimica/ai_model/output/gguf/<versão>/{model-Q4_K_M.gguf, meta.json, eval.json}` no formato que `backend/modal/promover.py` lê (`passed` = gates do app + por idioma + template + `<think>`; `prompt_suffix` do Qwen3.5); não publica nada |
 
 Receita (igual à do v2.3, só muda a base e o template): QLoRA 4-bit NF4 com dupla quantização, LoRA r=16, alpha=32, dropout 0,05 em
 **todas as lineares** (atenção cheia `q/k/v/o_proj`, Gated DeltaNet `in_proj_qkv/z/a/b` e `out_proj`, MLP `gate/up/down_proj`),
@@ -59,6 +60,14 @@ holdout que nunca treinou, e o resultado é recortado por idioma (`idioma` do ca
 JSON com gramática 100 %, validade nativa sem gramática ≥ 98 %, intenção ≥ 85 %, cada entidade ≥ 90 %, alucinação ≤ 5 %, queda Q4 × Q8 ≤ 3 p.p.
 Cadeia completa (≈ 1,5 h em CPU): química Q4 com holdout → eleições Q4 com holdout → Q8 dos dois só no golden (`--sem_livre`, referência
 da quantização). Resultado do v3: `docs/PLANO_IA_SAIBATUDO.md` §9.
+
+Testes desta pasta (partes puras do empacotador): `$PY -I -m unittest discover -s ia/treino -t ia/treino -p "test_*.py"`.
+
+## Publicar no app (química primeiro)
+O GGUF aprovado vai ao app pelo caminho do próprio app, nunca daqui: `empacotar_versao.py` (acima) e depois, dentro de `apps/quimica`,
+`modal volume put` dos três arquivos, `modal deploy backend/modal/nlu_app.py`, `backend/modal/promover.py --version <versão>` e as variáveis
+na Vercel (`docs/MODELO.md` §13 do app). O ponteiro do Volume carrega `prompt_suffix` (o bloco de raciocínio vazio do Qwen3.5) e `nlu_app.py`
+o acrescenta a `build_prompt()`: treino, gate e serviço montam o mesmo prompt. Eleições: só depois de 27/10, pelo `convert_gguf.py` de lá.
 
 ## Formato do prompt (treino = serviço)
 Template do Qwen3.5 com `enable_thinking=False` (no Qwen3.5 também é o padrão quando a variável não é passada):

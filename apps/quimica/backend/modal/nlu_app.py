@@ -2,8 +2,10 @@
 """
 SaibaTudo Química — interpretação (NLU) em nuvem no Modal.com (CPU + llama.cpp).
 
-Serve o GGUF (Q4_K_M) do modelo de interpretação (Qwen2.5-1.5B-Instruct ajustado, `nlu-v1-AAAAMMDD`) com llama-cpp-python e a gramática GBNF
-de nlu_core.py, atrás de um endpoint HTTPS protegido por Proxy Auth Token do Modal (cabeçalhos Modal-Key / Modal-Secret). Quem chama é SÓ o
+Serve o GGUF (Q4_K_M) do SaibaTudo-NLU (Qwen3.5-2B ajustado em ia/treino/, `nlu-v3.1-AAAAMMDD`; a base Qwen2.5 do plano original nunca foi
+publicada) com llama-cpp-python e a gramática GBNF de nlu_core.py, atrás de um endpoint HTTPS protegido por Proxy Auth Token do Modal
+(cabeçalhos Modal-Key / Modal-Secret). O prompt é `nlu_core.build_prompt(q) + ponteiro["prompt_suffix"]` (no Qwen3.5, o bloco de
+raciocínio vazio `<think>\n\n</think>\n\n`, igual ao treino e ao gate `ia/treino/avaliar_gguf.py`). Quem chama é SÓ o
 proxy serverless da Vercel (api/nlu.js), que guarda o segredo; o app/site nunca falam com o Modal.
 
   POST <url>  {"q": "<pergunta, no máximo 300 caracteres>"}
@@ -14,7 +16,8 @@ O proxy normaliza `output` e ANCORA cada entidade na pergunta (api/_lib/normaliz
 
 Deploy:   modal deploy backend/modal/nlu_app.py
 Benchmark (container efêmero, mede cold start e latência):   modal run backend/modal/nlu_app.py::bench
-Pré-requisito: o modelo no Volume e promovido (backend/modal/convert_local.py --upload; backend/modal/promover.py). Ver docs/MODELO.md.
+Pré-requisito: o modelo no Volume e promovido (ia/treino/empacotar_versao.py --app quimica; `modal volume put`; backend/modal/promover.py).
+Ver docs/MODELO.md §13.
 
 Custo: CPU-only, `scaledown_window` curto, `max_containers` baixo. NÃO usar GPU: tráfego esparso, saída curta (10 a 40 tokens), cold start cobrado.
 (NÃO executado ainda: o treino é a fase 5 de verdade. Rode o `bench` no primeiro deploy e ajuste CPU_CORES e MODAL_TIMEOUT_MS na Vercel.)
@@ -47,7 +50,7 @@ LLAMA_CPP_PYTHON_BUILD = (
 
 # --- parâmetros de custo/latência (ver docs/MODELO.md: custos) ---
 CPU_CORES = 4.0            # núcleos FÍSICOS (o Modal cobra pelo maior entre reserva e uso). Saída curta (10-40 tokens): ajustar após o `bench`
-MEMORY_MIB = 3072          # GGUF Q4_K_M ~1,1 GB + contexto + Python
+MEMORY_MIB = 4096          # GGUF Q4_K_M do Qwen3.5-2B = 1,2 GB (mmap) + contexto + Python; folga para o pico do carregamento
 SCALEDOWN_SECONDS = 30     # container ocioso desliga em 30 s (default do Modal é 60)
 MAX_CONTAINERS = 2         # teto de concorrência/custo
 REQUEST_TIMEOUT_S = 60
@@ -92,6 +95,11 @@ class Nlu:
         self.fmt = cfg.get("format") or core.FORMAT_VERSION
         if self.fmt != core.FORMAT_VERSION:
             raise RuntimeError(f"formato de saída desconhecido no ponteiro: {self.fmt}")
+        # Sufixo do prompt (igual ao treino): "" para Qwen2.5, THINK_VAZIO para Qwen3.5. Ponteiro sem o campo = "" (legado).
+        self.prompt_suffix = cfg.get("prompt_suffix") or ""
+        if self.prompt_suffix not in core.SUFIXOS_PROMPT:
+            raise RuntimeError(f"prompt_suffix desconhecido no ponteiro: {self.prompt_suffix!r}")
+        self.base_model = cfg.get("base_model")
         caminho = Path(MODELS_DIR) / self.version / cfg["file"]
         self.lock = threading.Lock()  # a instância do llama.cpp não é thread-safe
         self.llm = Llama(
@@ -106,7 +114,8 @@ class Nlu:
         # Aquecimento: preenche o cache de KV com o prefixo (system prompt), reaproveitado nas próximas perguntas.
         self._gerar("qual a massa molar da água?")
         self.load_seconds = round(time.time() - t0, 2)
-        print(json.dumps({"evt": "model_loaded", "version": self.version, "format": self.fmt, "seconds": self.load_seconds}))
+        print(json.dumps({"evt": "model_loaded", "version": self.version, "format": self.fmt, "base": self.base_model,
+                          "prompt_suffix": self.prompt_suffix, "seconds": self.load_seconds}))
 
     # -------------------------------------------------------------------------------------------------
     def _gerar(self, pergunta: str):
@@ -117,7 +126,7 @@ class Nlu:
         grammar = LlamaGrammar.from_string(core.grammar(), verbose=False)
         with self.lock:
             out = self.llm.create_completion(
-                prompt=core.build_prompt(pergunta),
+                prompt=core.build_prompt(pergunta) + self.prompt_suffix,
                 grammar=grammar,
                 max_tokens=core.MAX_NEW_TOKENS,
                 temperature=0.0,       # determinístico (guloso)

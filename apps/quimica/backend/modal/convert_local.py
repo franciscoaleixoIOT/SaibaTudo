@@ -53,7 +53,7 @@ QUANTS = {"Q4_K_M": "LLAMA_FTYPE_MOSTLY_Q4_K_M", "Q8_0": "LLAMA_FTYPE_MOSTLY_Q8_
 # só o que o serviço precisa sobe ao Volume; Q8 (referência do gate) e f16 ficam locais
 ARQUIVOS_NO_VOLUME = (ARQUIVO_PRODUCAO, "meta.json", "eval.json")
 TARGETS = ("nlu", "ask")
-RX_VERSAO = re.compile(r"^(nlu|ask)-v\d+-\d{8}$")
+RX_VERSAO = re.compile(r"^(nlu|ask)-v\d+(\.\d+)?-\d{8}$")  # nlu-v1-AAAAMMDD, nlu-v3.1-AAAAMMDD (continuação de treino)
 
 
 def sha256(path: Path) -> str:
@@ -65,7 +65,7 @@ def sha256(path: Path) -> str:
 
 
 def validar_versao(versao: str, target: str) -> str:
-    """Nomes imutáveis: nlu-v1-AAAAMMDD e ask-v1-AAAAMMDD. O prefixo tem de ser o do --target."""
+    """Nomes imutáveis: nlu-v1-AAAAMMDD, nlu-v3.1-AAAAMMDD (minor = continuação) e ask-v1-AAAAMMDD. O prefixo tem de ser o do --target."""
     m = RX_VERSAO.match(versao)
     if not m or m.group(1) != target:
         raise SystemExit(f"versão inválida para --target {target}: {versao!r} (esperado {target}-v<N>-AAAAMMDD, ex.: {target}-v1-20261101)")
@@ -87,13 +87,18 @@ def normalizar_previous(eval_json: dict | None) -> dict | None:
 
 
 def montar_meta(*, target: str, version: str, origem: str, llama_ref: str, llama_sha: str, aprovado: bool, motivos: list, gate_notes: list,
-                limites: dict, arquivos: dict, segundos: int, criado_em: str, train_meta: dict | None) -> dict:
-    """meta.json do Volume: o que o serviço e a promoção precisam saber (arquivo de produção, formato, resultado do gate)."""
+                limites: dict, arquivos: dict, segundos: int, criado_em: str, train_meta: dict | None,
+                prompt_suffix: str = "", base_model: str | None = None, convertido_por: str | None = None) -> dict:
+    """meta.json do Volume: o que o serviço e a promoção precisam saber (arquivo de produção, formato, sufixo do prompt, resultado do gate).
+    `prompt_suffix` é o que o serviço acrescenta a build_prompt() (core.SUFIXOS_PROMPT): vazio no Qwen2.5, THINK_VAZIO no Qwen3.5."""
+    if prompt_suffix not in core.SUFIXOS_PROMPT:
+        raise ValueError(f"prompt_suffix desconhecido: {prompt_suffix!r}")
     return {
         "target": target, "version": version, "format": core.FORMAT_VERSION if target == "nlu" else "ask-v1", "file": ARQUIVO_PRODUCAO,
+        "prompt_suffix": prompt_suffix, "base_model": base_model,
         "hf_repo": None, "hf_revision": None, "origem_modelo": origem,
         "llama_cpp_ref": llama_ref, "llama_cpp_sha": llama_sha, "llama_cpp_python": LLAMA_CPP_PYTHON,
-        "converted_localmente": "backend/modal/convert_local.py (quantização pela API do llama-cpp-python)",
+        "converted_localmente": convertido_por or "backend/modal/convert_local.py (quantização pela API do llama-cpp-python)",
         "created_at": criado_em, "seconds": segundos,
         "passed": bool(aprovado), "reasons": list(motivos), "promoted": False, "gate_notes": list(gate_notes),
         "gate_thresholds": dict(limites),

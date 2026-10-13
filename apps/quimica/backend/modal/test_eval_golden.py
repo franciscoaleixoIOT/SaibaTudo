@@ -325,5 +325,28 @@ class TestPromocao(unittest.TestCase):
         self.assertIsNone(ev.escolher_previous({"version": "a"}, {"x": 1}, 100)[0])
 
 
+class TestPerguntaInvalida(unittest.TestCase):
+    """Pergunta que o serviço recusa antes do modelo (vazia/longa/controle): avalia-se a resposta do sistema (DESCONHECIDA), sem gerar."""
+
+    def test_vazia_conta_como_json_valido_e_desconhecida(self):
+        chamadas = []
+
+        def gen(q):
+            chamadas.append(q)
+            return '{"intent":"MASSA_MOLAR","composto":"água"}'
+
+        casos = [{"q": "   ", "intent": "DESCONHECIDA"}, {"q": "x" * 400, "intent": "DESCONHECIDA"}, {"q": "massa molar da água", "intent": "MASSA_MOLAR", "composto": "água"}]
+        r = ev.evaluate(gen, casos, "t")
+        self.assertEqual(chamadas, ["massa molar da água"])  # o modelo só vê a pergunta válida
+        self.assertEqual((r["json_valid_pct"], r["intent_acc_pct"]), (100.0, 100.0))
+        self.assertEqual(r["cases"][0]["servico"], "pergunta inválida: recusada antes do modelo")
+        self.assertEqual(r["cases"][0]["saida"], ev.RESPOSTA_PERGUNTA_INVALIDA)
+        self.assertNotIn("servico", r["cases"][2])
+
+    def test_pergunta_invalida_com_outra_intencao_esperada_conta_erro(self):
+        r = ev.evaluate(lambda q: "{}", [{"q": "", "intent": "AJUDA"}], "t")
+        self.assertEqual(r["intent_acc_pct"], 0.0)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

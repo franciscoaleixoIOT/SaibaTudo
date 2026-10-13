@@ -46,6 +46,12 @@ IM_START = "<|im_start|>"
 IM_END = "<|im_end|>"
 STOP_TOKENS = [IM_END, "<|endoftext|>"]
 
+# Sufixo do turno do assistente que o SERVIÇO acrescenta depois de build_prompt(), igual ao do treino. Vazio para a base Qwen2.5;
+# para a base Qwen3.5 (SaibaTudo-NLU v3+, treinado em ia/treino/ com enable_thinking=False) é o bloco de raciocínio vazio que o
+# template do modelo põe no início da resposta. Vem do ponteiro do Volume (meta.json -> promover.py -> current.json).
+THINK_VAZIO = "<think>\n\n</think>\n\n"
+SUFIXOS_PROMPT = ("", THINK_VAZIO)
+
 _CONTROLES = re.compile(
     "[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F\u200B-\u200F\u202A-\u202E\u2060-\u2064\u2066-\u2069\uFEFF]"
 )

@@ -189,6 +189,9 @@ def _same(chave: str, esperado, obtido, cids=None):
 # ---------------------------------------------------------------------------------------------------------
 # Avaliação
 # ---------------------------------------------------------------------------------------------------------
+RESPOSTA_PERGUNTA_INVALIDA = '{"intent":"DESCONHECIDA"}'  # o que o sistema devolve quando o proxy recusa a pergunta antes do modelo
+
+
 def evaluate(generate, cases, label: str = "", cids=None) -> dict:
     """`generate(q) -> texto bruto do modelo`. `cids` = {cid: nomes} (carregar_cids) para medir `composto` dado como CID. Devolve métricas + detalhe."""
     n = len(cases)
@@ -199,15 +202,24 @@ def evaluate(generate, cases, label: str = "", cids=None) -> dict:
 
     for caso in cases:
         t0 = time.time()
+        servico = None
         try:
-            texto, erro = generate(caso["q"]), None
-        except Exception as e:  # falha de geração conta como inválido
-            texto, erro = "", type(e).__name__
+            core.validate_question(caso["q"])
+        except ValueError:
+            # Pergunta que o SERVIÇO recusa antes do modelo (vazia, longa demais, caracteres de controle): o proxy responde 400 e os
+            # clientes caem no NLU local, que devolve DESCONHECIDA. Avalia-se a resposta do sistema, não se chama o modelo.
+            texto, erro, servico = RESPOSTA_PERGUNTA_INVALIDA, None, "pergunta inválida: recusada antes do modelo"
+        else:
+            try:
+                texto, erro = generate(caso["q"]), None
+            except Exception as e:  # falha de geração conta como inválido
+                texto, erro = "", type(e).__name__
         lat.append(time.time() - t0)
         obj = core.parse_model_output(texto)
         valido = core.has_valid_shape(obj)
         validos += int(valido)
-        item = {"q": caso["q"], "json_valido": valido, "saida": (texto or "")[:600], **({"erro": erro} if erro else {})}
+        item = {"q": caso["q"], "json_valido": valido, "saida": (texto or "")[:600], **({"erro": erro} if erro else {}),
+                **({"servico": servico} if servico else {})}
         if valido:
             if "intent" in caso:
                 intent_n += 1
