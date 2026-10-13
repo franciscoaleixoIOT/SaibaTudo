@@ -132,6 +132,7 @@ def main():
     ap.add_argument("--logging_steps", type=int, default=10)
     ap.add_argument("--save_steps", type=int, default=200)
     ap.add_argument("--seed", type=int, default=2026)
+    ap.add_argument("--resume", default=None, help="pasta checkpoint-N de um treino interrompido (mesmo dataset e hiperparametros): retoma de la")
     a = ap.parse_args()
 
     import torch
@@ -217,7 +218,7 @@ def main():
     amostrador.start()
     torch.cuda.reset_peak_memory_stats()
     t_treino = time.time()
-    trainer.train()
+    trainer.train(resume_from_checkpoint=a.resume or None)
     dur_treino = time.time() - t_treino
     amostrador.parar.set()
 
