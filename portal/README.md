@@ -2,11 +2,14 @@
 
 Projeto próprio (Vercel `saibatudo-portal`, https://saibatudo-portal.vercel.app), servido em **https://saibatudo.net/**
 pelo proxy do projeto de eleições (`apps/eleicoes2026/vercel.json`: `/`, `/sw.js`, `/manifest.webmanifest`, `/portal/*` e
-as páginas por idioma `/en`, `/en/`, `/en/*`, idem `es`, `de`, `fr`).
+as páginas por idioma `/en`, `/en/`, `/en/*`, idem `es`, `de`, `fr`). Os apps: `/eleicoes2026/` é do próprio projeto de eleições; `/quimica`, `/quimica/`, `/quimica/*`
+(`saibatudo-quimica`) e `/achavagaia`, `/achavagaia/`, `/achavagaia/*` (`saibatudo-achavagaia`, repositório privado: a home
+não o linka) vão por proxy, no mesmo `vercel.json`.
 
 - `src/index.html` — o **molde** da página (não é servido tal qual): `{{chave}}` recebe o texto do catálogo do idioma,
   `{{?chave}}…{{/chave}}` só entra se a chave não for vazia, `{{pagina.*}}` é calculado no build (lang, canônica, hreflang,
-  seletor de idiomas) e `href="/quimica/"` ganha `?lang=<idioma>` fora do português.
+  seletor de idiomas) e `href="/quimica/"` ganha `?lang=<idioma>` fora do português (`/achavagaia/` **não** ganha: o app é só em
+  português por enquanto; o `build.mjs` só reescreve `/quimica/`).
 - `src/portal/i18n/` — `index.js` (lista de idiomas `pt-BR`, `en`, `es`, `de`, `fr` e caminhos) e um catálogo por idioma
   (`pt-BR.js` é a referência; os outros têm as mesmas chaves, conferidas por teste). **Só de build**: não vão para `dist/`.
 - `src/portal/` — tudo o que a home usa, com cópias próprias (CSS, tema, ícones, marca, fonte Poppins com a licença OFL).
@@ -28,8 +31,9 @@ vercel deploy --prod --yes        # publicação manual (normalmente: push na ma
 Uma página por idioma, gerada no build (contrato: `apps/quimica/docs/I18N.md` §2 e §5): `/` (pt-BR, padrão e `x-default`),
 `/en/`, `/es/`, `/de/`, `/fr/`. Cada página tem `<html lang>`, título/descrição/Open Graph no idioma, `<link rel="alternate"
 hreflang>` para as cinco + `x-default`, canônica própria, seletor de idiomas no topo (links simples, sem JS; idioma atual com
-`aria-current`), o cartão de Química apontando para `/quimica/?lang=<idioma>` e o cartão de Eleições com o selo
-"só em português" (o app de Eleições é só em português). Os números do cartão de química saem no formato do idioma
+`aria-current`), o cartão de Química apontando para `/quimica/?lang=<idioma>`, o cartão de Eleições com o selo
+"só em português" (o app de Eleições é só em português) e o cartão do AchaVagaIA com os selos "primeira versão em construção"
+(todos os idiomas) e "só em português" (fora do português), apontando para `/achavagaia/` sem `?lang=`. Os números do cartão de química saem no formato do idioma
 (`Intl.NumberFormat`), mantendo os ganchos `<span data-num>`. Na página em português, `home.js` mostra a quem não navega
 em português um aviso de uma linha ("This page is also available in English", dispensável, lembrado em `localStorage`);
 nunca redireciona.
@@ -37,7 +41,7 @@ nunca redireciona.
 ### Como traduzir ou corrigir um texto
 Edite `src/portal/i18n/<idioma>.js` (textos fixos da página), `src/portal/textos.js` (textos criados por `home.js`:
 tema, "Em breve", Google Play, aviso de idioma) ou `traducoes` em `src/portal/apps.js` (cartões "Em breve"). Marcas
-(`SaibaTudo`, `SaibaTudo — Eleições 2026`, `SaibaTudo — Química`, `PubChem`, `Wikidata`) não se traduzem. Os catálogos
+(`SaibaTudo`, `SaibaTudo — Eleições 2026`, `SaibaTudo — Química`, `SaibaTudo — AchaVagaIA`, `PubChem`, `Wikidata`) não se traduzem. Os catálogos
 en/es/de/fr foram escritos por agente e estão marcados `revisao: 'pendente'`; depois da revisão por falante nativo, troque
 para `'humana'`.
 
@@ -52,11 +56,15 @@ para `'humana'`.
 4. `node --test test/*.test.mjs` aqui e `node --test "tests/*.test.mjs"` na raiz conferem catálogo, páginas, rotas e SW.
 
 ## Como adicionar um novo app à home
-1. Cartão: edite `src/portal/apps.js` (`APPS` para apps no ar, `EM_BREVE` para planejados, com `traducoes`).
+1. Cartão: os apps principais no ar (Eleições, Química e AchaVagaIA) são cartões fixos no `src/index.html`, com textos nos
+   cinco catálogos (`src/portal/i18n/*.js`, mesmas chaves, conferidas por teste) e ícone em `src/portal/brand/svg/`. Outros
+   apps: `src/portal/apps.js` (`APPS` para apps no ar, `EM_BREVE` para planejados, com `traducoes`).
 2. Rota: se o app é outro projeto da Vercel, acrescente em `apps/eleicoes2026/vercel.json` as três regras de proxy
    (`/<app>`, `/<app>/` e `/<app>/:path*` — a barra final é literal) fora do congelamento de eleições.
 3. Service worker: inclua o prefixo do app nas exclusões de `src/sw.js` (cache-primeiro aqui prenderia arquivos antigos).
 4. `node --test "tests/*.test.mjs"` na raiz do repositório confere as três coisas juntas.
 5. Destaque igual para todos os apps no ar: no `index.html`, um botão no hero com a mesma classe (`btn btn-ouro grande`) e um
    cartão `card app-principal` com o mesmo botão `btn btn-primario grande` (decisão do mantenedor, 12/10/2026: nenhum app
-   com cor ou destaque diferente dos outros).
+   com cor ou destaque diferente dos outros). O teste da home confere os botões do topo e dos cartões nas cinco páginas.
+6. App só em português (como Eleições e AchaVagaIA): selo "só em português" nos idiomas que não são pt-BR e link **sem**
+   `?lang=` (só o `/quimica/` é reescrito pelo `build.mjs`).

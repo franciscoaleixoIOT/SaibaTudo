@@ -15,6 +15,7 @@ const eleicoes = JSON.parse(readFileSync(join(RAIZ, 'apps/eleicoes2026/vercel.js
 const por = Object.fromEntries(eleicoes.rewrites.map((r) => [r.source, r.destination]));
 const PORTAL = 'https://saibatudo-portal.vercel.app';
 const QUIMICA = 'https://saibatudo-quimica.vercel.app';
+const ACHAVAGAIA = 'https://saibatudo-achavagaia.vercel.app';
 const OUTROS = IDIOMAS.filter((i) => i !== PADRAO);
 /** Páginas do próprio projeto de eleições (não precisam de regra de proxy). */
 const PROPRIOS = ['/eleicoes2026/', '/privacidade', '/sobre-os-dados'];
@@ -57,18 +58,27 @@ test('química: as três formas do endereço vão ao projeto de química', () =>
   assert.equal(por['/quimica/:path*'], `${QUIMICA}/quimica/:path*`);
 });
 
+test('AchaVagaIA: as três formas do endereço vão ao projeto saibatudo-achavagaia (sempre em /achavagaia/ na origem)', () => {
+  assert.equal(por['/achavagaia'], `${ACHAVAGAIA}/achavagaia/`);
+  assert.equal(por['/achavagaia/'], `${ACHAVAGAIA}/achavagaia/`);
+  assert.equal(por['/achavagaia/:path*'], `${ACHAVAGAIA}/achavagaia/:path*`);
+  // proxy antes do SPA de eleições, que responde por /eleicoes2026/* e não pode engolir o app novo
+  const fontes = eleicoes.rewrites.map((r) => r.source);
+  assert.ok(fontes.indexOf('/achavagaia/:path*') < fontes.findIndex((f) => f.startsWith('/eleicoes2026/')), 'proxy antes do SPA de eleições');
+});
+
 test('o service worker da home (escopo /) não intercepta nenhum app servido por proxy, mas atende as páginas da própria home', () => {
   const sw = readFileSync(join(RAIZ, 'portal/src/sw.js'), 'utf8');
   const regras = eleicoes.rewrites.filter((r) => /^\/[a-zA-Z0-9-]+\/:path\*$/.test(r.source)).map((r) => [r.source.split('/')[1], r.destination]);
   const apps = [...new Set(regras.filter(([, d]) => !d.startsWith(`${PORTAL}/`)).map(([p]) => p))];
   const daHome = [...new Set(regras.filter(([, d]) => d.startsWith(`${PORTAL}/`)).map(([p]) => p))];
-  assert.ok(apps.includes('quimica'));
+  assert.ok(apps.includes('quimica') && apps.includes('achavagaia'), 'química e AchaVagaIA são apps por proxy');
   for (const p of apps) assert.ok(sw.includes(`p.startsWith('/${p}/')`), `portal/src/sw.js precisa ignorar /${p}/`);
   assert.ok(daHome.includes('portal') && OUTROS.every((i) => daHome.includes(i)), 'portal e idiomas vão ao portal');
   for (const p of daHome) assert.ok(!sw.includes(`p.startsWith('/${p}/')`), `portal/src/sw.js não deve ignorar /${p}/ (é da home)`);
 });
 
-test('todo link das cinco páginas da home tem rota (próprio de eleições, página da home ou proxy exato); química recebe ?lang= fora do português', () => {
+test('todo link das cinco páginas da home tem rota (próprio de eleições, página da home ou proxy exato); química recebe ?lang= fora do português e o AchaVagaIA nunca', () => {
   const inicio = IDIOMAS.map(caminho);
   for (const idioma of IDIOMAS) {
     const html = pagina(idioma);
@@ -77,11 +87,12 @@ test('todo link das cinco páginas da home tem rota (próprio de eleições, pá
     assert.ok(html.includes(`<link rel="alternate" hreflang="x-default" href="${ORIGEM}/">`), `${idioma}: x-default`);
     const links = [...html.matchAll(/href="(\/[^"#]*)"/g)].map((m) => m[1]).filter((u) => !u.startsWith('/portal/') && u !== '/manifest.webmanifest');
     const esperadoQuimica = idioma === PADRAO ? '/quimica/' : `/quimica/?lang=${idioma}`;
-    assert.ok(links.includes(esperadoQuimica) && links.includes('/eleicoes2026/'), `${idioma}: a home leva aos dois apps`);
+    assert.ok(links.includes(esperadoQuimica) && links.includes('/eleicoes2026/') && links.includes('/achavagaia/'), `${idioma}: a home leva aos três apps`);
     for (const u of links) {
       const p = u.split(/[?#]/)[0];
       assert.ok(PROPRIOS.includes(p) || inicio.includes(p) || por[p], `${idioma}: link da home sem rota: ${u}`);
       if (p === '/quimica/') assert.equal(u, esperadoQuimica, `${idioma}: link de química`);
+      if (p === '/achavagaia/') assert.equal(u, '/achavagaia/', `${idioma}: link do AchaVagaIA (só em português: sem ?lang=)`);
     }
     for (const i of OUTROS) if (i !== idioma) assert.ok(links.includes(caminho(i)), `${idioma}: seletor sem ${caminho(i)}`);
   }

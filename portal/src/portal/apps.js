@@ -16,7 +16,7 @@ export const GOOGLE_PLAY_URL = '';
 export const NUMEROS_QUIMICA = { elementos: 118, compostos: 1971, compostosComGhsHarmonizado: 485 };
 
 /**
- * Apps disponíveis além dos cartões principais (Eleições 2026 e Química, fixos no HTML da home).
+ * Apps disponíveis além dos cartões principais (Eleições 2026, Química e AchaVagaIA, fixos no HTML da home).
  * Formato: { id, nome, descricao, url, playUrl?, traducoes?: { en: { nome, descricao }, … } }
  */
 export const APPS = [];

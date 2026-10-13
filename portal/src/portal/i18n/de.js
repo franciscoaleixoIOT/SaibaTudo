@@ -28,7 +28,8 @@ export default {
     titulo: 'Geprüfte Bürgerinformation',
     sub: 'Unabhängige, quelloffene und werbefreie Apps, die amtliche offene Daten bündeln — von den Wahlen bis zur Chemie —, damit Sie die Fakten prüfen und selbst entscheiden können.',
     abrirEleicoes: 'App Wahlen 2026 öffnen',
-    abrirQuimica: 'App Chemie öffnen'
+    abrirQuimica: 'App Chemie öffnen',
+    abrirAchaVagaIA: 'AchaVagaIA öffnen'
   },
   apps: { titulo: 'Unsere Apps' },
   eleicoes: {
@@ -60,6 +61,21 @@ export default {
     ],
     abrir: 'App Chemie öffnen',
     nota: 'Funktioniert offline, und nichts verlässt Ihr Gerät. Die Android-Version ist in Vorbereitung; bis dahin lässt sich die Web-App installieren.'
+  },
+  achavagaia: {
+    selo: 'Karriere — Lebenslauf und Jobsuche',
+    emConstrucao: 'erste Version im Aufbau',
+    apenasPortugues: 'nur auf Portugiesisch',
+    nome: 'SaibaTudo — AchaVagaIA',
+    descricao: 'Persönlicher Karriereassistent: verbessert Ihren Lebenslauf mit einer Diagnose (und optionaler KI), stellt über die offiziellen Links die passende Suche für jeden Stellenkanal zusammen, verfolgt Ihre Bewerbungen und erzeugt Prompts und Automatisierungspakete für die KI-Dienste, die Sie schon nutzen.',
+    vantagens: [
+      'Lebenslauf-Diagnose mit Verbesserungspunkten — und optionaler KI, nur wenn Sie möchten',
+      'Für jeden Stellenkanal zusammengestellte Suche über die offiziellen Links: LinkedIn, Catho, Indeed, Gupy und weitere',
+      'Ihre Bewerbungen an einem Ort im Blick',
+      'Prompts und Automatisierungspakete für die KI-Dienste, die Sie schon nutzen: Claude, ChatGPT, Gemini, Perplexity und Kilo Code'
+    ],
+    abrir: 'AchaVagaIA öffnen',
+    nota: 'Datenschutz: Nichts aus Ihrem Lebenslauf verlässt Ihr Gerät ohne Ihren Fingertipp. Dies ist die erste Version der App, und sie befindet sich noch im Aufbau.'
   },
   confianca: {
     titulo: 'Warum Sie vertrauen können',

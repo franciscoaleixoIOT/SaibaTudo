@@ -89,6 +89,18 @@
       "destination": "https://saibatudo-quimica.vercel.app/quimica/:path*"
     },
     {
+      "source": "/achavagaia",
+      "destination": "https://saibatudo-achavagaia.vercel.app/achavagaia/"
+    },
+    {
+      "source": "/achavagaia/",
+      "destination": "https://saibatudo-achavagaia.vercel.app/achavagaia/"
+    },
+    {
+      "source": "/achavagaia/:path*",
+      "destination": "https://saibatudo-achavagaia.vercel.app/achavagaia/:path*"
+    },
+    {
       "source": "/eleicoes2026/:path((?!.*\\.).*)",
       "destination": "/eleicoes2026/"
     }

@@ -27,7 +27,8 @@ export default {
     titulo: 'Verified civic information',
     sub: 'Independent, open-source, ad-free apps that bring together official open data — from elections to chemistry — so you can check the facts and decide for yourself.',
     abrirEleicoes: 'Open the 2026 Elections app',
-    abrirQuimica: 'Open the Chemistry app'
+    abrirQuimica: 'Open the Chemistry app',
+    abrirAchaVagaIA: 'Open AchaVagaIA'
   },
   apps: { titulo: 'Our apps' },
   eleicoes: {
@@ -59,6 +60,21 @@ export default {
     ],
     abrir: 'Open the Chemistry app',
     nota: 'Works offline and nothing leaves your device. The Android version is in preparation; meanwhile, the web app can be installed.'
+  },
+  achavagaia: {
+    selo: 'Careers — résumé and job search',
+    emConstrucao: 'first version, under construction',
+    apenasPortugues: 'Portuguese only',
+    nome: 'SaibaTudo — AchaVagaIA',
+    descricao: 'A personal career assistant: it improves your résumé with a diagnosis (and optional AI), builds the right search for each job channel through the official links, tracks your applications and generates prompts and automation packs for the AIs you already use.',
+    vantagens: [
+      'Résumé diagnosis with points to improve — and optional AI, only if you want it',
+      'A search built for each job channel through the official links: LinkedIn, Catho, Indeed, Gupy and others',
+      'Your applications tracked in one place',
+      'Prompts and automation packs for the AIs you already use: Claude, ChatGPT, Gemini, Perplexity and Kilo Code'
+    ],
+    abrir: 'Open AchaVagaIA',
+    nota: 'Privacy: nothing from your résumé leaves your device without a tap from you. This is the first version of the app and it is still under construction.'
   },
   confianca: {
     titulo: 'Why trust it',

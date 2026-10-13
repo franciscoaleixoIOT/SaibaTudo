@@ -2,7 +2,7 @@
 <!-- molde: portal/build.mjs gera uma página por idioma (dist/index.html = pt-BR, dist/<idioma>/index.html) a partir deste
      arquivo e dos catálogos em src/portal/i18n/. {{chave}} = texto do catálogo; {{?chave}}…{{/chave}} só se a chave não for vazia;
      {{pagina.*}} são calculados no build (lang, URL canônica, hreflang e seletor de idiomas). Os links href="/quimica/" ganham
-     ?lang=<idioma> fora do português. Este comentário é removido no build. -->
+     ?lang=<idioma> fora do português (o /achavagaia/ não: o app é só em português). Este comentário é removido no build. -->
 <html lang="{{pagina.lang}}">
 <head>
   <meta charset="utf-8">
@@ -71,7 +71,8 @@
         <h1 id="titulo-hero">{{hero.titulo}}</h1>
         <p class="hero-sub">{{hero.sub}}</p>
         <p class="hero-acoes"><a class="btn btn-ouro grande" href="/eleicoes2026/">{{hero.abrirEleicoes}}</a>
-          <a class="btn btn-ouro grande" href="/quimica/">{{hero.abrirQuimica}}</a></p>
+          <a class="btn btn-ouro grande" href="/quimica/">{{hero.abrirQuimica}}</a>
+          <a class="btn btn-ouro grande" href="/achavagaia/">{{hero.abrirAchaVagaIA}}</a></p>
       </div>
     </section>
 
@@ -113,6 +114,24 @@
             <a class="btn btn-primario grande" href="/quimica/">{{quimica.abrir}}</a>
           </div>
           <p class="mini mudo">{{quimica.nota}}</p>
+        </div>
+      </article>
+      <article class="card app-principal app-achavagaia">
+        <img class="app-icone" src="/portal/brand/svg/achavagaia-icon.svg" width="88" height="88" alt="">
+        <div class="app-corpo">
+          <p class="selo">{{achavagaia.selo}}</p> <span class="tag tag-ouro selo-idioma">{{achavagaia.emConstrucao}}</span>{{?achavagaia.apenasPortugues}} <span class="tag tag-neutro selo-idioma">{{achavagaia.apenasPortugues}}</span>{{/achavagaia.apenasPortugues}}
+          <h3>{{achavagaia.nome}}</h3>
+          <p>{{achavagaia.descricao}}</p>
+          <ul class="vantagens">
+            <li>{{achavagaia.vantagens.0}}</li>
+            <li>{{achavagaia.vantagens.1}}</li>
+            <li>{{achavagaia.vantagens.2}}</li>
+            <li>{{achavagaia.vantagens.3}}</li>
+          </ul>
+          <div class="acoes">
+            <a class="btn btn-primario grande" href="/achavagaia/">{{achavagaia.abrir}}</a>
+          </div>
+          <p class="mini mudo">{{achavagaia.nota}}</p>
         </div>
       </article>
       <div id="apps-extra" class="grade-cards"></div>

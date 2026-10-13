@@ -28,7 +28,8 @@ export default {
     titulo: 'Información cívica verificada',
     sub: 'Aplicaciones independientes, de código abierto y sin anuncios, que reúnen datos oficiales y abiertos — de las elecciones a la química — para que consultes los hechos y decidas por tu cuenta.',
     abrirEleicoes: 'Abrir la app Elecciones 2026',
-    abrirQuimica: 'Abrir la app Química'
+    abrirQuimica: 'Abrir la app Química',
+    abrirAchaVagaIA: 'Abrir AchaVagaIA'
   },
   apps: { titulo: 'Nuestras apps' },
   eleicoes: {
@@ -60,6 +61,21 @@ export default {
     ],
     abrir: 'Abrir la app Química',
     nota: 'Funciona sin conexión y nada sale de tu dispositivo. La versión para Android está en preparación; mientras tanto, la app web se puede instalar.'
+  },
+  achavagaia: {
+    selo: 'Carrera — currículum y búsqueda de empleo',
+    emConstrucao: 'primera versión en construcción',
+    apenasPortugues: 'solo en portugués',
+    nome: 'SaibaTudo — AchaVagaIA',
+    descricao: 'Asistente personal de carrera: mejora tu currículum con un diagnóstico (y IA opcional), arma la búsqueda adecuada en cada canal de empleo con los enlaces oficiales, hace el seguimiento de tus postulaciones y genera prompts y paquetes de automatización para las IA que ya usas.',
+    vantagens: [
+      'Diagnóstico del currículum con puntos a mejorar — e IA opcional, solo si tú quieres',
+      'Búsqueda preparada para cada canal de empleo con los enlaces oficiales: LinkedIn, Catho, Indeed, Gupy y otros',
+      'Seguimiento de tus postulaciones en un solo lugar',
+      'Prompts y paquetes de automatización para las IA que ya usas: Claude, ChatGPT, Gemini, Perplexity y Kilo Code'
+    ],
+    abrir: 'Abrir AchaVagaIA',
+    nota: 'Privacidad: nada de tu currículum sale de tu dispositivo sin un toque tuyo. Es la primera versión de la app y aún está en construcción.'
   },
   confianca: {
     titulo: 'Por qué confiar',

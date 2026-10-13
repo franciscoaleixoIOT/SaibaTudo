@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="t d"><title id="t">SaibaTudo AchaVagaIA</title><desc id="d">Ícone do app: currículo com uma lupa dourada e uma marca de verificação verde</desc><clipPath id="b"><rect width="512" height="512" rx="112"/></clipPath>
+<g clip-path="url(#b)"><rect width="512" height="512" fill="#0C2340"/>
+<polygon points="0,372 512,196 512,512 0,512" fill="#143A66"/>
+<rect x="132" y="96" width="206" height="276" rx="20" fill="#FFFFFF"/>
+<circle cx="188" cy="152" r="26" fill="#143A66"/>
+<rect x="232" y="132" width="76" height="14" rx="7" fill="#143A66"/>
+<rect x="232" y="160" width="52" height="14" rx="7" fill="#9FB3C8"/>
+<rect x="164" y="212" width="142" height="14" rx="7" fill="#9FB3C8"/>
+<rect x="164" y="244" width="120" height="14" rx="7" fill="#9FB3C8"/>
+<rect x="164" y="276" width="96" height="14" rx="7" fill="#9FB3C8"/>
+<line x1="348" y1="348" x2="418" y2="418" stroke="#FFB81C" stroke-width="34" stroke-linecap="round"/>
+<circle cx="306" cy="306" r="82" fill="#143A66" stroke="#FFB81C" stroke-width="26"/>
+<polyline points="268,308 296,336 346,278" fill="none" stroke="#22C55E" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/></g></svg>

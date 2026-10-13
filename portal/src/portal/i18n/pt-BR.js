@@ -1,7 +1,7 @@
 // Catálogo de referência da home (português do Brasil): toda chave existe aqui; os outros idiomas são conferidos contra este.
 // Valores são fragmentos de HTML confiáveis (só <strong>, <em> e <a> com os mesmos atributos em todos os idiomas).
 // {num:chave} vira <span data-num="chave">número no formato do idioma</span>, com o número de NUMEROS_QUIMICA (apps.js).
-// Nunca traduzir as marcas: "SaibaTudo", "SaibaTudo — Eleições 2026", "SaibaTudo — Química", "PubChem", "Wikidata".
+// Nunca traduzir as marcas: "SaibaTudo", "SaibaTudo — Eleições 2026", "SaibaTudo — Química", "SaibaTudo — AchaVagaIA", "PubChem", "Wikidata".
 export default {
   idioma: 'pt-BR',
   nomeNativo: 'Português (Brasil)',
@@ -30,7 +30,8 @@ export default {
     titulo: 'Informação cívica verificada',
     sub: 'Aplicativos independentes, de código aberto e sem anúncios, que reúnem dados oficiais e abertos — das eleições à química — para você consultar os fatos e decidir por conta própria.',
     abrirEleicoes: 'Abrir app Eleições 2026',
-    abrirQuimica: 'Abrir app Química'
+    abrirQuimica: 'Abrir app Química',
+    abrirAchaVagaIA: 'Abrir o AchaVagaIA'
   },
   apps: { titulo: 'Nossos apps' },
   eleicoes: {
@@ -62,6 +63,21 @@ export default {
     ],
     abrir: 'Abrir app Química',
     nota: 'Funciona offline e nada sai do seu aparelho. A versão para Android está em preparação; enquanto isso, o app web pode ser instalado.'
+  },
+  achavagaia: {
+    selo: 'Carreira — currículo e busca de vagas',
+    emConstrucao: 'primeira versão em construção',
+    apenasPortugues: '',
+    nome: 'SaibaTudo — AchaVagaIA',
+    descricao: 'Assistente pessoal de carreira: melhora o seu currículo com diagnóstico (e IA opcional), monta a busca certa em cada canal de vagas pelos links oficiais, acompanha as suas candidaturas e gera prompts e pacotes de automação para as IAs que você já usa.',
+    vantagens: [
+      'Diagnóstico do currículo, com pontos a melhorar — e IA opcional, só se você quiser',
+      'Busca montada para cada canal de vagas pelos links oficiais: LinkedIn, Catho, Indeed, Gupy e outros',
+      'Acompanhamento das suas candidaturas em um só lugar',
+      'Prompts e pacotes de automação para as IAs que você já usa: Claude, ChatGPT, Gemini, Perplexity e Kilo Code'
+    ],
+    abrir: 'Abrir o AchaVagaIA',
+    nota: 'Privacidade: nada do seu currículo sai do aparelho sem um toque seu. É a primeira versão do app e ainda está em construção.'
   },
   confianca: {
     titulo: 'Por que confiar',

@@ -28,7 +28,8 @@ export default {
     titulo: 'Information civique vérifiée',
     sub: 'Des applications indépendantes, open source et sans publicité, qui rassemblent des données officielles ouvertes — des élections à la chimie — pour que vous puissiez vérifier les faits et décider par vous-même.',
     abrirEleicoes: 'Ouvrir l’app Élections 2026',
-    abrirQuimica: 'Ouvrir l’app Chimie'
+    abrirQuimica: 'Ouvrir l’app Chimie',
+    abrirAchaVagaIA: 'Ouvrir AchaVagaIA'
   },
   apps: { titulo: 'Nos applications' },
   eleicoes: {
@@ -60,6 +61,21 @@ export default {
     ],
     abrir: 'Ouvrir l’app Chimie',
     nota: 'Fonctionne hors ligne et rien ne quitte votre appareil. La version Android est en préparation ; en attendant, l’app web peut être installée.'
+  },
+  achavagaia: {
+    selo: 'Carrière — CV et recherche d’emploi',
+    emConstrucao: 'première version en construction',
+    apenasPortugues: 'en portugais uniquement',
+    nome: 'SaibaTudo — AchaVagaIA',
+    descricao: 'Assistant personnel de carrière : améliore votre CV grâce à un diagnostic (et à une IA en option), prépare la bonne recherche pour chaque canal d’offres via les liens officiels, suit vos candidatures et génère des prompts et des kits d’automatisation pour les IA que vous utilisez déjà.',
+    vantagens: [
+      'Diagnostic du CV avec des pistes d’amélioration — et IA en option, seulement si vous le souhaitez',
+      'Recherche préparée pour chaque canal d’offres via les liens officiels : LinkedIn, Catho, Indeed, Gupy et d’autres',
+      'Suivi de vos candidatures au même endroit',
+      'Prompts et kits d’automatisation pour les IA que vous utilisez déjà : Claude, ChatGPT, Gemini, Perplexity et Kilo Code'
+    ],
+    abrir: 'Ouvrir AchaVagaIA',
+    nota: 'Confidentialité : rien de votre CV ne quitte votre appareil sans un geste de votre part. C’est la première version de l’app et elle est encore en construction.'
   },
   confianca: {
     titulo: 'Pourquoi nous faire confiance',

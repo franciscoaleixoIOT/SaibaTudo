@@ -26,7 +26,7 @@ const existe = (u, base = OUT) => {
 const semQuery = (u) => u.split(/[?#]/)[0];
 const OUTROS = IDIOMAS.filter((i) => i !== PADRAO);
 /** Links de navegação para páginas de outros projetos no mesmo domínio (não são recursos da home). */
-const PAGINAS = ['/eleicoes2026/', '/privacidade', '/sobre-os-dados', '/quimica/'];
+const PAGINAS = ['/eleicoes2026/', '/privacidade', '/sobre-os-dados', '/quimica/', '/achavagaia/'];
 const catalogo = async (idioma) => (await import(pathToFileURL(join(SRC, 'portal/i18n', `${idioma}.js`)).href)).default;
 
 before(() => { roda(OUT); });
@@ -47,17 +47,32 @@ test('todo recurso local da home existe no próprio projeto (independente de ele
   }
   for (const arq of ['index.html', 'en/index.html', 'portal/home.js', 'portal/textos.js', 'portal/base.css', 'portal/site.css', 'manifest.webmanifest']) {
     const s = ler(arq);
-    for (const proibido of ['"/assets/', "'/assets/", '"/brand/', '"/fonts/', '/eleicoes2026/js/', '/quimica/js/']) assert.ok(!s.includes(proibido), `${arq} depende de outro projeto: ${proibido}`);
+    for (const proibido of ['"/assets/', "'/assets/", '"/brand/', '"/fonts/', '/eleicoes2026/js/', '/quimica/js/', '/achavagaia/js/']) assert.ok(!s.includes(proibido), `${arq} depende de outro projeto: ${proibido}`);
   }
   for (const m of ler('portal/home.js').matchAll(/from '([^']+)'/g)) assert.ok(m[1].startsWith('/portal/') && existe(m[1]), `import fora do portal: ${m[1]}`);
   for (const m of ler('portal/base.css').matchAll(/url\("([^"]+)"\)/g)) assert.ok(existe(m[1]), `CSS aponta para arquivo ausente: ${m[1]}`);
   for (const i of JSON.parse(ler('manifest.webmanifest')).icons) assert.ok(existe(i.src), `ícone do manifesto ausente: ${i.src}`);
   assert.equal(readFileSync(join(OUT, 'portal/fonts/poppins-semibold.woff')).subarray(0, 4).toString('latin1'), 'wOFF');
-  // os dois apps têm destaque: botão no topo e cartão principal com ícone próprio
+  // os três apps têm o MESMO destaque (decisão do mantenedor, 12/10/2026): botão dourado no topo e cartão principal com ícone
+  // próprio e o mesmo botão primário grande
   const html = pagina(PADRAO);
-  assert.match(html, /class="hero-acoes">[\s\S]*href="\/eleicoes2026\/"[\s\S]*href="\/quimica\/"[\s\S]*?<\/p>/);
-  assert.equal((html.match(/class="card app-principal/g) || []).length, 2);
-  assert.ok(html.includes('/portal/brand/svg/quimica-icon.svg') && html.includes('/portal/brand/svg/eleicoes2026-icon.svg'));
+  assert.match(html, /class="hero-acoes">[\s\S]*href="\/eleicoes2026\/"[\s\S]*href="\/quimica\/"[\s\S]*href="\/achavagaia\/"[\s\S]*?<\/p>/);
+  assert.equal((html.match(/class="card app-principal/g) || []).length, 3);
+  assert.ok(html.includes('/portal/brand/svg/quimica-icon.svg') && html.includes('/portal/brand/svg/eleicoes2026-icon.svg') && html.includes('/portal/brand/svg/achavagaia-icon.svg'));
+  for (const idioma of IDIOMAS) {
+    const h = pagina(idioma);
+    const hero = /class="hero-acoes">([\s\S]*?)<\/p>/.exec(h)[1];
+    const botoesHero = [...hero.matchAll(/<a class="([^"]+)" href="(\/[^"]*)"/g)].map((m) => m.slice(1));
+    assert.deepEqual(botoesHero.map((b) => b[0]), Array(3).fill('btn btn-ouro grande'), `${idioma}: botões do topo com o mesmo destaque`);
+    assert.deepEqual(botoesHero.map((b) => b[1].split('?')[0]), ['/eleicoes2026/', '/quimica/', '/achavagaia/'], `${idioma}: botões do topo`);
+    const cartoes = [...h.matchAll(/<article class="card app-principal[^"]*">([\s\S]*?)<\/article>/g)].map((m) => m[1]);
+    assert.equal(cartoes.length, 3, `${idioma}: cartões principais`);
+    const abrir = cartoes.map((x) => /<a class="(btn btn-primario grande)" href="(\/[^"]*)"/.exec(x));
+    assert.ok(abrir.every(Boolean), `${idioma}: cada cartão tem o botão primário grande`);
+    assert.deepEqual(abrir.map((m) => m[2].split('?')[0]), ['/eleicoes2026/', '/quimica/', '/achavagaia/'], `${idioma}: botões dos cartões`);
+    assert.ok(cartoes.every((x) => x.includes('<img class="app-icone"')), `${idioma}: cada cartão tem ícone`);
+  }
+  assert.ok(existsSync(join(OUT, 'portal/brand/svg/achavagaia-icon.svg')));
   // o molde e os catálogos são só de build: não vão para dist/
   assert.ok(!existsSync(join(OUT, 'portal/i18n')), 'catálogos não devem ir para dist/');
   assert.ok(!html.includes('{{') && !html.includes('<!-- molde'), 'marcadores do molde na página');
@@ -99,14 +114,16 @@ test('catálogos: mesmas chaves que pt-BR, sem vazios, mesmas marcas inline e {n
     assert.ok(['pendente', 'humana'].includes(c.revisao), `${idioma}: revisao deve ser 'pendente' ou 'humana'`);
     assert.equal(c.eleicoes.nome, 'SaibaTudo — Eleições 2026', `${idioma}: marca traduzida`);
     assert.equal(c.quimica.nome, 'SaibaTudo — Química', `${idioma}: marca traduzida`);
-    assert.ok(c.meta.titulo.startsWith('SaibaTudo') && c.nomeNativo && c.ogLocale && c.eleicoes.apenasPortugues, idioma);
+    assert.equal(c.achavagaia.nome, 'SaibaTudo — AchaVagaIA', `${idioma}: marca traduzida`);
+    assert.ok(c.meta.titulo.startsWith('SaibaTudo') && c.nomeNativo && c.ogLocale && c.eleicoes.apenasPortugues && c.achavagaia.apenasPortugues, idioma);
   }
-  // pt-BR: só eleicoes.apenasPortugues pode ser vazio (o selo "só em português" não aparece na página em português)
-  for (const [k, v] of Object.entries(refFolhas)) if (k !== 'eleicoes.apenasPortugues') assert.ok(typeof v === 'string' && v.trim() !== '', `pt-BR: ${k} vazio`);
+  // pt-BR: só eleicoes.apenasPortugues e achavagaia.apenasPortugues podem ser vazios (o selo "só em português" não aparece na página em português)
+  for (const [k, v] of Object.entries(refFolhas)) if (!/^(eleicoes|achavagaia)\.apenasPortugues$/.test(k)) assert.ok(typeof v === 'string' && v.trim() !== '', `pt-BR: ${k} vazio`);
   assert.equal(ref.eleicoes.apenasPortugues, '');
+  assert.equal(ref.achavagaia.apenasPortugues, '');
 });
 
-test('uma página por idioma: lang, título, canônica, hreflang (cinco + x-default), seletor com aria-current, links de química com ?lang e selo de eleições', async () => {
+test('uma página por idioma: lang, título, canônica, hreflang (cinco + x-default), seletor com aria-current, links de química com ?lang (AchaVagaIA sem) e selos de eleições e AchaVagaIA', async () => {
   for (const idioma of IDIOMAS) {
     const html = pagina(idioma);
     const c = await catalogo(idioma);
@@ -133,9 +150,15 @@ test('uma página por idioma: lang, título, canônica, hreflang (cinco + x-defa
     assert.ok(quimica.length >= 3, `${idioma}: links de química`);
     for (const u of quimica) assert.equal(u, idioma === PADRAO ? '/quimica/' : `/quimica/?lang=${idioma}`, `${idioma}: ${u}`);
     assert.ok(html.includes('href="/eleicoes2026/"') && !html.includes('/eleicoes2026/?lang'), `${idioma}: eleições`);
-    const selo = /<span class="tag tag-neutro selo-idioma">([^<]+)<\/span>/.exec(html);
-    if (idioma === PADRAO) assert.equal(selo, null, 'a página em português não tem selo "só em português"');
-    else assert.equal(selo?.[1], c.eleicoes.apenasPortugues, `${idioma}: selo de eleições`);
+    const selos = [...html.matchAll(/<span class="tag tag-neutro selo-idioma">([^<]+)<\/span>/g)].map((m) => m[1]);
+    if (idioma === PADRAO) assert.deepEqual(selos, [], 'a página em português não tem selo "só em português"');
+    else assert.deepEqual(selos, [c.eleicoes.apenasPortugues, c.achavagaia.apenasPortugues], `${idioma}: selos "só em português" (eleições e AchaVagaIA)`);
+    // AchaVagaIA: só em português por enquanto, então o link NÃO ganha ?lang= (diferente de química); selo de "em construção" em todos os idiomas
+    const achavaga = [...html.matchAll(/href="(\/achavagaia\/[^"]*)"/g)].map((m) => m[1]);
+    assert.equal(achavaga.length, 2, `${idioma}: links do AchaVagaIA (botão do topo e do cartão)`);
+    for (const u of achavaga) assert.equal(u, '/achavagaia/', `${idioma}: link do AchaVagaIA sem ?lang=`);
+    assert.ok(html.includes(`<span class="tag tag-ouro selo-idioma">${c.achavagaia.emConstrucao}</span>`), `${idioma}: selo de primeira versão em construção`);
+    assert.ok(!/github\.com\/[^"]*achavaga/i.test(html), `${idioma}: a home não linka o repositório do AchaVagaIA`);
     assert.ok(html.includes(`href="${caminho(idioma)}" aria-label="${c.topo.marcaAria}"`), `${idioma}: marca leva à home do idioma`);
     assert.ok(!html.includes('{{') && !html.includes('{num:') && !html.includes('<!-- molde'), `${idioma}: marcador não resolvido`);
   }
@@ -161,7 +184,7 @@ test('service worker: versão (hash), pré-cache (com as cinco páginas) e pági
   for (const i of IDIOMAS) assert.ok(pre.includes(caminho(i)), `pré-cache sem ${caminho(i)}`);
   for (const u of pre) {
     assert.ok(existe(u), `pré-cache aponta para arquivo inexistente: ${u}`);
-    assert.ok(!/^\/(api|data|quimica|eleicoes2026)\//.test(u) && !u.endsWith('.html') && !u.includes('/i18n/'), `fora do escopo da home: ${u}`);
+    assert.ok(!/^\/(api|data|quimica|achavagaia|eleicoes2026)\//.test(u) && !u.endsWith('.html') && !u.includes('/i18n/'), `fora do escopo da home: ${u}`);
   }
   assert.deepEqual(JSON.parse(/const PAGINAS_IDIOMA = (\[[^\]]*\]);/.exec(sw)[1]), OUTROS.map(caminho));
   new vm.Script(sw, { filename: 'sw.js' });
@@ -183,9 +206,10 @@ function carregarSw() {
   };
 }
 
-test('service worker: NUNCA intercepta química, API, dados, navegações de eleições nem métodos além de GET; atende as páginas por idioma', () => {
+test('service worker: NUNCA intercepta química, AchaVagaIA, API, dados, navegações de eleições nem métodos além de GET; atende as páginas por idioma', () => {
   const intercepta = carregarSw();
-  for (const u of ['/quimica', '/quimica/', '/quimica/tabela', '/quimica/js/main.js', '/quimica/data/manifest.json', '/quimica/api/health', '/quimica/?lang=en']) {
+  for (const u of ['/quimica', '/quimica/', '/quimica/tabela', '/quimica/js/main.js', '/quimica/data/manifest.json', '/quimica/api/health', '/quimica/?lang=en',
+    '/achavagaia', '/achavagaia/', '/achavagaia/curriculo', '/achavagaia/js/main.js', '/achavagaia/manifest.webmanifest', '/achavagaia/?lang=en']) {
     assert.equal(intercepta(u), false, u);
     assert.equal(intercepta(u, 'navigate'), false, `${u} (navegação)`);
   }
@@ -197,6 +221,7 @@ test('service worker: NUNCA intercepta química, API, dados, navegações de ele
   for (const i of OUTROS) { assert.equal(intercepta(caminho(i), 'navigate'), true, caminho(i)); assert.equal(intercepta(caminho(i).slice(0, -1), 'navigate'), true, `/${i}`); }
   assert.equal(intercepta('/portal/home.js'), true);
   assert.equal(intercepta('/quimicax/arquivo.js'), true, 'só o prefixo exato /quimica/ fica de fora');
+  assert.equal(intercepta('/achavagaiax/arquivo.js'), true, 'só o prefixo exato /achavagaia/ fica de fora');
 });
 
 test('service worker offline: a navegação a /en/ cai na página do idioma em cache, não na portuguesa', async () => {
