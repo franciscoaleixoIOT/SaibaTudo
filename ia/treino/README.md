@@ -31,12 +31,19 @@ publica nada: nada de Modal, Vercel, Hugging Face Space nem `MODEL_VERSION`. Sa�
 | treino completo (3 épocas) | `$PY -I -u ia/treino/treinar_nlu.py --epochs 3 --batch_size 4 --grad_accum 4 --pad_fixo 160 --out ia/treino/out/nlu-qwen35-2b` (~3,3 h; se faltar VRAM: lote 2 × 8 sem `--pad_fixo`, ~5,9 h) | idem |
 | mesclar + GGUF | `$PY -I ia/treino/exportar_gguf.py --lora <out>/final --out <out>/gguf [--q8]` | `mesclado/`, `*-bf16.gguf`, `*-Q4_K_M.gguf` (`*-Q8_0.gguf`) |
 | latência CPU comparada | `$PY -I ia/treino/latencia_cpu.py --n 30 --gguf v2.3=<gguf> --gguf novo=<gguf>:qwen35` | prompt / livre / gramática, p50 e p90 |
-| avaliar (gate, CPU) | `$PY -I ia/treino/avaliar_gguf.py --gguf <gguf> --threads 8 [--holdout] --out <out>/eval.json` | métricas do `eval_golden`, template, latência, `<think>` |
+| avaliar (gate, CPU) | `$PY -I ia/treino/avaliar_gguf.py --app quimica\|eleicoes --gguf <gguf> --threads 8 [--holdout] [--sem_livre] [--baseline <eval_q8.json>] --out <out>/eval_<app>_q4.json` | métricas do `eval_golden` **do app** (golden com/sem gramática e, com `--holdout`, os casos reservados de `ia/corpus/out/holdout_<app>.json`), tudo também **por idioma**, template, latência, `<think>`; um processo por app |
 
 Receita (igual à do v2.3, só muda a base e o template): QLoRA 4-bit NF4 com dupla quantização, LoRA r=16, alpha=32, dropout 0,05 em
 **todas as lineares** (atenção cheia `q/k/v/o_proj`, Gated DeltaNet `in_proj_qkv/z/a/b` e `out_proj`, MLP `gate/up/down_proj`),
 lote 2 × acúmulo 8, lr 2e-4 cosseno com 25 passos de aquecimento, `max_length` 256, `paged_adamw_8bit`, gradient checkpointing, bf16.
 Carrega só a parte de linguagem (`Qwen3_5ForCausalLM`; visão e MTP do checkpoint ficam de fora).
+
+## Gate do NLU único
+O mesmo GGUF é avaliado com o `eval_golden` e a gramática de produção de **cada app** (`--app quimica` e `--app eleicoes`), no golden e no
+holdout que nunca treinou, e o resultado é recortado por idioma (`idioma` do caso; ausente = pt-BR). Limiares (iguais nos dois apps):
+JSON com gramática 100 %, validade nativa sem gramática ≥ 98 %, intenção ≥ 85 %, cada entidade ≥ 90 %, alucinação ≤ 5 %, queda Q4 × Q8 ≤ 3 p.p.
+Cadeia completa (≈ 1,5 h em CPU): química Q4 com holdout → eleições Q4 com holdout → Q8 dos dois só no golden (`--sem_livre`, referência
+da quantização). Resultado do v3: `docs/PLANO_IA_SAIBATUDO.md` §9.
 
 ## Formato do prompt (treino = serviço)
 Template do Qwen3.5 com `enable_thinking=False` (no Qwen3.5 também é o padrão quando a variável não é passada):
