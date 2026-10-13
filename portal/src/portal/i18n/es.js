@@ -82,7 +82,7 @@ export default {
     pilares: [
       { titulo: 'Datos oficiales y abiertos', texto: 'Elecciones: archivos abiertos del TSE. Química: PubChem, Wikidata, CODATA y textos abiertos. Cada respuesta trae su fuente; nada es simulado ni inventado.' },
       { titulo: 'Neutral, independiente y seguro', texto: 'Sin vínculos con el TSE, el gobierno ni los partidos: no recomendamos, comparamos ni predecimos candidatos. En química, las peticiones peligrosas se rechazan.' },
-      { titulo: 'Abierto y sin anuncios', texto: 'Código abierto bajo licencia MIT, auditable por cualquier persona. Sin anuncios y sin registro para consultar.' }
+      { titulo: 'Abierto y sin anuncios', texto: 'Eleições 2026 y Química son de código abierto bajo licencia MIT, auditable por cualquier persona; AchaVagaIA, en construcción, aún no tiene el código publicado. Sin anuncios y sin registro para consultar.' }
     ]
   },
   instalar: {
@@ -120,7 +120,7 @@ export default {
     titulo: 'Proyecto público',
     codigo: {
       titulo: 'Código abierto (MIT)',
-      texto: 'Todo el código — sitio, app web, app Android, pipeline de datos y modelo de IA — es público y auditable.'
+      texto: 'En Eleições 2026 y Química, todo el código — sitio, app web, app Android, pipeline de datos y modelo de IA — es público y auditable. AchaVagaIA, en construcción, aún no tiene el código publicado.'
     },
     fontes: {
       titulo: 'Fuentes oficiales',
@@ -147,6 +147,6 @@ export default {
     privacidade: 'Privacidad (en portugués)',
     dados: 'Sobre los datos (en portugués)',
     github: 'GitHub',
-    texto: 'SaibaTudo es independiente, apartidista y no tiene vínculos con el TSE, el gobierno ni los partidos. Datos electorales: Tribunal Superior Eleitoral (Tribunal Superior Electoral de Brasil) — Portal de Datos Abiertos, licencia CC BY 4.0. Datos de química: PubChem, Wikidata, CODATA/NIST, ChEBI, Wikipedia y Wikilibros. Código bajo licencia MIT.'
+    texto: 'SaibaTudo es independiente, apartidista y no tiene vínculos con el TSE, el gobierno ni los partidos. Datos electorales: Tribunal Superior Eleitoral (Tribunal Superior Electoral de Brasil) — Portal de Datos Abiertos, licencia CC BY 4.0. Datos de química: PubChem, Wikidata, CODATA/NIST, ChEBI, Wikipedia y Wikilibros. Código de Eleições 2026 y Química bajo licencia MIT.'
   }
 };

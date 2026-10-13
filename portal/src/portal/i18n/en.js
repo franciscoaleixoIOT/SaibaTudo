@@ -81,7 +81,7 @@ export default {
     pilares: [
       { titulo: 'Official, open data', texto: 'Elections: the TSE’s open files. Chemistry: PubChem, Wikidata, CODATA and open texts. Every answer carries its source; nothing is simulated or made up.' },
       { titulo: 'Neutral, independent and safe', texto: 'No ties to the TSE, the government or any party: we do not endorse, compare or predict candidates. In chemistry, dangerous requests are refused.' },
-      { titulo: 'Open and ad-free', texto: 'Open source under the MIT license, auditable by anyone. No ads and no sign-up required.' }
+      { titulo: 'Open and ad-free', texto: 'Eleições 2026 and Química are open source under the MIT license, auditable by anyone; AchaVagaIA, still under construction, has no published code yet. No ads and no sign-up required.' }
     ]
   },
   instalar: {
@@ -119,7 +119,7 @@ export default {
     titulo: 'Public project',
     codigo: {
       titulo: 'Open source (MIT)',
-      texto: 'All the code — website, web app, Android app, data pipeline and AI model — is public and auditable.'
+      texto: 'For Eleições 2026 and Química, all the code — website, web app, Android app, data pipeline and AI model — is public and auditable. AchaVagaIA, still under construction, has no published code yet.'
     },
     fontes: {
       titulo: 'Official sources',
@@ -146,6 +146,6 @@ export default {
     privacidade: 'Privacy (in Portuguese)',
     dados: 'About the data (in Portuguese)',
     github: 'GitHub',
-    texto: 'SaibaTudo is independent and non-partisan, with no ties to the TSE, the government or any party. Election data: Tribunal Superior Eleitoral (Brazil’s Superior Electoral Court) — Open Data Portal, CC BY 4.0 license. Chemistry data: PubChem, Wikidata, CODATA/NIST, ChEBI, Wikipedia and Wikibooks. Code under the MIT license.'
+    texto: 'SaibaTudo is independent and non-partisan, with no ties to the TSE, the government or any party. Election data: Tribunal Superior Eleitoral (Brazil’s Superior Electoral Court) — Open Data Portal, CC BY 4.0 license. Chemistry data: PubChem, Wikidata, CODATA/NIST, ChEBI, Wikipedia and Wikibooks. Eleições 2026 and Química code under the MIT license.'
   }
 };

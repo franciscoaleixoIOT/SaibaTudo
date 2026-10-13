@@ -82,7 +82,7 @@ export default {
     pilares: [
       { titulo: 'Amtliche, offene Daten', texto: 'Wahlen: offene Dateien des TSE. Chemie: PubChem, Wikidata, CODATA und offene Texte. Jede Antwort nennt ihre Quelle; nichts ist simuliert oder erfunden.' },
       { titulo: 'Neutral, unabhängig und sicher', texto: 'Keine Verbindung zum TSE, zur Regierung oder zu Parteien: wir empfehlen, vergleichen und prognostizieren keine Kandidaten. In der Chemie werden gefährliche Anfragen abgelehnt.' },
-      { titulo: 'Offen und werbefrei', texto: 'Quelloffen unter MIT-Lizenz, für alle überprüfbar. Ohne Werbung und ohne Registrierung.' }
+      { titulo: 'Offen und werbefrei', texto: 'Eleições 2026 und Química sind quelloffen unter MIT-Lizenz, für alle überprüfbar; AchaVagaIA ist noch im Aufbau und sein Code noch nicht veröffentlicht. Ohne Werbung und ohne Registrierung.' }
     ]
   },
   instalar: {
@@ -120,7 +120,7 @@ export default {
     titulo: 'Öffentliches Projekt',
     codigo: {
       titulo: 'Quelloffen (MIT)',
-      texto: 'Der gesamte Code — Website, Web-App, Android-App, Datenpipeline und KI-Modell — ist öffentlich und überprüfbar.'
+      texto: 'Bei Eleições 2026 und Química ist der gesamte Code — Website, Web-App, Android-App, Datenpipeline und KI-Modell — öffentlich und überprüfbar. Der Code von AchaVagaIA, noch im Aufbau, ist noch nicht veröffentlicht.'
     },
     fontes: {
       titulo: 'Amtliche Quellen',
@@ -147,6 +147,6 @@ export default {
     privacidade: 'Datenschutz (auf Portugiesisch)',
     dados: 'Über die Daten (auf Portugiesisch)',
     github: 'GitHub',
-    texto: 'SaibaTudo ist unabhängig und überparteilich und hat keine Verbindung zum TSE, zur Regierung oder zu Parteien. Wahldaten: Tribunal Superior Eleitoral (Oberstes Wahlgericht Brasiliens) — Open-Data-Portal, Lizenz CC BY 4.0. Chemiedaten: PubChem, Wikidata, CODATA/NIST, ChEBI, Wikipedia und Wikibooks. Code unter MIT-Lizenz.'
+    texto: 'SaibaTudo ist unabhängig und überparteilich und hat keine Verbindung zum TSE, zur Regierung oder zu Parteien. Wahldaten: Tribunal Superior Eleitoral (Oberstes Wahlgericht Brasiliens) — Open-Data-Portal, Lizenz CC BY 4.0. Chemiedaten: PubChem, Wikidata, CODATA/NIST, ChEBI, Wikipedia und Wikibooks. Code von Eleições 2026 und Química unter MIT-Lizenz.'
   }
 };

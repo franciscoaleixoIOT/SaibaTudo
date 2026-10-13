@@ -84,7 +84,7 @@ export default {
     pilares: [
       { titulo: 'Dados oficiais e abertos', texto: 'Eleições: arquivos abertos do TSE. Química: PubChem, Wikidata, CODATA e textos abertos. Cada resposta traz a fonte; nada é simulado ou inventado.' },
       { titulo: 'Neutro, independente e seguro', texto: 'Sem vínculo com o TSE, o governo ou partidos: não indicamos, comparamos nem prevemos candidatos. Em química, pedidos perigosos são recusados.' },
-      { titulo: 'Aberto e sem anúncios', texto: 'Código aberto sob licença MIT, auditável por qualquer pessoa. Sem anúncios e sem cadastro para consultar.' }
+      { titulo: 'Aberto e sem anúncios', texto: 'Eleições 2026 e Química têm código aberto sob licença MIT, auditável por qualquer pessoa; o AchaVagaIA, em construção, ainda não tem o código publicado. Sem anúncios e sem cadastro para consultar.' }
     ]
   },
   instalar: {
@@ -122,7 +122,7 @@ export default {
     titulo: 'Projeto público',
     codigo: {
       titulo: 'Código aberto (MIT)',
-      texto: 'Todo o código — site, app web, app Android, pipeline de dados e modelo de IA — é público e auditável.'
+      texto: 'Em Eleições 2026 e Química, todo o código — site, app web, app Android, pipeline de dados e modelo de IA — é público e auditável. O AchaVagaIA, em construção, ainda não tem o código publicado.'
     },
     fontes: {
       titulo: 'Fontes oficiais',
@@ -149,6 +149,6 @@ export default {
     privacidade: 'Privacidade',
     dados: 'Sobre os dados',
     github: 'GitHub',
-    texto: 'SaibaTudo é independente, apartidário e não tem vínculo com o TSE, com o governo ou com partidos. Dados eleitorais: Tribunal Superior Eleitoral — Portal de Dados Abertos, licença CC BY 4.0. Dados de química: PubChem, Wikidata, CODATA/NIST, ChEBI, Wikipédia e Wikilivros. Código sob licença MIT.'
+    texto: 'SaibaTudo é independente, apartidário e não tem vínculo com o TSE, com o governo ou com partidos. Dados eleitorais: Tribunal Superior Eleitoral — Portal de Dados Abertos, licença CC BY 4.0. Dados de química: PubChem, Wikidata, CODATA/NIST, ChEBI, Wikipédia e Wikilivros. Código de Eleições 2026 e Química sob licença MIT.'
   }
 };
