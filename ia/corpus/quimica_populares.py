@@ -47,6 +47,15 @@ CIDS_COTIDIANO = [
 # combustíveis (perguntas de queima): metano, propano, butano, etanol, metanol, glicose, sacarose, benzeno, tolueno, hidrogênio
 CIDS_COMBUSTIVEL = {297, 6334, 7843, 702, 887, 5793, 5988, 241, 1140, 783}
 CIDS_SEM_SOLUBILIDADE = {962}  # a água não é "solúvel em água"
+# Substância elementar (O2, H2, N2, Cl2, O3, Br2, I2, F2, gases nobres): fórmula de um só elemento. No app, o NOME de um elemento é
+# ELEMENTO (golden: "Fale sobre o oxigênio" -> O; "Masa molar: azufre" -> S): essas entradas do pacote ficam FORA deste gerador
+# (o v3.1 aprendeu "oxigênio"/"Sauerstoff"/"hydrogen" como composto por causa delas e errou 22 casos de elemento no golden).
+ELEMENTAR = re.compile(r"^([A-Z][a-z]?)\d*$")
+
+
+def eh_elementar(c) -> bool:
+    formula = (c.get("formulaHill") or c.get("formula") or "").replace(" ", "")
+    return bool(formula) and bool(ELEMENTAR.match(formula))
 
 # ---------------------------------------------------------------------------------------------------------
 # Moldes por idioma. Placeholders: {co_s} nome cru | {co} com artigo | {Co} com artigo, inicial maiúscula | {co_de} "do/da/of/von/de"
@@ -208,6 +217,49 @@ PROPS = sorted(PROP_PT)
 # cotas por intenção e idioma (pt-BR recebe 1,6×: é o idioma do app)
 COTA = {"COMPOSTO": 260, "PROPRIEDADE": 300, "MASSA_MOLAR": 160, "SEGURANCA": 420, "ESTEQUIOMETRIA": 160, "ESTEQUIOMETRIA_QUEIMA": 120, "CONCENTRACAO": 180, "PH": 110}
 INTENT_DE = {"PROPRIEDADE_FIXA": "PROPRIEDADE", "ESTEQUIOMETRIA_QUEIMA": "ESTEQUIOMETRIA"}
+# Perguntas pelo NOME do elemento (contrapeso aos compostos: "oxigênio", "ferro", "enxofre" são ELEMENTO, nunca composto).
+# {el_s} nome cru | {El} nome com inicial maiúscula | {el} com artigo do idioma | {el_de} com "de" + artigo. Alvo: elemento = símbolo.
+COTA_ELEMENTO = {"ELEMENTO": 130, "MASSA_MOLAR": 60, "SEGURANCA": 60}
+# os que o v3.1 confundiu com composto (gases elementares do pacote) e os metais/nao metais do dia a dia pesam 12x; Z <= 36 e metais conhecidos 4x
+ELEMENTOS_MUITO_COMUNS = {"O", "H", "N", "Cl", "C", "S", "Fe", "Na", "K", "Ca", "Mg", "Al", "Cu", "Zn", "Ag", "Au", "Hg", "Pb", "He", "Ne", "Ar", "F", "Br", "I", "P", "Si", "Sn", "Ni"}
+ELEMENTOS_COMUNS = {"Ag", "Au", "Hg", "Pb", "Sn", "Pt", "W", "U", "I", "Ba", "Sr", "Cs", "Ra", "Rn", "Xe", "Kr", "Cd", "Bi", "Pd"}
+M_EL = {
+    "pt-BR": {
+        "ELEMENTO": ["Fale sobre {el}", "{el_s}", "{El}", "{el_s}?", "O que é {el}?", "o que é {el_s}", "Informações sobre {el}", "Me fale {el_de}",
+                     "Quero saber sobre {el}", "Conte-me sobre {el}", "{El}, o que é?", "me fala {el_de}"],
+        "MASSA_MOLAR": ["Massa atômica {el_de}", "qual a massa atômica {el_de}?", "massa molar {el_de}", "Massa molar: {el_s}", "quanto pesa um mol de {el_s}?",
+                        "massa atomica {el_de}"],
+        "SEGURANCA": ["Perigos {el_de}", "{El} é tóxico?", "O que fazer em caso de inalação de {el_s}?", "{el_s} faz mal à saúde?", "riscos {el_de}",
+                      "primeiros socorros: {el_s}", "{el_s} é perigoso?"],
+    },
+    "en": {
+        "ELEMENTO": ["Tell me about {el}", "{el_s}", "{El}", "{el_s}?", "What is {el}?", "what is {el_s}", "Information about {el}", "What do you know about {el}?",
+                     "I want to know about {el}", "{El}, what is it?"],
+        "MASSA_MOLAR": ["Atomic mass of {el}", "what is the atomic mass of {el_s}?", "molar mass of {el}", "Molar mass: {el_s}", "how much does one mole of {el_s} weigh?"],
+        "SEGURANCA": ["Hazards of {el}", "Is {el_s} toxic?", "What to do after inhaling {el_s}?", "is {el_s} harmful to health?", "first aid: {el_s}", "is {el_s} dangerous?"],
+    },
+    "es": {
+        "ELEMENTO": ["Háblame {el_de}", "{el_s}", "{El}", "{el_s}?", "¿Qué es {el}?", "qué es {el_s}", "Información sobre {el}", "¿Qué sabes sobre {el}?",
+                     "ficha {el_de}", "Quiero saber sobre {el}"],
+        "MASSA_MOLAR": ["Masa atómica {el_de}", "¿cuál es la masa atómica {el_de}?", "masa molar {el_de}", "Masa molar: {el_s}", "¿cuánto pesa un mol de {el_s}?"],
+        "SEGURANCA": ["Peligros {el_de}", "¿{El} es tóxico?", "¿Qué hacer tras inhalar {el_s}?", "¿{el_s} es dañino para la salud?", "primeros auxilios: {el_s}",
+                      "¿{el_s} es peligroso?"],
+    },
+    "de": {
+        "ELEMENTO": ["Erzähl mir etwas über {el_s}", "{el_s}", "{El}", "{el_s}?", "Was ist {el_s}?", "was ist {el_s}", "Informationen über {el_s}",
+                     "Was weißt du über {el_s}?", "Steckbrief {el_s}", "Ich möchte mehr über {el_s} wissen"],
+        "MASSA_MOLAR": ["Atommasse von {el_s}", "wie groß ist die Atommasse von {el_s}?", "molare Masse von {el_s}", "Molare Masse: {el_s}", "wie viel wiegt ein Mol {el_s}?"],
+        "SEGURANCA": ["Gefahren von {el_s}", "Ist {el_s} giftig?", "Was tun nach dem Einatmen von {el_s}?", "ist {el_s} gesundheitsschädlich?", "Erste Hilfe: {el_s}",
+                      "ist {el_s} gefährlich?"],
+    },
+    "fr": {
+        "ELEMENTO": ["Parle-moi {el_de}", "{el_s}", "{El}", "{el_s} ?", "Qu'est-ce que {el} ?", "qu'est-ce que {el_s}", "Informations sur {el}",
+                     "Que sais-tu sur {el} ?", "fiche {el_de}", "Je veux en savoir plus sur {el}"],
+        "MASSA_MOLAR": ["Masse atomique {el_de}", "quelle est la masse atomique {el_de} ?", "masse molaire {el_de}", "Masse molaire : {el_s}", "combien pèse une mole de {el_s} ?"],
+        "SEGURANCA": ["Dangers {el_de}", "{El} est-il toxique ?", "Que faire en cas d'inhalation de {el_s} ?", "{el_s} est-il nocif pour la santé ?",
+                      "premiers secours : {el_s}", "{el_s} est-il dangereux ?"],
+    },
+}
 VALS = {
     "g": ["1", "2", "2.5", "5", "10", "16", "20", "25", "40", "50", "100", "0.5", "250", "500"], "mg": ["5", "10", "50", "100", "250", "500"], "kg": ["1", "2", "5", "0.5"],
     "mL": ["10", "25", "50", "100", "200", "250", "500"], "L": ["0.5", "1", "2", "5", "1.5", "0.25", "10"],
@@ -264,12 +316,12 @@ def chave_estavel(s: str, seed: int, mod: int = 1000) -> int:
 
 
 def compostos_cotidiano(pac) -> list:
-    """Compostos com `nomePopular` ∪ CIDS_COTIDIANO, com nome, fórmula e sem pendência de nome."""
+    """Compostos com `nomePopular` ∪ CIDS_COTIDIANO, com nome, fórmula, sem pendência de nome e que NÃO sejam substância elementar."""
     cids = set(CIDS_COTIDIANO) | {c["cid"] for c in pac.compostos if c.get("nomePopular")}
     saida = []
     for cid in sorted(cids):
         c = pac.comp_cid.get(cid)
-        if not c or pac.comp_pendente(c) or not (c.get("formula") or c.get("formulaHill")):
+        if not c or pac.comp_pendente(c) or not (c.get("formula") or c.get("formulaHill")) or eh_elementar(c):
             continue
         saida.append(c)
     return saida
@@ -322,7 +374,60 @@ class Gerador:
     def __init__(self, pac, idioma: str, rng: random.Random, comum, mod):
         self.pac, self.idioma, self.rng, self.comum, self.mod = pac, idioma, rng, comum, mod
         self.compostos = [c for c in compostos_cotidiano(pac) if superficies(c, idioma)]
+        self.elementos = [e for e in getattr(pac, "elementos", []) if self._nome_elemento(e)]
+        self.pesos_el = [12 if e["simbolo"] in ELEMENTOS_MUITO_COMUNS else 4 if (e.get("z", 99) <= 36 or e["simbolo"] in ELEMENTOS_COMUNS) else 1
+                         for e in self.elementos]
         self.props = sorted(PROP_PT) if idioma == "pt-BR" else [p for p in PROPS if p in getattr(mod, "PROP_COMPOSTO", {})]
+
+    # -- elemento (pelo nome) ----------------------------------------------------------------------------
+    def _nome_elemento(self, e):
+        nomes = e.get("nomes") or {}
+        nome = nomes.get(self.idioma) or (e.get("nome") if self.idioma == "pt-BR" else None)
+        return nome if nome and SINONIMO_OK.match(nome) else None
+
+    def _erro_digitacao(self, texto: str) -> str:
+        """Como no golden ("ferrro", "hierrro", "Quecksilbr", "souffre"): dobra ou come uma letra do meio, sem mexer na inicial."""
+        if len(texto) < 5:
+            return texto
+        i = self.rng.randrange(2, len(texto) - 1)
+        if not texto[i].isalpha():
+            return texto
+        return texto[:i] + texto[i] + texto[i:] if self.rng.random() < 0.5 else texto[:i] + texto[i + 1:]
+
+    def amostra_elemento(self, intent: str, template: str):
+        rng = self.rng
+        e = rng.choices(self.elementos, weights=self.pesos_el)[0]
+        texto = self._nome_elemento(e)
+        r = rng.random()
+        if self.idioma == "de":
+            texto = texto[:1].upper() + texto[1:] if r < 0.85 else texto
+        elif r < 0.55:
+            texto = texto[:1].lower() + texto[1:]
+        elif r < 0.75:
+            texto = texto[:1].upper() + texto[1:]
+        elif r < 0.80:
+            texto = fold(texto)
+        if rng.random() < 0.08:
+            texto = self._erro_digitacao(texto)
+        valores = {}
+        for n in PLACEHOLDER.findall(template):
+            if n == "el_s":
+                valores[n] = texto
+            elif n == "El":
+                valores[n] = texto[:1].upper() + texto[1:]
+            elif n == "el":
+                valores[n] = self._com_prep(texto, "", "elemento")
+            elif n == "el_de":
+                valores[n] = self._com_prep(texto, "de", "elemento")
+            else:
+                raise ValueError(f"placeholder desconhecido {{{n}}} em {template!r}")
+        q = template
+        for n, v in valores.items():
+            q = q.replace("{" + n + "}", v)
+        q = self._cortesia(q)
+        if texto not in q:
+            return None
+        return q, {"intent": intent, "elemento": e["simbolo"]}, f"el:{e['simbolo']}"
 
     # -- composto ----------------------------------------------------------------------------------------
     def _co(self, c):
@@ -490,11 +595,19 @@ def gerar_idioma(pac, idioma: str, seed: int = 2026, escala: float = 1.0, ds=Non
             r = g.amostra(grupo, t, pf)
             if r and guardar(*r):
                 feitos += 1
+    for intent, meta in COTA_ELEMENTO.items():
+        meta = int(meta * fator)
+        feitos = tent = 0
+        while g.elementos and feitos < meta and tent < meta * 40:
+            tent += 1
+            r = g.amostra_elemento(intent, rng.choice(M_EL[idioma][intent]))
+            if r and guardar(*r):
+                feitos += 1
     registros = []
     for q, alvo, chave in amostras.values():
         lado = "holdout" if chave_estavel(f"{idioma}|{chave}", seed) < HOLDOUT_POR_MIL else "treino"
         registros.append({"q": q, "alvo": alvo, "idioma": idioma, "_lado": lado})
-    stats = {"idioma": idioma, "gerados": len(registros), "compostos_no_pool": len(g.compostos),
+    stats = {"idioma": idioma, "gerados": len(registros), "compostos_no_pool": len(g.compostos), "elementos_no_pool": len(g.elementos),
              "por_intencao": dict(sorted(Counter(r["alvo"]["intent"] for r in registros).items()))}
     return registros, stats
 

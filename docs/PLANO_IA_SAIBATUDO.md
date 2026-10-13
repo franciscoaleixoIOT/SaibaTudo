@@ -164,6 +164,22 @@ menos GPU que o 7B atual, então a cota de 40 min/dia rende mais respostas.
 > exemplos), casos duros com o composto/elemento copiado quando a substância está no pacote (5 geradores), corpus remontado (69.090) e
 > **treino de continuação** a partir do LoRA v3 (`--lora_init`, 19.280 exemplos = novos + revisão estratificada, 1 época, lr 1e-4, ~1,3 h).
 > Depois: gate completo de novo nos dois apps. A publicação continua condicionada ao gate (química primeiro; eleições só depois de 27/10).
+>
+> **Resultado do v3.1 (13/10, 1 h 45 de treino, gate completo de 2 h 30):** `composto` subiu de 88,3 % para **98,5 %** (holdout 2.266: 99,1 %),
+> intenção 96,3 %, mas **`elemento` caiu de 95,3 % para 85,1 %** e o composto passou a aparecer onde deveria ser nulo (5 dos 6 casos): "Fale
+> sobre o oxigênio", "Tell me about oxygen", "Sauerstoff", "hidrogênio", "Masa molar: azufre", "souffre" saíram como `COMPOSTO`/`composto`. Causa:
+> o pacote traz 13 **substâncias elementares** como compostos (O2, H2, N2, Cl2, O3, F2, Br2, I2, gases nobres; 4 com `nomePopular`) e o gerador
+> novo as sorteava pelos nomes de todos os idiomas ("Oxygen", "oxígeno"...) — ensinando que o nome de um elemento é composto, o contrário do
+> golden (nome de elemento → `ELEMENTO`/símbolo). Nas eleições a intenção recuou de 95,6 % para 93,9 % (holdout 96,3 %): cinco casos raros
+> (`REGRAS_URNA`, `AJUDA`, "Governador do Pará") foram para `DESCONHECIDA`/`PERFIL` — esquecimento por revisão pequena do app (3.944 exemplos).
+> Nenhuma queda de quantização; nenhum `<think>`.
+>
+> **Correção (v3.2, em andamento em 13/10 à tarde):** `quimica_populares.py` exclui substâncias elementares (`eh_elementar`) e ganha um grupo de
+> perguntas pelo **nome do elemento** nos 5 idiomas (`M_EL`: ELEMENTO, MASSA_MOLAR, SEGURANCA com `elemento` = símbolo; elementos comuns pesam
+> 12×, erro de digitação em 8 %, como no golden "ferrro"/"souffre"); `misturar_continuacao.py --peso-app eleicoes2026=2.5` (revisão das eleições
+> ×2,5). Treino de continuação **a partir do v3** (não do v3.1), 1 época, lr 1e-4; depois exportar e gate completo. Enquanto isso o serviço da
+> química foi preparado para servir o Qwen3.5 (`apps/quimica/docs/MODELO.md` §13, commit 09fc730): ponteiro com `prompt_suffix`,
+> `ia/treino/empacotar_versao.py` e avaliador que trata a pergunta em branco como resposta do sistema.
 
 > **Decidido em 12/10/2026 (noite):** o mantenedor aprovou seguir com o **Qwen3.5-2B** como interpretador **único de todos os apps**
 > (Qwen3.5-4B de reserva se a química não passar no gate em en/es/de/fr) e deu o nome **"SaibaTudo.IA"** à IA (confirmado em 12/10; o nome fica numa constante única). Em andamento: etapa 2 (corpus único, `ia/corpus/`) e etapa 3a

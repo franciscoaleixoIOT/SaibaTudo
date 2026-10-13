@@ -36,7 +36,7 @@ Opções: `--teto-intencao-quimica-pt` (padrão 2400; 0 desliga), `--val-pct-qui
 | Eleições, holdout | `out-v23/holdout_cases.json`: as 435 perguntas reservadas do gate do v2.3 | idem |
 | Química, pt-BR | `apps/quimica/dataset/nlu/{train,val}.jsonl` (`dataset/gerar_nlu.py`), passados por `backend/retrain/build_nlu_dataset.construir`. O `val.jsonl` (divisão por entidade) vira holdout | CC BY-SA 4.0 |
 | Química, en/es/de/fr | `quimica_multilingue.py` + `quimica_idiomas/<idioma>.py`, também passados por `build_nlu_dataset.construir`. Usa nomes do pacote assinado (`elementos[].nomes`, `compostos[].nomes`/`sinonimosPorIdioma`: PubChem, Wikidata), equações, fórmulas e códigos H dos módulos de `apps/quimica/dataset/` | CC BY-SA 4.0 |
-| Química, compostos do dia a dia (5 idiomas, desde o v3.1 em 13/10/2026) | `quimica_populares.py`: ~115 compostos (todos com `nomePopular` + lista conferida de substâncias do cotidiano) pelos nomes como as pessoas escrevem (nome popular, `sinonimosPorIdioma` curtos, fórmula também em minúsculas) nos padrões em que o NLU v3 deixou de copiar o `composto` no golden (perigos/segurança, propriedade, massa molar, "o que é", estequiometria de queima, diluição, pH). Mesmo construtor e filtro do golden; fica **fora** do teto por intenção da química pt (`--escala-populares`, 0 desliga) | CC BY-SA 4.0 |
+| Química, compostos do dia a dia (5 idiomas, desde o v3.1 em 13/10/2026) | `quimica_populares.py`: ~115 compostos (todos com `nomePopular` + lista conferida de substâncias do cotidiano) pelos nomes como as pessoas escrevem (nome popular, `sinonimosPorIdioma` curtos, fórmula também em minúsculas) nos padrões em que o NLU v3 deixou de copiar o `composto` no golden (perigos/segurança, propriedade, massa molar, "o que é", estequiometria de queima, diluição, pH). Desde o v3.2: **sem** as 13 substâncias elementares do pacote (O2, H2, Cl2, O3, gases nobres — nome de elemento é `ELEMENTO`, nunca composto) e com um grupo de perguntas pelo **nome do elemento** nos 5 idiomas (ELEMENTO, MASSA_MOLAR, SEGURANCA → `elemento` = símbolo; elementos comuns pesam 12×, 8 % com erro de digitação). Mesmo construtor e filtro do golden; fica **fora** do teto por intenção da química pt (`--escala-populares`, 0 desliga) | CC BY-SA 4.0 |
 
 Nada de `LivrosQuimica`. Os moldes en/es/de/fr têm só formas de perguntar, sem fatos químicos. Os de es/de/fr foram escritos sem
 abrir os golden nem os casos de segurança.
@@ -75,7 +75,8 @@ isso exige mudar o handler (`{q, v, idioma}`) e o Modal.
 ## Arquivos
 - `montar_corpus.py`: monta o corpus.
 - `quimica_populares.py`: gerador focado dos compostos do dia a dia nos cinco idiomas (ver a tabela de fontes); `test_quimica_populares.py`
-  confere composto copiado da pergunta, quantidades na ordem, rótulo válido pelo contrato, nomes populares presentes e filtro de sinônimos.
+  confere composto copiado da pergunta, quantidades na ordem, rótulo válido pelo contrato, nomes populares presentes, filtro de sinônimos,
+  substâncias elementares fora do pool e o grupo por nome de elemento (símbolo válido, sem `composto`).
   Amostra: `python -I ia/corpus/quimica_populares.py --idioma de --n 20`.
 - `quimica_multilingue.py`: gerador en/es/de/fr. Reusa por import o pacote, as equações, a nomenclatura, o GHS, as recusas e o contrato
   do app. Ficou aqui, e não dentro de `apps/quimica/dataset/gerar_nlu.py`, porque o gerador pt é todo feito da concordância do

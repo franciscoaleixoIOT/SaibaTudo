@@ -50,6 +50,8 @@ class Populares(unittest.TestCase):
         for idioma, regs in self.regs.items():
             for r in regs:
                 alvo = r["alvo"]
+                if "elemento" in alvo:  # grupo por nome de elemento: testado em test_perguntas_por_nome_de_elemento
+                    continue
                 self.assertIn(alvo["composto"], r["q"], (idioma, r))
                 saida = self.core.format_output(alvo)
                 self.assertTrue(self.core.has_valid_shape(self.core.parse_model_output(saida)), (idioma, saida))
@@ -108,6 +110,39 @@ class Populares(unittest.TestCase):
         for idioma in ("en", "es", "de", "fr"):
             for r in self.regs[idioma]:
                 self.assertIsNone(re.search(r"\b(qual|quais|quantos|misturar|perigos?)\b", r["q"], re.I), (idioma, r["q"]))
+
+    def test_substancias_elementares_fora_do_pool_de_compostos(self):
+        """O2, H2, Cl2, N2, O3 e gases nobres estao no pacote como "compostos", mas no app nome de elemento = ELEMENTO (golden)."""
+        self._pular_sem_pacote()
+        pool = qp.compostos_cotidiano(self.pac)
+        self.assertTrue(pool)
+        self.assertFalse([c["cid"] for c in pool if qp.eh_elementar(c)])
+        self.assertTrue(qp.eh_elementar({"formulaHill": "O2"}) and qp.eh_elementar({"formula": "He"}) and qp.eh_elementar({"formula": "Cl2"}))
+        self.assertFalse(qp.eh_elementar({"formula": "H2O"}) or qp.eh_elementar({"formula": "NaCl"}) or qp.eh_elementar({"formula": "CO"}))
+        nomes_el = {qp.fold(n) for e in self.pac.elementos for n in [e.get("nome"), *(e.get("nomes") or {}).values()] if n}
+        for idioma, regs in self.regs.items():
+            for r in regs:
+                co = r["alvo"].get("composto")
+                self.assertFalse(co and qp.fold(co) in nomes_el, (idioma, r["q"], co))
+
+    def test_perguntas_por_nome_de_elemento(self):
+        self._pular_sem_pacote()
+        simbolos = {e["simbolo"] for e in self.pac.elementos}
+        for idioma, regs in self.regs.items():
+            com_el = [r for r in regs if "elemento" in r["alvo"]]
+            self.assertGreater(len(com_el), 100, idioma)
+            self.assertEqual({r["alvo"]["intent"] for r in com_el}, {"ELEMENTO", "MASSA_MOLAR", "SEGURANCA"}, idioma)
+            for r in com_el:
+                self.assertIn(r["alvo"]["elemento"], simbolos, r)
+                self.assertNotIn("composto", r["alvo"], r)
+                self.assertTrue(self.core.has_valid_shape(r["alvo"]), r)
+        # os elementos que o v3.1 confundiu com composto aparecem em todos os idiomas juntos (peso 12x; a geracao e deterministica)
+        vistos = {r["alvo"]["elemento"] for regs in self.regs.values() for r in regs if "elemento" in r["alvo"]}
+        self.assertTrue({"O", "H", "Fe", "Cl", "S", "N", "Hg"} <= vistos, sorted(vistos))
+        pt = [r["q"] for r in self.regs["pt-BR"] if r["alvo"].get("elemento") == "O"]
+        self.assertTrue(any("oxig" in q.lower() for q in pt), pt[:5])
+        fr = [r["q"] for r in self.regs["fr"] if "elemento" in r["alvo"]]
+        self.assertFalse([q for q in fr if "composé" in q], fr[:3])
 
 
 if __name__ == "__main__":

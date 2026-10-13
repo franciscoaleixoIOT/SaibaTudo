@@ -33,6 +33,8 @@ def main(argv=None):
     ap.add_argument("--out", required=True)
     ap.add_argument("--revisao", type=float, default=1.2)
     ap.add_argument("--seed", type=int, default=2026)
+    ap.add_argument("--peso-app", action="append", default=[], metavar="APP=FATOR",
+                    help="multiplica a revisão de um app (ex.: eleicoes2026=2.5 quando os novos exemplos são todos de outro app e o golden daquele recuou)")
     a = ap.parse_args(argv)
 
     novo = json.loads(Path(a.novo).read_text(encoding="utf-8"))
@@ -50,9 +52,13 @@ def main(argv=None):
     for e in comuns:
         por_grupo[(e["app"], e["idioma"])].append(e)
     alvo_total = int(len(novos) * a.revisao)
+    pesos = {}
+    for item in a.peso_app:
+        app_, _, fator = item.partition("=")
+        pesos[app_] = float(fator or 1)
     revisao = []
     for g, lista in sorted(por_grupo.items()):
-        n = round(alvo_total * len(lista) / len(comuns))
+        n = min(len(lista), round(alvo_total * len(lista) / len(comuns) * pesos.get(g[0], 1.0)))
         rng.shuffle(lista)
         revisao += lista[:n]
     mistura = novos + revisao
@@ -64,6 +70,7 @@ def main(argv=None):
         "novos_por_app_idioma": dict(sorted(Counter(f"{e['app']}/{e['idioma']}" for e in novos).items())),
         "novos_por_intencao": dict(sorted(Counter(e.get("intent") for e in novos).items())),
         "revisao_por_app_idioma": dict(sorted(Counter(f"{e['app']}/{e['idioma']}" for e in revisao).items())),
+        "peso_app": pesos,
     }
     Path(a.out).with_suffix(".resumo.json").write_text(json.dumps(resumo, ensure_ascii=False, indent=1), encoding="utf-8")
     print(json.dumps(resumo, ensure_ascii=False, indent=1))
