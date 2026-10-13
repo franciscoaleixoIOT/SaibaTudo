@@ -114,9 +114,13 @@ Ordenado por fidelidade, idioma, recusas e latência (GPU, 110 prompts cada).
   prompt + falta de treino, não da base: ver §8.
 - **Idioma:** todos responderam no idioma pedido, inclusive com contexto em português e pergunta em en/es/de/fr; únicas exceções: Qwen3-8B
   (1 resposta em português a uma pergunta em espanhol) e Granite (1 recusa em português/espanhol misturados).
-- **Painel às cegas:** `tools/benchmark_ia/out/cegas.md` — 20 prompts (10 química, 2 por idioma; 10 eleições) com Qwen2.5-7B ×
-  Qwen3.5-4B (1º do ranking automático) em ordem sorteada. Para comparar com o Qwen3-4B-2507, rode
-  `python -I tools/benchmark_ia/cegas.py --candidato qwen3-4b-2507` (as respostas já estão gravadas).
+- **Painel às cegas (preenchido pelo mantenedor em 12/10/2026, Qwen2.5-7B × Qwen3.5-4B, 20 itens em ordem sorteada):** geral
+  **10 × 9 × 1 empate** a favor do Qwen3.5-4B. **Química: 8 × 2 para o Qwen3.5-4B** (venceu em pt-BR, en, de e fr; o 7B levou os dois
+  itens em espanhol). **Eleições: 7 × 2 × 1 empate para o Qwen2.5-7B atual.** Leitura: no texto com trechos licenciados (química, 5
+  idiomas) o 4B novo já é preferido sem treino; no contexto sintético de eleições o 7B atual ainda escreve melhor — é o comportamento
+  que a etapa 4 (treino de comportamento) deve fechar, e Eleições só troca depois de 27/10. O painel preenchido está no histórico do Git
+  (commit que registra este parágrafo); um **segundo painel**, Qwen2.5-7B × **Qwen3-4B-Instruct-2507** (o explicador escolhido), foi gerado
+  em seguida no mesmo `out/cegas.md` para o mantenedor preencher.
 
 ## 5. Licenças e marca "SaibaTudo"
 
@@ -175,5 +179,6 @@ os pesos são os mesmos da Qwen. Para o treino (etapas 3–4) parte-se dos safet
    painel às cegas preferir o Qwen3.5.
 3. **Prompt da química:** trocar o id de exemplo da regra 3 por um marcador que não pareça id real (ou citar só "quando houver trechos")
    e incluir no treino exemplos sem trecho que não citam nada.
-4. **Painel às cegas:** o mantenedor preenche `out/cegas.md` (20 itens) antes de abrir `cegas_chave.json`.
+4. **Painel às cegas:** o 1º (7B × Qwen3.5-4B) foi preenchido em 12/10 (ver §4); falta o 2º (7B × Qwen3-4B-2507), já gerado em
+   `out/cegas.md` — preencher antes de abrir `cegas_chave.json`.
 5. Gemma: só se o mantenedor aceitar a licença (os números do Qwen3.5 tornam improvável uma vitória "por ≥ 3 pontos" que justifique o custo de licença).

@@ -22,7 +22,7 @@ O poliéster é amplamente utilizado na produção de roupas devido à sua resis
 
 O poliéster é amplamente utilizado em roupas, especialmente em misturas com algodão para produzir tecidos fortes e resistentes. [wikipedia-pt-poliester-001]
 
-**Escolha:** [ ] A  [ ] B  [ ] empate — comentário: 
+**Escolha:** [X] A  [ ] B  [ ] empate — comentário: 
 
 ---
 
@@ -50,7 +50,7 @@ O moscóvio (Mc) tem número atômico 115 e está localizado no grupo 15 e no pe
 
 O moscóvio (Mc) é um elemento químico com símbolo Mc e número atômico 115, o que significa que cada átomo possui 115 prótons no núcleo [openstax-chem2e-3.1-001]. Sua massa atômica é de aproximadamente 290,19598 u [openstax-chem2e-3.1-001]. Na tabela periódica, ele está localizado no grupo 15 e no período 7 [openstax-chem2e-3.1-001]. As informações fornecidas limitam-se a esses dados estruturais e de massa, sem detalhes sobre propriedades físicas ou químicas específicas como estado físico ou reatividade.
 
-**Escolha:** [ ] A  [ ] B  [ ] empate — comentário: 
+**Escolha:** [ ] A  [X] B  [ ] empate — comentário: 
 
 ---
 
@@ -73,7 +73,7 @@ Based on the provided text, enzymes are substances with widespread practical app
 
 Enzymes are biological catalysts that speed up chemical reactions. They are highly specific and efficient, playing crucial roles in both natural and industrial processes. [wikipedia-en-enzyme-004]
 
-**Escolha:** [ ] A  [ ] B  [ ] empate — comentário: 
+**Escolha:** [X] A  [ ] B  [ ] empate — comentário: 
 
 ---
 
@@ -98,7 +98,7 @@ Tellurium (Te) is a brittle, mildly toxic, rare silver-white metalloid with atom
 
 Tellurium is a chemical element with the symbol Te and atomic number 52. It is a brittle, rare, silver-white metalloid chemically related to selenium and sulfur, which are chalcogens. [wikipedia-en-tellurium-001]
 
-**Escolha:** [ ] A  [ ] B  [ ] empate — comentário: 
+**Escolha:** [X] A  [ ] B  [ ] empate — comentário: 
 
 ---
 
@@ -127,7 +127,7 @@ El ácido pícrico, también conocido como trinitrofenol, es un explosivo que se
 
 El ácido pícrico es el nombre común del trinitrofenol (TNP), un compuesto con fórmula C6H2OH(NO2)3 que actúa como explosivo y carga aumentadora [wikipedia-es-acido-picrico-001]. Su denominación de "ácido" surge porque sus grupos nitro estabilizan la base conjugada, facilitando la disociación del hidrógeno del grupo OH y formando una solución ácida [wikipedia-es-acido-picrico-001]. Este compuesto también se utiliza en anatomía como un fijador simple para muestras histológicas [wikipedia-es-acido-picrico-001]. Es importante manejarlo con precaución debido a la peligrosidad de sus sales de picrato, que son inestables [wikipedia-es-acido-picrico-001].
 
-**Escolha:** [ ] A  [ ] B  [ ] empate — comentário: 
+**Escolha:** [X] A  [ ] B  [ ] empate — comentário: 
 
 ---
 
@@ -179,7 +179,7 @@ Si ocurre una exposición accidental, buscar atención médica inmediatamente. [
 
 El O-fenilenodiamina presenta toxicidad aguda fatal por ingestión, contacto con la piel o inhalación [openstax-chem2e-3.1-001]. Es nocivo para los organismos acuáticos y sus efectos pueden ser duraderos [openstax-chem2e-3.1-001]. Puede causar irritación ocular grave, reacciones alérgicas cutáneas y es sospechoso de provocar cáncer y anomalías genéticas [openstax-chem2e-3.1-001]. No se dispone de frases de precaución ni de una ficha de seguridad completa en los datos proporcionados. Para manipularlo con seguridad, se requiere el uso de equipos de protección personal adecuados y medidas de descontaminación inmediata en caso de exposición. Se debe evitar la inhalación, el contacto con la piel y la ingestión, y gestionar cualquier derrame según protocolos de descarte seguro.
 
-**Escolha:** [ ] A  [ ] B  [ ] empate — comentário: 
+**Escolha:** [X] A  [ ] B  [ ] empate — comentário: 
 
 ---
 
@@ -202,7 +202,7 @@ Lanthan ist ein chemisches Element mit dem Symbol La und der Ordnungszahl 57 [wi
 
 Lanthan ist ein chemisches Element mit dem Symbol La und der Ordnungszahl 57. Es gehört zu den Übergangsmetallen sowie den Metallen der Seltenen Erden. In der Periodensystem steht es in der 6. Periode und der 3. Nebengruppe, oder der 3. IUPAC-Gruppe. Manchmal wird es auch zu den Lanthanoiden gezählt, obwohl die f-Schale des Elements unbesetzt ist. [wikipedia-de-lanthan-001]
 
-**Escolha:** [ ] A  [ ] B  [ ] empate — comentário: 
+**Escolha:** [X] A  [ ] B  [ ] empate — comentário: 
 
 ---
 
@@ -231,7 +231,7 @@ Die Geschichte der Chemie beschreibt die Entwicklung von Erkenntnissen über Auf
 
 Die Geschichte der Chemie beschäftigt sich mit den Erkenntnissen über Aufbau, Eigenschaften, Umwandlung und Produktion von chemischen Stoffen. Sie beginnt mit antiker Praxis und mittelalterlicher Alchemie, entwickelt sich zur exakten Naturwissenschaft im 18. Jahrhundert und liefert ab dem 19. Jahrhundert praktisch verwertbare Ergebnisse, die zur chemischen Industrie führten. [wikipedia-de-geschichte-der-chemie-001]
 
-**Escolha:** [ ] A  [ ] B  [ ] empate — comentário: 
+**Escolha:** [X] A  [ ] B  [ ] empate — comentário: 
 
 ---
 
@@ -260,7 +260,7 @@ La métathèse des alcènes consiste à échanger des groupements alkylidène en
 
 La métathèse des alcènes est une réaction chimique où les groupes alkylidène (carbènes portant des chaînes alkyles) se transforment et s'échangent entre deux molécules. Cela peut créer de nouveaux liens chimiques. Cette réaction est catalysée par des complexes de métaux de transition comme le nickel, le tungstène ou le ruthénium. Par exemple, l'éthylène peut être cyclodimérisé en cyclobutane avec un catalyseur de nickel. [wikipedia-fr-metathese-chimie-002]
 
-**Escolha:** [ ] A  [ ] B  [ ] empate — comentário: 
+**Escolha:** [X] A  [ ] B  [ ] empate — comentário: 
 
 ---
 
@@ -293,7 +293,7 @@ Le 1,1-dichloroéthane est classé comme inflammable (pictogramme GHS02) et noci
 
 C2H4Cl2, ou 1,1-dicloroetano, est classé comme inflammable et pyrophorant. Il peut provoquer des irritations graves des yeux et des voies respiratoires, ainsi que des effets nocifs sur la peau et les organes aquatiques. Il est important de le manipuler avec précaution en portant des équipements de protection individuelle tels que des gants, des lunettes de protection et une combinaison anti-éclaboussures. Évitez tout contact avec l'eau et les sources de chaleur. En cas d'exposition, cherchez immédiatement un endroit sûr et contactez un professionnel de santé. [openstax-chem2e-3.1-001]
 
-**Escolha:** [ ] A  [ ] B  [ ] empate — comentário: 
+**Escolha:** [X] A  [ ] B  [ ] empate — comentário: 
 
 ---
 
@@ -324,7 +324,7 @@ Tânia Provisória venceu a eleição para governador no Rio Grande do Sul em 1�
 - **Número de votos:** 4.236.222  
 - **Fonte:** TSE — Divulgação de Candidaturas e Contas Eleitorais (dados abertos), atualizado em 11/10/2026.
 
-**Escolha:** [ ] A  [ ] B  [ ] empate — comentário: 
+**Escolha:** [X] A  [ ] B  [ ] empate — comentário: 
 
 ---
 
@@ -350,7 +350,7 @@ O segundo turno ocorrerá em 25/10/2026.
 *   **Senadores e Deputados:** Não há segundo turno; são eleitos em turno único.
 *   **Condição para o segundo turno:** Só ocorre se nenhum candidato obtiver mais de 50% dos votos válidos no primeiro turno.
 
-**Escolha:** [ ] A  [ ] B  [ ] empate — comentário: 
+**Escolha:** [ ] A  [X] B  [ ] empate — comentário: 
 
 ---
 
@@ -381,7 +381,7 @@ Sim, haverá 2º turno para Governador em Ceará entre Paulo Imaginário e Nilo 
 
 O 2º turno para Governador em Ceará ainda não ocorreu. As eleições definitivas acontecerão em 25/10/2026 entre Paulo Imaginário e Nilo Suposto.
 
-**Escolha:** [ ] A  [ ] B  [ ] empate — comentário: 
+**Escolha:** [ ] A  [X] B  [ ] empate — comentário: 
 
 ---
 
@@ -410,7 +410,7 @@ Fonte: TSE — Divulgação de Candidaturas e Contas Eleitorais (dados abertos),
 *   **Valor gasto:** R$ 555.984,12 (despesas contratadas).
 *   **Fonte:** TSE — Divulgação de Candidaturas e Contas Eleitorais (dados abertos), atualizado em 11/10/2026.
 
-**Escolha:** [ ] A  [ ] B  [ ] empate — comentário: 
+**Escolha:** [ ] A  [ ] B  [X] empate — comentário: 
 
 ---
 
@@ -439,7 +439,7 @@ Sim, haverá segundo turno para governador no Pará entre Íris Ilustrativa e Di
 *   **Motivo:** Nenhum candidato obteve mais de 50% dos votos válidos no primeiro turno.
 *   **Data do 2º turno:** 25 de outubro de 2026.
 
-**Escolha:** [ ] A  [ ] B  [ ] empate — comentário: 
+**Escolha:** [X] A  [ ] B  [ ] empate — comentário: 
 
 ---
 
@@ -478,7 +478,7 @@ Candidaturas a Senador em Pernambuco (PE) — 6 candidaturas:
 - Paulo Imaginário (PAL, nº 821)
 - Olga Inventada (PBE, nº 593)
 
-**Escolha:** [ ] A  [ ] B  [ ] empate — comentário: 
+**Escolha:** [ ] A  [X] B  [ ] empate — comentário: 
 
 ---
 
@@ -508,7 +508,7 @@ O aplicativo mostra só o registro das pesquisas; não mostra percentuais.
 
 *Nota: O aplicativo não exibe os percentuais ou nomes dos candidatos nessas pesquisas.*
 
-**Escolha:** [ ] A  [ ] B  [ ] empate — comentário: 
+**Escolha:** [ ] A  [X] B  [ ] empate — comentário: 
 
 ---
 
@@ -549,7 +549,7 @@ Fonte: TSE — Divulgação de Candidaturas e Contas Eleitorais (dados abertos),
 
 Gabriela Simulada é uma candidata à Deputado Federal pelo estado de Minas Gerais. Ela compete sob o número 8183 pelo partido PAL. Possui 62 anos e é médica. Sua candidatura foi deferida. De acordo com a fonte TSE — Divulgação de Candidaturas e Contas Eleitorais (dados abertos), atualizado em 11/10/2026, ela já foi eleita uma vez como vereadora.
 
-**Escolha:** [ ] A  [ ] B  [ ] empate — comentário: 
+**Escolha:** [ ] A  [X] B  [ ] empate — comentário: 
 
 ---
 
@@ -578,7 +578,7 @@ Fonte: TSE — Divulgação de Candidaturas e Contas Eleitorais (dados abertos),
 *   **Valor gasto:** R$ 3.966.334,44 (despesas contratadas).
 *   **Fonte:** TSE — Divulgação de Candidaturas e Contas Eleitorais (dados abertos), atualizado em 11/10/2026.
 
-**Escolha:** [ ] A  [ ] B  [ ] empate — comentário: 
+**Escolha:** [X] A  [ ] B  [ ] empate — comentário: 
 
 ---
 
@@ -607,4 +607,4 @@ Sim, haverá segundo turno para governador em Ceará entre Fábio Hipótese e An
 *   **Motivo:** Nenhum candidato obteve mais de 50% dos votos válidos no primeiro turno.
 *   **Data do 2º turno:** 25/10/2026.
 
-**Escolha:** [ ] A  [ ] B  [ ] empate — comentário: 
+**Escolha:** [X] A  [ ] B  [ ] empate — comentário: 
