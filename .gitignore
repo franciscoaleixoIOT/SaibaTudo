@@ -15,3 +15,6 @@ Thumbs.db
 !/tools/benchmark_ia/out/cegas.md
 !/tools/benchmark_ia/out/cegas_chave.json
 __pycache__/
+# SaibaTudo.IA (ia/): venv proprio e saidas grandes (checkpoints, GGUF, logs) ficam fora do Git
+/ia/.venv/
+/ia/**/out/

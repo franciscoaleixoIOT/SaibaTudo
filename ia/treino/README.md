@@ -1,0 +1,49 @@
+# SaibaTudo.IA — treino do interpretador (NLU)
+
+Pasta nova da IA própria dos apps (plano: [`docs/PLANO_IA_SAIBATUDO.md`](../../docs/PLANO_IA_SAIBATUDO.md)). Aqui fica o ciclo de treino
+do **NLU único** sobre o **Qwen3.5-2B** (`Qwen/Qwen3.5-2B`, Apache 2.0). Resultado do treino-teste (etapa 3a):
+[`docs/TREINO_TESTE_QWEN35_2026-10-12.md`](../../docs/TREINO_TESTE_QWEN35_2026-10-12.md).
+
+Só lê os apps (importa `treino_utils.py`, `nlu_core.py` e `eval_golden.py` de `apps/eleicoes2026/` pelo caminho, sem cópia). Não
+publica nada: nada de Modal, Vercel, Hugging Face Space nem `MODEL_VERSION`. Saídas grandes (LoRA, modelo mesclado, GGUF, logs) em
+`ia/treino/out/` (fora do Git).
+
+## Requisitos (esta máquina)
+- **Python do ambiente de treino** (`C:\Users\franc\AndroidStudioProjects\SaibaTudoEleicao2026\ai_model\.venv`, torch 2.11+cu128,
+  transformers 5.17, peft 0.21.1, bitsandbytes 0.50.2, llama-cpp-python 0.3.19 só CPU). **Não instale nada nele** (treina a produção).
+  Rode sempre com `-I`.
+- **Conversor do llama.cpp** na tag **b11575** (checkout esparso só de `convert_hf_to_gguf.py`, `conversion/` e `gguf-py/`) em
+  `C:\Users\franc\models\llama.cpp-src\b11575`:
+  `git clone --depth 1 --branch b11575 --filter=blob:none --no-checkout https://github.com/ggml-org/llama.cpp.git b11575`, depois
+  `git sparse-checkout init --no-cone` com `/convert_hf_to_gguf.py`, `/conversion/`, `/gguf-py/`, `/LICENSE` e `git checkout b11575`.
+  É código baixado: só o conversor roda, sobre os pesos, com `python -E -s` (precisa da própria pasta no `sys.path` para o pacote `conversion/`) e `cwd` fora dela.
+- **`llama-quantize.exe`** oficial da mesma tag em `C:\Users\franc\models\llama.cpp\b11575` (ver `tools/benchmark_ia/README.md`).
+- **Windows acordado** durante o treino: `pwsh -NoProfile -File tools/benchmark_ia/acordado.ps1` (apague `tools/benchmark_ia/out/acordado.on` no fim).
+- O Controle de Aplicativo do Windows (WDAC) bloqueia DLLs não assinadas: `pyarrow/arrow_dataset.dll` (o `treinar_nlu.py` esconde o
+  pacote `datasets`, não usado, do Trainer) e **o triton** — logo nada de `flash-linear-attention`/`causal-conv1d`/`torch.compile`: o Gated
+  DeltaNet treina na implementação em PyTorch puro. Não pedir exclusão nem mudar a política.
+- No Windows não há `expandable_segments`; com lote 4 use `--pad_fixo 160` (formas constantes, sem fragmentação da VRAM).
+
+## Rodar (da raiz; `PY` = Python do ambiente de treino)
+| Etapa | Comando | Saída |
+| :-- | :-- | :-- |
+| treino-teste (200 passos) | `$PY -I -u ia/treino/treinar_nlu.py --max_steps 200 --out ia/treino/out/nlu-qwen35-2b-teste` | `final/` (LoRA + `train_meta.json`), `medicoes.json` |
+| treino completo (3 épocas) | `$PY -I -u ia/treino/treinar_nlu.py --epochs 3 --batch_size 4 --grad_accum 4 --pad_fixo 160 --out ia/treino/out/nlu-qwen35-2b` (~3,3 h; se faltar VRAM: lote 2 × 8 sem `--pad_fixo`, ~5,9 h) | idem |
+| mesclar + GGUF | `$PY -I ia/treino/exportar_gguf.py --lora <out>/final --out <out>/gguf [--q8]` | `mesclado/`, `*-bf16.gguf`, `*-Q4_K_M.gguf` (`*-Q8_0.gguf`) |
+| latência CPU comparada | `$PY -I ia/treino/latencia_cpu.py --n 30 --gguf v2.3=<gguf> --gguf novo=<gguf>:qwen35` | prompt / livre / gramática, p50 e p90 |
+| avaliar (gate, CPU) | `$PY -I ia/treino/avaliar_gguf.py --gguf <gguf> --threads 8 [--holdout] --out <out>/eval.json` | métricas do `eval_golden`, template, latência, `<think>` |
+
+Receita (igual à do v2.3, só muda a base e o template): QLoRA 4-bit NF4 com dupla quantização, LoRA r=16, alpha=32, dropout 0,05 em
+**todas as lineares** (atenção cheia `q/k/v/o_proj`, Gated DeltaNet `in_proj_qkv/z/a/b` e `out_proj`, MLP `gate/up/down_proj`),
+lote 2 × acúmulo 8, lr 2e-4 cosseno com 25 passos de aquecimento, `max_length` 256, `paged_adamw_8bit`, gradient checkpointing, bf16.
+Carrega só a parte de linguagem (`Qwen3_5ForCausalLM`; visão e MTP do checkpoint ficam de fora).
+
+## Formato do prompt (treino = serviço)
+Template do Qwen3.5 com `enable_thinking=False` (no Qwen3.5 também é o padrão quando a variável não é passada):
+
+```
+<|im_start|>system\n{nlu_core.SYSTEM_PROMPT_V2}<|im_end|>\n<|im_start|>user\n{pergunta}<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n{JSON}<|im_end|>\n
+```
+
+O serviço monta exatamente `nlu_core.build_prompt(pergunta, "v2") + "<think>\n\n</think>\n\n"` e gera com a gramática v2 e parada em
+`<|im_end|>`. `avaliar_gguf.py` confere que o template gravado no GGUF, o do tokenizer HF e essa string são idênticos (e a tokenização).

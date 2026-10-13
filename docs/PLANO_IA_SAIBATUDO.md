@@ -136,6 +136,11 @@ menos GPU que o 7B atual, então a cota de 40 min/dia rende mais respostas.
 - **Congelamento:** eleições não muda entre 24 e 26/10; a química pode avançar nesse período.
 
 ## 9. Decisões pedidas ao mantenedor
+
+> **Decidido em 12/10/2026 (noite):** o mantenedor aprovou seguir com o **Qwen3.5-2B** como interpretador **único de todos os apps**
+> (Qwen3.5-4B de reserva se a química não passar no gate em en/es/de/fr) e deu o nome **"SaibaTudo.IA"** à IA (confirmado em 12/10; o nome fica numa constante única). Em andamento: etapa 2 (corpus único, `ia/corpus/`) e etapa 3a
+> (treino-teste curto do Qwen3.5-2B, `ia/treino/`). A pasta `ia/` na raiz reúne o que é da SaibaTudo.IA e lê os apps sem alterá-los.
+
 1. Aprovar as bases indicadas pelo benchmark: **Qwen3.5-2B** para o NLU (reserva Qwen3.5-4B) e **Qwen3-4B-Instruct-2507** para o
    explicador — ou pedir outra. Gemma 3 só entraria se o mantenedor aceitasse a licença no Hugging Face.
 2. Um só **SaibaTudo-NLU** para todos os apps (recomendado) ou um por app.
