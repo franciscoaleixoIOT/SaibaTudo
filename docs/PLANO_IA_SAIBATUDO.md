@@ -180,6 +180,20 @@ menos GPU que o 7B atual, então a cota de 40 min/dia rende mais respostas.
 > ×2,5). Treino de continuação **a partir do v3** (não do v3.1), 1 época, lr 1e-4; depois exportar e gate completo. Enquanto isso o serviço da
 > química foi preparado para servir o Qwen3.5 (`apps/quimica/docs/MODELO.md` §13, commit 09fc730): ponteiro com `prompt_suffix`,
 > `ia/treino/empacotar_versao.py` e avaliador que trata a pergunta em branco como resposta do sistema.
+>
+> **Resultado do v3.2 (13/10, 2 h 40 de treino, Q4 dos dois apps até 18h25):** o problema do v3.1 sumiu — química `elemento` **98,6 %**,
+> `composto` 97,4 %, intenção 97,9 % (holdout 2.376: 99,4 %), alucinação zero nos casos nulos; eleições intenção **96,1 %** no golden (v3: 95,6 %),
+> `cargo` 100 %, holdout 96,8 %; sem `<think>`, template igual ao serviço. Os gates de referência dos dois apps passaram, **mas o gate por idioma
+> reprovou**: `propriedade` em pt-BR 85,7 % (3 de 21) e `equacao` em es 80 % (1 de 5). Causa, de novo no gerador novo: as frases de **"massa
+> atômica de <elemento>"** entraram em `M_EL` sob **MASSA_MOLAR**, e no golden "massa atômica do oxigênio/carbono", "atomic mass of oxygen",
+> "Atommasse von Sauerstoff", "masse atomique de l'oxygène" são `PROPRIEDADE`/`massaAtomica` — o modelo aprendeu o contrário nas 5 línguas
+> (6 dos 7 erros de propriedade; o sétimo, "nox do cloro", erra desde o v3). O caso de equação ("combustión del metano: CH4 + O2 = CO2 + H2O" →
+> COMPOSTO) é um só e não tem padrão. A avaliação Q8 foi interrompida: a versão não seria publicada.
+>
+> **Correção (v3.3, iniciada em 13/10 às 19h):** em `M_EL`, "massa atômica/atomic mass/Atommasse/masse atomique" vai para um grupo
+> **PROPRIEDADE** com `propriedade = massaAtomica` (cota 50 por idioma) e MASSA_MOLAR fica só com "massa molar/molar mass/molare Masse/masse
+> molaire"; o teste do gerador exige a separação. Mesma receita do v3.2 (continuação a partir do v3, revisão das eleições ×2,5), gate completo
+> em seguida; cópia do corpus v3.2 em `ia/corpus/out/v32/`.
 
 > **Decidido em 12/10/2026 (noite):** o mantenedor aprovou seguir com o **Qwen3.5-2B** como interpretador **único de todos os apps**
 > (Qwen3.5-4B de reserva se a química não passar no gate em en/es/de/fr) e deu o nome **"SaibaTudo.IA"** à IA (confirmado em 12/10; o nome fica numa constante única). Em andamento: etapa 2 (corpus único, `ia/corpus/`) e etapa 3a

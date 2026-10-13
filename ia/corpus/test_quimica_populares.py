@@ -131,11 +131,20 @@ class Populares(unittest.TestCase):
         for idioma, regs in self.regs.items():
             com_el = [r for r in regs if "elemento" in r["alvo"]]
             self.assertGreater(len(com_el), 100, idioma)
-            self.assertEqual({r["alvo"]["intent"] for r in com_el}, {"ELEMENTO", "MASSA_MOLAR", "SEGURANCA"}, idioma)
+            self.assertEqual({r["alvo"]["intent"] for r in com_el}, {"ELEMENTO", "MASSA_MOLAR", "PROPRIEDADE", "SEGURANCA"}, idioma)
             for r in com_el:
                 self.assertIn(r["alvo"]["elemento"], simbolos, r)
                 self.assertNotIn("composto", r["alvo"], r)
                 self.assertTrue(self.core.has_valid_shape(r["alvo"]), r)
+                # convenção do golden: "massa atômica de X" = PROPRIEDADE/massaAtomica; "massa molar de X" = MASSA_MOLAR (o v3.2 misturou)
+                ql = r["q"].lower()
+                atomica = any(s in ql for s in ("atômica", "atomica", "atomic", "atómica", "atómico", "atommasse", "atomgewicht", "atomique"))
+                if r["alvo"]["intent"] == "PROPRIEDADE":
+                    self.assertEqual(r["alvo"]["propriedade"], "massaAtomica", r)
+                    self.assertTrue(atomica, r)
+                else:
+                    self.assertFalse(atomica, r)
+                    self.assertNotIn("propriedade", r["alvo"], r)
         # os elementos que o v3.1 confundiu com composto aparecem em todos os idiomas juntos (peso 12x; a geracao e deterministica)
         vistos = {r["alvo"]["elemento"] for regs in self.regs.values() for r in regs if "elemento" in r["alvo"]}
         self.assertTrue({"O", "H", "Fe", "Cl", "S", "N", "Hg"} <= vistos, sorted(vistos))
