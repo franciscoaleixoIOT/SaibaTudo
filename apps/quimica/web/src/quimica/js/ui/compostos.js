@@ -19,11 +19,15 @@ export async function comExibicao(store, entradas) {
   return entradas.map((e) => { const r = registros.get(e.cid); return r ? { ...e, nome: r.nome, nomes: r.nomes ?? e.nomes, nomePopular: r.nomePopular ?? e.nomePopular, nomeIupac: r.nomeIupac, formula: r.formula, cas: r.cas, massaMolar: r.massaMolar } : e; });
 }
 
+/** Itens por página na lista de compostos e teto de resultados de uma busca (paginados). */
+export const POR_PAGINA = 40;
+export const LIMITE_BUSCA = 400;
+
 export function viewCompostos({ store, query }) {
   const inicial = query.get('q') ?? '';
   const campo = h('input', { id: 'busca-composto', class: 'campo', type: 'search', value: inicial, autocomplete: 'off', autocapitalize: 'none', spellcheck: 'false', placeholder: t('ui.compostos.placeholder') });
   const lista = h('ul', { class: 'lista-resultados' });
-  const status = h('p', { class: 'tp-contagem', role: 'status', 'aria-live': 'polite' });
+  const status = h('p', { class: 'tp-contagem', role: 'status', 'aria-live': 'polite', tabindex: '-1' });
   const todos = store.indice.entradas;
   let sequencia = 0;
   const idioma = idiomaAtual();
@@ -37,38 +41,72 @@ export function viewCompostos({ store, query }) {
     ], { class: 'item-res' }));
   }
 
+  // Paginação (14/10/2026): a lista inteira (alfabética) e os resultados da busca vêm em páginas de POR_PAGINA; a página atual vai na URL (?p=).
+  let pagina = Math.max(1, Number.parseInt(query.get('p') ?? '1', 10) || 1);
+  const paginacao = h('nav', { class: 'paginacao', 'aria-label': t('ui.compostos.paginacao'), hidden: true });
+  let ordenados = null; // cache da lista alfabética completa (só muda com o idioma, que recarrega a tela)
+
+  const faixaTexto = (de, ate, n) => t('ui.compostos.faixa', { de: fmt(de), ate: fmt(ate), n: fmt(n) });
+
+  function desenharPaginacao(total, irPara) {
+    const paginas = Math.max(1, Math.ceil(total / POR_PAGINA));
+    paginacao.hidden = paginas <= 1;
+    if (paginacao.hidden) { paginacao.replaceChildren(); return; }
+    paginacao.replaceChildren(
+      h('button', { type: 'button', class: 'btn btn-contorno peq', disabled: pagina <= 1, 'aria-label': t('ui.compostos.anterior'), onClick: () => irPara(pagina - 1) }, icon('back', 16), t('ui.compostos.anterior')),
+      h('span', { class: 'pag-info' }, t('ui.compostos.pagina', { p: fmt(pagina), total: fmt(paginas) })),
+      h('button', { type: 'button', class: 'btn btn-contorno peq', disabled: pagina >= paginas, 'aria-label': t('ui.compostos.proxima'), onClick: () => irPara(pagina + 1) }, t('ui.compostos.proxima'), icon('forward', 16)));
+  }
+
   async function atualizar() {
     const q = campo.value.trim();
     const meu = ++sequencia;
     status.textContent = todos.length ? t('ui.compostos.buscando') : t('ui.compostos.semIndice');
+    let encontrados; // lista completa (sem exibição) de onde sai a página
     let achados;
     try {
       if (q) {
-        let entradas = buscarCompostos(todos, q, 60);
-        if (!entradas.length && /^\d{2,7}-\d{2}-\d$/.test(q)) { // o índice do pacote não traz CAS: procura nos lotes
+        encontrados = buscarCompostos(todos, q, LIMITE_BUSCA);
+        if (!encontrados.length && /^\d{2,7}-\d{2}-\d$/.test(q)) { // o índice do pacote não traz CAS: procura nos lotes
           const cid = await store.cidPorCas(q);
-          if (cid != null) entradas = [{ ...store.indice.porCid.get(cid), pontos: 100, motivo: 'CAS' }];
+          if (cid != null) encontrados = [{ ...store.indice.porCid.get(cid), pontos: 100, motivo: 'CAS' }];
         }
-        achados = await comExibicao(store, entradas);
       }
-      else if (store.indice.temNomes) achados = [...todos].sort((a, b) => nomeComposto(a).nome.localeCompare(nomeComposto(b).nome, idioma)).slice(0, 40);
-      else achados = await store.compostosIniciais(40);
+      else if (store.indice.temNomes) encontrados = ordenados ??= [...todos].sort((a, b) => nomeComposto(a).nome.localeCompare(nomeComposto(b).nome, idioma));
+      else encontrados = await store.compostosIniciais(POR_PAGINA * 5);
+      const paginas = Math.max(1, Math.ceil(encontrados.length / POR_PAGINA));
+      if (pagina > paginas) pagina = paginas;
+      // só a página visível é completada com os registros dos lotes (quando o índice não traz os nomes de exibição)
+      achados = await comExibicao(store, encontrados.slice((pagina - 1) * POR_PAGINA, pagina * POR_PAGINA));
     } catch (e) {
       if (meu === sequencia) status.textContent = t('ui.compostos.erro', { msg: e instanceof Error ? e.message : String(e) });
       return;
     }
     if (meu !== sequencia) return; // uma busca mais nova já começou
     lista.replaceChildren(...achados.map(item));
-    status.textContent = !todos.length ? t('ui.compostos.semIndice') : q ? (achados.length ? t('ui.compostos.resultados', { n: achados.length }) : t('ui.compostos.nenhum', { q })) : t('ui.compostos.total', { n: todos.length });
-    try { const qs = q ? `?q=${encodeURIComponent(q)}` : ''; history.replaceState(history.state, '', `${location.pathname}${qs}`); } catch { /* ignorado */ }
+    const n = encontrados.length;
+    const de = n ? (pagina - 1) * POR_PAGINA + 1 : 0;
+    const ate = Math.min(n, pagina * POR_PAGINA);
+    const faixa = n > POR_PAGINA ? ` ${faixaTexto(de, ate, n)}` : '';
+    status.textContent = !todos.length ? t('ui.compostos.semIndice')
+      : q ? (n ? t('ui.compostos.resultados', { n }) + faixa : t('ui.compostos.nenhum', { q }))
+        : t('ui.compostos.total', { n: todos.length }) + faixa;
+    desenharPaginacao(n, (p) => { pagina = p; atualizar().then(() => { status.focus?.(); status.scrollIntoView?.({ block: 'start' }); }); });
+    try {
+      const qs = new URLSearchParams();
+      if (q) qs.set('q', q);
+      if (pagina > 1) qs.set('p', String(pagina));
+      const s = qs.toString();
+      history.replaceState(history.state, '', `${location.pathname}${s ? `?${s}` : ''}`);
+    } catch { /* ignorado */ }
   }
   let tm = null;
-  campo.addEventListener('input', () => { clearTimeout(tm); tm = setTimeout(atualizar, 150); });
+  campo.addEventListener('input', () => { clearTimeout(tm); pagina = 1; tm = setTimeout(atualizar, 150); });
 
   const no = h('div', null,
     h('h1', { class: 'titulo-pagina', id: 'titulo-pagina', tabindex: '-1' }, t('ui.compostos.titulo')),
     h('p', { class: 'sub-pagina' }, t('ui.compostos.intro')),
-    h('label', { class: 'sr-only', for: 'busca-composto' }, t('ui.compostos.buscar')), campo, status, lista);
+    h('label', { class: 'sr-only', for: 'busca-composto' }, t('ui.compostos.buscar')), campo, status, lista, paginacao);
   atualizar();
   return { titulo: t('ui.compostos.titulo'), node: no };
 }

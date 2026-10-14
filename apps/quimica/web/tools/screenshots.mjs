@@ -117,6 +117,22 @@ const CENARIOS = {
     await foto(`${p}-elemento-ferro`);
   },
   async compostos(p) {
+    // lista completa paginada (40 por página). Com o pacote real (>40 compostos): controles visíveis, "próxima" muda a página e a URL e
+    // ?p= abre direto na página pedida; com o fixture pequeno (15), a paginação tem que ficar oculta e a lista inteira aparecer.
+    await abrir('/quimica/compostos', "document.querySelector('.lista-resultados li') && /\\d/.test(document.querySelector('.tp-contagem')?.innerText ?? '')");
+    const total = await avaliar("document.querySelectorAll('.lista-resultados li').length");
+    const oculta = await avaliar("document.querySelector('.paginacao').hidden");
+    await foto(`${p}-compostos-lista`);
+    if (total > 40) throw new Error(`paginação: a página devia ter no máximo 40 itens, tem ${total}`);
+    if (total === 40 && !oculta) {
+      const info1 = await texto('.paginacao .pag-info');
+      if (!/\b1\b/.test(info1)) throw new Error(`paginação: esperava página 1, veio "${info1}"`);
+      await clicar('.paginacao button:last-of-type');
+      await esperar("/\\b2\\b/.test(document.querySelector('.paginacao .pag-info')?.innerText ?? '') && location.search.includes('p=2')");
+      if ((await avaliar("document.querySelectorAll('.lista-resultados li').length")) !== 40) throw new Error('paginação: a página 2 devia ter 40 itens');
+      await foto(`${p}-compostos-lista-p2`);
+      await abrir('/quimica/compostos?p=3', "/\\b3\\b/.test(document.querySelector('.paginacao .pag-info')?.innerText ?? '')");
+    } else if (!oculta) throw new Error(`paginação: com ${total} itens o controle devia ficar oculto`);
     await abrir('/quimica/compostos?q=aspirina', "document.querySelector('.lista-resultados li')");
     await foto(`${p}-compostos-busca`);
     await abrir('/quimica/composto/2244', "document.querySelector('canvas.molecula')");

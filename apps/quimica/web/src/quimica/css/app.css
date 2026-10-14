@@ -283,6 +283,9 @@ canvas.molecula { max-width: 100%; height: auto; }
 .item-res { display: flex; flex-direction: column; gap: 2px; padding: 10px 4px; min-height: 52px; color: var(--txt); text-decoration: none; }
 .item-res:hover strong { text-decoration: underline; }
 .item-res .sub { font-size: .75rem; color: var(--txt2); }
+/* paginação da lista de compostos (40 por página; a página vai na URL em ?p=) */
+.paginacao { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 14px; margin: 14px 0 4px; }
+.paginacao .pag-info { font-size: .875rem; color: var(--txt2); min-width: 9ch; text-align: center; }
 .vazio { padding: 28px 8px; text-align: center; color: var(--txt2); }
 .toast {
   position: fixed; left: 50%; bottom: max(16px, env(safe-area-inset-bottom)); z-index: 200; transform: translate(-50%, 24px); opacity: 0;
