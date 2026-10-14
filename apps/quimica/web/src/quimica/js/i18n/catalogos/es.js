@@ -101,6 +101,7 @@ export default {
       nota: 'Envía solo el texto de esta pregunta a nuestro servidor para interpretarla; la respuesta sigue saliendo de los datos. Puede tardar hasta 30 s.',
       notaConferir: 'La respuesta de arriba se montó en tu dispositivo. Si no era lo que querías, la IA en la nube intenta entender la pregunta de otra manera; la respuesta sigue saliendo de los datos. Solo se envía el texto de esta pregunta. Puede tardar hasta 30 s.',
       consultando: 'Consultando a la IA en la nube…',
+      mesmaInterpretacao: 'La IA en la nube entendió la pregunta igual que la app: la respuesta de arriba ya es la respuesta. Si querías otra cosa, reformula citando el elemento, el compuesto o la propiedad.',
       semOutraInterpretacao: 'La IA en la nube no encontró otra forma de entender esta pregunta. La respuesta de arriba sigue valiendo.',
       indisponivelConferir: 'La IA en la nube no está disponible ahora o tardó demasiado. La respuesta de arriba sigue valiendo; inténtalo de nuevo en unos instantes.',
       falhouConferir: 'La IA en la nube no trajo otra respuesta ahora. La respuesta de arriba sigue valiendo.',

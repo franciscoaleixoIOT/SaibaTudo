@@ -103,6 +103,7 @@ export default {
       nota: 'Envoie seulement le texte de cette question à notre serveur pour l’interpréter ; la réponse continue de venir des données. Cela peut prendre jusqu’à 30 s.',
       notaConferir: 'La réponse ci-dessus a été construite sur votre appareil. Si ce n’était pas ce que vous vouliez, l’IA dans le cloud essaie de comprendre la question autrement ; la réponse continue de venir des données. Seul le texte de cette question est envoyé. Cela peut prendre jusqu’à 30 s.',
       consultando: 'Interrogation de l’IA dans le cloud…',
+      mesmaInterpretacao: 'L’IA dans le cloud a compris la question de la même façon que l’application : la réponse ci-dessus est déjà la réponse. Si vous vouliez autre chose, reformulez en citant l’élément, le composé ou la propriété.',
       semOutraInterpretacao: 'L’IA dans le cloud n’a pas trouvé d’autre façon de comprendre cette question. La réponse ci-dessus reste valable.',
       indisponivelConferir: 'L’IA dans le cloud est indisponible pour le moment ou a mis trop de temps. La réponse ci-dessus reste valable ; réessayez dans un instant.',
       falhouConferir: 'L’IA dans le cloud n’a pas apporté d’autre réponse pour le moment. La réponse ci-dessus reste valable.',

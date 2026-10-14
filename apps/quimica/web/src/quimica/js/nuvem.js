@@ -208,6 +208,7 @@ export async function pedirANuvem({ engine, atual, pergunta }) {
  * a primeira NÃO é falha do serviço e não deve parecer uma. `entendida` = o app já tinha respondido a pergunta.
  */
 export function chaveFalhaNuvem(entendida, motivo) {
+  if (motivo === 'igual') return 'mesmaInterpretacao';
   if (motivo === 'nao_entendeu') return entendida ? 'semOutraInterpretacao' : 'naoEntendeu';
   if (motivo === 'indisponivel') return entendida ? 'indisponivelConferir' : 'indisponivel';
   return entendida ? 'falhouConferir' : 'falhou';

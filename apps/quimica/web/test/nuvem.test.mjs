@@ -136,7 +136,7 @@ test('Engine.perguntarANuvem: resposta montada DOS DADOS com origem NUVEM; igual
   // a nuvem devolve a MESMA interpretação: não há resposta nova
   const igual = await pedirANuvem({ engine, atual: local, pergunta: local.pergunta });
   assert.equal(igual.ok, false);
-  assert.equal(igual.motivo, 'nao_entendeu');
+  assert.equal(igual.motivo, 'igual');
   assert.equal(chamadas.length, 1);
   // pergunta que o NLU local não entende, mas a nuvem sim: resposta nova, montada localmente, com origem e modelo
   const naoEntendida = await engine.responder('me diz aí quanto pesa um mol daquele líquido que a gente bebe');
@@ -181,6 +181,8 @@ test('ofereceNuvem, chaveFalhaNuvem e mesmaInterpretacao', () => {
   assert.equal(ofereceNuvem({ intent: 'RECUSA_PERIGO', resolvida: true, origem: 'LOCAL' }), false);
   assert.equal(ofereceNuvem({ intent: 'AJUDA', resolvida: true, origem: 'LOCAL' }), false);
   assert.equal(ofereceNuvem(null), false);
+  assert.equal(chaveFalhaNuvem(true, 'igual'), 'mesmaInterpretacao');
+  assert.equal(chaveFalhaNuvem(false, 'igual'), 'mesmaInterpretacao');
   assert.equal(chaveFalhaNuvem(true, 'nao_entendeu'), 'semOutraInterpretacao');
   assert.equal(chaveFalhaNuvem(false, 'nao_entendeu'), 'naoEntendeu');
   assert.equal(chaveFalhaNuvem(true, 'indisponivel'), 'indisponivelConferir');
@@ -188,7 +190,7 @@ test('ofereceNuvem, chaveFalhaNuvem e mesmaInterpretacao', () => {
   assert.equal(chaveFalhaNuvem(true, null), 'falhouConferir');
   assert.equal(chaveFalhaNuvem(false, undefined), 'falhou');
   for (const idioma of Object.keys(CATALOGOS)) {
-    for (const k of ['semOutraInterpretacao', 'naoEntendeu', 'indisponivelConferir', 'indisponivel', 'falhouConferir', 'falhou', 'botao', 'nota', 'notaConferir', 'consultando', 'quisDizer']) {
+    for (const k of ['mesmaInterpretacao', 'semOutraInterpretacao', 'naoEntendeu', 'indisponivelConferir', 'indisponivel', 'falhouConferir', 'falhou', 'botao', 'nota', 'notaConferir', 'consultando', 'quisDizer']) {
       assert.equal(typeof CATALOGOS[idioma].ui.nuvem[k], 'string', `${idioma}: ui.nuvem.${k}`);
     }
     assert.equal(typeof CATALOGOS[idioma].ui.config.nuvemAutomatica, 'string');

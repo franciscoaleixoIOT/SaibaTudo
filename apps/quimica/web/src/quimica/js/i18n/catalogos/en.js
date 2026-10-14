@@ -101,6 +101,7 @@ export default {
       nota: 'Sends only the text of this question to our server to interpret it; the answer keeps coming from the data. It may take up to 30 s.',
       notaConferir: 'The answer above was built on your device. If it is not what you wanted, the cloud AI tries to understand the question another way; the answer keeps coming from the data. Only the text of this question is sent. It may take up to 30 s.',
       consultando: 'Asking the cloud AI…',
+      mesmaInterpretacao: 'The cloud AI understood the question the same way the app did: the answer above is already the answer to it. If you meant something else, rephrase naming the element, the compound or the property.',
       semOutraInterpretacao: 'The cloud AI found no other way to understand this question. The answer above still stands.',
       indisponivelConferir: 'The cloud AI is unavailable right now or took too long. The answer above still stands; try again in a moment.',
       falhouConferir: 'The cloud AI did not bring another answer right now. The answer above still stands.',

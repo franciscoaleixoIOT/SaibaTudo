@@ -17,7 +17,7 @@ export class Engine {
     this._dic = null;
     this._rev = -1;
     this._ultimoContexto = null;
-    /** Motivo do último pedido à nuvem sem resposta nova: 'nao_entendeu' | 'indisponivel' | null. */
+    /** Motivo do último pedido à nuvem sem resposta nova: 'igual' (entendeu como o app) | 'nao_entendeu' | 'indisponivel' | null. */
     this.ultimoMotivoNuvem = null;
     /** Compostos sugeridos pela API quando o texto citado não bate com o pacote ("quis dizer…?"): [{cid, nome}]. */
     this.ultimasSugestoesNuvem = [];
@@ -81,7 +81,7 @@ export class Engine {
     this.ultimasSugestoesNuvem = this.nuvem.ultimasSugestoes ?? [];
     if (!p) { this.ultimoMotivoNuvem = this.nuvem.ultimoResultado === 'ok' ? 'nao_entendeu' : (this.nuvem.ultimoResultado ?? 'indisponivel'); return null; }
     // interpretação igual à local: nada de novo para mostrar
-    if (atual?.parsed && mesmaInterpretacao(atual.parsed, p)) { this.ultimoMotivoNuvem = 'nao_entendeu'; return null; }
+    if (atual?.parsed && mesmaInterpretacao(atual.parsed, p)) { this.ultimoMotivoNuvem = 'igual'; return null; }
     await this.resolverCas(q);
     const r = await this._montar(p);
     if (!r.resolvida) { this.ultimoMotivoNuvem = 'nao_entendeu'; return null; }

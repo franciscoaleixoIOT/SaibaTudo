@@ -102,6 +102,7 @@ export default {
       nota: 'Sendet nur den Text dieser Frage zur Deutung an unseren Server; die Antwort stammt weiterhin aus den Daten. Kann bis zu 30 s dauern.',
       notaConferir: 'Die Antwort oben wurde auf Ihrem Gerät erstellt. Falls sie nicht das war, was Sie wollten, versucht die KI in der Cloud, die Frage anders zu verstehen; die Antwort stammt weiterhin aus den Daten. Nur der Text dieser Frage wird gesendet. Kann bis zu 30 s dauern.',
       consultando: 'KI in der Cloud wird gefragt…',
+      mesmaInterpretacao: 'Die KI in der Cloud hat die Frage genauso verstanden wie die App: Die Antwort oben ist bereits die Antwort darauf. Falls Sie etwas anderes meinten, nennen Sie das Element, die Verbindung oder die Eigenschaft.',
       semOutraInterpretacao: 'Die KI in der Cloud hat keine andere Deutung dieser Frage gefunden. Die Antwort oben gilt weiterhin.',
       indisponivelConferir: 'Die KI in der Cloud ist gerade nicht verfügbar oder hat zu lange gebraucht. Die Antwort oben gilt weiterhin; versuchen Sie es gleich noch einmal.',
       falhouConferir: 'Die KI in der Cloud hat gerade keine andere Antwort geliefert. Die Antwort oben gilt weiterhin.',
