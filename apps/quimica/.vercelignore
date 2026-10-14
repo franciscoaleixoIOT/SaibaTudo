@@ -39,3 +39,4 @@ build/
 /web/tools/*
 !/web/tools/minify.mjs
 .vercel/
+/store/

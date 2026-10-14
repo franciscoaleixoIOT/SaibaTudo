@@ -1,0 +1,22 @@
+[
+  {
+    "language": "pt-BR",
+    "text": "Primeira versão: tabela periódica, cerca de 2.000 compostos com estrutura 2D e perigos GHS, calculadoras com passo a passo, assistente de perguntas com fonte e licença em cada resposta, cinco idiomas e uso offline. IA na nuvem opcional (desligada por padrão)."
+  },
+  {
+    "language": "en-US",
+    "text": "First release: periodic table, about 2,000 compounds with 2D structures and GHS hazards, step-by-step calculators, a question assistant that shows the source and license in every answer, five languages and offline use. Optional cloud AI (off by default)."
+  },
+  {
+    "language": "es-419",
+    "text": "Primera versión: tabla periódica, cerca de 2000 compuestos con estructura 2D y peligros SGA, calculadoras paso a paso, asistente de preguntas con fuente y licencia en cada respuesta, cinco idiomas y uso sin conexión. IA en la nube opcional (desactivada por defecto)."
+  },
+  {
+    "language": "de-DE",
+    "text": "Erste Version: Periodensystem, rund 2.000 Verbindungen mit 2D-Struktur und GHS-Gefahren, Rechner mit Rechenweg, Fragenassistent mit Quelle und Lizenz bei jeder Antwort, fünf Sprachen und Offline-Nutzung. Optionale KI in der Cloud (standardmäßig aus)."
+  },
+  {
+    "language": "fr-FR",
+    "text": "Première version : tableau périodique, environ 2 000 composés avec structure 2D et dangers SGH, calculatrices pas à pas, assistant de questions avec source et licence dans chaque réponse, cinq langues et usage hors ligne. IA dans le cloud facultative (désactivée par défaut)."
+  }
+]

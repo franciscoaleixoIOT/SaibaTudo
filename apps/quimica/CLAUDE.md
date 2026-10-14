@@ -26,6 +26,7 @@ cliente). Contrato completo: [`docs/I18N.md`](docs/I18N.md). Nunca escreva texto
 5. **Sem CDN, CSP estrita, sem analytics, sem anúncios, sem login.** Bibliotecas vendorizadas em `web/src/quimica/vendor/` com a licença ao lado (SmilesDrawer e KaTeX: MIT).
 6. **Segredos em `secrets/`** (ignorado). A chave privada dos dados é `secrets/data_signing_key.pem` (**diferente** da do app de eleições); pública em `pipeline/data_signing_public.pem`.
 7. **Treino e conversão de modelo são locais**; o Hugging Face é a publicação principal e o Modal, a reserva.
+8. **Android:** release assinado com `keystore.properties` + `secrets/upload-keystore.p12` (fora do Git; criados em 14/10/2026). `./gradlew.bat :app:bundleRelease` + `python tools/verificar_release.py app/build/outputs/apk/release/app-release.apk` antes de enviar; `docs/PLAY_STORE.md` e `docs/RELEASE_<versão>.md`.
 
 ## Publicar
 - Push na `main` **não** faz deploy: `gh workflow run quimica-data-refresh.yml` publica; conferir `https://saibatudo.net/quimica/api/health` depois.

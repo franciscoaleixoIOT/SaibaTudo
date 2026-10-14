@@ -41,7 +41,7 @@ android {
         buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
         buildConfigField("String", "DATA_PUBLIC_KEY", "\"$dataPublicKey\"")
         buildConfigField("String", "PRIVACY_URL", "\"https://saibatudo.net/quimica/privacidade\"")
-        buildConfigField("String", "SOURCE_URL", "\"https://github.com/franciscoaleixoIOT/SaibaTudo-Quimica\"")
+        buildConfigField("String", "SOURCE_URL", "\"https://github.com/franciscoaleixoIOT/SaibaTudo\"")
     }
 
     val releaseSigning = signingProp("storeFile", "SAIBATUDO_STORE_FILE")?.let { storePath ->
