@@ -215,7 +215,7 @@ menos GPU que o 7B atual, então a cota de 40 min/dia rende mais respostas.
 > **normalização da entrada** antes do modelo (subscritos, tipografia, setas, NBSP, pontuação; sem minúsculas nem remoção de acentos). O gate da
 > química rodou de novo com o GGUF em produção e a gramática nova: **idêntico** (intenção 99,0 %, 5 idiomas ok, holdout 99,6 %, latência CPU
 > p50 1,56 s nas duas). Lição operacional: com `scaledown_window` de 30 s quase toda pergunta real é fria (~10–11 s) e duas estouraram o timeout
-> de 12 s → `MODAL_TIMEOUT_MS=20000`; manter contêiner quente é decisão de custo do mantenedor. Isso vale para o serviço de qualquer app que
+> de 12 s e uma levou 18,7 s → `MODAL_TIMEOUT_MS=25000` (máximo do proxy); manter contêiner quente é decisão de custo do mantenedor. Isso vale para o serviço de qualquer app que
 > adotar o SaibaTudo-NLU (a gramática por intenção precisa da tabela de chaves do app).
 
 > **Decidido em 12/10/2026 (noite):** o mantenedor aprovou seguir com o **Qwen3.5-2B** como interpretador **único de todos os apps**

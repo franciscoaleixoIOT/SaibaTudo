@@ -258,7 +258,14 @@ test('vercel.json: build, saída, cleanUrls, rewrite do SPA em /quimica/, CSP re
   assert.equal(api.destination, '/api/:path*');
   assert.ok(vercel.rewrites.indexOf(api) < vercel.rewrites.indexOf(rw), 'o rewrite da API vem antes do SPA');
   assert.equal(JSON.stringify(vercel).split('"/api').length - 1, 1, 'nenhuma outra regra toca /api');
-  assert.deepEqual(vercel.functions, { 'api/health.js': { includeFiles: 'data/quimica/manifest.json' } }, 'o manifesto vai junto do /health');
+  assert.deepEqual(
+    vercel.functions,
+    {
+      'api/health.js': { includeFiles: 'data/quimica/manifest.json' },
+      'api/nlu.js': { includeFiles: 'data/quimica/compostos/index.json' },
+    },
+    'o manifesto vai junto do /health e o índice de compostos junto do /nlu (resolução do composto)',
+  );
   const todos = vercel.headers.find((h) => h.source === '/(.*)').headers;
   const h = Object.fromEntries(todos.map((x) => [x.key, x.value]));
   const csp = h['Content-Security-Policy'];
