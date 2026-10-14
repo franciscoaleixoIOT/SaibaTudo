@@ -34,6 +34,13 @@ Cada entidade só vem se tiver **evidência no texto da pergunta** (`_lib/ground
 entidade (`ELEMENTO`, `COMPOSTO`, `PROPRIEDADE`, `MASSA_MOLAR`, `NOMENCLATURA`, `DESENHAR`, `COMPARAR`) sem a entidade viram `DESCONHECIDA`; as calculadoras continuam
 sem entidades. Pedido perigoso (`_lib/seguranca.js`) **nunca chega ao modelo**: `200 { "nlu": { "intent": "RECUSA_PERIGO" }, "model": "regra" }`.
 
+**`resolucao` (desde 14/10/2026, `_lib/compostos.js`):** quando `nlu.composto` existe, a API procura o texto no índice do pacote de dados
+(`data/quimica/compostos/index.json`, incluído na função pelo `vercel.json`; nomes em 5 idiomas, apelidos e fórmulas, sem acento e em minúsculas;
+aceita artigo/preposição à frente). Achou: `"resolucao": { "composto": { "cid": "962", "nome": "agua" } }`. Não achou: `{ "composto": { "cid": null,
+"sugestoes": [ { "cid": "1118", "nome": "acido sulfurico" } ] } }` (até 3, por distância de edição ou prefixo) — o cliente mostra "não encontrei X;
+você quis dizer Y?" com os nomes de exibição do próprio dicionário, em vez de inventar. `null` quando não há composto ou o índice não veio junto.
+A resolução vai junto no cache e nunca derruba a resposta (erro interno vira `null`). A API continua sem fornecer fatos: só CID e nome de busca.
+
 ### `POST /api/ask`
 Entrada `{ "q", "context"?, "trechos"?: [{ "id", "texto" }], "v": 1, "client", "iid" }`: contexto até 4.000 caracteres; até 6 trechos (`id` no formato de
 `data/quimica/textos`, `texto` até 1.200 caracteres, 6.000 no total); corpo até 24 KB.

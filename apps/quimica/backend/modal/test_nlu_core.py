@@ -36,7 +36,9 @@ EXEMPLOS = [
     {"intent": "CONVERSAO_UNIDADE", "quantidades": [{"valor": 25, "unidade": "°C"}], "unidadeDestino": "K"},
     {"intent": "CONVERSAO_UNIDADE", "quantidades": [{"valor": -5.5, "unidade": "°C"}], "unidadeDestino": "°F"},
     {"intent": "CONVERSAO_UNIDADE", "quantidades": [{"valor": 1, "unidade": "Å"}], "unidadeDestino": "nm"},
-    {"intent": "CONCEITO", "propriedade": "eletronegatividade", "nivel": "medio"},
+    {"intent": "CONCEITO", "nivel": "medio"},
+    {"intent": "TABELA_PERIODICA", "propriedade": "eletronegatividade"},
+    {"intent": "PROPRIEDADE", "composto": "água", "propriedade": "pontoEbulicaoK"},
     {"intent": "SEGURANCA", "composto": "HCl"},
     {"intent": "RECUSA_PERIGO"},
     {"intent": "COMPARAR", "elemento": "Na", "propriedade": "eletronegatividade"},
@@ -78,6 +80,21 @@ class TestPergunta(unittest.TestCase):
     def test_limpeza_de_controles(self):
         self.assertEqual(core.clean_question("a\u200Bb\u0000c"), "a b c")
 
+    def test_normalizacao_tipografica(self):
+        """14/10/2026: variantes tipográficas viram a forma canônica antes do modelo; letras, maiúsculas e acentos não mudam."""
+        self.assertEqual(core.normalize_question("massa molar do H₂SO₄"), "massa molar do H2SO4")
+        self.assertEqual(core.normalize_question("balanceie Fe + O2 ⟶ Fe2O3"), "balanceie Fe + O2 → Fe2O3")
+        self.assertEqual(core.normalize_question("N2 + H2 => NH3"), "N2 + H2 → NH3")
+        self.assertEqual(core.normalize_question("CH4 + O2 --> CO2 + H2O"), "CH4 + O2 → CO2 + H2O")
+        self.assertEqual(core.normalize_question("H2 + O2 -> H2O"), "H2 + O2 -> H2O")  # forma do treino: fica
+        self.assertEqual(core.normalize_question("pH = 7 é neutro?"), "pH = 7 é neutro?")  # '=' não é seta
+        self.assertEqual(core.normalize_question("masse de l\u2019oxygène \u2013 5 \u00d7 10 g???"), "masse de l'oxygène - 5 x 10 g?")
+        self.assertEqual(core.normalize_question("Ácido Sulfúrico\u00A0H2SO4"), "Ácido Sulfúrico H2SO4")
+        self.assertEqual(core.normalize_question("\u22125 °C em K"), "-5 °C em K")
+        q = "Qual a massa molar do Al2(SO4)3? É 342 g/mol? Hg, Fe3+, 1e-5 mol/L"
+        self.assertEqual(core.normalize_question(q), q)
+        self.assertEqual(core.validate_question(" H₂O  →  H2 + O2 "), "H2O → H2 + O2")
+
 
 class TestGramatica(unittest.TestCase):
     @classmethod
@@ -98,16 +115,56 @@ class TestGramatica(unittest.TestCase):
             self.assertEqual(json.loads(s), {k: v for k, v in e.items()}, s)
 
     def test_todas_as_intencoes_elementos_propriedades_unidades_e_niveis(self):
+        minimo = {"ELEMENTO": {"elemento": "Fe"}, "PROPRIEDADE": {"propriedade": "massaAtomica"}, "DESENHAR": {"composto": "etanol"},
+                  "CONVERSAO_UNIDADE": {"unidadeDestino": "K"}}
         for i in core.INTENTS:
-            self.assertIsNotNone(self.rx.match(core.format_output({"intent": i})), i)
+            self.assertIsNotNone(self.rx.match(core.format_output({"intent": i, **minimo.get(i, {})})), i)
         for s in core.SIMBOLOS:
             self.assertIsNotNone(self.rx.match(core.format_output({"intent": "ELEMENTO", "elemento": s})), s)
         for p in core.PROPRIEDADES:
-            self.assertIsNotNone(self.rx.match(core.format_output({"intent": "CONCEITO", "propriedade": p})), p)
+            self.assertIsNotNone(self.rx.match(core.format_output({"intent": "PROPRIEDADE", "elemento": "Fe", "propriedade": p})), p)
         for u in core.UNIDADES:
             self.assertIsNotNone(self.rx.match(core.format_output({"intent": "CONVERSAO_UNIDADE", "quantidades": [{"valor": 3, "unidade": u}], "unidadeDestino": u})), u)
         for n in core.NIVEIS:
             self.assertIsNotNone(self.rx.match(core.format_output({"intent": "CONCEITO", "nivel": n})), n)
+
+    def test_gramatica_so_deixa_as_chaves_da_intencao(self):
+        """14/10/2026: gramática condicionada à intenção (ENTIDADES_POR_INTENCAO): chave fora da intenção ou obrigatória ausente não sai."""
+        for intent, (permitidas, obrigatorias) in core.ENTIDADES_POR_INTENCAO.items():
+            self.assertIn(intent, core.INTENTS)
+            self.assertTrue(set(obrigatorias) <= set(permitidas), intent)
+            for chave in permitidas:
+                self.assertIn(chave, core.KEYS[1:], (intent, chave))
+        self.assertEqual(set(core.ENTIDADES_POR_INTENCAO), set(core.INTENTS))
+        ruins = [
+            {"intent": "ELEMENTO"},  # elemento obrigatório
+            {"intent": "ELEMENTO", "elemento": "Fe", "composto": "FeO"},  # composto não cabe em ELEMENTO
+            {"intent": "PROPRIEDADE", "elemento": "Fe"},  # propriedade obrigatória
+            {"intent": "DESENHAR"}, {"intent": "CONVERSAO_UNIDADE", "quantidades": [{"valor": 1, "unidade": "g"}]},
+            {"intent": "CONCEITO", "propriedade": "eletronegatividade"}, {"intent": "BALANCEAR", "composto": "H2O"},
+            {"intent": "DESCONHECIDA", "elemento": "Fe"}, {"intent": "AJUDA", "nivel": "medio"}, {"intent": "TABELA_PERIODICA", "elemento": "Fe"},
+            {"intent": "MASSA_MOLAR", "propriedade": "massaMolar"}, {"intent": "SEGURANCA", "quantidades": [{"valor": 1, "unidade": "g"}]},
+        ]
+        for r in ruins:
+            self.assertFalse(core.combinacao_valida(r), r)
+            self.assertIsNone(self.rx.match(core.format_output(r)), r)
+            self.assertTrue(core.has_valid_shape(r), r)  # a forma em si continua válida: só a gramática barra a combinação
+        bons = [{"intent": "MASSA_MOLAR"}, {"intent": "MASSA_MOLAR", "elemento": "S"}, {"intent": "BALANCEAR"}, {"intent": "COMPOSTO"},
+                {"intent": "ESTEQUIOMETRIA", "elemento": "Fe", "quantidades": [{"valor": 1, "unidade": "g"}]}, {"intent": "CONCENTRACAO", "unidadeDestino": "g/L"}]
+        for r in bons:
+            self.assertTrue(core.combinacao_valida(r), r)
+            self.assertIsNotNone(self.rx.match(core.format_output(r)), r)
+
+    def test_todo_o_golden_cabe_na_gramatica_por_intencao(self):
+        arq = REPO / "contracts" / "nlu_golden_cases.json"
+        if not arq.exists():
+            self.skipTest("golden ausente")
+        for c in json.loads(arq.read_text(encoding="utf-8"))["cases"]:
+            alvo = {k: c.get(k) for k in core.KEYS if c.get(k) not in (None, "", [])}
+            if isinstance(alvo.get("composto"), int):
+                alvo["composto"] = str(alvo["composto"])
+            self.assertTrue(core.combinacao_valida(alvo), c["q"])
+            self.assertIsNotNone(self.rx.match(core.format_output(alvo)), c["q"])
 
     def test_rejeita_chaves_extras_e_formas_invalidas(self):
         ruins = [

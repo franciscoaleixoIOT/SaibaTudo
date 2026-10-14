@@ -170,3 +170,9 @@ que **não** podem ser recusados (ex.: "como neutralizar ácido derramado").
 (perigos, EPI, primeiros socorros), `CONCEITO` (explicação), `RECUSA_PERIGO`, `SOBRE_DADOS`, `FONTES`, `AJUDA`, `DESCONHECIDA`.
 Entidades: `elemento` (símbolo), `composto` (cid ou nome canônico), `propriedade` (id de `regras.propriedades`), `quantidades: [{valor, unidade}]`, `equacao` (texto),
 `nivel` (`fundamental|medio|superior`), `unidadeDestino`.
+**Chaves por intenção (14/10/2026):** cada intenção admite só algumas entidades, e algumas são obrigatórias — tabela `ENTIDADES_POR_INTENCAO` em
+`backend/modal/nlu_core.py`, derivada do golden e do corpus (ex.: `ELEMENTO` só `elemento`, obrigatório; `PROPRIEDADE` exige `propriedade` e admite
+`elemento`/`composto`; `MASSA_MOLAR` admite `elemento`/`composto` sem obrigar; `RECUSA_PERIGO`, `SOBRE_DADOS`, `FONTES`, `AJUDA`, `DESCONHECIDA` não
+admitem nenhuma). A gramática do modelo em nuvem só gera essas combinações; o proxy (`api/_lib/normalize.js`) ainda revalida e ancora.
+**Resposta da nuvem (`/api/nlu`):** além de `nlu`, traz `resolucao.composto` — o `composto` copiado resolvido no índice do pacote (`{cid, nome}`) ou
+`{cid: null, sugestoes: [{cid, nome}]}` (até 3) para o cliente perguntar "você quis dizer…?"; `null` sem composto. Detalhes em `api/README.md`.

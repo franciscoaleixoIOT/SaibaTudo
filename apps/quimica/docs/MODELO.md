@@ -160,6 +160,17 @@ do assistente (`nlu_core.THINK_VAZIO`). O `meta.json` grava `prompt_suffix` e `b
 (`current.json`) e `nlu_app.py` envia `nlu_core.build_prompt(q) + prompt_suffix` (ponteiro sem o campo = sufixo vazio, Qwen2.5). `avaliar_gguf.py`
 confere que o template gravado no GGUF, o do tokenizer e essa string são idênticos (`template.gguf_template_igual_servico`), e o empacotador reprova se não forem.
 
+**Gramática condicionada à intenção e normalização da pergunta (14/10/2026, decisão do mantenedor; itens 1 e 4 da lista de melhorias de código).**
+`nlu_core.build_grammar()` gera uma alternativa da raiz por intenção: só as chaves que a intenção admite, na ordem do contrato, com as obrigatórias
+sem `?` (`ENTIDADES_POR_INTENCAO`, tabela derivada do golden de 723 e do corpus de 44.703 + 1.406 alvos, nenhum fora dela; `test_nlu_core` confere
+o golden inteiro). `elemento`, `propriedade`, `unidadeDestino` e `nivel` já eram vocabulários fechados (118 símbolos, ids do pacote, unidades);
+`MASSA_MOLAR`/`COMPOSTO`/`BALANCEAR` **não** obrigam entidade porque o golden tem perguntas genéricas. `has_valid_shape` continua só estrutural
+(sem gramática, uma chave fora da intenção conta como erro de entidade no avaliador, não como JSON inválido). `nlu_core.normalize_question`
+(dentro de `clean_question`, logo também no gate e no `eval_golden`) canoniza tipografia antes do modelo: subscritos → dígitos, aspas e traços
+curvos, setas exóticas e `=>`/`-->` → `→`, NBSP, `×` → `x`, pontuação repetida; nada vira minúscula e acentos ficam (o modelo copia o composto como
+está). **Qualquer mudança em `nlu_core.py` exige rodar de novo o gate (`avaliar_gguf.py --app quimica --holdout`) com o GGUF em produção antes de
+`python -m modal deploy backend/modal/nlu_app.py`**, porque a gramática e a limpeza da pergunta são as mesmas do serviço.
+
 **Pergunta inválida no golden** (`"   "` → `DESCONHECIDA`): o serviço a recusa antes do modelo (proxy 400 → NLU local → `DESCONHECIDA`), por isso
 `eval_golden.evaluate` não chama o modelo nesses casos e conta a resposta do sistema (`cases[].servico`).
 

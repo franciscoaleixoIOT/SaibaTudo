@@ -157,6 +157,18 @@ diretório local** (o `quimica-data-refresh.yml` segue sem terminar no GitHub, �
 **Os clientes (site e Android) ainda não chamam a API** — o botão de nuvem opt-in é o próximo passo de produto (§8.4 das pendências).
 Eleições reprovou no mesmo gate por um caso de cargo ("deputado mais votado") e só entra depois de 27/10.
 
+## 6.i Serviço do NLU: gramática por intenção, resolução do composto e normalização (14/10/2026, madrugada)
+Três melhorias de **código** (sem treino) decididas pelo mantenedor em 13/10, publicadas em 14/10 ~5h depois de o gate rodar de novo com o GGUF em
+produção e dar números idênticos. (1) `nlu_core.py`: `ENTIDADES_POR_INTENCAO` (chaves permitidas/obrigatórias por intenção, conferida sem violação
+no golden e no corpus) gera uma regra GBNF por intenção — o modelo não consegue mais emitir `composto` em TABELA_PERIODICA nem omitir `elemento`
+em ELEMENTO; `has_valid_shape` segue estrutural. (2) `api/_lib/compostos.js` resolve o `composto` copiado no `index.json` do pacote (embarcado na
+função por `includeFiles`): `resolucao` na resposta com CID ou até 3 sugestões ("você quis dizer…?"); cache guarda `{nlu, resolucao}`.
+(4) `normalize_question` canoniza subscritos, tipografia, NBSP, setas e pontuação antes do modelo (mesma função no serviço, no gate e no
+avaliador; nada vira minúscula, `=` não vira seta). Ao vivo: typo → sugestões com CID, `=>`/`-->` → `→`, de/en/pt resolvidos. **Operação:** duas
+chamadas frias estouraram os 12 s → `MODAL_TIMEOUT_MS=20000` na Vercel; a raiz é o `scaledown_window` de 30 s (quase toda pergunta real é fria,
+~10–11 s) — subir a janela custa Modal, decisão do mantenedor. Regra nova em `MODELO.md` §13: qualquer mudança em `nlu_core.py` exige o gate de
+novo antes do `modal deploy`. Testes: backend 125, API 209.
+
 ## 7. Contas e segredos
 Vercel `saibatudo-quimica` (time `franciscoaleixo-9696`); GitHub `franciscoaleixoIOT`; Hugging Face `franciscoaleixo` (PRO, 40 min/dia de ZeroGPU); Modal `franciscoaleixo/main` (US$ 30/mês grátis; já usados pelo app de eleições, ~US$ 5/mês).
 `secrets/data_signing_key.pem` (nova, exclusiva deste app; pública em `pipeline/data_signing_public.pem`). Fazer backup offline. Modal: app `saibatudo-quimica-nlu`, Volume `saibatudo-quimica-models`, par de Proxy Auth Token criado pelo mantenedor em 13/10/2026 (guardado em `secrets/modal_proxy_quimica.env` da raiz do monorepo, ignorado, e como variáveis sensíveis na Vercel; nunca no Git nem no chat).

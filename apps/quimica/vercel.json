@@ -187,6 +187,9 @@
   "functions": {
     "api/health.js": {
       "includeFiles": "data/quimica/manifest.json"
+    },
+    "api/nlu.js": {
+      "includeFiles": "data/quimica/compostos/index.json"
     }
   }
 }

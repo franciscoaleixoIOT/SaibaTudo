@@ -10,6 +10,7 @@ import { createCache, normalizeQuestion } from './cache.js';
 import { createDailyBudget, createSlidingWindow, JANELAS } from './ratelimit.js';
 import { createSharedLimiter, orcamentoComCompartilhado } from './compartilhado.js';
 import { normalizeModelOutput } from './normalize.js';
+import { resolverComposto } from './compostos.js';
 import { avaliarPedido } from './seguranca.js';
 import { validateNluBody } from './validate.js';
 
@@ -84,6 +85,14 @@ export function createNluHandler(deps = {}) {
   const now = deps.now ?? (() => Date.now());
   const doFetch = deps.fetch ?? ((...args) => globalThis.fetch(...args));
   const log = deps.log ?? defaultLog;
+  // Resolução do composto no índice do pacote (deps.resolver nos testes). Nunca derruba a resposta: falha vira null.
+  const resolver = (texto) => {
+    try {
+      return (deps.resolver ?? resolverComposto)(texto) ?? null;
+    } catch {
+      return null;
+    }
+  };
   const state = deps.state ?? createNluState({ now });
 
   return async function handleNlu(request) {
@@ -155,7 +164,7 @@ export function createNluHandler(deps = {}) {
     const emCache = state.cache.get(chave);
     if (emCache) {
       meta.cache = 'hit';
-      return responder(200, { ok: true, nlu: emCache, model: cfg.modelVersion, cached: true });
+      return responder(200, { ok: true, nlu: emCache.nlu, resolucao: emCache.resolucao ?? null, model: cfg.modelVersion, cached: true });
     }
     meta.cache = 'miss';
 
@@ -180,7 +189,11 @@ export function createNluHandler(deps = {}) {
       return responder(502, { ok: false, error: 'bad_model_output' });
     }
     meta.drop = n.dropped.length;
-    state.cache.set(chave, n.nlu, cfg.cacheTtlMs);
-    return responder(200, { ok: true, nlu: n.nlu, model: cfg.modelVersion, cached: false });
+    // Resolução do composto no índice do pacote (14/10/2026): CID quando existe; senão até 3 sugestões, para o cliente perguntar
+    // "você quis dizer…?" em vez de inventar. `resolucao` é null quando não há composto ou o índice não veio junto da função.
+    const resolucao = n.nlu.composto ? resolver(n.nlu.composto) : null;
+    const entrada = { nlu: n.nlu, resolucao };
+    state.cache.set(chave, entrada, cfg.cacheTtlMs);
+    return responder(200, { ok: true, nlu: n.nlu, resolucao, model: cfg.modelVersion, cached: false });
   };
 }

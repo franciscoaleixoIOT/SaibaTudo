@@ -33,7 +33,7 @@ test('caminho feliz: chama o Modal com as credenciais e devolve o NLU normalizad
   const { handler, chamadas, cap } = montar();
   const res = await handler(post('qual a massa atômica do ferro?'));
   assert.equal(res.status, 200);
-  assert.deepEqual(await res.json(), { ok: true, nlu: { intent: 'PROPRIEDADE', elemento: 'Fe', propriedade: 'massaAtomica' }, model: 'teste-1', cached: false });
+  assert.deepEqual(await res.json(), { ok: true, nlu: { intent: 'PROPRIEDADE', elemento: 'Fe', propriedade: 'massaAtomica' }, resolucao: null, model: 'teste-1', cached: false });
   assert.equal(chamadas.length, 1);
   assert.equal(chamadas[0].url, new URL(ENV_BASE.MODAL_ENDPOINT).toString());
   assert.equal(chamadas[0].init.headers['Modal-Key'], 'wk-teste');

@@ -19,6 +19,7 @@ devolve o JSON bruto. Os vocabulários abaixo espelham api/_lib/vocab.js: test_n
 """
 import json
 import re
+import unicodedata
 
 # ---------------------------------------------------------------------------------------------------------
 # Limites
@@ -57,10 +58,29 @@ _CONTROLES = re.compile(
 )
 
 
+# Normalização ANTES do modelo (14/10/2026): o mesmo texto chega ao modelo, ao gate (avaliar_gguf/eval_golden) e ao cache do proxy.
+# Só variantes tipográficas que não mudam o sentido: subscritos (H₂O -> H2O), aspas e apóstrofos curvos, traços longos e sinal de menos,
+# setas exóticas (⟶ ⇒ ➔ => --> -> '→' da equação continua '→'; '=' NÃO vira seta: 'pH = 7'), espaços especiais (NBSP), '×' -> 'x',
+# pontuação repetida ('???' -> '?'). Nada é posto em minúsculas e acentos ficam: o modelo copia o composto como está na pergunta.
+_SUBSCRITOS = str.maketrans("₀₁₂₃₄₅₆₇₈₉", "0123456789")
+_TIPOGRAFIA = str.maketrans({"’": "'", "‘": "'", "´": "'", "`": "'", "“": '"', "”": '"', "„": '"', "−": "-", "–": "-", "—": "-", "‐": "-",
+                             "\u00A0": " ", "\u202F": " ", "\u2009": " ", "\u3000": " ", "×": "x", "⟶": "→", "⇒": "→", "➔": "→", "⇾": "→", "⟹": "→"})
+_SETA_ASCII = re.compile(r"(?<![-<])(?:-->|=>)(?!>)")  # "-->" e "=>" entre espécies viram "→" ("->" e "→" já são as formas do treino)
+_PONTUACAO_REPETIDA = re.compile(r"([?!.,;:])\1+")
+
+
+def normalize_question(q: str) -> str:
+    """Variantes tipográficas -> forma canônica (ver _TIPOGRAFIA). Idempotente; não altera letras, maiúsculas nem acentos."""
+    q = unicodedata.normalize("NFC", str(q)).translate(_SUBSCRITOS).translate(_TIPOGRAFIA)
+    q = _SETA_ASCII.sub("→", q)
+    return _PONTUACAO_REPETIDA.sub(r"\1", q)
+
+
 def clean_question(q: str) -> str:
-    """Remove controles/zero-width, colapsa espaços e neutraliza os delimitadores de token especial do ChatML
-    (a pergunta não pode fabricar turnos de conversa nem tokens especiais no prompt)."""
+    """Remove controles/zero-width, normaliza a tipografia (normalize_question), colapsa espaços e neutraliza os delimitadores de
+    token especial do ChatML (a pergunta não pode fabricar turnos de conversa nem tokens especiais no prompt)."""
     q = _CONTROLES.sub(" ", str(q))
+    q = normalize_question(q)
     q = q.replace("<|", "< |").replace("|>", "| >")
     return re.sub(r"\s+", " ", q).strip()
 
@@ -138,6 +158,46 @@ UNIDADES = [
 
 MAX_QUANTIDADES = 4  # a gramática desenrola 4; o proxy aceita até 6, mas o modelo nunca precisou de mais de 4
 
+# Chaves PERMITIDAS e OBRIGATÓRIAS por intenção (14/10/2026). Derivadas dos dados: golden (723), corpus de treino (44.703) e validação
+# (1.406) da química não têm nenhuma combinação fora desta tabela (test_nlu_core confere o golden). A gramática só deixa o modelo emitir
+# as chaves da intenção escolhida e obriga as que aparecem em 100 % dos casos (ELEMENTO -> elemento, PROPRIEDADE -> propriedade,
+# DESENHAR -> composto, CONVERSAO_UNIDADE -> unidadeDestino). MASSA_MOLAR/COMPOSTO/BALANCEAR NÃO obrigam entidade: o golden tem
+# "como calcular a massa molar?", "balanceamento de equações" (o proxy decide o que fazer sem entidade: api/_lib/normalize.js REQUISITOS).
+# Intenções sem entidade (RECUSA_PERIGO, SOBRE_DADOS, FONTES, AJUDA, DESCONHECIDA) não admitem chave nenhuma.
+ENTIDADES_POR_INTENCAO = {
+    "ELEMENTO": (("elemento",), ("elemento",)),
+    "COMPOSTO": (("composto",), ()),
+    "PROPRIEDADE": (("elemento", "composto", "propriedade"), ("propriedade",)),
+    "MASSA_MOLAR": (("elemento", "composto"), ()),
+    "BALANCEAR": (("equacao",), ()),
+    "ESTEQUIOMETRIA": (("elemento", "composto", "quantidades", "equacao"), ()),
+    "CONCENTRACAO": (("composto", "quantidades", "unidadeDestino"), ()),
+    "PH": (("composto", "quantidades"), ()),
+    "GAS_IDEAL": (("composto", "quantidades"), ()),
+    "CONVERSAO_UNIDADE": (("quantidades", "unidadeDestino"), ("unidadeDestino",)),
+    "NOMENCLATURA": (("composto",), ()),
+    "DESENHAR": (("composto",), ("composto",)),
+    "COMPARAR": (("elemento", "composto", "propriedade"), ()),
+    "TABELA_PERIODICA": (("propriedade",), ()),
+    "SEGURANCA": (("elemento", "composto"), ()),
+    "CONCEITO": (("composto", "nivel"), ()),
+    "RECUSA_PERIGO": ((), ()),
+    "SOBRE_DADOS": ((), ()),
+    "FONTES": ((), ()),
+    "AJUDA": ((), ()),
+    "DESCONHECIDA": ((), ()),
+}
+
+
+def combinacao_valida(obj: dict) -> bool:
+    """As chaves presentes cabem na intenção e as obrigatórias estão lá (ENTIDADES_POR_INTENCAO)."""
+    regra = ENTIDADES_POR_INTENCAO.get(obj.get("intent"))
+    if regra is None:
+        return False
+    permitidas, obrigatorias = regra
+    presentes = {k for k, v in obj.items() if k != "intent" and v not in (None, "", [])}
+    return presentes <= set(permitidas) and set(obrigatorias) <= presentes
+
 # ---------------------------------------------------------------------------------------------------------
 # Gramática GBNF
 # ---------------------------------------------------------------------------------------------------------
@@ -172,14 +232,32 @@ def _bounded(char_rule: str, minimo: int, maximo: int) -> str:
     return f"{obrigatorios} {aninhado}".strip()
 
 
+_REGRA_DA_CHAVE = {"elemento": "elemento", "composto": "composto", "propriedade": "propriedade", "quantidades": "quantidades",
+                  "equacao": "equacao", "nivel": "nivel", "unidadeDestino": "destino"}
+
+
+def _regra_intencao(intent: str) -> str:
+    """Alternativa da raiz para uma intenção: o literal da intenção seguido SÓ das chaves permitidas (na ordem do contrato), com as
+    obrigatórias sem `?`."""
+    permitidas, obrigatorias = ENTIDADES_POR_INTENCAO[intent]
+    partes = [_lit(intent)]
+    for chave in KEYS[1:]:
+        if chave in permitidas:
+            partes.append(_REGRA_DA_CHAVE[chave] + ("" if chave in obrigatorias else "?"))
+    return " ".join(partes)
+
+
 def build_grammar() -> str:
-    """Gramática do formato v1: só as chaves presentes, na ordem fixa do contrato."""
+    """Gramática do formato v1: só as chaves presentes, na ordem fixa do contrato, e — desde 14/10/2026 — só as chaves que a intenção
+    escolhida admite (ENTIDADES_POR_INTENCAO), com as obrigatórias garantidas. A regra `intent` fica definida para referência."""
     # quantidades: 1 a MAX_QUANTIDADES itens, desenrolados (sem recursão)
     resto = ""
     for _ in range(MAX_QUANTIDADES - 1):
         resto = f'(", " quant{(" " + resto) if resto else ""})?'
+    alternativas = " | ".join(f"i{n}" for n in range(len(INTENTS)))
     linhas = [
-        'root ::= "{\\"intent\\": " intent elemento? composto? propriedade? quantidades? equacao? nivel? destino? "}"',
+        f'root ::= "{{\\"intent\\": " ({alternativas}) "}}"',
+        *[f"i{n} ::= {_regra_intencao(intent)}" for n, intent in enumerate(INTENTS)],
         f"intent ::= {_alt(INTENTS)}",
         f'elemento ::= ", \\"elemento\\": " ({_alt(SIMBOLOS)})',
         f'composto ::= ", \\"composto\\": \\"" {_bounded(_COMPOSTO_CHARS, 2, 60)} "\\""',
@@ -227,7 +305,9 @@ KEYS = ["intent", "elemento", "composto", "propriedade", "quantidades", "equacao
 
 
 def has_valid_shape(obj) -> bool:
-    """Forma esperada: intent do vocabulário, só chaves do contrato, entidades do vocabulário fechado, quantidades bem formadas."""
+    """Forma esperada: intent do vocabulário, só chaves do contrato, entidades do vocabulário fechado, quantidades bem formadas.
+    NÃO exige a combinação por intenção (combinacao_valida): a gramática a garante na geração; sem gramática, uma chave fora da
+    intenção conta como erro de entidade/alucinação no avaliador, não como JSON inválido."""
     if not isinstance(obj, dict) or obj.get("intent") not in INTENTS:
         return False
     if any(k not in KEYS for k in obj):

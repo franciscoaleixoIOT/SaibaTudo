@@ -207,6 +207,16 @@ menos GPU que o 7B atual, então a cota de 40 min/dia rende mais respostas.
 > nlu on`; 5 perguntas em pt/de/es respondidas certas pelo `/quimica/api/nlu` (2,4–3,2 s quente; 9,8 s na primeira, frio). O primeiro NLU
 > treinado da SaibaTudo.IA em produção. Próximos passos decididos pelo mantenedor: gramática gerada dos dados, resolução do composto na API e
 > normalização da entrada (código, não treino); depois a etapa 1 do AchaVagaIA.
+>
+> **Melhorias de código publicadas (14/10, madrugada; detalhes em `apps/quimica/docs/MODELO.md` §13 e `PROJECT_MEMORY.md` §6.i):**
+> gramática GBNF **condicionada à intenção** (`ENTIDADES_POR_INTENCAO` em `nlu_core.py`, uma regra por intenção; derivada dos dados e conferida
+> sem violação no golden de 723 e no corpus de 46 mil alvos — MASSA_MOLAR, COMPOSTO e BALANCEAR **não** podem obrigar entidade porque o golden
+> tem perguntas genéricas), **resolução do composto** no índice do pacote dentro da API (`resolucao` com CID ou até 3 sugestões) e
+> **normalização da entrada** antes do modelo (subscritos, tipografia, setas, NBSP, pontuação; sem minúsculas nem remoção de acentos). O gate da
+> química rodou de novo com o GGUF em produção e a gramática nova: **idêntico** (intenção 99,0 %, 5 idiomas ok, holdout 99,6 %, latência CPU
+> p50 1,56 s nas duas). Lição operacional: com `scaledown_window` de 30 s quase toda pergunta real é fria (~10–11 s) e duas estouraram o timeout
+> de 12 s → `MODAL_TIMEOUT_MS=20000`; manter contêiner quente é decisão de custo do mantenedor. Isso vale para o serviço de qualquer app que
+> adotar o SaibaTudo-NLU (a gramática por intenção precisa da tabela de chaves do app).
 
 > **Decidido em 12/10/2026 (noite):** o mantenedor aprovou seguir com o **Qwen3.5-2B** como interpretador **único de todos os apps**
 > (Qwen3.5-4B de reserva se a química não passar no gate em en/es/de/fr) e deu o nome **"SaibaTudo.IA"** à IA (confirmado em 12/10; o nome fica numa constante única). Em andamento: etapa 2 (corpus único, `ia/corpus/`) e etapa 3a
