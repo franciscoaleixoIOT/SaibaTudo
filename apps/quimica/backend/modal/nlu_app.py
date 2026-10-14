@@ -51,13 +51,16 @@ LLAMA_CPP_PYTHON_BUILD = (
 # --- parâmetros de custo/latência (ver docs/MODELO.md: custos) ---
 CPU_CORES = 4.0            # núcleos FÍSICOS (o Modal cobra pelo maior entre reserva e uso). Saída curta (10-40 tokens): ajustar após o `bench`
 MEMORY_MIB = 4096          # GGUF Q4_K_M do Qwen3.5-2B = 1,2 GB (mmap) + contexto + Python; folga para o pico do carregamento
-SCALEDOWN_SECONDS = 30     # container ocioso desliga em 30 s (default do Modal é 60)
+SCALEDOWN_SECONDS = 300    # container ocioso desliga em 5 min (14/10/2026; era 30 s): quem faz perguntas seguidas não paga o frio a cada uma.
+                           # Custo da janela: ~US$ 0,02 por rajada de uso (4 núcleos + 4 GiB ≈ US$ 0,22/h); decisão do mantenedor em 14/10.
 MAX_CONTAINERS = 2         # teto de concorrência/custo
 REQUEST_TIMEOUT_S = 60
 N_THREADS = int(os.environ.get("NLU_THREADS", "4"))
 
-# Memory snapshot (restaura o modelo já carregado em vez de relê-lo): DESLIGADO até ser validado com o `bench`.
-USE_SNAPSHOT = False
+# Memory snapshot (restaura o modelo já carregado em vez de relê-lo). Ligado em 14/10/2026 para cortar o frio de ~10 s: o primeiro
+# contêiner depois de um deploy carrega o modelo e tira o snapshot; os seguintes restauram. Com snapshot o GGUF é lido para a RAM
+# (sem mmap), para os pesos irem junto na imagem de memória — 4 GiB bastam para o Q4 de 1,2 GB.
+USE_SNAPSHOT = True
 
 image = (
     modal.Image.debian_slim(python_version="3.12")
@@ -108,7 +111,7 @@ class Nlu:
             n_threads=N_THREADS,
             n_threads_batch=N_THREADS,
             n_batch=256,
-            use_mmap=True,
+            use_mmap=not USE_SNAPSHOT,
             verbose=False,
         )
         # Aquecimento: preenche o cache de KV com o prefixo (system prompt), reaproveitado nas próximas perguntas.

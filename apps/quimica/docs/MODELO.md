@@ -124,6 +124,8 @@ O `deploy` pode ser feito antes de promover (os contêineres só sobem quando ho
 - **Dados:** semanal (domingo 03:00, Brasília), só publica se uma fonte mudou. **Modelo:** mensal, ou quando o painel noturno reprovar a produção, ou quando surgirem **intenção, propriedade, unidade ou classe de composto novos**
   (nesse caso atualizar *juntos*: `api/_lib/vocab.js`, `backend/modal/nlu_core.py`, `LocalNlu.kt`/`nlu.js` e `dataset/vocab_nlu.py`; `test_nlu_core.py` e `vocab.test.mjs` falham se divergirem).
 - **Custos de referência** (medidos no app de eleições; **medir de novo** aqui): Modal US$ 30/mês grátis no workspace (o teto de gasto só se define no painel); NLU em CPU ≈ US$ 0,40/h ligado (≈ US$ 3/mês no ritmo atual);
+  **química, 14/10/2026:** contêiner de 4 núcleos + 4 GiB ≈ US$ 0,22/h (US$ 0,047/núcleo-h + US$ 0,008/GiB-h); `scaledown_window` 300 s (~US$ 0,02 por rajada);
+  snapshot de memória ligado (frio ~9 s ao vivo em vez de 12–19 s; quente 2–3 s); 1 contêiner sempre ligado custaria ~US$ 160/mês (descartado);
   L4 ≈ US$ 0,88/h e cobra o contêiner inteiro (inclui os 60 s de `scaledown_window`) — por isso é só reserva, com `MODAL_ASK_DAILY_BUDGET=15`; Hugging Face PRO: 40 min/dia de ZeroGPU, ≈ 3 s de GPU por resposta
   (≈ 800 respostas/dia), passar da cota só cobra com **crédito pré-pago** (não deixe saldo); Upstash gratuito (500 mil comandos/mês, ≈ 4 por chamada); Vercel Hobby (uso não comercial).
 - **Limites de proteção:** `RATE_IP_PER_MIN=20`, `RATE_IID_PER_DAY=60`, `DAILY_BUDGET=300`, `HF_ASK_DAILY_BUDGET=400`; firewall da Vercel 60 req/min por IP em `/api/*`.

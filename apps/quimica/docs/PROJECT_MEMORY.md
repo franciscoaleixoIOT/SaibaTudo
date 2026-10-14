@@ -165,7 +165,7 @@ em ELEMENTO; `has_valid_shape` segue estrutural. (2) `api/_lib/compostos.js` res
 função por `includeFiles`): `resolucao` na resposta com CID ou até 3 sugestões ("você quis dizer…?"); cache guarda `{nlu, resolucao}`.
 (4) `normalize_question` canoniza subscritos, tipografia, NBSP, setas e pontuação antes do modelo (mesma função no serviço, no gate e no
 avaliador; nada vira minúscula, `=` não vira seta). Ao vivo: typo → sugestões com CID, `=>`/`-->` → `→`, de/en/pt resolvidos. **Operação:** duas
-chamadas frias estouraram os 12 s e uma levou 18,7 s → `MODAL_TIMEOUT_MS=25000` (máximo do proxy; vale no próximo deploy) na Vercel; a raiz é o `scaledown_window` de 30 s (quase toda pergunta real é fria,
+chamadas frias estouraram os 12 s e uma levou 18,7 s → `MODAL_TIMEOUT_MS=25000` (máximo do proxy; vale no próximo deploy) na Vercel; de manhã, **snapshot de memória ligado** (frio ~9 s) e **janela de 5 min** (decisão do mantenedor; ~US$ 0,02 por rajada); a raiz é o `scaledown_window` de 30 s (quase toda pergunta real é fria,
 ~10–11 s) — subir a janela custa Modal, decisão do mantenedor. Regra nova em `MODELO.md` §13: qualquer mudança em `nlu_core.py` exige o gate de
 novo antes do `modal deploy`. Testes: backend 125, API 209.
 
