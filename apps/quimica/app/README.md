@@ -36,6 +36,13 @@ Molde: `apps/eleicoes2026/.../ai/nlu/CloudNlu.kt` e `HybridAiInferenceEngine.kt`
   MockWebServer: 200, 503 disabled/budget, 429, 400/502, tempo esgotado, JSON malformado; assistente: resposta local com origem NUVEM, motivos, sugestões,
   pedido perigoso não sai; `iid` UUID v4 estável).
 
+## Relatar problema nesta resposta
+
+Rodapé de cada resposta (`ui/components/RespostaView.kt`): abre no navegador uma issue pública pré-preenchida no GitHub (`domain/Relato.kt`, `urlRelato`:
+`BuildConfig.SOURCE_URL/issues/new?title=…&labels=quimica,resposta&body=…`, pergunta cortada em 80 no título; corpo com pergunta, intenção, origem
+local/nuvem e versões do app e dos dados); nada sai sem o toque e a confirmação no GitHub; nunca em `RECUSA_PERIGO`. Textos `ui_relatar_resposta*`,
+`relato_*`; testes em `RelatoTest`.
+
 ## Ícone
 
 `res/drawable/ic_launcher_{background,foreground,monochrome}.xml` são a conversão direta de `../brand/quimica-icon.svg` (só polígonos e círculos;

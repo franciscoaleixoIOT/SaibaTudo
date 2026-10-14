@@ -874,4 +874,9 @@
     <string name="nuvem_voce_quis_dizer">Você quis dizer:</string>
     <string name="ui_config_nuvem_titulo">IA na nuvem automática</string>
     <string name="ui_config_nuvem_descricao">Desligada por padrão. Ligada, as perguntas que o app não entender são enviadas (só o texto) à IA na nuvem para interpretação; a resposta continua sendo montada no aparelho com os dados do pacote. Desligada, você ainda pode tocar em “Perguntar à IA na nuvem” em cada resposta.</string>
+    <!-- Relatar problema nesta resposta (issue pública pré-preenchida no GitHub) -->
+    <string name="ui_relatar_resposta">Relatar problema nesta resposta</string>
+    <string name="ui_relatar_resposta_desc">Relatar problema nesta resposta. Abre no navegador uma issue pública no GitHub já preenchida; nada é enviado sem você confirmar lá.</string>
+    <string name="relato_titulo">Química: resposta a \"%1$s\"</string>
+    <string name="relato_corpo">O que estava errado ou faltou na resposta? (Não inclua dados pessoais.)\n\nPergunta: %1$s\nIntenção: %2$s\nOrigem da resposta: %3$s\nVersão do app (Android): %4$s\nVersão dos dados: %5$s</string>
 </resources>

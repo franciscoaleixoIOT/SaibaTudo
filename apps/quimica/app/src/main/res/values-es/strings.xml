@@ -680,7 +680,7 @@
     <string name="ui_sobre_codigo_fonte">Ver el código fuente</string>
     <string name="ui_privacidade_titulo">Privacidad</string>
     <string name="ui_privacidade_nada_sai_titulo">Nada sale de tu dispositivo, a menos que se lo pidas a la IA en la nube</string>
-    <string name="ui_privacidade_nada_sai_texto">Tus preguntas se interpretan y se responden en el propio dispositivo. Internet sirve para descargar actualizaciones firmadas del paquete de datos desde saibatudo.net y, solo cuando lo pidas, para consultar la IA en la nube.</string>
+    <string name="ui_privacidade_nada_sai_texto">Tus preguntas se interpretan y se responden en el propio dispositivo. Internet se usa para descargar actualizaciones firmadas del paquete de datos desde saibatudo.net y, solo cuando lo pidas, para consultar la IA en la nube.</string>
     <string name="ui_privacidade_guardado_titulo">Lo que se guarda en el dispositivo</string>
     <string name="ui_privacidade_guardado_item1">Tus preferencias: tema, tamaño del texto, nivel, ahorro de datos e IA en la nube automática; y el identificador aleatorio de esta instalación, usado solo en las consultas a la IA en la nube.</string>
     <string name="ui_privacidade_guardado_item2">El historial de las últimas preguntas (hasta 30), solo para que puedas reutilizarlas. Puedes borrarlo abajo.</string>
@@ -691,7 +691,7 @@
     <string name="ui_privacidade_nao_tem_titulo">Lo que la app no tiene</string>
     <string name="ui_privacidade_nao_tem_texto">Sin inicio de sesión, sin anuncios, sin análisis de uso, sin ubicación, sin acceso a contactos, cámara ni micrófono.</string>
     <string name="ui_privacidade_nuvem_titulo">IA en la nube</string>
-    <string name="ui_privacidade_nuvem_texto">Opcional y desactivada por defecto. Cuando tocas «Preguntar a la IA en la nube» (o activas la opción automática en Ajustes), la app envía a saibatudo.net solo el texto de esa pregunta (hasta 300 caracteres) y un identificador aleatorio de esta instalación, que no te identifica y sirve solo para el límite de uso. El modelo solo interpreta la pregunta: cada nombre, símbolo y unidad se comprueba con los datos del dispositivo, y los números vienen siempre del paquete firmado. El servidor no registra la pregunta en los logs; solo queda en una caché temporal en memoria.</string>
+    <string name="ui_privacidade_nuvem_texto">Opcional y desactivada por defecto. Cuando tocas «Preguntar a la IA en la nube» (o activas la opción automática en Configuración), la app envía a saibatudo.net solo el texto de esa pregunta (hasta 300 caracteres) y un identificador aleatorio de esta instalación, que no te identifica y se usa solo para aplicar el límite de uso. El modelo solo interpreta la pregunta: cada nombre, símbolo y unidad se comprueba con los datos del dispositivo, y los números vienen siempre del paquete firmado. La pregunta no queda en los registros del servidor; solo permanece en una caché temporal en memoria.</string>
     <string name="ui_privacidade_politica_completa">Política de privacidad completa</string>
     <string name="ui_privacidade_relatar">Informar de un problema o un error en los datos</string>
     <string name="ui_config_titulo">Configuración</string>
@@ -856,19 +856,24 @@
 
     <!-- 50_nuvem (IA na nuvem opt-in, só interpretação) -->
     <string name="origem_nuvem">IA en la nube • interpretación; datos del paquete</string>
-    <string name="ui_origem_nuvem">IA en la nube: el modelo solo interpretó la pregunta. La respuesta y los números se armaron en el dispositivo a partir del paquete de datos firmado.</string>
+    <string name="ui_origem_nuvem">IA en la nube: el modelo solo interpretó la pregunta. La respuesta y los números se construyeron en el dispositivo a partir del paquete de datos firmado.</string>
     <string name="nuvem_botao_perguntar">Preguntar a la IA en la nube</string>
-    <string name="nuvem_nota_nao_entendida">Envía solo el texto de esta pregunta al servidor de SaibaTudo (saibatudo.net) para interpretarla; la respuesta se sigue armando en el dispositivo con los datos del paquete. Puede tardar hasta 25 s.</string>
-    <string name="nuvem_nota_entendida">La respuesta de arriba vino de la app. Si no era lo que querías, la IA en la nube intenta entender la pregunta de otra forma; la respuesta sigue saliendo de los datos del paquete. Envía solo el texto de esta pregunta. Puede tardar hasta 25 s.</string>
+    <string name="nuvem_nota_nao_entendida">Envía solo el texto de esta pregunta al servidor de SaibaTudo (saibatudo.net) para interpretarla; la respuesta se sigue construyendo en el dispositivo con los datos del paquete. Puede tardar hasta 25 s.</string>
+    <string name="nuvem_nota_entendida">La respuesta de arriba se construyó en tu dispositivo. Si no era lo que querías, la IA en la nube puede intentar entender la pregunta de otra forma; la respuesta sigue viniendo de los datos del paquete. Solo se envía el texto de esta pregunta. Puede tardar hasta 25 s.</string>
     <string name="nuvem_consultando">Consultando la IA en la nube…</string>
     <string name="nuvem_falha_desligada">La IA en la nube está desactivada en este momento. La respuesta de arriba sigue siendo válida.</string>
     <string name="nuvem_falha_limite">Se alcanzó el límite de preguntas a la IA en la nube. Inténtalo de nuevo más tarde; la respuesta de arriba sigue siendo válida.</string>
-    <string name="nuvem_falha_indisponivel">La IA en la nube no está disponible ahora o tardó demasiado. Inténtalo de nuevo en unos instantes o reformula citando el elemento, el compuesto o la magnitud.</string>
+    <string name="nuvem_falha_indisponivel">La IA en la nube no está disponible ahora o tardó demasiado. Inténtalo de nuevo en unos instantes o reformula la pregunta citando el elemento, el compuesto o la magnitud.</string>
     <string name="nuvem_falha_indisponivel_entendida">La IA en la nube no está disponible ahora o tardó demasiado. La respuesta de arriba sigue siendo válida; inténtalo de nuevo en unos instantes.</string>
     <string name="nuvem_falha_nao_entendeu">La IA en la nube tampoco entendió esta pregunta. Intenta reformularla citando el elemento, el compuesto o la magnitud.</string>
     <string name="nuvem_falha_mesma">La IA en la nube no encontró otra forma de entender esta pregunta. La respuesta de arriba sigue siendo válida.</string>
     <string name="nuvem_falha_invalida">La IA en la nube devolvió una respuesta con un formato inesperado y se descartó. Inténtalo de nuevo en unos instantes.</string>
     <string name="nuvem_voce_quis_dizer">¿Quisiste decir…?</string>
     <string name="ui_config_nuvem_titulo">IA en la nube automática</string>
-    <string name="ui_config_nuvem_descricao">Desactivada por defecto. Activada, las preguntas que la app no entienda se envían (solo el texto) a la IA en la nube para interpretarlas; la respuesta se sigue armando en el dispositivo con los datos del paquete. Desactivada, aún puedes tocar «Preguntar a la IA en la nube» en cada respuesta.</string>
+    <string name="ui_config_nuvem_descricao">Desactivada por defecto. Activada, las preguntas que la app no entienda se envían (solo el texto) a la IA en la nube para interpretarlas; la respuesta se sigue construyendo en el dispositivo con los datos del paquete. Desactivada, aún puedes tocar «Preguntar a la IA en la nube» en cada respuesta.</string>
+    <!-- Relatar problema nesta resposta (issue pública pré-preenchida no GitHub) -->
+    <string name="ui_relatar_resposta">Informar de un problema con esta respuesta</string>
+    <string name="ui_relatar_resposta_desc">Informar de un problema con esta respuesta. Abre en el navegador una incidencia pública de GitHub ya rellenada; no se envía nada si no lo confirmas allí.</string>
+    <string name="relato_titulo">Química: respuesta a “%1$s”</string>
+    <string name="relato_corpo">¿Qué estaba mal o faltaba en la respuesta? (No incluyas datos personales.)\n\nPregunta: %1$s\nIntención: %2$s\nOrigen de la respuesta: %3$s\nVersión de la app (Android): %4$s\nVersión de los datos: %5$s</string>
 </resources>

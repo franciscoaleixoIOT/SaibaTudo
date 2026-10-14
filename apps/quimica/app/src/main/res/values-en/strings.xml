@@ -855,17 +855,22 @@
     <string name="origem_nuvem">Cloud AI • interpretation; data from the package</string>
     <string name="ui_origem_nuvem">Cloud AI: the model only interpreted the question. The answer and the numbers were put together on the device from the signed data package.</string>
     <string name="nuvem_botao_perguntar">Ask the cloud AI</string>
-    <string name="nuvem_nota_nao_entendida">Sends only the text of this question to the SaibaTudo server (saibatudo.net) for interpretation; the answer is still put together on the device from the package data. It can take up to 25 s.</string>
-    <string name="nuvem_nota_entendida">The answer above came from the app. If it is not what you wanted, the cloud AI tries to understand the question another way; the answer still comes from the package data. Sends only the text of this question. It can take up to 25 s.</string>
-    <string name="nuvem_consultando">Consulting the cloud AI…</string>
-    <string name="nuvem_falha_desligada">The cloud AI is switched off at the moment. The answer above still stands.</string>
+    <string name="nuvem_nota_nao_entendida">Sends only the text of this question to the SaibaTudo server (saibatudo.net) for interpretation; the answer is still put together on the device from the data package. It can take up to 25 s.</string>
+    <string name="nuvem_nota_entendida">The answer above was built on your device. If it is not what you wanted, the cloud AI can try to understand the question another way; the answer still comes from the data package. Only the text of this question is sent. It can take up to 25 s.</string>
+    <string name="nuvem_consultando">Asking the cloud AI…</string>
+    <string name="nuvem_falha_desligada">The cloud AI is turned off right now. The answer above still stands.</string>
     <string name="nuvem_falha_limite">The limit of questions to the cloud AI has been reached. Try again later; the answer above still stands.</string>
-    <string name="nuvem_falha_indisponivel">The cloud AI is unavailable right now or took too long. Try again in a moment or rephrase, naming the element, the compound or the quantity.</string>
+    <string name="nuvem_falha_indisponivel">The cloud AI is unavailable right now or took too long. Try again in a moment, or rephrase the question by naming the element, the compound or the quantity.</string>
     <string name="nuvem_falha_indisponivel_entendida">The cloud AI is unavailable right now or took too long. The answer above still stands; try again in a moment.</string>
-    <string name="nuvem_falha_nao_entendeu">The cloud AI did not understand this question either. Try rephrasing, naming the element, the compound or the quantity.</string>
+    <string name="nuvem_falha_nao_entendeu">The cloud AI did not understand this question either. Try rephrasing it by naming the element, the compound or the quantity.</string>
     <string name="nuvem_falha_mesma">The cloud AI found no other way to understand this question. The answer above still stands.</string>
     <string name="nuvem_falha_invalida">The cloud AI returned a reply in an unexpected format and it was discarded. Try again in a moment.</string>
     <string name="nuvem_voce_quis_dizer">Did you mean:</string>
     <string name="ui_config_nuvem_titulo">Automatic cloud AI</string>
-    <string name="ui_config_nuvem_descricao">Off by default. When on, questions the app does not understand are sent (text only) to the cloud AI for interpretation; the answer is still put together on the device from the package data. When off, you can still tap “Ask the cloud AI” on each answer.</string>
+    <string name="ui_config_nuvem_descricao">Off by default. When on, questions the app does not understand are sent (text only) to the cloud AI for interpretation; the answer is still put together on the device from the data package. When off, you can still tap “Ask the cloud AI” on each answer.</string>
+    <!-- Relatar problema nesta resposta (issue pública pré-preenchida no GitHub) -->
+    <string name="ui_relatar_resposta">Report a problem with this answer</string>
+    <string name="ui_relatar_resposta_desc">Report a problem with this answer. Opens a prefilled public GitHub issue in the browser; nothing is sent unless you confirm there.</string>
+    <string name="relato_titulo">Chemistry: answer to \"%1$s\"</string>
+    <string name="relato_corpo">What was wrong or missing in the answer? (Do not include personal data.)\n\nQuestion: %1$s\nIntent: %2$s\nAnswer source: %3$s\nApp version (Android): %4$s\nData version: %5$s</string>
 </resources>

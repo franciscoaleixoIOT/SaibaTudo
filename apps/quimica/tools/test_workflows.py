@@ -69,6 +69,35 @@ class Yaml(unittest.TestCase):
                         self.assertNotIn("secrets.", cond, f"{nome}: `secrets` não pode ser usado em if (use env)")
 
 
+    def test_regras_do_repositorio_unico(self):
+        # CLAUDE.md da raiz, regra 2: pasta do app como diretório de trabalho, filtros de caminho só do app (ou do próprio workflow) e
+        # concorrência com o prefixo do app
+        for p in WORKFLOWS:
+            with self.subTest(arquivo=p.name):
+                d = _carregar(p)
+                self.assertTrue(str(d["name"]).startswith("Química"), d["name"])
+                self.assertEqual(d.get("defaults", {}).get("run", {}).get("working-directory"), "apps/quimica")
+                gatilho = d.get("on", d.get(True)) or {}
+                for evento in ("push", "pull_request"):
+                    for caminho in (gatilho.get(evento) or {}).get("paths", []) if isinstance(gatilho, dict) else []:
+                        self.assertTrue(caminho.lstrip("!").startswith("apps/quimica/") or caminho == f".github/workflows/{p.name}", caminho)
+                if "concurrency" in d:
+                    grupo = d["concurrency"]["group"] if isinstance(d["concurrency"], dict) else d["concurrency"]
+                    self.assertTrue(str(grupo).startswith("quimica-"), grupo)
+
+    def test_android_ci_sem_segredos_e_com_verificador(self):
+        p = GITHUB / "workflows" / "quimica-android-ci.yml"
+        texto = p.read_text(encoding="utf-8")
+        self.assertNotIn("secrets.", texto, "o CI Android da Química não usa segredos (release sem assinatura)")
+        runs = chr(10).join(passo.get("run", "") for job in _carregar(p)["jobs"].values() for passo in job["steps"])
+        for tarefa in (":app:testDebugUnitTest", ":app:lintRelease", ":app:assembleRelease"):
+            self.assertIn(tarefa, runs)
+        self.assertIn("tools/verificar_release.py", runs)
+        caminhos = _carregar(p)[True]["push"]["paths"]
+        for c in ("apps/quimica/app/**", "apps/quimica/contracts/**", "apps/quimica/data/**", "apps/quimica/tools/verificar_release.py"):
+            self.assertIn(c, caminhos)
+
+
 @unittest.skipIf(yaml is None or BASH is None, "PyYAML ou bash ausente")
 class Shell(unittest.TestCase):
     def test_sintaxe_de_shell_de_cada_passo_run(self):

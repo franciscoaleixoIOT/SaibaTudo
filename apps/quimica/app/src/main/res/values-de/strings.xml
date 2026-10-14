@@ -473,7 +473,7 @@
     <string name="ui_inicio_experimente">Fragen Sie zum Beispiel</string>
     <string name="ui_inicio_recentes">Letzte Fragen</string>
     <string name="ui_inicio_limpar">Löschen</string>
-    <string name="ui_inicio_privacidade">Datenschutz: Ihre Fragen werden auf diesem Gerät beantwortet. Nichts verlässt Ihr Gerät, außer Sie fragen die Cloud-KI.</string>
+    <string name="ui_inicio_privacidade">Datenschutz: Ihre Fragen werden auf diesem Gerät beantwortet. Nichts verlässt Ihr Gerät, es sei denn, Sie fragen die KI in der Cloud.</string>
     <string name="molecula_desc">2D-Struktur von %1$s</string>
 
     <!-- 23_propriedades -->
@@ -625,7 +625,7 @@
     <string name="ui_mais_seguranca_descricao">Piktogramme, Signalwörter und Gefahrenhinweise</string>
     <string name="ui_mais_sobre_descricao">Version, Quellen, Lizenzen und Aktualisierung</string>
     <string name="ui_mais_privacidade_descricao">Was auf dem Gerät bleibt und was es verlässt</string>
-    <string name="ui_mais_config_descricao">Sprache, Design, Textgröße, Stufe und Cloud-KI</string>
+    <string name="ui_mais_config_descricao">Sprache, Design, Textgröße, Stufe und KI in der Cloud</string>
     <string name="ui_mais_versao">SaibaTudo Química %1$s (Version %2$d). Open Source, MIT-Lizenz.</string>
     <string name="ui_seguranca_titulo">Sicherheit und GHS</string>
     <string name="ui_seguranca_oque_titulo">Was ist das GHS</string>
@@ -677,19 +677,19 @@
     <string name="ui_sobre_app_texto">Open Source, MIT-Lizenz. Die Moleküle werden mit SmilesDrawer (MIT-Lizenz) gezeichnet. Keine Werbung, kein Login und keine Nutzungsanalyse.</string>
     <string name="ui_sobre_codigo_fonte">Quellcode ansehen</string>
     <string name="ui_privacidade_titulo">Datenschutz</string>
-    <string name="ui_privacidade_nada_sai_titulo">Nichts verlässt Ihr Gerät, außer Sie fragen die Cloud-KI</string>
-    <string name="ui_privacidade_nada_sai_texto">Ihre Fragen werden auf dem Gerät selbst interpretiert und beantwortet. Das Internet dient zum Herunterladen signierter Aktualisierungen des Datenpakets von saibatudo.net und, nur wenn Sie es verlangen, zur Abfrage der Cloud-KI.</string>
+    <string name="ui_privacidade_nada_sai_titulo">Nichts verlässt Ihr Gerät, es sei denn, Sie fragen die KI in der Cloud</string>
+    <string name="ui_privacidade_nada_sai_texto">Ihre Fragen werden auf dem Gerät selbst interpretiert und beantwortet. Das Internet dient zum Herunterladen signierter Aktualisierungen des Datenpakets von saibatudo.net und, nur wenn Sie es wünschen, für Fragen an die KI in der Cloud.</string>
     <string name="ui_privacidade_guardado_titulo">Was auf dem Gerät gespeichert bleibt</string>
-    <string name="ui_privacidade_guardado_item1">Ihre Einstellungen: Design, Textgröße, Stufe, Datensparmodus und automatische Cloud-KI; dazu die zufällige Kennung dieser Installation, die nur bei Anfragen an die Cloud-KI verwendet wird.</string>
+    <string name="ui_privacidade_guardado_item1">Ihre Einstellungen: Design, Textgröße, Stufe, Datensparmodus und KI in der Cloud automatisch; dazu die zufällige Kennung dieser Installation, die nur bei Anfragen an die KI in der Cloud verwendet wird.</string>
     <string name="ui_privacidade_guardado_item2">Der Verlauf der letzten Fragen (bis zu 30), nur damit Sie sie erneut verwenden können. Sie können ihn unten löschen.</string>
     <string name="ui_privacidade_guardado_item3">Das Datenpaket und die heruntergeladenen Aktualisierungen.</string>
     <string name="ui_privacidade_apagar_historico">Fragenverlauf löschen</string>
     <string name="ui_privacidade_sai_titulo">Was das Gerät verlässt</string>
-    <string name="ui_privacidade_sai_texto">Bei der Suche nach Aktualisierungen sendet die App HTTPS-Anfragen an saibatudo.net, um die Datendateien herunterzuladen. Wie bei jedem Internetzugriff sieht der Server die IP-Adresse und die App-Version. Es werden keine Nutzungsdaten gesendet. Der Text einer Frage verlässt das Gerät nur, wenn Sie auf „Cloud-KI fragen“ tippen oder die automatische Cloud-KI einschalten.</string>
+    <string name="ui_privacidade_sai_texto">Bei der Suche nach Aktualisierungen sendet die App HTTPS-Anfragen an saibatudo.net, um die Datendateien herunterzuladen. Wie bei jedem Internetzugriff sieht der Server die IP-Adresse und die App-Version. Es werden keine Nutzungsdaten gesendet. Der Text einer Frage verlässt das Gerät nur, wenn Sie auf „KI in der Cloud fragen“ tippen oder „KI in der Cloud automatisch“ einschalten.</string>
     <string name="ui_privacidade_nao_tem_titulo">Was die App nicht hat</string>
     <string name="ui_privacidade_nao_tem_texto">Kein Login, keine Werbung, keine Nutzungsanalyse, keine Standortabfrage, kein Zugriff auf Kontakte, Kamera oder Mikrofon.</string>
     <string name="ui_privacidade_nuvem_titulo">KI in der Cloud</string>
-    <string name="ui_privacidade_nuvem_texto">Optional und standardmäßig ausgeschaltet. Wenn Sie auf „Cloud-KI fragen“ tippen (oder die automatische Option in den Einstellungen einschalten), sendet die App an saibatudo.net nur den Text dieser Frage (bis zu 300 Zeichen) und eine zufällige Kennung dieser Installation, die Sie nicht identifiziert und nur für das Nutzungslimit dient. Das Modell interpretiert die Frage nur: Jeder Name, jedes Symbol und jede Einheit wird mit den Daten auf dem Gerät abgeglichen, und die Zahlen stammen immer aus dem signierten Paket. Der Server protokolliert die Frage nicht; sie liegt nur in einem temporären Zwischenspeicher im Arbeitsspeicher.</string>
+    <string name="ui_privacidade_nuvem_texto">Optional und standardmäßig ausgeschaltet. Wenn Sie auf „KI in der Cloud fragen“ tippen (oder die automatische Option in den Einstellungen einschalten), sendet die App an saibatudo.net nur den Text dieser Frage (bis zu 300 Zeichen) und eine zufällige Kennung dieser Installation, die Sie nicht identifiziert und nur für das Nutzungslimit dient. Das Modell interpretiert die Frage nur: Jeder Name, jedes Symbol und jede Einheit wird mit den Daten auf dem Gerät abgeglichen, und die Zahlen stammen immer aus dem signierten Datenpaket. Der Server protokolliert die Frage nicht; sie liegt nur in einem temporären Zwischenspeicher im Arbeitsspeicher.</string>
     <string name="ui_privacidade_politica_completa">Vollständige Datenschutzerklärung</string>
     <string name="ui_privacidade_relatar">Ein Problem oder einen Fehler in den Daten melden</string>
     <string name="ui_config_titulo">Einstellungen</string>
@@ -852,20 +852,25 @@
     <string name="classe_alcaloide">Alkaloid</string>
 
     <!-- 50_nuvem (IA na nuvem opt-in, só interpretação) -->
-    <string name="origem_nuvem">Cloud-KI • Interpretation; Daten aus dem Paket</string>
-    <string name="ui_origem_nuvem">Cloud-KI: Das Modell hat nur die Frage interpretiert. Antwort und Zahlen wurden auf dem Gerät aus dem signierten Datenpaket zusammengestellt.</string>
-    <string name="nuvem_botao_perguntar">Cloud-KI fragen</string>
-    <string name="nuvem_nota_nao_entendida">Sendet nur den Text dieser Frage zur Interpretation an den SaibaTudo-Server (saibatudo.net); die Antwort wird weiterhin auf dem Gerät aus den Paketdaten zusammengestellt. Das kann bis zu 25 s dauern.</string>
-    <string name="nuvem_nota_entendida">Die Antwort oben stammt von der App. Wenn sie nicht das war, was Sie wollten, versucht die Cloud-KI, die Frage anders zu verstehen; die Antwort stammt weiterhin aus den Paketdaten. Sendet nur den Text dieser Frage. Das kann bis zu 25 s dauern.</string>
-    <string name="nuvem_consultando">Cloud-KI wird abgefragt…</string>
-    <string name="nuvem_falha_desligada">Die Cloud-KI ist derzeit ausgeschaltet. Die Antwort oben gilt weiterhin.</string>
-    <string name="nuvem_falha_limite">Das Limit für Fragen an die Cloud-KI ist erreicht. Versuchen Sie es später erneut; die Antwort oben gilt weiterhin.</string>
-    <string name="nuvem_falha_indisponivel">Die Cloud-KI ist gerade nicht erreichbar oder hat zu lange gebraucht. Versuchen Sie es gleich noch einmal oder formulieren Sie die Frage mit Element, Verbindung oder Größe neu.</string>
-    <string name="nuvem_falha_indisponivel_entendida">Die Cloud-KI ist gerade nicht erreichbar oder hat zu lange gebraucht. Die Antwort oben gilt weiterhin; versuchen Sie es gleich noch einmal.</string>
-    <string name="nuvem_falha_nao_entendeu">Auch die Cloud-KI hat diese Frage nicht verstanden. Formulieren Sie sie mit Element, Verbindung oder Größe neu.</string>
-    <string name="nuvem_falha_mesma">Die Cloud-KI hat keine andere Deutung dieser Frage gefunden. Die Antwort oben gilt weiterhin.</string>
-    <string name="nuvem_falha_invalida">Die Cloud-KI hat eine Antwort in einem unerwarteten Format geliefert; sie wurde verworfen. Versuchen Sie es gleich noch einmal.</string>
+    <string name="origem_nuvem">KI in der Cloud • Interpretation; Daten aus dem Datenpaket</string>
+    <string name="ui_origem_nuvem">KI in der Cloud: Das Modell hat nur die Frage interpretiert. Antwort und Zahlen wurden auf dem Gerät aus dem signierten Datenpaket erstellt.</string>
+    <string name="nuvem_botao_perguntar">KI in der Cloud fragen</string>
+    <string name="nuvem_nota_nao_entendida">Sendet nur den Text dieser Frage zur Interpretation an den SaibaTudo-Server (saibatudo.net); die Antwort wird weiterhin auf dem Gerät aus den Daten des Datenpakets erstellt. Das kann bis zu 25 s dauern.</string>
+    <string name="nuvem_nota_entendida">Die Antwort oben wurde auf Ihrem Gerät erstellt. Falls sie nicht Ihren Erwartungen entspricht, kann die KI in der Cloud versuchen, die Frage anders zu verstehen; die Antwort stammt weiterhin aus den Daten des Datenpakets. Es wird nur der Text dieser Frage gesendet. Das kann bis zu 25 s dauern.</string>
+    <string name="nuvem_consultando">Die KI in der Cloud wird gefragt…</string>
+    <string name="nuvem_falha_desligada">Die KI in der Cloud ist derzeit ausgeschaltet. Die Antwort oben gilt weiterhin.</string>
+    <string name="nuvem_falha_limite">Das Limit für Fragen an die KI in der Cloud ist erreicht. Versuchen Sie es später erneut; die Antwort oben gilt weiterhin.</string>
+    <string name="nuvem_falha_indisponivel">Die KI in der Cloud ist gerade nicht erreichbar oder hat zu lange gebraucht. Versuchen Sie es gleich noch einmal oder formulieren Sie die Frage neu und nennen Sie das Element, die Verbindung oder die Größe.</string>
+    <string name="nuvem_falha_indisponivel_entendida">Die KI in der Cloud ist gerade nicht erreichbar oder hat zu lange gebraucht. Die Antwort oben gilt weiterhin; versuchen Sie es gleich noch einmal.</string>
+    <string name="nuvem_falha_nao_entendeu">Auch die KI in der Cloud hat diese Frage nicht verstanden. Formulieren Sie sie neu und nennen Sie das Element, die Verbindung oder die Größe.</string>
+    <string name="nuvem_falha_mesma">Die KI in der Cloud hat keine andere Interpretation dieser Frage gefunden. Die Antwort oben gilt weiterhin.</string>
+    <string name="nuvem_falha_invalida">Die KI in der Cloud hat eine Antwort in einem unerwarteten Format geliefert; sie wurde verworfen. Versuchen Sie es gleich noch einmal.</string>
     <string name="nuvem_voce_quis_dizer">Meinten Sie:</string>
-    <string name="ui_config_nuvem_titulo">Automatische Cloud-KI</string>
-    <string name="ui_config_nuvem_descricao">Standardmäßig ausgeschaltet. Eingeschaltet werden Fragen, die die App nicht versteht, (nur als Text) zur Interpretation an die Cloud-KI gesendet; die Antwort wird weiterhin auf dem Gerät aus den Paketdaten zusammengestellt. Ausgeschaltet können Sie bei jeder Antwort trotzdem auf „Cloud-KI fragen“ tippen.</string>
+    <string name="ui_config_nuvem_titulo">KI in der Cloud automatisch</string>
+    <string name="ui_config_nuvem_descricao">Standardmäßig ausgeschaltet. Wenn eingeschaltet, werden Fragen, die die App nicht versteht, zur Interpretation an die KI in der Cloud gesendet (nur der Text); die Antwort wird weiterhin auf dem Gerät aus dem Datenpaket erstellt. Wenn ausgeschaltet, können Sie bei jeder Antwort trotzdem auf „KI in der Cloud fragen“ tippen.</string>
+    <!-- Relatar problema nesta resposta (issue pública pré-preenchida no GitHub) -->
+    <string name="ui_relatar_resposta">Ein Problem mit dieser Antwort melden</string>
+    <string name="ui_relatar_resposta_desc">Ein Problem mit dieser Antwort melden. Öffnet im Browser ein vorausgefülltes öffentliches GitHub-Issue; es wird nichts gesendet, solange Sie es dort nicht bestätigen.</string>
+    <string name="relato_titulo">Chemie: Antwort auf „%1$s“</string>
+    <string name="relato_corpo">Was war an der Antwort falsch oder was fehlte? (Bitte keine personenbezogenen Daten angeben.)\n\nFrage: %1$s\nAbsicht: %2$s\nHerkunft der Antwort: %3$s\nApp-Version (Android): %4$s\nDatenversion: %5$s</string>
 </resources>

@@ -16,6 +16,7 @@ import net.saibatudo.quimica.data.model.Elemento
 import net.saibatudo.quimica.data.model.Fonte
 import net.saibatudo.quimica.data.prefs.Nivel
 import net.saibatudo.quimica.data.repository.Pacote
+import net.saibatudo.quimica.domain.GhsFonte
 import net.saibatudo.quimica.domain.GhsPictogramas
 import net.saibatudo.quimica.domain.Idiomas
 import net.saibatudo.quimica.domain.Nomes
@@ -433,7 +434,8 @@ class AnswerBuilder(
             val g = c.ghs
             if (g != null && (g.pictogramas.isNotEmpty() || g.frasesH.isNotEmpty())) {
                 blocos += Bloco.GhsBloco(g, textosH(g.textosH))
-                g.fonte?.let { blocos += Bloco.Paragrafo(t(R.string.resp_ghs_classificacao, it)) }
+                // a fonte CLP (1272/2008) já vai localizada na lista de fontes da resposta; só outra fonte ganha linha própria (GhsFonte)
+                GhsFonte.linhaAvulsa(g.fonte)?.let { blocos += Bloco.Paragrafo(t(R.string.resp_ghs_classificacao, it)) }
             } else {
                 blocos += Bloco.Paragrafo(t(R.string.resp_sem_ghs, nomeDe(c)))
             }

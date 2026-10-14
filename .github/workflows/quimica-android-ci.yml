@@ -1,0 +1,96 @@
+name: Química — Android CI
+
+# Testes unitários, lint de release, APK de release (R8) e verificador do release do app Android da Química.
+# Sem segredos: sem keystore.properties nem SAIBATUDO_STORE_* o build.gradle.kts não assina e gera app-release-unsigned.apk
+# (o AAB/APK assinado para a Play é feito na máquina do mantenedor; ver apps/quimica/CLAUDE.md regra 8 e docs/RELEASE_<versão>.md).
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "apps/quimica/app/**"
+      - "apps/quimica/contracts/**"
+      - "apps/quimica/data/**"
+      - "apps/quimica/pipeline/data_signing_public.b64"
+      - "apps/quimica/gradle/**"
+      - "apps/quimica/*.gradle.kts"
+      - "apps/quimica/gradle.properties"
+      - "apps/quimica/gradlew"
+      - "apps/quimica/tools/verificar_release.py"
+      - ".github/workflows/quimica-android-ci.yml"
+  pull_request:
+    paths:
+      - "apps/quimica/app/**"
+      - "apps/quimica/contracts/**"
+      - "apps/quimica/data/**"
+      - "apps/quimica/pipeline/data_signing_public.b64"
+      - "apps/quimica/gradle/**"
+      - "apps/quimica/*.gradle.kts"
+      - "apps/quimica/gradle.properties"
+      - "apps/quimica/gradlew"
+      - "apps/quimica/tools/verificar_release.py"
+      - ".github/workflows/quimica-android-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quimica-android-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: apps/quimica
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+          cache-dependency-path: |
+            apps/quimica/gradle/libs.versions.toml
+            apps/quimica/gradle/wrapper/gradle-wrapper.properties
+            apps/quimica/**/*.gradle.kts
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Permissão do gradlew
+        run: chmod +x gradlew
+
+      # Os testes leem contracts/ (NLU e segurança, os mesmos do site), o pacote real data/quimica/ e a chave pública do pipeline.
+      # Release sem assinatura (sem segredos): o verificador lê o DEX e os assets, não a assinatura.
+      - name: Testes unitários, lint (release) e APK de release
+        run: ./gradlew :app:testDebugUnitTest :app:lintRelease :app:assembleRelease --no-daemon
+
+      # O R8 pode remover classes criadas por reflexão (Room/WorkManager) e o pacote embutido pode faltar: testes e debug não pegam.
+      - name: Verificar o release minificado (classes por reflexão e pacote embutido)
+        run: |
+          APK=$(ls app/build/outputs/apk/release/*.apk | head -1)
+          echo "APK: $APK"
+          python tools/verificar_release.py "$APK"
+
+      - name: Relatórios de teste e lint
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quimica-relatorios-android
+          path: |
+            apps/quimica/app/build/reports/tests/testDebugUnitTest
+            apps/quimica/app/build/reports/lint-results-release.html
+          if-no-files-found: ignore
+
+      - name: APK de release (não assinado)
+        uses: actions/upload-artifact@v4
+        with:
+          name: quimica-app-release-nao-assinado
+          path: apps/quimica/app/build/outputs/apk/release/*.apk
+          retention-days: 14

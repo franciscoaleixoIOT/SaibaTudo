@@ -859,16 +859,21 @@
     <string name="ui_origem_nuvem">IA dans le cloud : le modèle a seulement interprété la question. La réponse et les nombres ont été construits sur l’appareil à partir du paquet de données signé.</string>
     <string name="nuvem_botao_perguntar">Demander à l’IA dans le cloud</string>
     <string name="nuvem_nota_nao_entendida">Envoie uniquement le texte de cette question au serveur de SaibaTudo (saibatudo.net) pour l’interpréter ; la réponse reste construite sur l’appareil avec les données du paquet. Cela peut prendre jusqu’à 25 s.</string>
-    <string name="nuvem_nota_entendida">La réponse ci-dessus vient de l’application. Si ce n’est pas ce que vous vouliez, l’IA dans le cloud essaie de comprendre la question autrement ; la réponse vient toujours des données du paquet. Envoie uniquement le texte de cette question. Cela peut prendre jusqu’à 25 s.</string>
+    <string name="nuvem_nota_entendida">La réponse ci-dessus a été construite sur votre appareil. Si ce n’est pas ce que vous attendiez, l’IA dans le cloud peut essayer de comprendre la question autrement ; la réponse provient toujours des données du paquet. Seul le texte de cette question est envoyé. Cela peut prendre jusqu’à 25 s.</string>
     <string name="nuvem_consultando">Consultation de l’IA dans le cloud…</string>
     <string name="nuvem_falha_desligada">L’IA dans le cloud est désactivée pour le moment. La réponse ci-dessus reste valable.</string>
-    <string name="nuvem_falha_limite">La limite de questions à l’IA dans le cloud est atteinte. Réessayez plus tard ; la réponse ci-dessus reste valable.</string>
-    <string name="nuvem_falha_indisponivel">L’IA dans le cloud est indisponible pour l’instant ou a mis trop de temps. Réessayez dans un instant ou reformulez en citant l’élément, le composé ou la grandeur.</string>
-    <string name="nuvem_falha_indisponivel_entendida">L’IA dans le cloud est indisponible pour l’instant ou a mis trop de temps. La réponse ci-dessus reste valable ; réessayez dans un instant.</string>
+    <string name="nuvem_falha_limite">La limite de questions adressées à l’IA dans le cloud est atteinte. Réessayez plus tard ; la réponse ci-dessus reste valable.</string>
+    <string name="nuvem_falha_indisponivel">L’IA dans le cloud est indisponible pour l’instant ou a mis trop de temps à répondre. Réessayez dans un instant ou reformulez la question en citant l’élément, le composé ou la grandeur.</string>
+    <string name="nuvem_falha_indisponivel_entendida">L’IA dans le cloud est indisponible pour l’instant ou a mis trop de temps à répondre. La réponse ci-dessus reste valable ; réessayez dans un instant.</string>
     <string name="nuvem_falha_nao_entendeu">L’IA dans le cloud n’a pas compris cette question non plus. Essayez de la reformuler en citant l’élément, le composé ou la grandeur.</string>
     <string name="nuvem_falha_mesma">L’IA dans le cloud n’a pas trouvé d’autre façon de comprendre cette question. La réponse ci-dessus reste valable.</string>
     <string name="nuvem_falha_invalida">L’IA dans le cloud a renvoyé une réponse dans un format inattendu ; elle a été écartée. Réessayez dans un instant.</string>
     <string name="nuvem_voce_quis_dizer">Vouliez-vous dire :</string>
     <string name="ui_config_nuvem_titulo">IA dans le cloud automatique</string>
     <string name="ui_config_nuvem_descricao">Désactivée par défaut. Activée, les questions que l’application ne comprend pas sont envoyées (le texte seulement) à l’IA dans le cloud pour interprétation ; la réponse reste construite sur l’appareil avec les données du paquet. Désactivée, vous pouvez toujours toucher « Demander à l’IA dans le cloud » sous chaque réponse.</string>
+    <!-- Relatar problema nesta resposta (issue pública pré-preenchida no GitHub) -->
+    <string name="ui_relatar_resposta">Signaler un problème avec cette réponse</string>
+    <string name="ui_relatar_resposta_desc">Signaler un problème avec cette réponse. Ouvre dans le navigateur un ticket public GitHub prérempli ; rien n’est envoyé tant que vous ne confirmez pas sur cette page.</string>
+    <string name="relato_titulo">Chimie : réponse à « %1$s »</string>
+    <string name="relato_corpo">Qu’est-ce qui était faux ou manquant dans la réponse ? (N’incluez pas de données personnelles.)\n\nQuestion : %1$s\nIntention : %2$s\nOrigine de la réponse : %3$s\nVersion de l’application (Android) : %4$s\nVersion des données : %5$s</string>
 </resources>

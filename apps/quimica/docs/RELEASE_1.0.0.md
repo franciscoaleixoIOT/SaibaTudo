@@ -27,6 +27,12 @@ Os textos estão em cinco idiomas (pt-BR, en, es, de, fr). Detalhes técnicos em
    adaptativo vetorial e tem versão monocromática para o ícone temático do Android 13+. Ele substitui o Erlenmeyer provisório.
 6. **Privacidade.** A página de Privacidade e o aviso do Início passaram a dizer "Nada sai do seu aparelho, a menos que você peça à IA na nuvem".
    Eles explicam o que é enviado, o identificador aleatório e que o servidor não registra a pergunta em log (só um cache temporário em memória).
+7. **"Relatar problema nesta resposta"** no rodapé de cada resposta (política de IA da Play; igual ao site, `docs/PADRAO_ASSISTENTE.md` §3).
+   O toque abre no navegador uma issue **pública** no GitHub já preenchida (`SOURCE_URL/issues/new`, etiquetas `quimica,resposta`): título com a
+   pergunta cortada em 80 caracteres e corpo com a pergunta, a intenção, a origem (local ou nuvem), a versão do app e a do pacote de dados.
+   Nada é enviado pelo app; a pessoa confirma no GitHub. Resposta a pedido perigoso recusado não tem o relato (`domain/Relato.kt`).
+
+8. **Fonte da classificação GHS localizada.** A linha "Classificação: Regulation (EC) No 1272/2008…" (texto cru do PubChem, em inglês e repetida) deixou de aparecer: a fonte vem da entrada já traduzida da lista de fontes do composto (`domain/GhsFonte.kt`, mesma regra do site).
 
 ## Como foi testado (14/10/2026)
 - `./gradlew.bat :app:testDebugUnitTest :app:lintRelease :app:bundleRelease :app:assembleRelease`:
@@ -39,6 +45,12 @@ Os textos estão em cinco idiomas (pt-BR, en, es, de, fr). Detalhes técnicos em
   (`WorkDatabase_Impl`, `MainActivity`, `SaibaTudoApp`, `DataUpdateWorker`, `BundleManifest`). O pacote embutido está completo, com a mesma
   versão de `data/quimica/` e sem o fixture. Os testes do verificador (`python -m unittest tools.test_verificar_release`) passam: 16, incluindo
   os 2 que leem o APK real.
+- **Relato por resposta (14/10, depois do build acima):** `RelatoTest` (6 testes: URL com pergunta, intenção, origem e versões; espaço como `%20`;
+  origem nuvem e dados sem versão; título cortado em 80 caracteres com o corpo completo; `RECUSA_PERIGO` sem relato; título nos 5 idiomas;
+  `BuildConfig.SOURCE_URL` por padrão). `:app:testDebugUnitTest :app:lintRelease`: **158 testes, 0 falhas**; lint de release 0 erros, 19 avisos
+  (os mesmos). Ainda não visto no emulador nem refeito o AAB/APK assinado.
+- **CI Android** (`.github/workflows/quimica-android-ci.yml`, sem segredos): testes, lint de release, `assembleRelease` sem assinatura e
+  `tools/verificar_release.py` no `app-release-unsigned.apk` (simulado localmente sem `keystore.properties`: OK).
 - **Assinatura:** `jarsigner -verify` no AAB deu "jar verified." e `apksigner verify` no APK confirmou o esquema v2 com 1 signatário (chave de
   upload).
 - **Emulador Pixel 9 (Android 15, API 35), APK de release assinado e em inglês (o idioma do emulador):**
@@ -75,7 +87,7 @@ vêm sempre dos dados do app. Em português, inglês, espanhol, alemão e franc�
 1. **Mantenedor:** enviar o AAB ao teste fechado, preencher a ficha e o Data Safety (acima) e testar num aparelho real.
 2. **Modelo de NLU na nuvem:** perguntas como "at what temperature does iron turn into a liquid" voltam `DESCONHECIDA` na v3.3. Elas entram
    no próximo ciclo de dados e treino (`docs/MODELO.md`).
-3. **Paridade com Eleições ainda pendente** (`PENDENCIAS.md` §8.4): limpar o campo ao enviar, setas ▲▼ do histórico, "Relatar problema",
+3. **Paridade com Eleições ainda pendente** (`PENDENCIAS.md` §8.4): limpar o campo ao enviar, setas ▲▼ do histórico,
    captura opt-in "Ajudar a melhorar o app" e o botão de explicação gerada (`/api/ask`). Os desvios conhecidos do NLU local (§6) também
    continuam.
 4. **Site:** a web da Química ainda diz que a nuvem "não está disponível" (outro agente cuida de `web/`). Para manter a paridade, o site deve

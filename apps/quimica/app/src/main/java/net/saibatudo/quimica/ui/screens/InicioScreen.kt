@@ -112,7 +112,10 @@ fun InicioScreen(
             item(key = "resposta-" + r.pergunta) {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(t(R.string.ui_inicio_voce_perguntou, r.pergunta), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    RespostaView(r.resposta, onAcao = onAcao, onSugestao = { s -> texto = s; onPerguntar(s) }, onAbrirUrl = onAbrirUrl)
+                    RespostaView(
+                        r.resposta, onAcao = onAcao, onSugestao = { s -> texto = s; onPerguntar(s) }, onAbrirUrl = onAbrirUrl,
+                        pergunta = r.pergunta, versaoDados = (estado.dados as? EstadoDados.Pronto)?.pacote?.manifest?.version
+                    )
                     if (estado.nuvemDisponivel) {
                         PainelNuvem(r.resposta, estado.nuvem, onPerguntar = onPerguntarNuvem, onSugestao = { s -> texto = s; onPerguntar(s) })
                     }

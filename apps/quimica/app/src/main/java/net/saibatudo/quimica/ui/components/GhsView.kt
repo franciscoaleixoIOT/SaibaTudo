@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import net.saibatudo.quimica.R
 import net.saibatudo.quimica.data.model.Ghs
+import net.saibatudo.quimica.domain.GhsFonte
 import net.saibatudo.quimica.domain.GhsPictogramas
 import net.saibatudo.quimica.domain.GhsTextos
 import net.saibatudo.quimica.domain.Idiomas
@@ -98,6 +99,6 @@ fun GhsView(ghs: Ghs, textosH: Map<String, String>, modifier: Modifier = Modifie
                 }
             }
         }
-        ghs.fonte?.let { Text(t(R.string.ghs_classificacao, it), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+        GhsFonte.linhaAvulsa(ghs.fonte)?.let { Text(t(R.string.ghs_classificacao, it), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
     }
 }
