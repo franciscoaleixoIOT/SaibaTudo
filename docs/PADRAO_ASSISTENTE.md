@@ -57,6 +57,8 @@ houver regra de interpretação. Checklist por app em `apps/<app>/docs/PENDENCIA
 - Eleições web: tudo do §1–§5, exceto copiar (feito em 12/10) e foco no título da resposta.
 - Química web: §1 completo (12/10), §3 completo no mínimo (origem+data, copiar, fechar, relatar por issue), contexto parcial
   (entidade e atributo), sem nuvem/captura (backend pronto, desligado), sem nível na web, instalar só nas configurações.
+  **14/10/2026:** nuvem opt-in ligada na web da Química (botão em toda resposta, consentimento por pergunta ou chave automática, falha com
+  motivo, sugestões "quis dizer"); captura "Ajudar a melhorar" continua pendente.
 - Android: Eleições completo; Química com histórico (sem ▲▼), sem limpar ao enviar, sem relatar, com copiar e nível.
 
 ## 8. Atualização de 14/10/2026

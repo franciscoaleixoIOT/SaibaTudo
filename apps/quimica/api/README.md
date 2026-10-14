@@ -7,7 +7,7 @@ pergunta** (só status, latência, cache, `client` e o motivo do erro).
 | Rota | Arquivo | O que faz | Estado padrão |
 | :-- | :-- | :-- | :-- |
 | `GET /quimica/api/health` | `health.js` | saúde, versão do modelo, `nlu`/`ask`/`shared` ligados ou não, idade do pacote de dados | sempre ligada |
-| `POST /quimica/api/nlu` | `nlu.js` + `_lib/nlu-handler.js` | interpreta a pergunta na nuvem (intenção + entidades ancoradas na pergunta) | **desligada**: `503 disabled` |
+| `POST /quimica/api/nlu` | `nlu.js` + `_lib/nlu-handler.js` | interpreta a pergunta na nuvem (intenção + entidades ancoradas na pergunta); chamada pelo site desde 14/10/2026 (`web/.../js/nuvem.js`, opt-in) | ligada desde 14/10 (sem `MODAL_ENDPOINT` → `503 disabled`) |
 | `POST /quimica/api/ask` | `ask.js` + `_lib/ask-handler.js` | explicação gerada, ancorada nos trechos licenciados, com verificador de fidelidade | **desligada**: `503 disabled` |
 
 ## Rewrite necessário (aplicar no `vercel.json`, fora da área de quem escreveu a API)

@@ -29,9 +29,9 @@
   </header>
   <main id="conteudo" class="tela-corpo" tabindex="-1">
     <h1>Politique de confidentialité — SaibaTudo Química</h1>
-    <p><strong>Version 1.0 — 10 octobre 2026</strong> · S’applique au site/PWA à l’adresse <code>saibatudo.net/quimica</code> (et à l’application Android correspondante, une fois publiée). Ce texte est une traduction ; la <a href="/quimica/privacidade" hreflang="pt-BR" lang="pt-BR">page en portugais</a> est le texte source de la politique.</p>
+    <p><strong>Version 1.1 — 14 octobre 2026</strong> (IA dans le cloud facultative) · S’applique au site/PWA à l’adresse <code>saibatudo.net/quimica</code> (et à l’application Android correspondante, une fois publiée). Ce texte est une traduction ; la <a href="/quimica/privacidade" hreflang="pt-BR" lang="pt-BR">page en portugais</a> est le texte source de la politique.</p>
 
-    <p class="aviso-caixa"><strong>En une phrase :</strong>&nbsp;SaibaTudo Química n’a ni inscription, ni publicité, ni traceurs, ni analyse d’usage ; dans cette version, tout ce qui est nécessaire pour consulter les éléments et les composés et pour faire des calculs reste sur votre appareil, et <strong>rien de ce que vous saisissez n’est envoyé à nos serveurs</strong>. L’IA dans le cloud n’est pas encore disponible.</p>
+    <p class="aviso-caixa"><strong>En une phrase :</strong>&nbsp;SaibaTudo Química n’a ni inscription, ni publicité, ni traceurs, ni analyse d’usage ; dans cette version, tout ce qui est nécessaire pour consulter les éléments et les composés et pour faire des calculs reste sur votre appareil, et <strong>rien de ce que vous saisissez n’est envoyé à nos serveurs</strong>, sauf si vous touchez « Demander à l’IA dans le cloud » (ou activez le mode automatique) : seul le texte de cette question est alors envoyé, pour être interprété.</p>
 
     <h2>1. Qui sommes-nous</h2>
     <p>SaibaTudo est un projet indépendant, open source (licence MIT) et à but non lucratif. Responsable : <strong>Francisco Aleixo</strong> (développeur) — contact : <a href="mailto:saibatudo@saibatudo.net">saibatudo@saibatudo.net</a>.</p>
@@ -48,7 +48,7 @@
       <tbody>
         <tr><td><strong>Charger l’application et les données</strong></td><td><code>saibatudo.net</code> (hébergement Vercel)</td><td>une requête HTTPS ordinaire (le fournisseur enregistre l’adresse IP et le navigateur dans les journaux du serveur)</td><td>à l’ouverture de l’application et, en arrière-plan, pour vérifier s’il y a de nouvelles données (le jeu de données est mis à jour chaque semaine et signé numériquement)</td></tr>
         <tr><td><strong>Liens vers des sources externes</strong></td><td>PubChem, ICSC/OIT, ChEBI, Wikipédia, Wikidata et autres sites cités</td><td>une requête ordinaire de votre navigateur (le site de destination voit votre adresse IP) ; aucune donnée de notre part</td><td>uniquement lorsque vous touchez un lien externe</td></tr>
-        <tr><td><strong>IA dans le cloud</strong></td><td>—</td><td>rien : <strong>pas encore disponible</strong></td><td>Si elle est lancée, elle sera facultative, désactivée par défaut, soumise à votre consentement, et cette politique sera mise à jour au préalable</td></tr>
+        <tr><td><strong>IA dans le cloud</strong> (facultative, désactivée par défaut ; depuis le 14/10/2026)</td><td><code>saibatudo.net/quimica/api/nlu</code> (Vercel) → <strong>Modal</strong> (serveur du modèle, États-Unis)</td><td>le texte de la question (jusqu’à 300 caractères) et un code aléatoire de cette installation (UUID), seulement lorsque vous touchez « Demander à l’IA dans le cloud » ou activez « IA dans le cloud automatique » dans les Paramètres</td><td>Interpréter la question (intention et entités) ; la réponse reste construite sur votre appareil, à partir des données. Le texte de la question n’est pas journalisé ; nous ne conservons que des mesures techniques (durée, erreur). Le code d’installation sert à la limite d’usage et est supprimé avec « Supprimer les données de cet appareil »</td></tr>
       </tbody>
     </table>
     <p>Les bibliothèques (KaTeX et SmilesDrawer), les polices et les pictogrammes sont servis par <code>saibatudo.net</code> lui-même : il n’y a ni CDN ni ressource tierce dans les pages.</p>
@@ -60,7 +60,7 @@
     <p>Répondre à votre demande de consultation (art. 7, V) et assurer la sécurité du service et prévenir les abus (art. 7, IX). Comme nos serveurs ne traitent aucune donnée personnelle en dehors des journaux techniques du fournisseur, il n’y a aucun consentement à recueillir dans cette version.</p>
 
     <h2>7. Partage et sous-traitants</h2>
-    <p>Sous-traitants agissant selon nos instructions : <strong>Vercel</strong> (hébergement), <strong>GitHub</strong> (code source et publication automatique) et, à l’avenir, <strong>Google Play</strong> (distribution de l’application Android). Ces services peuvent traiter des données en dehors du Brésil (par exemple, aux États-Unis) et ont leurs propres politiques.</p>
+    <p>Sous-traitants agissant selon nos instructions : <strong>Vercel</strong> (hébergement), <strong>GitHub</strong> (code source et publication automatique), <strong>Modal</strong> (exécution du modèle de l’IA dans le cloud, seulement pour les questions que vous envoyez) et, à l’avenir, <strong>Google Play</strong> (distribution de l’application Android). Ces services peuvent traiter des données en dehors du Brésil (par exemple, aux États-Unis) et ont leurs propres politiques.</p>
 
     <h2>8. Conservation</h2>
     <p>Nous ne tenons ni registre d’utilisateurs ni base de données. Les journaux techniques du fournisseur d’hébergement (adresse IP, date, URL) suivent la durée de conservation propre à ce fournisseur.</p>

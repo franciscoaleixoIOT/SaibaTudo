@@ -118,6 +118,11 @@ textarea.auto-altura { resize: none; overflow-y: hidden; line-height: 1.4; overf
 .resp-corpo { flex: 1; min-width: 0; }
 .resp-origem { margin-top: 2px; }
 .resp-rodape { margin-top: 10px; }
+.resp-nuvem { margin-top: 12px; display: grid; gap: 6px; justify-items: start; }
+.resp-nuvem .mini { margin: 0; }
+.chave { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; cursor: pointer; }
+.chave input { margin-top: 3px; flex: none; }
+.chave .ajuda-campo { display: block; margin-top: 2px; }
 .mini-btn.envia:disabled { color: var(--outline); cursor: default; }
 .spinner.mini { width: 18px; height: 18px; margin: 0 6px; }
 .resp-sugestoes { margin-top: 12px; }

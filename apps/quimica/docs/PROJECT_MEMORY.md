@@ -154,7 +154,7 @@ aprendida como MASSA_MOLAR) e a **v3.3 passou**: golden 723 com gramática 99,0 
 `promover.py` → `MODAL_ENDPOINT`, `MODAL_KEY`, `MODAL_SECRET` (sensíveis) e `MODEL_VERSION` na Vercel (produção) → `vercel deploy --prod` **do
 diretório local** (o `quimica-data-refresh.yml` segue sem terminar no GitHub, §9.b/9.c de `PENDENCIAS.md`). Ao vivo: `/quimica/api/health` →
 `"model":"nlu-v3.3-20261013","nlu":"on"`; cinco perguntas em pt/de/es pelo `/quimica/api/nlu` certas (2,4–3,2 s quente; 9,8 s fria).
-**Os clientes (site e Android) ainda não chamam a API** — o botão de nuvem opt-in é o próximo passo de produto (§8.4 das pendências).
+**O site chama a API desde 14/10/2026 à tarde** (6.l); o Android ganhou a mesma nuvem opt-in na versão 1.0.0 preparada na mesma data (6.m).
 Eleições reprovou no mesmo gate por um caso de cargo ("deputado mais votado") e só entra depois de 27/10.
 
 ## 6.i Serviço do NLU: gramática por intenção, resolução do composto e normalização (14/10/2026, madrugada)
@@ -184,6 +184,18 @@ app `SaibaTudoIA-NLU-Quimica` implantado (`nlu_app.py`, `ask_app.py`, `convert_l
 API ok), `MODAL_ENDPOINT` trocado na Vercel e redeploy pela CLI; teste ao vivo certo; app e Volume antigos apagados. Endpoint novo: primeira chamada
 22,2 s (cria o snapshot), quente 3,6–4,3 s direto e 3,0–4,9 s pela Vercel. Eleições (`saibatudo-nlu`, `saibatudo-nlu-models`, `saibatudo-qwen7b-awq`, Space
 `saibatudo-qwen7b`) e os repositórios públicos do HF só depois de 27/10.
+
+## 6.l IA na nuvem opt-in no site (14/10/2026, tarde)
+Pedido do mantenedor ao ver o selo "A IA na nuvem ainda não está disponível". `js/nuvem.js` (porte de `cloud.js` do Eleições): `NuvemNlu` (POST
+`/quimica/api/nlu`, corpo `{q, v:1, client:'web', iid}`, 14 s automático / 25 s explícito), `validarNluNuvem` (intenção do contrato; elemento = símbolo
+do pacote; composto = CID da `resolucao` da API conferido no pacote ou resolvido pelo dicionário local; propriedade = id de `regras.propriedades`;
+quantidades e `unidadeDestino` por `lerUnidade`; equação por `extrairEquacao`; entidade obrigatória por intenção como em `ENTIDADES_POR_INTENCAO`),
+`ofereceNuvem`, `pedirANuvem`, `chaveFalhaNuvem`. `Engine` recebe `nuvem` e ganhou `perguntarANuvem` (segurança antes; interpretação igual à local =
+"nada novo"; resposta montada dos dados com `origem: 'NUVEM'` e `modelo`) e o modo automático em `responder`. UI: bloco `.resp-nuvem` em `respostaEl`
+(botão + nota), estado "Consultando…", aviso com motivo e chips "quis dizer"; Configurações: chave `nuvemAutomatica` (prefs) no lugar do aviso
+"indisponível"; `installId()`/`gerarUuid()` em prefs. Selo da home e "Sobre os dados" reescritos nos 5 idiomas; `ui.nuvem.*` novo; privacidade 1.1
+(linha da IA na nuvem com Vercel → Modal, Modal como operador) nas 5 páginas; `pipeline/build.py` com o endpoint certo (`/quimica/api/nlu`).
+Testes: `test/nuvem.test.mjs` (8) + `modules.test` aceita rotas `/quimica/api/`; web 154. Deploy pela CLI; teste ao vivo no site.
 
 ## 7. Contas e segredos
 Vercel `saibatudo-quimica` (time `franciscoaleixo-9696`); GitHub `franciscoaleixoIOT`; Hugging Face `franciscoaleixo` (PRO, 40 min/dia de ZeroGPU); Modal `franciscoaleixo/main` (US$ 30/mês grátis; já usados pelo app de eleições, ~US$ 5/mês).

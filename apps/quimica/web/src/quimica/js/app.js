@@ -6,7 +6,8 @@ import { Engine } from './engine.js';
 import { h, icon, anunciar } from './dom.js';
 import { aplicarIdiomaAoDocumento, caminhoPrivacidade, definirIdioma, detectarIdioma, idiomaAtual, t } from './i18n/index.js';
 import { aoMudarInstalacao, ehIos, iniciarInstalacao, instalar, jaInstalado, podeInstalarAgora } from './install.js';
-import { aplicarAparencia, carregar, salvarIdioma } from './prefs.js';
+import { NuvemNlu } from './nuvem.js';
+import { aplicarAparencia, carregar, installId, salvarIdioma } from './prefs.js';
 import { roteador, toast } from './ui/componentes.js';
 import { viewCalculadoras } from './ui/calculadoras.js';
 import { viewComposto, viewCompostos } from './ui/compostos.js';
@@ -186,7 +187,8 @@ export async function iniciarApp() {
   try {
     S.store = new DataStore();
     await S.store.iniciar();
-    S.engine = new Engine({ store: S.store });
+    // IA na nuvem (opt-in): o cliente só envia com consentimento — toque no botão da resposta ou chave "automática" em Configurações
+    S.engine = new Engine({ store: S.store, nuvem: new NuvemNlu({ installId, habilitada: () => carregar().nuvemAutomatica === true }) });
   } catch (e) {
     telaErro(t('ui.app.erroDados.complemento', { msg: e instanceof Error ? e.message : String(e) }));
     return;

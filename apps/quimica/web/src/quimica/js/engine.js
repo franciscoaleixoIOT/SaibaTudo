@@ -1,18 +1,26 @@
 // Motor LOCAL e DETERMINÍSTICO: segurança por regras → NLU por regras + dicionário dos dados → resposta montada dos dados. Funciona offline.
-// (A IA na nuvem é da fase 5 e ainda não está disponível: nada sai do aparelho.)
+// IA na nuvem (desde 14/10/2026, opt-in): só INTERPRETA a pergunta quando a pessoa pede (botão) ou liga o modo automático; a resposta continua
+// sendo montada aqui, dos dados do pacote (js/nuvem.js). Pedido perigoso nunca é enviado: a segurança roda antes.
 import { AnswerBuilder } from './answers.js';
 import { Dicionario } from './dicionario.js';
 import { idiomaAtual } from './i18n/index.js';
 import { parse } from './nlu.js';
 import { avaliarSeguranca } from './seguranca.js';
 
+const SEM_CONTEXTO = new Set(['RECUSA_PERIGO', 'AJUDA', 'SOBRE_DADOS', 'FONTES']);
+
 export class Engine {
-  /** @param {{store: import('./data.js').DataStore}} o */
-  constructor({ store }) {
+  /** @param {{store: import('./data.js').DataStore, nuvem?: import('./nuvem.js').NuvemNlu|null}} o */
+  constructor({ store, nuvem = null }) {
     this.store = store;
+    this.nuvem = nuvem;
     this._dic = null;
     this._rev = -1;
     this._ultimoContexto = null;
+    /** Motivo do último pedido à nuvem sem resposta nova: 'nao_entendeu' | 'indisponivel' | null. */
+    this.ultimoMotivoNuvem = null;
+    /** Compostos sugeridos pela API quando o texto citado não bate com o pacote ("quis dizer…?"): [{cid, nome}]. */
+    this.ultimasSugestoesNuvem = [];
   }
 
   /** Dicionário derivado dos dados e do idioma ativo; reconstruído quando o pacote ou o idioma muda. */
@@ -38,10 +46,46 @@ export class Engine {
     const p = seg.recusar
       ? { ...parse('', this.dicionario()), intent: 'RECUSA_PERIGO', textoOriginal: String(pergunta ?? '').slice(0, 300), seguranca: seg }
       : parse(pergunta, this.dicionario(), ctx);
+    const r = await this._montar(p);
+    // 2) modo automático (consentimento contínuo em Configurações): pergunta não entendida vai à nuvem sem toque
+    if (!r.resolvida && !seg.recusar && this.nuvem?.habilitada?.()) {
+      const nova = await this.perguntarANuvem(pergunta, r, { explicito: false });
+      if (nova?.resolvida) return nova;
+    }
+    return r;
+  }
+
+  async _montar(p) {
     const builder = new AnswerBuilder({ store: this.store, dic: this.dicionario() });
     const r = await builder.construir(p);
-    if (r.resolvida && !['RECUSA_PERIGO', 'AJUDA', 'SOBRE_DADOS', 'FONTES'].includes(r.intent) && (p.elemento || p.composto || p.propriedade)) this._ultimoContexto = p;
+    if (r.resolvida && !SEM_CONTEXTO.has(r.intent) && (p.elemento || p.composto || p.propriedade)) this._ultimoContexto = p;
     return { ...r, pergunta: p.textoOriginal, parsed: p };
+  }
+
+  /**
+   * Pede à IA na nuvem uma interpretação da pergunta e monta a resposta DOS DADOS LOCAIS com ela (origem 'NUVEM'). Nunca lança.
+   * `explicito` = toque no botão (consentimento desta pergunta; espera até 25 s); false = modo automático (só com a chave ligada).
+   * Devolve null quando não houve interpretação útil; o motivo fica em `ultimoMotivoNuvem` e as sugestões em `ultimasSugestoesNuvem`.
+   */
+  async perguntarANuvem(pergunta, atual = null, { explicito = true } = {}) {
+    this.ultimoMotivoNuvem = null;
+    this.ultimasSugestoesNuvem = [];
+    if (!this.nuvem) { this.ultimoMotivoNuvem = 'indisponivel'; return null; }
+    const q = String(pergunta ?? '').trim();
+    if (!q || avaliarSeguranca(q).recusar) { this.ultimoMotivoNuvem = 'nao_entendeu'; return null; }
+    const dic = this.dicionario();
+    let p = null;
+    try {
+      p = explicito ? await this.nuvem.interpretarAgora(q, dic) : await this.nuvem.interpretar(q, dic);
+    } catch { p = null; }
+    this.ultimasSugestoesNuvem = this.nuvem.ultimasSugestoes ?? [];
+    if (!p) { this.ultimoMotivoNuvem = this.nuvem.ultimoResultado === 'ok' ? 'nao_entendeu' : (this.nuvem.ultimoResultado ?? 'indisponivel'); return null; }
+    // interpretação igual à local: nada de novo para mostrar
+    if (atual?.parsed && mesmaInterpretacao(atual.parsed, p)) { this.ultimoMotivoNuvem = 'nao_entendeu'; return null; }
+    await this.resolverCas(q);
+    const r = await this._montar(p);
+    if (!r.resolvida) { this.ultimoMotivoNuvem = 'nao_entendeu'; return null; }
+    return { ...r, origem: 'NUVEM', modelo: this.nuvem.ultimoModelo ?? null };
   }
 
   /** Número CAS citado na pergunta e ausente do dicionário (o índice do pipeline não tem CAS): procura nos lotes e ensina o dicionário. */
@@ -54,4 +98,16 @@ export class Engine {
   }
 
   limparContexto() { this._ultimoContexto = null; }
+}
+
+/**
+ * Duas interpretações equivalentes (mesma intenção e mesmas entidades que a resposta usa): a nuvem não trouxe nada novo.
+ * A propriedade só conta nas intenções que respondem por ela (o NLU local anota "massa molar" como propriedade também em MASSA_MOLAR).
+ */
+export function mesmaInterpretacao(a, b) {
+  if (!a || !b || a.intent !== b.intent) return false;
+  const usaPropriedade = a.intent === 'PROPRIEDADE' || a.intent === 'TABELA_PERIODICA' || a.intent === 'COMPARAR';
+  const chave = (p) => JSON.stringify([p.elemento ?? null, p.composto ?? null, usaPropriedade ? p.propriedade ?? null : null, p.equacao ?? null, p.unidadeDestino ?? null,
+    (p.quantidades ?? []).map((q) => [q.valor, q.unidade ?? null])]);
+  return chave(a) === chave(b);
 }

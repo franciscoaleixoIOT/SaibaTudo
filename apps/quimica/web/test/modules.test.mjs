@@ -102,7 +102,7 @@ test('ícones usados existem; todas as rotas "/quimica/..." do código resolvem 
     for (const m of s.matchAll(/\bicone:\s*'([a-zA-Z]+)'/g)) assert.ok(ICONES.includes(m[1]), `${f}: ícone inexistente ${m[1]}`);
     for (const m of s.matchAll(/['"`](\/quimica\/[^'"`?#\s]*)/g)) {
       const p = m[1].replace(/\$\{[^}]*\}/g, '1').replace(/\/$/, ''); // "${...}" vira um valor qualquer que as rotas aceitam
-      if (p === '/quimica' || gerados(p) || /\/quimica\/(js|css|vendor|data|brand|fonts)\//.test(m[1]) || p.endsWith('/sw.js') || p === '/quimica/privacidade' || p === '/quimica/privacidade/1') continue; // privacidade/<idioma>: páginas estáticas (caminhoPrivacidade); cada arquivo é conferido em i18n.test.mjs
+      if (p === '/quimica' || gerados(p) || /\/quimica\/(js|css|vendor|data|brand|fonts|api)\//.test(m[1]) || p.endsWith('/sw.js') || p === '/quimica/privacidade' || p === '/quimica/privacidade/1') continue; // privacidade/<idioma>: páginas estáticas (caminhoPrivacidade); cada arquivo é conferido em i18n.test.mjs
       assert.ok(resolverRota(p) || existsSync(join(SRC, p)), `${f}: rota sem tela ${m[1]}`);
     }
   }

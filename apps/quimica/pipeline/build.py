@@ -183,7 +183,7 @@ def montar_manifest(out: Path, rels, fontes_usadas, contagens, hoje, agora, idio
                       "Wikipédia (português, inglês, espanhol, alemão e francês, cada trecho no idioma do artigo) e do Wikilivros em "
                       "português, CC BY-SA 4.0; ChEBI, CC BY 4.0; Faraday (Project Gutenberg #14474), domínio público; "
                       "frases H do Regulamento CLP (EUR-Lex), por idioma. Aplicativo independente.",
-        "cliente": {"pollIntervalMinutes": 10080, "baseUrl": BASE_URL, "nlu": {"endpoint": "https://saibatudo.net/api/quimica/nlu"},
+        "cliente": {"pollIntervalMinutes": 10080, "baseUrl": BASE_URL, "nlu": {"endpoint": "https://saibatudo.net/quimica/api/nlu"},
                     "ask": {"enabled": False}, "melhoria": {"enabled": False}},
     }
     dump_json(out / "manifest.json", manifest, indent=2)

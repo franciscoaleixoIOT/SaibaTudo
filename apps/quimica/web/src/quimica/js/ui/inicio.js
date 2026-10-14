@@ -1,7 +1,10 @@
 // Início: caixa de pergunta (motor local), resposta com fonte em cada bloco, sugestões e atalhos para as telas. Textos pelo catálogo do idioma.
+// IA na nuvem (opt-in, 14/10/2026): botão "Perguntar à IA na nuvem" em toda resposta que não veio da nuvem (padrão docs/PADRAO_ASSISTENTE.md §IA na
+// nuvem); o toque é o consentimento para enviar SÓ aquela pergunta; a resposta nova continua montada dos dados locais.
 import { dataDoPacote, sugestoesPadrao } from '../answers.js';
 import { h, icon, anunciar, trocar } from '../dom.js';
 import { t } from '../i18n/index.js';
+import { chaveFalhaNuvem, ofereceNuvem, pedirANuvem } from '../nuvem.js';
 import { carregar, registrarPergunta } from '../prefs.js';
 import { ajustarAltura, blocoEl, campoAutoAltura, cartaoEl, chip, linkExterno, linkRota, toast } from './componentes.js';
 
@@ -31,11 +34,20 @@ function acaoEl(a) {
   return linkRota(a.rota, a.rotulo, { class: 'btn btn-contorno peq' });
 }
 
-export function respostaEl(r, perguntar, { pergunta = null, dataDados = null, fechar = null } = {}) {
+/** Bloco da IA na nuvem numa resposta: botão + nota de consentimento; `pedirNuvem(r, slot)` é definido pela tela (null = sem botão). */
+function nuvemEl(r, pedirNuvem) {
+  if (!pedirNuvem || !ofereceNuvem(r, carregar().nuvemAutomatica === true)) return null;
+  const slot = h('div', { class: 'resp-nuvem' });
+  const botao = h('button', { type: 'button', class: 'btn btn-contorno peq', onClick: () => pedirNuvem(r, slot) }, icon('cloud', 16), t('ui.nuvem.botao'));
+  slot.replaceChildren(botao, h('p', { class: 'mini mudo' }, t(r.resolvida ? 'ui.nuvem.notaConferir' : 'ui.nuvem.nota')));
+  return slot;
+}
+
+export function respostaEl(r, perguntar, { pergunta = null, dataDados = null, fechar = null, pedirNuvem = null } = {}) {
   const classe = r.intent === 'RECUSA_PERIGO' ? 'recusa' : r.resolvida ? '' : 'nao-resolvida';
   const rotulo = r.intent === 'RECUSA_PERIGO' ? t('ui.resposta.rotuloRecusa') : r.resolvida ? t('ui.resposta.rotuloResolvida') : t('ui.resposta.rotuloNaoResolvida');
   const titulo = h('h2', { class: 'resp-titulo', tabindex: '-1', id: 'resp-titulo' }, r.titulo);
-  const origem = r.origem === 'NUVEM' ? t('ui.resposta.origemNuvem') : t('ui.resposta.origemAparelho');
+  const origem = r.origem === 'NUVEM' ? t('ui.resposta.origemNuvem', { modelo: r.modelo ?? 'SaibaTudo IA' }) : t('ui.resposta.origemAparelho');
   const el = h('section', { class: `resposta ${classe}`.trim(), 'aria-labelledby': 'resp-titulo' },
     h('div', { class: 'resp-cab' },
       h('span', { class: 'resp-ic' }, icon(r.intent === 'RECUSA_PERIGO' ? 'shield' : r.resolvida ? 'verified' : 'help', 22)),
@@ -44,6 +56,7 @@ export function respostaEl(r, perguntar, { pergunta = null, dataDados = null, fe
       fechar ? h('button', { type: 'button', class: 'btn-icone mini-btn', 'aria-label': t('ui.resposta.fechar'), onClick: fechar }, icon('x', 18)) : null),
     r.blocos.map(blocoEl),
     r.acoes?.length ? h('div', { class: 'resp-acoes' }, r.acoes.map(acaoEl)) : null,
+    nuvemEl(r, pedirNuvem),
     r.sugestoes?.length ? h('div', { class: 'resp-sugestoes' }, h('div', { class: 'rot' }, t('ui.resposta.tambem')),
       h('div', { class: 'chips' }, r.sugestoes.map((s) => chip({ rotulo: s, icone: false, classe: 'sug', onClick: () => perguntar(s) })))) : null,
     r.fontes?.length ? h('details', { class: 'resp-fontes' }, h('summary', null, t('ui.resposta.fontes', { n: r.fontes.length })),
@@ -138,8 +151,29 @@ export function viewInicio({ engine, query }) {
   }
 
   const dataDados = () => dataDoPacote(engine.store);
+  // toque em "Perguntar à IA na nuvem": consentimento desta pergunta; enquanto consulta, o botão vira um aviso; falha = aviso com o motivo (e sugestões)
+  async function pedirNuvem(r, slot) {
+    if (ocupado) return;
+    const pergunta = ultima?.pergunta ?? r.pergunta;
+    ocupado = true;
+    atualizarEstado();
+    slot.replaceChildren(h('div', { class: 'carregando', role: 'status' }, h('span', { class: 'spinner mini', 'aria-hidden': 'true' }), h('span', { class: 'mudo' }, t('ui.nuvem.consultando'))));
+    anunciar(t('ui.nuvem.consultando'));
+    try {
+      const res = await pedirANuvem({ engine, atual: r, pergunta });
+      if (res.ok) {
+        ultima = { pergunta, resposta: res.resposta };
+        mostrar(res.resposta, true);
+        return;
+      }
+      const aviso = h('p', { class: 'aviso-caixa discreto', role: 'status' }, icon('info', 16), t(`ui.nuvem.${chaveFalhaNuvem(r.resolvida, res.motivo)}`));
+      const sug = res.sugestoes?.length ? h('div', { class: 'resp-sugestoes' }, h('div', { class: 'rot' }, t('ui.nuvem.quisDizer')),
+        h('div', { class: 'chips' }, res.sugestoes.map((s) => chip({ rotulo: s.nome, icone: false, classe: 'sug', onClick: () => perguntar(s.nome) })))) : null;
+      slot.replaceChildren(aviso, sug);
+    } finally { ocupado = false; atualizarEstado(); }
+  }
   function mostrar(r, foco) {
-    regiao.replaceChildren(respostaEl(r, perguntar, { pergunta: ultima?.pergunta, dataDados: dataDados(), fechar: () => { ultima = null; engine.limparContexto?.(); regiao.replaceChildren(); campo.focus(); } }));
+    regiao.replaceChildren(respostaEl(r, perguntar, { pergunta: ultima?.pergunta, dataDados: dataDados(), pedirNuvem, fechar: () => { ultima = null; engine.limparContexto?.(); regiao.replaceChildren(); campo.focus(); } }));
     if (foco) {
       document.getElementById('resp-titulo')?.focus({ preventScroll: false });
       anunciar(r.resolvida ? t('ui.inicio.respostaAnuncio', { titulo: r.titulo }) : r.titulo);

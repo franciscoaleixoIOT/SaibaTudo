@@ -29,9 +29,9 @@
   </header>
   <main id="conteudo" class="tela-corpo" tabindex="-1">
     <h1>Datenschutzerklärung — SaibaTudo Química</h1>
-    <p><strong>Version 1.0 — 10. Oktober 2026</strong> · Gilt für die Website/PWA unter <code>saibatudo.net/quimica</code> (und für die entsprechende Android-App, sobald sie veröffentlicht ist). Dies ist eine Übersetzung; maßgeblicher Text dieser Erklärung ist die <a href="/quimica/privacidade" hreflang="pt-BR" lang="pt-BR">portugiesische Seite</a>.</p>
+    <p><strong>Version 1.1 — 14. Oktober 2026</strong> (optionale KI in der Cloud) · Gilt für die Website/PWA unter <code>saibatudo.net/quimica</code> (und für die entsprechende Android-App, sobald sie veröffentlicht ist). Dies ist eine Übersetzung; maßgeblicher Text dieser Erklärung ist die <a href="/quimica/privacidade" hreflang="pt-BR" lang="pt-BR">portugiesische Seite</a>.</p>
 
-    <p class="aviso-caixa"><strong>In einem Satz:</strong>&nbsp;SaibaTudo Química hat keine Registrierung, keine Werbung, keine Tracker und keine Nutzungsanalyse; in dieser Version bleibt alles, was zum Nachschlagen von Elementen und Verbindungen und für Berechnungen nötig ist, auf Ihrem Gerät, und <strong>nichts, was Sie eingeben, wird an unsere Server gesendet</strong>. KI in der Cloud ist noch nicht verfügbar.</p>
+    <p class="aviso-caixa"><strong>In einem Satz:</strong>&nbsp;SaibaTudo Química hat keine Registrierung, keine Werbung, keine Tracker und keine Nutzungsanalyse; in dieser Version bleibt alles, was zum Nachschlagen von Elementen und Verbindungen und für Berechnungen nötig ist, auf Ihrem Gerät, und <strong>nichts, was Sie eingeben, wird an unsere Server gesendet</strong>, es sei denn, Sie tippen auf „KI in der Cloud fragen“ (oder schalten den automatischen Modus ein): Dann wird nur der Text dieser Frage gesendet, um gedeutet zu werden.</p>
 
     <h2>1. Wer wir sind</h2>
     <p>SaibaTudo ist ein unabhängiges, gemeinnütziges Open-Source-Projekt (MIT-Lizenz). Verantwortlich: <strong>Francisco Aleixo</strong> (Entwickler) — Kontakt: <a href="mailto:saibatudo@saibatudo.net">saibatudo@saibatudo.net</a>.</p>
@@ -48,7 +48,7 @@
       <tbody>
         <tr><td><strong>App und Daten laden</strong></td><td><code>saibatudo.net</code> (Hosting bei Vercel)</td><td>eine gewöhnliche HTTPS-Anfrage (der Anbieter protokolliert IP-Adresse und Browser in Server-Logs)</td><td>beim Öffnen der App und im Hintergrund, um nach neuen Daten zu suchen (das Paket wird wöchentlich aktualisiert und ist digital signiert)</td></tr>
         <tr><td><strong>Links zu externen Quellen</strong></td><td>PubChem, ICSC/ILO, ChEBI, Wikipedia, Wikidata und andere zitierte Websites</td><td>eine gewöhnliche Anfrage Ihres Browsers (die Zielseite sieht Ihre IP-Adresse); keine Daten von uns</td><td>nur wenn Sie auf einen externen Link tippen</td></tr>
-        <tr><td><strong>KI in der Cloud</strong></td><td>—</td><td>nichts: <strong>noch nicht verfügbar</strong></td><td>Falls sie eingeführt wird, ist sie optional, standardmäßig ausgeschaltet und von Ihrer Einwilligung abhängig; diese Erklärung wird vorher aktualisiert</td></tr>
+        <tr><td><strong>KI in der Cloud</strong> (optional, standardmäßig aus; seit 14.10.2026)</td><td><code>saibatudo.net/quimica/api/nlu</code> (Vercel) → <strong>Modal</strong> (Modellserver, USA)</td><td>der Text der Frage (bis 300 Zeichen) und ein zufälliger Code dieser Installation (UUID), nur wenn Sie auf „KI in der Cloud fragen“ tippen oder „KI in der Cloud automatisch“ in den Einstellungen einschalten</td><td>Deutung der Frage (Absicht und Entitäten); die Antwort wird weiterhin auf Ihrem Gerät aus den Daten erstellt. Der Text der Frage wird nicht protokolliert; wir speichern nur technische Kennzahlen (Dauer, Fehler). Der Installationscode dient dem Nutzungslimit und wird mit „Daten auf diesem Gerät löschen“ gelöscht</td></tr>
       </tbody>
     </table>
     <p>Bibliotheken (KaTeX und SmilesDrawer), Schriften und Piktogramme werden von <code>saibatudo.net</code> selbst ausgeliefert: Es gibt kein CDN und keine Ressourcen von Drittanbietern auf den Seiten.</p>
@@ -60,7 +60,7 @@
     <p>Bearbeitung Ihrer Anfrage (Art. 7, V) sowie Sicherheit und Missbrauchsschutz des Dienstes (Art. 7, IX). Da unsere Server über die technischen Logs des Anbieters hinaus keine personenbezogenen Daten verarbeiten, ist in dieser Version keine Einwilligung einzuholen.</p>
 
     <h2>7. Weitergabe und Auftragsverarbeiter</h2>
-    <p>Auftragsverarbeiter, die nach unseren Weisungen handeln: <strong>Vercel</strong> (Hosting), <strong>GitHub</strong> (Quellcode und automatische Veröffentlichung) und künftig <strong>Google Play</strong> (Vertrieb der Android-App). Diese Dienste können Daten außerhalb Brasiliens verarbeiten (zum Beispiel in den USA) und haben eigene Datenschutzrichtlinien.</p>
+    <p>Auftragsverarbeiter, die nach unseren Weisungen handeln: <strong>Vercel</strong> (Hosting), <strong>GitHub</strong> (Quellcode und automatische Veröffentlichung), <strong>Modal</strong> (Ausführung des Modells der KI in der Cloud, nur für die Fragen, die Sie senden) und künftig <strong>Google Play</strong> (Vertrieb der Android-App). Diese Dienste können Daten außerhalb Brasiliens verarbeiten (zum Beispiel in den USA) und haben eigene Datenschutzrichtlinien.</p>
 
     <h2>8. Speicherdauer</h2>
     <p>Wir führen weder Nutzerkonten noch eine Nutzerdatenbank. Die technischen Logs des Hosting-Anbieters (IP-Adresse, Datum, URL) unterliegen der Speicherdauer des Anbieters.</p>

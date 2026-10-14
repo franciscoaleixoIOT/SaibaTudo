@@ -1,4 +1,4 @@
-// Configurações: idioma, aparência, instalação do app, IA na nuvem (ainda indisponível) e apagar os dados deste aparelho.
+// Configurações: idioma, aparência, instalação do app, IA na nuvem (opt-in: chave do modo automático) e apagar os dados deste aparelho.
 import { h, icon } from '../dom.js';
 import { IDIOMAS, NOMES_IDIOMAS, caminhoPrivacidade, idiomaAtual, t } from '../i18n/index.js';
 import { instalar, instrucoes, jaInstalado, podeInstalarAgora } from '../install.js';
@@ -52,6 +52,8 @@ export function viewConfig({ store, mudarIdioma }) {
     h('div', { class: 'grupo', id: 'instalar', tabindex: '-1' }, t('ui.config.instalar')), blocoInstalar,
     h('div', { class: 'grupo' }, t('ui.config.ia')),
     h('p', { class: 'aviso-caixa discreto' }, icon('info', 16), t('ui.config.iaAviso')),
+    h('label', { class: 'chave' }, h('input', { type: 'checkbox', id: 'nuvem-automatica', checked: prefs.nuvemAutomatica === true, onChange: (e) => mudar('nuvemAutomatica', e.target.checked === true) }),
+      h('span', null, h('strong', null, t('ui.config.nuvemAutomatica')), h('span', { class: 'ajuda-campo' }, t('ui.config.nuvemAutomaticaAjuda')))),
     h('div', { class: 'grupo' }, t('ui.config.dados')),
     kvEl([{ rotulo: t('ui.config.versaoPacote'), valor: String(store.versao) }, { rotulo: t('ui.config.assinatura'), valor: t(`ui.config.assinaturaValor.${store.sig.estado}`) }]),
     botaoAtualizacao(store),

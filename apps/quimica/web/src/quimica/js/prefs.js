@@ -1,4 +1,6 @@
-// Preferências (tema, tamanho do texto, idioma e histórico de perguntas): ficam só neste navegador (localStorage). Nada é enviado a servidores.
+// Preferências (tema, tamanho do texto, idioma, histórico de perguntas, IA na nuvem automática e o código aleatório da instalação): ficam só neste
+// navegador (localStorage). Nada daqui é enviado a servidores, exceto o código da instalação (iid), que acompanha as chamadas à IA na nuvem
+// que a pessoa pediu (limite de uso por instalação no proxy; não identifica ninguém e é apagado com "Apagar os dados deste aparelho").
 import { normalizarIdioma } from './i18n/idiomas.js';
 
 const CHAVE = 'stq:prefs';
@@ -10,7 +12,8 @@ export const FONTES = {
   GRANDE: { rotulo: 'Grande', fator: 1.15 }, MUITO_GRANDE: { rotulo: 'Muito grande', fator: 1.3 }
 };
 /** `idioma` null = ainda não escolhido (vale a detecção: ?lang=, navegador, pt-BR). */
-export const PADRAO = Object.freeze({ tema: 'SISTEMA', tamanhoFonte: 'NORMAL', idioma: null, historicoPerguntas: Object.freeze([]) });
+export const PADRAO = Object.freeze({ tema: 'SISTEMA', tamanhoFonte: 'NORMAL', idioma: null, historicoPerguntas: Object.freeze([]), nuvemAutomatica: false, iid: null });
+const RX_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-7][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 export const MAX_HISTORICO = 50;
 
 let memoria = null; // fallback quando o armazenamento está bloqueado (modo privado etc.)
@@ -37,7 +40,7 @@ export function sanear(b) {
   const o = b && typeof b === 'object' ? b : {};
   return {
     historicoPerguntas: sanearHistorico(o.historicoPerguntas), tema: o.tema in TEMAS ? o.tema : PADRAO.tema, tamanhoFonte: o.tamanhoFonte in FONTES ? o.tamanhoFonte : PADRAO.tamanhoFonte,
-    idioma: normalizarIdioma(o.idioma)
+    idioma: normalizarIdioma(o.idioma), nuvemAutomatica: o.nuvemAutomatica === true, iid: typeof o.iid === 'string' && RX_UUID.test(o.iid) ? o.iid.toLowerCase() : null
   };
 }
 
@@ -59,6 +62,24 @@ export function salvarIdioma(idioma) {
   const novo = { ...atual, idioma: normalizarIdioma(idioma) };
   salvar(novo);
   return novo;
+}
+
+/** UUID v4 aleatório desta instalação (criado na primeira chamada à IA na nuvem e guardado nas preferências). */
+export function installId() {
+  const atual = carregar();
+  if (atual.iid) return atual.iid;
+  const iid = gerarUuid();
+  salvar({ ...atual, iid });
+  return iid;
+}
+
+export function gerarUuid() {
+  if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
+  const b = new Uint8Array(16);
+  if (globalThis.crypto?.getRandomValues) globalThis.crypto.getRandomValues(b); else for (let i = 0; i < 16; i++) b[i] = Math.floor(Math.random() * 256);
+  b[6] = (b[6] & 0x0f) | 0x40; b[8] = (b[8] & 0x3f) | 0x80;
+  const h = [...b].map((x) => x.toString(16).padStart(2, '0')).join('');
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
 }
 
 export function apagar() {

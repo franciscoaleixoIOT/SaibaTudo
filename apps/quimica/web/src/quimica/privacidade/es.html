@@ -29,9 +29,9 @@
   </header>
   <main id="conteudo" class="tela-corpo" tabindex="-1">
     <h1>Política de Privacidad — SaibaTudo Química</h1>
-    <p><strong>Versión 1.0 — 10 de octubre de 2026</strong> · Se aplica al sitio web/PWA en <code>saibatudo.net/quimica</code> (y a la aplicación Android correspondiente, cuando se publique). Esta es una traducción; la <a href="/quimica/privacidade" hreflang="pt-BR" lang="pt-BR">página en portugués</a> es el texto fuente de la política.</p>
+    <p><strong>Versión 1.1 — 14 de octubre de 2026</strong> (IA en la nube opcional) · Se aplica al sitio web/PWA en <code>saibatudo.net/quimica</code> (y a la aplicación Android correspondiente, cuando se publique). Esta es una traducción; la <a href="/quimica/privacidade" hreflang="pt-BR" lang="pt-BR">página en portugués</a> es el texto fuente de la política.</p>
 
-    <p class="aviso-caixa"><strong>En una frase:</strong>&nbsp;SaibaTudo Química no tiene registro, anuncios, rastreadores ni análisis de uso; en esta versión todo lo necesario para consultar elementos y compuestos y hacer cálculos se queda en tu dispositivo, y <strong>nada de lo que escribes se envía a nuestros servidores</strong>. La IA en la nube aún no está disponible.</p>
+    <p class="aviso-caixa"><strong>En una frase:</strong>&nbsp;SaibaTudo Química no tiene registro, anuncios, rastreadores ni análisis de uso; en esta versión todo lo necesario para consultar elementos y compuestos y hacer cálculos se queda en tu dispositivo, y <strong>nada de lo que escribes se envía a nuestros servidores</strong>, salvo que toques “Preguntar a la IA en la nube” (o actives el modo automático): entonces solo se envía el texto de esa pregunta, para interpretarla.</p>
 
     <h2>1. Quiénes somos</h2>
     <p>SaibaTudo es un proyecto independiente, de código abierto (licencia MIT) y sin ánimo de lucro. Responsable: <strong>Francisco Aleixo</strong> (desarrollador) — contacto: <a href="mailto:saibatudo@saibatudo.net">saibatudo@saibatudo.net</a>.</p>
@@ -48,7 +48,7 @@
       <tbody>
         <tr><td><strong>Cargar la aplicación y los datos</strong></td><td><code>saibatudo.net</code> (alojamiento en Vercel)</td><td>una solicitud HTTPS normal (el proveedor registra la dirección IP y el navegador en los registros del servidor)</td><td>al abrir la aplicación y, en segundo plano, para comprobar si hay datos nuevos (el paquete se actualiza cada semana y está firmado digitalmente)</td></tr>
         <tr><td><strong>Enlaces a fuentes externas</strong></td><td>PubChem, ICSC/OIT, ChEBI, Wikipedia, Wikidata y otros sitios citados</td><td>una solicitud normal de tu navegador (el sitio de destino ve tu dirección IP); ningún dato nuestro</td><td>solo cuando tocas un enlace externo</td></tr>
-        <tr><td><strong>IA en la nube</strong></td><td>—</td><td>nada: <strong>aún no está disponible</strong></td><td>Si se lanza, será opcional, estará desactivada por defecto, dependerá de tu consentimiento y esta política se actualizará antes</td></tr>
+        <tr><td><strong>IA en la nube</strong> (opcional, desactivada por defecto; desde el 14/10/2026)</td><td><code>saibatudo.net/quimica/api/nlu</code> (Vercel) → <strong>Modal</strong> (servidor del modelo, EE. UU.)</td><td>el texto de la pregunta (hasta 300 caracteres) y un código aleatorio de esta instalación (UUID), solo cuando tocas “Preguntar a la IA en la nube” o activas “IA en la nube automática” en Configuración</td><td>Interpretar la pregunta (intención y entidades); la respuesta se sigue montando en tu dispositivo, a partir de los datos. El texto de la pregunta no se registra; solo guardamos métricas técnicas (tiempo, error). El código de la instalación sirve para el límite de uso y se borra con “Borrar los datos de este dispositivo”</td></tr>
       </tbody>
     </table>
     <p>Las bibliotecas (KaTeX y SmilesDrawer), las fuentes tipográficas y los pictogramas los sirve el propio <code>saibatudo.net</code>: no hay CDN ni recursos de terceros en las páginas.</p>
@@ -60,7 +60,7 @@
     <p>Atender tu solicitud de consulta (art. 7, V) y mantener la seguridad del servicio y evitar abusos (art. 7, IX). Como nuestros servidores no tratan datos personales más allá de los registros técnicos del proveedor, en esta versión no hay consentimiento que recabar.</p>
 
     <h2>7. Comunicación de datos y encargados del tratamiento</h2>
-    <p>Encargados que tratan datos siguiendo nuestras instrucciones: <strong>Vercel</strong> (alojamiento), <strong>GitHub</strong> (código fuente y publicación automática) y, en el futuro, <strong>Google Play</strong> (distribución de la aplicación Android). Estos servicios pueden tratar datos fuera de Brasil (por ejemplo, en EE. UU.) y tienen sus propias políticas.</p>
+    <p>Encargados que tratan datos siguiendo nuestras instrucciones: <strong>Vercel</strong> (alojamiento), <strong>GitHub</strong> (código fuente y publicación automática), <strong>Modal</strong> (ejecución del modelo de la IA en la nube, solo para las preguntas que envías) y, en el futuro, <strong>Google Play</strong> (distribución de la aplicación Android). Estos servicios pueden tratar datos fuera de Brasil (por ejemplo, en EE. UU.) y tienen sus propias políticas.</p>
 
     <h2>8. Conservación</h2>
     <p>No mantenemos registros de usuarios ni bases de datos. Los registros técnicos del proveedor de alojamiento (dirección IP, fecha, URL) siguen el plazo de conservación del propio proveedor.</p>
