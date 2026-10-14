@@ -143,11 +143,16 @@ modal deploy backend/modal/nlu_app.py
 A saída mostra duas URLs, no formato `https://<workspace>--saibatudo-nlu-nlu-infer.modal.run` (POST) e
 `https://<workspace>--saibatudo-nlu-health.modal.run` (GET). Ambas exigem token de proxy.
 
-Parâmetros relevantes (constantes no topo de `nlu_app.py`): `cpu=4`, `memory=3072` MiB, `scaledown_window=30`,
+Parâmetros relevantes (constantes no topo de `nlu_app.py`): `cpu=8`, `memory=3072` MiB, `scaledown_window=300` (5 min desde 14/10/2026; era 30 s),
 `max_containers=2`, `timeout=60`, 1 requisição por container (a instância do llama.cpp não é thread-safe; com
 `max_containers=2` há no máximo 2 inferências simultâneas, as demais esperam na fila do Modal).
-`USE_SNAPSHOT=False` (memory snapshot): ligue só depois de comparar o cold start com o `bench` — llama.cpp usa mmap e
-threads, e **não foi verificado** que o restore funcione.
+`USE_SNAPSHOT=True` (memory snapshot, ligado em 14/10/2026 depois de validado na química): o GGUF é lido para a RAM (`use_mmap=False`)
+para os pesos irem na imagem de memória; o primeiro contêiner após o deploy carrega e tira o snapshot, os seguintes restauram. Frio ao vivo
+medido em 14/10 (pela Vercel, `/api/nlu`): 19–21 s nas duas primeiras chamadas frias, que ainda **criaram** snapshot (o log mostra
+"Creating CPU memory snapshot" → "Restoring"; o Modal refaz o snapshot nos primeiros frios, por tipo de máquina) — execução de 1,5–2,9 s, o resto
+é fila/boot. Na química, o frio só com restauração ficou em ~9 s; **medir aqui de novo em alguns dias** (quente 1,7–2,7 s).
+`clean_question` normaliza a tipografia antes do modelo (aspas e traços curvos, espaços especiais, pontuação repetida — igual à química);
+gate de 14/10 sobre o GGUF v2.3 com a normalização: idêntico (JSON 100 %, intenção 93,9 % em 114 casos, entidades 100 %), em `eval/local/`.
 
 ### 6. Criar o Proxy Auth Token
 
@@ -224,7 +229,9 @@ núcleo físico / s**; memória **US$ 0,00000222 / GiB / s**; cobra-se o **maior
 > **US$ 0,00005906 / s ≈ US$ 0,2126 / hora de container** (com `cpu=8`: **US$ 0,0001115 / s ≈ US$ 0,40 / hora**; uma chamada
 > fria ≈ 20 s de boot + 10 s de inferência + 30 s de cauda ≈ **US$ 0,007**; quente ≈ US$ 0,001. `DAILY_BUDGET=100` limita o pior caso a ≈ US$ 21/mês)
 
-Modelo: custo por chamada = taxa × (t_inf + f × (t_boot + 30 s de cauda ociosa)), onde `f` = fração das chamadas que
+Com a janela de 5 min (14/10/2026) a cauda ociosa por rajada de uso custa ≈ US$ 0,03 (8 núcleos + 3 GiB a US$ 0,40/h); contêiner sempre
+ligado custaria ≈ US$ 290/mês — descartado pelo mantenedor.
+Modelo: custo por chamada = taxa × (t_inf + f × (t_boot + cauda ociosa)), onde `f` = fração das chamadas que
 **acordam um container** (depende da densidade do tráfego).
 
 **Premissas explícitas (estimativas, nada medido):** `t_boot` (boot + carga do GGUF + aquecimento) = **15 s**;

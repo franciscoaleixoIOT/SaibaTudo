@@ -25,6 +25,7 @@ A normalização para o contrato (api/_lib/normalize.js) é feita no proxy; este
 """
 import json
 import re
+import unicodedata
 
 # ---------------------------------------------------------------------------------------------------------
 # Limites
@@ -66,10 +67,24 @@ _CONTROLES = re.compile(
 )
 
 
+# Normalização tipográfica antes do modelo (14/10/2026; igual à da química, apps/quimica/backend/modal/nlu_core.py): aspas e traços
+# curvos, espaços especiais, multiplicação e pontuação repetida viram a forma que o treino viu. Não altera letras, maiúsculas nem acentos.
+_TIPOGRAFIA = str.maketrans({"’": "'", "‘": "'", "´": "'", "`": "'", "“": '"', "”": '"', "„": '"', "−": "-", "–": "-", "—": "-", "‐": "-",
+                             " ": " ", " ": " ", " ": " ", "　": " ", "×": "x"})
+_PONTUACAO_REPETIDA = re.compile(r"([?!.,;:])\1+")
+
+
+def normalize_question(q: str) -> str:
+    """Variantes tipográficas -> forma canônica (ver _TIPOGRAFIA). Idempotente; não altera letras, maiúsculas nem acentos."""
+    q = unicodedata.normalize("NFC", str(q)).translate(_TIPOGRAFIA)
+    return _PONTUACAO_REPETIDA.sub(r"\1", q)
+
+
 def clean_question(q: str) -> str:
-    """Remove controles/zero-width, colapsa espaços e neutraliza os delimitadores de token especial do ChatML
-    (a pergunta não pode fabricar turnos de conversa nem tokens especiais no prompt)."""
+    """Remove controles/zero-width, normaliza a tipografia (normalize_question), colapsa espaços e neutraliza os delimitadores de
+    token especial do ChatML (a pergunta não pode fabricar turnos de conversa nem tokens especiais no prompt)."""
     q = _CONTROLES.sub(" ", str(q))
+    q = normalize_question(q)
     q = q.replace("<|", "< |").replace("|>", "| >")
     return re.sub(r"\s+", " ", q).strip()
 

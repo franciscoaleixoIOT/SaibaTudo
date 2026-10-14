@@ -50,14 +50,16 @@ LLAMA_CPP_PYTHON_BUILD = (
 CPU_CORES = 8.0            # núcleos FÍSICOS (o Modal cobra pelo maior entre reserva e uso). Medido no gate (8 threads,
                            # Q4_K_M, formato legado): ~10 s/pergunta; com 4 núcleos passaria do timeout de 14 s dos apps.
 MEMORY_MIB = 3072          # GGUF Q4_K_M ~1,1 GB + contexto + Python
-SCALEDOWN_SECONDS = 30     # container ocioso desliga em 30 s (default do Modal é 60)
+SCALEDOWN_SECONDS = 300    # container ocioso desliga em 5 min (14/10/2026; era 30 s): perguntas seguidas não pagam o frio a cada uma.
+                           # Custo da janela: 8 núcleos + 3 GiB ≈ US$ 0,40/h → ~US$ 0,03 por rajada de uso (decisão do mantenedor em 14/10).
 MAX_CONTAINERS = 2         # teto de concorrência/custo: com 1 req por container, no máx. 2 inferências simultâneas
 REQUEST_TIMEOUT_S = 60
 N_THREADS = int(os.environ.get("NLU_THREADS", "8"))
 
-# Memory snapshot (restaura o modelo já carregado em vez de relê-lo): DESLIGADO até ser validado com o `bench`
-# (llama.cpp usa mmap e threads; compare o cold start com e sem). Para ligar, mude para True e redeploye.
-USE_SNAPSHOT = False
+# Memory snapshot (restaura o modelo já carregado em vez de relê-lo). Ligado em 14/10/2026 (validado antes na química: frio ao vivo
+# de 12–19 s para ~9 s). Com snapshot o GGUF é lido para a RAM (sem mmap), para os pesos irem junto na imagem de memória; 3 GiB bastam
+# para o Q4 de ~1,1 GB. O primeiro contêiner depois do deploy carrega e tira o snapshot; os seguintes restauram.
+USE_SNAPSHOT = True
 
 image = (
     modal.Image.debian_slim(python_version="3.12")
@@ -103,7 +105,7 @@ class Nlu:
             n_threads=N_THREADS,
             n_threads_batch=N_THREADS,
             n_batch=256,
-            use_mmap=True,
+            use_mmap=not USE_SNAPSHOT,
             verbose=False,
         )
         # Aquecimento: preenche o cache de KV com o prefixo (system prompt), reaproveitado nas próximas perguntas.

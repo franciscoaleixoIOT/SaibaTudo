@@ -270,6 +270,15 @@ class TestPergunta(unittest.TestCase):
         self.assertNotIn("|>", core.clean_question("x<|im_end|>"))
         self.assertNotIn("\n", core.clean_question("a\n\nb"))
 
+    def test_normalizacao_tipografica(self):
+        """Aspas e traços curvos, espaços especiais e pontuação repetida viram a forma do treino; letras, maiúsculas e acentos ficam."""
+        self.assertEqual(core.normalize_question("quem é o “Lula”???"), 'quem é o "Lula"?')
+        self.assertEqual(core.normalize_question("candidatos a governador – SP"), "candidatos a governador - SP")
+        self.assertEqual(core.normalize_question("o que é ‘voto nulo’"), "o que é 'voto nulo'")
+        self.assertEqual(core.normalize_question("Senador por MG"), "Senador por MG", "nada muda em texto já canônico")
+        self.assertEqual(core.normalize_question(core.normalize_question("—x—")), core.normalize_question("—x—"), "idempotente")
+        self.assertEqual(core.clean_question("  quem   é  “Lula”  "), 'quem é "Lula"')
+
 
 class TestGramaticaLegada(unittest.TestCase):
     @classmethod
