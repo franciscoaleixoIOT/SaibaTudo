@@ -82,6 +82,21 @@ export function palavraSinal(p) {
  * Descrição pronta da classificação GHS de um composto (campo `ghs` do pacote), ou null se não houver.
  * @returns {{pictogramas: {codigo: string, nome: string, descricao: string, url: string}[], palavraSinal: string|null, sinal: string|null, frases: {codigo: string, texto: string|null, idiomaTexto: string|null}[], fonte: string|null}|null}
  */
+/**
+ * Fonte da classificação GHS de um composto, para exibir junto das frases H. O pacote traz em `ghs.fonte` o nome cru da fonte do PubChem
+ * ("Regulation (EC) No 1272/2008 …", em inglês) e, na lista `fontes` do mesmo composto, a entrada já localizada e com URL
+ * ("Regulamento (CE) n.º 1272/2008, Anexo VI …, via PubChem"). Devolve a entrada localizada quando existe (evita a linha em inglês
+ * repetida na resposta); senão `{ nome: ghs.fonte }`; sem fonte, null.
+ */
+export function fonteGhs(c) {
+  const bruta = typeof c?.ghs?.fonte === 'string' ? c.ghs.fonte.trim() : '';
+  const lista = Array.isArray(c?.fontes) ? c.fontes : [];
+  const ehClp = (s) => /1272\/2008|CLP/i.test(String(s ?? ''));
+  const localizada = lista.find((f) => f && (ehClp(f.nome) || ehClp(f.url)));
+  if (localizada && (!bruta || ehClp(bruta))) return localizada;
+  return bruta ? lista.find((f) => f && f.nome === bruta) ?? { nome: bruta } : null;
+}
+
 export function descreverGhs(ghs, regras = null) {
   if (!ghs || typeof ghs !== 'object') return null;
   const pict = (Array.isArray(ghs.pictogramas) ? ghs.pictogramas : []).map((c) => String(c).toUpperCase()).filter((c) => /^GHS0[1-9]$/.test(c));

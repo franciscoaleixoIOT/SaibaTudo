@@ -14,7 +14,7 @@ import { fmt, fmtTex } from './formato.js';
 import { fmtData, idiomaAtual, nomeDoIdioma, t, tl } from './i18n/index.js';
 import { ligarQuantidades, termosDeBusca } from './nlu.js';
 import { exibirNome, minusNoMeio, nomeComposto as infoNomeComposto, nomeElemento as infoNomeElemento } from './nomes.js';
-import { descreverGhs, urlSegura } from './perigos.js';
+import { fonteGhs, descreverGhs, urlSegura } from './perigos.js';
 import { categoriaPlural, categoriaRotulo, classeRotulo, estadoChave, estadoRotulo, formatarValor, valorBruto } from './propriedades.js';
 import { capitalizar, listar, normalizar } from './texto.js';
 
@@ -280,7 +280,7 @@ export class AnswerBuilder {
     const blocos = [B.kv(null, itens, fonte)];
     if (c.smiles) blocos.push(B.molecula(c.smiles, nome, fonte));
     const g = descreverGhs(c.ghs, this.store.regras);
-    if (g) blocos.push({ tipo: 'ghs', titulo: t('respostas.composto.perigosGhs'), ...g, fonte: dado(c.ghs.fonte ? { nome: c.ghs.fonte } : fonte, this.fonteFrases()) });
+    if (g) blocos.push({ tipo: 'ghs', titulo: t('respostas.composto.perigosGhs'), ...g, fonte: dado(fonteGhs(c) ?? fonte, this.fonteFrases()) });
     const defin = this.definicaoChebi(c);
     if (defin) blocos.push({ tipo: 'citacao', texto: defin.texto, aviso: this.idioma === 'en' ? null : t('respostas.composto.definicaoIngles'), fonte: defin.fonte });
     const s = [sug('massaMolarDe', { nome: minus(nome) })];
@@ -885,7 +885,7 @@ export class AnswerBuilder {
     if (!g) {
       return B.aviso(t('respostas.seguranca.semGhs', { nome }), fonteC);
     }
-    return { tipo: 'ghs', titulo: t('respostas.seguranca.perigosDe', { nome }), ...g, fonte: dado(c.ghs.fonte ? { nome: c.ghs.fonte } : fonteC, this.fonteFrases()) };
+    return { tipo: 'ghs', titulo: t('respostas.seguranca.perigosDe', { nome }), ...g, fonte: dado(fonteGhs(c) ?? fonteC, this.fonteFrases()) };
   }
 
   async seguranca(p) {

@@ -22,16 +22,17 @@
 .app { min-height: 100vh; display: flex; flex-direction: column; }
 
 /* ---- barra superior (navy nos dois temas) ---- */
+.topo-fixo { position: sticky; top: 0; z-index: 30; }
 .appbar {
   --foco: #FFD166;
-  position: sticky; top: 0; z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
   min-height: 60px; padding: max(8px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) 8px max(12px, env(safe-area-inset-left));
   background: var(--navy); color: #fff;
 }
 .appbar-marca { display: flex; align-items: center; gap: 10px; min-width: 0; color: #fff; text-decoration: none; }
 .appbar-logo { border-radius: 9px; flex: none; }
 .appbar-textos { min-width: 0; }
-.appbar-titulo { font-family: var(--fonte-marca); font-weight: 600; font-size: 1.125rem; line-height: 1.15; color: #fff; }
+.appbar-titulo { font-family: var(--fonte-marca); font-weight: 600; font-size: 1.125rem; line-height: 1.15; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .appbar-sub { font-size: .75rem; color: var(--ouro); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .appbar-acoes { display: flex; align-items: center; gap: 2px; flex: none; }
 .appbar-idioma { display: inline-flex; align-items: center; gap: 0; color: #fff; }
@@ -41,7 +42,7 @@
 .appbar-select:focus-visible { outline: 3px solid var(--foco); outline-offset: 2px; }
 @media (max-width: 420px) { .appbar-select { max-width: 5.5rem; } }
 
-.abas { background: var(--navy-2); position: sticky; top: 60px; z-index: 29; }
+.abas { background: var(--navy-2); }
 .abas ul { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: thin; max-width: 1200px; margin: 0 auto; padding: 0 max(8px, env(safe-area-inset-left)); }
 .abas a {
   --foco: #FFD166;

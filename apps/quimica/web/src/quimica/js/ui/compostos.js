@@ -7,7 +7,7 @@ import { fmt } from '../formato.js';
 import { idiomaAtual, nomeDoIdioma, t } from '../i18n/index.js';
 import { moleculaEl } from '../molecula.js';
 import { minusNoMeio, nomeComposto, nomeCompostoExibicao } from '../nomes.js';
-import { descreverGhs, urlSegura } from '../perigos.js';
+import { fonteGhs, descreverGhs, urlSegura } from '../perigos.js';
 import { classeRotulo, formatarValor, tabelaDePropriedades, valorBruto } from '../propriedades.js';
 import { capitalizar, listar } from '../texto.js';
 import { fonteEl, formulaEl, ghsEl, kvEl, linkExterno, linkRota } from './componentes.js';
@@ -159,7 +159,7 @@ export async function viewComposto({ store, params }) {
     c.smiles ? h('section', { class: 'secao' }, h('h2', null, t('ui.compostos.estrutura')), moleculaEl(c.smiles, nome),
       h('p', { class: 'bloco-fonte' }, t('ui.compostos.desenhada'))) : null,
     h('section', { class: 'secao', id: 'seguranca' }, h('h2', null, t('ui.compostos.seguranca')),
-      g ? [ghsEl({ ...g, titulo: t('ui.compostos.classificacaoGhs') }, { grande: true }), fonteEl([c.ghs.fonte ? { nome: c.ghs.fonte } : null, fonteFrases].filter(Boolean))]
+      g ? [ghsEl({ ...g, titulo: t('ui.compostos.classificacaoGhs') }, { grande: true }), fonteEl([fonteGhs(c), fonteFrases].filter(Boolean))]
         : h('p', { class: 'aviso-caixa' }, icon('info', 18), t('ui.compostos.semGhs')),
       h('div', { class: 'resp-acoes' },
         icsc ? h('a', { class: 'btn btn-contorno peq', href: icsc, target: '_blank', rel: 'noopener noreferrer' }, t('ui.compostos.icsc'), icon('external', 14)) : null,

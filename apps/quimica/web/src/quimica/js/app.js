@@ -111,7 +111,8 @@ function montarShell() {
     h('a', { href: '/quimica/sobre-os-dados' }, t('ui.app.rodape.sobre')), h('a', { href: caminhoPrivacidade() }, t('ui.app.rodape.privacidade')), h('a', { href: '/quimica/configuracoes' }, t('ui.app.rodape.configuracoes')),
     h('p', null, t('ui.app.rodape.projeto')));
   const aviso = h('div', { id: 'aviso-global' });
-  raiz().replaceChildren(h('div', { class: 'app' }, topo, nav, aviso, conteudo, rodape));
+  // barra + abas num só bloco fixo: a altura da barra pode variar (título longo, botão de instalar), e as abas ficam sempre logo abaixo
+  raiz().replaceChildren(h('div', { class: 'app' }, h('div', { class: 'topo-fixo' }, topo, nav), aviso, conteudo, rodape));
   const pular = document.querySelector('a.skip');
   if (pular) pular.textContent = t('ui.html.pular');
   S.shell = { conteudo, nav, aviso, atualizarInstalar };
