@@ -29,6 +29,8 @@ export function viewConfig({ store, mudarIdioma }) {
         : h('div', null, h('p', { class: 'mudo' }, ins.titulo), h('ul', { class: 'lista-pontos' }, ins.passos.map((p) => h('li', null, p)))));
   };
   atualizarInstalar();
+  // vindo do botão da barra (/quimica/configuracoes#instalar): leva o foco às instruções de instalação
+  if (globalThis.location?.hash === '#instalar') setTimeout(() => { const g = document.getElementById('instalar'); g?.focus?.(); g?.scrollIntoView?.({ block: 'start' }); }, 50);
 
   const status = h('p', { class: 'pequeno mudo', role: 'status', 'aria-live': 'polite' });
   const botaoApagar = h('button', { class: 'btn btn-contorno peq perigo', type: 'button', onClick: async () => {
@@ -47,7 +49,7 @@ export function viewConfig({ store, mudarIdioma }) {
     h('div', { class: 'grupo' }, t('ui.config.aparencia')),
     radios('tema', t('ui.config.tema'), Object.keys(TEMAS).map((k) => [k, t(`ui.prefs.tema.${k}`)]), prefs.tema, (v) => mudar('tema', v)),
     radios('fonte', t('ui.config.tamanhoTexto'), Object.keys(FONTES).map((k) => [k, t(`ui.prefs.fonte.${k}`)]), prefs.tamanhoFonte, (v) => mudar('tamanhoFonte', v)),
-    h('div', { class: 'grupo' }, t('ui.config.instalar')), blocoInstalar,
+    h('div', { class: 'grupo', id: 'instalar', tabindex: '-1' }, t('ui.config.instalar')), blocoInstalar,
     h('div', { class: 'grupo' }, t('ui.config.ia')),
     h('p', { class: 'aviso-caixa discreto' }, icon('info', 16), t('ui.config.iaAviso')),
     h('div', { class: 'grupo' }, t('ui.config.dados')),

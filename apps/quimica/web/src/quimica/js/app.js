@@ -5,7 +5,7 @@ import { DataStore } from './data.js';
 import { Engine } from './engine.js';
 import { h, icon, anunciar } from './dom.js';
 import { aplicarIdiomaAoDocumento, caminhoPrivacidade, definirIdioma, detectarIdioma, idiomaAtual, t } from './i18n/index.js';
-import { iniciarInstalacao } from './install.js';
+import { aoMudarInstalacao, ehIos, iniciarInstalacao, instalar, jaInstalado, podeInstalarAgora } from './install.js';
 import { aplicarAparencia, carregar, salvarIdioma } from './prefs.js';
 import { roteador, toast } from './ui/componentes.js';
 import { viewCalculadoras } from './ui/calculadoras.js';
@@ -93,11 +93,19 @@ function montarShell() {
   const nav = h('nav', { class: 'abas', 'aria-label': t('ui.app.secoes') }, h('ul', null, ABAS.map(([href, chave, ic]) => h('li', null, h('a', { href, 'data-aba': href }, icon(ic, 18), t(`ui.app.abas.${chave}`))))));
   const idiomaEl = h('label', { class: 'appbar-idioma' }, h('span', { class: 'btn-icone claro', 'aria-hidden': 'true' }, icon('globe', 22)),
     seletorIdioma({ id: 'sel-idioma-barra', classe: 'appbar-select', aoMudar: mudarIdioma, ariaLabel: t('ui.app.idioma') }));
+  // Instalar como app na barra (padrão de todos os apps SaibaTudo, docs/PADRAO_ASSISTENTE.md §5): aparece quando o navegador oferece a
+  // instalação (beforeinstallprompt) ou no iPhone/iPad sem o app instalado; o clique abre o prompt nativo ou leva às instruções em Configurações.
+  const instalarEl = h('span', { class: 'appbar-instalar' });
+  const atualizarInstalar = () => instalarEl.replaceChildren(...(podeInstalarAgora() || (ehIos() && !jaInstalado())
+    ? [h('button', { type: 'button', class: 'btn-icone claro btn-instalar-barra', 'aria-label': t('ui.config.instalarApp'), title: t('ui.config.instalarApp'),
+      onClick: () => (podeInstalarAgora() ? instalar() : irPara('/quimica/configuracoes#instalar')) }, icon('download', 22))] : []));
+  atualizarInstalar();
+  if (!S.pararInstalacao) S.pararInstalacao = aoMudarInstalacao(() => S.shell?.atualizarInstalar?.());
   const topo = h('header', { class: 'appbar' },
     h('a', { class: 'appbar-marca', href: '/quimica/', 'aria-label': t('ui.app.marcaAria') },
       h('img', { class: 'appbar-logo', src: '/quimica/brand/quimica-icon.svg', width: '38', height: '38', alt: '' }),
       h('div', { class: 'appbar-textos' }, h('div', { class: 'appbar-titulo' }, t('ui.marca')), h('div', { class: 'appbar-sub' }, t('ui.app.marcaSub')))),
-    h('div', { class: 'appbar-acoes' }, idiomaEl, h('a', { class: 'btn-icone claro', href: '/quimica/configuracoes', 'aria-label': t('ui.app.configuracoes'), 'data-aba': '/quimica/configuracoes' }, icon('settings', 22))));
+    h('div', { class: 'appbar-acoes' }, idiomaEl, instalarEl, h('a', { class: 'btn-icone claro', href: '/quimica/configuracoes', 'aria-label': t('ui.app.configuracoes'), 'data-aba': '/quimica/configuracoes' }, icon('settings', 22))));
   const rodape = h('footer', { class: 'rodape' },
     h('a', { href: '/quimica/sobre-os-dados' }, t('ui.app.rodape.sobre')), h('a', { href: caminhoPrivacidade() }, t('ui.app.rodape.privacidade')), h('a', { href: '/quimica/configuracoes' }, t('ui.app.rodape.configuracoes')),
     h('p', null, t('ui.app.rodape.projeto')));
@@ -105,7 +113,7 @@ function montarShell() {
   raiz().replaceChildren(h('div', { class: 'app' }, topo, nav, aviso, conteudo, rodape));
   const pular = document.querySelector('a.skip');
   if (pular) pular.textContent = t('ui.html.pular');
-  S.shell = { conteudo, nav, aviso };
+  S.shell = { conteudo, nav, aviso, atualizarInstalar };
 }
 
 function marcarAba(pathname) {

@@ -106,7 +106,9 @@ dados na resposta, copiar resposta, fechar resposta, relatar problema (issue com
       pessoal; sem filtro político aqui, mas nunca capturar texto de pedido perigoso) — fase 5, depois do modelo.
 - [ ] **Relatar problema com diálogo e `/api/report`** (hoje é link para a issue) — copiar `apps/eleicoes2026/api/report.js`.
 - [ ] **Nível (fundamental/médio/superior) na web** como preferência que muda o motor (o Android já tem; `nlu.nivelDe` existe e é ignorado).
-- [ ] Instalar PWA na barra (não só em configurações) com instruções para iOS; economia de dados; checagem de dados ao voltar o foco.
+- [~] ~~Instalar PWA na barra (não só em configurações) com instruções para iOS~~ (feito em 14/10/2026: botão na barra quando o navegador
+      oferece a instalação ou no iOS sem o app; clique = prompt nativo ou Configurações#instalar; mesmo padrão no AchaVagaIA); economia de dados;
+      checagem de dados ao voltar o foco.
 - [ ] Eleições web: mover o foco para o título da resposta (como Química faz).
 
 ## 9. Decisões pedidas ao mantenedor (10/10/2026, noite)

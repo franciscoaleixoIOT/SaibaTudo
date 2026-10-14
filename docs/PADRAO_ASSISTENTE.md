@@ -58,3 +58,10 @@ houver regra de interpretação. Checklist por app em `apps/<app>/docs/PENDENCIA
 - Química web: §1 completo (12/10), §3 completo no mínimo (origem+data, copiar, fechar, relatar por issue), contexto parcial
   (entidade e atributo), sem nuvem/captura (backend pronto, desligado), sem nível na web, instalar só nas configurações.
 - Android: Eleições completo; Química com histórico (sem ▲▼), sem limpar ao enviar, sem relatar, com copiar e nível.
+
+## 8. Atualização de 14/10/2026
+- **Botão "Instalar app" na barra superior em todos os apps** (pedido do mantenedor em 14/10): Eleições já tinha; Química e AchaVagaIA
+  ganharam o mesmo comportamento — o botão aparece quando o navegador oferece a instalação (`beforeinstallprompt`) ou no iPhone/iPad sem
+  o app instalado; o clique abre o prompt nativo ou leva às instruções em Configurações (`#instalar`). Regra: toda melhoria de casca
+  (barra, instalação, preferências) também é padrão e se porta para os outros apps, como as da caixa de pergunta.
+- Química web: lista de compostos paginada (40 por página, página na URL), também um padrão para listas longas nos outros apps.

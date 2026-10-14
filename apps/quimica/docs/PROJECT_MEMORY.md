@@ -169,6 +169,14 @@ chamadas frias estouraram os 12 s e uma levou 18,7 s → `MODAL_TIMEOUT_MS=25000
 ~10–11 s) — subir a janela custa Modal, decisão do mantenedor. Regra nova em `MODELO.md` §13: qualquer mudança em `nlu_core.py` exige o gate de
 novo antes do `modal deploy`. Testes: backend 125, API 209.
 
+## 6.j Paginação da lista de compostos e botão de instalar na barra (14/10/2026, manhã)
+Pedidos do mantenedor em 14/10. (1) `/quimica/compostos` cortava em 40 compostos alfabéticos ("mostrando alguns") e em 60 resultados de busca sem
+como ver o resto: agora a lista inteira e a busca (até 400) vêm em páginas de 40 (`POR_PAGINA`), com anterior/próxima, "página x de y", faixa
+"x–y de n" e a página na URL (`?p=`); só a página visível é completada com os lotes. Textos nos 5 idiomas; o cenário E2E (`tools/screenshots.mjs`)
+exercita a paginação com o pacote real e exige o controle oculto com o fixture de 15 compostos. (2) Botão "Instalar app" na barra superior, como
+no Eleições (padrão de todos os apps, `docs/PADRAO_ASSISTENTE.md` §8): aparece com `beforeinstallprompt` ou no iOS sem o app; clique = prompt nativo
+ou `/quimica/configuracoes#instalar` (foco nas instruções). Mesmo botão no AchaVagaIA.
+
 ## 7. Contas e segredos
 Vercel `saibatudo-quimica` (time `franciscoaleixo-9696`); GitHub `franciscoaleixoIOT`; Hugging Face `franciscoaleixo` (PRO, 40 min/dia de ZeroGPU); Modal `franciscoaleixo/main` (US$ 30/mês grátis; já usados pelo app de eleições, ~US$ 5/mês).
 `secrets/data_signing_key.pem` (nova, exclusiva deste app; pública em `pipeline/data_signing_public.pem`). Fazer backup offline. Modal: app `saibatudo-quimica-nlu`, Volume `saibatudo-quimica-models`, par de Proxy Auth Token criado pelo mantenedor em 13/10/2026 (guardado em `secrets/modal_proxy_quimica.env` da raiz do monorepo, ignorado, e como variáveis sensíveis na Vercel; nunca no Git nem no chat).
