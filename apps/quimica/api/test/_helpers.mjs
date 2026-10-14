@@ -13,7 +13,7 @@ export function novoIid() {
 }
 
 export const ENV_BASE = Object.freeze({
-  MODAL_ENDPOINT: 'https://exemplo--saibatudo-quimica-nlu-nlu-infer.modal.run',
+  MODAL_ENDPOINT: 'https://exemplo--saibatudoia-nlu-quimica-nlu-infer.us-east.modal.run',
   MODAL_KEY: 'wk-teste',
   MODAL_SECRET: 'ws-teste',
   MODEL_VERSION: 'teste-1',

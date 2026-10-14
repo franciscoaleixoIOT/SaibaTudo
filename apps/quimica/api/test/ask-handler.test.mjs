@@ -7,7 +7,7 @@ import { askAtivo, readConfig } from '../_lib/config.js';
 import { ENV_BASE, IID_V4, capturarLog, mkRequest, novoIid, relogio } from './_helpers.mjs';
 
 const HF = 'https://exemplo-saibatudo-quimica.hf.space';
-const MODAL = 'https://exemplo--saibatudo-quimica-ask-ask.modal.run';
+const MODAL = 'https://exemplo--saibatudoia-explica-quimica-ask.us-east.modal.run';
 const ENV_HF = { ...ENV_BASE, ASK_ENABLED: '1', HF_ASK_SPACE_URL: HF, HF_TOKEN: 'hf_segredo_de_teste' };
 const URL_ASK = 'https://saibatudo.net/quimica/api/ask';
 

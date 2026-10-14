@@ -150,7 +150,7 @@ O NLU da nuvem passou a ser o **SaibaTudo-NLU** (Qwen3.5-2B ajustado em `ia/trei
 aprendida como MASSA_MOLAR) e a **v3.3 passou**: golden 723 com gramática 99,0 % de intenção, elemento 98,6 %, composto 98,1 %, propriedade
 98,3 %, equação 100 %, alucinação 0 %, os 5 idiomas ok; holdout de 2.395 nunca treinados 99,6 %; Q8 = Q4. Publicação (fluxo de `MODELO.md`
 §13): `ia/treino/empacotar_versao.py --app quimica --version nlu-v3.3-20261013` → `modal volume put` ×3 no Volume `saibatudo-quimica-models`
-(criado nesta data) → `modal deploy backend/modal/nlu_app.py` (app `saibatudo-quimica-nlu`; `::bench`: frio 11,2 s, quente p50 2,19 s) →
+(criado nesta data; renomeado em 14/10 de manhã — 6.k) → `modal deploy backend/modal/nlu_app.py` (app `saibatudo-quimica-nlu`, hoje `SaibaTudoIA-NLU-Quimica`; `::bench`: frio 11,2 s, quente p50 2,19 s) →
 `promover.py` → `MODAL_ENDPOINT`, `MODAL_KEY`, `MODAL_SECRET` (sensíveis) e `MODEL_VERSION` na Vercel (produção) → `vercel deploy --prod` **do
 diretório local** (o `quimica-data-refresh.yml` segue sem terminar no GitHub, §9.b/9.c de `PENDENCIAS.md`). Ao vivo: `/quimica/api/health` →
 `"model":"nlu-v3.3-20261013","nlu":"on"`; cinco perguntas em pt/de/es pelo `/quimica/api/nlu` certas (2,4–3,2 s quente; 9,8 s fria).
@@ -177,6 +177,14 @@ exercita a paginação com o pacote real e exige o controle oculto com o fixture
 no Eleições (padrão de todos os apps, `docs/PADRAO_ASSISTENTE.md` §8): aparece com `beforeinstallprompt` ou no iOS sem o app; clique = prompt nativo
 ou `/quimica/configuracoes#instalar` (foco nas instruções). Mesmo botão no AchaVagaIA.
 
+## 6.k Nomes `SaibaTudoIA-...` no Modal (14/10/2026, manhã)
+Decisão do mantenedor: todo serviço da SaibaTudo IA se chama `SaibaTudoIA-<Papel>-<App>`, com hífen, no Modal e no Hugging Face (`docs/PLANO_IA_SAIBATUDO.md` §6).
+Na química (feito hoje): Volume `SaibaTudoIA-Models-Quimica` criado e carregado (GGUF da `nlu-v3.3-20261013` com sha256 conferido, meta, eval, `current.json`),
+app `SaibaTudoIA-NLU-Quimica` implantado (`nlu_app.py`, `ask_app.py`, `convert_local.py`, `promover.py` e testes com os nomes novos; 125 testes do backend e 209 da
+API ok), `MODAL_ENDPOINT` trocado na Vercel e redeploy pela CLI; teste ao vivo certo; app e Volume antigos apagados. Endpoint novo: primeira chamada
+22,2 s (cria o snapshot), quente 3,6–4,3 s direto e 3,0–4,9 s pela Vercel. Eleições (`saibatudo-nlu`, `saibatudo-nlu-models`, `saibatudo-qwen7b-awq`, Space
+`saibatudo-qwen7b`) e os repositórios públicos do HF só depois de 27/10.
+
 ## 7. Contas e segredos
 Vercel `saibatudo-quimica` (time `franciscoaleixo-9696`); GitHub `franciscoaleixoIOT`; Hugging Face `franciscoaleixo` (PRO, 40 min/dia de ZeroGPU); Modal `franciscoaleixo/main` (US$ 30/mês grátis; já usados pelo app de eleições, ~US$ 5/mês).
-`secrets/data_signing_key.pem` (nova, exclusiva deste app; pública em `pipeline/data_signing_public.pem`). Fazer backup offline. Modal: app `saibatudo-quimica-nlu`, Volume `saibatudo-quimica-models`, par de Proxy Auth Token criado pelo mantenedor em 13/10/2026 (guardado em `secrets/modal_proxy_quimica.env` da raiz do monorepo, ignorado, e como variáveis sensíveis na Vercel; nunca no Git nem no chat).
+`secrets/data_signing_key.pem` (nova, exclusiva deste app; pública em `pipeline/data_signing_public.pem`). Fazer backup offline. Modal: app `SaibaTudoIA-NLU-Quimica`, Volume `SaibaTudoIA-Models-Quimica` (nomes desde 14/10/2026; os antigos `saibatudo-quimica-*` foram apagados), par de Proxy Auth Token criado pelo mantenedor em 13/10/2026 (guardado em `secrets/modal_proxy_quimica.env` da raiz do monorepo, ignorado, e como variáveis sensíveis na Vercel; nunca no Git nem no chat).

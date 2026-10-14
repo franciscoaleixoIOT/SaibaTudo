@@ -33,9 +33,9 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import ask_core as core  # noqa: E402
 
-APP_NAME = os.environ.get("ASK_APP_NAME", "saibatudo-quimica-ask")
+APP_NAME = os.environ.get("ASK_APP_NAME", "SaibaTudoIA-Explica-Quimica")
 POINTER = os.environ.get("ASK_POINTER", "ask-current.json")
-VOLUME_NAME = "saibatudo-quimica-models"
+VOLUME_NAME = "SaibaTudoIA-Models-Quimica"
 MODELS_DIR = "/models"
 LLAMA_CPP_PYTHON = "llama-cpp-python==0.3.19"
 GPU = "L4"

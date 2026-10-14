@@ -11,8 +11,8 @@ e o deploy são a fase 5 de verdade (§11).
 | Treino | QLoRA 4-bit, `max_length 256`, 3 épocas | QLoRA 4-bit, `max_length 1024`, lote 1 × acúmulo 16, 2 épocas |
 | Versão | `nlu-v3.1-AAAAMMDD` (imutável; minor = continuação de treino) | `ask-v1-AAAAMMDD` (imutável) |
 | Serve em | Modal, CPU, GGUF Q4_K_M + gramática GBNF (`backend/modal/nlu_app.py`) | **Space ZeroGPU do HF** (`backend/hf_space_quimica`); reserva Modal L4 (`ask_app.py`) |
-| Repositório HF | `franciscoaleixo/SaibaTudo-Quimica-NLU` | `franciscoaleixo/SaibaTudo-Quimica-Ask` |
-| Volume do Modal | `saibatudo-quimica-models` (ponteiro `current.json`) | o mesmo Volume (ponteiro `ask-current.json`) |
+| Repositório HF (a criar) | `franciscoaleixo/SaibaTudoIA-NLU` (o NLU é um só para todos os apps) | `franciscoaleixo/SaibaTudoIA-Explica-Quimica` |
+| Modal | app `SaibaTudoIA-NLU-Quimica`, Volume `SaibaTudoIA-Models-Quimica` (ponteiro `current.json`) | reserva: app `SaibaTudoIA-Explica-Quimica` (não implantado), mesmo Volume (ponteiro `ask-current.json`) |
 | Gates (bloqueiam) | `eval_golden.py` (via `ia/treino/avaliar_gguf.py --app quimica`, golden e holdout, **por idioma**): JSON ≥ 98 %, intenção ≥ 85 %, cada entidade ≥ 90 %, alucinação ≤ 5 %, holdout, catraca ≤ 1 ponto, Q4×Q8 ≤ 3 pontos | `eval_seguranca.py`: 0 % de resposta útil a pedido perigoso e ≥ 95 % de resposta aos legítimos · `eval_fidelidade.py`: ≥ 98 % das explicações sem número fora dos trechos |
 
 Regras que não mudam: o modelo **não fornece fatos** (números vêm do pacote assinado ou de cálculo local); os casos de `contracts/` **nunca treinam**; pedido perigoso é recusado
@@ -23,7 +23,7 @@ Regras que não mudam: o modelo **não fornece fatos** (números vêm do pacote 
   bitsandbytes e `llama-cpp-python==0.3.19` (a versão do gate = a do serviço). Ou crie um: `python -m venv ai_model/.venv` e instale `torch` do índice `cu128`, `ai_model/requirements.txt` e `llama-cpp-python==0.3.19`.
 - **Contas e ferramentas:** `hf auth login` (token de escrita só nesta máquina), `python -m modal setup`, `vercel login`, `gh auth login`. Segredos ficam em `secrets/` (ignorado pelo Git); quando
   precisar passar um valor ao assistente, cole-o em um arquivo de `secrets/`, nunca no chat.
-- **Repositórios no Hugging Face** (uma vez): `hf repos create franciscoaleixo/SaibaTudo-Quimica-NLU` e `...-Ask`; o Space: `hf repos create franciscoaleixo/saibatudo-quimica --type space --space-sdk gradio --private`.
+- **Repositórios no Hugging Face** (uma vez): `hf repos create franciscoaleixo/SaibaTudoIA-NLU` e `.../SaibaTudoIA-Explica-Quimica`; o Space: `hf repos create franciscoaleixo/SaibaTudoIA-Explica-Quimica --type space --space-sdk gradio --private` (padrão de nomes `SaibaTudoIA-<Papel>-<App>`, decidido em 14/10/2026 — `docs/PLANO_IA_SAIBATUDO.md` §6).
 - **Armadilhas desta máquina:** `MSYS_NO_PATHCONV=1` para argumentos que começam com `/` (destinos do `modal volume put`); **impedir a suspensão do Windows** durante o treino
   (`SetThreadExecutionState` em um PowerShell que viva enquanto o treino viver); scripts longos: gravar em arquivo e executar; se usar o WSL, `wsl --shutdown` logo depois.
 
@@ -73,9 +73,9 @@ O que faz: `convert_hf_to_gguf.py` do llama.cpp na tag fixa `b11355` (clonado em
 
 ## 6. Publicar no Hugging Face (revisão nova e imutável)
 ```bash
-hf upload franciscoaleixo/SaibaTudo-Quimica-NLU ai_model/output/SaibaTudo-Quimica-NLU-merged . --commit-message "nlu-v1-AAAAMMDD: <gates>"
-hf upload franciscoaleixo/SaibaTudo-Quimica-NLU ai_model/output/gguf/nlu-v1-AAAAMMDD/model-Q4_K_M.gguf gguf/nlu-v1-AAAAMMDD-Q4_K_M.gguf     # opcional: o GGUF aprovado
-hf repos tag create franciscoaleixo/SaibaTudo-Quimica-NLU nlu-v1-AAAAMMDD
+hf upload franciscoaleixo/SaibaTudoIA-NLU ai_model/output/SaibaTudo-Quimica-NLU-merged . --commit-message "nlu-v1-AAAAMMDD: <gates>"
+hf upload franciscoaleixo/SaibaTudoIA-NLU ai_model/output/gguf/nlu-v1-AAAAMMDD/model-Q4_K_M.gguf gguf/nlu-v1-AAAAMMDD-Q4_K_M.gguf     # opcional: o GGUF aprovado
+hf repos tag create franciscoaleixo/SaibaTudoIA-NLU nlu-v1-AAAAMMDD
 ```
 (idem para `-Ask`). Anote o **SHA do commit** do upload: a versão é a revisão, não `main`. O `main` pode mudar; a revisão antiga continua recuperável (`--revision <SHA>`).
 **Space do explicador** (principal em produção): publicar `backend/hf_space_quimica/` com o `ask_core.py` copiado (receita no README de lá), e nas *Variables* do Space `ASK_MODEL_ID=franciscoaleixo/SaibaTudo-Quimica-Ask`,
@@ -84,13 +84,13 @@ hf repos tag create franciscoaleixo/SaibaTudo-Quimica-NLU nlu-v1-AAAAMMDD
 ## 7. Enviar ao Modal (reserva e serviço do NLU)
 ```bash
 # só se o gate aprovou; o --upload do convert_local.py faz o mesmo. Sem MSYS_NO_PATHCONV=1 o Git Bash reescreve o destino para C:/Program Files/Git/...
-MSYS_NO_PATHCONV=1 python -m modal volume put saibatudo-quimica-models ai_model/output/gguf/<versão>/model-Q4_K_M.gguf /<versão>/model-Q4_K_M.gguf
-MSYS_NO_PATHCONV=1 python -m modal volume put saibatudo-quimica-models ai_model/output/gguf/<versão>/meta.json /<versão>/meta.json
-MSYS_NO_PATHCONV=1 python -m modal volume put saibatudo-quimica-models ai_model/output/gguf/<versão>/eval.json /<versão>/eval.json
-python -m modal deploy backend/modal/nlu_app.py          # NLU (CPU); primeira vez: python -m modal run backend/modal/nlu_app.py::bench
+MSYS_NO_PATHCONV=1 python -m modal volume put SaibaTudoIA-Models-Quimica ai_model/output/gguf/<versão>/model-Q4_K_M.gguf /<versão>/model-Q4_K_M.gguf
+MSYS_NO_PATHCONV=1 python -m modal volume put SaibaTudoIA-Models-Quimica ai_model/output/gguf/<versão>/meta.json /<versão>/meta.json
+MSYS_NO_PATHCONV=1 python -m modal volume put SaibaTudoIA-Models-Quimica ai_model/output/gguf/<versão>/eval.json /<versão>/eval.json
+python -m modal deploy backend/modal/nlu_app.py          # NLU (CPU), app SaibaTudoIA-NLU-Quimica; primeira vez: python -m modal run backend/modal/nlu_app.py::bench
 python -m modal deploy backend/modal/ask_app.py          # reserva do explicador (L4); primeira vez: ... ask_app.py::bench
 ```
-O `deploy` pode ser feito antes de promover (os contêineres só sobem quando houver ponteiro). Anote as URLs (`...-infer.modal.run`, `...-ask.modal.run`) e crie o par de tokens de proxy no painel do Modal (Settings → Proxy Auth Tokens).
+O `deploy` pode ser feito antes de promover (os contêineres só sobem quando houver ponteiro). Anote as URLs (`https://franciscoaleixo--saibatudoia-nlu-quimica-nlu-infer.us-east.modal.run`; o Modal escreve o nome do app em minúsculas na URL) e crie o par de tokens de proxy no painel do Modal (Settings → Proxy Auth Tokens).
 
 ## 8. Promover, configurar a Vercel e testar ao vivo
 1. **Promover:** `python backend/modal/promover.py --version nlu-v1-AAAAMMDD` (e `--version ask-v1-AAAAMMDD`). Lê `meta.json`, exige `passed`; reprovada só com `--force --reason "..."` (fica registrado). Grava `/current.json` ou `/ask-current.json` no Volume.
@@ -154,7 +154,7 @@ histórico; o explicador (`ask`) continua nelas.
 | exportar GGUF | `ia/treino/` | `exportar_gguf.py --lora <out>/final --out <out>/gguf --q8` (llama.cpp **b11575**, `--no-mtp`) |
 | gate | `ia/treino/` | `avaliar_gguf.py --app quimica --gguf <Q4> --holdout --out <out>/eval_quimica_q4.json` e `--gguf <Q8> --sem_livre --out <out>/eval_quimica_q8.json` (e o mesmo com `--app eleicoes`: o modelo é um só) |
 | empacotar | `ia/treino/` | `empacotar_versao.py --app quimica --version nlu-v3.1-AAAAMMDD --gguf <Q4> --eval <q4.json> --eval-q8 <q8.json> --train-meta <out>/final/train_meta.json --origem "..."` → `ai_model/output/gguf/<versão>/{model-Q4_K_M.gguf, meta.json, eval.json}`; `passed` só se os gates do app, **cada idioma**, o template e a ausência de `<think>` passarem |
-| enviar e servir | este app | §7: `MSYS_NO_PATHCONV=1 python -m modal volume put saibatudo-quimica-models ai_model/output/gguf/<versão>/<arquivo> /<versão>/<arquivo>` para os três arquivos; `python -m modal deploy backend/modal/nlu_app.py` |
+| enviar e servir | este app | §7: `MSYS_NO_PATHCONV=1 python -m modal volume put SaibaTudoIA-Models-Quimica ai_model/output/gguf/<versão>/<arquivo> /<versão>/<arquivo>` para os três arquivos; `python -m modal deploy backend/modal/nlu_app.py` |
 | promover | este app | §8: `python backend/modal/promover.py --version <versão>` (exige `passed`), depois `MODEL_VERSION`, `MODAL_ENDPOINT`, `MODAL_KEY`, `MODAL_SECRET` na Vercel e `gh workflow run quimica-data-refresh.yml` |
 
 **Prompt igual no treino, no gate e no serviço.** O Qwen3.5 responde sem raciocínio: o template põe um bloco de raciocínio vazio no início do turno
@@ -183,3 +183,5 @@ Qwen3.5; para um modelo Qwen2.5 seria preciso editar o ponteiro).
 **Eleições:** o mesmo GGUF passa pelo gate de lá (`--app eleicoes`), mas a publicação segue o `convert_gguf.py`/Volume `saibatudo-nlu-models` do app
 de eleições e só depois do congelamento (27/10).
 
+
+**Renome no Modal (14/10/2026, manhã):** o app `saibatudo-quimica-nlu` e o Volume `saibatudo-quimica-models` viraram `SaibaTudoIA-NLU-Quimica` e `SaibaTudoIA-Models-Quimica` (padrão `SaibaTudoIA-<Papel>-<App>` com hífen, decidido pelo mantenedor). O Modal não renomeia: Volume novo criado, os três arquivos da `nlu-v3.3-20261013` e o `current.json` copiados (sha256 do GGUF conferido), `modal deploy` com o nome novo, `MODAL_ENDPOINT` trocado na Vercel (produção) e redeploy; o app e o Volume antigos foram apagados depois do teste ao vivo. Medidas no endpoint novo: primeira chamada 22,2 s (cria o snapshot), quente 3,6–4,3 s direto no Modal e 3,0–4,9 s pela Vercel. O par de Proxy Auth Token é do workspace e não mudou.

@@ -100,7 +100,12 @@ opt-in e filtrada; segredos em `secrets/`.
 
 ## 6. Serviço, publicação e marca
 
-- **Hugging Face:** repositórios privados `franciscoaleixo/SaibaTudo-NLU` e `franciscoaleixo/SaibaTudo-Explica`, revisões
+- **Padrão de nomes (decisão do mantenedor em 14/10/2026):** `SaibaTudoIA-<Papel>-<App>`, com hífen, em todo serviço: Modal `SaibaTudoIA-NLU-Quimica` +
+  Volume `SaibaTudoIA-Models-Quimica` (**feito em 14/10**: Volume novo, GGUF copiado, redeploy, `MODAL_ENDPOINT` novo na Vercel, antigos apagados — o Modal
+  não renomeia); depois de 27/10: `SaibaTudoIA-NLU-Eleicoes` + `SaibaTudoIA-Models-Eleicoes`, `SaibaTudoIA-Explica-Reserva` (L4), Space
+  `SaibaTudoIA-Explica-Eleicoes`, HF `SaibaTudoIA-NLU-Eleicoes` (renome com redirecionamento), novos `SaibaTudoIA-NLU` e `SaibaTudoIA-Explica-Quimica`.
+  Os nomes abaixo (`SaibaTudo-NLU`, `saibatudo-ia-models`, `saibatudo-ia-explica`) são os do plano original e ficam só como referência.
+- **Hugging Face:** repositórios privados `franciscoaleixo/SaibaTudoIA-NLU` e `franciscoaleixo/SaibaTudoIA-Explica-<App>`, revisões
   imutáveis por versão (`v3.0-AAAAMMDD`). *Model card* com base, licença Apache 2.0 e aviso de atribuição ("baseado em Qwen3,
   © Alibaba Cloud, Apache 2.0") — exigência da licença; na interface dos apps o nome é só **SaibaTudo IA**.
 - **Modal:** Volume `saibatudo-ia-models` com `current.json` por tarefa; a função `nlu` recebe `app`; `MODEL_VERSION` por app na

@@ -9,7 +9,7 @@ meta.json/eval.json. Serve aos dois modelos do projeto (--target):
        legítimos) e eval_fidelidade (>= 98 % das explicações sem número inventado).
 
 O Modal só entra no fim, e só se os gates aprovarem: `--upload` envia o arquivo de produção (Q4_K_M), meta.json e eval.json ao Volume
-`saibatudo-quimica-models` (armazenamento, sem computação). A promoção é `backend/modal/promover.py --version <versão>`, que lê o `passed`
+`SaibaTudoIA-Models-Quimica` (armazenamento, sem computação). A promoção é `backend/modal/promover.py --version <versão>`, que lê o `passed`
 do meta.json: versão reprovada não é promovida (nem enviada).
 
 Uso (com o Python do ambiente de treino, que tem torch/transformers/llama-cpp-python):
@@ -44,7 +44,7 @@ import eval_golden as ev  # noqa: E402
 import eval_seguranca as ev_seg  # noqa: E402
 import nlu_core as core  # noqa: E402
 
-VOLUME_NAME = "saibatudo-quimica-models"
+VOLUME_NAME = "SaibaTudoIA-Models-Quimica"
 LLAMA_CPP_REPO = "https://github.com/ggml-org/llama.cpp"
 LLAMA_CPP_REF = "b11355"                       # tag fixa do conversor (a mesma usada nas conversões do app de eleições)
 LLAMA_CPP_PYTHON = "llama-cpp-python==0.3.19"  # manter igual ao de nlu_app.py (o gate roda com o runtime do serviço)

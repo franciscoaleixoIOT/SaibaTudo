@@ -68,7 +68,7 @@ O CSP do site continua estrito (`script-src 'self'`): toda biblioteca é vendori
 | Base para **interpretação** (nlu) | **Qwen2.5-1.5B-Instruct** (mesmo fluxo do app de eleições) | Rápido em CPU no Modal (GGUF Q4, ~1 s), formato JSON com gramática, gate já pronto. |
 | Treino | **Local** (QLoRA, `ai_model/scripts/train_hybrid.py` do projeto irmão, generalizado) | Decisão do mantenedor; custo zero. |
 | Conversão e gate | **Local** (`backend/modal/convert_local.py` do projeto irmão, generalizado) | Só o arquivo aprovado sobe. |
-| Publicação | **Hugging Face** (repo de modelo `franciscoaleixo/SaibaTudo-Quimica-NLU` e `-Ask`, revisões imutáveis) e **Modal** como reserva (Volume `saibatudo-quimica-models`) | Pedido do mantenedor: HF principal, Modal backup. |
+| Publicação | **Hugging Face** (repos de modelo `franciscoaleixo/SaibaTudoIA-NLU` e `SaibaTudoIA-Explica-Quimica`, revisões imutáveis; a criar) e **Modal** (app `SaibaTudoIA-NLU-Quimica` serve o NLU; Volume `SaibaTudoIA-Models-Quimica`; nomes de 14/10/2026) | Pedido do mantenedor: HF principal, Modal backup. |
 | Serviço de explicação | Space privado no **ZeroGPU** (cota de 40 min/dia da conta PRO), Modal L4 reserva com teto diário baixo | Mesmo desenho já medido no app de eleições (3 s de GPU por resposta). |
 | Cadência | Dados: **semanal**. Modelo: **mensal** ou quando o gate reprovar a produção no painel noturno | "Atualizações constantes com periodicidade menor". |
 

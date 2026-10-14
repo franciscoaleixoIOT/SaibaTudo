@@ -53,7 +53,7 @@ class TestMeta(unittest.TestCase):
         self.assertEqual(destinos, ["/nlu-v1-20261101/model-Q4_K_M.gguf", "/nlu-v1-20261101/meta.json", "/nlu-v1-20261101/eval.json"])
         for c in cmds:
             self.assertEqual(c[:5], ["python", "-m", "modal", "volume", "put"])
-            self.assertEqual(c[5], "saibatudo-quimica-models")
+            self.assertEqual(c[5], "SaibaTudoIA-Models-Quimica")
         self.assertFalse(any("f16" in " ".join(c) or "Q8_0" in " ".join(c) for c in cmds))
 
     def test_normalizar_previous_aceita_os_dois_formatos(self):
@@ -65,7 +65,7 @@ class TestMeta(unittest.TestCase):
         self.assertIsNone(conv.normalizar_previous(None))
 
     def test_o_volume_e_o_do_projeto_de_quimica(self):
-        self.assertEqual(conv.VOLUME_NAME, "saibatudo-quimica-models")
+        self.assertEqual(conv.VOLUME_NAME, "SaibaTudoIA-Models-Quimica")
 
 
 class TestPromocao(unittest.TestCase):

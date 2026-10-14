@@ -35,10 +35,10 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import nlu_core as core  # noqa: E402  (lógica pura: prompt, gramática, validação)
 
-APP_NAME = os.environ.get("NLU_APP_NAME", "saibatudo-quimica-nlu")
+APP_NAME = os.environ.get("NLU_APP_NAME", "SaibaTudoIA-NLU-Quimica")
 # Ponteiro de versão que este app serve (gravado por promover.py). Sem ele o contêiner falha ao subir: é assim que o rollback é explícito.
 POINTER = os.environ.get("NLU_POINTER", "current.json")
-VOLUME_NAME = "saibatudo-quimica-models"
+VOLUME_NAME = "SaibaTudoIA-Models-Quimica"
 MODELS_DIR = "/models"
 LLAMA_CPP_PYTHON = "llama-cpp-python==0.3.19"  # mesmo runtime do gate (convert_local.py)
 # Compilado do código-fonte: a wheel "cpu" do índice do projeto é ligada à musl (não carrega no Debian/glibc).

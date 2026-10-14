@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Promove (ou reverte) uma versão do modelo no Volume `saibatudo-quimica-models` do Modal: grava o ponteiro que o serviço lê ao subir.
+Promove (ou reverte) uma versão do modelo no Volume `SaibaTudoIA-Models-Quimica` do Modal: grava o ponteiro que o serviço lê ao subir.
 
   nlu  -> /current.json      (lido por nlu_app.py)
   ask  -> /ask-current.json  (lido por ask_app.py, a reserva do explicador)
 
 O serviço carrega o ponteiro quando o contêiner sobe: depois de promover, os contêineres novos já servem a versão nova (os que estão
-quentes terminam em até `scaledown_window` segundos; para forçar, `python -m modal app stop saibatudo-quimica-nlu` e redeploy).
+quentes terminam em até `scaledown_window` segundos; para forçar, `python -m modal app stop SaibaTudoIA-NLU-Quimica` e redeploy).
 
 Uso:
   python backend/modal/promover.py --version nlu-v1-20261101                 # lê ai_model/output/gguf/<versão>/meta.json; exige passed=true
