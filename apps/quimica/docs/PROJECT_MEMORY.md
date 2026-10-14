@@ -144,6 +144,19 @@ compartilhado; cópias geradas em `api/_lib/lexico/`), Android por idioma (léxi
 `idiomas` e textos em 5 idiomas. Pendências: revisão nativa (`revisao: pendente`), pistas de cálculo em pt no `AnswerBuilder`,
 elisão francesa no `ground.js`, miúdos listados em `PENDENCIAS.md` §12; versão Android **não** foi subida (sem release novo).
 
+## 6.h Primeiro NLU treinado em produção — SaibaTudo-NLU v3.3 (13/10/2026 à noite → 14/10 0h)
+O NLU da nuvem passou a ser o **SaibaTudo-NLU** (Qwen3.5-2B ajustado em `ia/treino/` da raiz, um modelo para todos os apps; plano em
+`docs/PLANO_IA_SAIBATUDO.md`). Três versões reprovaram no gate em 13/10 (v3: composto 88 %; v3.1: elemento 85 %; v3.2: "massa atômica"
+aprendida como MASSA_MOLAR) e a **v3.3 passou**: golden 723 com gramática 99,0 % de intenção, elemento 98,6 %, composto 98,1 %, propriedade
+98,3 %, equação 100 %, alucinação 0 %, os 5 idiomas ok; holdout de 2.395 nunca treinados 99,6 %; Q8 = Q4. Publicação (fluxo de `MODELO.md`
+§13): `ia/treino/empacotar_versao.py --app quimica --version nlu-v3.3-20261013` → `modal volume put` ×3 no Volume `saibatudo-quimica-models`
+(criado nesta data) → `modal deploy backend/modal/nlu_app.py` (app `saibatudo-quimica-nlu`; `::bench`: frio 11,2 s, quente p50 2,19 s) →
+`promover.py` → `MODAL_ENDPOINT`, `MODAL_KEY`, `MODAL_SECRET` (sensíveis) e `MODEL_VERSION` na Vercel (produção) → `vercel deploy --prod` **do
+diretório local** (o `quimica-data-refresh.yml` segue sem terminar no GitHub, §9.b/9.c de `PENDENCIAS.md`). Ao vivo: `/quimica/api/health` →
+`"model":"nlu-v3.3-20261013","nlu":"on"`; cinco perguntas em pt/de/es pelo `/quimica/api/nlu` certas (2,4–3,2 s quente; 9,8 s fria).
+**Os clientes (site e Android) ainda não chamam a API** — o botão de nuvem opt-in é o próximo passo de produto (§8.4 das pendências).
+Eleições reprovou no mesmo gate por um caso de cargo ("deputado mais votado") e só entra depois de 27/10.
+
 ## 7. Contas e segredos
 Vercel `saibatudo-quimica` (time `franciscoaleixo-9696`); GitHub `franciscoaleixoIOT`; Hugging Face `franciscoaleixo` (PRO, 40 min/dia de ZeroGPU); Modal `franciscoaleixo/main` (US$ 30/mês grátis; já usados pelo app de eleições, ~US$ 5/mês).
-`secrets/data_signing_key.pem` (nova, exclusiva deste app; pública em `pipeline/data_signing_public.pem`). Fazer backup offline. Nenhum outro segredo deste projeto existe ainda.
+`secrets/data_signing_key.pem` (nova, exclusiva deste app; pública em `pipeline/data_signing_public.pem`). Fazer backup offline. Modal: app `saibatudo-quimica-nlu`, Volume `saibatudo-quimica-models`, par de Proxy Auth Token criado pelo mantenedor em 13/10/2026 (guardado em `secrets/modal_proxy_quimica.env` da raiz do monorepo, ignorado, e como variáveis sensíveis na Vercel; nunca no Git nem no chat).

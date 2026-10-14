@@ -182,8 +182,8 @@ menos GPU que o 7B atual, então a cota de 40 min/dia rende mais respostas.
 > `ia/treino/empacotar_versao.py` e avaliador que trata a pergunta em branco como resposta do sistema.
 >
 > **Resultado do v3.2 (13/10, 2 h 40 de treino, Q4 dos dois apps até 18h25):** o problema do v3.1 sumiu — química `elemento` **98,6 %**,
-> `composto` 97,4 %, intenção 97,9 % (holdout 2.376: 99,4 %), alucinação zero nos casos nulos; eleições intenção **96,1 %** no golden (v3: 95,6 %),
-> `cargo` 100 %, holdout 96,8 %; sem `<think>`, template igual ao serviço. Os gates de referência dos dois apps passaram, **mas o gate por idioma
+> `composto` 97,4 %, intenção 97,9 % (holdout 2.376: 99,4 %), alucinação zero nos casos nulos; eleições intenção 92,1 % no golden de 114 (v3: 95,6 %; esquecimento de REGRAS_URNA),
+> holdout de 435: 96,1 %, `cargo` 100 % e sem alucinação; sem `<think>`, template igual ao serviço. Os gates de referência dos dois apps passaram, **mas o gate por idioma
 > reprovou**: `propriedade` em pt-BR 85,7 % (3 de 21) e `equacao` em es 80 % (1 de 5). Causa, de novo no gerador novo: as frases de **"massa
 > atômica de <elemento>"** entraram em `M_EL` sob **MASSA_MOLAR**, e no golden "massa atômica do oxigênio/carbono", "atomic mass of oxygen",
 > "Atommasse von Sauerstoff", "masse atomique de l'oxygène" são `PROPRIEDADE`/`massaAtomica` — o modelo aprendeu o contrário nas 5 línguas
@@ -194,6 +194,19 @@ menos GPU que o 7B atual, então a cota de 40 min/dia rende mais respostas.
 > **PROPRIEDADE** com `propriedade = massaAtomica` (cota 50 por idioma) e MASSA_MOLAR fica só com "massa molar/molar mass/molare Masse/masse
 > molaire"; o teste do gerador exige a separação. Mesma receita do v3.2 (continuação a partir do v3, revisão das eleições ×2,5), gate completo
 > em seguida; cópia do corpus v3.2 em `ia/corpus/out/v32/`.
+>
+> **Resultado do v3.3 e PUBLICAÇÃO (13/10 à noite, 2 h 20 de treino, gate completo até 23h50):** química **aprovada em tudo** — golden 723 com
+> gramática: intenção 99,0 %, elemento 98,6 %, composto 98,1 %, propriedade 98,3 %, equacao 100 %, unidadeDestino 100 %, alucinação 0 % nos
+> casos nulos, os 5 idiomas ok; holdout de 2.395 nunca treinados: 99,6 %; Q8 = Q4 (sem queda de quantização); sem `<think>`. Eleições: golden
+> 95,6 % (igual ao v3), holdout 96,8 %, reprovado só por "deputado mais votado" → `cargo` DEPUTADO_DISTRITAL (o mesmo caso do v3) e 4 erros
+> de intenção em REGRAS_URNA/frases soltas — fica para o ciclo das eleições depois de 27/10. **Publicado na química em 14/10 às 0h00 (UTC 03h):**
+> `ia/treino/empacotar_versao.py` → `nlu-v3.3-20261013` (`apps/quimica/ai_model/output/gguf/`), Volume `saibatudo-quimica-models` criado e
+> carregado (GGUF Q4 + meta + eval), `modal deploy backend/modal/nlu_app.py` (app `saibatudo-quimica-nlu`; bench: frio 11,2 s, quente p50 2,19 s),
+> `promover.py` (ponteiro com `prompt_suffix`), variáveis `MODAL_ENDPOINT`/`MODAL_KEY`/`MODAL_SECRET`/`MODEL_VERSION` na Vercel e
+> `vercel deploy --prod` pela CLI local (o workflow de dados ainda não termina no GitHub). Ao vivo: `/quimica/api/health` → `model nlu-v3.3-20261013,
+> nlu on`; 5 perguntas em pt/de/es respondidas certas pelo `/quimica/api/nlu` (2,4–3,2 s quente; 9,8 s na primeira, frio). O primeiro NLU
+> treinado da SaibaTudo.IA em produção. Próximos passos decididos pelo mantenedor: gramática gerada dos dados, resolução do composto na API e
+> normalização da entrada (código, não treino); depois a etapa 1 do AchaVagaIA.
 
 > **Decidido em 12/10/2026 (noite):** o mantenedor aprovou seguir com o **Qwen3.5-2B** como interpretador **único de todos os apps**
 > (Qwen3.5-4B de reserva se a química não passar no gate em en/es/de/fr) e deu o nome **"SaibaTudo.IA"** à IA (confirmado em 12/10; o nome fica numa constante única). Em andamento: etapa 2 (corpus único, `ia/corpus/`) e etapa 3a

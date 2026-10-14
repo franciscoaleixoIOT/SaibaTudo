@@ -29,10 +29,13 @@
 - [ ] Privacidade: `docs/PRIVACIDADE.md` ainda não existe; criar a partir da página `web/src/quimica/privacidade/` (os dois devem ser idênticos, com teste como no app de eleições).
 
 ## 4. Modelo (fase 5) — só depois de 2
-- [ ] NLU: `ai_model/scripts/train_hybrid.py --target nlu` sobre `dataset/nlu/` (Qwen2.5-1.5B, QLoRA, ~3 h na RTX 5060); merge; `backend/modal/convert_local.py --target nlu`; gates (JSON, intenção ≥ 85 %, entidades, alucinação, `eval_seguranca.py`).
+- [x] **NLU em produção desde 14/10/2026 (0h):** `nlu-v3.3-20261013` = SaibaTudo-NLU (Qwen3.5-2B, um só para todos os apps, treinado em `ia/treino/` da raiz — o caminho antigo `train_hybrid.py --target nlu` com Qwen2.5 não foi usado). Gate em `docs/MODELO.md` §13: golden 723 com gramática 99,0 % de intenção, elemento 98,6 %, composto 98,1 %, propriedade 98,3 %, equação 100 %, 5 idiomas ok, holdout 2.395 = 99,6 %, Q8 = Q4. Volume `saibatudo-quimica-models` (criado 13/10), app Modal `saibatudo-quimica-nlu` (bench: frio 11,2 s, quente p50 2,19 s), ponteiro com `prompt_suffix`. Histórico das versões reprovadas (v3, v3.1, v3.2) em `docs/PLANO_IA_SAIBATUDO.md` §9.
+- [ ] **Clientes ainda não chamam `/api/nlu`** (site e Android usam só o NLU local): ligar o botão de nuvem opt-in (§8.4) para o modelo publicado ter efeito para quem usa o app.
+- [ ] `MODAL_TIMEOUT_MS` está no padrão (12 s) e a primeira chamada fria levou 9,8 s ao vivo: se aparecer `upstream_timeout` nos logs, subir para 20000 e dar `maxDuration` 25 s a `api/nlu.js` no `vercel.json`.
+- [ ] Melhorias de código do serviço decididas pelo mantenedor em 13/10 (antes da etapa 1 do AchaVagaIA): gramática GBNF gerada dos dados do app (elemento só nos 118 símbolos, propriedade só nas chaves do pacote, unidadeDestino só na lista, MASSA_MOLAR obriga composto ou elemento); resolver o `composto` copiado no dicionário do pacote dentro da API ("não encontrei X, quis dizer Y?"); normalizar a entrada antes do modelo (setas e `=` em equações, fórmulas em minúsculas, acentos, digitação pelo léxico).
 - [ ] Explicador: `backend/retrain/build_ask_dataset.py` → `train_hybrid.py --target ask` (Qwen3-4B, `max_length 1024`; medir tempo: pode passar de 8 h); merge; gates `eval_fidelidade.py` e `eval_seguranca.py`.
-- [ ] Publicar no Hugging Face em repositórios novos (`franciscoaleixo/SaibaTudo-Quimica-NLU`, `-Ask`), revisão imutável; enviar GGUF do NLU ao Volume do Modal `saibatudo-quimica-models` e implantar `backend/modal/nlu_app.py`; criar o Space `franciscoaleixo/saibatudo-quimica-ask` (ZeroGPU) com `backend/hf_space_quimica/`.
-- [ ] Vercel: `MODAL_ENDPOINT`, `MODAL_KEY`, `MODAL_SECRET`, `MODEL_VERSION`, `HF_ASK_SPACE_URL`, `HF_TOKEN`, `ASK_ENABLED=1`; variável do repositório `ASK_ENABLED=1`; deploy; teste ao vivo; política de privacidade atualizada (nuvem opt-in, Hugging Face e Modal como operadores).
+- [~] ~~enviar GGUF do NLU ao Volume do Modal `saibatudo-quimica-models` e implantar `backend/modal/nlu_app.py`~~ (feito 14/10). Publicar no Hugging Face em repositórios novos (`franciscoaleixo/SaibaTudo-Quimica-NLU`, `-Ask`), revisão imutável; criar o Space `franciscoaleixo/saibatudo-quimica-ask` (ZeroGPU) com `backend/hf_space_quimica/`.
+- [~] Vercel: ~~`MODAL_ENDPOINT`, `MODAL_KEY`, `MODAL_SECRET`, `MODEL_VERSION`~~ (gravadas 14/10, produção; deploy pela CLI local; health `nlu on`), `HF_ASK_SPACE_URL`, `HF_TOKEN`, `ASK_ENABLED=1`; variável do repositório `ASK_ENABLED=1`; deploy; teste ao vivo; política de privacidade atualizada (nuvem opt-in, Hugging Face e Modal como operadores).
 - [ ] Impedir a suspensão do Windows durante o treino; não rodar outras cargas na GPU.
 - [ ] Teto de gasto no painel do Modal (ainda não definido pelo mantenedor).
 
@@ -202,5 +205,5 @@ Etapas (A–F em `I18N.md` §9):
 1. ~~`VERCEL_TOKEN_TIME`~~ criado em 11/10.
 2. Origem da chave `apikey-sabetudo.txt`.
 3. Permissão da OpenStax (opcional).
-4. Tokens do Modal e conta do Hugging Face quando o modelo estiver pronto; teto de gasto no Modal.
+4. ~~Tokens do Modal~~ (par de Proxy Auth criado pelo mantenedor em 13/10, em `secrets/modal_proxy_quimica.env` da raiz e na Vercel); conta do Hugging Face para o explicador; **teto de gasto no Modal** (ainda não definido).
 5. Chave de upload e conta da Play para o Android.
