@@ -475,7 +475,7 @@
     <string name="ui_inicio_experimente">Essayez de demander</string>
     <string name="ui_inicio_recentes">Questions récentes</string>
     <string name="ui_inicio_limpar">Effacer</string>
-    <string name="ui_inicio_privacidade">Confidentialité : vos questions sont traitées sur cet appareil et ne sont envoyées à personne. Internet ne sert qu’à télécharger des mises à jour signées des données.</string>
+    <string name="ui_inicio_privacidade">Confidentialité : vos questions sont traitées sur cet appareil. Rien ne quitte votre appareil, sauf si vous le demandez à l’IA dans le cloud.</string>
     <string name="molecula_desc">Structure 2D : %1$s</string>
 
     <!-- 23_propriedades -->
@@ -627,7 +627,7 @@
     <string name="ui_mais_seguranca_descricao">Pictogrammes, mentions d’avertissement et mentions de danger</string>
     <string name="ui_mais_sobre_descricao">Version, sources, licences et mise à jour</string>
     <string name="ui_mais_privacidade_descricao">Ce qui reste sur l’appareil et ce qui en sort</string>
-    <string name="ui_mais_config_descricao">Langue, thème, taille du texte et niveau</string>
+    <string name="ui_mais_config_descricao">Langue, thème, taille du texte, niveau et IA dans le cloud</string>
     <string name="ui_mais_versao">SaibaTudo Química %1$s (version %2$d). Open source, licence MIT.</string>
     <string name="ui_seguranca_titulo">Sécurité et SGH</string>
     <string name="ui_seguranca_oque_titulo">Qu’est-ce que le SGH</string>
@@ -679,19 +679,19 @@
     <string name="ui_sobre_app_texto">Open source, licence MIT. Le dessin des molécules utilise SmilesDrawer (licence MIT). Sans publicité, sans connexion et sans analyse d’usage.</string>
     <string name="ui_sobre_codigo_fonte">Voir le code source</string>
     <string name="ui_privacidade_titulo">Confidentialité</string>
-    <string name="ui_privacidade_nada_sai_titulo">Dans cette version, rien ne quitte votre appareil</string>
-    <string name="ui_privacidade_nada_sai_texto">Vos questions sont interprétées et traitées sur l’appareil lui-même. Internet ne sert qu’à télécharger les mises à jour signées du paquet de données sur saibatudo.net.</string>
+    <string name="ui_privacidade_nada_sai_titulo">Rien ne quitte votre appareil, sauf si vous le demandez à l’IA dans le cloud</string>
+    <string name="ui_privacidade_nada_sai_texto">Vos questions sont interprétées et traitées sur l’appareil lui-même. Internet sert à télécharger les mises à jour signées du paquet de données sur saibatudo.net et, uniquement à votre demande, à consulter l’IA dans le cloud.</string>
     <string name="ui_privacidade_guardado_titulo">Ce qui reste enregistré sur l’appareil</string>
-    <string name="ui_privacidade_guardado_item1">Vos préférences : thème, taille du texte, niveau et économie de données.</string>
+    <string name="ui_privacidade_guardado_item1">Vos préférences : thème, taille du texte, niveau, économie de données et IA dans le cloud automatique ; et l’identifiant aléatoire de cette installation, utilisé uniquement dans les demandes à l’IA dans le cloud.</string>
     <string name="ui_privacidade_guardado_item2">L’historique des dernières questions (jusqu’à 30), uniquement pour que vous puissiez les réutiliser. Vous pouvez l’effacer ci-dessous.</string>
     <string name="ui_privacidade_guardado_item3">Le paquet de données et les mises à jour téléchargées.</string>
     <string name="ui_privacidade_apagar_historico">Effacer l’historique des questions</string>
     <string name="ui_privacidade_sai_titulo">Ce qui quitte l’appareil</string>
-    <string name="ui_privacidade_sai_texto">Quand elle cherche une mise à jour, l’application envoie des requêtes HTTPS à saibatudo.net pour télécharger les fichiers de données. Comme pour tout accès à internet, le serveur voit l’adresse IP et la version de l’application. Aucune question, aucun identifiant et aucune donnée d’usage ne sont envoyés.</string>
+    <string name="ui_privacidade_sai_texto">Quand elle cherche une mise à jour, l’application envoie des requêtes HTTPS à saibatudo.net pour télécharger les fichiers de données. Comme pour tout accès à internet, le serveur voit l’adresse IP et la version de l’application. Aucune donnée d’usage n’est envoyée. Le texte d’une question ne quitte l’appareil que si vous touchez « Demander à l’IA dans le cloud » ou activez l’IA dans le cloud automatique.</string>
     <string name="ui_privacidade_nao_tem_titulo">Ce que l’application n’a pas</string>
     <string name="ui_privacidade_nao_tem_texto">Pas de connexion, pas de publicité, pas d’analyse d’usage, pas de localisation, pas d’accès aux contacts, à la caméra ni au microphone.</string>
     <string name="ui_privacidade_nuvem_titulo">IA dans le cloud</string>
-    <string name="ui_privacidade_nuvem_texto">Pas encore disponible. Si elle est proposée à l’avenir, elle sera facultative, uniquement avec votre consentement explicite et avec un avertissement sur ce qui serait envoyé.</string>
+    <string name="ui_privacidade_nuvem_texto">Facultative et désactivée par défaut. Quand vous touchez « Demander à l’IA dans le cloud » (ou activez l’option automatique dans Paramètres), l’application envoie à saibatudo.net uniquement le texte de cette question (300 caractères au plus) et un identifiant aléatoire de cette installation, qui ne vous identifie pas et sert seulement à la limite d’usage. Le modèle se contente d’interpréter la question : chaque nom, symbole et unité est vérifié dans les données de l’appareil, et les nombres viennent toujours du paquet signé. Le serveur n’enregistre pas la question dans ses journaux ; elle reste seulement dans un cache temporaire en mémoire.</string>
     <string name="ui_privacidade_politica_completa">Politique de confidentialité complète</string>
     <string name="ui_privacidade_relatar">Signaler un problème ou une erreur dans les données</string>
     <string name="ui_config_titulo">Paramètres</string>
@@ -853,4 +853,22 @@
     <string name="classe_molecular">composé moléculaire</string>
     <string name="classe_esteroide">stéroïde</string>
     <string name="classe_alcaloide">alcaloïde</string>
+
+    <!-- 50_nuvem (IA na nuvem opt-in, só interpretação) -->
+    <string name="origem_nuvem">IA dans le cloud • interprétation ; données du paquet</string>
+    <string name="ui_origem_nuvem">IA dans le cloud : le modèle a seulement interprété la question. La réponse et les nombres ont été construits sur l’appareil à partir du paquet de données signé.</string>
+    <string name="nuvem_botao_perguntar">Demander à l’IA dans le cloud</string>
+    <string name="nuvem_nota_nao_entendida">Envoie uniquement le texte de cette question au serveur de SaibaTudo (saibatudo.net) pour l’interpréter ; la réponse reste construite sur l’appareil avec les données du paquet. Cela peut prendre jusqu’à 25 s.</string>
+    <string name="nuvem_nota_entendida">La réponse ci-dessus vient de l’application. Si ce n’est pas ce que vous vouliez, l’IA dans le cloud essaie de comprendre la question autrement ; la réponse vient toujours des données du paquet. Envoie uniquement le texte de cette question. Cela peut prendre jusqu’à 25 s.</string>
+    <string name="nuvem_consultando">Consultation de l’IA dans le cloud…</string>
+    <string name="nuvem_falha_desligada">L’IA dans le cloud est désactivée pour le moment. La réponse ci-dessus reste valable.</string>
+    <string name="nuvem_falha_limite">La limite de questions à l’IA dans le cloud est atteinte. Réessayez plus tard ; la réponse ci-dessus reste valable.</string>
+    <string name="nuvem_falha_indisponivel">L’IA dans le cloud est indisponible pour l’instant ou a mis trop de temps. Réessayez dans un instant ou reformulez en citant l’élément, le composé ou la grandeur.</string>
+    <string name="nuvem_falha_indisponivel_entendida">L’IA dans le cloud est indisponible pour l’instant ou a mis trop de temps. La réponse ci-dessus reste valable ; réessayez dans un instant.</string>
+    <string name="nuvem_falha_nao_entendeu">L’IA dans le cloud n’a pas compris cette question non plus. Essayez de la reformuler en citant l’élément, le composé ou la grandeur.</string>
+    <string name="nuvem_falha_mesma">L’IA dans le cloud n’a pas trouvé d’autre façon de comprendre cette question. La réponse ci-dessus reste valable.</string>
+    <string name="nuvem_falha_invalida">L’IA dans le cloud a renvoyé une réponse dans un format inattendu ; elle a été écartée. Réessayez dans un instant.</string>
+    <string name="nuvem_voce_quis_dizer">Vouliez-vous dire :</string>
+    <string name="ui_config_nuvem_titulo">IA dans le cloud automatique</string>
+    <string name="ui_config_nuvem_descricao">Désactivée par défaut. Activée, les questions que l’application ne comprend pas sont envoyées (le texte seulement) à l’IA dans le cloud pour interprétation ; la réponse reste construite sur l’appareil avec les données du paquet. Désactivée, vous pouvez toujours toucher « Demander à l’IA dans le cloud » sous chaque réponse.</string>
 </resources>

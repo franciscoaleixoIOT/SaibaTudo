@@ -253,7 +253,8 @@ fun PrivacidadeScreen(onAbrirUrl: (String) -> Unit, onLimparHistorico: () -> Uni
 @Composable
 fun ConfiguracoesScreen(
     prefs: UserPreferences, onTema: (TemaApp) -> Unit, onFonte: (TamanhoFonte) -> Unit, onNivel: (Nivel) -> Unit, onEconomia: (Boolean) -> Unit,
-    modifier: Modifier = Modifier, idioma: String = Idiomas.PADRAO, onIdioma: (String) -> Unit = {}
+    modifier: Modifier = Modifier, idioma: String = Idiomas.PADRAO, onIdioma: (String) -> Unit = {},
+    onNuvemAutomatica: (Boolean) -> Unit = {}
 ) {
     val t = LocalTextos.current
     Pagina(t(R.string.ui_config_titulo), modifier) {
@@ -290,6 +291,15 @@ fun ConfiguracoesScreen(
                     Text(t(R.string.ui_config_economia_descricao), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 Switch(checked = prefs.economiaDeDados, onCheckedChange = onEconomia)
+            }
+        }
+        Cartao {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                Column(Modifier.weight(1f)) {
+                    Text(t(R.string.ui_config_nuvem_titulo), style = MaterialTheme.typography.titleSmall)
+                    Text(t(R.string.ui_config_nuvem_descricao), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Switch(checked = prefs.iaNuvemAutomatica, onCheckedChange = onNuvemAutomatica)
             }
         }
     }

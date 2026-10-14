@@ -121,7 +121,8 @@ private fun MainAppConteudo(vm: MainViewModel) {
         when (tela) {
             Tela.Inicio -> InicioScreen(
                 estado = estado, onPerguntar = vm::perguntar, onLimpar = vm::limparResposta, onAcao = { vm.executar(it, aberto) }, onAbrir = vm::abrir,
-                onAba = vm::irParaAba, onAbrirUrl = aberto, onLimparHistorico = vm::limparHistorico, modifier = m
+                onAba = vm::irParaAba, onAbrirUrl = aberto, onLimparHistorico = vm::limparHistorico, modifier = m,
+                onPerguntarNuvem = vm::perguntarNaNuvem
             )
             Tela.Tabela -> TabelaScreen(pacote, onAbrirElemento = { vm.abrir(Tela.Elemento(it)) }, modifier = m)
             Tela.Busca -> BuscaScreen(
@@ -140,7 +141,8 @@ private fun MainAppConteudo(vm: MainViewModel) {
             Tela.Privacidade -> PrivacidadeScreen(onAbrirUrl = aberto, onLimparHistorico = vm::limparHistorico, modifier = m)
             Tela.Configuracoes -> ConfiguracoesScreen(
                 estado.prefs, onTema = vm::definirTema, onFonte = vm::definirFonte, onNivel = vm::definirNivel, onEconomia = vm::definirEconomia, modifier = m,
-                idioma = estado.idioma, onIdioma = { id -> vm.definirIdioma(id); IdiomaApp.definir(contexto, id) }
+                idioma = estado.idioma, onIdioma = { id -> vm.definirIdioma(id); IdiomaApp.definir(contexto, id) },
+                onNuvemAutomatica = vm::definirNuvemAutomatica
             )
         }
     }

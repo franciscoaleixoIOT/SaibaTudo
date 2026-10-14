@@ -33,8 +33,9 @@ enum class Nivel(val id: String, @param:StringRes val rotulo: Int, @param:String
 }
 
 /**
- * Preferências do usuário (armazenadas apenas no aparelho).
- * Nada aqui é enviado a servidores: nesta versão o único tráfego de rede é a atualização assinada do pacote de dados.
+ * Preferências do usuário (armazenadas apenas no aparelho). Nada aqui é enviado a servidores. A rede serve para a atualização assinada
+ * do pacote de dados e, só com consentimento (botão "Perguntar à IA na nuvem" ou [iaNuvemAutomatica]), para enviar o TEXTO de uma
+ * pergunta ao NLU na nuvem; o [idInstalacao] é aleatório (UUID v4, não identifica a pessoa) e só acompanha essas chamadas (limite de uso).
  */
 data class UserPreferences(
     val tema: TemaApp = TemaApp.SISTEMA,
@@ -44,7 +45,11 @@ data class UserPreferences(
     val economiaDeDados: Boolean = false,
     val ultimaVerificacaoDados: Long = 0L,
     val ultimaVersaoDados: String? = null,
-    val historicoPerguntas: List<String> = emptyList()
+    val historicoPerguntas: List<String> = emptyList(),
+    /** IA na nuvem automática: as perguntas que o app não entende vão (só o texto) ao NLU na nuvem. Desligada por padrão. */
+    val iaNuvemAutomatica: Boolean = false,
+    /** Identificador aleatório desta instalação, criado no primeiro pedido à nuvem. */
+    val idInstalacao: String? = null
 )
 
 /** Armazenamento de preferências (interface para permitir testes sem Android). */
@@ -65,6 +70,8 @@ class DataStorePreferences(private val context: Context) : PreferencesStore {
         val verif = longPreferencesKey("ultima_verificacao_dados")
         val versao = stringPreferencesKey("ultima_versao_dados")
         val historico = stringPreferencesKey("historico_perguntas")
+        val iaNuvem = booleanPreferencesKey("ia_nuvem_automatica")
+        val iid = stringPreferencesKey("id_instalacao")
     }
 
     private val gson = Gson()
@@ -84,7 +91,9 @@ class DataStorePreferences(private val context: Context) : PreferencesStore {
             } catch (_: Exception) {
                 null
             }
-        } ?: emptyList()
+        } ?: emptyList(),
+        iaNuvemAutomatica = p[K.iaNuvem] ?: false,
+        idInstalacao = p[K.iid]
     )
 
     override suspend fun atualizar(transformacao: (UserPreferences) -> UserPreferences) {
@@ -96,6 +105,8 @@ class DataStorePreferences(private val context: Context) : PreferencesStore {
             p[K.economia] = novo.economiaDeDados
             p[K.verif] = novo.ultimaVerificacaoDados
             if (novo.ultimaVersaoDados != null) p[K.versao] = novo.ultimaVersaoDados else p.remove(K.versao)
+            p[K.iaNuvem] = novo.iaNuvemAutomatica
+            if (novo.idInstalacao != null) p[K.iid] = novo.idInstalacao else p.remove(K.iid)
             if (novo.historicoPerguntas.isNotEmpty()) {
                 p[K.historico] = gson.toJson(novo.historicoPerguntas.takeLast(30))
             } else {
@@ -103,6 +114,14 @@ class DataStorePreferences(private val context: Context) : PreferencesStore {
             }
         }
     }
+}
+
+/** Identificador aleatório da instalação (UUID v4): o guardado ou um novo, que fica salvo. */
+suspend fun PreferencesStore.idInstalacao(): String {
+    atual().idInstalacao?.let { return it }
+    var id = ""
+    atualizar { p -> if (p.idInstalacao != null) p.also { id = it.idInstalacao!! } else p.copy(idInstalacao = java.util.UUID.randomUUID().toString()).also { id = it.idInstalacao!! } }
+    return id
 }
 
 /** Implementação em memória (testes unitários e pré-visualizações). */

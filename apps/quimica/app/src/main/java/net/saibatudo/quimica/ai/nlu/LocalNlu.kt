@@ -252,7 +252,7 @@ object LocalNlu {
     private fun grupoDe(m: MatchResult?): Int? = m?.groupValues?.drop(1)?.firstOrNull { it.isNotEmpty() }?.toIntOrNull()
 
     /** Remove o gatilho de conceito e os artigos do idioma: "o que é um mol" → "mol"; "what is a mole" → "mole". */
-    private fun conceitoDe(n: String, lex: Lexico): String {
+    internal fun conceitoDe(n: String, lex: Lexico): String {
         var s = n.replace(lex.intencao("conceitoCue"), "").trim()
         for (rx in lex.limparConceito) s = s.replace(rx, "")
         return s.trim()

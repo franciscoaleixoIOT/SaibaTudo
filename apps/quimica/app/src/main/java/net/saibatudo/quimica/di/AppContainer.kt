@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import net.saibatudo.quimica.BuildConfig
+import net.saibatudo.quimica.ai.nlu.CloudNluClient
 import net.saibatudo.quimica.data.bundle.BundleStore
 import net.saibatudo.quimica.data.bundle.DataUpdateScheduler
 import net.saibatudo.quimica.data.bundle.DataUpdater
@@ -23,11 +24,14 @@ import okhttp3.OkHttpClient
 class AppContainer(private val app: Context) {
     private val escopo = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
-    /** Único cliente HTTP do app: usado só pela atualização assinada do pacote de dados. */
+    /** Único cliente HTTP do app: atualização assinada do pacote de dados e, com consentimento, a IA na nuvem. */
     val http: OkHttpClient by lazy { HttpClientFactory.criar(BuildConfig.VERSION_NAME) }
 
     /** Textos do app (res/values-<idioma>/strings.xml) por idioma: respostas, dicionário e telas. */
     val recursos: FonteDeTextos by lazy { RecursosAndroid(app) }
+
+    /** NLU na nuvem (`POST <API_BASE_URL>nlu`): só chamado com consentimento; só interpreta, a resposta é montada no aparelho. */
+    val nuvem: CloudNluClient by lazy { CloudNluClient(http, BuildConfig.API_BASE_URL + "nlu") }
 
     val preferencias: PreferencesStore by lazy { DataStorePreferences(app) }
     private val verificador: ManifestVerifier by lazy { ManifestVerifier(BuildConfig.DATA_PUBLIC_KEY) }

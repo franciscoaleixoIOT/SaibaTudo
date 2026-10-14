@@ -12,6 +12,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.saibatudo.quimica.ai.answer.AnswerBuilder
+import net.saibatudo.quimica.ai.engine.AssistenteNuvem
+import net.saibatudo.quimica.ai.engine.DesfechoNuvem
+import net.saibatudo.quimica.ai.engine.FalhaNuvem
+import net.saibatudo.quimica.ai.nlu.CloudNluClient
+import net.saibatudo.quimica.ai.model.OrigemResposta
 import net.saibatudo.quimica.ai.answer.sugestoes
 import net.saibatudo.quimica.ai.model.Acao
 import net.saibatudo.quimica.ai.model.Intent
@@ -29,6 +34,7 @@ import net.saibatudo.quimica.data.prefs.PreferencesStore
 import net.saibatudo.quimica.data.prefs.TamanhoFonte
 import net.saibatudo.quimica.data.prefs.TemaApp
 import net.saibatudo.quimica.data.prefs.UserPreferences
+import net.saibatudo.quimica.data.prefs.idInstalacao
 import net.saibatudo.quimica.data.repository.EstadoDados
 import net.saibatudo.quimica.data.repository.Pacote
 import net.saibatudo.quimica.data.repository.QuimicaDataStore
@@ -64,6 +70,14 @@ fun Tela.aba(): Tela = when (this) {
 
 data class RespostaUi(val pergunta: String, val resposta: Resposta)
 
+/** Estado do pedido à IA na nuvem para a resposta atual. */
+data class EstadoNuvem(
+    val consultando: Boolean = false,
+    val falha: FalhaNuvem? = null,
+    /** Perguntas reescritas com o composto sugerido pela nuvem ("você quis dizer…?"). */
+    val sugestoes: List<String> = emptyList()
+)
+
 data class UiState(
     val dados: EstadoDados = EstadoDados.Carregando,
     val prefs: UserPreferences = UserPreferences(),
@@ -72,7 +86,10 @@ data class UiState(
     val pensando: Boolean = false,
     val sugestoes: List<String> = emptyList(),
     /** Idioma do app (pt-BR, en, es, de, fr): o do interpretador, do dicionário e das respostas. */
-    val idioma: String = Idiomas.PADRAO
+    val idioma: String = Idiomas.PADRAO,
+    val nuvem: EstadoNuvem = EstadoNuvem(),
+    /** O app tem o cliente da IA na nuvem (sempre, no aparelho; os testes podem montar sem). */
+    val nuvemDisponivel: Boolean = false
 )
 
 class MainViewModel(
@@ -81,8 +98,15 @@ class MainViewModel(
     private val atualizacoes: UpdateCoordinator,
     /** De onde vêm os textos (res/values-<idioma>/strings.xml no aparelho): o dicionário, as respostas e as telas leem daqui, no idioma do app. */
     private val fonteDeTextos: FonteDeTextos,
-    idiomaInicial: String = Idiomas.PADRAO
+    idiomaInicial: String = Idiomas.PADRAO,
+    /** Cliente da IA na nuvem (opt-in, só interpretação); null = sem nuvem. */
+    clienteNuvem: CloudNluClient? = null
 ) : ViewModel() {
+
+    private val assistenteNuvem: AssistenteNuvem? = clienteNuvem?.let { AssistenteNuvem(it, { prefs.idInstalacao() }) }
+    /** Contexto da conversa ANTES da pergunta exibida (para reinterpretar a mesma pergunta na nuvem). */
+    private var contextoDaResposta: ParsedQuery? = null
+    private val _nuvem = MutableStateFlow(EstadoNuvem())
 
     private val _pilha = MutableStateFlow<List<Tela>>(listOf(Tela.Inicio))
     val pilha: StateFlow<List<Tela>> = _pilha
@@ -108,7 +132,9 @@ class MainViewModel(
         UiState(dados = d, prefs = p, atualizacao = a, resposta = r, pensando = pe)
     }
 
-    val estado: StateFlow<UiState> = combine(base, _sugestoes, _idioma) { b, s, i -> b.copy(sugestoes = s, idioma = i) }
+    val estado: StateFlow<UiState> = combine(base, _sugestoes, _idioma, _nuvem) { b, s, i, nv ->
+        b.copy(sugestoes = s, idioma = i, nuvem = nv, nuvemDisponivel = assistenteNuvem != null)
+    }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UiState())
 
     init {
@@ -182,17 +208,62 @@ class MainViewModel(
                     _resposta.value = null
                     return@launch
                 }
+                val contextoAnterior = contexto
+                contextoDaResposta = contextoAnterior
                 val (q, r) = withContext(Dispatchers.Default) { b.responder(pergunta, contexto) }
                 if (r.entendida && q.intent !in META) contexto = q
+                _nuvem.value = EstadoNuvem()
                 _resposta.value = RespostaUi(pergunta, r)
                 prefs.atualizar { p -> p.copy(historicoPerguntas = (p.historicoPerguntas.filter { it != pergunta } + pergunta).takeLast(30)) }
+                // IA na nuvem automática (consentimento dado nas configurações): só nas perguntas que o app não entendeu
+                if (!r.entendida && !r.recusa && q.intent != Intent.RECUSA_PERIGO && assistenteNuvem != null && prefs.atual().iaNuvemAutomatica) {
+                    _pensando.value = false
+                    consultarNuvem(pergunta, b, contextoAnterior, r, explicito = false)
+                }
             } finally {
                 _pensando.value = false
             }
         }
     }
 
-    fun limparResposta() { _resposta.value = null }
+    /**
+     * Botão "Perguntar à IA na nuvem" (consentimento só para esta pergunta). A nuvem só interpreta; a resposta nova é montada no aparelho.
+     * Sucesso ⇒ substitui a resposta; falha ⇒ mantém a resposta e mostra o motivo.
+     */
+    fun perguntarNaNuvem() {
+        val atual = _resposta.value ?: return
+        if (_nuvem.value.consultando || atual.resposta.origem == OrigemResposta.NUVEM || atual.resposta.recusa || assistenteNuvem == null) return
+        viewModelScope.launch {
+            val b = withContext(Dispatchers.Default) { montador() } ?: return@launch
+            consultarNuvem(atual.pergunta, b, contextoDaResposta, atual.resposta, explicito = true)
+        }
+    }
+
+    private suspend fun consultarNuvem(pergunta: String, b: AnswerBuilder, ctx: ParsedQuery?, respostaAtual: Resposta, explicito: Boolean) {
+        val a = assistenteNuvem ?: return
+        _nuvem.value = EstadoNuvem(consultando = true)
+        val desfecho = try {
+            withContext(Dispatchers.Default) { a.interpretar(pergunta, b, ctx, respostaAtual, explicito) }
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
+        } catch (_: Exception) {
+            DesfechoNuvem.Falhou(FalhaNuvem.INDISPONIVEL)
+        }
+        // a pessoa pode ter feito outra pergunta ou fechado a resposta enquanto a nuvem pensava
+        if (_resposta.value?.pergunta != pergunta) { _nuvem.value = EstadoNuvem(); return }
+        when (desfecho) {
+            is DesfechoNuvem.Respondida -> {
+                if (desfecho.resposta.entendida && desfecho.query.intent !in META) contexto = desfecho.query
+                _resposta.value = RespostaUi(pergunta, desfecho.resposta)
+                _nuvem.value = EstadoNuvem()
+            }
+            is DesfechoNuvem.Falhou -> _nuvem.value = EstadoNuvem(falha = desfecho.motivo, sugestoes = desfecho.sugestoes)
+        }
+    }
+
+    fun limparResposta() { _resposta.value = null; _nuvem.value = EstadoNuvem() }
+
+    fun definirNuvemAutomatica(v: Boolean) { viewModelScope.launch { prefs.atualizar { it.copy(iaNuvemAutomatica = v) } } }
 
     fun limparHistorico() { viewModelScope.launch { prefs.atualizar { it.copy(historicoPerguntas = emptyList()) } } }
 

@@ -50,6 +50,7 @@ import net.saibatudo.quimica.data.repository.EstadoDados
 import net.saibatudo.quimica.ui.components.AvisoBox
 import net.saibatudo.quimica.ui.components.Cartao
 import net.saibatudo.quimica.ui.LocalTextos
+import net.saibatudo.quimica.ui.components.PainelNuvem
 import net.saibatudo.quimica.ui.components.RespostaView
 import net.saibatudo.quimica.ui.viewmodel.Tela
 import net.saibatudo.quimica.ui.viewmodel.UiState
@@ -66,7 +67,8 @@ fun InicioScreen(
     onAba: (Tela) -> Unit,
     onAbrirUrl: (String) -> Unit,
     onLimparHistorico: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onPerguntarNuvem: () -> Unit = {}
 ) {
     val t = LocalTextos.current
     var texto by rememberSaveable { mutableStateOf("") }
@@ -111,6 +113,9 @@ fun InicioScreen(
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(t(R.string.ui_inicio_voce_perguntou, r.pergunta), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     RespostaView(r.resposta, onAcao = onAcao, onSugestao = { s -> texto = s; onPerguntar(s) }, onAbrirUrl = onAbrirUrl)
+                    if (estado.nuvemDisponivel) {
+                        PainelNuvem(r.resposta, estado.nuvem, onPerguntar = onPerguntarNuvem, onSugestao = { s -> texto = s; onPerguntar(s) })
+                    }
                     TextButton(onClick = { onLimpar(); texto = "" }) { Text(t(R.string.ui_inicio_nova_pergunta)) }
                 }
             }

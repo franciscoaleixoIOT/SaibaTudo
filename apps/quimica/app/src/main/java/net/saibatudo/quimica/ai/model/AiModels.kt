@@ -80,7 +80,9 @@ data class ParsedQuery(
 
 enum class OrigemResposta(@param:StringRes val rotulo: Int) {
     LOCAL(R.string.origem_local),
-    AVISO(R.string.origem_aviso)
+    AVISO(R.string.origem_aviso),
+    /** A IA na nuvem só INTERPRETOU a pergunta; a resposta foi montada no aparelho com os dados do pacote. */
+    NUVEM(R.string.origem_nuvem)
 }
 
 /** Calculadoras do app, para os atalhos "Abrir calculadora". */

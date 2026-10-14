@@ -473,7 +473,7 @@
     <string name="ui_inicio_experimente">Try asking</string>
     <string name="ui_inicio_recentes">Recent questions</string>
     <string name="ui_inicio_limpar">Clear</string>
-    <string name="ui_inicio_privacidade">Privacy: your questions are answered on this device and are not sent to anyone. The internet is only used to download signed data updates.</string>
+    <string name="ui_inicio_privacidade">Privacy: your questions are answered on this device. Nothing leaves your device unless you ask the cloud AI.</string>
     <string name="molecula_desc">2D structure of %1$s</string>
 
     <!-- 23_propriedades -->
@@ -625,7 +625,7 @@
     <string name="ui_mais_seguranca_descricao">Pictograms, signal words and hazard statements</string>
     <string name="ui_mais_sobre_descricao">Version, sources, licences and update</string>
     <string name="ui_mais_privacidade_descricao">What stays on the device and what leaves it</string>
-    <string name="ui_mais_config_descricao">Language, theme, text size and level</string>
+    <string name="ui_mais_config_descricao">Language, theme, text size, level and cloud AI</string>
     <string name="ui_mais_versao">SaibaTudo Química %1$s (version %2$d). Open source, MIT licence.</string>
     <string name="ui_seguranca_titulo">Safety and GHS</string>
     <string name="ui_seguranca_oque_titulo">What GHS is</string>
@@ -677,19 +677,19 @@
     <string name="ui_sobre_app_texto">Open source, MIT licence. The molecule drawing uses SmilesDrawer (MIT licence). No ads, no login and no usage analytics.</string>
     <string name="ui_sobre_codigo_fonte">View the source code</string>
     <string name="ui_privacidade_titulo">Privacy</string>
-    <string name="ui_privacidade_nada_sai_titulo">In this version, nothing of yours leaves the device</string>
-    <string name="ui_privacidade_nada_sai_texto">Your questions are interpreted and answered on the device itself. The only use of the internet is to download signed data package updates from saibatudo.net.</string>
+    <string name="ui_privacidade_nada_sai_titulo">Nothing leaves your device unless you ask the cloud AI</string>
+    <string name="ui_privacidade_nada_sai_texto">Your questions are interpreted and answered on the device itself. The internet is used to download signed data package updates from saibatudo.net and, only when you ask, to consult the cloud AI.</string>
     <string name="ui_privacidade_guardado_titulo">What is stored on the device</string>
-    <string name="ui_privacidade_guardado_item1">Your preferences: theme, text size, level and data saver.</string>
+    <string name="ui_privacidade_guardado_item1">Your preferences: theme, text size, level, data saver and automatic cloud AI; and the random identifier of this installation, used only in requests to the cloud AI.</string>
     <string name="ui_privacidade_guardado_item2">The history of your last questions (up to 30), only so you can reuse them. You can delete it below.</string>
     <string name="ui_privacidade_guardado_item3">The data package and the updates downloaded.</string>
     <string name="ui_privacidade_apagar_historico">Delete the question history</string>
     <string name="ui_privacidade_sai_titulo">What leaves the device</string>
-    <string name="ui_privacidade_sai_texto">When looking for an update, the app makes HTTPS requests to saibatudo.net to download the data files. As with any internet access, the server sees the IP address and the app version. No questions, identifiers or usage data are sent.</string>
+    <string name="ui_privacidade_sai_texto">When looking for an update, the app makes HTTPS requests to saibatudo.net to download the data files. As with any internet access, the server sees the IP address and the app version. No usage data is sent. The text of a question only leaves the device when you tap “Ask the cloud AI” or turn on automatic cloud AI.</string>
     <string name="ui_privacidade_nao_tem_titulo">What the app does not have</string>
     <string name="ui_privacidade_nao_tem_texto">No login, no ads, no usage analytics, no location, no access to contacts, camera or microphone.</string>
     <string name="ui_privacidade_nuvem_titulo">Cloud AI</string>
-    <string name="ui_privacidade_nuvem_texto">Not available yet. If it is offered in the future, it will be optional, only with your explicit consent and with a notice of what would be sent.</string>
+    <string name="ui_privacidade_nuvem_texto">Optional and off by default. When you tap “Ask the cloud AI” (or turn on the automatic option in Settings), the app sends saibatudo.net only the text of that question (up to 300 characters) and a random identifier of this installation, which does not identify you and is used only for the usage limit. The model only interprets the question: every name, symbol and unit is checked against the data on the device, and the numbers always come from the signed package. The server does not log the question; it is kept only in a temporary in-memory cache.</string>
     <string name="ui_privacidade_politica_completa">Full privacy policy</string>
     <string name="ui_privacidade_relatar">Report a problem or an error in the data</string>
     <string name="ui_config_titulo">Settings</string>
@@ -850,4 +850,22 @@
     <string name="classe_molecular">molecular compound</string>
     <string name="classe_esteroide">steroid</string>
     <string name="classe_alcaloide">alkaloid</string>
+
+    <!-- 50_nuvem (IA na nuvem opt-in, só interpretação) -->
+    <string name="origem_nuvem">Cloud AI • interpretation; data from the package</string>
+    <string name="ui_origem_nuvem">Cloud AI: the model only interpreted the question. The answer and the numbers were put together on the device from the signed data package.</string>
+    <string name="nuvem_botao_perguntar">Ask the cloud AI</string>
+    <string name="nuvem_nota_nao_entendida">Sends only the text of this question to the SaibaTudo server (saibatudo.net) for interpretation; the answer is still put together on the device from the package data. It can take up to 25 s.</string>
+    <string name="nuvem_nota_entendida">The answer above came from the app. If it is not what you wanted, the cloud AI tries to understand the question another way; the answer still comes from the package data. Sends only the text of this question. It can take up to 25 s.</string>
+    <string name="nuvem_consultando">Consulting the cloud AI…</string>
+    <string name="nuvem_falha_desligada">The cloud AI is switched off at the moment. The answer above still stands.</string>
+    <string name="nuvem_falha_limite">The limit of questions to the cloud AI has been reached. Try again later; the answer above still stands.</string>
+    <string name="nuvem_falha_indisponivel">The cloud AI is unavailable right now or took too long. Try again in a moment or rephrase, naming the element, the compound or the quantity.</string>
+    <string name="nuvem_falha_indisponivel_entendida">The cloud AI is unavailable right now or took too long. The answer above still stands; try again in a moment.</string>
+    <string name="nuvem_falha_nao_entendeu">The cloud AI did not understand this question either. Try rephrasing, naming the element, the compound or the quantity.</string>
+    <string name="nuvem_falha_mesma">The cloud AI found no other way to understand this question. The answer above still stands.</string>
+    <string name="nuvem_falha_invalida">The cloud AI returned a reply in an unexpected format and it was discarded. Try again in a moment.</string>
+    <string name="nuvem_voce_quis_dizer">Did you mean:</string>
+    <string name="ui_config_nuvem_titulo">Automatic cloud AI</string>
+    <string name="ui_config_nuvem_descricao">Off by default. When on, questions the app does not understand are sent (text only) to the cloud AI for interpretation; the answer is still put together on the device from the package data. When off, you can still tap “Ask the cloud AI” on each answer.</string>
 </resources>

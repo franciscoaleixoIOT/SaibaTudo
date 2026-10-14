@@ -65,7 +65,11 @@ fun RespostaView(
         resposta.blocos.forEach { BlocoView(it, onAbrirUrl) }
         FontesView(resposta.fontes, onAbrirUrl)
         Text(
-            if (resposta.origem == OrigemResposta.LOCAL) t(R.string.ui_origem_local) else t(resposta.origem.rotulo),
+            when (resposta.origem) {
+                OrigemResposta.LOCAL -> t(R.string.ui_origem_local)
+                OrigemResposta.NUVEM -> t(R.string.ui_origem_nuvem)
+                else -> t(resposta.origem.rotulo)
+            },
             style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         if (resposta.acoes.isNotEmpty()) {

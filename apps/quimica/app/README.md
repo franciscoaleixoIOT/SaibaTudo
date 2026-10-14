@@ -1,4 +1,4 @@
-# App Android — SaibaTudo Química (v0)
+# App Android — SaibaTudo Química (1.0.0)
 
 Kotlin + Jetpack Compose (Material 3), MVVM, DataStore, WorkManager, OkHttp, Gson. Pacote `net.saibatudo.quimica`, `versionName 1.0.0`
 (`versionCode 1`), `minSdk 24`. Molde: o app do SaibaTudo Eleições 2026.
@@ -6,8 +6,42 @@ Kotlin + Jetpack Compose (Material 3), MVVM, DataStore, WorkManager, OkHttp, Gso
 **O que faz:** início com campo de pergunta (NLU local, respostas só dos dados com fonte), tabela periódica interativa, ficha do elemento e do
 composto (estrutura 2D numa WebView local com SmilesDrawer, GHS com pictogramas vetoriais, link da ficha ICSC no site da OIT), busca,
 calculadoras com passos (massa molar, balanceamento, estequiometria, concentração/diluição, pH forte e fraco, gás ideal, unidades),
-segurança/GHS, "Sobre os dados", privacidade e configurações (tema, tamanho do texto, nível). Nesta versão **nada do usuário sai do aparelho**:
-a internet serve só para a atualização assinada do pacote de dados; a IA na nuvem aparece como "ainda não disponível".
+segurança/GHS, "Sobre os dados", privacidade e configurações (idioma, tema, tamanho do texto, nível, economia de dados, IA na nuvem automática).
+**Nada sai do aparelho, a menos que a pessoa peça à IA na nuvem**: a internet serve para a atualização assinada do pacote de dados e, só com
+consentimento, para a interpretação na nuvem (abaixo).
+
+**Estado (14/10/2026):** versão **1.0.0 (versionCode 1)** pronta para o teste fechado na Play — IA na nuvem opt-in (só interpretação), ícone da
+marca, release assinado com R8 e verificador de release. Notas e como foi testado: [`../docs/RELEASE_1.0.0.md`](../docs/RELEASE_1.0.0.md).
+
+## IA na nuvem (opt-in, só interpretação)
+
+Molde: `apps/eleicoes2026/.../ai/nlu/CloudNlu.kt` e `HybridAiInferenceEngine.kt`. Contrato do servidor em `../api/README.md` (§ `POST /api/nlu`).
+- **Quando sai algo do aparelho:** só no toque em "Perguntar à IA na nuvem" (embaixo de toda resposta que não é recusa nem já veio da nuvem; o texto da
+  nota muda se a resposta foi ou não entendida) ou com **Configurações > IA na nuvem automática** ligada (desligada por padrão; só nas perguntas
+  que o app não entendeu). Pedido perigoso (`Seguranca.kt`) nunca sai do aparelho.
+- **O que sai:** `POST <API_BASE_URL>nlu` com `{"q": <até 300 caracteres>, "v": 1, "client": "android", "iid": <UUID v4 aleatório da instalação>}`.
+  O `iid` é criado no primeiro pedido e guardado no DataStore (`id_instalacao`); a chave automática é `ia_nuvem_automatica`.
+- **Nenhum número vem do modelo.** `ai/nlu/CloudNlu.kt`: `CloudNluClient` (200 → `Ok`; `503 disabled` → desligada; `429`/`503 budget` → limite;
+  rede/tempo/5xx/4xx → indisponível; JSON fora do contrato → inválida) e `NluValidator`, que revalida cada entidade nos dados LOCAIS
+  (símbolo existe no pacote e está escrito na pergunta; composto copiado da pergunta e resolvido no dicionário local, CID de `resolucao` só se
+  existir no pacote, fórmula válida; propriedade com id conhecido; unidade conhecida e número escrito na pergunta; equação com espécies da
+  pergunta; nível válido). Fora do vocabulário = descartado; intenção que exige entidade sem a entidade = não confiável. A segurança local vence.
+- `ai/engine/AssistenteNuvem.kt` junta a interpretação validada com a local, monta a resposta no `AnswerBuilder` com `OrigemResposta.NUVEM`
+  (rótulo "IA na nuvem • interpretação; dados do pacote") e devolve o motivo da falha (`FalhaNuvem`: desligada, limite, indisponível, não entendeu,
+  mesma interpretação, inválida). Sugestões de `resolucao.composto.sugestoes` (só CIDs do pacote) viram perguntas reescritas ("Você quis dizer:").
+- Tempo: **25 s** no pedido explícito (o serviço leva até ~22 s na partida a frio) e 14 s no automático (`callTimeout` por pedido).
+- UI: `ui/components/NuvemView.kt` (botão, nota de consentimento, "Consultando a IA na nuvem…", motivo da falha); textos `nuvem_*`,
+  `origem_nuvem`, `ui_origem_nuvem`, `ui_config_nuvem_*` e a página de Privacidade nos cinco idiomas.
+- Testes: `CloudNluTest` (validador: aceitas/descartadas, fora do vocabulário, intenção sem entidade, tipos inesperados, recusa local; cliente com
+  MockWebServer: 200, 503 disabled/budget, 429, 400/502, tempo esgotado, JSON malformado; assistente: resposta local com origem NUVEM, motivos, sugestões,
+  pedido perigoso não sai; `iid` UUID v4 estável).
+
+## Ícone
+
+`res/drawable/ic_launcher_{background,foreground,monochrome}.xml` são a conversão direta de `../brand/quimica-icon.svg` (só polígonos e círculos;
+vector drawable, sem PNG): fundo #0C2340 com a faixa #143A66, frasco branco, líquido #22C55E e bolhas #FFB81C, escala 0,774 para caber na zona
+segura do ícone adaptativo; o monocromático (ícone temático do Android 13+) é a silhueta com o nível do líquido vazado. Ícone da ficha da Play:
+`../brand/png/play-icon-512.png`.
 
 ## Construir
 
@@ -18,7 +52,13 @@ export JAVA_HOME="/c/Program Files/Android/Android Studio/jbr"
 ./gradlew.bat testDebugUnitTest lintDebug     # testes e lint
 ./gradlew.bat assembleDebug                    # app/build/outputs/apk/debug/app-debug.apk
 ./gradlew.bat assembleRelease lintRelease      # R8 ligado (regras em app/src/main/keepRules/rules.keep)
+./gradlew.bat :app:testDebugUnitTest :app:lintRelease :app:bundleRelease :app:assembleRelease   # release completo (Play)
+python tools/verificar_release.py app/build/outputs/apk/release/app-release.apk                # classes do R8 + pacote embutido
 ```
+
+`tools/verificar_release.py` (testes: `python -m unittest tools.test_verificar_release`) lê o DEX do APK e confere as classes criadas por reflexão
+(`WorkDatabase_Impl`, `MainActivity`, `SaibaTudoApp`, `DataUpdateWorker`, `BundleManifest`), os assets da estrutura 2D e o pacote de dados embutido:
+todos os arquivos do manifesto com o tamanho declarado, versão igual à de `data/quimica/manifest.json` e nunca o fixture.
 
 Os testes leem arquivos reais fora do módulo: `contracts/*.json` (NLU e segurança, compartilhados com o site) e `pipeline/data_signing_public.b64`;
 `inputs.files` declara `contracts` e `data` para o Gradle não pular testes quando eles mudam. Sem `data/quimica/`, os testes de contrato usam o
@@ -44,7 +84,8 @@ Lotes de compostos (`compostos/index.json` → `compostos/<lote>.json`) são lid
 
 ## Assinatura de release
 
-A chave de upload será criada pelo mantenedor. Crie `keystore.properties` na raiz (**fora do Git**, já está no `.gitignore`):
+A chave de upload existe desde 14/10/2026: `secrets/upload-keystore.p12` + `keystore.properties` na raiz do app (os dois **fora do Git**; nunca
+copie o conteúdo para o chat, logs ou documentos). Formato do `keystore.properties`:
 
 ```properties
 storeFile=caminho/para/upload.jks
