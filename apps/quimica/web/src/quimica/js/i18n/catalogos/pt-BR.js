@@ -595,7 +595,8 @@ export default {
     comparar: {
       titulo: 'Comparação: {nomes}', propriedade: 'Propriedade', fichaDe: 'Ficha de {nome}',
       linhas: { formula: 'Fórmula', massaMolar: 'Massa molar', cas: 'Número CAS', nomeIupac: 'Nome IUPAC', xlogp: 'XLogP', sinal: 'Palavra de sinal (GHS)', pictogramas: 'Pictogramas (GHS)' },
-      maior: '{prop}: maior em {nome} ({valor}).', tituloGeral: 'Comparar', explicacao: 'Compare itens do mesmo tipo: dois elementos ("compare sódio e cloro") ou dois compostos ("diferença entre etanol e ácido acético").'
+      maior: '{prop}: maior em {nome} ({valor}).',
+      ordemCrescente: '{prop}, em ordem crescente: {lista}.', ordemDecrescente: '{prop}, em ordem decrescente: {lista}.', semDadoOrdem: 'Sem esse dado no pacote: {nomes}.', tituloGeral: 'Comparar', explicacao: 'Compare itens do mesmo tipo: dois elementos ("compare sódio e cloro") ou dois compostos ("diferença entre etanol e ácido acético").'
     },
     tabela: {
       abrir: 'Abrir a tabela periódica', naoTemProp: 'O pacote não tem {prop} para os elementos carregados.',

@@ -107,6 +107,23 @@ export function converterQuantidade(e, ctx) {
   }
 }
 
+/**
+ * Partículas → mol sem substância ("quantos mols há em 1,2 × 10²³ átomos?"): só a constante de Avogadro do pacote (n = N/N_A).
+ * @returns {{ok: true, mol: number, resultados: object[], passos: object[], fontes: object[]} | {ok: false, erro: string}}
+ */
+export function molDeParticulas(valor, ctx) {
+  if (!Number.isFinite(valor) || valor < 0) return { ok: false, erro: T('quantidadeInvalida') };
+  const NA = ctx.avogadro();
+  if (!NA) return { ok: false, erro: T('semAvogadro') };
+  const mol = valor / NA.valor;
+  return {
+    ok: true, mol,
+    resultados: [{ rotulo: T('quantidade'), valor: fm(mol), unidade: 'mol', destaque: true }, { rotulo: T('particulas'), valor: fm(valor), unidade: '' }],
+    passos: [{ texto: T('particulasParaMol'), tex: `n = \\dfrac{N}{N_A} = \\dfrac{${ft(valor)}}{${ft(NA.valor, 9)}\\ \\mathrm{mol^{-1}}} = ${ft(mol)}\\ \\mathrm{mol}` }],
+    fontes: fontesDe(ctx, NA)
+  };
+}
+
 /** Nota das condições: CNTP adotada (0 °C, 1 atm) e, ao lado, a condição padrão atual da IUPAC (0 °C, 1 bar); ambos de RT/P. */
 export function notasCntp(ctx) {
   const vm = ctx.volumeMolarCNTP();

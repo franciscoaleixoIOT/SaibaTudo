@@ -196,7 +196,7 @@ export class Dicionario {
           // C) símbolo de um elemento
           const s = [...f.atomos.keys()][0];
           const ambiguo = s.length === 2 && simbolosAmbiguos.has(s) && idx === 0 && !unico;
-          if (!ambiguo && (s.length === 2 || unico || this.cueElemento(texto))) {
+          if (!ambiguo && (s.length === 2 || unico || this.cueElemento(texto) || this.vizinhoDeSimbolo(toks, idx))) {
             achados.push({ tipo: 'elemento', simbolo: s, nome: this.nomeDoElemento(s), via: 'simbolo', pos });
             return;
           }
@@ -241,6 +241,28 @@ export class Dicionario {
   }
 
   cueElemento(texto) { return this.lex.pistas.cueElemento.test(normalizar(texto)); }
+
+  /**
+   * Símbolo de uma letra numa lista de símbolos ("F, Cl, Br", "K ou Na", "Cl, S e O"): vale como elemento quando a lista (símbolos separados por
+   * vírgula ou por um conectivo do léxico, `pistas.conectivoLista`) tem um símbolo de duas letras bem escrito. Sozinho, "F" ou "K" continua
+   * ambíguo (Fahrenheit, kelvin); no começo da frase, uma letra que é palavra funcional do idioma ("O Fe…": artigo) também.
+   */
+  vizinhoDeSimbolo(toks, idx) {
+    if (idx === 0 && this.lex.palavrasFuncionais.has(String(toks[0]).toLowerCase())) return false;
+    const simbolo = (t) => {
+      if (!/^[A-Z][a-z]?$/.test(t ?? '')) return false;
+      const f = tentarFormula(t);
+      return !!f && f.atomos.size === 1 && f.atomos.get(t) === 1;
+    };
+    for (const d of [-1, 1]) {
+      for (let j = idx + d; j >= 0 && j < toks.length; j += d) {
+        if (this.lex.pistas.conectivoLista.test(normalizar(toks[j]))) continue;
+        if (!simbolo(toks[j])) break;
+        if (toks[j].length === 2) return true;
+      }
+    }
+    return false;
+  }
 
   /** Uma palavra só (normalizada) que nomeia uma CLASSE de compostos: tema de conceito do léxico do idioma ou de [CLASSES_DE_COMPOSTOS]. */
   ehClasseDeCompostos(palavra) {
@@ -302,5 +324,23 @@ export class Dicionario {
     out.sort((a, b) => a.pos - b.pos);
     const vistos = new Set();
     return out.filter((p) => (vistos.has(p.id) ? false : vistos.add(p.id)));
+  }
+
+  /**
+   * O texto normalizado com os sinônimos de propriedade apagados (mesma varredura de `propriedadesEm`): "radio atomico del sodio" → "del sodio".
+   * Serve para saber se um nome de elemento só aparece dentro do nome de uma propriedade ("radio" = rádio em espanhol).
+   */
+  semPropriedades(n) {
+    const usado = new Array(n.length).fill(false);
+    for (const { chave } of this.sinonimosPropriedade) {
+      let i = n.indexOf(chave);
+      while (i !== -1) {
+        const j = i + chave.length;
+        const ok = (i === 0 || n[i - 1] === ' ') && (j === n.length || n[j] === ' ');
+        if (ok && !usado.slice(i, j).some(Boolean)) for (let k = i; k < j; k++) usado[k] = true;
+        i = n.indexOf(chave, i + 1);
+      }
+    }
+    return [...n].map((c, k) => (usado[k] ? ' ' : c)).join('');
   }
 }

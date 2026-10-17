@@ -36,12 +36,20 @@ def consulta_lote(inicio, fim):
 }}"""
 
 
+def _com_dica(it, cids):
+    """Candidatos de um item: a dica `cid=` (se houver) na frente dos CIDs achados pelo nome, sem repetir."""
+    dica = it.get("cid")
+    return ([dica] if dica else []) + [c for c in cids if c != dica]
+
+
 def resolver_lista_fixa(pubchem, itens, log=print):
-    """Resolve CIDs da lista fixa. Devolve (selecionados, descartados)."""
+    """Resolve CIDs da lista fixa. Devolve (selecionados, descartados).
+    A dica `cid=` da lista entra como primeiro candidato (a busca por nome do PubChem não resolve "iron(III) oxide"); passa pela mesma
+    conferência de fórmula que os demais."""
     candidatos, falhas = {}, []
     for i, it in enumerate(itens):
         try:
-            candidatos[it["termo"]] = pubchem.nome_para_cids(it["termo"])[:5]
+            candidatos[it["termo"]] = _com_dica(it, pubchem.nome_para_cids(it["termo"])[:5])
         except HttpErro as exc:
             if exc.status == 429:  # bloqueio persistente do PubChem: insistir só prolonga o bloqueio
                 raise
@@ -53,9 +61,10 @@ def resolver_lista_fixa(pubchem, itens, log=print):
         time.sleep(60)
         for it in falhas:
             try:
-                candidatos[it["termo"]] = pubchem.nome_para_cids(it["termo"])[:5]
+                candidatos[it["termo"]] = _com_dica(it, pubchem.nome_para_cids(it["termo"])[:5])
             except HttpErro:
-                pass
+                if it.get("cid"):
+                    candidatos[it["termo"]] = [it["cid"]]
         if len([f for f in falhas if f["termo"] not in candidatos]) > 0.05 * len(itens):
             raise RuntimeError("PubChem indisponível para resolver a lista fixa (muitos erros de rede/429)")
         for it in falhas:

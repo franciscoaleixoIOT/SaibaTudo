@@ -467,6 +467,15 @@ class AnswerBuilder(
         val acoes = mutableListOf<Acao>()
         val semDado = t(R.string.resp_sem_dado_valor)
         if (elementos.size >= 2) {
+            // "ordem crescente de número atômico de Na, Al, Zn…", "qual tem maior raio: K ou Na?": a lista ordenada vem antes da tabela (como no site)
+            val defOrdem = if (q.ordem != null) q.propriedade?.let { dic.propriedade(it) } else null
+            if (defOrdem != null && (defOrdem.alvo == "elemento" || "elemento" in defOrdem.escopos)) {
+                val itens = elementos.map { e ->
+                    val v = (Propriedades.bruto(defOrdem, e) as? Number)?.toDouble()?.takeIf { it.isFinite() }
+                    Triple("${nomeDe(e)} (${e.simbolo})", v, v?.let { Propriedades.formatar(t, defOrdem, Propriedades.bruto(defOrdem, e), un, nivel)?.curto })
+                }
+                fraseDeOrdem(q.ordem!!, defOrdem.rotulo, itens)?.let { blocos += Bloco.Paragrafo(it) }
+            }
             val ids = listOf("numeroAtomico", "massaAtomica", "categoria", "eletronegatividade", "raioAtomicoPm", "pontoFusaoK", "pontoEbulicaoK", "densidadeKgm3")
             for (id in ids) {
                 val d = dic.propriedade(id) ?: continue
@@ -488,6 +497,7 @@ class AnswerBuilder(
             val medidas = compostos.map { c -> Propriedades.medidasDoComposto(c, dic.propriedades, t, un).associateBy { it.def.id } }
             val pedidas = q.propriedades.ifEmpty { listOfNotNull(q.propriedade) }.toSet()
             val frases = mutableListOf<String>()
+            val frasesOrdem = mutableListOf<String>()
             for (id in Propriedades.MEDIDAS_COMPOSTO) {
                 val ms = medidas.map { it[id] }
                 if (ms.count { it != null } < 2) continue
@@ -500,8 +510,18 @@ class AnswerBuilder(
                     val topo = num.maxBy { it.third }
                     if (num.count { it.third == topo.third } == 1) frases += t(R.string.resp_comparar_maior, Texto.capitalizar(def.rotulo), nomeDe(compostos[topo.first]), topo.second.formatado.curto)
                 }
+                // ordem pedida ("ordem crescente de densidade: água, etanol e glicerina"): lista ordenada antes da tabela
+                if (q.ordem != null && id in pedidas && num.size >= 2 && num.map { it.second.campo }.distinct().size == 1) {
+                    val itens = compostos.indices.map { i ->
+                        val m = ms[i]
+                        val v = (m?.valor as? Number)?.toDouble()
+                        Triple(nomeDe(compostos[i]), v, if (v != null) m?.formatado?.curto else null)
+                    }
+                    fraseDeOrdem(q.ordem, def.rotulo, itens)?.let { frasesOrdem += it }
+                }
             }
             frases.forEach { blocos += Bloco.Paragrafo(it) }
+            if (frasesOrdem.isNotEmpty()) blocos.addAll(0, frasesOrdem.map { Bloco.Paragrafo(it) })
         } else {
             return semDado(q, t(R.string.resp_comparar_cite_dois))
         }
@@ -510,6 +530,22 @@ class AnswerBuilder(
             Intent.COMPARAR, t(R.string.resp_comparar_titulo, titulo), blocos.ifEmpty { listOf(Bloco.Paragrafo(t(R.string.resp_comparar_sem_comum))) },
             fontes = fontes.distinctBy { "${it.nome}|${it.url}|${it.detalhe}" }.take(12), acoes = acoes
         )
+    }
+
+    /**
+     * Frase com os itens em ordem de uma propriedade numérica ("Número atômico, em ordem crescente: Sódio (Na) 11 < Alumínio (Al) 13…"), como
+     * `fraseDeOrdem` do site. [itens]: (nome, valor, valor formatado; null = sem o valor no pacote, citado à parte). null se menos de dois têm o valor.
+     */
+    private fun fraseDeOrdem(ordem: String, rotulo: String, itens: List<Triple<String, Double?, String?>>): String? {
+        val desc = ordem == "decrescente"
+        val com = itens.filter { it.second != null && it.third != null }.let { l -> if (desc) l.sortedByDescending { it.second!! } else l.sortedBy { it.second!! } }
+        if (com.size < 2) return null
+        val lista = StringBuilder("${com[0].first} ${com[0].third}")
+        for (i in 1 until com.size) lista.append(if (com[i].second == com[i - 1].second) " = " else if (desc) " > " else " < ").append("${com[i].first} ${com[i].third}")
+        var frase = t(if (desc) R.string.resp_comparar_ordem_decrescente else R.string.resp_comparar_ordem_crescente, Texto.capitalizar(rotulo), lista.toString())
+        val sem = itens.filter { it.third == null }.map { it.first }
+        if (sem.isNotEmpty()) frase += " " + t(R.string.resp_comparar_sem_dado_ordem, Propriedades.listar(t, sem))
+        return frase
     }
 
     // ---- segurança -----------------------------------------------------------------------------------------------------------------------

@@ -4472,6 +4472,563 @@
       "intent": "PROPRIEDADE",
       "propriedade": "solubilidade",
       "composto": 5234
+    },
+    {
+      "q": "qual a massa de água formada a partir de 4 g de hidrogênio?",
+      "intent": "ESTEQUIOMETRIA",
+      "composto": 962
+    },
+    {
+      "q": "massa de CO2 produzida na queima de 32 g de metano",
+      "intent": "ESTEQUIOMETRIA",
+      "composto": 297
+    },
+    {
+      "q": "quanto oxigênio reage com 10 g de magnésio?",
+      "intent": "ESTEQUIOMETRIA",
+      "elemento": "O"
+    },
+    {
+      "q": "quanto pesa meio mol de água?",
+      "intent": "ESTEQUIOMETRIA",
+      "composto": 962
+    },
+    {
+      "q": "massa de dois mols de CO2",
+      "intent": "ESTEQUIOMETRIA",
+      "composto": 280
+    },
+    {
+      "q": "massa de 1/4 mol de glicose",
+      "intent": "ESTEQUIOMETRIA",
+      "composto": 5793
+    },
+    {
+      "q": "coloque Li, Na e K em ordem crescente de raio atômico",
+      "intent": "COMPARAR",
+      "elemento": "Li",
+      "propriedade": "raioAtomicoPm"
+    },
+    {
+      "q": "qual possui maior eletronegatividade: oxigênio ou enxofre?",
+      "intent": "COMPARAR",
+      "elemento": "O",
+      "propriedade": "eletronegatividade"
+    },
+    {
+      "q": "ordene Mg, Ca e Ba pela energia de ionização, do maior para o menor",
+      "intent": "COMPARAR",
+      "elemento": "Mg",
+      "propriedade": "energiaIonizacaoKJmol"
+    },
+    {
+      "q": "qual é mais denso, ouro ou cobre?",
+      "intent": "COMPARAR",
+      "elemento": "Au",
+      "propriedade": "densidadeKgm3"
+    },
+    {
+      "q": "mass of water produced from 4 g of hydrogen",
+      "idioma": "en",
+      "intent": "ESTEQUIOMETRIA",
+      "composto": 962
+    },
+    {
+      "q": "what mass of CO2 is released when 32 g of methane burns?",
+      "idioma": "en",
+      "intent": "ESTEQUIOMETRIA",
+      "composto": 297
+    },
+    {
+      "q": "how much oxygen reacts with 10 g of magnesium?",
+      "idioma": "en",
+      "intent": "ESTEQUIOMETRIA",
+      "elemento": "O"
+    },
+    {
+      "q": "what is the mass of half a mole of water?",
+      "idioma": "en",
+      "intent": "ESTEQUIOMETRIA",
+      "composto": 962
+    },
+    {
+      "q": "mass of two moles of CO2",
+      "idioma": "en",
+      "intent": "ESTEQUIOMETRIA",
+      "composto": 280
+    },
+    {
+      "q": "what is the mass of 1/4 mol of glucose?",
+      "idioma": "en",
+      "intent": "ESTEQUIOMETRIA",
+      "composto": 5793
+    },
+    {
+      "q": "arrange Li, Na and K in increasing order of atomic radius",
+      "idioma": "en",
+      "intent": "COMPARAR",
+      "elemento": "Li",
+      "propriedade": "raioAtomicoPm"
+    },
+    {
+      "q": "which has the higher electronegativity, oxygen or sulfur?",
+      "idioma": "en",
+      "intent": "COMPARAR",
+      "elemento": "O",
+      "propriedade": "eletronegatividade"
+    },
+    {
+      "q": "which is denser, gold or copper?",
+      "idioma": "en",
+      "intent": "COMPARAR",
+      "elemento": "Au"
+    },
+    {
+      "q": "masa de agua formada a partir de 4 g de hidrógeno",
+      "idioma": "es",
+      "intent": "ESTEQUIOMETRIA",
+      "composto": 962
+    },
+    {
+      "q": "¿qué masa de CO2 se produce al quemar 32 g de metano?",
+      "idioma": "es",
+      "intent": "ESTEQUIOMETRIA",
+      "composto": 297
+    },
+    {
+      "q": "¿cuánto oxígeno reacciona con 10 g de magnesio?",
+      "idioma": "es",
+      "intent": "ESTEQUIOMETRIA",
+      "elemento": "O"
+    },
+    {
+      "q": "¿cuánto pesa medio mol de agua?",
+      "idioma": "es",
+      "intent": "ESTEQUIOMETRIA",
+      "composto": 962
+    },
+    {
+      "q": "masa de dos moles de CO2",
+      "idioma": "es",
+      "intent": "ESTEQUIOMETRIA",
+      "composto": 280
+    },
+    {
+      "q": "masa de 1/4 mol de glucosa",
+      "idioma": "es",
+      "intent": "ESTEQUIOMETRIA",
+      "composto": 5793
+    },
+    {
+      "q": "ordena Li, Na y K de menor a mayor radio atómico",
+      "idioma": "es",
+      "intent": "COMPARAR",
+      "elemento": "Li",
+      "propriedade": "raioAtomicoPm"
+    },
+    {
+      "q": "¿cuál tiene mayor electronegatividad, el oxígeno o el azufre?",
+      "idioma": "es",
+      "intent": "COMPARAR",
+      "elemento": "O",
+      "propriedade": "eletronegatividade"
+    },
+    {
+      "q": "¿qué es más denso, el oro o el cobre?",
+      "idioma": "es",
+      "intent": "COMPARAR",
+      "elemento": "Au",
+      "propriedade": "densidadeKgm3"
+    },
+    {
+      "q": "Masse an Wasser, die aus 4 g Wasserstoff entsteht",
+      "idioma": "de",
+      "intent": "ESTEQUIOMETRIA",
+      "composto": 962
+    },
+    {
+      "q": "Wie viel Sauerstoff reagiert mit 10 g Magnesium?",
+      "idioma": "de",
+      "intent": "ESTEQUIOMETRIA",
+      "elemento": "O"
+    },
+    {
+      "q": "Masse von einem halben Mol Wasser",
+      "idioma": "de",
+      "intent": "ESTEQUIOMETRIA",
+      "composto": 962
+    },
+    {
+      "q": "Welche Masse haben zwei Mol CO2?",
+      "idioma": "de",
+      "intent": "ESTEQUIOMETRIA",
+      "composto": 280
+    },
+    {
+      "q": "Masse von 1/4 mol Glucose",
+      "idioma": "de",
+      "intent": "ESTEQUIOMETRIA",
+      "composto": 5793
+    },
+    {
+      "q": "Ordne Li, Na und K nach aufsteigendem Atomradius",
+      "idioma": "de",
+      "intent": "COMPARAR",
+      "elemento": "Li",
+      "propriedade": "raioAtomicoPm"
+    },
+    {
+      "q": "Welches Element hat die höhere Elektronegativität, Sauerstoff oder Schwefel?",
+      "idioma": "de",
+      "intent": "COMPARAR",
+      "elemento": "O",
+      "propriedade": "eletronegatividade"
+    },
+    {
+      "q": "Was ist dichter, Gold oder Kupfer?",
+      "idioma": "de",
+      "intent": "COMPARAR",
+      "elemento": "Au"
+    },
+    {
+      "q": "masse d'eau formée à partir de 4 g d'hydrogène",
+      "idioma": "fr",
+      "intent": "ESTEQUIOMETRIA",
+      "composto": 962
+    },
+    {
+      "q": "Quelle masse de CO2 est produite par la combustion de 32 g de méthane ?",
+      "idioma": "fr",
+      "intent": "ESTEQUIOMETRIA",
+      "composto": 297
+    },
+    {
+      "q": "Quelle masse de dioxygène réagit avec 10 g de magnésium ?",
+      "idioma": "fr",
+      "intent": "ESTEQUIOMETRIA",
+      "composto": 977
+    },
+    {
+      "q": "Quelle est la masse d'une demi-mole d'eau ?",
+      "idioma": "fr",
+      "intent": "ESTEQUIOMETRIA",
+      "composto": 962
+    },
+    {
+      "q": "masse de deux moles de CO2",
+      "idioma": "fr",
+      "intent": "ESTEQUIOMETRIA",
+      "composto": 280
+    },
+    {
+      "q": "masse de 1/4 mol de glucose",
+      "idioma": "fr",
+      "intent": "ESTEQUIOMETRIA",
+      "composto": 5793
+    },
+    {
+      "q": "Classez Li, Na et K par ordre croissant de rayon atomique",
+      "idioma": "fr",
+      "intent": "COMPARAR",
+      "elemento": "Li",
+      "propriedade": "raioAtomicoPm"
+    },
+    {
+      "q": "Lequel a la plus grande électronégativité : l'oxygène ou le soufre ?",
+      "idioma": "fr",
+      "intent": "COMPARAR",
+      "elemento": "O",
+      "propriedade": "eletronegatividade"
+    },
+    {
+      "q": "Lequel est le plus dense, le fer ou le cuivre ?",
+      "idioma": "fr",
+      "intent": "COMPARAR",
+      "elemento": "Fe",
+      "propriedade": "densidadeKgm3"
+    },
+    {
+      "q": "Quantos mols correspondem a 1,8 × 10²⁴ átomos?",
+      "intent": "ESTEQUIOMETRIA"
+    },
+    {
+      "q": "quantos mols são 6,02.10^23 partículas?",
+      "intent": "ESTEQUIOMETRIA"
+    },
+    {
+      "q": "transforme 3,0 × 10⁻² kg em gramas",
+      "intent": "CONVERSAO_UNIDADE",
+      "unidadeDestino": "g"
+    },
+    {
+      "q": "converta 2.500 mmHg em atm",
+      "intent": "CONVERSAO_UNIDADE",
+      "unidadeDestino": "atm"
+    },
+    {
+      "q": "converta 250 mL para litros e metros cúbicos",
+      "intent": "CONVERSAO_UNIDADE",
+      "unidadeDestino": "L"
+    },
+    {
+      "q": "passe 1.140 mmHg para atm, kPa e torr",
+      "intent": "CONVERSAO_UNIDADE",
+      "unidadeDestino": "atm"
+    },
+    {
+      "q": "o ar atmosférico é uma substância pura ou uma mistura?",
+      "intent": "CONCEITO",
+      "conceito": "mistura"
+    },
+    {
+      "q": "o leite é mistura homogênea ou heterogênea?",
+      "intent": "CONCEITO",
+      "conceito": "mistura"
+    },
+    {
+      "q": "é perigoso misturar água sanitária com vinagre?",
+      "intent": "SEGURANCA"
+    },
+    {
+      "q": "Como se chama o 2-cloro-3-metil-pentano?",
+      "intent": "NOMENCLATURA",
+      "composto": null
+    },
+    {
+      "q": "How many moles are in 3.01 × 10²⁴ molecules?",
+      "idioma": "en",
+      "intent": "ESTEQUIOMETRIA"
+    },
+    {
+      "q": "how many moles is 1.2 × 10**23 atoms?",
+      "idioma": "en",
+      "intent": "ESTEQUIOMETRIA"
+    },
+    {
+      "q": "convert 4.5 x 10^3 g to kilograms",
+      "idioma": "en",
+      "intent": "CONVERSAO_UNIDADE",
+      "unidadeDestino": "kg"
+    },
+    {
+      "q": "convert 1,520 mmHg to atm",
+      "idioma": "en",
+      "intent": "CONVERSAO_UNIDADE",
+      "unidadeDestino": "atm"
+    },
+    {
+      "q": "convert 750 mL to liters and cubic meters",
+      "idioma": "en",
+      "intent": "CONVERSAO_UNIDADE",
+      "unidadeDestino": "L"
+    },
+    {
+      "q": "convert 1,140 mmHg to atm, kPa and torr",
+      "idioma": "en",
+      "intent": "CONVERSAO_UNIDADE",
+      "unidadeDestino": "atm"
+    },
+    {
+      "q": "Is seawater a pure substance or a mixture?",
+      "idioma": "en",
+      "intent": "CONCEITO",
+      "conceito": "mixture"
+    },
+    {
+      "q": "Is air a homogeneous or heterogeneous mixture?",
+      "idioma": "en",
+      "intent": "CONCEITO",
+      "conceito": "mixture"
+    },
+    {
+      "q": "is it dangerous to mix bleach and ammonia?",
+      "idioma": "en",
+      "intent": "SEGURANCA"
+    },
+    {
+      "q": "What is the IUPAC name of 3-ethyl-2-methylhexane?",
+      "idioma": "en",
+      "intent": "NOMENCLATURA",
+      "composto": null
+    },
+    {
+      "q": "¿Cuántos moles hay en 1,2 × 10²³ átomos?",
+      "idioma": "es",
+      "intent": "ESTEQUIOMETRIA"
+    },
+    {
+      "q": "convierte 2,0 x 10^4 mL a litros",
+      "idioma": "es",
+      "intent": "CONVERSAO_UNIDADE",
+      "unidadeDestino": "L"
+    },
+    {
+      "q": "convierte 500 mL a litros y metros cúbicos",
+      "idioma": "es",
+      "intent": "CONVERSAO_UNIDADE",
+      "unidadeDestino": "L"
+    },
+    {
+      "q": "pasa 1.520 mmHg a atm, kPa y torr",
+      "idioma": "es",
+      "intent": "CONVERSAO_UNIDADE",
+      "unidadeDestino": "atm"
+    },
+    {
+      "q": "¿El vinagre es una sustancia pura o una mezcla?",
+      "idioma": "es",
+      "intent": "CONCEITO",
+      "conceito": "mezcla"
+    },
+    {
+      "q": "¿La leche es una mezcla homogénea o heterogénea?",
+      "idioma": "es",
+      "intent": "CONCEITO",
+      "conceito": "mezcla"
+    },
+    {
+      "q": "¿es peligroso mezclar lejía con amoníaco?",
+      "idioma": "es",
+      "intent": "SEGURANCA"
+    },
+    {
+      "q": "Wie viele Mol sind 1,2 × 10²³ Teilchen?",
+      "idioma": "de",
+      "intent": "ESTEQUIOMETRIA"
+    },
+    {
+      "q": "Rechne 2,5·10^3 g in kg um",
+      "idioma": "de",
+      "intent": "CONVERSAO_UNIDADE",
+      "unidadeDestino": "kg"
+    },
+    {
+      "q": "Rechne 750 mL in Liter und Kubikmeter um",
+      "idioma": "de",
+      "intent": "CONVERSAO_UNIDADE",
+      "unidadeDestino": "L"
+    },
+    {
+      "q": "Rechne 1.520 mmHg in atm, kPa und Torr um",
+      "idioma": "de",
+      "intent": "CONVERSAO_UNIDADE",
+      "unidadeDestino": "atm"
+    },
+    {
+      "q": "Ist Meerwasser ein Reinstoff oder ein Gemisch?",
+      "idioma": "de",
+      "intent": "CONCEITO",
+      "conceito": "gemisch"
+    },
+    {
+      "q": "Ist Milch ein homogenes oder heterogenes Gemisch?",
+      "idioma": "de",
+      "intent": "CONCEITO",
+      "conceito": "gemisch"
+    },
+    {
+      "q": "Wie heißt 2-Chlor-3-methylpentan?",
+      "idioma": "de",
+      "intent": "NOMENCLATURA",
+      "composto": null
+    },
+    {
+      "q": "Combien de moles y a-t-il dans 1,2 × 10²³ atomes ?",
+      "idioma": "fr",
+      "intent": "ESTEQUIOMETRIA"
+    },
+    {
+      "q": "Convertis 3,0 × 10⁴ mL en litres",
+      "idioma": "fr",
+      "intent": "CONVERSAO_UNIDADE",
+      "unidadeDestino": "L"
+    },
+    {
+      "q": "Convertis 750 mL en litres et en mètres cubes",
+      "idioma": "fr",
+      "intent": "CONVERSAO_UNIDADE",
+      "unidadeDestino": "L"
+    },
+    {
+      "q": "Convertis 1.520 mmHg en atm, kPa et torr",
+      "idioma": "fr",
+      "intent": "CONVERSAO_UNIDADE",
+      "unidadeDestino": "atm"
+    },
+    {
+      "q": "Le vinaigre est-il un corps pur ou un mélange ?",
+      "idioma": "fr",
+      "intent": "CONCEITO",
+      "conceito": "melange"
+    },
+    {
+      "q": "Le lait est-il un mélange homogène ou hétérogène ?",
+      "idioma": "fr",
+      "intent": "CONCEITO",
+      "conceito": "melange"
+    },
+    {
+      "q": "Est-il dangereux de mélanger de l'eau de Javel avec de l'ammoniac ?",
+      "idioma": "fr",
+      "intent": "SEGURANCA"
+    },
+    {
+      "q": "nomeie o composto orgânico C5H12",
+      "intent": "NOMENCLATURA",
+      "formula": "C5H12"
+    },
+    {
+      "q": "dê o nome oficial do C4H9Br",
+      "intent": "NOMENCLATURA",
+      "formula": "C4H9Br"
+    },
+    {
+      "q": "name the organic compound C6H14",
+      "idioma": "en",
+      "intent": "NOMENCLATURA",
+      "formula": "C6H14"
+    },
+    {
+      "q": "give the IUPAC name of C3H7Cl",
+      "idioma": "en",
+      "intent": "NOMENCLATURA",
+      "formula": "C3H7Cl"
+    },
+    {
+      "q": "nombra el compuesto orgánico C7H16",
+      "idioma": "es",
+      "intent": "NOMENCLATURA",
+      "formula": "C7H16"
+    },
+    {
+      "q": "da el nombre oficial de C3H7Cl",
+      "idioma": "es",
+      "intent": "NOMENCLATURA",
+      "formula": "C3H7Cl"
+    },
+    {
+      "q": "Benenne die organische Verbindung C5H12",
+      "idioma": "de",
+      "intent": "NOMENCLATURA",
+      "formula": "C5H12"
+    },
+    {
+      "q": "Gib den IUPAC-Namen von C4H9Br an",
+      "idioma": "de",
+      "intent": "NOMENCLATURA",
+      "formula": "C4H9Br"
+    },
+    {
+      "q": "Nommez le composé organique C6H14",
+      "idioma": "fr",
+      "intent": "NOMENCLATURA",
+      "formula": "C6H14"
+    },
+    {
+      "q": "Donne le nom IUPAC de C3H7Cl",
+      "idioma": "fr",
+      "intent": "NOMENCLATURA",
+      "formula": "C3H7Cl"
     }
   ]
 }

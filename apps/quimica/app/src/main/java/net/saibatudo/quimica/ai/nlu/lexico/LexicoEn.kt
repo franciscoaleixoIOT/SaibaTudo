@@ -12,6 +12,7 @@ internal object LexicoEn {
         "pistas" to n_pistas(),
         "nivel" to n_nivel(),
         "unidades" to n_unidades(),
+        "numerais" to n_numerais(),
         "categorias" to n_categorias(),
         "estados" to n_estados(),
         "extremos" to n_extremos(),
@@ -39,7 +40,7 @@ internal object LexicoEn {
         "estequiometria" to "\\b(?:stoichiometr\\w*|limiting (?:reagent|reactant)|reagent in excess|excess reagent|excess reactant|yield|how many (?:moles?|mols?|grams?|molecules?|atoms?|lit(?:er|re)s?|ions?|particles?|kilos?|kilograms?|mg|milligrams?)\\b|number of (?:moles?|molecules|atoms|particles|ions)|stp|standard (?:temperature and pressure|conditions)|volume occupied|avogadro'?s? (?:constant|number))\\b",
         "massaMolar" to "\\b(?:molar mass|molecular (?:mass|weight)|formula (?:mass|weight)|molar weight|how much does (?:a |one )?mole(?: of \\S+)? weigh|what is the molar mass)\\b|\\bg mol\\b",
         "desenhar" to "\\b(?:draw\\w*|structure (?:2d|molecular|chemical|of|for)|2d structure|structure|show (?:me )?(?:the )?(?:structure|molecule)|molecule of|what does (?:the )?(?:molecule|structure) (?:of \\S+ )?look like|structural formula|molecular geometry|visuali[sz]e|skeleton|sketch)\\b",
-        "comparar" to "\\b(?:compar\\w+|difference between|differences between|\\bversus\\b|which (?:is|one is|has) (?:heavier|lighter|denser|bigger|larger|smaller|higher|lower|stronger|weaker|more|less|the (?:highest|lowest|greatest|biggest|smallest))|\\bvs\\b|what is the difference|similarit\\w+|same as|similar to|alike)\\b",
+        "comparar" to "\\b(?:compar\\w+|difference between|differences between|\\bversus\\b|which (?:is|one is|has) (?:heavier|lighter|denser|bigger|larger|smaller|higher|lower|stronger|weaker|more|less|the (?:highest|lowest|greatest|biggest|smallest))|\\bvs\\b|what is the difference|similarit\\w+|same as|similar to|alike|(?:increasing|decreasing|ascending|descending) order|in order of|order (?:them|these|from)|arrange\\w*|rank\\w*|put (?:them |these )?in order|which (?:one )?(?:is|has) the (?:higher|larger|bigger|greater|lower|smaller|heavier|lighter|denser|highest|largest|lowest|smallest)|which (?:one )?is (?:more|less) \\w+)\\b",
         "seguranca" to "\\b(?:danger\\w*|hazard\\w*|toxic\\w*|safe\\w*|ppe|protective equipment|first aid|spill\\w*|leak\\w*|stor(?:e|age|ing)|fire\\w*|flammab\\w*|corrosiv\\w*|irritant\\w*|irritat\\w*|ghs|pictograms?|h[- ]?statements?|h[- ]?phrases?|safety data sheet|sds|msds|icsc|mix\\w*|incompatib\\w*|dispos\\w*|handl\\w+|inhal\\w+|ingest\\w+|swallow\\w*|burns?|poison\\w*|harmful|is it safe|is it dangerous|neutrali[sz]\\w+|gloves|goggles|signal word|hazard classification|carcinogen\\w*|explosiv\\w*|reacts? with water|reactiv\\w+ with)\\b",
         "nomenclatura" to "\\b(?:what is the name|what is it called|what is \\S+ called|what do we call|what do you call|name (?:of|for)|chemical name|iupac name|systematic name|scientific name|official name|nomenclature|how (?:do you|to) (?:write|spell)|what is the (?:chemical |molecular )?formula|formula (?:of|for)|name of the compound)\\b",
         "tabela" to "\\b(?:periodic table|periodicity|trends?|group \\d{1,2}|family \\d{1,2}|period \\d|block [spdf]|[spdf][- ]block|elements? (?:of|in|from) (?:the )?(?:group|period|block|family)|which (?:are the )?elements|what elements|how many elements|(?:gaseous|liquid|solid) elements|metals|non[- ]?metals|nonmetals|metalloids|semimetals|halogens?|noble gas(?:es)?|alkaline earth metals?|alkali metals?|lanthanides?|lanthanoids?|actinides?|actinoids?|most \\w+ element|least \\w+ element|ascending order|descending order|(?:highest|largest|biggest|greatest|lowest|smallest) (?:atomic radius|radius|electronegativity|energy|point|mass|density))\\b",
@@ -83,7 +84,18 @@ internal object LexicoEn {
         "diluicao" to "\\b(?:dilut\\w*|c1v1|c1 v1)\\b",
         "percentualMassa" to "\\bmass|percent|weight|fraction\\b",
         "cntp" to "\\b(?:stp|standard conditions|standard temperature|volume)\\b",
-        "cueElemento" to "\\b(?:element|symbol|chemical symbol)\\b"
+        "cueElemento" to "\\b(?:element|symbol|chemical symbol)\\b",
+        "reacaoVerbo" to "\\b(?:formed|produced|obtained|react|reacts|reacting|reacted|consumed|needed|required|released|given off|from|burn\\w*|combustion|decompos\\w+)\\b",
+        "pedidoQuantidade" to "\\b(?:weigh\\w*|mass(?! (?:number|spectrometry))|moles?|mols?|amount of substance|volume)\\b",
+        "ordemCrescente" to "\\b(?:increasing|ascending|from (?:the )?(?:lowest|smallest|least) to (?:the )?(?:highest|largest|greatest|most)|which (?:one )?(?:is|has) (?:the )?(?:lower|smaller|lowest|smallest|lighter|less|least))\\b",
+        "ordemDecrescente" to "\\b(?:decreasing|descending|from (?:the )?(?:highest|largest|greatest|most) to (?:the )?(?:lowest|smallest|least)|which (?:one )?(?:is|has) (?:the )?(?:higher|larger|bigger|greater|highest|largest|biggest|greatest|heavier|denser|more|most))\\b",
+        "conectivoLista" to "^(?:and|or)\$",
+        "paraUnidades" to "\\b(?:to|into|in)\\s+(?:the )?",
+        "paraUnidadesFim" to "\\s*[?!.]*\$",
+        "misturaTema" to "\\b(mixture)s?\\b",
+        "misturaConceito" to "\\b(?:substances?|pure|homogeneous|heterogeneous|systems?|classif\\w*|types? of|what (?:is|are)|difference between|phases?)\\b",
+        "nomenclaturaPedido" to "\\b(?:what is (?:it|this|that) called|what is \\S+ called|what do (?:we|you) call|name (?:this|these|that|the following|the)|give the (?:iupac |systematic |correct )?name|what is the (?:iupac |systematic |official |common |correct )?name|(?:iupac|systematic|official) name|how (?:do (?:you|i|we) |to |would you )name)\\b",
+        "nomenclaturaAlvo" to "\\b(?:compounds?|substances?|molecules?|hydrocarbons?|organic|chains?|structures?|\\w*(?:meth|eth|prop|but|pent|hex|hept|oct|non|dec|phen|benz)\\w*(?:ane|ene|yne|ol|one|oic|yl|amine))\\b"
     )
 
     private fun n_nivel(): Map<String, Any?> = linkedMapOf<String, Any?>(
@@ -272,6 +284,21 @@ internal object LexicoEn {
         "s"
     )
 
+    private fun n_unidades_36(): List<Any?> = listOf<Any?>(
+        "^cubic met(?:er|re)s?\$",
+        "m3"
+    )
+
+    private fun n_unidades_37(): List<Any?> = listOf<Any?>(
+        "^cubic decimet(?:er|re)s?\$",
+        "dm3"
+    )
+
+    private fun n_unidades_38(): List<Any?> = listOf<Any?>(
+        "^cubic centimet(?:er|re)s?\$",
+        "cm3"
+    )
+
     private fun n_unidades(): List<Any?> = listOf<Any?>(
         n_unidades_0(),
         n_unidades_1(),
@@ -308,7 +335,79 @@ internal object LexicoEn {
         n_unidades_32(),
         n_unidades_33(),
         n_unidades_34(),
-        n_unidades_35()
+        n_unidades_35(),
+        n_unidades_36(),
+        n_unidades_37(),
+        n_unidades_38()
+    )
+
+    private fun n_numerais_0(): List<Any?> = listOf<Any?>(
+        "half an?|half",
+        0.5
+    )
+
+    private fun n_numerais_1(): List<Any?> = listOf<Any?>(
+        "one",
+        1
+    )
+
+    private fun n_numerais_2(): List<Any?> = listOf<Any?>(
+        "two",
+        2
+    )
+
+    private fun n_numerais_3(): List<Any?> = listOf<Any?>(
+        "three",
+        3
+    )
+
+    private fun n_numerais_4(): List<Any?> = listOf<Any?>(
+        "four",
+        4
+    )
+
+    private fun n_numerais_5(): List<Any?> = listOf<Any?>(
+        "five",
+        5
+    )
+
+    private fun n_numerais_6(): List<Any?> = listOf<Any?>(
+        "six",
+        6
+    )
+
+    private fun n_numerais_7(): List<Any?> = listOf<Any?>(
+        "seven",
+        7
+    )
+
+    private fun n_numerais_8(): List<Any?> = listOf<Any?>(
+        "eight",
+        8
+    )
+
+    private fun n_numerais_9(): List<Any?> = listOf<Any?>(
+        "nine",
+        9
+    )
+
+    private fun n_numerais_10(): List<Any?> = listOf<Any?>(
+        "ten",
+        10
+    )
+
+    private fun n_numerais(): List<Any?> = listOf<Any?>(
+        n_numerais_0(),
+        n_numerais_1(),
+        n_numerais_2(),
+        n_numerais_3(),
+        n_numerais_4(),
+        n_numerais_5(),
+        n_numerais_6(),
+        n_numerais_7(),
+        n_numerais_8(),
+        n_numerais_9(),
+        n_numerais_10()
     )
 
     private fun n_categorias_0(): List<Any?> = listOf<Any?>(

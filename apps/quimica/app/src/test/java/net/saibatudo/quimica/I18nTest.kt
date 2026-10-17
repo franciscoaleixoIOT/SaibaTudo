@@ -60,7 +60,8 @@ class I18nTest {
         e.isJsonObject -> LinkedHashMap<String, Any?>().also { m -> e.asJsonObject.entrySet().forEach { (k, v) -> m[k] = paraKotlin(v) } }
         e.isJsonArray -> e.asJsonArray.map { paraKotlin(it) }
         e.asJsonPrimitive.isBoolean -> e.asBoolean
-        e.asJsonPrimitive.isNumber -> e.asNumber.toInt()
+        // inteiro vira Int e fração vira Double, como no gerador (`numerais`: ["meio|meia", 0.5])
+        e.asJsonPrimitive.isNumber -> e.asDouble.let { d -> if (d == Math.floor(d) && !d.isInfinite()) d.toInt() else d }
         else -> e.asString
     }
 

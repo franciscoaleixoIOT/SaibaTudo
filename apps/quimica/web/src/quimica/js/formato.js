@@ -85,8 +85,11 @@ export function casasPara(n, sig = 4) {
   return Math.max(0, sig - 1 - Math.floor(Math.log10(Math.abs(n))));
 }
 
+const DIGITO_SOBRESCRITO = { '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9', '⁻': '-' };
+
 /**
- * Lê um número digitado em qualquer dos idiomas do app: "1,5", "1.5", "1.234,56", "1,234.56", "1,8e-5", "1,8 x 10^-5", "10^-3".
+ * Lê um número digitado em qualquer dos idiomas do app: "1,5", "1.5", "1.234,56", "1,234.56", "1,8e-5", "1,8 x 10^-5", "10^-3", e a notação
+ * científica dos livros: "1,2 × 10²³" (expoente sobrescrito), "1,2·10^23", "6,02.10^23" (ponto como "vezes"), "1.2 × 10**23".
  * Heurística (docs/I18N.md §1.3): com "," e "." no mesmo número, o último é o decimal; com um só separador, vale a convenção do idioma
  * ("1.000" é mil em pt/es/de/fr e 1 em inglês; "1,000" é mil em inglês e 1 nos demais), exceto quando os grupos não têm três dígitos ("1,5" e "1.5").
  * @returns {number} NaN se não for um número.
@@ -94,7 +97,8 @@ export function casasPara(n, sig = 4) {
 export function lerNumero(entrada, locale = LOCALE) {
   let s = String(entrada ?? '').trim().replace(/\s+/g, ' ').replace(/−/g, '-');
   if (!s) return NaN;
-  s = s.replace(/\s*[x×*·]\s*10\s*\^?\s*\{?(-?\d+)\}?/i, 'e$1').replace(/^10\s*\^\s*\{?(-?\d+)\}?$/, '1e$1');
+  s = s.replace(/10\s*([⁻]?[⁰¹²³⁴⁵⁶⁷⁸⁹]+)/, (_, e) => `10^${[...e].map((c) => DIGITO_SOBRESCRITO[c]).join('')}`).replace(/\*\*/g, '^');
+  s = s.replace(/\s*(?:[x×*·]\s*10\s*\^?|\.10\s*\^)\s*\{?(-?\d+)\}?/i, 'e$1').replace(/^10\s*\^\s*\{?(-?\d+)\}?$/, '1e$1');
   s = s.replace(/[\s  ]/g, '');
   const m = /^([+-]?)([\d.,]+)(e[+-]?\d+)?$/i.exec(s);
   if (!m) return NaN;
@@ -116,8 +120,8 @@ export function lerNumero(entrada, locale = LOCALE) {
     if (partes.length > 2) {
       if (!/^\d{1,3}$/.test(partes[0]) || !partes.slice(1).every((p) => /^\d{3}$/.test(p))) return NaN;
       numero = partes.join('');
-    } else if (sep !== decimalDoIdioma && /^\d{1,3}$/.test(partes[0]) && /^\d{3}$/.test(partes[1])) {
-      numero = partes.join(''); // separador de milhar do idioma: "1.000" (pt) = 1000; "1,000" (en) = 1000
+    } else if (sep !== decimalDoIdioma && /^[1-9]\d{0,2}$/.test(partes[0]) && /^\d{3}$/.test(partes[1])) {
+      numero = partes.join(''); // separador de milhar do idioma: "1.000" (pt) = 1000; "1,000" (en) = 1000; "0,500" é sempre 0,5
     } else {
       numero = `${partes[0] || '0'}.${partes[1] ?? ''}`;
     }

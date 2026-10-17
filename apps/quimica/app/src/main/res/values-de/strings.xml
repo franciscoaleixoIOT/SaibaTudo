@@ -550,6 +550,9 @@
     <string name="resp_prop_solubilidade_de_qual">Sagen Sie, von welcher Verbindung Sie die Löslichkeit in Wasser wissen möchten. Zum Beispiel: „Löslichkeit von Harnstoff“.</string>
     <string name="resp_prop_propriedades_de">Eigenschaften von %1$s</string>
     <string name="resp_comparar_maior">%1$s: höher bei %2$s (%3$s).</string>
+    <string name="resp_comparar_ordem_crescente">%1$s, aufsteigend: %2$s.</string>
+    <string name="resp_comparar_ordem_decrescente">%1$s, absteigend: %2$s.</string>
+    <string name="resp_comparar_sem_dado_ordem">Ohne diesen Wert im Datenpaket: %1$s.</string>
     <string name="lista_e">%1$s und %2$s</string>
 
     <!-- 24_categorias_estados -->

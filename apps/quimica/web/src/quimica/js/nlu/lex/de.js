@@ -17,7 +17,7 @@ export default {
   "estequiometria": "\\b(?:stochiometri\\w*|limitierend\\w* (?:reagenz|reaktant|edukt)|begrenzend\\w* (?:reagenz|reaktant)|im uberschuss|uberschuss|ausbeute|wie ?viele? (?:mol|molekule|atome|ionen|teilchen)\\b|wie ?viele? (?:gramm|liter|kilo|kilogramm|mg|milligramm)\\b(?!\\s+(?:sind|ist|entsprechen|entspricht|ergeben|hat|haben)\\s+\\d+(?: \\d+)* ?(?:kg|g|mg|l|ml|liter|milliliter|gramm|kilogramm|milligramm)\\b)|anzahl (?:der |an )?(?:mol|molekule|atome|teilchen|ionen)|normbedingungen|standardbedingungen|eingenommenes volumen|avogadro(?:konstante|zahl)|avogadro'?sche (?:zahl|konstante))\\b",
   "massaMolar": "\\b(?:molare masse|molmasse|molekulmasse|molekulargewicht|molekulare masse|formelmasse|molgewicht|wie ?viel wiegt (?:ein )?mol|wie ?viel wiegen (?:ein|1) mol|wie schwer (?:ist|sind) (?:ein|1) mol|wie gro(?:ss| ) ist (?:die )?molare masse|was ist die molare masse)\\b|\\bg mol\\b",
   "desenhar": "\\b(?:zeichn\\w+|struktur (?:2d|molekular|chemisch\\w*|von|des|der)|2d struktur|struktur|zeig\\w* (?:mir )?(?:die )?(?:struktur|molekul)|molekul (?:von|des|der)|wie sieht (?:das |die )?(?:molekul|struktur) (?:von \\S+ )?aus|strukturformel|molekulgeometrie|visualisier\\w*|gerust|skizz\\w+)\\b",
-  "comparar": "\\b(?:vergleich\\w*|unterscheid\\w*|unterschied(?:e)? zwischen|\\bversus\\b|\\bvs\\b|was ist der unterschied|ahnlichkeit\\w*|gleich wie|(?:was|welches|welcher|welche) (?:element |stoff |verbindung |von beiden )?(?:ist|hat|sind) (?:schwerer|leichter|dichter|gro(?:ss| )er|kleiner|hoher|niedriger|starker|schwacher|elektronegativer|reaktiver)|ahnlich wie|gemeinsamkeit\\w*)\\b",
+  "comparar": "\\b(?:vergleich\\w*|unterscheid\\w*|unterschied(?:e)? zwischen|\\bversus\\b|\\bvs\\b|was ist der unterschied|ahnlichkeit\\w*|gleich wie|(?:was|welches|welcher|welche) (?:element |stoff |verbindung |von beiden )?(?:ist|hat|sind) (?:schwerer|leichter|dichter|gro(?:ss| )er|kleiner|hoher|niedriger|starker|schwacher|elektronegativer|reaktiver)|ahnlich wie|gemeinsamkeit\\w*|(?:aufsteigend|absteigend|zunehmend|abnehmend)\\w*|reihenfolge|ordne\\w*|sortier\\w*|(?:welche[rs]?|was) (?:element |stoff |verbindung |von beiden )?(?:hat|ist) (?:den |die |das )?(?:grossere\\w*|kleinere\\w*|hohere\\w*|niedrigere\\w*|mehr|weniger))\\b",
   "seguranca": "\\b(?:gefahr\\w*|gefahrlich\\w*|giftig\\w*|toxisch\\w*|toxizitat|sicher\\w*|psa|schutzausrustung|erste hilfe|verschutt\\w*|auslauf\\w*|leck\\w*|lager\\w*|aufbewahr\\w*|brand\\w*|feuer\\w*|entzundlich\\w*|brennbar\\w*|atzend\\w*|korrosiv\\w*|reizend\\w*|reiz\\w*|ghs|piktogramm\\w*|h[- ]?satz\\w*|h[- ]?satze|gefahrenhinweis\\w*|sicherheitsdatenblatt|sdb|icsc|misch\\w*|unvertraglich\\w*|entsorg\\w*|handhab\\w*|umgang mit|einatm\\w*|verschluck\\w*|verbrenn\\w*|gift|vergift\\w*|schadlich|ist (?:es|das) sicher|ist (?:es|das) gefahrlich|neutralisier\\w*|handschuhe|schutzbrille|signalwort|gefahreneinstufung|krebserregend|karzinogen\\w*|explosiv\\w*|reagiert mit wasser|reaktiv\\w* mit)\\b",
   "nomenclatura": "\\b(?:wie (?:hei(?:ss| )t|lautet) der name|wie hei(?:ss| )t|wie nennt man|name (?:von|des|der|fur)|chemische\\w* name|iupac name|systematische\\w* name|wissenschaftliche\\w* name|offizielle\\w* name|nomenklatur|wie schreibt man|wie lautet die (?:chemische |molekulare |summen)?formel|was ist die (?:chemische |summen)?formel|formel (?:von|des|der|fur)|summenformel|name der verbindung)\\b",
   "tabela": "\\b(?:periodensystem|pse|periodizitat|trends?|gruppe \\d{1,2}|familie \\d{1,2}|periode \\d|block [spdf]|[spdf][- ]block|elemente? (?:der|des|aus der|aus dem|in der|in) (?:gruppe|periode|block|familie)|welche elemente|wie ?viele elemente|(?:gasformige|flussige|feste) elemente|metalle|nichtmetalle|halbmetalle|metalloide|halogene?|edelgase?|erdalkalimetalle?|alkalimetalle?|lanthanoide?|lanthanide?|actinoide?|actinide?|element mit (?:der|dem) (?:hochsten|gro(?:ss| )ten|niedrigsten|kleinsten)|aufsteigend\\w* reihenfolge|absteigend\\w* reihenfolge|(?:hochste|gro(?:ss| )te|niedrigste|kleinste)r? (?:atomradius|radius|elektronegativitat|energie|punkt|masse|dichte))\\b",
@@ -61,7 +61,18 @@ export default {
   "diluicao": "\\b(?:verdunn\\w*|c1v1|c1 v1)\\b",
   "percentualMassa": "\\bmasse|prozent|anteil|gewicht\\b",
   "cntp": "\\b(?:normbedingungen|standardbedingungen|volumen)\\b",
-  "cueElemento": "\\b(?:element|symbol|elementsymbol|chemisches symbol)\\b"
+  "cueElemento": "\\b(?:element|symbol|elementsymbol|chemisches symbol)\\b",
+  "reacaoVerbo": "\\b(?:entsteh\\w*|entstanden\\w*|gebildet\\w*|bildet|bilden|erhalten\\w*|gewonnen\\w*|reagier\\w*|verbraucht\\w*|benotigt\\w*|freigesetzt\\w*|aus|verbrenn\\w*|zersetz\\w*)\\b",
+  "pedidoQuantidade": "\\b(?:wiegt|wiegen|masse(?! (?:von )?(?:molar|molekul|atom))|mol|stoffmenge|volumen)\\b",
+  "ordemCrescente": "\\b(?:aufsteigend\\w*|zunehmend\\w*|steigend\\w*|vom kleinsten zum grossten|(?:welche[rs]?|was) (?:element |stoff |verbindung |von beiden )?(?:hat|ist) (?:den |die |das )?(?:kleinere\\w*|niedrigere\\w*|weniger|leichter))\\b",
+  "ordemDecrescente": "\\b(?:absteigend\\w*|abnehmend\\w*|fallend\\w*|vom grossten zum kleinsten|(?:welche[rs]?|was) (?:element |stoff |verbindung |von beiden )?(?:hat|ist) (?:den |die |das )?(?:grossere\\w*|hohere\\w*|mehr|schwerer|dichter))\\b",
+  "conectivoLista": "^(?:und|oder|bzw)$",
+  "paraUnidades": "\\b(?:in|zu|nach)\\s+(?:den |die |das |dem |der )?",
+  "paraUnidadesFim": "(?:\\s+(?:umrechnen|umwandeln|konvertieren|angeben|ausdrucken|darstellen|um|dar|an|aus))?\\s*[?!.]*$",
+  "misturaTema": "\\b(gemisch|mischung|gemenge)(?:e|en|es)?\\b",
+  "misturaConceito": "\\b(?:reinstoff\\w*|stoff\\w*|substanz\\w*|rein|homogen\\w*|heterogen\\w*|system\\w*|einteil\\w*|teile? \\S+ ein|klassifizier\\w*|ordne\\w*|arten von|was (?:ist|sind)|unterschied zwischen|phasen?)\\b",
+  "nomenclaturaPedido": "\\b(?:wie hei(?:ss| )t|wie nennt man|wie lautet der (?:iupac[- ]?)?name|benenne\\w*|gib den (?:iupac[- ]?)?namen|(?:iupac|systematische\\w*|offizielle\\w*)[- ]?name\\w*)\\b",
+  "nomenclaturaAlvo": "\\b(?:verbindung\\w*|stoff\\w*|substanz\\w*|molekul\\w*|kohlenwasserstoff\\w*|organisch\\w*|kette\\w*|struktur\\w*|\\w*(?:meth|eth|prop|but|pent|hex|hept|oct|non|dec|phen|benz)\\w*(?:an|en|in|ol|on|yl|amin))\\b"
  },
  "nivel": {
   "fundamental": "\\b(?:grundschule|kinder|kind|einfach|ganz einfach|leicht verstandlich|fur anfanger|fur laien)\\b",
@@ -212,6 +223,64 @@ export default {
   [
    "^sekunden?$",
    "s"
+  ],
+  [
+   "^kubikmeter?n?$",
+   "m3"
+  ],
+  [
+   "^kubikdezimeter?n?$",
+   "dm3"
+  ],
+  [
+   "^kubikzentimeter?n?$",
+   "cm3"
+  ]
+ ],
+ "numerais": [
+  [
+   "ein halbes|eine halbe|einem halben|einer halben|ein halb|halbes|halbe|halben|halb",
+   0.5
+  ],
+  [
+   "ein|eine|einem|einen|einer|eins",
+   1
+  ],
+  [
+   "zwei",
+   2
+  ],
+  [
+   "drei",
+   3
+  ],
+  [
+   "vier",
+   4
+  ],
+  [
+   "funf",
+   5
+  ],
+  [
+   "sechs",
+   6
+  ],
+  [
+   "sieben",
+   7
+  ],
+  [
+   "acht",
+   8
+  ],
+  [
+   "neun",
+   9
+  ],
+  [
+   "zehn",
+   10
   ]
  ],
  "categorias": [

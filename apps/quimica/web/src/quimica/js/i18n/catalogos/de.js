@@ -595,7 +595,8 @@ export default {
     comparar: {
       titulo: 'Vergleich: {nomes}', propriedade: 'Eigenschaft', fichaDe: 'Steckbrief von {nome}',
       linhas: { formula: 'Formel', massaMolar: 'Molare Masse', cas: 'CAS-Nummer', nomeIupac: 'IUPAC-Name', xlogp: 'XLogP', sinal: 'Signalwort (GHS)', pictogramas: 'Piktogramme (GHS)' },
-      maior: '{prop}: höher bei {nome} ({valor}).', tituloGeral: 'Vergleichen', explicacao: 'Vergleichen Sie Gleichartiges: zwei Elemente („Natrium und Chlor vergleichen“) oder zwei Verbindungen („Unterschied zwischen Ethanol und Essigsäure“).'
+      maior: '{prop}: höher bei {nome} ({valor}).',
+      ordemCrescente: '{prop}, aufsteigend: {lista}.', ordemDecrescente: '{prop}, absteigend: {lista}.', semDadoOrdem: 'Ohne diesen Wert im Datenpaket: {nomes}.', tituloGeral: 'Vergleichen', explicacao: 'Vergleichen Sie Gleichartiges: zwei Elemente („Natrium und Chlor vergleichen“) oder zwei Verbindungen („Unterschied zwischen Ethanol und Essigsäure“).'
     },
     tabela: {
       abrir: 'Periodensystem öffnen', naoTemProp: 'Das Paket enthält für die geladenen Elemente keine Daten (Eigenschaft: {prop}).',

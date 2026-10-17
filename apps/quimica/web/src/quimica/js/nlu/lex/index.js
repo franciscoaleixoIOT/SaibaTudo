@@ -55,6 +55,8 @@ export function compilar(bruto) {
     pistas,
     nivel: Object.fromEntries(Object.entries(bruto.nivel).map(([k, v]) => [k, rx(v)])),
     unidades: bruto.unidades.map(([src, simbolo]) => [rx(src), simbolo]),
+    /** Numerais por extenso antes de uma unidade ("meio mol", "two moles"): [regex como texto, valor], na ordem do contrato. */
+    numerais: (bruto.numerais ?? []).map(([src, valor]) => [src, valor]),
     categorias: bruto.categorias.map(([src, id]) => [rx(src), id]),
     estados: bruto.estados.map(([src, id]) => [rx(src), id]),
     extremos: bruto.extremos.map(([src, prop, dir]) => [rx(src), [prop, dir]]),

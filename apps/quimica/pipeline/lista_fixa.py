@@ -2,11 +2,16 @@
 """
 Lista fixa de compostos do ensino médio e de cultura geral (autoria própria).
 
-Formato de cada linha: `Nome em português | termo de busca no PubChem (inglês) | fórmula convencional [| nome popular]`.
-Linhas `## classes` definem as classes (ids em snake_case) das linhas seguintes. O CID NÃO é digitado aqui: é resolvido no
+Formato de cada linha: `Nome em português | termo de busca no PubChem (inglês) | fórmula convencional [| nome popular [| cid=NNN]]`.
+Linhas `## classes` definem as classes (ids em snake_case) das linhas seguintes. O CID normalmente NÃO é digitado aqui: é resolvido no
 PubChem pelo termo de busca e **conferido** pela fórmula (a composição da fórmula convencional tem de ser igual à fórmula
 Hill do PubChem). Entrada que não confere é descartada e registrada em `stats.json`.
+`cid=NNN` é uma dica para os nomes que a busca por nome do PubChem não resolve (nomes de Stock com algarismos romanos: "iron(III) oxide"
+→ 404) ou resolve para um registro de fórmula diferente (íon, hidrato): a dica vale como primeiro candidato e passa pela MESMA conferência
+de fórmula, então um CID digitado errado é descartado, nunca publicado. As 9 dicas abaixo foram conferidas no PubChem em 17/10/2026
+(mapa dos livros didáticos: Fe₂O₃, Fe₃O₄, Ag₂O, CaC₂, CoCl₂, Fe(OH)₃, Na₂S, P₄O₁₀ e o glutamato aparecem nos exercícios e o pacote não os tinha).
 """
+import re
 
 LISTA_FIXA_TXT = """
 ## acido inorganico
@@ -32,6 +37,9 @@ LISTA_FIXA_TXT = """
 Ácido crômico | chromic acid | H2CrO4
 Ácido silícico | silicic acid | H4SiO4
 Ácido pirofosfórico | pyrophosphoric acid | H4P2O7
+Ácido periódico | periodic acid | HIO4 | | cid=65185
+Ácido brômico | bromic acid | HBrO3 | | cid=24445
+Ácido permangânico | permanganic acid | HMnO4 | | cid=422689
 ## acido organico acido_carboxilico
 Ácido acético | acetic acid | CH3COOH
 Ácido fórmico | formic acid | HCOOH
@@ -79,10 +87,11 @@ Hidróxido de potássio | potassium hydroxide | KOH | Potassa cáustica
 Hidróxido de lítio | lithium hydroxide | LiOH
 Hidróxido de cálcio | calcium hydroxide | Ca(OH)2 | Cal hidratada
 Hidróxido de magnésio | magnesium hydroxide | Mg(OH)2
+Hidróxido de amônio | ammonium hydroxide | NH4OH | Amoníaco (solução) | cid=14923
 Hidróxido de bário | barium hydroxide | Ba(OH)2
 Hidróxido de estrôncio | strontium hydroxide | Sr(OH)2
 Hidróxido de alumínio | aluminum hydroxide | Al(OH)3
-Hidróxido de ferro(III) | iron(III) hydroxide | Fe(OH)3
+Hidróxido de ferro(III) | iron(III) hydroxide | Fe(OH)3 | | cid=73964
 Hidróxido de ferro(II) | iron(II) hydroxide | Fe(OH)2
 Hidróxido de cobre(II) | copper(II) hydroxide | Cu(OH)2
 Hidróxido de zinco | zinc hydroxide | Zn(OH)2
@@ -112,11 +121,16 @@ Cloreto de ferro(II) | iron(II) chloride | FeCl2
 Cloreto de cobre(II) | copper(II) chloride | CuCl2
 Cloreto de zinco | zinc chloride | ZnCl2
 Cloreto de prata | silver chloride | AgCl
+Sulfeto de prata | silver sulfide | Ag2S | | cid=166738
+Sulfato de prata | silver sulfate | Ag2SO4 | | cid=159865
+Iodeto de ferro(III) | iron(III) iodide | FeI3 | | cid=85017
+Iodato de potássio | potassium iodate | KIO3 | | cid=23665710
+Monocloreto de iodo | iodine monochloride | ICl | | cid=24640
 Cloreto de bário | barium chloride | BaCl2
 Cloreto de lítio | lithium chloride | LiCl
 Cloreto de estanho(II) | tin(II) chloride | SnCl2
 Cloreto de mercúrio(II) | mercury(II) chloride | HgCl2
-Cloreto de cobalto(II) | cobalt(II) chloride | CoCl2
+Cloreto de cobalto(II) | cobalt(II) chloride | CoCl2 | | cid=24288
 Cloreto de níquel(II) | nickel(II) chloride | NiCl2
 Cloreto de chumbo(II) | lead(II) chloride | PbCl2
 Brometo de sódio | sodium bromide | NaBr
@@ -127,6 +141,7 @@ Iodeto de sódio | sodium iodide | NaI
 Iodeto de prata | silver iodide | AgI
 Iodeto de chumbo(II) | lead(II) iodide | PbI2
 Fluoreto de sódio | sodium fluoride | NaF
+Fluoreto de potássio | potassium fluoride | KF
 Fluoreto de cálcio | calcium fluoride | CaF2 | Fluorita
 Sulfato de sódio | sodium sulfate | Na2SO4
 Sulfato de potássio | potassium sulfate | K2SO4
@@ -191,21 +206,22 @@ Hipoclorito de cálcio | calcium hypochlorite | Ca(ClO)2
 Cianeto de sódio | sodium cyanide | NaCN
 Cianeto de potássio | potassium cyanide | KCN
 Tiocianato de potássio | potassium thiocyanate | KSCN
-Sulfeto de sódio | sodium sulfide | Na2S
+Sulfeto de sódio | sodium sulfide | Na2S | | cid=14804
 Sulfeto de ferro(II) | iron(II) sulfide | FeS
 Sulfeto de zinco | zinc sulfide | ZnS
 Sulfeto de cádmio | cadmium sulfide | CdS
 Sulfeto de chumbo(II) | lead(II) sulfide | PbS | Galena
 Sulfeto de mercúrio(II) | mercury(II) sulfide | HgS | Cinábrio
 Sulfeto de cobre(II) | copper(II) sulfide | CuS
+Sulfeto de cobre(I) | copper(I) sulfide | Cu2S
 Hidreto de sódio | sodium hydride | NaH
 Hidreto de lítio e alumínio | lithium aluminium hydride | LiAlH4
 Borohidreto de sódio | sodium borohydride | NaBH4
 Tetraborato de sódio | sodium tetraborate | Na2B4O7 | Bórax
 Silicato de sódio | sodium silicate | Na2SiO3
-Carbeto de cálcio | calcium carbide | CaC2
+Carbeto de cálcio | calcium carbide | CaC2 | Carbureto | cid=6352
 Citrato trissódico | trisodium citrate | Na3C6H5O7
-Glutamato monossódico | monosodium glutamate | C5H8NNaO4
+Glutamato monossódico | monosodium glutamate | C5H8NNaO4 | | cid=23672308
 Benzoato de sódio | sodium benzoate | C7H5NaO2
 Sorbato de potássio | potassium sorbate | C6H7KO2
 Estearato de sódio | sodium stearate | C18H35NaO2
@@ -227,13 +243,13 @@ Pentóxido de dinitrogênio | dinitrogen pentoxide | N2O5
 Óxido de sódio | sodium oxide | Na2O
 Óxido de potássio | potassium oxide | K2O
 Óxido de alumínio | aluminum oxide | Al2O3 | Alumina
-Óxido de ferro(III) | iron(III) oxide | Fe2O3 | Hematita
+Óxido de ferro(III) | iron(III) oxide | Fe2O3 | Hematita | cid=518696
 Óxido de ferro(II) | iron(II) oxide | FeO
-Óxido de ferro(II,III) | iron(II,III) oxide | Fe3O4 | Magnetita
+Óxido de ferro(II,III) | iron(II,III) oxide | Fe3O4 | Magnetita | cid=16211978
 Óxido de zinco | zinc oxide | ZnO
 Óxido de cobre(II) | copper(II) oxide | CuO
 Óxido de cobre(I) | copper(I) oxide | Cu2O
-Óxido de prata | silver oxide | Ag2O
+Óxido de prata | silver oxide | Ag2O | | cid=9794626
 Óxido de mercúrio(II) | mercury(II) oxide | HgO
 Óxido de chumbo(II) | lead(II) oxide | PbO | Litargírio
 Dióxido de chumbo | lead dioxide | PbO2
@@ -244,7 +260,7 @@ Dióxido de manganês | manganese dioxide | MnO2
 Trióxido de cromo | chromium trioxide | CrO3
 Dióxido de estanho | tin(IV) oxide | SnO2
 Óxido de bário | barium oxide | BaO
-Pentóxido de difósforo | phosphorus pentoxide | P4O10
+Pentóxido de difósforo | phosphorus pentoxide | P4O10 | | cid=14812
 Trióxido de diboro | boron trioxide | B2O3
 Óxido de lítio | lithium oxide | Li2O
 Peróxido de hidrogênio | hydrogen peroxide | H2O2 | Água oxigenada
@@ -542,6 +558,13 @@ def parse_lista(texto=LISTA_FIXA_TXT):
         item = {"nome": partes[0], "termo": partes[1], "formula": partes[2], "classes": list(classes)}
         if len(partes) > 3 and partes[3]:
             item["popular"] = partes[3]
+        if len(partes) > 4 and partes[4]:
+            m = re.fullmatch(r"cid=(\d+)", partes[4])
+            if not m:
+                raise ValueError(f"5º campo inválido na lista fixa (esperado cid=NNN): {linha!r}")
+            item["cid"] = int(m.group(1))
+        if len(partes) > 5:
+            raise ValueError(f"linha com campos demais na lista fixa: {linha!r}")
         itens.append(item)
     return itens
 
@@ -572,6 +595,10 @@ APELIDOS_POR_IDIOMA = {
         "de": ["Glukose", "Glucose", "Traubenzucker", "Dextrose"], "fr": ["glucose", "dextrose"]}},
     24083: {"nome": "Sulfato de magnésio", "formula": "MgSO4", "apelidos": {
         "pt-BR": ["sal de Epsom", "sal inglês"], "es": ["sal de Epsom", "sal inglesa"], "de": ["Bittersalz", "Epsomsalz"], "fr": ["sel d'Epsom"]}},
+    280: {"nome": "Dióxido de carbono", "formula": "CO2", "apelidos": {
+        "pt-BR": ["gelo seco"], "en": ["dry ice"], "es": ["hielo seco"], "de": ["Trockeneis"], "fr": ["glace sèche", "glace carbonique"]}},
+    73981: {"nome": "Hidróxido de magnésio", "formula": "Mg(OH)2", "apelidos": {
+        "pt-BR": ["leite de magnésia"], "en": ["milk of magnesia"], "es": ["leche de magnesia"], "de": ["Magnesiamilch"], "fr": ["lait de magnésie"]}},
     25517: {"nome": "Cloreto de amônio", "formula": "NH4Cl", "apelidos": {
         "pt-BR": ["sal amoníaco"], "es": ["sal amoníaco"], "de": ["Salmiak", "Salmiaksalz"], "fr": ["sel ammoniac"]}},
 }

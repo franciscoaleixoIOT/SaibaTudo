@@ -16,7 +16,7 @@
     "estequiometria": "\\b(?:estequiometri\\w*|reactivo (?:limitante|en exceso)|limitante|exceso de reactivo|rendimiento|cuantos? (?:moles?|mols?|gramos?|moleculas?|atomos?|litros?|iones?|particulas?|kilos?|mg|miligramos?)\\b|cuantas? (?:moleculas|particulas|gramos|moles|litros)|numero de (?:moles?|moleculas|atomos|particulas|iones)|condiciones normales|cn|tpn|volumen ocupado|constante de avogadro|numero de avogadro)\\b",
     "massaMolar": "\\b(?:masa molar|masa molecular|masa formula|peso molecular|peso molar|cuanto pesa (?:un )?mol|cuanto vale (?:la )?masa molar)\\b|\\bg mol\\b",
     "desenhar": "\\b(?:dibuj\\w+|estructura (?:2d|molecular|quimica|plana|de lewis|del|de la|de)|estructura|muestr\\w+ (?:la )?(?:estructura|molecula)|molecula (?:del|de la|de)|como es (?:la )?(?:molecula|estructura)|formula estructural|geometria molecular|visualizar|esqueleto)\\b",
-    "comparar": "\\b(?:compar\\w+|diferencias? entre|\\bversus\\b|\\bvs\\b|cual es la diferencia|semejanza\\w*|similitud\\w*|igual a|parecid\\w+|cual (?:es |tiene |pesa |pesan |tienen )?(?:mas|menos|mayor|menor)\\b)\\b",
+    "comparar": "\\b(?:compar\\w+|diferencias? entre|\\bversus\\b|\\bvs\\b|cual es la diferencia|semejanza\\w*|similitud\\w*|igual a|parecid\\w+|cual (?:es |tiene |pesa |pesan |tienen )?(?:mas|menos|mayor|menor)\\b|orden (?:creciente|decreciente|ascendente|descendente)|en orden|orden[ae]\\w*|de (?:menor|mayor) a (?:mayor|menor)|cual (?:de ellos |de los dos |de las dos )?(?:es |tiene |posee )?(?:el |la )(?:mayor|menor|mas|menos)|que (?:es|tiene|pesa) (?:el |la )?(?:mas|menos|mayor|menor))\\b",
     "seguranca": "\\b(?:peligr\\w+|toxic\\w+|segur\\w+|epp|epis?\\b|equipos? de proteccion|primeros auxilios|derram\\w+|fuga\\w*|almacen\\w+|incendi\\w+|inflamab\\w+|corrosiv\\w+|irritant\\w+|irrita\\w*|ghs|sga|pictogramas?|frases? h\\b|indicaciones? de peligro|ficha de (?:datos de )?seguridad|fds|icsc|mezcl\\w+|incompatib\\w+|desech\\w+|eliminaci\\w+|manipul\\w+|inhal\\w+|ingest\\w+|quemadur\\w+|venenos\\w+|veneno|hace dano|hacen dano|neutraliz\\w+|guantes|gafas de proteccion|palabra de advertencia|clasificacion de peligro|es seguro|es peligroso|cancerigen\\w+|explosiv\\w+|reacciona con agua|reactiv\\w+ con)\\b",
     "nomenclatura": "\\b(?:cual es (?:el )?nombre|como se llama|nombre (?:quimico|iupac|sistematico|cientifico|oficial)|nomenclatura|como se escribe|cual es (?:la )?formula(?: quimica| molecular)?|formula (?:del|de la|de|quimica del|quimica de la|molecular del|molecular de la)|nombre del compuesto)\\b",
     "tabela": "\\b(?:tabla periodica|periodicidad|tendencia\\w*|grupo \\d{1,2}|familia \\d{1,2}|periodo \\d|bloque [spdf]|elementos? (?:del|de la|de los|de las) (?:grupo|periodo|bloque|familia)|cuales (?:son )?(?:los )?elementos|cuantos elementos|elementos (?:gaseosos|liquidos|solidos)|metales|no metales|semimetales|metaloides|halogenos?|gases? nobles?|alcalinoterreos?|alcalino terreos?|alcalinos?|lantanidos?|actinidos?|elemento mas|elementos mas|orden creciente|orden decreciente|mayor (?:radio|electronegatividad|energia|punto|masa|densidad)|menor (?:radio|electronegatividad|energia|punto|masa|densidad))\\b",
@@ -57,7 +57,18 @@
     "diluicao": "\\b(?:dilu\\w*|c1v1|c1 v1)\\b",
     "percentualMassa": "\\bmasa|porcent|por ciento|fraccion\\b",
     "cntp": "\\b(?:condiciones normales|cn|tpn|volumen)\\b",
-    "cueElemento": "\\b(?:elemento|simbolo|simbolo quimico)\\b"
+    "cueElemento": "\\b(?:elemento|simbolo|simbolo quimico)\\b",
+    "reacaoVerbo": "\\b(?:formad[oa]s?|se forman?|producid[oa]s?|producen?|obtenid[oa]s?|reacciona|reaccionan|reaccionar|consumid[oa]s?|consume|consumen|necesari[oa]s?|liberad[oa]s?|liberan?|a partir de|quema|combustion|descomposicion|descompone)\\b",
+    "pedidoQuantidade": "\\b(?:cuanto pesan?|pesa|pesan|masa(?! (?:molar|molecular|atomica|exacta))|moles?|mols?|cantidad de sustancia|volumen)\\b",
+    "ordemCrescente": "\\b(?:creciente|ascendente|de menor a mayor|del menor al mayor|cual (?:de ellos |de los dos |de las dos )?(?:es |tiene |posee )?(?:el |la )?(?:menor|menos)|que (?:es|tiene) (?:el |la )?(?:menor|menos))\\b",
+    "ordemDecrescente": "\\b(?:decreciente|descendente|de mayor a menor|del mayor al menor|cual (?:de ellos |de los dos |de las dos )?(?:es |tiene |posee )?(?:el |la )?(?:mayor|mas)|que (?:es|tiene) (?:el |la )?(?:mayor|mas))\\b",
+    "conectivoLista": "^(?:y|e|o|u)$",
+    "paraUnidades": "\\b(?:a|en|hacia|hasta)\\s+(?:el |la |los |las )?",
+    "paraUnidadesFim": "\\s*[?!.]*$",
+    "misturaTema": "\\b(mezcla)s?\\b",
+    "misturaConceito": "\\b(?:sustancias?|pura|puras|puro|puros|homogene\\w*|heterogene\\w*|sistemas?|clasifi\\w*|tipos? de|que (?:es|son)|diferencia entre|fases?)\\b",
+    "nomenclaturaPedido": "\\b(?:como se llama|como se nombra|como nombrar|nombra|nombrar|nombre (?:este|esta|estos|estas|el siguiente)|da el nombre|de el nombre|cual es el nombre|nombre (?:oficial|iupac|usual|sistematico|correcto))\\b",
+    "nomenclaturaAlvo": "\\b(?:compuestos?|sustancias?|moleculas?|hidrocarburos?|organic[oa]s?|cadenas?|estructuras?|\\w*(?:met|et|prop|but|pent|hex|hept|oct|non|dec|fen|benc)\\w*(?:ano|eno|ino|ol|ona|oico|il|amina))\\b"
   },
   "nivel": {
     "fundamental": "\\b(?:primaria|escuela primaria|secundaria basica|nino|ninos|simple|muy simple|facil de entender|para principiantes)\\b",
@@ -208,6 +219,64 @@
     [
       "^segundos?$",
       "s"
+    ],
+    [
+      "^metros? cubicos?$",
+      "m3"
+    ],
+    [
+      "^decimetros? cubicos?$",
+      "dm3"
+    ],
+    [
+      "^centimetros? cubicos?$",
+      "cm3"
+    ]
+  ],
+  "numerais": [
+    [
+      "medio|media",
+      0.5
+    ],
+    [
+      "un|una|uno",
+      1
+    ],
+    [
+      "dos",
+      2
+    ],
+    [
+      "tres",
+      3
+    ],
+    [
+      "cuatro",
+      4
+    ],
+    [
+      "cinco",
+      5
+    ],
+    [
+      "seis",
+      6
+    ],
+    [
+      "siete",
+      7
+    ],
+    [
+      "ocho",
+      8
+    ],
+    [
+      "nueve",
+      9
+    ],
+    [
+      "diez",
+      10
     ]
   ],
   "categorias": [

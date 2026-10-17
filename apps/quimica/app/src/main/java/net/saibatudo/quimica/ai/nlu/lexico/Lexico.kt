@@ -47,6 +47,11 @@ class Lexico private constructor(bruto: Map<String, Any?>) {
     val ligacaoPreposicoes: String
     private val nivelRx: List<Pair<String, Regex>> = mapa(bruto, "nivel").map { (k, v) -> k to Regex(v as String) }
     val unidades: List<Pair<Regex, String>> = pares(bruto["unidades"])
+    /** Numerais por extenso antes de uma unidade ("meio mol", "two moles"): (regex como texto, valor), na ordem do contrato. */
+    val numerais: List<Pair<String, Double>> = (bruto["numerais"] as? List<*>).orEmpty().map { e ->
+        val l = e as List<*>
+        (l[0] as String) to (l[1] as Number).toDouble()
+    }
     val categorias: List<Pair<Regex, String>> = pares(bruto["categorias"])
     val estados: List<Pair<Regex, String>> = pares(bruto["estados"])
     /** Regex → (id da propriedade, "max"|"min"). */

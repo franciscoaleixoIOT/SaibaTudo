@@ -16,7 +16,7 @@
     "estequiometria": "\\b(?:stoichiometr\\w*|limiting (?:reagent|reactant)|reagent in excess|excess reagent|excess reactant|yield|how many (?:moles?|mols?|grams?|molecules?|atoms?|lit(?:er|re)s?|ions?|particles?|kilos?|kilograms?|mg|milligrams?)\\b|number of (?:moles?|molecules|atoms|particles|ions)|stp|standard (?:temperature and pressure|conditions)|volume occupied|avogadro'?s? (?:constant|number))\\b",
     "massaMolar": "\\b(?:molar mass|molecular (?:mass|weight)|formula (?:mass|weight)|molar weight|how much does (?:a |one )?mole(?: of \\S+)? weigh|what is the molar mass)\\b|\\bg mol\\b",
     "desenhar": "\\b(?:draw\\w*|structure (?:2d|molecular|chemical|of|for)|2d structure|structure|show (?:me )?(?:the )?(?:structure|molecule)|molecule of|what does (?:the )?(?:molecule|structure) (?:of \\S+ )?look like|structural formula|molecular geometry|visuali[sz]e|skeleton|sketch)\\b",
-    "comparar": "\\b(?:compar\\w+|difference between|differences between|\\bversus\\b|which (?:is|one is|has) (?:heavier|lighter|denser|bigger|larger|smaller|higher|lower|stronger|weaker|more|less|the (?:highest|lowest|greatest|biggest|smallest))|\\bvs\\b|what is the difference|similarit\\w+|same as|similar to|alike)\\b",
+    "comparar": "\\b(?:compar\\w+|difference between|differences between|\\bversus\\b|which (?:is|one is|has) (?:heavier|lighter|denser|bigger|larger|smaller|higher|lower|stronger|weaker|more|less|the (?:highest|lowest|greatest|biggest|smallest))|\\bvs\\b|what is the difference|similarit\\w+|same as|similar to|alike|(?:increasing|decreasing|ascending|descending) order|in order of|order (?:them|these|from)|arrange\\w*|rank\\w*|put (?:them |these )?in order|which (?:one )?(?:is|has) the (?:higher|larger|bigger|greater|lower|smaller|heavier|lighter|denser|highest|largest|lowest|smallest)|which (?:one )?is (?:more|less) \\w+)\\b",
     "seguranca": "\\b(?:danger\\w*|hazard\\w*|toxic\\w*|safe\\w*|ppe|protective equipment|first aid|spill\\w*|leak\\w*|stor(?:e|age|ing)|fire\\w*|flammab\\w*|corrosiv\\w*|irritant\\w*|irritat\\w*|ghs|pictograms?|h[- ]?statements?|h[- ]?phrases?|safety data sheet|sds|msds|icsc|mix\\w*|incompatib\\w*|dispos\\w*|handl\\w+|inhal\\w+|ingest\\w+|swallow\\w*|burns?|poison\\w*|harmful|is it safe|is it dangerous|neutrali[sz]\\w+|gloves|goggles|signal word|hazard classification|carcinogen\\w*|explosiv\\w*|reacts? with water|reactiv\\w+ with)\\b",
     "nomenclatura": "\\b(?:what is the name|what is it called|what is \\S+ called|what do we call|what do you call|name (?:of|for)|chemical name|iupac name|systematic name|scientific name|official name|nomenclature|how (?:do you|to) (?:write|spell)|what is the (?:chemical |molecular )?formula|formula (?:of|for)|name of the compound)\\b",
     "tabela": "\\b(?:periodic table|periodicity|trends?|group \\d{1,2}|family \\d{1,2}|period \\d|block [spdf]|[spdf][- ]block|elements? (?:of|in|from) (?:the )?(?:group|period|block|family)|which (?:are the )?elements|what elements|how many elements|(?:gaseous|liquid|solid) elements|metals|non[- ]?metals|nonmetals|metalloids|semimetals|halogens?|noble gas(?:es)?|alkaline earth metals?|alkali metals?|lanthanides?|lanthanoids?|actinides?|actinoids?|most \\w+ element|least \\w+ element|ascending order|descending order|(?:highest|largest|biggest|greatest|lowest|smallest) (?:atomic radius|radius|electronegativity|energy|point|mass|density))\\b",
@@ -57,7 +57,18 @@
     "diluicao": "\\b(?:dilut\\w*|c1v1|c1 v1)\\b",
     "percentualMassa": "\\bmass|percent|weight|fraction\\b",
     "cntp": "\\b(?:stp|standard conditions|standard temperature|volume)\\b",
-    "cueElemento": "\\b(?:element|symbol|chemical symbol)\\b"
+    "cueElemento": "\\b(?:element|symbol|chemical symbol)\\b",
+    "reacaoVerbo": "\\b(?:formed|produced|obtained|react|reacts|reacting|reacted|consumed|needed|required|released|given off|from|burn\\w*|combustion|decompos\\w+)\\b",
+    "pedidoQuantidade": "\\b(?:weigh\\w*|mass(?! (?:number|spectrometry))|moles?|mols?|amount of substance|volume)\\b",
+    "ordemCrescente": "\\b(?:increasing|ascending|from (?:the )?(?:lowest|smallest|least) to (?:the )?(?:highest|largest|greatest|most)|which (?:one )?(?:is|has) (?:the )?(?:lower|smaller|lowest|smallest|lighter|less|least))\\b",
+    "ordemDecrescente": "\\b(?:decreasing|descending|from (?:the )?(?:highest|largest|greatest|most) to (?:the )?(?:lowest|smallest|least)|which (?:one )?(?:is|has) (?:the )?(?:higher|larger|bigger|greater|highest|largest|biggest|greatest|heavier|denser|more|most))\\b",
+    "conectivoLista": "^(?:and|or)$",
+    "paraUnidades": "\\b(?:to|into|in)\\s+(?:the )?",
+    "paraUnidadesFim": "\\s*[?!.]*$",
+    "misturaTema": "\\b(mixture)s?\\b",
+    "misturaConceito": "\\b(?:substances?|pure|homogeneous|heterogeneous|systems?|classif\\w*|types? of|what (?:is|are)|difference between|phases?)\\b",
+    "nomenclaturaPedido": "\\b(?:what is (?:it|this|that) called|what is \\S+ called|what do (?:we|you) call|name (?:this|these|that|the following|the)|give the (?:iupac |systematic |correct )?name|what is the (?:iupac |systematic |official |common |correct )?name|(?:iupac|systematic|official) name|how (?:do (?:you|i|we) |to |would you )name)\\b",
+    "nomenclaturaAlvo": "\\b(?:compounds?|substances?|molecules?|hydrocarbons?|organic|chains?|structures?|\\w*(?:meth|eth|prop|but|pent|hex|hept|oct|non|dec|phen|benz)\\w*(?:ane|ene|yne|ol|one|oic|yl|amine))\\b"
   },
   "nivel": {
     "fundamental": "\\b(?:elementary school|primary school|middle school|for kids|for children|simple|very simple|easy to understand|for beginners|layman)\\b",
@@ -208,6 +219,64 @@
     [
       "^seconds?$",
       "s"
+    ],
+    [
+      "^cubic met(?:er|re)s?$",
+      "m3"
+    ],
+    [
+      "^cubic decimet(?:er|re)s?$",
+      "dm3"
+    ],
+    [
+      "^cubic centimet(?:er|re)s?$",
+      "cm3"
+    ]
+  ],
+  "numerais": [
+    [
+      "half an?|half",
+      0.5
+    ],
+    [
+      "one",
+      1
+    ],
+    [
+      "two",
+      2
+    ],
+    [
+      "three",
+      3
+    ],
+    [
+      "four",
+      4
+    ],
+    [
+      "five",
+      5
+    ],
+    [
+      "six",
+      6
+    ],
+    [
+      "seven",
+      7
+    ],
+    [
+      "eight",
+      8
+    ],
+    [
+      "nine",
+      9
+    ],
+    [
+      "ten",
+      10
     ]
   ],
   "categorias": [

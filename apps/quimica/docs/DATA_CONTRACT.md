@@ -123,7 +123,9 @@ Nome em PT: do Wikidata (rótulo `pt`/`pt-br`) quando existir; senão o nome IUP
   `nomesPorIdioma[idioma]` = chaves de `nomes[idioma]` + `sinonimosPorIdioma[idioma]` **que ainda não estão em `nomes`** (deduplicado para o índice não dobrar de
   tamanho): a busca no idioma X usa `nomes` ∪ `nomesPorIdioma[X]`. Só idiomas com alguma entrada; `pt-BR` nunca aparece aqui (já está em `nomes`).
 Seleção do núcleo: compostos com página na Wikipédia em português (sitelink `ptwiki`) **e** CID no PubChem, mais listas fixas (ácidos/bases/sais do ensino médio, solventes,
-gases, polímeros comuns, fármacos de uso geral). Critério de inclusão é público (`pipeline/selecao_compostos.py`).
+gases, polímeros comuns, fármacos de uso geral). Critério de inclusão é público (`pipeline/selecao_compostos.py`). Na lista fixa o CID vem da busca por nome no
+PubChem e é conferido pela fórmula; uma entrada pode trazer `cid=NNN` como dica (nomes de Stock como "iron(III) oxide" dão 404 na busca por nome), que passa pela
+mesma conferência de fórmula (17/10/2026: Fe₂O₃, Fe₃O₄, Ag₂O, CaC₂, CoCl₂, Fe(OH)₃, Na₂S, P₄O₁₀ e glutamato monossódico voltam ao pacote no próximo build).
 
 ## 4. `seguranca/icsc/<numero>.json` — Fichas Internacionais de Segurança Química (OIT/OMS), em português
 Campos oficiais do cartão: `{ icsc, nome, cas, un, formula, perigosAgudos: {incendio, explosao}, exposicao: {inalacao, pele, olhos, ingestao}, primeirosSocorros: {...},
@@ -260,7 +262,7 @@ que **não** podem ser recusados (ex.: "como neutralizar ácido derramado").
 `PH`, `GAS_IDEAL`, `CONVERSAO_UNIDADE`, `NOMENCLATURA` (nome ↔ fórmula), `DESENHAR` (estrutura), `COMPARAR`, `TABELA_PERIODICA` (tendências, grupo, período), `SEGURANCA`
 (perigos, EPI, primeiros socorros), `CONCEITO` (explicação), `RECUSA_PERIGO`, `SOBRE_DADOS`, `FONTES`, `AJUDA`, `DESCONHECIDA`.
 Entidades: `elemento` (símbolo), `composto` (cid ou nome canônico), `propriedade` (id de `regras.propriedades`), `quantidades: [{valor, unidade}]`, `equacao` (texto),
-`nivel` (`fundamental|medio|superior`), `unidadeDestino`.
+`nivel` (`fundamental|medio|superior`), `unidadeDestino` (e, só nos clientes, `unidadesDestino`: todos os destinos de "para atm, kPa e torr", desde 17/10/2026).
 **Chaves por intenção (14/10/2026):** cada intenção admite só algumas entidades, e algumas são obrigatórias — tabela `ENTIDADES_POR_INTENCAO` em
 `backend/modal/nlu_core.py`, derivada do golden e do corpus (ex.: `ELEMENTO` só `elemento`, obrigatório; `PROPRIEDADE` exige `propriedade` e admite
 `elemento`/`composto`; `MASSA_MOLAR` admite `elemento`/`composto` sem obrigar; `RECUSA_PERIGO`, `SOBRE_DADOS`, `FONTES`, `AJUDA`, `DESCONHECIDA` não

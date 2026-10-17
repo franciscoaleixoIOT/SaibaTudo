@@ -183,6 +183,21 @@ private suspend fun AnswerBuilder.conversaoMolar(q: ParsedQuery): Resposta {
         )
     }
     val c = compostoDe(q)
+    // "quantos mols há em 1,2 × 10²³ átomos?": partículas → mol não depende da substância (só da constante de Avogadro do pacote)
+    val particulas = q.quantidades.firstOrNull { it.unidade == "particulas" }
+    val na = pacote.constante("NA")
+    if (particulas != null && na != null && q.formula == null && c == null && elementoDe(q) == null) {
+        val mols = particulas.valor / na.valor
+        return Resposta(
+            Intent.ESTEQUIOMETRIA, t(R.string.calc_est_titulo),
+            listOf(
+                Bloco.Campo(t(R.string.resp_est_entidades), t.cient(particulas.valor, 4)),
+                Bloco.Campo(t(R.string.calc_sol_qtd_materia), "${t.sig(mols, 5)} mol"),
+                Bloco.Passos(t(R.string.resp_como_calculei), listOf(t(R.string.calc_est_passo_n_avogadro, t.sig(particulas.valor, 5), t.cient(na.valor, 4), t.sig(mols, 5))))
+            ),
+            fontes = fonteDe(na.fontes), acoes = acoes
+        )
+    }
     val formula = q.formula ?: c?.formula ?: elementoDe(q)?.simbolo
         ?: return Resposta(
             Intent.ESTEQUIOMETRIA, t(R.string.calc_est_titulo),
@@ -392,9 +407,13 @@ internal suspend fun AnswerBuilder.conversao(q: ParsedQuery): Resposta {
         passos += t(R.string.calc_conv_fatores, de.simbolo, t.sig(de.fator, 7), unidadeBase, destino.simbolo, t.sig(destino.fator, 7))
         passos += "$passo."
     }
+    // "para atm, kPa e torr": as outras unidades de destino da mesma grandeza, uma linha cada (os passos são os do primeiro destino)
+    val outros = q.unidadesDestino.filter { it != q.unidadeDestino }.mapNotNull { un.buscar(it, de.grandeza) }
+        .filter { it.simbolo != destino.simbolo }
+        .map { u -> Bloco.Destaque("${t.sig(qt.valor, 6)} ${de.simbolo} = ${t.sig(un.converterComPasso(t, qt.valor, de, u).first, 7)} ${u.simbolo}") }
     return Resposta(
         Intent.CONVERSAO_UNIDADE, t(R.string.resp_conv_titulo),
-        listOf(Bloco.Destaque("${t.sig(qt.valor, 6)} ${de.simbolo} = ${t.sig(valor, 7)} ${destino.simbolo}"), Bloco.Passos(t(R.string.resp_como_converti), passos)),
+        listOf(Bloco.Destaque("${t.sig(qt.valor, 6)} ${de.simbolo} = ${t.sig(valor, 7)} ${destino.simbolo}")) + outros + Bloco.Passos(t(R.string.resp_como_converti), passos),
         fontes = fonteDe(emptyList()), acoes = listOf(acaoCalculadora(TipoCalculadora.UNIDADES))
     )
 }

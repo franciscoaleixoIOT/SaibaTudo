@@ -3,7 +3,7 @@
 // Formato de uma resposta: { intent, resolvida, origem, titulo, blocos[], directAnswer, fontes[], acoes[], sugestoes[], ... } (ver `montar`).
 import { balancear } from './calc/balancear.js';
 import { calcularConcentracao } from './calc/concentracao.js';
-import { calcularEstequiometria, converterQuantidade, notasCntp } from './calc/estequiometria.js';
+import { calcularEstequiometria, converterQuantidade, molDeParticulas, notasCntp } from './calc/estequiometria.js';
 import { calcularBoyle, calcularGas } from './calc/gas.js';
 import { calcularMassaMolar } from './calc/massa.js';
 import { calcularPH } from './calc/ph.js';
@@ -541,6 +541,18 @@ export class AnswerBuilder {
         sugestoes: [sug('balancear')]
       });
     }
+    // "quantos mols há em 1,2 × 10²³ átomos?": partículas → mol não depende da substância (só da constante de Avogadro)
+    const part = p.quantidades.find((x) => x.unidade === 'particulas');
+    if (part) {
+      const r = molDeParticulas(part.valor, this.ctx);
+      if (r.ok) {
+        return montar({
+          intent: 'ESTEQUIOMETRIA', titulo: `${fmt(part.valor, { sig: 6 })} ${t('respostas.estequiometria.particulas')} = ${fmt(r.mol, { sig: 6 })} mol`,
+          blocos: [B.resultado(null, r.resultados, r.fontes[0]), B.passos(t('respostas.blocos.passoAPasso'), r.passos, r.fontes[0])],
+          acoes: acaoCalc, sugestoes: [sug('molsAgua')]
+        });
+      }
+    }
     const mol = p.quantidades.find((x) => x.unidade && acharUnidade(this.ctx.unidades, x.unidade).some((u) => u.grupo === 'quantidade'));
     const vm = this.ctx.volumeMolarCNTP();
     if (mol && vm && this.dic.lex.pistas.cntp.test(normalizar(p.textoOriginal))) {
@@ -752,9 +764,12 @@ export class AnswerBuilder {
     const r = converter(q.valor, q.unidade, p.unidadeDestino, this.ctx.unidades);
     if (!r.ok) return montar({ intent: 'CONVERSAO_UNIDADE', resolvida: false, titulo: t('respostas.conversao.naoConsegui'), blocos: [B.aviso(r.erro)], acoes: calc, sugestoes: [sug('converter')] });
     const fonteTabela = { nome: t('respostas.fontes.tabelaUnidades', { origem: origemUnidades(this.ctx.unidades) }) };
+    const linha = (x, destaque) => ({ rotulo: t('respostas.conversao.em', { valor: fmt(x.valor, { sig: 8 }), de: x.de, para: x.para }), valor: fmt(x.resultado, { sig: 8 }), unidade: x.para, destaque });
+    // "para atm, kPa e torr": as outras unidades de destino, uma linha cada (os passos são os do primeiro destino; destino de outra grandeza fica de fora)
+    const outros = (p.unidadesDestino ?? []).filter((u) => u !== p.unidadeDestino).map((u) => converter(q.valor, q.unidade, u, this.ctx.unidades)).filter((x) => x.ok && x.para !== r.para);
     return montar({
       intent: 'CONVERSAO_UNIDADE', titulo: `${fmt(r.valor, { sig: 8 })} ${r.de} = ${fmt(r.resultado, { sig: 8 })} ${r.para}`,
-      blocos: [B.resultado(null, [{ rotulo: t('respostas.conversao.em', { valor: fmt(r.valor, { sig: 8 }), de: r.de, para: r.para }), valor: fmt(r.resultado, { sig: 8 }), unidade: r.para, destaque: true }], fonteTabela), B.passos(t('respostas.blocos.comoConverter'), r.passos, fonteTabela)],
+      blocos: [B.resultado(null, [linha(r, true), ...outros.map((x) => linha(x, false))], fonteTabela), B.passos(t('respostas.blocos.comoConverter'), r.passos, fonteTabela)],
       acoes: calc, sugestoes: [sug('converter')]
     });
   }
@@ -807,9 +822,21 @@ export class AnswerBuilder {
       const props = this.dic.props.filter((x) => x.alvo === 'elemento' && !['simbolo', 'descoberta'].includes(x.id));
       const linhas = props.map((pr) => [capitalizar(pr.rotulo), ...elementos.map((e) => formatarValor(pr, valorBruto(pr, e), this.ctx)?.curto ?? '—')]).filter((l) => l.slice(1).some((x) => x !== '—'));
       const nomes = elementos.map((e) => this.nomeElementoTitulo(e));
+      const fonteEl = dado(...elementos.map((e) => e.fontes?.[0]))[0] ?? fonteApp();
+      // "ordem crescente de número atômico de Na, Al, Zn…", "qual tem maior raio: K ou Na?": a lista ordenada vem antes da tabela
+      const blocosOrdem = [];
+      const prOrdem = p.ordem && p.propriedade ? this.dic.propPorId.get(p.propriedade) : null;
+      if (prOrdem && (prOrdem.alvo === 'elemento' || (prOrdem.escopos ?? []).includes('elemento'))) {
+        const itens = elementos.map((e, i) => {
+          const v = valorBruto(prOrdem, e);
+          return { nome: `${nomes[i]} (${e.simbolo})`, v, curto: typeof v === 'number' && Number.isFinite(v) ? formatarValor(prOrdem, v, this.ctx)?.curto ?? null : null };
+        });
+        const frase = this.fraseDeOrdem(p.ordem, prOrdem.rotulo, itens);
+        if (frase) blocosOrdem.push(B.texto(frase, fonteEl));
+      }
       return montar({
         intent: 'COMPARAR', titulo: t('respostas.comparar.titulo', { nomes: listar(nomes) }),
-        blocos: [B.tabela(null, [t('respostas.comparar.propriedade'), ...elementos.map((e, i) => `${nomes[i]} (${e.simbolo})`)], linhas, dado(...elementos.map((e) => e.fontes?.[0]))[0] ?? fonteApp())],
+        blocos: [...blocosOrdem, B.tabela(null, [t('respostas.comparar.propriedade'), ...elementos.map((e, i) => `${nomes[i]} (${e.simbolo})`)], linhas, fonteEl)],
         acoes: elementos.map((e, i) => rota(this.rotaElemento(e.simbolo), t('respostas.comparar.fichaDe', { nome: nomes[i] }))), sugestoes: []
       });
     }
@@ -828,6 +855,7 @@ export class AnswerBuilder {
       const medidas = compostos.map((c) => new Map(medidasDoComposto(c, this.dic.props, this.ctx).map((m) => [m.prop.id, m])));
       const fontesMedidas = [];
       const frases = [];
+      const frasesOrdem = [];
       const pedidas = new Set(p.propriedades?.length ? p.propriedades : p.propriedade ? [p.propriedade] : []);
       for (const id of ['estadoPadrao', 'pontoFusaoK', 'pontoEbulicaoK', 'densidadeKgm3', 'solubilidade', 'pka']) {
         const ms = medidas.map((mm) => mm.get(id) ?? null);
@@ -841,11 +869,18 @@ export class AnswerBuilder {
           const top = num.reduce((x, y) => (y.m.valor > x.m.valor ? y : x));
           if (num.filter((x) => x.m.valor === top.m.valor).length === 1) frases.push(t('respostas.comparar.maior', { prop: capitalizar(prop.rotulo), nome: this.nomeComposto(compostos[top.i]), valor: top.m.f.curto }));
         }
+        // ordem pedida ("ordem crescente de densidade: água, etanol e glicerina"): lista ordenada antes da tabela
+        if (p.ordem && pedidas.has(id) && num.length >= 2 && new Set(num.map((x) => x.m.campo)).size === 1) {
+          const itens = ms.map((m, i) => ({ nome: this.nomeComposto(compostos[i]), v: m && typeof m.valor === 'number' ? m.valor : null, curto: m && typeof m.valor === 'number' ? m.f.curto : null }));
+          const frase = this.fraseDeOrdem(p.ordem, prop.rotulo, itens);
+          if (frase) frasesOrdem.push(frase);
+        }
       }
       const fonteTabela = [...dado(...compostos.map((c) => c.fontes?.[0])), ...fontesMedidas];
       return montar({
         intent: 'COMPARAR', titulo: t('respostas.comparar.titulo', { nomes: listar(compostos.map((c) => this.nomeComposto(c))) }),
-        blocos: [B.tabela(null, ['', ...compostos.map((c) => this.nomeComposto(c))], linhas, fontesMedidas.length ? fonteTabela : dado(...compostos.map((c) => c.fontes?.[0]))[0] ?? fonteApp()),
+        blocos: [...frasesOrdem.map((f) => B.texto(f, fontesMedidas.length ? fontesMedidas : fonteApp())),
+          B.tabela(null, ['', ...compostos.map((c) => this.nomeComposto(c))], linhas, fontesMedidas.length ? fonteTabela : dado(...compostos.map((c) => c.fontes?.[0]))[0] ?? fonteApp()),
           ...frases.map((f) => B.texto(f, fontesMedidas.length ? fontesMedidas : fonteApp()))],
         acoes: compostos.map((c) => rota(this.rotaComposto(c.cid), t('respostas.comparar.fichaDe', { nome: this.nomeComposto(c) }))), sugestoes: []
       });
@@ -855,6 +890,23 @@ export class AnswerBuilder {
       blocos: [B.texto(t('respostas.comparar.explicacao'))],
       sugestoes: [sug('compareNaCl')]
     });
+  }
+
+  /**
+   * Frase com os itens em ordem de uma propriedade numérica ("Número atômico, em ordem crescente: Sódio (Na) 11 < Alumínio (Al) 13…").
+   * `itens`: [{nome, v, curto}] (curto null = sem o valor no pacote, citado à parte). null se menos de dois têm o valor.
+   */
+  fraseDeOrdem(ordem, rotulo, itens) {
+    const com = itens.filter((x) => x.curto != null && typeof x.v === 'number');
+    if (com.length < 2) return null;
+    const desc = ordem === 'decrescente';
+    com.sort((a, b) => (desc ? b.v - a.v : a.v - b.v));
+    let lista = `${com[0].nome} ${com[0].curto}`;
+    for (let i = 1; i < com.length; i++) lista += `${com[i].v === com[i - 1].v ? ' = ' : desc ? ' > ' : ' < '}${com[i].nome} ${com[i].curto}`;
+    let frase = t(desc ? 'respostas.comparar.ordemDecrescente' : 'respostas.comparar.ordemCrescente', { prop: capitalizar(rotulo), lista });
+    const sem = itens.filter((x) => x.curto == null).map((x) => x.nome);
+    if (sem.length) frase += ' ' + t('respostas.comparar.semDadoOrdem', { nomes: listar(sem) });
+    return frase;
   }
 
   // ------------------------------------------------------------------------------------------------ tabela periódica

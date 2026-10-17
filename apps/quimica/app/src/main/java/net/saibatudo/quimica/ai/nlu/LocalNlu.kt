@@ -111,7 +111,11 @@ object LocalNlu {
             val nomesEl = els.map { Texto.nlu(it.nome) }.toSet()
             compostos = comps.filter { it.via != "nome" || Texto.nlu(it.nome) !in nomesEl || pista("gasSubstancia") }
         }
-        val elementos = els.filter { e -> !(compostos.isNotEmpty() && compostos.any { it.via == "formula" && it.texto == e.simbolo }) }
+        // um nome de elemento que só aparece dentro do nome de uma propriedade não cita o elemento ("radio atómico" em espanhol não é o rádio)
+        val nSemProp = if (props.isNotEmpty()) d.semPropriedades(n) else n
+        fun temPalavra(txt: String, w: String) = w.isNotEmpty() && " $txt ".contains(" $w ")
+        fun soNaPropriedade(e: Achado) = e.via == "nome" && temPalavra(n, Texto.nlu(e.nome)) && !temPalavra(nSemProp, Texto.nlu(e.nome))
+        val elementos = els.filter { e -> !(compostos.isNotEmpty() && compostos.any { it.via == "formula" && it.texto == e.simbolo }) && !soNaPropriedade(e) }
         val formulasTexto = ents.formulas.map { it.texto!! }
         p = p.copy(
             nivel = nivel, quantidades = quantidadesPublicas, constantes = constantes,
@@ -144,14 +148,17 @@ object LocalNlu {
         val textoCompacto = Regex("""^(.*\d)\s+""").replace(original.trim(), "$1 ").trim()
         val paraUnidade: String? = lex.paraUnidade.find(textoCompacto)?.let { Quantidades.lerUnidade(it.groupValues[1], unidades, lex) }
         val quantosUnidade = lex.quantosUnidade.find(Texto.semAcentos(original))
+        // "para litros e metros cúbicos", "para atm, kPa e torr": um ou vários destinos (o primeiro é o unidadeDestino)
+        val destinos = Quantidades.lerDestinos(original, unidades, lex)
         if (!tem || p.formulas.isEmpty() || temQuant) {
             val temConv = i("conversao") || quantosUnidade != null || lex.pista("conversaoPreposicoes").containsMatchIn(original)
             if (unidadesLidas.isNotEmpty() && temConv && !i("ph") && !i("gas") && !i("concentracao") && !i("estequiometria") && !i("massaMolar")) {
-                var destino = if (quantosUnidade != null) Quantidades.lerUnidade(quantosUnidade.groupValues[1], unidades, lex) else paraUnidade
+                var destino = if (quantosUnidade != null) Quantidades.lerUnidade(quantosUnidade.groupValues[1], unidades, lex) else paraUnidade ?: destinos.firstOrNull()
                 if (destino == null && unidadesLidas.size >= 2) destino = unidadesLidas.last().unidade
                 val origem = unidadesLidas.first().unidade
                 if (destino != null && origem != null && destino != origem && unidades.buscar(origem) != null) {
-                    return fim(Intent.CONVERSAO_UNIDADE) { it.copy(unidadeDestino = destino, quantidades = listOfNotNull(unidadesLidas.first().let { q -> q.unidade?.let { u -> Quantidade(q.valor, u, q.texto) } })) }
+                    val unidadesDestino = if (destinos.size > 1 && destinos[0] == destino) destinos.filter { u -> u != origem } else emptyList()
+                    return fim(Intent.CONVERSAO_UNIDADE) { it.copy(unidadeDestino = destino, unidadesDestino = unidadesDestino, quantidades = listOfNotNull(unidadesLidas.first().let { q -> q.unidade?.let { u -> Quantidade(q.valor, u, q.texto) } })) }
                 }
             }
         }
@@ -180,12 +187,47 @@ object LocalNlu {
             }
         }
         if (i("massaMolar") && !pista("prefixoDefinicao")) return fim(Intent.MASSA_MOLAR)
+        // estequiometria sem "quantos": uma quantidade de massa, mols ou volume + substância citada + verbo de reação ("formada a partir de 2 g
+        // de hidrogênio", "reage com 10 g de Cu2S") ou pedido de massa/mols/volume ("massa de meio mol de NaCl")
+        val quantEsteq = unidadesLidas.any { q -> GRANDEZAS_ESTEQUIOMETRIA.any { g -> unidades.buscar(q.unidade!!, g) != null } }
+        if (tem && quantEsteq && (pista("reacaoVerbo") || pista("pedidoQuantidade")) && !pista("prefixoDefinicao")) {
+            val ligado = compostoLigadoAQuantidade(original, quant, d, p.compostos, lex)
+            return fim(Intent.ESTEQUIOMETRIA) {
+                if (ligado == null) it.copy(equacao = equacao)
+                else it.copy(equacao = equacao, composto = ligado, compostos = listOf(ligado) + it.compostos.filter { c -> c != ligado })
+            }
+        }
 
         // 6) representação, comparação, segurança, nomenclatura
-        if (i("comparar") && p.compostos.size + p.elementos.size + p.formulas.size >= 2) return fim(Intent.COMPARAR)
+        if (i("comparar") && p.compostos.size + p.elementos.size + p.formulas.size >= 2) {
+            // "ordem crescente de número atômico", "qual tem maior raio": a ordem pedida e, sem propriedade citada, a do extremo ("qual é mais denso")
+            val extremoCmp = lex.extremos.firstOrNull { it.first.containsMatchIn(n) }?.second
+            val ordem = when {
+                pista("ordemDecrescente") -> "decrescente"
+                pista("ordemCrescente") -> "crescente"
+                extremoCmp != null -> if (extremoCmp.second == "max") "decrescente" else "crescente"
+                else -> null
+            }
+            return fim(Intent.COMPARAR) { it.copy(ordem = ordem, propriedade = p.propriedade ?: if (ordem != null && extremoCmp != null) extremoCmp.first else null) }
+        }
         if (i("desenhar") && (p.compostos.isNotEmpty() || p.formulas.isNotEmpty()) && !pista("propriedadesPalavra")) return fim(Intent.DESENHAR)
+        // "a água mineral é pura ou mistura?", "classifique em substâncias e misturas": a mistura como CONCEITO, não o aviso de mistura perigosa.
+        // Vale quando a palavra "mistura" (`pistas.misturaTema`) vem com uma pista de classificação (`pistas.misturaConceito`) e, sem ela, nada
+        // na pergunta fala de perigo nem de misturar X com Y ("misturar água sanitária com amoníaco" e "essa mistura é tóxica?" continuam SEGURANCA)
+        val temaMistura = lex.pista("misturaTema").find(n)
+        if (temaMistura != null && pista("misturaConceito")) {
+            val resto = lex.pista("misturaTema").replace(n, " ")
+            if (!lex.intencao("seguranca").containsMatchIn(resto) && !lex.pista("mistura").containsMatchIn(resto)) {
+                return fim(Intent.CONCEITO) { it.copy(conceito = temaMistura.groupValues[1]) }
+            }
+        }
         if (i("seguranca")) return fim(Intent.SEGURANCA) { it.copy(mistura = pista("mistura")) }
         if (i("nomenclatura") && (p.compostos.isNotEmpty() || p.formulas.isNotEmpty())) return fim(Intent.NOMENCLATURA)
+        // "como se chama o 2-cloro-butano?", "nomeie este composto orgânico": o pedido de nome (`pistas.nomenclaturaPedido`) sobre um composto
+        // (`pistas.nomenclaturaAlvo`: "composto", "molécula" ou nome com raiz orgânica; ou uma fórmula/composto citado) é NOMENCLATURA mesmo sem composto do pacote (a resposta
+        // diz que não o encontrou); pergunta de elemento ou de outra propriedade (que não o próprio nome IUPAC) não entra
+        val soPropriedadeDeNome = p.propriedades.all { it in PROPRIEDADES_DE_NOME }
+        if (pista("nomenclaturaPedido") && (pista("nomenclaturaAlvo") || p.formulas.isNotEmpty() || p.compostos.isNotEmpty()) && p.elementos.isEmpty() && soPropriedadeDeNome && !pista("elementoPalavra")) return fim(Intent.NOMENCLATURA)
 
         // 7) tabela periódica
         val grupo = lex.pista("grupo").find(n)
@@ -253,6 +295,10 @@ object LocalNlu {
 
     private val RX_PV_NRT = Regex("""pv\s*=\s*nrt""", RegexOption.IGNORE_CASE)
     private val UNIDADES_DE_GAS = setOf("atm", "Pa", "kPa", "mmHg", "Torr", "bar", "K", "°C")
+    /** Grandezas (grupos de regras.unidades) de uma quantidade de estequiometria: massa, quantidade de matéria e volume. */
+    private val GRANDEZAS_ESTEQUIOMETRIA = listOf("massa", "quantidade", "volume")
+    /** Propriedades (ids de regras.propriedades) que são o próprio nome: "nome IUPAC de X" num pedido de nomenclatura não é pergunta de propriedade. */
+    private val PROPRIEDADES_DE_NOME = setOf("nomeIupac")
 
     /** Número do primeiro grupo de captura que casou (as pistas `grupo`/`periodo` de alguns idiomas têm alternativas com grupos diferentes). */
     private fun grupoDe(m: MatchResult?): Int? = m?.groupValues?.drop(1)?.firstOrNull { it.isNotEmpty() }?.toIntOrNull()

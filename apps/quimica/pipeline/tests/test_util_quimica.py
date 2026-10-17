@@ -35,6 +35,49 @@ class FormulaTest(unittest.TestCase):
             self.assertTrue(it["classes"], it["nome"])
         self.assertEqual(len({i["termo"] for i in itens}), len(itens), "termos de busca repetidos")
 
+    def test_lista_fixa_dica_de_cid(self):
+        itens = lista_fixa.parse_lista("## oxido\nÓxido de ferro(III) | iron(III) oxide | Fe2O3 | Hematita | cid=518696\n"
+                                       "Óxido de prata | silver oxide | Ag2O | | cid=9794626\nÁgua | water | H2O\n")
+        self.assertEqual(itens[0]["cid"], 518696)
+        self.assertEqual(itens[0]["popular"], "Hematita")
+        self.assertEqual(itens[1]["cid"], 9794626)
+        self.assertNotIn("popular", itens[1])
+        self.assertNotIn("cid", itens[2])
+        with self.assertRaises(ValueError):
+            lista_fixa.parse_lista("## x\nA | a | H2O | | 518696\n")
+        with self.assertRaises(ValueError):
+            lista_fixa.parse_lista("## x\nA | a | H2O | | cid=1 | sobra\n")
+        reais = lista_fixa.parse_lista()
+        com_dica = {i["nome"]: i["cid"] for i in reais if "cid" in i}
+        for nome in ("Óxido de ferro(III)", "Óxido de ferro(II,III)", "Óxido de prata", "Carbeto de cálcio", "Cloreto de cobalto(II)",
+                     "Hidróxido de ferro(III)", "Sulfeto de sódio", "Glutamato monossódico", "Pentóxido de difósforo"):
+            self.assertIn(nome, com_dica)
+        for nome in ("Fluoreto de potássio", "Sulfeto de cobre(I)"):
+            self.assertIn(nome, {i["nome"] for i in reais})
+
+    def test_resolver_lista_fixa_usa_a_dica_e_confere_a_formula(self):
+        import selecao_compostos as S
+
+        class PubChemFalso:
+            def __init__(self):
+                self.props = {518696: {"MolecularFormula": "Fe2O3"}, 14833: {"MolecularFormula": "Fe2O3"}, 237873: {"MolecularFormula": "HNa2S+"},
+                              14804: {"MolecularFormula": "Na2S"}, 999: {"MolecularFormula": "CO2"}}
+
+            def nome_para_cids(self, nome):
+                return {"iron(III) oxide": [], "sodium sulfide": [237873], "silver oxide": [], "water": [962]}.get(nome, [])
+
+            def propriedades(self, cids):
+                return {c: self.props[c] for c in cids if c in self.props}
+
+        itens = lista_fixa.parse_lista("## x\nÓxido de ferro(III) | iron(III) oxide | Fe2O3 | Hematita | cid=518696\n"
+                                       "Sulfeto de sódio | sodium sulfide | Na2S | | cid=14804\n"
+                                       "Óxido de prata | silver oxide | Ag2O | | cid=999\n")
+        sel, desc = S.resolver_lista_fixa(PubChemFalso(), itens, log=lambda *a: None)
+        self.assertEqual([(r["nome"], r["cid"]) for r in sel], [("Óxido de ferro(III)", 518696), ("Sulfeto de sódio", 14804)])
+        self.assertEqual(len(desc), 1)
+        self.assertEqual(desc[0]["nome"], "Óxido de prata")
+        self.assertIn("não confere", desc[0]["motivo"])  # dica com CID errado é descartada, não publicada
+
 
 class CasTest(unittest.TestCase):
     def test_checksum(self):

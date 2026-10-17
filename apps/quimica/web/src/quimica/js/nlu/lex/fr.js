@@ -17,7 +17,7 @@ export default {
   "estequiometria": "\\b(?:st(?:oe| )chiometri\\w*|reactif (?:limitant|en exces)|limitant|exces de reactif|rendement|combien de (?:moles?|mol|grammes?|molecules?|atomes?|litres?|ions?|particules?|kilos?|kilogrammes?|mg|milligrammes?)\\b|nombre de (?:moles?|molecules|atomes|particules|ions)|masse de [0-9][0-9.,]* ?(?:mol|moles?|mmol)\\b|cntp|tpn|conditions normales|volume occupe|constante d avogadro|nombre d avogadro)\\b",
   "massaMolar": "\\b(?:masse molaire|masse moleculaire|masse formulaire|poids moleculaire|poids molaire|combien pese (?:une )?mole|quelle est la masse molaire)\\b|\\bg mol\\b",
   "desenhar": "\\b(?:dessin\\w+|structure (?:2d|moleculaire|chimique|plane|de lewis|du|de la|de l|de)|structure|montr\\w+ (?:moi )?(?:la )?(?:structure|molecule)|molecule (?:du|de la|de l|de)|a quoi ressemble (?:la )?(?:molecule|structure)|formule (?:developpee|structurale|semi developpee)|geometrie moleculaire|visualis\\w+|squelette|schema de)\\b",
-  "comparar": "\\b(?:compar\\w+|differences? entre|\\bversus\\b|\\bvs\\b|quelle est la difference|\\blequel\\b|\\bquel(?:le)? est (?:le |la )?plus\\b|\\blaquelle\\b|ressemblance\\w*|similitude\\w*|pareil que|semblable a|similaire a)\\b",
+  "comparar": "\\b(?:compar\\w+|differences? entre|\\bversus\\b|\\bvs\\b|quelle est la difference|\\blequel\\b|\\bquel(?:le)? est (?:le |la )?plus\\b|\\blaquelle\\b|ressemblance\\w*|similitude\\w*|pareil que|semblable a|similaire a|ordre (?:croissant|decroissant)|par ordre|dans l ordre|class(?:er|ez|e)\\b|rang(?:er|ez|e)\\b|ordonn\\w+|du plus \\w+ au plus|(?:qui|quel(?:le)?) (?:a|possede) (?:le |la )?(?:plus|moins))\\b",
   "seguranca": "\\b(?:danger\\w*|dangereu\\w*|risque\\w*|toxi\\w+|securit\\w+|(?:est|est[- ]il|est[- ]elle|c est) sur\\b|epi|equipements? de protection|premiers (?:soins|secours)|deversement\\w*|renvers\\w*|fuite\\w*|stock\\w+|entrepos\\w+|incendie\\w*|feu|inflammab\\w+|corrosi\\w+|irritant\\w*|irrit\\w*|ghs|sgh|pictogramme\\w*|mentions? de danger|phrases? h\\b|fiche de (?:donnees de )?securite|fds|icsc|melang\\w+|incompatib\\w+|elimin\\w+|jeter|manipul\\w+|inhal\\w+|ingest\\w+|ingere\\w*|brulure\\w*|poison\\w*|venimeu\\w*|nocif\\w*|fait mal|est[- ]ce (?:sur|dangereux)|neutralis\\w+|gants|lunettes de protection|mention d avertissement|classification (?:de|des) danger|cancerigen\\w*|cancerogen\\w*|explosi\\w+|reagit avec l eau|reacti\\w+ avec)\\b",
   "nomenclatura": "\\b(?:quel est (?:le |son )?nom|comment (?:s appelle|ca s appelle|on appelle|appelle[- ]t[- ]on)|nom (?:chimique|iupac|systematique|scientifique|officiel)|nomenclature|comment (?:s ecrit|ecrire|on ecrit|ecrit[- ]on)|quelle est (?:la |sa )?formule(?: chimique| brute| moleculaire)?|formule (?:du|de la|de l|de|chimique du|chimique de|brute du|brute de|moleculaire du|moleculaire de)|nom du compose)\\b",
   "tabela": "\\b(?:tableau periodique|classification periodique|periodicite|tendance\\w*|groupe \\d{1,2}|famille \\d{1,2}|periode \\d|bloc [spdf]|elements? (?:du|de la|des|de) (?:groupe|periode|bloc|famille)|quels (?:sont )?(?:les )?elements|combien d elements|elements (?:gazeux|liquides|solides)|metaux|non metaux|semi metaux|metalloides|halogenes?|gaz nobles?|gaz rares?|alcalino terreux|alcalins?|lanthanides?|actinides?|element le plus|elements les plus|ordre croissant|ordre decroissant|plus (?:grand|grande|haut|haute|eleve|elevee) (?:rayon|electronegativite|energie|point|masse|densite)|plus (?:petit|petite|bas|basse|faible) (?:rayon|electronegativite|energie|point|masse|densite))\\b",
@@ -58,7 +58,18 @@ export default {
   "diluicao": "\\b(?:dilu\\w*|c1v1|c1 v1)\\b",
   "percentualMassa": "\\bmasse|pourcent|pour cent|titre|fraction\\b",
   "cntp": "\\b(?:cntp|tpn|conditions normales|volume)\\b",
-  "cueElemento": "\\b(?:element|symbole|symbole chimique)\\b"
+  "cueElemento": "\\b(?:element|symbole|symbole chimique)\\b",
+  "reacaoVerbo": "\\b(?:forme(?:e|s|es)?|se forment?|produit(?:e|s|es)?|obtenue?s?|obtenu|reagi\\w*|consommee?s?|necessaires?|liberee?s?|liberent?|a partir d(?:e|u|es)?|brul\\w+|combustion|decomposition|decompose)\\b",
+  "pedidoQuantidade": "\\b(?:pese\\w*|masse(?! (?:molaire|moleculaire|atomique|exacte|volumique))|moles?|mol|quantite de matiere|volume)\\b",
+  "ordemCrescente": "\\b(?:croissant\\w*|du plus (?:petit|faible|bas) au plus (?:grand|fort|haut|eleve)|(?:lequel|laquelle) (?:a|est) (?:le |la )?(?:plus (?:petit|petite|faible|bas|basse|leger|legere)|moins))\\b",
+  "ordemDecrescente": "\\b(?:decroissant\\w*|du plus (?:grand|fort|haut|eleve) au plus (?:petit|faible|bas)|(?:lequel|laquelle) (?:a|est) (?:le |la )?plus (?:grand|grande|fort|forte|haut|haute|eleve|elevee|dense|lourd|lourde))\\b",
+  "conectivoLista": "^(?:et|ou)$",
+  "paraUnidades": "(?:\\b(?:en|vers|jusqu['’ ]?a)|(?:^|\\s)[aà])\\s+(?:le |la |les |l['’ ])?",
+  "paraUnidadesFim": "\\s*[?!.]*$",
+  "misturaTema": "\\b(melange)s?\\b",
+  "misturaConceito": "\\b(?:substances?|corps purs?|pure?s?|homogene\\w*|heterogene\\w*|systemes?|classe[rz]?|classifi\\w*|types? de|qu est[- ]ce qu\\w*|difference entre|phases?)\\b",
+  "nomenclaturaPedido": "\\b(?:comment (?:s appelle|ca s appelle|on appelle|appelle[- ]t[- ]on|nommer|nomme[- ]t[- ]on|se nomme)|nomme[zr]|donne[rz]? le nom|quel est (?:le |son )?nom|nom (?:officiel|iupac|usuel|systematique))\\b",
+  "nomenclaturaAlvo": "\\b(?:composes?|substances?|molecules?|hydrocarbures?|organiques?|chaines?|structures?|\\w*(?:meth|eth|prop|but|pent|hex|hept|oct|non|dec|phen|benz)\\w*(?:ane|ene|yne|ol|one|oique|yle|amine))\\b"
  },
  "nivel": {
   "fundamental": "\\b(?:primaire|ecole primaire|college|enfant|enfants|simple|tres simple|facile a comprendre|pour debutants|pour les nuls)\\b",
@@ -209,6 +220,64 @@ export default {
   [
    "^secondes?$",
    "s"
+  ],
+  [
+   "^metres? cubes?$",
+   "m3"
+  ],
+  [
+   "^decimetres? cubes?$",
+   "dm3"
+  ],
+  [
+   "^centimetres? cubes?$",
+   "cm3"
+  ]
+ ],
+ "numerais": [
+  [
+   "une demi|un demi|demie|demi",
+   0.5
+  ],
+  [
+   "un|une",
+   1
+  ],
+  [
+   "deux",
+   2
+  ],
+  [
+   "trois",
+   3
+  ],
+  [
+   "quatre",
+   4
+  ],
+  [
+   "cinq",
+   5
+  ],
+  [
+   "six",
+   6
+  ],
+  [
+   "sept",
+   7
+  ],
+  [
+   "huit",
+   8
+  ],
+  [
+   "neuf",
+   9
+  ],
+  [
+   "dix",
+   10
   ]
  ],
  "categorias": [

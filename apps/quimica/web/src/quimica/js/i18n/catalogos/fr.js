@@ -596,7 +596,8 @@ export default {
     comparar: {
       titulo: 'Comparaison : {nomes}', propriedade: 'Propriété', fichaDe: 'Fiche : {nome}',
       linhas: { formula: 'Formule', massaMolar: 'Masse molaire', cas: 'Numéro CAS', nomeIupac: 'Nom IUPAC', xlogp: 'XLogP', sinal: 'Mention d’avertissement (SGH)', pictogramas: 'Pictogrammes (SGH)' },
-      maior: '{prop} : plus élevé pour {nome} ({valor}).', tituloGeral: 'Comparer', explicacao: 'Comparez des éléments de même nature : deux éléments (« comparer le sodium et le chlore ») ou deux composés (« différence entre l’éthanol et l’acide acétique »).'
+      maior: '{prop} : plus élevé pour {nome} ({valor}).',
+      ordemCrescente: '{prop}, par ordre croissant : {lista}.', ordemDecrescente: '{prop}, par ordre décroissant : {lista}.', semDadoOrdem: 'Absent du paquet de données : {nomes}.', tituloGeral: 'Comparer', explicacao: 'Comparez des éléments de même nature : deux éléments (« comparer le sodium et le chlore ») ou deux composés (« différence entre l’éthanol et l’acide acétique »).'
     },
     tabela: {
       abrir: 'Ouvrir le tableau périodique', naoTemProp: 'Le jeu de données ne contient aucune valeur de « {prop} » pour les éléments chargés.',

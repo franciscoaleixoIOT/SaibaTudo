@@ -550,6 +550,9 @@
     <string name="resp_prop_solubilidade_de_qual">Tell me which compound you want the water solubility of. For example: \"solubility of urea\".</string>
     <string name="resp_prop_propriedades_de">Properties of %1$s</string>
     <string name="resp_comparar_maior">%1$s: higher for %2$s (%3$s).</string>
+    <string name="resp_comparar_ordem_crescente">%1$s, in increasing order: %2$s.</string>
+    <string name="resp_comparar_ordem_decrescente">%1$s, in decreasing order: %2$s.</string>
+    <string name="resp_comparar_sem_dado_ordem">Not in the data package: %1$s.</string>
     <string name="lista_e">%1$s and %2$s</string>
 
     <!-- 24_categorias_estados -->

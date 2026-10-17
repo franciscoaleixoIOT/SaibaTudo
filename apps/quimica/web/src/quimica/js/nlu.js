@@ -20,6 +20,11 @@ export const INTENTS = [
 
 export const TAMANHO_MAXIMO = 300;
 
+/** Grandezas (grupos de regras.unidades) de uma quantidade de estequiometria: massa, quantidade de matéria e volume. */
+const GRANDEZAS_ESTEQUIOMETRIA = new Set(['massa', 'quantidade', 'volume']);
+/** Propriedades (ids de regras.propriedades) que são o próprio nome: "nome IUPAC de X" num pedido de nomenclatura não é pergunta de propriedade. */
+const PROPRIEDADES_DE_NOME = new Set(['nomeIupac']);
+
 // ---------------------------------------------------------------------------------------------------- unidades (nomes por extenso: léxico)
 /** Interpreta uma unidade escrita (símbolo ou nome por extenso no idioma): devolve o símbolo ou null. */
 export function lerUnidade(texto, unidades, lex = lexico()) {
@@ -28,42 +33,116 @@ export function lerUnidade(texto, unidades, lex = lexico()) {
   if (bruto === '%') return '%';
   const n = normalizar(bruto);
   for (const [rx, sim] of lex.unidades) if (rx.test(n)) return sim;
-  if (/^[A-Za-zµμ°º/³²⁻¹·.-]+$/.test(bruto) && unidades && acharUnidade(unidades, bruto.replace(/·/g, '/').replace(/\/+/g, '/')).length) return bruto;
+  if (/^[A-Za-zµμ°º/³²⁻¹·.-]+(?:-?[1-3])?$/.test(bruto) && unidades && acharUnidade(unidades, bruto.replace(/·/g, '/').replace(/\/+/g, '/')).length) return bruto;
   return null;
 }
 
-// número com vírgula ou ponto (decimal ou milhar), notação científica ("2,5 x 10^-3", "1.8e-5"): lerNumero decide pela heurística do idioma
-const NUM = String.raw`(\d+(?:[.,]\d+)*(?:\s*(?:[x×*]\s*10\s*\^?\s*\{?-?\d+\}?|e[+-]?\d+))?)`;
+// número com vírgula ou ponto (decimal ou milhar), notação científica ("2,5 x 10^-3", "1,2 × 10²³", "1,2·10^23", "6,02.10^23", "1.2 × 10**23",
+// "1.8e-5"): lerNumero decide pela heurística do idioma. Um ".10^" depois da mantissa é o "vezes dez elevado a", não a casa decimal.
+const NUM = String.raw`(\d+(?:[.,](?!10\s*(?:\^|\*\*))\d+)*(?:\s*(?:[x×*·]\s*10\s*(?:(?:\^|\*\*)?\s*\{?[-−]?\d+\}?|⁻?[⁰¹²³⁴⁵⁶⁷⁸⁹]+)|\.10\s*(?:\^|\*\*)\s*\{?[-−]?\d+\}?|e[+-]?\d+))?)`;
+// fração escrita com barra ("1/2 mol") ou caractere de fração ("½ mol"): vem antes do número comum, senão "1/2" viraria "1" e "2 mol"
+const FRACAO = String.raw`\d+\s?\/\s?[1-9]\d*|[½¼¾]`;
+const FRACOES_UNICODE = { '½': 0.5, '¼': 0.25, '¾': 0.75 };
+/** Valor de um número lido: fração ("1/2", "½") ou número com vírgula/ponto (lerNumero, com a convenção do idioma do léxico). */
+function valorDoNumero(s, idioma) {
+  if (s in FRACOES_UNICODE) return FRACOES_UNICODE[s];
+  const f = /^(\d+)\s?\/\s?(\d+)$/.exec(s);
+  if (f) return Number(f[2]) ? Number(f[1]) / Number(f[2]) : NaN;
+  return lerNumero(s, idioma);
+}
+/**
+ * Unidade logo depois do número (símbolo com o expoente em dígito, "dm3"; °C, % ou nome por extenso com até duas palavras: "mol por litro",
+ * "degrees celsius"); a palavra vai inteira, com acentos ("átomos", "años"), como em Quantidades.kt.
+ */
+const unidadeRx = (lex) => String.raw`(°\s*[CF]|º\s*[CF]|%|[\p{L}µμ°º][\p{L}µμ°º/³²⁻¹·.-]*(?:-?[1-3](?![\d.,]?\d))?(?:\s+${lex.pistas.quantidadeComplemento}\s+[${lex.pistas.letrasUnidade}]+)?(?:\s+[${lex.pistas.letrasUnidade}]+)?)`;
 const rxQuantCache = new WeakMap();
-/** Quantidade + unidade (símbolo, °C, % ou nome por extenso com até duas palavras: "mol por litro", "degrees celsius"). */
+/** Quantidade + unidade (número, fração ou numeral por extenso do léxico: "meio mol", "two moles"). */
 function rxQuant(lex) {
   if (!rxQuantCache.has(lex)) {
-    const L = lex.pistas.letrasUnidade;
-    rxQuantCache.set(lex, new RegExp(String.raw`(?<![A-Za-z(\[)\]^_\-.,\d])${NUM}\s*(°\s*[CF]|º\s*[CF]|%|[A-Za-zµμ°º][A-Za-zµμ°º/³²⁻¹·.-]*(?:\s+${lex.pistas.quantidadeComplemento}\s+[${L}]+)?(?:\s+[${L}]+)?)?`, 'gu'));
+    const palavras = lex.numerais.map(([src]) => `(?:${src})`).join('|');
+    rxQuantCache.set(lex, {
+      digitos: new RegExp(String.raw`(?<![A-Za-z(\[)\]^_\-.,\d])(${FRACAO}|${NUM.slice(1, -1)})\s*${unidadeRx(lex)}?`, 'gu'),
+      // aplicado ao texto em minúsculas e sem acentos (mesmo comprimento do original): "Meio mol", "três mols", "une demi-mole"
+      extenso: palavras ? new RegExp(String.raw`(?<![A-Za-z\d])(${palavras})[\s-]+${unidadeRx(lex)}`, 'gu') : null,
+      numerais: lex.numerais.map(([src, valor]) => [new RegExp(`^(?:${src})$`), valor])
+    });
   }
   return rxQuantCache.get(lex);
 }
 
-/** Quantidades com unidade encontradas no texto: [{valor, unidade, texto}] (unidade null quando não reconhecida). */
-export function lerQuantidades(texto, unidades, lex = lexico()) {
-  const out = [];
-  for (const m of String(texto).matchAll(rxQuant(lex))) {
-    const valor = lerNumero(m[1]);
-    if (!Number.isFinite(valor)) continue;
-    let unidade = null;
-    let usado = '';
-    const cand = (m[2] ?? '').trim().replace(/\s+/g, ' ');
-    if (cand) {
-      const palavras = cand.split(' ');
-      for (let k = Math.min(palavras.length, 3); k >= 1 && !unidade; k--) {
-        const frase = palavras.slice(0, k).join(' ');
-        unidade = lerUnidade(frase.replace(/^°\s*/, '°'), unidades, lex);
-        if (unidade) usado = frase;
-      }
-    }
-    out.push({ valor, unidade, texto: `${m[1]}${usado ? ' ' + usado : ''}`.trim() });
+/** Minúsculas sem acento, caractere a caractere (o texto continua com o MESMO comprimento: as posições valem no original). */
+function dobrarMesmoComprimento(s) {
+  let out = '';
+  for (const ch of s) {
+    const d = ch.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+    out += d.length === ch.length ? d : ch;
   }
   return out;
+}
+
+/** A unidade no começo de `cand` (até três palavras): { unidade, usado } ou nulos. */
+function unidadeNoInicio(cand, unidades, lex) {
+  const palavras = String(cand ?? '').trim().replace(/\s+/g, ' ').split(' ').filter(Boolean);
+  for (let k = Math.min(palavras.length, 3); k >= 1; k--) {
+    const frase = palavras.slice(0, k).join(' ');
+    const unidade = lerUnidade(frase.replace(/^°\s*/, '°'), unidades, lex);
+    if (unidade) return { unidade, usado: frase };
+  }
+  return { unidade: null, usado: '' };
+}
+
+/** Quantidades com unidade encontradas no texto, na ordem: [{valor, unidade, texto}] (unidade null quando não reconhecida). */
+export function lerQuantidades(texto, unidades, lex = lexico()) {
+  const achadas = [];
+  const original = String(texto);
+  const R = rxQuant(lex);
+  for (const m of original.matchAll(R.digitos)) {
+    const valor = valorDoNumero(m[1], lex.idioma);
+    if (!Number.isFinite(valor)) continue;
+    const { unidade, usado } = unidadeNoInicio(m[2], unidades, lex);
+    achadas.push({ pos: m.index, q: { valor, unidade, texto: `${m[1]}${usado ? ' ' + usado : ''}`.trim() } });
+  }
+  // numeral por extenso ("meio mol", "half a mole", "zwei Mol"): só conta com unidade reconhecida (senão "um elemento" seria quantidade)
+  if (R.extenso) {
+    for (const m of dobrarMesmoComprimento(original).matchAll(R.extenso)) {
+      const inicioUnidade = m.index + m[0].length - m[2].length;
+      const { unidade, usado } = unidadeNoInicio(original.slice(inicioUnidade, m.index + m[0].length), unidades, lex);
+      const valor = R.numerais.find(([rxN]) => rxN.test(m[1]))?.[1];
+      if (!unidade || unidade === '%' || valor == null) continue;
+      achadas.push({ pos: m.index, q: { valor, unidade, texto: `${original.slice(m.index, m.index + m[1].length)} ${usado}` } });
+    }
+  }
+  return achadas.sort((a, b) => a.pos - b.pos).map((x) => x.q);
+}
+
+/**
+ * Unidades de destino de uma conversão escritas no fim da pergunta, depois de uma preposição do léxico (`pistas.paraUnidades`): uma ou várias,
+ * separadas por vírgula ou por conectivo (`pistas.conectivoLista`): "para litros e metros cúbicos" → ['L', 'm3']; "para atm, kPa e torr" →
+ * ['atm', 'kPa', 'Torr']. Todas as partes têm de ser unidades (senão a preposição não é a da conversão); `pistas.paraUnidadesFim` tira o resto
+ * (pontuação, "umrechnen"). Devolve [] quando não acha. Espelho de `Quantidades.lerDestinos` (Android).
+ */
+export function lerDestinos(texto, unidades, lex = lexico()) {
+  const original = String(texto ?? '');
+  const dobrado = dobrarMesmoComprimento(original);
+  const P = lex.pistas;
+  for (const m of dobrado.matchAll(new RegExp(P.paraUnidades.source, 'g'))) {
+    const ini = m.index + m[0].length;
+    const caudaD = dobrado.slice(ini);
+    const mf = P.paraUnidadesFim.exec(caudaD);
+    const cauda = original.slice(ini, ini + (mf ? mf.index : caudaD.length));
+    const partes = [[]];
+    for (const tok of cauda.replace(/,/g, ' , ').split(/\s+/).filter(Boolean)) {
+      if (tok === ',' || P.conectivoLista.test(normalizar(tok))) partes.push([]);
+      else partes[partes.length - 1].push(tok);
+    }
+    // "en litres et en mètres cubes", "e para m³": a preposição repetida no começo de uma parte não conta
+    const semPreposicao = (x) => { const mp = P.paraUnidades.exec(dobrarMesmoComprimento(x)); return mp && mp.index === 0 ? x.slice(mp[0].length).trim() : x; };
+    const textos = partes.filter((x) => x.length).map((x) => semPreposicao(x.join(' '))).filter(Boolean);
+    if (!textos.length || textos.some((x) => x.split(' ').length > 3)) continue;
+    const lidas = textos.map((x) => lerUnidade(x.replace(/^°\s*/, '°'), unidades, lex));
+    if (lidas.every((u) => u && u !== '%')) return [...new Set(lidas)];
+  }
+  return [];
 }
 
 /**
@@ -74,7 +153,7 @@ export function ligarQuantidades(texto, dic, lex = dic?.lex ?? lexico()) {
   const rx = new RegExp(String.raw`(?<![A-Za-z(\[)\]^_\-.,\d])${NUM}\s*([A-Za-zµμ°º]+(?:/[A-Za-z]+)?)\s+${lex.pistas.ligacaoPreposicoes}\s+(?=(\S+(?:\s+\S+){0,2}))`, 'gu');
   const out = [];
   for (const m of String(texto).matchAll(rx)) {
-    const valor = lerNumero(m[1]);
+    const valor = lerNumero(m[1], lex.idioma);
     const unidade = lerUnidade(m[2], dic.unidades, lex);
     if (!Number.isFinite(valor) || !unidade) continue;
     const toks = m[3].split(/\s+/);
@@ -127,8 +206,8 @@ export function extrairEquacao(texto) {
 function parseVazio(original) {
   return {
     intent: 'DESCONHECIDA', textoOriginal: original, elemento: null, elementos: [], composto: null, compostoNome: null, compostos: [], formulas: [], formula: null,
-    propriedade: null, propriedades: [], quantidades: [], equacao: null, nivel: null, unidadeDestino: null, conceito: null,
-    grupo: null, periodo: null, bloco: null, categoria: null, estado: null, extremo: null, tendencia: false, mistura: false, constantes: {}, seguranca: null
+    propriedade: null, propriedades: [], quantidades: [], equacao: null, nivel: null, unidadeDestino: null, unidadesDestino: [], conceito: null,
+    grupo: null, periodo: null, bloco: null, categoria: null, estado: null, extremo: null, tendencia: false, ordem: null, mistura: false, constantes: {}, seguranca: null
   };
 }
 
@@ -142,7 +221,7 @@ function nivelDe(n, lex) {
 function lerConstantes(original, lex) {
   const out = {};
   for (const m of original.matchAll(lex.pistas.constantes)) {
-    const v = lerNumero(m[2]);
+    const v = lerNumero(m[2], lex.idioma);
     if (Number.isFinite(v)) out[m[1].toLowerCase() === 'pka' ? 'pKa' : m[1].toLowerCase() === 'pkb' ? 'pKb' : m[1].toLowerCase() === 'ka' ? 'Ka' : 'Kb'] = v;
   }
   return out;
@@ -222,7 +301,11 @@ export function parse(pergunta, dic, contexto = null, lex = dic?.lex ?? lexico()
     const ligado = ligarQuantidades(original, dic, lex).find((x) => x.cid != null && compostos.some((c) => c.cid === x.cid));
     if (ligado) compostos = [compostos.find((c) => c.cid === ligado.cid), ...compostos.filter((c) => c.cid !== ligado.cid)];
   }
-  const elementos = els.filter((e) => !(compostos.length && compostos.some((c) => c.via === 'formula' && c.texto === e.simbolo)));
+  // um nome de elemento que só aparece dentro do nome de uma propriedade não cita o elemento ("radio atómico" em espanhol não é o rádio)
+  const nSemProp = props.length && typeof dic.semPropriedades === 'function' ? dic.semPropriedades(n) : n;
+  const temPalavra = (txt, w) => !!w && ` ${txt} `.includes(` ${w} `);
+  const soNaPropriedade = (e) => e.via === 'nome' && temPalavra(n, normalizar(e.nome)) && !temPalavra(nSemProp, normalizar(e.nome));
+  const elementos = els.filter((e) => !(compostos.length && compostos.some((c) => c.via === 'formula' && c.texto === e.simbolo)) && !soNaPropriedade(e));
   p.elementos = elementos.map((e) => e.simbolo);
   p.elemento = p.elementos[0] ?? null;
   p.compostos = compostos.map((c) => c.cid);
@@ -259,14 +342,17 @@ export function parse(pergunta, dic, contexto = null, lex = dic?.lex ?? lexico()
     return m ? lerUnidade(m[1], unidades, lex) : null;
   })();
   const quantosUnidade = P.quantosUnidade.exec(original);
+  // "para litros e metros cúbicos", "para atm, kPa e torr": um ou vários destinos (o primeiro é o unidadeDestino)
+  const destinos = lerDestinos(original, unidades, lex);
   if (!tem || p.formulas.length === 0 || temQuant) {
     const temConv = I.conversao.test(n) || P.conversaoPreposicoes.test(original);
     if (unidadesLidas.length >= 1 && temConv && !I.ph.test(n) && !I.gas.test(n) && !I.concentracao.test(n) && !I.estequiometria.test(n) && !I.massaMolar.test(n)) {
-      let destino = quantosUnidade ? lerUnidade(quantosUnidade[1], unidades, lex) : paraUnidade;
+      let destino = quantosUnidade ? lerUnidade(quantosUnidade[1], unidades, lex) : paraUnidade ?? destinos[0] ?? null;
       if (!destino && unidadesLidas.length >= 2) destino = unidadesLidas[unidadesLidas.length - 1].unidade;
       const origem = unidadesLidas[0].unidade;
       if (destino && origem && destino !== origem && acharUnidade(unidades ?? { grupos: {}, prefixos: [] }, origem).length) {
-        return fim('CONVERSAO_UNIDADE', { unidadeDestino: destino, quantidades: [unidadesLidas[0]] });
+        const unidadesDestino = destinos.length > 1 && destinos[0] === destino ? destinos.filter((u) => u !== origem) : [];
+        return fim('CONVERSAO_UNIDADE', { unidadeDestino: destino, unidadesDestino, quantidades: [unidadesLidas[0]] });
       }
     }
   }
@@ -287,15 +373,37 @@ export function parse(pergunta, dic, contexto = null, lex = dic?.lex ?? lexico()
   if (I.concentracao.test(n) && (temQuant || P.concentracaoForte.test(n)) && !P.prefixoExplicacaoPalavra.test(n)) return fim('CONCENTRACAO');
   if (I.estequiometria.test(n) && (temQuant || tem) && !P.prefixoDefinicao.test(n)) return fim('ESTEQUIOMETRIA', { equacao });
   if (I.massaMolar.test(n) && !P.prefixoDefinicao.test(n)) return fim('MASSA_MOLAR');
+  // estequiometria sem "quantos": uma quantidade de massa, mols ou volume + substância citada + verbo de reação ("formada a partir de 2 g de
+  // hidrogênio", "reage com 10 g de Cu2S") ou pedido de massa/mols/volume ("massa de meio mol de NaCl")
+  const quantEsteq = unidadesLidas.some((q) => unidades && acharUnidade(unidades, q.unidade).some((x) => GRANDEZAS_ESTEQUIOMETRIA.has(x.grupo)));
+  if (tem && quantEsteq && (P.reacaoVerbo.test(n) || P.pedidoQuantidade.test(n)) && !P.prefixoDefinicao.test(n)) return fim('ESTEQUIOMETRIA', { equacao });
 
   // 6) representação, comparação, segurança, nomenclatura
-  if (I.comparar.test(n) && p.compostos.length + p.elementos.length + p.formulas.length >= 2) return fim('COMPARAR');
+  if (I.comparar.test(n) && p.compostos.length + p.elementos.length + p.formulas.length >= 2) {
+    // "ordem crescente de número atômico", "qual tem maior raio": a ordem pedida e, sem propriedade citada, a do extremo ("qual é mais denso")
+    const extremoCmp = lex.extremos.find(([rx]) => rx.test(n))?.[1] ?? null;
+    const ordem = P.ordemDecrescente.test(n) ? 'decrescente' : P.ordemCrescente.test(n) ? 'crescente' : extremoCmp ? (extremoCmp[1] === 'max' ? 'decrescente' : 'crescente') : null;
+    return fim('COMPARAR', { ordem, propriedade: p.propriedade ?? (ordem && extremoCmp ? extremoCmp[0] : null) });
+  }
   if (I.desenhar.test(n) && (p.compostos.length || p.formulas.length) && !P.propriedadesPalavra.test(n)) return fim('DESENHAR');
+  // "a água mineral é pura ou mistura?", "classifique em substâncias e misturas": a mistura como CONCEITO, não o aviso de mistura perigosa.
+  // Vale quando a palavra "mistura" (`pistas.misturaTema`) vem com uma pista de classificação (`pistas.misturaConceito`) e, sem ela, nada na
+  // pergunta fala de perigo nem de misturar X com Y ("misturar água sanitária com amoníaco" e "essa mistura é tóxica?" continuam SEGURANCA).
+  const temaMistura = P.misturaTema.exec(n);
+  if (temaMistura && P.misturaConceito.test(n)) {
+    const resto = n.replace(new RegExp(P.misturaTema.source, 'g'), ' ');
+    if (!I.seguranca.test(resto) && !P.mistura.test(resto)) return fim('CONCEITO', { conceito: temaMistura[1] });
+  }
   if (I.seguranca.test(n)) {
     const mistura = P.mistura.test(n);
     return fim('SEGURANCA', { mistura });
   }
   if (I.nomenclatura.test(n) && (p.compostos.length || p.formulas.length)) return fim('NOMENCLATURA');
+  // "como se chama o 2-cloro-butano?", "nomeie este composto orgânico": o pedido de nome (`pistas.nomenclaturaPedido`) sobre um composto
+  // (`pistas.nomenclaturaAlvo`: "composto", "molécula" ou nome com raiz orgânica; ou uma fórmula/composto citado) é NOMENCLATURA mesmo sem composto do pacote (a resposta diz
+  // que não o encontrou); pergunta de elemento ou de outra propriedade (que não o próprio nome IUPAC) não entra
+  const soPropriedadeDeNome = p.propriedades.every((x) => PROPRIEDADES_DE_NOME.has(x));
+  if (P.nomenclaturaPedido.test(n) && (P.nomenclaturaAlvo.test(n) || p.formulas.length || p.compostos.length) && !p.elementos.length && soPropriedadeDeNome && !P.elementoPalavra.test(n)) return fim('NOMENCLATURA');
 
   // 7) tabela periódica
   const grupo = P.grupo.exec(n);

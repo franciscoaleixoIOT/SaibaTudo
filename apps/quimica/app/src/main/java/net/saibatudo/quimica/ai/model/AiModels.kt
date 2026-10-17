@@ -58,6 +58,8 @@ data class ParsedQuery(
     val equacao: String? = null,
     val nivel: String? = null,
     val unidadeDestino: String? = null,
+    /** CONVERSAO_UNIDADE com vários destinos ("para atm, kPa e torr"): todos, na ordem (o primeiro é [unidadeDestino]); vazio com um só. */
+    val unidadesDestino: List<String> = emptyList(),
     /** Assunto de CONCEITO. */
     val conceito: String? = null,
     // ---- tabela periódica ----
@@ -69,6 +71,8 @@ data class ParsedQuery(
     /** Extremo pedido: (propriedade, "max" ou "min"). */
     val extremo: Pair<String, String>? = null,
     val tendencia: Boolean = false,
+    /** COMPARAR: ordem pedida de uma propriedade numérica ("crescente" ou "decrescente"), como `ordem` do site. */
+    val ordem: String? = null,
     // ---- outros ----
     val mistura: Boolean = false,
     /** Ka, Kb, pKa e pKb citados na pergunta. */

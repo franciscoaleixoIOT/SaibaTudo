@@ -12,6 +12,7 @@ internal object LexicoPtBr {
         "pistas" to n_pistas(),
         "nivel" to n_nivel(),
         "unidades" to n_unidades(),
+        "numerais" to n_numerais(),
         "categorias" to n_categorias(),
         "estados" to n_estados(),
         "extremos" to n_extremos(),
@@ -39,7 +40,7 @@ internal object LexicoPtBr {
         "estequiometria" to "\\b(?:estequiometri\\w*|reagente (?:limitante|em excesso)|limitante|excesso de reagente|rendimento|quantos? (?:mols?|gramas?|moleculas?|atomos?|litros?|ions?|particulas?|quilos?|mg|miligramas?)\\b|quantas? (?:moleculas|particulas|atomos|gramas|mols|litros)|numero de (?:mols?|moleculas|atomos|particulas|ions)|cntp|condicoes normais|volume ocupado|constante de avogadro|numero de avogadro)\\b",
         "massaMolar" to "\\b(?:massa molar|massa molecular|massa formula|peso molecular|peso molar|quanto pesa (?:um )?mol|quanto vale (?:a )?massa molar)\\b|\\bg mol\\b",
         "desenhar" to "\\b(?:desenh\\w+|estrutura (?:2d|molecular|quimica|plana|de lewis|do|da|de)|estrutura|mostr\\w+ (?:a )?(?:estrutura|molecula)|molecula (?:do|da|de)|como (?:e|eh) (?:a )?(?:molecula|estrutura)|formula estrutural|geometria molecular|visualizar|esqueleto)\\b",
-        "comparar" to "\\b(?:compar\\w+|diferenca (?:s )?entre|diferencas? entre|\\bversus\\b|\\bvs\\b|qual (?:a )?diferenca|semelhanca\\w*|igual a|parecid\\w+)\\b",
+        "comparar" to "\\b(?:compar\\w+|diferenca (?:s )?entre|diferencas? entre|\\bversus\\b|\\bvs\\b|qual (?:a )?diferenca|semelhanca\\w*|igual a|parecid\\w+|ordem (?:crescente|decrescente)|em ordem|orden\\w+|qual (?:deles |delas |dos dois |das duas )?(?:tem|possui|apresenta|e) (?:o |a )?(?:maior|menor|mais|menos)|quem (?:tem|e) (?:o |a )?(?:maior|menor|mais|menos)|do (?:menor|maior) (?:para|ao) (?:o )?(?:maior|menor))\\b",
         "seguranca" to "\\b(?:perig\\w+|toxic\\w+|segur\\w+|epis?\\b|equipamentos? de protecao|primeiros? socorros|derram\\w+|vazament\\w+|armazen\\w+|incendi\\w+|inflamav\\w+|corrosiv\\w+|irritant\\w+|irrita\\w*|ghs|pictogramas?|frases? h\\b|ficha de seguranca|icsc|fispq|mistur\\w+|incompativ\\w+|descart\\w+|manusear|manuseio|inala\\w+|ingest\\w+|queimadur\\w+|venenos\\w+|veneno|faz mal|fazem mal|neutraliz\\w+|luvas|oculos de protecao|palavra de sinal|classificacao de perigo|e seguro|e perigoso|cancerigen\\w+|explosiv\\w+|reage com agua|reativ\\w+ com)\\b",
         "nomenclatura" to "\\b(?:qual (?:e )?(?:o )?nome|como (?:se )?chama|nome (?:quimico|iupac|sistematico|cientifico|oficial)|nomenclatura|como (?:se )?escreve|qual (?:e )?a? ?formula(?: quimica| molecular)?|formula (?:do|da|de|quimica do|quimica da|molecular do|molecular da)|nome do composto)\\b",
         "tabela" to "\\b(?:tabela periodica|periodicidade|tendencia\\w*|grupo \\d{1,2}|familia \\d{1,2}|periodo \\d|bloco [spdf]|elementos? (?:do|da|dos|das) (?:grupo|periodo|bloco|familia)|quais (?:sao )?(?:os )?elementos|quantos elementos|elementos (?:gasosos|liquidos|solidos)|metais|nao metais|ametais|semimetais|metaloides|halogenios?|gases? nobres?|alcalino terrosos?|alcalinos?|lantanideos?|lantanidios?|actinideos?|actinidios?|elemento mais|elementos mais|ordem crescente|ordem decrescente|maior (?:raio|eletronegatividade|energia|ponto|massa|densidade)|menor (?:raio|eletronegatividade|energia|ponto|massa|densidade))\\b",
@@ -83,7 +84,18 @@ internal object LexicoPtBr {
         "diluicao" to "\\b(?:dilu\\w*|c1v1|c1 v1)\\b",
         "percentualMassa" to "\\bmassa|percent|porcent|titulo\\b",
         "cntp" to "\\b(?:cntp|condicoes normais|volume)\\b",
-        "cueElemento" to "\\b(?:elemento|simbolo|simbolo quimico)\\b"
+        "cueElemento" to "\\b(?:elemento|simbolo|simbolo quimico)\\b",
+        "reacaoVerbo" to "\\b(?:formad[oa]s?|se formam?|produzid[oa]s?|produz(?:em)?|obtid[oa]s?|reage|reagem|reagir|reagindo|consumid[oa]s?|consome|consomem|necessari[oa]s?|liberad[oa]s?|liberam?|a partir de|queima|combustao|decomposicao|decompoe)\\b",
+        "pedidoQuantidade" to "\\b(?:quanto pesam?|pesa|pesam|massa(?! (?:molar|molecular|atomica|exata|especifica|formula))|mols?|quantidade de materia|quantidade em mols?|volume)\\b",
+        "ordemCrescente" to "\\b(?:crescente|do menor (?:para|ao) (?:o )?maior|qual (?:deles |delas |dos dois |das duas )?(?:tem|possui|apresenta|e) (?:o |a )?(?:menor|menos)|quem (?:tem|e) (?:o |a )?(?:menor|menos))\\b",
+        "ordemDecrescente" to "\\b(?:decrescente|do maior (?:para|ao) (?:o )?menor|qual (?:deles |delas |dos dois |das duas )?(?:tem|possui|apresenta|e) (?:o |a )?(?:maior|mais)|quem (?:tem|e) (?:o |a )?(?:maior|mais))\\b",
+        "conectivoLista" to "^(?:e|ou)\$",
+        "paraUnidades" to "\\b(?:para|em|a|pra|ate)\\s+(?:o |a |os |as )?",
+        "paraUnidadesFim" to "\\s*[?!.]*\$",
+        "misturaTema" to "\\b(mistura)s?\\b",
+        "misturaConceito" to "\\b(?:substancias?|pura|puras|puro|puros|homogene\\w*|heterogene\\w*|sistemas?|classifi\\w*|tipos? de|o que (?:e|sao)|diferenca entre|fases?)\\b",
+        "nomenclaturaPedido" to "\\b(?:como (?:se )?chama|como (?:se )?nomeia|como nomear|nomei(?:e|a|em)|nomear|de o nome|da o nome|qual (?:e )?o nome|nome (?:oficial|iupac|usual|sistematico|correto))\\b",
+        "nomenclaturaAlvo" to "\\b(?:compostos?|substancias?|moleculas?|hidrocarbonetos?|organic[oa]s?|cadeias?|estruturas?|\\w*(?:met|et|prop|but|pent|hex|hept|oct|non|dec|fen|benz)\\w*(?:ano|eno|ino|ol|ona|oico|il|amina))\\b"
     )
 
     private fun n_nivel(): Map<String, Any?> = linkedMapOf<String, Any?>(
@@ -272,6 +284,21 @@ internal object LexicoPtBr {
         "s"
     )
 
+    private fun n_unidades_36(): List<Any?> = listOf<Any?>(
+        "^metros? cubicos?\$",
+        "m3"
+    )
+
+    private fun n_unidades_37(): List<Any?> = listOf<Any?>(
+        "^decimetros? cubicos?\$",
+        "dm3"
+    )
+
+    private fun n_unidades_38(): List<Any?> = listOf<Any?>(
+        "^centimetros? cubicos?\$",
+        "cm3"
+    )
+
     private fun n_unidades(): List<Any?> = listOf<Any?>(
         n_unidades_0(),
         n_unidades_1(),
@@ -308,7 +335,79 @@ internal object LexicoPtBr {
         n_unidades_32(),
         n_unidades_33(),
         n_unidades_34(),
-        n_unidades_35()
+        n_unidades_35(),
+        n_unidades_36(),
+        n_unidades_37(),
+        n_unidades_38()
+    )
+
+    private fun n_numerais_0(): List<Any?> = listOf<Any?>(
+        "meio|meia",
+        0.5
+    )
+
+    private fun n_numerais_1(): List<Any?> = listOf<Any?>(
+        "um|uma",
+        1
+    )
+
+    private fun n_numerais_2(): List<Any?> = listOf<Any?>(
+        "dois|duas",
+        2
+    )
+
+    private fun n_numerais_3(): List<Any?> = listOf<Any?>(
+        "tres",
+        3
+    )
+
+    private fun n_numerais_4(): List<Any?> = listOf<Any?>(
+        "quatro",
+        4
+    )
+
+    private fun n_numerais_5(): List<Any?> = listOf<Any?>(
+        "cinco",
+        5
+    )
+
+    private fun n_numerais_6(): List<Any?> = listOf<Any?>(
+        "seis",
+        6
+    )
+
+    private fun n_numerais_7(): List<Any?> = listOf<Any?>(
+        "sete",
+        7
+    )
+
+    private fun n_numerais_8(): List<Any?> = listOf<Any?>(
+        "oito",
+        8
+    )
+
+    private fun n_numerais_9(): List<Any?> = listOf<Any?>(
+        "nove",
+        9
+    )
+
+    private fun n_numerais_10(): List<Any?> = listOf<Any?>(
+        "dez",
+        10
+    )
+
+    private fun n_numerais(): List<Any?> = listOf<Any?>(
+        n_numerais_0(),
+        n_numerais_1(),
+        n_numerais_2(),
+        n_numerais_3(),
+        n_numerais_4(),
+        n_numerais_5(),
+        n_numerais_6(),
+        n_numerais_7(),
+        n_numerais_8(),
+        n_numerais_9(),
+        n_numerais_10()
     )
 
     private fun n_categorias_0(): List<Any?> = listOf<Any?>(

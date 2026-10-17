@@ -553,6 +553,9 @@
     <string name="resp_prop_solubilidade_de_qual">Indiquez le composé dont vous voulez la solubilité dans l’eau. Par exemple : « solubilité de l’urée ».</string>
     <string name="resp_prop_propriedades_de">Propriétés : %1$s</string>
     <string name="resp_comparar_maior">%1$s : plus élevé pour %2$s (%3$s).</string>
+    <string name="resp_comparar_ordem_crescente">%1$s, par ordre croissant : %2$s.</string>
+    <string name="resp_comparar_ordem_decrescente">%1$s, par ordre décroissant : %2$s.</string>
+    <string name="resp_comparar_sem_dado_ordem">Absent du paquet de données : %1$s.</string>
     <string name="lista_e">%1$s et %2$s</string>
 
     <!-- 24_categorias_estados -->

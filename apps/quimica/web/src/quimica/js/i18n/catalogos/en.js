@@ -594,7 +594,8 @@ export default {
     comparar: {
       titulo: 'Comparison: {nomes}', propriedade: 'Property', fichaDe: 'Sheet of {nome}',
       linhas: { formula: 'Formula', massaMolar: 'Molar mass', cas: 'CAS number', nomeIupac: 'IUPAC name', xlogp: 'XLogP', sinal: 'Signal word (GHS)', pictogramas: 'Pictograms (GHS)' },
-      maior: '{prop}: higher for {nome} ({valor}).', tituloGeral: 'Compare', explicacao: 'Compare items of the same kind: two elements ("compare sodium and chlorine") or two compounds ("difference between ethanol and acetic acid").'
+      maior: '{prop}: higher for {nome} ({valor}).',
+      ordemCrescente: '{prop}, in increasing order: {lista}.', ordemDecrescente: '{prop}, in decreasing order: {lista}.', semDadoOrdem: 'Not in the data package: {nomes}.', tituloGeral: 'Compare', explicacao: 'Compare items of the same kind: two elements ("compare sodium and chlorine") or two compounds ("difference between ethanol and acetic acid").'
     },
     tabela: {
       abrir: 'Open the periodic table', naoTemProp: 'The package has no {prop} for the loaded elements.',

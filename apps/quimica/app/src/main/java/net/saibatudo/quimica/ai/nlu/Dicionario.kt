@@ -187,6 +187,32 @@ class Dicionario private constructor(
     /** A pergunta fala em "elemento"/"símbolo" (no idioma)? Então um símbolo de uma letra ("O", "C") vale como elemento. */
     fun cueElemento(texto: String) = lexico.pista("cueElemento").containsMatchIn(Texto.nlu(texto))
 
+    /**
+     * Símbolo de uma letra numa lista de símbolos ("F, Cl, Br", "K ou Na", "Cl, S e O"): vale como elemento quando a lista (símbolos separados por
+     * vírgula ou por um conectivo do léxico, `pistas.conectivoLista`) tem um símbolo de duas letras bem escrito. Sozinho, "F" ou "K" continua
+     * ambíguo (Fahrenheit, kelvin); no começo da frase, uma letra que é palavra funcional do idioma ("O Fe…": artigo) também. Espelho do site.
+     */
+    private fun vizinhoDeSimbolo(toks: List<String>, idx: Int): Boolean {
+        if (idx == 0 && toks[0].lowercase() in lexico.palavrasFuncionais) return false
+        fun simbolo(t: String): Boolean {
+            if (!RX_SIMBOLO.matches(t)) return false
+            val f = FormulaQuimica.tentar(t) ?: return false
+            return f.contagem.size == 1 && f.contagem[t] == 1
+        }
+        val conectivo = lexico.pista("conectivoLista")
+        for (d in intArrayOf(-1, 1)) {
+            var j = idx + d
+            while (j in toks.indices) {
+                if (!conectivo.containsMatchIn(Texto.nlu(toks[j]))) {
+                    if (!simbolo(toks[j])) break
+                    if (toks[j].length == 2) return true
+                }
+                j += d
+            }
+        }
+        return false
+    }
+
     /** Uma palavra só (normalizada) que nomeia uma CLASSE de compostos: tema de conceito do léxico do idioma ou de [CLASSES_DE_COMPOSTOS]. */
     fun ehClasseDeCompostos(palavra: String): Boolean {
         val k = Texto.nlu(palavra)
@@ -257,7 +283,7 @@ class Dicionario private constructor(
                 } else {
                     val s = f.contagem.keys.first()
                     val ambiguo = s.length == 2 && s in lexico.simbolosAmbiguos && idx == 0 && !unico
-                    if (!ambiguo && (s.length == 2 || unico || cueElemento(texto))) {
+                    if (!ambiguo && (s.length == 2 || unico || cueElemento(texto) || vizinhoDeSimbolo(toks, idx))) {
                         achados += Achado(Achado.Tipo.ELEMENTO, "simbolo", pos, simbolo = s, nome = nomeDoElemento(s))
                         continue
                     }
@@ -425,6 +451,24 @@ class Dicionario private constructor(
         return out.filter { vistos.add(it.id) }
     }
 
+    /**
+     * O texto normalizado com os sinônimos de propriedade apagados (mesma varredura de [propriedadesEm]): "radio atomico del sodio" → "del sodio".
+     * Serve para saber se um nome de elemento só aparece dentro do nome de uma propriedade ("radio" = rádio em espanhol). Espelho do site.
+     */
+    fun semPropriedades(n: String): String {
+        val usado = BooleanArray(n.length)
+        for ((chave, _) in sinonimosPropriedade) {
+            var i = n.indexOf(chave)
+            while (i != -1) {
+                val j = i + chave.length
+                val ok = (i == 0 || n[i - 1] == ' ') && (j == n.length || n[j] == ' ')
+                if (ok && (i until j).none { usado[it] }) for (k in i until j) usado[k] = true
+                i = n.indexOf(chave, i + 1)
+            }
+        }
+        return String(CharArray(n.length) { k -> if (usado[k]) ' ' else n[k] })
+    }
+
     /** Categoria de elemento citada (halogênios, gases nobres…): a primeira que casar, como no site. */
     companion object {
         /**
@@ -438,6 +482,8 @@ class Dicionario private constructor(
         )
 
         fun chaveFormula(texto: String): String = FormulaQuimica.normalizarEntrada(texto).replace("^", "").lowercase()
+
+        private val RX_SIMBOLO = Regex("^[A-Z][a-z]?$")
 
         /** Tokens do texto original separados por espaço, sem pontuação final (preserva parênteses internos). */
         fun tokensOriginais(texto: String): List<String> = texto.split(Regex("""\s+""")).map { t ->

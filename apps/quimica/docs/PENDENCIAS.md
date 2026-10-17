@@ -222,6 +222,22 @@ Etapas (A–F em `I18N.md` §9):
 - [ ] Pacote completo multilíngue: rodar o build cheio (Wikipédia ×4) e medir tamanho e quantidade de arquivos antes de publicar
       (cota de upload da Vercel — `tools/vercel_cota.py --minimo N`).
 
+## 13. Mapa dos livros didáticos (17/10/2026) — `docs/MAPA_LIVROS.md`
+Livros protegidos usados só como bússola (derivados locais em `local/mapa_livros/`, fora do Git). 15.382 exercícios segmentados, 2.052
+classificados por modelo local; 70 % caem em intenções do app. Feito em 17/10: lista fixa corrigida (9 compostos descartados por 404 do
+PubChem voltam com `cid=`), +11 compostos e 2 apelidos; 7 lacunas das regras do NLU corrigidas (site + Android + léxico + golden).
+- [ ] **Rebuild do pacote** com a lista fixa nova (local, `--paciente`) e conferir no `stats.json` que `listaFixaDescartadas` ficou vazia.
+- [ ] **Corpus v3.5**: famílias novas no gerador (notação científica, frações/numerais, "massa de X formada a partir de", "como se chama
+  <nome IUPAC>", "é mistura ou substância pura", ordenação de listas) — só o padrão, nenhuma frase dos livros; depois reavaliar
+  `local/mapa_livros/cache/perguntas_app.jsonl` com `70_nlu_cobertura.py`.
+- [ ] **Calculadoras/intenções novas por rendimento** (fora do app hoje, resposta de cálculo na maioria): entalpia (Hess/formação; fonte
+  aberta de ΔHf a confirmar), configuração eletrônica (dado já existe por elemento), NOX por regra, Kc/Kp simples, tipo de ligação por
+  diferença de eletronegatividade. Decidir com o mantenedor a ordem.
+- [ ] **Classes de compostos** (éster, alceno, amida, álcoois…) no léxico/CONCEITO — item de 6.b, sobe de prioridade (citadas 20+ vezes).
+- [ ] OCR dos 3 livros só imagem (Levine, Martha Reis FQ, McQuarrie) se o mapa precisar de físico-química de nível superior em pt.
+- [ ] Conferência de respostas × gabaritos ficou inconclusiva por desenho (pergunta derivada é 1 passo; alternativa tem valores
+  intermediários): só vale com um resolvedor de problema inteiro (explicador).
+
 ## Pendente com o mantenedor (resumo)
 1. ~~`VERCEL_TOKEN_TIME`~~ criado em 11/10.
 2. Origem da chave `apikey-sabetudo.txt`.
