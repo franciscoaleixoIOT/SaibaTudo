@@ -442,7 +442,6 @@
     <string name="ui_unidade">Unité</string>
     <string name="ui_formula_desc">Formule %1$s</string>
     <string name="ui_copiar_resposta">Copier la réponse</string>
-    <string name="ui_origem_local">Calculé sur l’appareil à partir du paquet de données signé. Aucune IA n’a généré ces nombres.</string>
     <string name="ui_experimente_perguntar_dois_pontos">Essayez de demander :</string>
     <string name="ui_recolher">Réduire</string>
     <string name="ui_mostrar">Afficher</string>
@@ -682,12 +681,12 @@
     <string name="ui_privacidade_nada_sai_titulo">Rien ne quitte votre appareil, sauf si vous le demandez à l’IA dans le cloud</string>
     <string name="ui_privacidade_nada_sai_texto">Vos questions sont interprétées et traitées sur l’appareil lui-même. Internet sert à télécharger les mises à jour signées du paquet de données sur saibatudo.net et, uniquement à votre demande, à consulter l’IA dans le cloud.</string>
     <string name="ui_privacidade_guardado_titulo">Ce qui reste enregistré sur l’appareil</string>
-    <string name="ui_privacidade_guardado_item1">Vos préférences : thème, taille du texte, niveau, économie de données et IA dans le cloud automatique ; et l’identifiant aléatoire de cette installation, utilisé uniquement dans les demandes à l’IA dans le cloud.</string>
+    <string name="ui_privacidade_guardado_item1">Vos préférences : thème, taille du texte, niveau, économie de données et IA dans le cloud automatique ; et l’identifiant aléatoire de cette installation, utilisé uniquement dans les demandes à l’IA dans le cloud. Si « Aider à améliorer l’application » est activé, également la file des questions pas encore envoyées.</string>
     <string name="ui_privacidade_guardado_item2">L’historique des dernières questions (jusqu’à 30), uniquement pour que vous puissiez les réutiliser. Vous pouvez l’effacer ci-dessous.</string>
     <string name="ui_privacidade_guardado_item3">Le paquet de données et les mises à jour téléchargées.</string>
     <string name="ui_privacidade_apagar_historico">Effacer l’historique des questions</string>
     <string name="ui_privacidade_sai_titulo">Ce qui quitte l’appareil</string>
-    <string name="ui_privacidade_sai_texto">Quand elle cherche une mise à jour, l’application envoie des requêtes HTTPS à saibatudo.net pour télécharger les fichiers de données. Comme pour tout accès à internet, le serveur voit l’adresse IP et la version de l’application. Aucune donnée d’usage n’est envoyée. Le texte d’une question ne quitte l’appareil que si vous touchez « Demander à l’IA dans le cloud » ou activez l’IA dans le cloud automatique.</string>
+    <string name="ui_privacidade_sai_texto">Quand elle cherche une mise à jour, l’application envoie des requêtes HTTPS à saibatudo.net pour télécharger les fichiers de données. Comme pour tout accès à internet, le serveur voit l’adresse IP et la version de l’application. Aucune donnée d’usage n’est envoyée. Le texte d’une question ne quitte l’appareil que si vous touchez « Demander à l’IA dans le cloud » ou activez l’IA dans le cloud automatique. Avec « Aider à améliorer l’application » (facultatif, ci-dessous), les questions non comprises que vous choisissez d’envoyer quittent aussi l’appareil.</string>
     <string name="ui_privacidade_nao_tem_titulo">Ce que l’application n’a pas</string>
     <string name="ui_privacidade_nao_tem_texto">Pas de connexion, pas de publicité, pas d’analyse d’usage, pas de localisation, pas d’accès aux contacts, à la caméra ni au microphone.</string>
     <string name="ui_privacidade_nuvem_titulo">IA dans le cloud</string>
@@ -876,4 +875,27 @@
     <string name="ui_relatar_resposta_desc">Signaler un problème avec cette réponse. Ouvre dans le navigateur un ticket public GitHub prérempli ; rien n’est envoyé tant que vous ne confirmez pas sur cette page.</string>
     <string name="relato_titulo">Chimie : réponse à « %1$s »</string>
     <string name="relato_corpo">Qu’est-ce qui était faux ou manquant dans la réponse ? (N’incluez pas de données personnelles.)\n\nQuestion : %1$s\nIntention : %2$s\nOrigine de la réponse : %3$s\nVersion de l’application (Android) : %4$s\nVersion des données : %5$s</string>
+
+    <!-- 1.0.1: caixa de pergunta (histórico ▲▼), origem + data dos dados, "Ajudar a melhorar o app", apagar dados -->
+    <string name="ui_inicio_ultima_pergunta">Dernière question</string>
+    <string name="ui_inicio_pergunta_anterior">Question précédente</string>
+    <string name="ui_inicio_pergunta_seguinte">Question suivante</string>
+    <string name="ui_inicio_limpar_texto">Effacer le texte</string>
+    <string name="ui_inicio_analisando">Analyse de la question…</string>
+    <string name="ui_resposta_origem_aparelho">Réponse construite sur votre appareil</string>
+    <string name="ui_resposta_origem_nuvem">Réponse construite sur votre appareil, avec la question interprétée par l’IA dans le cloud (%1$s)</string>
+    <string name="ui_resposta_dados_de">jeu de données du %1$s</string>
+    <string name="ui_melhoria_enviar">Envoyer cette question</string>
+    <string name="ui_melhoria_nota">Aidez à améliorer l’application : envoyez uniquement cette question, sans votre nom, pour qu’une personne la relise et apprenne à l’application à la comprendre.</string>
+    <string name="ui_melhoria_enviando">Envoi de la question…</string>
+    <string name="ui_melhoria_enviada">Merci ! La question a été envoyée pour relecture.</string>
+    <string name="ui_melhoria_guardada">La question a été gardée sur l’appareil et sera envoyée pour relecture plus tard.</string>
+    <string name="ui_melhoria_recusada">Impossible d’envoyer cette question.</string>
+    <string name="ui_config_melhoria_titulo">Aider à améliorer l’application</string>
+    <string name="ui_config_melhoria_descricao">Désactivé par défaut. Activé, les questions que l’application n’a pas comprises sont envoyées à notre serveur, sans votre nom et sans vous identifier, pour qu’une personne les relise et apprenne à l’application à les comprendre. Seuls le texte de la question, l’interprétation de l’application, la langue, la date et l’identifiant aléatoire de cette installation sont envoyés. Les questions contenant une adresse e-mail, un numéro de téléphone, un numéro fiscal brésilien (CPF ou CNPJ), une adresse web, un @identifiant ou de longs nombres, ainsi que les demandes dangereuses, ne sont jamais envoyées. Aucun filtre n’étant parfait, évitez d’écrire des données personnelles dans vos questions. La désactivation efface ce qui n’a pas encore été envoyé.</string>
+    <string name="ui_config_apagar_dados">Effacer les données de cet appareil</string>
+    <string name="ui_config_apagar_dados_descricao">Efface l’historique des questions, la file d’attente et le consentement de « Aider à améliorer l’application », l’IA dans le cloud automatique et l’identifiant aléatoire de cette installation. Le thème, la taille du texte, le niveau et la langue sont conservés.</string>
+    <string name="ui_config_dados_apagados">Données de cet appareil effacées.</string>
+    <string name="ui_privacidade_melhoria_titulo">Aider à améliorer l’application (facultatif)</string>
+    <string name="ui_privacidade_melhoria_texto">Désactivé par défaut. Si vous activez l’option dans Paramètres, ou touchez « Envoyer cette question » sous une réponse que l’application n’a pas comprise, l’application envoie à saibatudo.net le texte de la question, l’interprétation de l’application, la langue, la date (sans l’heure) et l’identifiant aléatoire de cette installation. Contrairement à l’IA dans le cloud, ces questions sont conservées sur le serveur pour qu’une personne les relise et améliore l’application. Avant que quoi que ce soit ne quitte l’appareil, l’application écarte les questions contenant une adresse e-mail, un numéro de téléphone, un numéro fiscal brésilien (CPF ou CNPJ), une adresse web, un @identifiant ou de longs nombres, ainsi que les demandes dangereuses. La file d’attente reste sur l’appareil jusqu’à son envoi ; désactiver l’option ou « Effacer les données de cet appareil » l’efface.</string>
 </resources>

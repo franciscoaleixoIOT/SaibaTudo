@@ -251,11 +251,31 @@ object LocalNlu {
     /** Número do primeiro grupo de captura que casou (as pistas `grupo`/`periodo` de alguns idiomas têm alternativas com grupos diferentes). */
     private fun grupoDe(m: MatchResult?): Int? = m?.groupValues?.drop(1)?.firstOrNull { it.isNotEmpty() }?.toIntOrNull()
 
-    /** Remove o gatilho de conceito e os artigos do idioma: "o que é um mol" → "mol"; "what is a mole" → "mole". */
+    /**
+     * Assunto de CONCEITO exatamente como o site (`limparConceito` de nlu.js): tira o gatilho e aplica UMA vez cada padrão de limpeza do
+     * léxico, SEM aparar o espaço que o gatilho deixa — por isso, como no site, o artigo fica em "o que é a massa molar" ("a massa molar") e
+     * "explique o que é massa molar" vira "o que e massa molar". O contrato (ParsedQuery) é igual nos dois clientes; quem procura o texto
+     * usa [temaDoConceito], que limpa de verdade.
+     */
     internal fun conceitoDe(n: String, lex: Lexico): String {
-        var s = n.replace(lex.intencao("conceitoCue"), "").trim()
-        for (rx in lex.limparConceito) s = s.replace(rx, "")
+        var s = n.replaceFirst(lex.intencao("conceitoCue"), "")
+        for (rx in lex.limparConceito) s = s.replaceFirst(rx, "")
         return s.trim()
+    }
+
+    /**
+     * Tema "limpo" para procurar o trecho licenciado: repete gatilho + limpeza do léxico até estabilizar ("o que e massa molar" → "massa molar";
+     * "a massa molar" → "massa molar"; "what molar mass is" → "molar mass is"). Só a busca de texto usa; o ParsedQuery guarda [conceitoDe].
+     */
+    fun temaDoConceito(conceito: String, lex: Lexico): String {
+        var s = Texto.nlu(conceito).trim()
+        repeat(4) {
+            var t = s.replaceFirst(lex.intencao("conceitoCue"), "").trim()
+            for (rx in lex.limparConceito) t = t.replaceFirst(rx, "").trim()
+            if (t == s || t.isEmpty()) return if (t.isEmpty()) s else t
+            s = t
+        }
+        return s
     }
 
     /** Composto citado logo depois de uma quantidade ("16 g de metano"): é a substância à qual a quantidade se refere. */

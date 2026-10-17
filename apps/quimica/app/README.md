@@ -1,17 +1,53 @@
-# App Android — SaibaTudo Química (1.0.0)
+# App Android — SaibaTudo Química (1.0.1)
 
-Kotlin + Jetpack Compose (Material 3), MVVM, DataStore, WorkManager, OkHttp, Gson. Pacote `net.saibatudo.quimica`, `versionName 1.0.0`
-(`versionCode 1`), `minSdk 24`. Molde: o app do SaibaTudo Eleições 2026.
+Kotlin + Jetpack Compose (Material 3), MVVM, DataStore, WorkManager, OkHttp, Gson. Pacote `net.saibatudo.quimica`, `versionName 1.0.1`
+(`versionCode 2`), `minSdk 24`. Molde: o app do SaibaTudo Eleições 2026.
 
 **O que faz:** início com campo de pergunta (NLU local, respostas só dos dados com fonte), tabela periódica interativa, ficha do elemento e do
 composto (estrutura 2D numa WebView local com SmilesDrawer, GHS com pictogramas vetoriais, link da ficha ICSC no site da OIT), busca,
 calculadoras com passos (massa molar, balanceamento, estequiometria, concentração/diluição, pH forte e fraco, gás ideal, unidades),
-segurança/GHS, "Sobre os dados", privacidade e configurações (idioma, tema, tamanho do texto, nível, economia de dados, IA na nuvem automática).
-**Nada sai do aparelho, a menos que a pessoa peça à IA na nuvem**: a internet serve para a atualização assinada do pacote de dados e, só com
+segurança/GHS, "Sobre os dados", privacidade e configurações (idioma, tema, tamanho do texto, nível, economia de dados, IA na nuvem automática,
+"Ajudar a melhorar o app", "Apagar os dados deste aparelho").
+**Nada sai do aparelho, a menos que a pessoa peça à IA na nuvem (ou ligue/toque em "Ajudar a melhorar o app")**: a internet serve para a atualização assinada do pacote de dados e, só com
 consentimento, para a interpretação na nuvem (abaixo).
 
 **Estado (14/10/2026):** versão **1.0.0 (versionCode 1)** pronta para o teste fechado na Play — IA na nuvem opt-in (só interpretação), ícone da
 marca, release assinado com R8 e verificador de release. Notas e como foi testado: [`../docs/RELEASE_1.0.0.md`](../docs/RELEASE_1.0.0.md).
+**16/10/2026:** versão **1.0.1 (versionCode 2)** com a paridade da caixa de pergunta (Eleições e site), origem + data dos dados, "Ajudar a melhorar o
+app" e o assunto de CONCEITO igual ao do site: [`../docs/RELEASE_1.0.1.md`](../docs/RELEASE_1.0.1.md).
+
+## Caixa de pergunta (docs/PADRAO_ASSISTENTE.md §1 e §3)
+
+- `ui/screens/InicioScreen.kt`: o campo volta em branco ao enviar (a pergunta vai para o histórico); cresce de 1 a 3 linhas e não aceita quebra
+  de linha (`HistoricoPerguntas.editar`: Enter no fim envia, quebras coladas viram espaço); botão X para limpar (só com texto); enviar desabilitado
+  sem texto, sem pacote e enquanto responde (aí vira um indicador "Analisando a pergunta…" com `liveRegion`); chips e "Perguntas recentes"
+  desabilitados enquanto responde. Cartão **"Última pergunta"** acima do campo com as setas ▲▼, que percorrem o histórico e põem o texto no campo
+  (▼ depois da última devolve o rascunho). Molde: `SearchBarAi.kt` e `HistoricoPerguntas.kt` do app de Eleições.
+- `ui/viewmodel/HistoricoPerguntas.kt`: navegação ▲▼ e `registrar` (repetição sai do meio e vai para o fim, até 300 caracteres, no máximo 50 itens,
+  `UserPreferences.LIMITE_HISTORICO`). Testes: `HistoricoPerguntasTest`.
+- **Origem + data dos dados** (`ui/components/RespostaView.kt`): "Resposta montada no seu aparelho • dados do pacote de <data>" ou
+  "Resposta montada no seu aparelho, com a pergunta interpretada pela IA na nuvem (<modelo>) • dados do pacote de <data>" (o modelo vem do campo
+  `model` da API, `Resposta.modelo`; sem ele, "SaibaTudo IA", como no site). A data é o `generatedAt` do manifesto em `Textos.data` (formato do
+  idioma). Igual a `respostaEl` de `web/src/quimica/js/ui/inicio.js` (chaves `ui.resposta.origem*`/`dadosDe` → `ui_resposta_origem_*`,
+  `ui_resposta_dados_de`). A linha também vai no "Copiar resposta". Na nuvem continua a nota `ui_origem_nuvem` (o modelo só interpretou).
+
+## Ajudar a melhorar o app (opt-in)
+
+Molde: `apps/eleicoes2026/.../data/remote/MelhoriaClient.kt`. Código em `data/remote/MelhoriaClient.kt` (`Melhoria`, `MelhoriaClient`, `MelhoriaFila`).
+- **Contrato** (`../api`, frente A): `POST <API_BASE_URL>melhoria` com `{"v":1,"client":"android","iid":<UUID v4 da instalação, o mesmo da nuvem>,
+  "idioma":"pt-BR|en|es|de|fr","itens":[{"q":<3..300>,"intentLocal":<intenção local>,"t":"AAAA-MM-DD"}]}` (até 10 itens, todos do mesmo idioma).
+  `200 {ok:true,aceitos,descartados}` tira o lote da fila; `503 {error:"disabled"}` guarda a fila sem erro na tela; `429` e rede guardam e tentam
+  depois; `400` descarta o lote (nunca seria aceito).
+- **Quando entra na fila:** só respostas NÃO entendidas (nem recusa). Com **Configurações > Ajudar a melhorar o app** ligado (desligado por padrão,
+  chave `melhoria`), entram sozinhas; desligado, a resposta mostra **"Enviar esta pergunta"** (consentimento só para ela; o envio é tentado na hora).
+- **Filtro local** (`Melhoria.textoEnfileiravel`): nunca entra pedido perigoso (`Seguranca.avaliar` no idioma + en + pt-BR) nem texto com e-mail,
+  telefone, CPF/CNPJ, URL/domínio, @usuário ou 9+ dígitos seguidos; controles invisíveis viram espaço. O servidor refaz a checagem.
+- **Fila** no DataStore (`fila_melhoria`, JSON de `ItemMelhoria`, regra de R8 em `keepRules/rules.keep`): até 30, sem repetir, envio em lotes de 10
+  quando há pelo menos 3 ou alguma veio do botão; nova tentativa ao voltar para o app. Desligar a opção apaga a fila; **"Apagar os dados deste
+  aparelho"** (Configurações) apaga histórico, fila, consentimento, IA na nuvem automática e o `iid` (ficam tema, texto, nível, idioma e economia).
+- Textos `ui_melhoria_*`, `ui_config_melhoria_*`, `ui_config_apagar_dados*`, `ui_privacidade_melhoria_*` nos cinco idiomas. Testes: `MelhoriaTest`
+  (filtro: química passa, dado pessoal e pedido perigoso não; cliente com MockWebServer: corpo do contrato, 200, 503 disabled/budget, 429, 400,
+  JSON inválido, sem rede; fila: consentimento, botão, repetição, limite 30, mínimo 3, lote 10 por idioma, falhas que guardam, exceção).
 
 ## IA na nuvem (opt-in, só interpretação)
 
@@ -108,6 +144,12 @@ gera `app-release-unsigned.apk`.
 
 `ai/nlu/LocalNlu.kt` é o espelho de `web/src/quimica/js/nlu.js` (mesma ordem de regras, documentada no cabeçalho) e `ai/Seguranca.kt` de `seguranca.js`;
 os casos de `contracts/nlu_golden_cases.json` e `contracts/seguranca_cases.json` conferem os dois. O dicionário é derivado dos dados do pacote.
+- **Assunto de CONCEITO (16/10/2026):** `conceitoDe` faz o mesmo que `limparConceito` do site (tira o gatilho e aplica cada limpeza do léxico uma vez,
+  sem aparar o espaço; por isso "o que é a massa molar" → "a massa molar", como no site). A busca do texto licenciado usa `LocalNlu.temaDoConceito`,
+  que repete gatilho + limpeza até estabilizar ("massa molar"). Teste: `NluParidadeSiteTest`.
+- **Varredura de paridade (16/10/2026):** 30.363 perguntas (dataset NLU pt-BR, golden, holdout e 8.000 do corpus multilíngue) passaram nos dois
+  `parse` com o pacote real. Os desvios que sobram não estão no `LocalNlu` e sim no dicionário, nas unidades e nas quantidades — listados em
+  `../docs/RELEASE_1.0.1.md` (§ Paridade do NLU), vários deles erros do site.
 
 ## Idiomas (docs/I18N.md §6)
 

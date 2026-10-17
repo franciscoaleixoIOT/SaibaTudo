@@ -15,6 +15,8 @@ import net.saibatudo.quimica.data.bundle.UpdateCoordinator
 import net.saibatudo.quimica.data.prefs.DataStorePreferences
 import net.saibatudo.quimica.data.prefs.PreferencesStore
 import net.saibatudo.quimica.data.remote.HttpClientFactory
+import net.saibatudo.quimica.data.remote.MelhoriaClient
+import net.saibatudo.quimica.data.remote.MelhoriaFila
 import net.saibatudo.quimica.data.repository.QuimicaDataStore
 import net.saibatudo.quimica.domain.FonteDeTextos
 import net.saibatudo.quimica.ui.RecursosAndroid
@@ -34,6 +36,12 @@ class AppContainer(private val app: Context) {
     val nuvem: CloudNluClient by lazy { CloudNluClient(http, BuildConfig.API_BASE_URL + "nlu") }
 
     val preferencias: PreferencesStore by lazy { DataStorePreferences(app) }
+
+    /** "Ajudar a melhorar o app" (`POST <API_BASE_URL>melhoria`): só com consentimento; fila no DataStore, filtrada no aparelho. */
+    val melhoria: MelhoriaFila by lazy {
+        val cliente = MelhoriaClient(http, BuildConfig.API_BASE_URL + "melhoria")
+        MelhoriaFila(preferencias, enviarLote = cliente::enviar)
+    }
     private val verificador: ManifestVerifier by lazy { ManifestVerifier(BuildConfig.DATA_PUBLIC_KEY) }
     val pacotes: BundleStore by lazy { BundleStore(app, verificador) }
     val dados: QuimicaDataStore by lazy { QuimicaDataStore(pacotes) }

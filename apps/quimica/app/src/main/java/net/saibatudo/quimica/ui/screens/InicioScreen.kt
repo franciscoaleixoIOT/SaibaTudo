@@ -6,6 +6,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.background
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.runtime.remember
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -52,6 +64,8 @@ import net.saibatudo.quimica.ui.components.Cartao
 import net.saibatudo.quimica.ui.LocalTextos
 import net.saibatudo.quimica.ui.components.PainelNuvem
 import net.saibatudo.quimica.ui.components.RespostaView
+import net.saibatudo.quimica.ui.viewmodel.EnvioPergunta
+import net.saibatudo.quimica.ui.viewmodel.HistoricoPerguntas
 import net.saibatudo.quimica.ui.viewmodel.Tela
 import net.saibatudo.quimica.ui.viewmodel.UiState
 
@@ -68,12 +82,20 @@ fun InicioScreen(
     onAbrirUrl: (String) -> Unit,
     onLimparHistorico: () -> Unit,
     modifier: Modifier = Modifier,
-    onPerguntarNuvem: () -> Unit = {}
+    onPerguntarNuvem: () -> Unit = {},
+    onEnviarMelhoria: () -> Unit = {}
 ) {
     val t = LocalTextos.current
+    val teclado = LocalSoftwareKeyboardController.current
     var texto by rememberSaveable { mutableStateOf("") }
     val pronto = estado.dados is EstadoDados.Pronto
-    val enviar = { if (texto.isNotBlank() && pronto) { onPerguntar(texto) } }
+    // histórico guardado (mais antiga primeiro) + posição das setas ▲▼; volta ao "modo livre" a cada pergunta nova
+    val itensHistorico = estado.prefs.historicoPerguntas
+    var historico by remember(itensHistorico) { mutableStateOf(HistoricoPerguntas(itensHistorico)) }
+    val podeEnviar = pronto && !estado.pensando && texto.isNotBlank()
+    // a pergunta vai para o histórico e o campo volta em branco (docs/PADRAO_ASSISTENTE.md §1)
+    val perguntar: (String) -> Unit = { q -> if (pronto && !estado.pensando && q.isNotBlank()) { texto = ""; teclado?.hide(); onPerguntar(q) } }
+    val enviar = { if (podeEnviar) perguntar(texto) }
 
     LazyColumn(modifier.fillMaxSize(), contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item {
@@ -86,19 +108,49 @@ fun InicioScreen(
             }
         }
         item {
-            OutlinedTextField(
-                value = texto, onValueChange = { texto = it.take(300) }, modifier = Modifier.fillMaxWidth(),
-                label = { Text(t(R.string.ui_inicio_campo_rotulo)) },
-                placeholder = { Text(t(R.string.ui_inicio_campo_dica)) },
-                trailingIcon = {
-                    IconButton(onClick = enviar, enabled = pronto && texto.isNotBlank()) {
-                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = t(R.string.ui_inicio_enviar))
-                    }
-                },
-                singleLine = false, maxLines = 3,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
-                keyboardActions = KeyboardActions(onSend = { enviar() })
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                historico.ultima?.let { ultima ->
+                    UltimaPergunta(
+                        ultima, podeSubir = historico.podeSubir, podeDescer = historico.podeDescer,
+                        onSubir = { historico.subir(texto)?.let { (h, q) -> historico = h; texto = q } },
+                        onDescer = { historico.descer()?.let { (h, q) -> historico = h; texto = q } }
+                    )
+                }
+                OutlinedTextField(
+                    value = texto,
+                    onValueChange = { novo ->
+                        val (limpo, enter) = HistoricoPerguntas.editar(texto, novo)
+                        texto = limpo
+                        if (enter) enviar()
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(t(R.string.ui_inicio_campo_rotulo)) },
+                    placeholder = { Text(t(R.string.ui_inicio_campo_dica)) },
+                    trailingIcon = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (texto.isNotEmpty()) {
+                                IconButton(onClick = { texto = "" }, modifier = Modifier.size(36.dp)) {
+                                    Icon(Icons.Filled.Clear, contentDescription = t(R.string.ui_inicio_limpar_texto), modifier = Modifier.size(18.dp))
+                                }
+                            }
+                            if (estado.pensando) {
+                                val analisando = t(R.string.ui_inicio_analisando)
+                                CircularProgressIndicator(
+                                    Modifier.padding(horizontal = 10.dp).size(22.dp).semantics { contentDescription = analisando; liveRegion = LiveRegionMode.Polite },
+                                    strokeWidth = 2.5.dp
+                                )
+                            } else {
+                                IconButton(onClick = enviar, enabled = podeEnviar) {
+                                    Icon(Icons.AutoMirrored.Filled.Send, contentDescription = t(R.string.ui_inicio_enviar))
+                                }
+                            }
+                        }
+                    },
+                    singleLine = false, minLines = 1, maxLines = 3,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
+                    keyboardActions = KeyboardActions(onSend = { enviar() })
+                )
+            }
         }
         when (val d = estado.dados) {
             EstadoDados.Carregando -> item { Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) { CircularProgressIndicator(Modifier.padding(4.dp)); Text(t(R.string.ui_inicio_carregando)) } }
@@ -113,13 +165,15 @@ fun InicioScreen(
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(t(R.string.ui_inicio_voce_perguntou, r.pergunta), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     RespostaView(
-                        r.resposta, onAcao = onAcao, onSugestao = { s -> texto = s; onPerguntar(s) }, onAbrirUrl = onAbrirUrl,
-                        pergunta = r.pergunta, versaoDados = (estado.dados as? EstadoDados.Pronto)?.pacote?.manifest?.version
+                        r.resposta, onAcao = onAcao, onSugestao = perguntar, onAbrirUrl = onAbrirUrl,
+                        pergunta = r.pergunta, versaoDados = (estado.dados as? EstadoDados.Pronto)?.pacote?.manifest?.version,
+                        dataDados = (estado.dados as? EstadoDados.Pronto)?.pacote?.manifest?.generatedAt?.let { t.data(it) }
                     )
                     if (estado.nuvemDisponivel) {
-                        PainelNuvem(r.resposta, estado.nuvem, onPerguntar = onPerguntarNuvem, onSugestao = { s -> texto = s; onPerguntar(s) })
+                        PainelNuvem(r.resposta, estado.nuvem, onPerguntar = onPerguntarNuvem, onSugestao = perguntar)
                     }
-                    TextButton(onClick = { onLimpar(); texto = "" }) { Text(t(R.string.ui_inicio_nova_pergunta)) }
+                    if (estado.melhoriaDisponivel) PainelMelhoria(estado.envioPergunta, onEnviarMelhoria)
+                    TextButton(onClick = { onLimpar(); texto = ""; historico = HistoricoPerguntas(itensHistorico) }) { Text(t(R.string.ui_inicio_nova_pergunta)) }
                 }
             }
         }
@@ -143,7 +197,7 @@ fun InicioScreen(
                 item { Text(t(R.string.ui_inicio_experimente), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.semantics { heading() }) }
                 item {
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        estado.sugestoes.forEach { s -> SuggestionChip(onClick = { texto = s; onPerguntar(s) }, label = { Text(s) }) }
+                        estado.sugestoes.forEach { s -> SuggestionChip(onClick = { perguntar(s) }, enabled = pronto && !estado.pensando, label = { Text(s) }) }
                     }
                 }
             }
@@ -157,7 +211,7 @@ fun InicioScreen(
                 }
                 items(historico, key = { "h-$it" }) { h ->
                     Text(
-                        h, Modifier.fillMaxWidth().clickable { texto = h; onPerguntar(h) }.padding(vertical = 10.dp),
+                        h, Modifier.fillMaxWidth().clickable(enabled = pronto && !estado.pensando) { perguntar(h) }.padding(vertical = 10.dp),
                         style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -179,5 +233,52 @@ private fun Atalho(rotulo: String, icone: ImageVector, modifier: Modifier, onCli
             Icon(icone, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer)
             Text(rotulo, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onPrimaryContainer, fontWeight = FontWeight.SemiBold)
         }
+    }
+}
+
+/** Cartão "Última pergunta" acima do campo, com as setas ▲▼ que percorrem o histórico (molde: SearchBarAi do app de Eleições). */
+@Composable
+private fun UltimaPergunta(ultima: String, podeSubir: Boolean, podeDescer: Boolean, onSubir: () -> Unit, onDescer: () -> Unit) {
+    val t = LocalTextos.current
+    Row(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(start = 12.dp, top = 2.dp, bottom = 2.dp, end = 2.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(Modifier.weight(1f).padding(vertical = 4.dp)) {
+            Text(t(R.string.ui_inicio_ultima_pergunta), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(ultima, style = MaterialTheme.typography.bodyMedium, maxLines = 2, overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.onSurface)
+        }
+        IconButton(onClick = onSubir, enabled = podeSubir) {
+            Icon(Icons.Filled.KeyboardArrowUp, contentDescription = t(R.string.ui_inicio_pergunta_anterior))
+        }
+        IconButton(onClick = onDescer, enabled = podeDescer) {
+            Icon(Icons.Filled.KeyboardArrowDown, contentDescription = t(R.string.ui_inicio_pergunta_seguinte))
+        }
+    }
+}
+
+/** "Ajudar a melhorar o app" numa resposta não entendida: botão "Enviar esta pergunta" ou o estado do envio (nada sai sem o toque ou a opção). */
+@Composable
+private fun PainelMelhoria(envio: EnvioPergunta, onEnviar: () -> Unit) {
+    val t = LocalTextos.current
+    when (envio) {
+        EnvioPergunta.INDISPONIVEL -> Unit
+        EnvioPergunta.DISPONIVEL -> Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            androidx.compose.material3.OutlinedButton(onClick = onEnviar) { Text(t(R.string.ui_melhoria_enviar)) }
+            Text(t(R.string.ui_melhoria_nota), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        else -> Text(
+            t(
+                when (envio) {
+                    EnvioPergunta.ENVIANDO -> R.string.ui_melhoria_enviando
+                    EnvioPergunta.ENVIADA -> R.string.ui_melhoria_enviada
+                    EnvioPergunta.GUARDADA -> R.string.ui_melhoria_guardada
+                    else -> R.string.ui_melhoria_recusada
+                }
+            ),
+            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }
+        )
     }
 }

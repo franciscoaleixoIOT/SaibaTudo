@@ -146,7 +146,8 @@ private fun AnswerBuilder.descrever(def: PropriedadeDef, seq: List<Elemento>): S
  * outro idioma perde um ponto (só entra se for o único jeito de responder) e sai rotulado ("Trecho em inglês").
  */
 internal suspend fun AnswerBuilder.buscarConceito(q: ParsedQuery): Resposta {
-    val tema = Texto.nlu(q.conceito.orEmpty())
+    // o ParsedQuery guarda o assunto como o site (com o artigo que sobrou do gatilho); a busca usa o tema limpo
+    val tema = LocalNlu.temaDoConceito(q.conceito.orEmpty(), dic.lexico)
     val palavras = LocalNlu.termosDeBusca(tema, dic.lexico).filter { it.length >= 3 }
     fun corpoDe(tr: Trecho) = if (tr.idioma == Idiomas.PADRAO) tr.textoPt ?: tr.textoOriginal.orEmpty() else tr.textoOriginal ?: tr.textoPt.orEmpty()
     fun pontos(tr: Trecho): Int {

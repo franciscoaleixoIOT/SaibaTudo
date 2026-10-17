@@ -41,7 +41,7 @@ class MainActivity : ComponentActivity() {
                         MainViewModel(
                             dados = container.dados, prefs = container.preferencias, atualizacoes = container.atualizacoes,
                             fonteDeTextos = container.recursos, idiomaInicial = IdiomaApp.atual(this@MainActivity),
-                            clienteNuvem = container.nuvem
+                            clienteNuvem = container.nuvem, melhoria = container.melhoria
                         )
                     }
                 }

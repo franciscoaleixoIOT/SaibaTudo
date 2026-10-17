@@ -440,7 +440,6 @@
     <string name="ui_unidade">Einheit</string>
     <string name="ui_formula_desc">Formel %1$s</string>
     <string name="ui_copiar_resposta">Antwort kopieren</string>
-    <string name="ui_origem_local">Auf dem Gerät aus dem signierten Datenpaket berechnet. Keine KI hat diese Zahlen erzeugt.</string>
     <string name="ui_experimente_perguntar_dois_pontos">Fragen Sie zum Beispiel:</string>
     <string name="ui_recolher">Einklappen</string>
     <string name="ui_mostrar">Anzeigen</string>
@@ -680,12 +679,12 @@
     <string name="ui_privacidade_nada_sai_titulo">Nichts verlässt Ihr Gerät, es sei denn, Sie fragen die KI in der Cloud</string>
     <string name="ui_privacidade_nada_sai_texto">Ihre Fragen werden auf dem Gerät selbst interpretiert und beantwortet. Das Internet dient zum Herunterladen signierter Aktualisierungen des Datenpakets von saibatudo.net und, nur wenn Sie es wünschen, für Fragen an die KI in der Cloud.</string>
     <string name="ui_privacidade_guardado_titulo">Was auf dem Gerät gespeichert bleibt</string>
-    <string name="ui_privacidade_guardado_item1">Ihre Einstellungen: Design, Textgröße, Stufe, Datensparmodus und KI in der Cloud automatisch; dazu die zufällige Kennung dieser Installation, die nur bei Anfragen an die KI in der Cloud verwendet wird.</string>
+    <string name="ui_privacidade_guardado_item1">Ihre Einstellungen: Design, Textgröße, Stufe, Datensparmodus und KI in der Cloud automatisch; dazu die zufällige Kennung dieser Installation, die nur bei Anfragen an die KI in der Cloud verwendet wird. Wenn „Helfen, die App zu verbessern“ eingeschaltet ist, auch die Warteschlange der noch nicht gesendeten Fragen.</string>
     <string name="ui_privacidade_guardado_item2">Der Verlauf der letzten Fragen (bis zu 30), nur damit Sie sie erneut verwenden können. Sie können ihn unten löschen.</string>
     <string name="ui_privacidade_guardado_item3">Das Datenpaket und die heruntergeladenen Aktualisierungen.</string>
     <string name="ui_privacidade_apagar_historico">Fragenverlauf löschen</string>
     <string name="ui_privacidade_sai_titulo">Was das Gerät verlässt</string>
-    <string name="ui_privacidade_sai_texto">Bei der Suche nach Aktualisierungen sendet die App HTTPS-Anfragen an saibatudo.net, um die Datendateien herunterzuladen. Wie bei jedem Internetzugriff sieht der Server die IP-Adresse und die App-Version. Es werden keine Nutzungsdaten gesendet. Der Text einer Frage verlässt das Gerät nur, wenn Sie auf „KI in der Cloud fragen“ tippen oder „KI in der Cloud automatisch“ einschalten.</string>
+    <string name="ui_privacidade_sai_texto">Bei der Suche nach Aktualisierungen sendet die App HTTPS-Anfragen an saibatudo.net, um die Datendateien herunterzuladen. Wie bei jedem Internetzugriff sieht der Server die IP-Adresse und die App-Version. Es werden keine Nutzungsdaten gesendet. Der Text einer Frage verlässt das Gerät nur, wenn Sie auf „KI in der Cloud fragen“ tippen oder „KI in der Cloud automatisch“ einschalten. Mit „Helfen, die App zu verbessern“ (optional, unten) verlassen auch die nicht verstandenen Fragen das Gerät, die Sie senden möchten.</string>
     <string name="ui_privacidade_nao_tem_titulo">Was die App nicht hat</string>
     <string name="ui_privacidade_nao_tem_texto">Kein Login, keine Werbung, keine Nutzungsanalyse, keine Standortabfrage, kein Zugriff auf Kontakte, Kamera oder Mikrofon.</string>
     <string name="ui_privacidade_nuvem_titulo">KI in der Cloud</string>
@@ -873,4 +872,27 @@
     <string name="ui_relatar_resposta_desc">Ein Problem mit dieser Antwort melden. Öffnet im Browser ein vorausgefülltes öffentliches GitHub-Issue; es wird nichts gesendet, solange Sie es dort nicht bestätigen.</string>
     <string name="relato_titulo">Chemie: Antwort auf „%1$s“</string>
     <string name="relato_corpo">Was war an der Antwort falsch oder was fehlte? (Bitte keine personenbezogenen Daten angeben.)\n\nFrage: %1$s\nAbsicht: %2$s\nHerkunft der Antwort: %3$s\nApp-Version (Android): %4$s\nDatenversion: %5$s</string>
+
+    <!-- 1.0.1: caixa de pergunta (histórico ▲▼), origem + data dos dados, "Ajudar a melhorar o app", apagar dados -->
+    <string name="ui_inicio_ultima_pergunta">Letzte Frage</string>
+    <string name="ui_inicio_pergunta_anterior">Vorherige Frage</string>
+    <string name="ui_inicio_pergunta_seguinte">Nächste Frage</string>
+    <string name="ui_inicio_limpar_texto">Text löschen</string>
+    <string name="ui_inicio_analisando">Frage wird analysiert …</string>
+    <string name="ui_resposta_origem_aparelho">Antwort erstellt auf Ihrem Gerät</string>
+    <string name="ui_resposta_origem_nuvem">Antwort erstellt auf Ihrem Gerät; die Frage wurde von der KI in der Cloud interpretiert (%1$s)</string>
+    <string name="ui_resposta_dados_de">Datenpaket vom %1$s</string>
+    <string name="ui_melhoria_enviar">Diese Frage senden</string>
+    <string name="ui_melhoria_nota">Helfen Sie, die App zu verbessern: Senden Sie nur diese Frage, ohne Ihren Namen, damit ein Mensch sie prüft und der App beibringt, sie zu verstehen.</string>
+    <string name="ui_melhoria_enviando">Frage wird gesendet …</string>
+    <string name="ui_melhoria_enviada">Danke! Die Frage wurde zur Prüfung gesendet.</string>
+    <string name="ui_melhoria_guardada">Die Frage wurde auf dem Gerät gespeichert und wird später zur Prüfung gesendet.</string>
+    <string name="ui_melhoria_recusada">Diese Frage konnte nicht gesendet werden.</string>
+    <string name="ui_config_melhoria_titulo">Helfen, die App zu verbessern</string>
+    <string name="ui_config_melhoria_descricao">Standardmäßig ausgeschaltet. Wenn eingeschaltet, werden Fragen, die die App nicht verstanden hat, ohne Ihren Namen und ohne Sie zu identifizieren an unseren Server gesendet, damit ein Mensch sie prüft und der App beibringt, sie zu verstehen. Gesendet werden nur der Text der Frage, die Interpretation der App, die Sprache, das Datum und die zufällige Kennung dieser Installation. Fragen mit E-Mail-Adresse, Telefonnummer, brasilianischer Steuernummer (CPF oder CNPJ), Webadresse, @Benutzername oder langen Zahlen sowie gefährliche Anfragen werden nie gesendet. Da kein Filter perfekt ist, schreiben Sie bitte keine persönlichen Daten in Ihre Fragen. Beim Ausschalten wird gelöscht, was noch nicht gesendet wurde.</string>
+    <string name="ui_config_apagar_dados">Daten auf diesem Gerät löschen</string>
+    <string name="ui_config_apagar_dados_descricao">Löscht den Fragenverlauf, die Warteschlange und die Einwilligung für „Helfen, die App zu verbessern“, „KI in der Cloud automatisch“ und die zufällige Kennung dieser Installation. Design, Textgröße, Stufe und Sprache bleiben erhalten.</string>
+    <string name="ui_config_dados_apagados">Daten auf diesem Gerät gelöscht.</string>
+    <string name="ui_privacidade_melhoria_titulo">Helfen, die App zu verbessern (optional)</string>
+    <string name="ui_privacidade_melhoria_texto">Standardmäßig ausgeschaltet. Wenn Sie die Option in den Einstellungen einschalten oder bei einer Antwort, die die App nicht verstanden hat, auf „Diese Frage senden“ tippen, sendet die App an saibatudo.net den Text der Frage, die Interpretation der App, die Sprache, das Datum (ohne Uhrzeit) und die zufällige Kennung dieser Installation. Anders als bei der KI in der Cloud werden diese Fragen auf dem Server gespeichert, damit ein Mensch sie prüft und die App verbessert. Bevor etwas das Gerät verlässt, verwirft die App Fragen mit E-Mail-Adresse, Telefonnummer, brasilianischer Steuernummer (CPF oder CNPJ), Webadresse, @Benutzername oder langen Zahlen sowie gefährliche Anfragen. Die Warteschlange bleibt bis zum Senden auf dem Gerät; Ausschalten der Option oder „Daten auf diesem Gerät löschen“ löscht sie.</string>
 </resources>

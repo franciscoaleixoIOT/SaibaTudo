@@ -35,6 +35,8 @@ import net.saibatudo.quimica.data.prefs.TamanhoFonte
 import net.saibatudo.quimica.data.prefs.TemaApp
 import net.saibatudo.quimica.data.prefs.UserPreferences
 import net.saibatudo.quimica.data.prefs.idInstalacao
+import net.saibatudo.quimica.data.remote.EnvioMelhoria
+import net.saibatudo.quimica.data.remote.MelhoriaFila
 import net.saibatudo.quimica.data.repository.EstadoDados
 import net.saibatudo.quimica.data.repository.Pacote
 import net.saibatudo.quimica.data.repository.QuimicaDataStore
@@ -78,6 +80,21 @@ data class EstadoNuvem(
     val sugestoes: List<String> = emptyList()
 )
 
+/** "Ajudar a melhorar o app" na resposta não entendida exibida. */
+enum class EnvioPergunta {
+    /** O botão "Enviar esta pergunta" está disponível. */
+    DISPONIVEL,
+    /** A pergunta não pode ir (dado pessoal, pedido perigoso, curta/longa) ou não há cliente: nada aparece. */
+    INDISPONIVEL,
+    ENVIANDO,
+    /** O servidor aceitou. */
+    ENVIADA,
+    /** Ficou guardada no aparelho (opção ligada, ou o servidor está desligado/no limite/sem rede): vai depois, sem erro na tela. */
+    GUARDADA,
+    /** O servidor recusou o texto. */
+    RECUSADA
+}
+
 data class UiState(
     val dados: EstadoDados = EstadoDados.Carregando,
     val prefs: UserPreferences = UserPreferences(),
@@ -89,7 +106,11 @@ data class UiState(
     val idioma: String = Idiomas.PADRAO,
     val nuvem: EstadoNuvem = EstadoNuvem(),
     /** O app tem o cliente da IA na nuvem (sempre, no aparelho; os testes podem montar sem). */
-    val nuvemDisponivel: Boolean = false
+    val nuvemDisponivel: Boolean = false,
+    /** Estado do "Enviar esta pergunta" (Ajudar a melhorar o app) para a resposta atual. */
+    val envioPergunta: EnvioPergunta = EnvioPergunta.INDISPONIVEL,
+    /** O app tem a fila do "Ajudar a melhorar o app" (sempre, no aparelho; os testes podem montar sem). */
+    val melhoriaDisponivel: Boolean = false
 )
 
 class MainViewModel(
@@ -100,13 +121,16 @@ class MainViewModel(
     private val fonteDeTextos: FonteDeTextos,
     idiomaInicial: String = Idiomas.PADRAO,
     /** Cliente da IA na nuvem (opt-in, só interpretação); null = sem nuvem. */
-    clienteNuvem: CloudNluClient? = null
+    clienteNuvem: CloudNluClient? = null,
+    /** Fila do "Ajudar a melhorar o app" (opt-in); null = sem captura. */
+    private val melhoria: MelhoriaFila? = null
 ) : ViewModel() {
 
     private val assistenteNuvem: AssistenteNuvem? = clienteNuvem?.let { AssistenteNuvem(it, { prefs.idInstalacao() }) }
     /** Contexto da conversa ANTES da pergunta exibida (para reinterpretar a mesma pergunta na nuvem). */
     private var contextoDaResposta: ParsedQuery? = null
     private val _nuvem = MutableStateFlow(EstadoNuvem())
+    private val _envio = MutableStateFlow(EnvioPergunta.INDISPONIVEL)
 
     private val _pilha = MutableStateFlow<List<Tela>>(listOf(Tela.Inicio))
     val pilha: StateFlow<List<Tela>> = _pilha
@@ -132,8 +156,8 @@ class MainViewModel(
         UiState(dados = d, prefs = p, atualizacao = a, resposta = r, pensando = pe)
     }
 
-    val estado: StateFlow<UiState> = combine(base, _sugestoes, _idioma, _nuvem) { b, s, i, nv ->
-        b.copy(sugestoes = s, idioma = i, nuvem = nv, nuvemDisponivel = assistenteNuvem != null)
+    val estado: StateFlow<UiState> = combine(base, _sugestoes, _idioma, _nuvem, _envio) { b, s, i, nv, ev ->
+        b.copy(sugestoes = s, idioma = i, nuvem = nv, nuvemDisponivel = assistenteNuvem != null, envioPergunta = ev, melhoriaDisponivel = melhoria != null)
     }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UiState())
 
@@ -213,8 +237,10 @@ class MainViewModel(
                 val (q, r) = withContext(Dispatchers.Default) { b.responder(pergunta, contexto) }
                 if (r.entendida && q.intent !in META) contexto = q
                 _nuvem.value = EstadoNuvem()
+                _envio.value = EnvioPergunta.INDISPONIVEL
                 _resposta.value = RespostaUi(pergunta, r)
-                prefs.atualizar { p -> p.copy(historicoPerguntas = (p.historicoPerguntas.filter { it != pergunta } + pergunta).takeLast(30)) }
+                prefs.atualizar { p -> p.copy(historicoPerguntas = HistoricoPerguntas.registrar(p.historicoPerguntas, pergunta)) }
+                if (!r.entendida && !r.recusa && q.intent != Intent.RECUSA_PERIGO) capturarNaoEntendida(pergunta, q.intent)
                 // IA na nuvem automática (consentimento dado nas configurações): só nas perguntas que o app não entendeu
                 if (!r.entendida && !r.recusa && q.intent != Intent.RECUSA_PERIGO && assistenteNuvem != null && prefs.atual().iaNuvemAutomatica) {
                     _pensando.value = false
@@ -261,7 +287,65 @@ class MainViewModel(
         }
     }
 
-    fun limparResposta() { _resposta.value = null; _nuvem.value = EstadoNuvem() }
+    /**
+     * Pergunta não entendida: com "Ajudar a melhorar o app" ligado, entra sozinha na fila (filtrada) e o lote vai quando houver o mínimo;
+     * desligado, o botão "Enviar esta pergunta" aparece se o texto puder ir (sem dado pessoal, sem pedido perigoso).
+     */
+    private suspend fun capturarNaoEntendida(pergunta: String, intent: Intent) {
+        val fila = melhoria ?: return
+        val idioma = _idioma.value
+        if (!fila.podeEnviar(pergunta, idioma)) return
+        if (prefs.atual().melhoria) {
+            fila.enfileirar(pergunta, intent.name, idioma)   // false = já estava na fila
+            _envio.value = EnvioPergunta.GUARDADA
+            viewModelScope.launch { fila.enviarSePreciso() }
+        } else {
+            _envio.value = EnvioPergunta.DISPONIVEL
+        }
+    }
+
+    /** Botão "Enviar esta pergunta" (consentimento só para ela): entra na fila e o envio é tentado na hora. */
+    fun enviarPerguntaParaMelhoria() {
+        val atual = _resposta.value ?: return
+        val fila = melhoria ?: return
+        if (_envio.value != EnvioPergunta.DISPONIVEL) return
+        _envio.value = EnvioPergunta.ENVIANDO
+        viewModelScope.launch {
+            val entrou = fila.enfileirar(atual.pergunta, atual.resposta.intent.name, _idioma.value, explicito = true)
+            val r = if (entrou) fila.enviarSePreciso(forcar = true) else null
+            if (_resposta.value?.pergunta != atual.pergunta) return@launch
+            _envio.value = when (r) {
+                is EnvioMelhoria.Aceito -> EnvioPergunta.ENVIADA
+                EnvioMelhoria.Invalido -> EnvioPergunta.RECUSADA
+                null -> if (entrou) EnvioPergunta.GUARDADA else EnvioPergunta.RECUSADA
+                else -> EnvioPergunta.GUARDADA
+            }
+        }
+    }
+
+    fun limparResposta() { _resposta.value = null; _nuvem.value = EstadoNuvem(); _envio.value = EnvioPergunta.INDISPONIVEL }
+
+    /** Configurações > "Ajudar a melhorar o app". Desligar apaga a fila (o que ainda não foi enviado). */
+    fun definirMelhoria(v: Boolean) {
+        viewModelScope.launch {
+            prefs.atualizar { it.copy(melhoria = v, filaMelhoria = if (v) it.filaMelhoria else emptyList()) }
+            if (!v && _envio.value == EnvioPergunta.GUARDADA) _envio.value = EnvioPergunta.INDISPONIVEL
+        }
+    }
+
+    /**
+     * "Apagar os dados deste aparelho": histórico de perguntas, fila e consentimento do "Ajudar a melhorar o app", IA na nuvem automática e o
+     * identificador aleatório da instalação. Ficam as preferências de aparência (tema, texto, nível, idioma, economia de dados) e o estado
+     * da atualização do pacote.
+     */
+    fun apagarDadosDoAparelho() {
+        viewModelScope.launch {
+            prefs.atualizar { it.copy(historicoPerguntas = emptyList(), melhoria = false, filaMelhoria = emptyList(), iaNuvemAutomatica = false, idInstalacao = null) }
+            contexto = null
+            contextoDaResposta = null
+            limparResposta()
+        }
+    }
 
     fun definirNuvemAutomatica(v: Boolean) { viewModelScope.launch { prefs.atualizar { it.copy(iaNuvemAutomatica = v) } } }
 
@@ -306,7 +390,11 @@ class MainViewModel(
     fun atualizarAgora() { viewModelScope.launch { atualizacoes.verificar(forcar = true) } }
 
     /** Ao voltar para o app, confere se há dados novos (respeita o intervalo do manifesto e a economia de dados). */
-    fun verificarAtualizacaoAoRetomar() { viewModelScope.launch { atualizacoes.verificar(forcar = false) } }
+    fun verificarAtualizacaoAoRetomar() {
+        viewModelScope.launch { atualizacoes.verificar(forcar = false) }
+        // "Ajudar a melhorar o app": tenta de novo o que ficou na fila (sem rede, servidor desligado ou no limite)
+        melhoria?.let { f -> viewModelScope.launch { f.enviarSePreciso() } }
+    }
 
     companion object {
         private val META = setOf(Intent.AJUDA, Intent.SOBRE_DADOS, Intent.FONTES, Intent.RECUSA_PERIGO, Intent.DESCONHECIDA)

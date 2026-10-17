@@ -137,7 +137,9 @@ class NluTest {
         assertEquals(Intent.TABELA_PERIODICA, p("tendência da eletronegatividade ao longo do período 2").intent)
         val c = p("o que é o mol?")
         assertEquals(Intent.CONCEITO, c.intent)
-        assertEquals("mol", c.conceito)
+        // como o site (nlu.js limparConceito): o artigo fica no ParsedQuery; a busca do texto usa o tema limpo
+        assertEquals("o mol", c.conceito)
+        assertEquals("mol", LocalNlu.temaDoConceito(c.conceito!!, d.lexico))
         assertEquals(Intent.CONCEITO, p("explique o que é massa molar").intent)
     }
 

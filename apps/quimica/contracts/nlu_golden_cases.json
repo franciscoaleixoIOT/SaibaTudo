@@ -724,6 +724,11 @@
   {"q":"Expliquez la stœchiométrie","idioma":"fr","intent":"CONCEITO"},
   {"q":"Quel temps fera-t-il demain ?","idioma":"fr","intent":"DESCONHECIDA"},
   {"q":"Peux-tu traduire cette phrase en anglais ?","idioma":"fr","intent":"DESCONHECIDA"},
-  {"q":"Convertir 2 atmosphères en pascals","idioma":"fr","intent":"CONVERSAO_UNIDADE","unidadeDestino":"Pa"}
+  {"q":"Convertir 2 atmosphères en pascals","idioma":"fr","intent":"CONVERSAO_UNIDADE","unidadeDestino":"Pa"},
+  {"q":"explique o que é massa molar","intent":"CONCEITO"},
+  {"q":"o que é a massa molar?","intent":"CONCEITO"},
+  {"q":"Explique Teoria ácido-base de Brønsted-Lowry","intent":"CONCEITO"},
+  {"q":"explain what molar mass is","idioma":"en","intent":"CONCEITO"},
+  {"q":"Qu'est-ce que la stœchiométrie ?","idioma":"fr","intent":"CONCEITO"}
  ]
 }

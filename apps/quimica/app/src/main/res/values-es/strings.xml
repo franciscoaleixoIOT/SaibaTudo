@@ -442,7 +442,6 @@
     <string name="ui_unidade">Unidad</string>
     <string name="ui_formula_desc">Fórmula %1$s</string>
     <string name="ui_copiar_resposta">Copiar la respuesta</string>
-    <string name="ui_origem_local">Calculado en el dispositivo a partir del paquete de datos firmado. Ninguna IA generó estos números.</string>
     <string name="ui_experimente_perguntar_dois_pontos">Prueba a preguntar:</string>
     <string name="ui_recolher">Contraer</string>
     <string name="ui_mostrar">Mostrar</string>
@@ -682,12 +681,12 @@
     <string name="ui_privacidade_nada_sai_titulo">Nada sale de tu dispositivo, a menos que se lo pidas a la IA en la nube</string>
     <string name="ui_privacidade_nada_sai_texto">Tus preguntas se interpretan y se responden en el propio dispositivo. Internet se usa para descargar actualizaciones firmadas del paquete de datos desde saibatudo.net y, solo cuando lo pidas, para consultar la IA en la nube.</string>
     <string name="ui_privacidade_guardado_titulo">Lo que se guarda en el dispositivo</string>
-    <string name="ui_privacidade_guardado_item1">Tus preferencias: tema, tamaño del texto, nivel, ahorro de datos e IA en la nube automática; y el identificador aleatorio de esta instalación, usado solo en las consultas a la IA en la nube.</string>
+    <string name="ui_privacidade_guardado_item1">Tus preferencias: tema, tamaño del texto, nivel, ahorro de datos e IA en la nube automática; y el identificador aleatorio de esta instalación, usado solo en las consultas a la IA en la nube. Si «Ayudar a mejorar la app» está activado, también la cola de preguntas aún no enviadas.</string>
     <string name="ui_privacidade_guardado_item2">El historial de las últimas preguntas (hasta 30), solo para que puedas reutilizarlas. Puedes borrarlo abajo.</string>
     <string name="ui_privacidade_guardado_item3">El paquete de datos y las actualizaciones descargadas.</string>
     <string name="ui_privacidade_apagar_historico">Borrar el historial de preguntas</string>
     <string name="ui_privacidade_sai_titulo">Lo que sale del dispositivo</string>
-    <string name="ui_privacidade_sai_texto">Al buscar actualizaciones, la app hace peticiones HTTPS a saibatudo.net para descargar los archivos de datos. Como en cualquier acceso a internet, el servidor ve la dirección IP y la versión de la app. No se envían datos de uso. El texto de una pregunta solo sale del dispositivo cuando tocas «Preguntar a la IA en la nube» o activas la IA en la nube automática.</string>
+    <string name="ui_privacidade_sai_texto">Al buscar actualizaciones, la app hace peticiones HTTPS a saibatudo.net para descargar los archivos de datos. Como en cualquier acceso a internet, el servidor ve la dirección IP y la versión de la app. No se envían datos de uso. El texto de una pregunta solo sale del dispositivo cuando tocas «Preguntar a la IA en la nube» o activas la IA en la nube automática. Con «Ayudar a mejorar la app» (opcional, abajo), también salen las preguntas no entendidas que elijas enviar.</string>
     <string name="ui_privacidade_nao_tem_titulo">Lo que la app no tiene</string>
     <string name="ui_privacidade_nao_tem_texto">Sin inicio de sesión, sin anuncios, sin análisis de uso, sin ubicación, sin acceso a contactos, cámara ni micrófono.</string>
     <string name="ui_privacidade_nuvem_titulo">IA en la nube</string>
@@ -876,4 +875,27 @@
     <string name="ui_relatar_resposta_desc">Informar de un problema con esta respuesta. Abre en el navegador una incidencia pública de GitHub ya rellenada; no se envía nada si no lo confirmas allí.</string>
     <string name="relato_titulo">Química: respuesta a “%1$s”</string>
     <string name="relato_corpo">¿Qué estaba mal o faltaba en la respuesta? (No incluyas datos personales.)\n\nPregunta: %1$s\nIntención: %2$s\nOrigen de la respuesta: %3$s\nVersión de la app (Android): %4$s\nVersión de los datos: %5$s</string>
+
+    <!-- 1.0.1: caixa de pergunta (histórico ▲▼), origem + data dos dados, "Ajudar a melhorar o app", apagar dados -->
+    <string name="ui_inicio_ultima_pergunta">Última pregunta</string>
+    <string name="ui_inicio_pergunta_anterior">Pregunta anterior</string>
+    <string name="ui_inicio_pergunta_seguinte">Pregunta siguiente</string>
+    <string name="ui_inicio_limpar_texto">Borrar el texto</string>
+    <string name="ui_inicio_analisando">Analizando la pregunta…</string>
+    <string name="ui_resposta_origem_aparelho">Respuesta construida en tu dispositivo</string>
+    <string name="ui_resposta_origem_nuvem">Respuesta construida en tu dispositivo, con la pregunta interpretada por la IA en la nube (%1$s)</string>
+    <string name="ui_resposta_dados_de">paquete de datos del %1$s</string>
+    <string name="ui_melhoria_enviar">Enviar esta pregunta</string>
+    <string name="ui_melhoria_nota">Ayuda a mejorar la app: envía solo esta pregunta, sin tu nombre, para que una persona la revise y enseñe a la app a entenderla.</string>
+    <string name="ui_melhoria_enviando">Enviando la pregunta…</string>
+    <string name="ui_melhoria_enviada">¡Gracias! La pregunta se envió para revisión.</string>
+    <string name="ui_melhoria_guardada">La pregunta quedó guardada en el dispositivo y se enviará para revisión más tarde.</string>
+    <string name="ui_melhoria_recusada">No se pudo enviar esta pregunta.</string>
+    <string name="ui_config_melhoria_titulo">Ayudar a mejorar la app</string>
+    <string name="ui_config_melhoria_descricao">Desactivado por defecto. Activado, las preguntas que la app no entendió se envían a nuestro servidor, sin tu nombre y sin identificarte, para que una persona las revise y enseñe a la app a entenderlas. Solo se envían el texto de la pregunta, la interpretación de la app, el idioma, la fecha y el identificador aleatorio de esta instalación. Las preguntas con correo electrónico, teléfono, documento fiscal brasileño (CPF o CNPJ), dirección web, @usuario o números largos, y los pedidos peligrosos, nunca se envían. Como ningún filtro es perfecto, evita escribir datos personales en las preguntas. Al desactivarlo se borra lo que aún no se envió.</string>
+    <string name="ui_config_apagar_dados">Borrar los datos de este dispositivo</string>
+    <string name="ui_config_apagar_dados_descricao">Borra el historial de preguntas, la cola y el consentimiento de «Ayudar a mejorar la app», la IA en la nube automática y el identificador aleatorio de esta instalación. El tema, el tamaño del texto, el nivel y el idioma se mantienen.</string>
+    <string name="ui_config_dados_apagados">Datos de este dispositivo borrados.</string>
+    <string name="ui_privacidade_melhoria_titulo">Ayudar a mejorar la app (opcional)</string>
+    <string name="ui_privacidade_melhoria_texto">Desactivado por defecto. Si activas la opción en Configuración, o tocas «Enviar esta pregunta» en una respuesta que la app no entendió, la app envía a saibatudo.net el texto de la pregunta, la interpretación de la app, el idioma, la fecha (sin hora) y el identificador aleatorio de esta instalación. A diferencia de la IA en la nube, estas preguntas se guardan en el servidor para que una persona las revise y mejore la app. Antes de que salgan del dispositivo, la app descarta las preguntas con correo electrónico, teléfono, documento fiscal brasileño (CPF o CNPJ), dirección web, @usuario o números largos, y los pedidos peligrosos. La cola permanece en el dispositivo hasta enviarse; desactivar la opción o «Borrar los datos de este dispositivo» la borra.</string>
 </resources>

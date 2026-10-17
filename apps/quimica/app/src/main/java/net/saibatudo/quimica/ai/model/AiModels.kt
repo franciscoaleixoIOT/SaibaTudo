@@ -131,7 +131,9 @@ data class Resposta(
     val sugestoes: List<String> = emptyList(),
     val recusa: Boolean = false,
     /** false = o app não entendeu ou não tem o dado. */
-    val entendida: Boolean = true
+    val entendida: Boolean = true,
+    /** Origem NUVEM: o modelo que interpretou a pergunta (campo `model` da API), para a linha de origem. */
+    val modelo: String? = null
 ) {
     /** Texto simples (copiar, acessibilidade e testes): título, blocos e fontes, com os rótulos no idioma de [t]. */
     fun texto(t: Textos): String = buildString {

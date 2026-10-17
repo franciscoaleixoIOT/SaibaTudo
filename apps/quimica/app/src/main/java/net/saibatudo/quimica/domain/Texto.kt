@@ -38,7 +38,8 @@ object Texto {
      * separados por um espaço; sinais soltos são descartados. "Ácido  Sulfúrico!" vira "acido sulfurico".
      */
     fun nlu(s: String?): String {
-        val sem = RX_COMBINANTES.replace(Normalizer.normalize(s ?: "", Normalizer.Form.NFD), "").lowercase()
+        // como `normalizar` de texto.js: ligaduras (ß, œ, æ, ø) antes, depois NFKD ("Brønsted" → "bronsted", "stœchiométrie" → "stoechiometrie")
+        val sem = RX_COMBINANTES.replace(Normalizer.normalize(ligaduras(s ?: ""), Normalizer.Form.NFKD), "").lowercase()
         return RX_ESPACOS.replace(RX_SINAL_SOLTO.replace(RX_NAO_NLU.replace(sem, " "), " "), " ").trim()
     }
 

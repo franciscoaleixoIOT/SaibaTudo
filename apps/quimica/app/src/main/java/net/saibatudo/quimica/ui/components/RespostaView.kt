@@ -55,10 +55,18 @@ fun RespostaView(
     onAbrirUrl: (String) -> Unit,
     modifier: Modifier = Modifier,
     pergunta: String? = null,
-    versaoDados: String? = null
+    versaoDados: String? = null,
+    /** Data do pacote (`generatedAt` do manifesto) já no formato do idioma, para a linha de origem. */
+    dataDados: String? = null
 ) {
     val area = LocalClipboardManager.current
     val t = LocalTextos.current
+    // "Resposta montada no seu aparelho • dados do pacote de 12/10/2026" (igual ao site, inicio.js respostaEl)
+    val origem = when (resposta.origem) {
+        OrigemResposta.LOCAL -> t(R.string.ui_resposta_origem_aparelho)
+        OrigemResposta.NUVEM -> t(R.string.ui_resposta_origem_nuvem, resposta.modelo?.takeIf { it.isNotBlank() } ?: MODELO_PADRAO)
+        else -> t(resposta.origem.rotulo)
+    } + (if (dataDados != null && resposta.origem != OrigemResposta.AVISO) " • " + t(R.string.ui_resposta_dados_de, dataDados) else "")
     Cartao(modifier) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(
@@ -66,20 +74,16 @@ fun RespostaView(
                 fontWeight = FontWeight.SemiBold,
                 color = if (resposta.recusa) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
             )
-            IconButton(onClick = { area.setText(AnnotatedString(resposta.texto(t))) }) {
+            IconButton(onClick = { area.setText(AnnotatedString(resposta.texto(t) + "\n" + origem)) }) {
                 Icon(Icons.Filled.ContentCopy, contentDescription = t(R.string.ui_copiar_resposta))
             }
         }
         resposta.blocos.forEach { BlocoView(it, onAbrirUrl) }
         FontesView(resposta.fontes, onAbrirUrl)
-        Text(
-            when (resposta.origem) {
-                OrigemResposta.LOCAL -> t(R.string.ui_origem_local)
-                OrigemResposta.NUVEM -> t(R.string.ui_origem_nuvem)
-                else -> t(resposta.origem.rotulo)
-            },
-            style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        Text(origem, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        if (resposta.origem == OrigemResposta.NUVEM) {
+            Text(t(R.string.ui_origem_nuvem), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
         if (resposta.acoes.isNotEmpty()) {
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 resposta.acoes.forEach { a -> AssistChip(onClick = { onAcao(a) }, label = { Text(a.rotulo) }) }
@@ -102,6 +106,9 @@ fun RespostaView(
         }
     }
 }
+
+/** Nome exibido quando a API não informa o modelo (o mesmo reserva do site). */
+private const val MODELO_PADRAO = "SaibaTudo IA"
 
 @Composable
 fun BlocoView(bloco: Bloco, onAbrirUrl: (String) -> Unit) {

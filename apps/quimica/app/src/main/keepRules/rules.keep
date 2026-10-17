@@ -16,3 +16,6 @@
 -keep class * extends androidx.room.RoomDatabase { *; }
 -keep class androidx.work.impl.WorkDatabase_Impl { *; }
 -dontwarn androidx.room.paging.**
+
+# Fila do "Ajudar a melhorar o app" (DataStore, JSON via Gson por reflexão): nomes e construtor preservados
+-keep class net.saibatudo.quimica.data.prefs.ItemMelhoria { *; }

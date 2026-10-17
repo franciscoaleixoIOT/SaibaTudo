@@ -48,9 +48,21 @@ data class UserPreferences(
     val historicoPerguntas: List<String> = emptyList(),
     /** IA na nuvem automática: as perguntas que o app não entende vão (só o texto) ao NLU na nuvem. Desligada por padrão. */
     val iaNuvemAutomatica: Boolean = false,
-    /** Identificador aleatório desta instalação, criado no primeiro pedido à nuvem. */
-    val idInstalacao: String? = null
-)
+    /** Identificador aleatório desta instalação, criado no primeiro pedido à nuvem (ou ao "Ajudar a melhorar o app"). */
+    val idInstalacao: String? = null,
+    /** "Ajudar a melhorar o app": as perguntas que o app não entendeu vão (filtradas) para revisão. Desligado por padrão. */
+    val melhoria: Boolean = false,
+    /** Perguntas aguardando envio ao "Ajudar a melhorar o app" (só no aparelho; apagadas ao desligar a opção ou apagar os dados). */
+    val filaMelhoria: List<ItemMelhoria> = emptyList()
+) {
+    companion object {
+        /** Histórico de perguntas: até 50 itens (docs/PADRAO_ASSISTENTE.md §1). */
+        const val LIMITE_HISTORICO = 50
+    }
+}
+
+/** Uma pergunta na fila do "Ajudar a melhorar o app". [explicito]: veio do botão "Enviar esta pergunta" (não vai ao servidor). */
+data class ItemMelhoria(val q: String, val intentLocal: String, val t: String, val idioma: String, val explicito: Boolean = false)
 
 /** Armazenamento de preferências (interface para permitir testes sem Android). */
 interface PreferencesStore {
@@ -72,6 +84,8 @@ class DataStorePreferences(private val context: Context) : PreferencesStore {
         val historico = stringPreferencesKey("historico_perguntas")
         val iaNuvem = booleanPreferencesKey("ia_nuvem_automatica")
         val iid = stringPreferencesKey("id_instalacao")
+        val melhoria = booleanPreferencesKey("melhoria")
+        val filaMelhoria = stringPreferencesKey("fila_melhoria")
     }
 
     private val gson = Gson()
@@ -93,7 +107,15 @@ class DataStorePreferences(private val context: Context) : PreferencesStore {
             }
         } ?: emptyList(),
         iaNuvemAutomatica = p[K.iaNuvem] ?: false,
-        idInstalacao = p[K.iid]
+        idInstalacao = p[K.iid],
+        melhoria = p[K.melhoria] ?: false,
+        filaMelhoria = p[K.filaMelhoria]?.let { raw ->
+            try {
+                gson.fromJson(raw, Array<ItemMelhoria>::class.java)?.toList()?.filter { it.q.isNotBlank() }
+            } catch (_: Exception) {
+                null
+            }
+        } ?: emptyList()
     )
 
     override suspend fun atualizar(transformacao: (UserPreferences) -> UserPreferences) {
@@ -107,8 +129,10 @@ class DataStorePreferences(private val context: Context) : PreferencesStore {
             if (novo.ultimaVersaoDados != null) p[K.versao] = novo.ultimaVersaoDados else p.remove(K.versao)
             p[K.iaNuvem] = novo.iaNuvemAutomatica
             if (novo.idInstalacao != null) p[K.iid] = novo.idInstalacao else p.remove(K.iid)
+            p[K.melhoria] = novo.melhoria
+            if (novo.filaMelhoria.isNotEmpty()) p[K.filaMelhoria] = gson.toJson(novo.filaMelhoria.takeLast(30)) else p.remove(K.filaMelhoria)
             if (novo.historicoPerguntas.isNotEmpty()) {
-                p[K.historico] = gson.toJson(novo.historicoPerguntas.takeLast(30))
+                p[K.historico] = gson.toJson(novo.historicoPerguntas.takeLast(UserPreferences.LIMITE_HISTORICO))
             } else {
                 p.remove(K.historico)
             }

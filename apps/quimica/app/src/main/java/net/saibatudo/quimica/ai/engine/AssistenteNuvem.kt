@@ -58,7 +58,7 @@ class AssistenteNuvem(
             return DesfechoNuvem.Falhou(FalhaNuvem.NAO_ENTENDEU, perguntas.distinct())
         }
         if (respostaAtual?.entendida == true && mesmaInterpretacao(q, local)) return DesfechoNuvem.Falhou(FalhaNuvem.MESMA_INTERPRETACAO)
-        val resposta = builder.construir(q).copy(origem = OrigemResposta.NUVEM)
+        val resposta = builder.construir(q).copy(origem = OrigemResposta.NUVEM, modelo = ok.modelo)
         if (!resposta.entendida && !resposta.recusa) return DesfechoNuvem.Falhou(FalhaNuvem.NAO_ENTENDEU)
         return DesfechoNuvem.Respondida(q, resposta)
     }

@@ -255,8 +255,8 @@ internal object LexicoDe {
     )
 
     private fun n_unidades_32(): List<Any?> = listOf<Any?>(
-        "^torr\$",
-        "mmHg"
+        "^torrs?\$",
+        "Torr"
     )
 
     private fun n_unidades_33(): List<Any?> = listOf<Any?>(

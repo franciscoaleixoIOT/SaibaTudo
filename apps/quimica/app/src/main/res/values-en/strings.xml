@@ -440,7 +440,6 @@
     <string name="ui_unidade">Unit</string>
     <string name="ui_formula_desc">Formula %1$s</string>
     <string name="ui_copiar_resposta">Copy answer</string>
-    <string name="ui_origem_local">Calculated on the device from the signed data package. No AI generated these numbers.</string>
     <string name="ui_experimente_perguntar_dois_pontos">Try asking:</string>
     <string name="ui_recolher">Collapse</string>
     <string name="ui_mostrar">Show</string>
@@ -680,12 +679,12 @@
     <string name="ui_privacidade_nada_sai_titulo">Nothing leaves your device unless you ask the cloud AI</string>
     <string name="ui_privacidade_nada_sai_texto">Your questions are interpreted and answered on the device itself. The internet is used to download signed data package updates from saibatudo.net and, only when you ask, to consult the cloud AI.</string>
     <string name="ui_privacidade_guardado_titulo">What is stored on the device</string>
-    <string name="ui_privacidade_guardado_item1">Your preferences: theme, text size, level, data saver and automatic cloud AI; and the random identifier of this installation, used only in requests to the cloud AI.</string>
+    <string name="ui_privacidade_guardado_item1">Your preferences: theme, text size, level, data saver and automatic cloud AI; and the random identifier of this installation, used only in requests to the cloud AI. If “Help improve the app” is on, also the queue of questions not yet sent.</string>
     <string name="ui_privacidade_guardado_item2">The history of your last questions (up to 30), only so you can reuse them. You can delete it below.</string>
     <string name="ui_privacidade_guardado_item3">The data package and the updates downloaded.</string>
     <string name="ui_privacidade_apagar_historico">Delete the question history</string>
     <string name="ui_privacidade_sai_titulo">What leaves the device</string>
-    <string name="ui_privacidade_sai_texto">When looking for an update, the app makes HTTPS requests to saibatudo.net to download the data files. As with any internet access, the server sees the IP address and the app version. No usage data is sent. The text of a question only leaves the device when you tap “Ask the cloud AI” or turn on automatic cloud AI.</string>
+    <string name="ui_privacidade_sai_texto">When looking for an update, the app makes HTTPS requests to saibatudo.net to download the data files. As with any internet access, the server sees the IP address and the app version. No usage data is sent. The text of a question only leaves the device when you tap “Ask the cloud AI” or turn on automatic cloud AI. With “Help improve the app” (optional, below), the questions not understood that you choose to send also leave.</string>
     <string name="ui_privacidade_nao_tem_titulo">What the app does not have</string>
     <string name="ui_privacidade_nao_tem_texto">No login, no ads, no usage analytics, no location, no access to contacts, camera or microphone.</string>
     <string name="ui_privacidade_nuvem_titulo">Cloud AI</string>
@@ -873,4 +872,27 @@
     <string name="ui_relatar_resposta_desc">Report a problem with this answer. Opens a prefilled public GitHub issue in the browser; nothing is sent unless you confirm there.</string>
     <string name="relato_titulo">Chemistry: answer to \"%1$s\"</string>
     <string name="relato_corpo">What was wrong or missing in the answer? (Do not include personal data.)\n\nQuestion: %1$s\nIntent: %2$s\nAnswer source: %3$s\nApp version (Android): %4$s\nData version: %5$s</string>
+
+    <!-- 1.0.1: caixa de pergunta (histórico ▲▼), origem + data dos dados, "Ajudar a melhorar o app", apagar dados -->
+    <string name="ui_inicio_ultima_pergunta">Last question</string>
+    <string name="ui_inicio_pergunta_anterior">Previous question</string>
+    <string name="ui_inicio_pergunta_seguinte">Next question</string>
+    <string name="ui_inicio_limpar_texto">Clear text</string>
+    <string name="ui_inicio_analisando">Analysing the question…</string>
+    <string name="ui_resposta_origem_aparelho">Answer built on your device</string>
+    <string name="ui_resposta_origem_nuvem">Answer built on your device, with the question interpreted by the cloud AI (%1$s)</string>
+    <string name="ui_resposta_dados_de">data package of %1$s</string>
+    <string name="ui_melhoria_enviar">Send this question</string>
+    <string name="ui_melhoria_nota">Help improve the app: send just this question, without your name, so a person can review it and teach the app to understand it.</string>
+    <string name="ui_melhoria_enviando">Sending the question…</string>
+    <string name="ui_melhoria_enviada">Thank you! The question was sent for review.</string>
+    <string name="ui_melhoria_guardada">The question was saved on the device and will be sent for review later.</string>
+    <string name="ui_melhoria_recusada">This question could not be sent.</string>
+    <string name="ui_config_melhoria_titulo">Help improve the app</string>
+    <string name="ui_config_melhoria_descricao">Off by default. When on, questions the app did not understand are sent to our server, without your name and without identifying you, so a person can review them and teach the app to understand them. Only the question text, the app’s interpretation, the language, the date and the random identifier of this installation are sent. Questions with an email address, phone number, Brazilian tax ID (CPF or CNPJ), website address, @username or long numbers, and dangerous requests, are never sent. Since no filter is perfect, avoid writing personal data in your questions. Turning it off deletes whatever has not been sent yet.</string>
+    <string name="ui_config_apagar_dados">Delete the data on this device</string>
+    <string name="ui_config_apagar_dados_descricao">Deletes the question history, the queue and the consent of “Help improve the app”, automatic cloud AI and the random identifier of this installation. Theme, text size, level and language are kept.</string>
+    <string name="ui_config_dados_apagados">Data on this device deleted.</string>
+    <string name="ui_privacidade_melhoria_titulo">Help improve the app (optional)</string>
+    <string name="ui_privacidade_melhoria_texto">Off by default. If you turn the option on in Settings, or tap “Send this question” on an answer the app did not understand, the app sends saibatudo.net the question text, the app’s interpretation, the language, the date (no time) and the random identifier of this installation. Unlike the cloud AI, these questions are stored on the server so a person can review them and improve the app. Before anything leaves the device, the app discards questions with an email address, phone number, Brazilian tax ID (CPF or CNPJ), website address, @username or long numbers, and dangerous requests. The queue stays on the device until it is sent; turning the option off or “Delete the data on this device” deletes it.</string>
 </resources>

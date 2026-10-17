@@ -24,6 +24,8 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
@@ -243,6 +245,10 @@ fun PrivacidadeScreen(onAbrirUrl: (String) -> Unit, onLimparHistorico: () -> Uni
             TituloSecao(t(R.string.ui_privacidade_nuvem_titulo))
             Text(t(R.string.ui_privacidade_nuvem_texto), style = MaterialTheme.typography.bodyMedium)
         }
+        Cartao {
+            TituloSecao(t(R.string.ui_privacidade_melhoria_titulo))
+            Text(t(R.string.ui_privacidade_melhoria_texto), style = MaterialTheme.typography.bodyMedium)
+        }
         OutlinedButton(onClick = { onAbrirUrl(BuildConfig.PRIVACY_URL) }) { Text(t(R.string.ui_privacidade_politica_completa)) }
         OutlinedButton(onClick = { onAbrirUrl(BuildConfig.SOURCE_URL + "/issues") }) { Text(t(R.string.ui_privacidade_relatar)) }
     }
@@ -254,9 +260,13 @@ fun PrivacidadeScreen(onAbrirUrl: (String) -> Unit, onLimparHistorico: () -> Uni
 fun ConfiguracoesScreen(
     prefs: UserPreferences, onTema: (TemaApp) -> Unit, onFonte: (TamanhoFonte) -> Unit, onNivel: (Nivel) -> Unit, onEconomia: (Boolean) -> Unit,
     modifier: Modifier = Modifier, idioma: String = Idiomas.PADRAO, onIdioma: (String) -> Unit = {},
-    onNuvemAutomatica: (Boolean) -> Unit = {}
+    onNuvemAutomatica: (Boolean) -> Unit = {},
+    melhoriaDisponivel: Boolean = false,
+    onMelhoria: (Boolean) -> Unit = {},
+    onApagarDados: () -> Unit = {}
 ) {
     val t = LocalTextos.current
+    var apagados by androidx.compose.runtime.saveable.rememberSaveable { androidx.compose.runtime.mutableStateOf(false) }
     Pagina(t(R.string.ui_config_titulo), modifier) {
         Cartao {
             TituloSecao(t(R.string.config_idioma_titulo))
@@ -301,6 +311,23 @@ fun ConfiguracoesScreen(
                 }
                 Switch(checked = prefs.iaNuvemAutomatica, onCheckedChange = onNuvemAutomatica)
             }
+        }
+        if (melhoriaDisponivel) {
+            Cartao {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                    Column(Modifier.weight(1f)) {
+                        Text(t(R.string.ui_config_melhoria_titulo), style = MaterialTheme.typography.titleSmall)
+                        Text(t(R.string.ui_config_melhoria_descricao), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    Switch(checked = prefs.melhoria, onCheckedChange = { apagados = false; onMelhoria(it) })
+                }
+            }
+        }
+        Cartao {
+            Text(t(R.string.ui_config_apagar_dados), style = MaterialTheme.typography.titleSmall)
+            Text(t(R.string.ui_config_apagar_dados_descricao), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            OutlinedButton(onClick = { onApagarDados(); apagados = true }) { Text(t(R.string.ui_config_apagar_dados)) }
+            if (apagados) Text(t(R.string.ui_config_dados_apagados), style = MaterialTheme.typography.bodySmall)
         }
     }
 }
