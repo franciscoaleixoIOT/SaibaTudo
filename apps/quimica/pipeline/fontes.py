@@ -50,7 +50,8 @@ FONTES = [
     {"id": "chebi", "nome": "ChEBI", "mantenedor": "EMBL-EBI", "url": "https://www.ebi.ac.uk/chebi/",
      "licenca": "CC BY 4.0", "uso": "textos", "idioma": "en",
      "atribuicao": "Malik, A. et al. (2025). ChEBI: re-engineered for a sustainable future. Nucleic Acids Research. "
-                   "Definições em inglês, sem tradução.",
+                   "Definições em inglês; quando há tradução automática conferida por regras (pipeline/traducoes/chebi.jsonl), "
+                   "`textoPt` traz o português marcado `traducao: automatica` e o original fica em `textoOriginal`.",
      "exibir": "sim", "dataset": "sim", "treino": "sim"},
     _wikipedia("pt-BR"), _wikipedia("en"), _wikipedia("es"), _wikipedia("de"), _wikipedia("fr"),
     {"id": "wikibooks-pt", "nome": "Wikilivros (Wikibooks) em português", "mantenedor": "Wikimedia Foundation",
@@ -60,7 +61,14 @@ FONTES = [
      "exibir": "sim", "dataset": "sim", "treino": "sim"},
     {"id": "gutenberg-14474", "nome": "Project Gutenberg #14474 — The Chemical History of a Candle (Faraday, 1861)",
      "mantenedor": "Project Gutenberg", "url": "https://www.gutenberg.org/ebooks/14474", "licenca": "domínio público",
-     "uso": "textos", "idioma": "en", "atribuicao": "Michael Faraday (1861), editado por William Crookes. Texto histórico em inglês.",
+     "uso": "textos", "idioma": "en", "atribuicao": "Michael Faraday (1861), editado por William Crookes. Texto histórico em inglês; tradução "
+                                    "automática para o português (`traducao: automatica`, original em `textoOriginal`) quando houver.",
+     "exibir": "sim", "dataset": "sim", "treino": "sim"},
+    {"id": "wikipedia-en-dados", "nome": "Wikipedia (en) — páginas de dados de referência", "mantenedor": "Wikimedia Foundation",
+     "url": "https://en.wikipedia.org/", "licenca": "CC BY-SA 4.0", "uso": "dados",
+     "atribuicao": "Valores numéricos de regras.json (potenciais-padrão E° da série de reatividade, solubilidade e Kps de Ca(OH)₂, "
+                   "Mg(OH)₂, Sr(OH)₂ e Ba(OH)₂, pKw por temperatura), cada um com o link permanente (oldid) da página lida e a "
+                   "referência primária que ela cita (CRC Handbook; Bandura & Lvov 2006).",
      "exibir": "sim", "dataset": "sim", "treino": "sim"},
     {"id": "icsc-oit", "nome": "ICSC — Fichas Internacionais de Segurança Química (OIT/OMS)", "mantenedor": "OIT/OMS (versão em português: ACT, Portugal)",
      "url": "https://chemicalsafety.ilo.org/dyn/icsc/showcard.home",

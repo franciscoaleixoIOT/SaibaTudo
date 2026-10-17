@@ -40,8 +40,8 @@ A saída é atômica: o pacote é montado em `<out>.novo`, validado e só então
 | `coleta_wikimedia.py` | Wikipédia pt (introduções) e Wikilivros pt, CC BY-SA 4.0, com `revisao` e `tema`; `coletar_wikipedia_idioma()` repete os mesmos artigos em en/es/de/fr pelo item do Wikidata (sitelinks), sem busca nem tradução |
 | `coleta_textos.py` | trechos de 400-1.200 caracteres; Faraday (Gutenberg #14474); sonda do Gold Book |
 | `coleta_icsc.py` | só o link de busca por CAS (`icscBuscaUrl`); parser dos cartões **desativado** |
-| `regras.py` | `regras.json` (prefixos SI, unidades, reatividade, solubilidade, nomenclatura, `propriedades` com `rotulos`/`sinonimosPorIdioma` por idioma — glossário I18N §8, revisão pendente) |
-| `build.py`, `sign.py` | orquestração, validação (gates) e assinatura ECDSA P-256/SHA-256 do manifesto |
+| `regras.py` | `regras.json` (prefixos SI, unidades, reatividade com E° por par, solubilidade, `solubilidadeBases` (Ca/Mg/Sr/Ba(OH)₂), `agua` (pKw e pKw(T)) — valores com fonte e oldid —, nomenclatura, `propriedades` com `rotulos`/`sinonimosPorIdioma` por idioma — glossário I18N §8, revisão pendente) |
+| `build.py`, `sign.py` | orquestração, validação (gates) e assinatura ECDSA P-256/SHA-256 do manifesto; aplica `pipeline/traducoes/<fonte>.jsonl` (ChEBI, Faraday) pelo hash do `textoOriginal` (DATA_CONTRACT §5.1; `--traducoes DIR`, `--sem-traducoes`); `cliente.ask/melhoria.enabled` de `SAIBATUDO_ASK_ENABLED`/`SAIBATUDO_MELHORIA_ENABLED` |
 
 ## Limites de taxa (respeitados em `http_cache.LIMITES_POR_HOST`)
 PubChem 2 req/s (teto pedido: 4; o servidor devolveu 429 a ~3,3 req/s sustentados e **bloqueia o IP por alguns minutos**: depois de um

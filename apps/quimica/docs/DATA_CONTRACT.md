@@ -12,7 +12,9 @@ Os campos antigos (`nome`, `nomeEn`, `sinonimos`, `texto`, `pictogramas`…) con
 ## 1. `manifest.json` (+ `manifest.sig`)
 Mesmo esquema do app de eleições: `{ version, generatedAt, schemaVersion: 1, files: { "<caminho>": { bytes, sha256 } }, sources: [...], licencas: [...],
 idiomas: ["pt-BR", "en", "es", "de", "fr"], contagens: {...}, atribuicao, cliente: { pollIntervalMinutes: 10080, baseUrl, nlu: { endpoint }, ask: { enabled: false },
-melhoria: { enabled: false } } }`. A assinatura é ECDSA P-256/SHA-256 (DER, Base64) do arquivo `manifest.json` byte a byte; chave pública em
+melhoria: { enabled: false } } }`. `cliente.ask.enabled` e `cliente.melhoria.enabled` vêm das variáveis de ambiente do build `SAIBATUDO_ASK_ENABLED` e
+`SAIBATUDO_MELHORIA_ENABLED` (`1`/`true`/`sim`/`on`/`yes` = ligado; ausente ou outro valor = `false`), que o `quimica-data-refresh.yml` preenche com
+`vars.QUIMICA_ASK_ENABLED` e `vars.QUIMICA_MELHORIA_ENABLED`; `nlu.endpoint` é sempre `https://saibatudo.net/quimica/api/nlu`. A assinatura é ECDSA P-256/SHA-256 (DER, Base64) do arquivo `manifest.json` byte a byte; chave pública em
 `pipeline/data_signing_public.pem` (e `.b64` para o site e o app). `pollIntervalMinutes` = 7 dias. `files` lista **todos** os arquivos do pacote, inclusive cada lote de
 textos e `textos/index.json` (§5), com SHA-256; `stats.json` fica fora.
 - `idiomas`: os idiomas construídos neste pacote (pt-BR sempre primeiro).
@@ -123,13 +125,31 @@ Esquema de cada trecho (igual ao de antes):
   "fontes": [ { "nome": "Wikipedia (en): Oxygen", "url": "https://en.wikipedia.org/wiki/Oxygen", "licenca": "CC BY-SA 4.0", "acessadoEm": "2026-10-12" } ] }
 ```
 - `idioma` **do trecho** usa o código da língua do texto como sempre: `pt` (Wikipédia/Wikilivros em português), `en` (Wikipedia en, ChEBI, Faraday), `es`, `de`, `fr`.
-  Em português `textoPt` = `textoOriginal`; nos outros idiomas `textoPt` é `null` e `traducao` diz que não se aplica (**nunca traduzimos**; ChEBI e Faraday seguem
-  `"traducao": "pendente"`). `fonte` por idioma: "Wikipédia em português", "Wikipedia (en)", "Wikipedia (es)", "Wikipedia (de)", "Wikipedia (fr)".
+  Em português `textoPt` = `textoOriginal`; nos textos da Wikipédia em en/es/de/fr `textoPt` é `null` e `traducao` diz que não se aplica (a Wikipédia de outro idioma
+  **nunca é traduzida**). ChEBI e Faraday (em inglês, sem versão em português) ficam `"traducao": "pendente"` ou recebem a **tradução automática** de §5.1. `fonte` por idioma: "Wikipédia em português", "Wikipedia (en)", "Wikipedia (es)", "Wikipedia (de)", "Wikipedia (fr)".
 - Wikipédia em en/es/de/fr: **os mesmos artigos** da coleta em português — 118 elementos, até 150 compostos do pacote e os conceitos de `dataset/topicos.json` +
   lista fixa —, achados pelo item do Wikidata (sitelink `<lang>wiki`); `tema`/`temas` do conceito vêm do artigo em português. Artigo que não existe no idioma = nada
   (o cliente cai para `en` e depois `pt`). Wikilivros só em pt. `url` é o permalink (`oldid`) no wiki do idioma; `revisao` o revid.
 - Regras: o trecho original é preservado (auditoria e citação); tradução, quando existir, é marcada como automática até uma pessoa revisar. CC BY-NC-SA (LibreTexts) só
   entra em pasta própria com a licença no `manifest.licencas`, e o dataset derivado dela herda CC BY-NC-SA.
+
+### 5.1 Tradução automática (ChEBI e Faraday, 17/10/2026)
+`pipeline/traduzir_textos.py` grava `pipeline/traducoes/<fonte>.jsonl` (uma linha por trecho: `{id, hash, titulo, texto, idiomaOrigem, modelo, data,
+traducao: "automatica"}`, `hash` = sha256 do `textoOriginal` em UTF-8). O `build.py` (`aplicar_traducoes`; `--traducoes DIR`, `--sem-traducoes`) aplica a linha a um
+trecho com `traducao: "pendente"` **só quando o hash bate** (texto mudou = tradução ignorada, o trecho continua pendente):
+```json
+{ "id": "gutenberg-14474-lecture-1-001", "titulo": "Lecture I: A Candle: ...", "secao": "...", "idioma": "en",
+  "textoOriginal": "I purpose, in return for the honour ...", "textoPt": "Proponho-me, em retribuição à honra ...",
+  "traducao": "automatica", "traducaoModelo": "qwen3.8-max", "traducaoData": "2026-10-16", "idiomaOriginal": "en",
+  "tituloPt": "Conferência I: Uma vela: ...",
+  "fontes": [ { "nome": "Project Gutenberg #14474 — traduzido automaticamente para o português (não revisado por pessoa)", "url": "...",
+                "licenca": "domínio público", "acessadoEm": "...", "adaptacao": "traduzido automaticamente para o português (não revisado por pessoa)" } ] }
+```
+- O português vai para `textoPt` (o campo que os clientes leem em pt-BR); `textoOriginal`, `idioma` (idioma do original), `titulo` e `secao` **não mudam** (`titulo`
+  alimenta a `chave` do índice; o título traduzido fica em `tituloPt`, só quando difere — no ChEBI o título já é o nome em português do Wikidata).
+- `fontes[].nome` ganha "traduzido automaticamente…" e `adaptacao` (a tradução é adaptação: o CC BY 4.0 do ChEBI exige indicar mudanças); `licenca` não muda.
+- O cliente mostra o aviso de tradução automática (`respostas.conceito.traducaoAutomatica`) quando `traducao` é `automatica`. O validador exige `textoPt`,
+  `traducaoModelo` e `idiomaOriginal` em todo trecho `automatica`. Contagens em `stats.json` → `traducoes.<fonte>` (`aplicadas`, `hashDivergente`, `semTraducao`).
 
 `textos/index.json` — **formato exato** (docs/I18N.md §4); `lotes` em ordem de `caminho`, `trechos` na ordem do arquivo:
 ```json
@@ -174,7 +194,16 @@ Esquema de cada trecho (igual ao de antes):
   PT, EN, ES, DE, FR); idioma sem linha para um código = chave ausente. Nenhuma frase é traduzida por máquina.
 
 ## 7. `constantes.json` (CODATA 2022, NIST, domínio público), `regras.json` e `fontes.json`
-- `regras.json`: prefixos SI, unidades, série de reatividade, solubilidade, nomenclatura básica — autoria própria com fontes — e a tabela `propriedades`:
+- `regras.json`: prefixos SI, unidades, série de reatividade, solubilidade, nomenclatura básica — autoria própria com fontes — e a tabela `propriedades`.
+  Tabelas de valores de referência (17/10/2026; cada uma com `fonte {nome, url (oldid), licenca}`, Wikipédia en CC BY-SA 4.0 citando a referência primária):
+  - `serieReatividadeMetais`: `{ ordem, nota, criterio: "E° (V, 25 °C) crescente", potenciais: [{simbolo, par, E0V}], fonte }` — a ordem é a do E° (Li, Cs, Rb, K, Ba,
+    Sr, Ca, Na, … H, Cu, Hg, Ag, Pt, Au); convenção termodinâmica, não cinética.
+  - `solubilidadeBases`: `[{ formula, kps?, kpsTemperaturaC?, solubilidadeMolL, solubilidadeGL, temperaturaC, nota, fonte }]` para Ca(OH)₂, Mg(OH)₂, Sr(OH)₂ e Ba(OH)₂
+    (aviso de saturação no pH; `solubilidadeMolL` tem precedência sobre o Kps).
+  - `agua`: `{ pKw: 14.00, temperaturaC: 25, pKw25CPreciso: 13.997, nota, pKwPorTemperatura: [{temperaturaC, pKw, referencia}] (0–50 °C), fonte }`.
+  - `solubilidade.regras[]` pode ter `nota` (ex.: fluoretos na regra dos haletos).
+
+  Tabela `propriedades`:
   ```json
   "propriedades": { "massaMolar": { "nome": "Massa molar", "unidade": "g/mol", "origem": "compostos.massaMolar", "escopo": "composto",
                                     "sinonimos": ["massa molar", "massa molecular", "peso molecular"],

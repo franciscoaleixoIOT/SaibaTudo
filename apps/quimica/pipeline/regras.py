@@ -6,6 +6,11 @@
 Autoria própria do projeto. Os fatos (definições de unidades e prefixos do SI, fatores exatos) seguem o SI Brochure do BIPM
 e o IUPAC Green Book; o texto das regras de ensino é nosso. Nenhum trecho de obra protegida foi copiado.
 Fatores: valor da unidade expresso na unidade base da grandeza (base = valor 1).
+
+Valores numéricos de referência (17/10/2026, revisão independente da onda 2): potenciais-padrão de redução (série de reatividade),
+solubilidade/Kps das bases pouco solúveis e pKw(T) vêm de páginas da Wikipédia em inglês (CC BY-SA 4.0), citadas com o link
+permanente (oldid) da revisão lida; cada página cita a referência primária (CRC Handbook — Vanýsek, "Electrochemical Series";
+Bandura & Lvov 2006, J. Phys. Chem. Ref. Data 35, 15; CRC Handbook 70ª ed.). Os números são fatos; nenhum texto foi copiado.
 """
 import quimica_util as Q
 from common import IDIOMAS
@@ -43,9 +48,25 @@ UNIDADES = {
         "nota": "K = a·x + b; °F: K = (x + 459,67)·5/9"},
 }
 
-# do mais para o menos reativo (ordem da série eletroquímica dos potenciais-padrão de redução)
-SERIE_REATIVIDADE = ["Li", "Rb", "K", "Cs", "Ba", "Sr", "Ca", "Na", "Mg", "Al", "Mn", "Zn", "Cr", "Fe", "Cd", "Co", "Ni", "Sn",
-                     "Pb", "H", "Cu", "Ag", "Hg", "Pt", "Au"]
+# Do mais para o menos reativo. CONVENÇÃO: ordem crescente do potencial-padrão de redução E° (25 °C, 1 mol/L) do par Mⁿ⁺/M
+# (termodinâmica em solução aquosa), como na série eletroquímica; por isso o Li (−3,04 V) vem antes do Cs, do Rb e do K, embora
+# K, Rb e Cs reajam mais depressa com a água (cinética; o Li tem a maior energia de hidratação). Hg vem antes de Ag
+# (Hg₂²⁺/Hg +0,7973 V < Ag⁺/Ag +0,7996 V), como na série clássica "… H, Cu, Hg, Ag, Pt, Au".
+# Fonte dos E°: Wikipedia, "Standard electrode potential (data page)", oldid 1377006472 (CC BY-SA 4.0), que cita Vanýsek,
+# "Electrochemical Series", CRC Handbook of Chemistry and Physics, 92ª/93ª ed. (2011/2012); Al de Lide (CRC 87ª ed.); Cr, Fe,
+# Na, Pb de Atkins (1997); Cu, Hg²⁺, Au de Bard, Parsons & Jordan (1985); Pt²⁺ de Bard & Faulkner (2001).
+URL_POTENCIAIS = "https://en.wikipedia.org/w/index.php?title=Standard_electrode_potential_(data_page)&oldid=1377006472"
+POTENCIAIS_PADRAO = [  # (símbolo, par, E° em V)
+    ("Li", "Li⁺/Li", -3.0401), ("Cs", "Cs⁺/Cs", -3.026), ("Rb", "Rb⁺/Rb", -2.98), ("K", "K⁺/K", -2.931), ("Ba", "Ba²⁺/Ba", -2.912),
+    ("Sr", "Sr²⁺/Sr", -2.899), ("Ca", "Ca²⁺/Ca", -2.868), ("Na", "Na⁺/Na", -2.71), ("Mg", "Mg²⁺/Mg", -2.372), ("Al", "Al³⁺/Al", -1.662),
+    ("Mn", "Mn²⁺/Mn", -1.185), ("Zn", "Zn²⁺/Zn", -0.7618), ("Cr", "Cr³⁺/Cr", -0.74), ("Fe", "Fe²⁺/Fe", -0.44), ("Cd", "Cd²⁺/Cd", -0.40),
+    ("Co", "Co²⁺/Co", -0.28), ("Ni", "Ni²⁺/Ni", -0.257), ("Sn", "Sn²⁺/Sn", -0.13), ("Pb", "Pb²⁺/Pb", -0.126), ("H", "2H⁺/H₂", 0.0),
+    ("Cu", "Cu²⁺/Cu", 0.337), ("Hg", "Hg₂²⁺/2Hg", 0.7973), ("Ag", "Ag⁺/Ag", 0.7996), ("Pt", "Pt²⁺/Pt", 1.188), ("Au", "Au³⁺/Au", 1.52),
+]
+SERIE_REATIVIDADE = [s for s, _, _ in POTENCIAIS_PADRAO]
+SERIE_NOTA = ("do mais reativo (cede elétrons com mais facilidade) ao menos reativo; o hidrogênio (H) é a referência. Um metal desloca "
+              "o cátion de outro que está depois dele. Ordem pelo potencial-padrão de redução E° (25 °C, solução aquosa 1 mol/L): é uma "
+              "ordem termodinâmica, por isso o lítio vem primeiro, embora potássio, rubídio e césio reajam mais depressa com a água.")
 
 SOLUBILIDADE = [
     {"id": "alcalinos-amonio", "regra": "Os sais de metais alcalinos (Li⁺, Na⁺, K⁺, Rb⁺, Cs⁺) e de amônio (NH₄⁺) são solúveis em água.",
@@ -53,10 +74,13 @@ SOLUBILIDADE = [
     {"id": "nitratos-acetatos", "regra": "Os nitratos (NO₃⁻), acetatos (CH₃COO⁻), cloratos (ClO₃⁻) e percloratos (ClO₄⁻) são solúveis.",
      "solubilidade": "soluvel", "ions": ["NO3-", "CH3COO-", "ClO3-", "ClO4-"], "excecoes": []},
     {"id": "haletos", "regra": "Cloretos, brometos e iodetos são solúveis, exceto os de Ag⁺, Pb²⁺ e Hg₂²⁺ (insolúveis ou pouco solúveis).",
-     "solubilidade": "soluvel", "ions": ["Cl-", "Br-", "I-"], "excecoes": ["Ag+", "Pb2+", "Hg2 2+"]},
-    {"id": "sulfatos", "regra": "Os sulfatos (SO₄²⁻) são solúveis, exceto os de Ba²⁺, Sr²⁺ e Pb²⁺ (insolúveis); os de Ca²⁺ e Ag⁺ são pouco solúveis.",
-     "solubilidade": "soluvel", "ions": ["SO4 2-"], "excecoes": ["Ba2+", "Sr2+", "Pb2+", "Ca2+", "Ag+"]},
-    {"id": "hidroxidos", "regra": "Os hidróxidos (OH⁻) são insolúveis, exceto os de metais alcalinos e de amônio; os de Ca²⁺, Sr²⁺ e Ba²⁺ são moderadamente solúveis.",
+     "solubilidade": "soluvel", "ions": ["Cl-", "Br-", "I-"], "excecoes": ["Ag+", "Pb2+", "Hg2 2+"],
+     "nota": "A regra não vale para os fluoretos (F⁻), que seguem o padrão inverso: AgF é solúvel, enquanto CaF₂, MgF₂, SrF₂, BaF₂ e "
+             "PbF₂ são pouco solúveis."},
+    {"id": "sulfatos", "regra": "Os sulfatos (SO₄²⁻) são solúveis, exceto os de Ba²⁺, Sr²⁺ e Pb²⁺ (insolúveis); os de Ca²⁺, Ag⁺ e Hg₂²⁺ são pouco solúveis.",
+     "solubilidade": "soluvel", "ions": ["SO4 2-"], "excecoes": ["Ba2+", "Sr2+", "Pb2+", "Ca2+", "Ag+", "Hg2 2+"]},
+    {"id": "hidroxidos", "regra": "Os hidróxidos (OH⁻) são insolúveis, exceto os de metais alcalinos e de amônio; entre os alcalinoterrosos, "
+                                  "Ba(OH)₂ é solúvel, Sr(OH)₂ é moderadamente solúvel e Ca(OH)₂ é pouco solúvel (Mg(OH)₂ é praticamente insolúvel).",
      "solubilidade": "insoluvel", "ions": ["OH-"], "excecoes": ["Li+", "Na+", "K+", "Rb+", "Cs+", "NH4+", "Ca2+", "Sr2+", "Ba2+"]},
     {"id": "carbonatos-fosfatos", "regra": "Carbonatos (CO₃²⁻), fosfatos (PO₄³⁻), sulfitos (SO₃²⁻), cromatos (CrO₄²⁻) e oxalatos (C₂O₄²⁻) são insolúveis, exceto os de metais alcalinos e de amônio.",
      "solubilidade": "insoluvel", "ions": ["CO3 2-", "PO4 3-", "SO3 2-", "CrO4 2-", "C2O4 2-"], "excecoes": ["Li+", "Na+", "K+", "Rb+", "Cs+", "NH4+"]},
@@ -77,7 +101,7 @@ BASES_FORTES = [
     {"formula": "LiOH", "nome": "Hidróxido de lítio"}, {"formula": "NaOH", "nome": "Hidróxido de sódio"},
     {"formula": "KOH", "nome": "Hidróxido de potássio"}, {"formula": "RbOH", "nome": "Hidróxido de rubídio"},
     {"formula": "CsOH", "nome": "Hidróxido de césio"}, {"formula": "Ca(OH)2", "nome": "Hidróxido de cálcio", "nota": "pouco solúvel; dissocia-se totalmente o que dissolve"},
-    {"formula": "Sr(OH)2", "nome": "Hidróxido de estrôncio"}, {"formula": "Ba(OH)2", "nome": "Hidróxido de bário"},
+    {"formula": "Sr(OH)2", "nome": "Hidróxido de estrôncio", "nota": "moderadamente solúvel"}, {"formula": "Ba(OH)2", "nome": "Hidróxido de bário"},
 ]
 
 NOMENCLATURA = {
@@ -102,10 +126,11 @@ NOMENCLATURA = {
     "sufixosOrganicos": [
         {"funcao": "alcano", "sufixo": "-ano"}, {"funcao": "alceno", "sufixo": "-eno"}, {"funcao": "alcino", "sufixo": "-ino"},
         {"funcao": "álcool", "sufixo": "-ol"}, {"funcao": "aldeído", "sufixo": "-al"}, {"funcao": "cetona", "sufixo": "-ona"},
-        {"funcao": "ácido carboxílico", "sufixo": "-óico", "nota": "ácido …óico"}, {"funcao": "amina", "sufixo": "-amina"},
+        {"funcao": "ácido carboxílico", "sufixo": "-oico", "nota": "ácido …oico (sem acento desde o Acordo Ortográfico de 1990)"}, {"funcao": "amina", "sufixo": "-amina"},
         {"funcao": "amida", "sufixo": "-amida"}, {"funcao": "éster", "sufixo": "-oato de …ila"}],
     "ions": [
-        {"formula": "H⁺", "nome": "hidrogênio (próton); em água, hidrônio H₃O⁺", "carga": 1},
+        {"formula": "H⁺", "nome": "hidrogênio (hidron; próton); em água, oxônio H₃O⁺", "carga": 1},
+        {"formula": "H₃O⁺", "nome": "oxônio (hidrônio, nome tradicional)", "carga": 1},
         {"formula": "Li⁺", "nome": "lítio", "carga": 1}, {"formula": "Na⁺", "nome": "sódio", "carga": 1},
         {"formula": "K⁺", "nome": "potássio", "carga": 1}, {"formula": "NH₄⁺", "nome": "amônio", "carga": 1},
         {"formula": "Ag⁺", "nome": "prata", "carga": 1}, {"formula": "Mg²⁺", "nome": "magnésio", "carga": 2},
@@ -115,6 +140,7 @@ NOMENCLATURA = {
         {"formula": "Fe³⁺", "nome": "ferro(III) (férrico)", "carga": 3}, {"formula": "Cu⁺", "nome": "cobre(I) (cuproso)", "carga": 1},
         {"formula": "Cu²⁺", "nome": "cobre(II) (cúprico)", "carga": 2}, {"formula": "Pb²⁺", "nome": "chumbo(II)", "carga": 2},
         {"formula": "Sn²⁺", "nome": "estanho(II) (estanoso)", "carga": 2}, {"formula": "Hg²⁺", "nome": "mercúrio(II)", "carga": 2},
+        {"formula": "Hg₂²⁺", "nome": "mercúrio(I) (dímero; mercuroso)", "carga": 2},
         {"formula": "F⁻", "nome": "fluoreto", "carga": -1}, {"formula": "Cl⁻", "nome": "cloreto", "carga": -1},
         {"formula": "Br⁻", "nome": "brometo", "carga": -1}, {"formula": "I⁻", "nome": "iodeto", "carga": -1},
         {"formula": "O²⁻", "nome": "óxido", "carga": -2}, {"formula": "S²⁻", "nome": "sulfeto", "carga": -2},
@@ -127,6 +153,50 @@ NOMENCLATURA = {
         {"formula": "CH₃COO⁻", "nome": "acetato", "carga": -1}, {"formula": "MnO₄⁻", "nome": "permanganato", "carga": -1},
         {"formula": "CrO₄²⁻", "nome": "cromato", "carga": -2}, {"formula": "Cr₂O₇²⁻", "nome": "dicromato", "carga": -2}],
 }
+
+def _fonte_wp(titulo, oldid, cita):
+    return {"nome": f"Wikipedia (en), \"{titulo}\" (revisão {oldid}); cita {cita}",
+            "url": f"https://en.wikipedia.org/w/index.php?title={titulo.replace(' ', '_')}&oldid={oldid}", "licenca": "CC BY-SA 4.0"}
+
+
+# Bases pouco solúveis (aviso de saturação no pH; o site lê em calc/contexto.js). `solubilidadeMolL` = solubilidade medida
+# convertida para mol por litro (g/L ÷ massa molar; "por 100 mL de água" ≈ por litro de solução diluída: aproximação de ensino);
+# `kps` quando a fonte o dá. O site usa `solubilidadeMolL` quando existe (senão a deriva do Kps).
+SOLUBILIDADE_BASES = [
+    {"formula": "Ca(OH)2", "kps": 5.02e-6, "solubilidadeMolL": round(1.73 / 74.093, 5), "temperaturaC": 20,
+     "solubilidadeGL": 1.73, "kpsTemperaturaC": 25,
+     "nota": "1,73 g/L a 20 °C; solubilidade retrógrada (diminui com a temperatura: 0,66 g/L a 100 °C). O Kps (25 °C) subestima a "
+             "solubilidade medida (atividade ≠ concentração).",
+     "fonte": _fonte_wp("Calcium hydroxide", 1379974348, "CRC Handbook of Chemistry and Physics")},
+    {"formula": "Mg(OH)2", "kps": 5.61e-12, "solubilidadeMolL": round(0.0064 / 58.3197, 7), "temperaturaC": 25,
+     "solubilidadeGL": 0.0064, "kpsTemperaturaC": 25, "nota": "0,00064 g/100 mL a 25 °C (praticamente insolúvel).",
+     "fonte": _fonte_wp("Magnesium hydroxide", 1380140030, "CRC Handbook of Chemistry and Physics")},
+    {"formula": "Sr(OH)2", "solubilidadeMolL": round(17.7 / 121.63, 4), "temperaturaC": 40, "solubilidadeGL": 17.7,
+     "nota": "1,77 g/100 mL a 40 °C (0,41 g/100 mL a 0 °C; 21,83 g/100 mL a 100 °C); a fonte não traz 25 °C. Como a solubilidade "
+             "cresce com a temperatura, acima deste valor a solução também está saturada a 25 °C (o aviso nunca é falso; pode faltar "
+             "entre o valor de 25 °C e este).",
+     "fonte": _fonte_wp("Solubility table", 1351761616, "Patnaik, Handbook of Inorganic Chemicals (2003)")},
+    {"formula": "Ba(OH)2", "solubilidadeMolL": round(46.8 / 153.326, 4), "temperaturaC": 25, "solubilidadeGL": round(46.8 / 153.326 * 171.34, 1),
+     "nota": "4,68 g de BaO por 100 mL de água a 25 °C (a fonte expressa em BaO), isto é, ≈ 0,305 mol/L de Ba(OH)₂: solúvel.",
+     "fonte": _fonte_wp("Barium hydroxide", 1380015778, "CRC Handbook of Chemistry and Physics")},
+]
+
+# Produto iônico da água. pKw a 25 °C = 13,997 (CRC, 70ª ed.; 13,99 em Bandura & Lvov 2006, IAPWS); o valor de ensino 14,00 é o
+# arredondamento a 25 °C e é o que os cálculos usam (`agua.pKw`). Tabela pKw(T) a 0,1 MPa: 0 °C de Bandura & Lvov (2006);
+# 10–50 °C do CRC Handbook 70ª ed. (1990), ambos pela mesma página da Wikipédia. 37 °C não está na fonte (fica fora da tabela).
+URL_PKW = "https://en.wikipedia.org/w/index.php?title=Self-ionization_of_water&oldid=1340047012"
+PKW_TABELA = [(0, 14.95, "Bandura & Lvov 2006"), (10, 14.535, "CRC 70ª ed."), (20, 14.167, "CRC 70ª ed."), (25, 13.997, "CRC 70ª ed."),
+              (30, 13.830, "CRC 70ª ed."), (40, 13.535, "CRC 70ª ed."), (50, 13.262, "CRC 70ª ed.")]
+AGUA = {
+    "pKw": 14.00, "temperaturaC": 25, "pKw25CPreciso": 13.997,
+    "nota": "pKw = 14,00 vale só a 25 °C (água pura, força iônica zero); o valor medido é 13,997. A outras temperaturas use a tabela "
+            "pKwPorTemperatura (ex.: 14,95 a 0 °C, neutralidade perto de pH 7,5; 13,26 a 50 °C, perto de pH 6,6).",
+    "pKwPorTemperatura": [{"temperaturaC": t, "pKw": v, "referencia": ref} for t, v, ref in PKW_TABELA],
+    "fonte": {"nome": "Wikipedia (en), \"Self-ionization of water\" (revisão 1340047012); cita Bandura & Lvov (2006), J. Phys. Chem. "
+                      "Ref. Data 35, 15–30, e o CRC Handbook of Chemistry and Physics, 70ª ed. (1990)",
+              "url": URL_PKW, "licenca": "CC BY-SA 4.0"},
+}
+
 
 # id -> {nome, unidade, origem, escopo, sinonimos}. `origem` = "<arquivo>.<campo>" do pacote.
 PROPRIEDADES = {
@@ -317,16 +387,27 @@ def montar(hoje=None, idiomas=None):
                 "fatos (definições do SI), citados", hoje),
         Q.fonte("IUPAC — Green Book, Quantities, Units and Symbols in Physical Chemistry (símbolos e unidades; fatos)",
                 "https://iupac.org/what-we-do/books/greenbook/", "fatos (símbolos e unidades), citados; texto não copiado", hoje),
+        Q.fonte("Wikipedia (en), \"Standard electrode potential (data page)\" (potenciais-padrão da série de reatividade; cita Vanýsek, "
+                "CRC Handbook)", URL_POTENCIAIS, "CC BY-SA 4.0", hoje),
+        *[Q.fonte(b["fonte"]["nome"] + f" — solubilidade de {b['formula']}", b["fonte"]["url"], b["fonte"]["licenca"], hoje)
+          for b in SOLUBILIDADE_BASES],
+        Q.fonte(AGUA["fonte"]["nome"] + " — pKw(T)", URL_PKW, "CC BY-SA 4.0", hoje),
     ]
     return {
         "versao": SCHEMA,
-        "descricao": "Regras e tabelas de apoio: prefixos SI, unidades e fatores, série de reatividade, solubilidade, ácidos e bases fortes, "
-                     "nomenclatura básica e propriedades suportadas. Autoria própria; fatos conforme BIPM/IUPAC.",
+        "descricao": "Regras e tabelas de apoio: prefixos SI, unidades e fatores, série de reatividade (com E°), solubilidade, solubilidade das "
+                     "bases pouco solúveis, pKw(T), ácidos e bases fortes, nomenclatura básica e propriedades suportadas. Autoria própria; "
+                     "fatos conforme BIPM/IUPAC e valores de referência citados (Wikipédia CC BY-SA 4.0, com a referência primária).",
         "prefixosSI": [{"nome": n, "simbolo": s, "expoente": e, "fator": float(f"1e{e}")} for n, s, e in PREFIXOS_SI],
         "unidades": UNIDADES,
-        "serieReatividadeMetais": {"ordem": SERIE_REATIVIDADE, "nota": "do mais reativo (cede elétrons com mais facilidade) ao menos "
-                                   "reativo; o hidrogênio (H) é a referência. Um metal desloca o cátion de outro que está depois dele."},
+        "serieReatividadeMetais": {"ordem": SERIE_REATIVIDADE, "nota": SERIE_NOTA, "criterio": "E° (V, 25 °C) crescente",
+                                   "potenciais": [{"simbolo": s, "par": par, "E0V": e} for s, par, e in POTENCIAIS_PADRAO],
+                                   "fonte": {"nome": "Wikipedia (en), \"Standard electrode potential (data page)\" (revisão 1377006472); cita "
+                                                     "Vanýsek, \"Electrochemical Series\", CRC Handbook of Chemistry and Physics",
+                                             "url": URL_POTENCIAIS, "licenca": "CC BY-SA 4.0"}},
         "solubilidade": {"regras": SOLUBILIDADE, "nota": SOLUBILIDADE_NOTA},
+        "solubilidadeBases": SOLUBILIDADE_BASES,
+        "agua": AGUA,
         "acidosFortes": ACIDOS_FORTES,
         "basesFortes": BASES_FORTES,
         "nomenclatura": NOMENCLATURA,

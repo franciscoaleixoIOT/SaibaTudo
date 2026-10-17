@@ -193,8 +193,8 @@
    "bar"
   ],
   [
-   "^torr$",
-   "mmHg"
+   "^torrs?$",
+   "Torr"
   ],
   [
    "^hours?$",

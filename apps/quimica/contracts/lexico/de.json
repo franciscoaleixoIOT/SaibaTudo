@@ -196,8 +196,8 @@
    "bar"
   ],
   [
-   "^torr$",
-   "mmHg"
+   "^torrs?$",
+   "Torr"
   ],
   [
    "^stunden?$",

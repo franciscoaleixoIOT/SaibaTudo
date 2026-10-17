@@ -15,6 +15,7 @@ Saída atômica: o pacote é montado em `<out>.novo`, validado e só então troc
 continua intacto). `stats.json` fica ao lado do manifesto mas fora do manifesto (muda a cada execução).
 """
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -48,6 +49,7 @@ from robots import Robots  # noqa: E402
 RAIZ = Path(__file__).resolve().parent.parent
 OUT_PADRAO = RAIZ / "data" / "quimica"
 TOPICOS_PADRAO = RAIZ / "dataset" / "topicos.json"
+TRADUCOES_PADRAO = Path(__file__).resolve().parent / "traducoes"  # <fonte>.jsonl de pipeline/traduzir_textos.py (DATA_CONTRACT §5.1)
 SCHEMA_VERSION = 1
 BASE_URL = "https://saibatudo.net/quimica/data/"
 LICENCAS_TEXTO_PERMITIDAS = {"CC BY-SA 4.0", "CC BY 4.0", "domínio público"}
@@ -76,7 +78,78 @@ DECISOES = [
     "idioma (CC BY-SA 4.0), escolhidos pelo item do Wikidata (sitelinks) — nunca tradução automática; frases H por idioma do Anexo III do CLP.",
     "Textos em lotes (textos/<fonte>/lote-NNN.json + textos/index.json) em vez de um arquivo por trecho (cota de upload da Vercel).",
     "APIs oficiais (PUG REST, WDQS, /w/api.php) são acessadas apesar do Disallow genérico do robots.txt, conforme robots.EXCECOES.",
+    "Tradução automática só dos textos em inglês sem versão em português (ChEBI, Faraday): pipeline/traducoes/<fonte>.jsonl, aplicada "
+    "pelo hash do textoOriginal (texto mudou = tradução ignorada); textoOriginal preservado, traducao: automatica, modelo e data registrados.",
 ]
+
+
+# ====================================================================================================== traduções
+NOTA_ADAPTACAO = "traduzido automaticamente para o português (não revisado por pessoa)"
+
+
+def _sha256_texto(txt):
+    return hashlib.sha256(txt.encode("utf-8")).hexdigest()
+
+
+def ler_traducoes(pasta, fonte):
+    """{id: registro} de `<pasta>/<fonte>.jsonl` (vazio se o arquivo não existe). Linhas inválidas são puladas."""
+    arq = Path(pasta) / f"{fonte}.jsonl"
+    if not arq.is_file():
+        return {}
+    out = {}
+    for linha in arq.read_text(encoding="utf-8").splitlines():
+        linha = linha.strip()
+        if not linha:
+            continue
+        try:
+            r = json.loads(linha)
+        except ValueError:
+            continue
+        if isinstance(r, dict) and r.get("id") and r.get("hash") and isinstance(r.get("texto"), str) and r["texto"].strip():
+            out[r["id"]] = r
+    return out
+
+
+def aplicar_traducoes(regs, fonte, pasta):
+    """Aplica as traduções de `<pasta>/<fonte>.jsonl` aos trechos com `traducao: "pendente"` (DATA_CONTRACT §5.1): quando o `hash`
+    (sha256 do `textoOriginal`) bate, `textoPt` recebe o texto em português, `traducao` vira "automatica" e ficam registrados
+    `traducaoModelo`, `traducaoData` e `idiomaOriginal`; `tituloPt` quando o título traduzido difere do original. O `textoOriginal`,
+    o `idioma` (idioma do original) e o `titulo` não mudam. Hash diferente = o texto mudou desde a tradução: ignora (fica pendente).
+    Devolve as contagens {aplicadas, hashDivergente, semTraducao}."""
+    trad = ler_traducoes(pasta, fonte) if pasta else {}
+    st = {"aplicadas": 0, "hashDivergente": 0, "semTraducao": 0}
+    if not trad:
+        st["semTraducao"] = sum(1 for r in regs if r.get("traducao") == "pendente")
+        return st
+    for r in regs:
+        if r.get("traducao") != "pendente" or not r.get("textoOriginal"):
+            continue
+        t = trad.get(r["id"])
+        if not t:
+            st["semTraducao"] += 1
+            continue
+        if t["hash"] != _sha256_texto(r["textoOriginal"]):
+            st["hashDivergente"] += 1
+            continue
+        r["textoPt"] = t["texto"].strip()
+        r["traducao"] = "automatica"
+        r["traducaoModelo"] = t.get("modelo") or "desconhecido"
+        if t.get("data"):
+            r["traducaoData"] = t["data"]
+        r["idiomaOriginal"] = t.get("idiomaOrigem") or r.get("idioma") or "en"
+        titulo = (t.get("titulo") or "").strip()
+        if titulo and titulo != r.get("titulo"):
+            r["tituloPt"] = titulo  # `titulo`/`secao` ficam no original: alimentam a `chave` do índice de textos
+        # atribuição: a tradução é uma adaptação do original (ChEBI CC BY 4.0 exige indicar mudanças); a licença não muda
+        r["fontes"] = [dict(f, nome=f"{f.get('nome', '')} — {NOTA_ADAPTACAO}", adaptacao=NOTA_ADAPTACAO) for f in (r.get("fontes") or [])]
+        st["aplicadas"] += 1
+    return st
+
+
+def env_ligado(nome, ambiente=None):
+    """Variável de ambiente booleana ("1", "true", "sim", "on", "yes" = ligada; vazia/ausente/qualquer outra = desligada)."""
+    v = (ambiente if ambiente is not None else os.environ).get(nome, "")
+    return str(v).strip().lower() in {"1", "true", "sim", "on", "yes"}
 
 
 # ====================================================================================================== escrita
@@ -172,7 +245,7 @@ def montar_ghs_frases(frases_h, compostos, hoje, info_clp, idiomas=None):
 
 
 # ====================================================================================================== manifesto
-def montar_manifest(out: Path, rels, fontes_usadas, contagens, hoje, agora, idiomas=None):
+def montar_manifest(out: Path, rels, fontes_usadas, contagens, hoje, agora, idiomas=None, ambiente=None):
     arquivos = {}
     for rel in sorted(set(rels)):
         p = out / rel
@@ -194,7 +267,10 @@ def montar_manifest(out: Path, rels, fontes_usadas, contagens, hoje, agora, idio
                       "português, CC BY-SA 4.0; ChEBI, CC BY 4.0; Faraday (Project Gutenberg #14474), domínio público; "
                       "frases H do Regulamento CLP (EUR-Lex), por idioma. Aplicativo independente.",
         "cliente": {"pollIntervalMinutes": 10080, "baseUrl": BASE_URL, "nlu": {"endpoint": "https://saibatudo.net/quimica/api/nlu"},
-                    "ask": {"enabled": False}, "melhoria": {"enabled": False}},
+                    # chaves de liga/desliga do cliente: variáveis do quimica-data-refresh.yml (vars.QUIMICA_ASK_ENABLED e
+                    # vars.QUIMICA_MELHORIA_ENABLED -> SAIBATUDO_ASK_ENABLED / SAIBATUDO_MELHORIA_ENABLED); ausentes = desligado
+                    "ask": {"enabled": env_ligado("SAIBATUDO_ASK_ENABLED", ambiente)},
+                    "melhoria": {"enabled": env_ligado("SAIBATUDO_MELHORIA_ENABLED", ambiente)}},
     }
     dump_json(out / "manifest.json", manifest, indent=2)
     return manifest
@@ -324,6 +400,8 @@ def validar(out: Path, previo=None, minimos=None):
                 erros.append(f"texto {t.get('id')}: OpenStax não pode entrar")
             if not 30 <= len(t.get("textoOriginal", "")) <= 1600 and not str(t.get("id", "")).startswith("chebi-"):
                 erros.append(f"texto {t.get('id')}: tamanho fora do esperado ({len(t.get('textoOriginal', ''))})")
+            if t.get("traducao") == "automatica" and not (t.get("textoPt") and t.get("traducaoModelo") and t.get("idiomaOriginal")):
+                erros.append(f"texto {t.get('id')}: tradução automática sem textoPt/traducaoModelo/idiomaOriginal")
     if n_textos < mn["textos"]:
         erros.append(f"textos insuficientes: {n_textos}")
     if INDEX_TEXTOS in m["files"]:  # o índice tem de descrever exatamente os lotes do manifesto
@@ -528,7 +606,11 @@ def construir(opts, log=print):
                 rels += escrever_lotes(novo, "wikibooks-pt", regs, "pt-BR", indice_textos)
                 fontes_usadas.add("wikibooks-pt")
             n_textos["wikibooks-pt"] = len(regs)
+        # opts sem `traducoes` (testes que montam opts à mão) = nenhuma tradução; a linha de comando usa pipeline/traducoes por padrão
+        pasta_trad = None if getattr(opts, "sem_traducoes", False) else getattr(opts, "traducoes", None)
+        stats["traducoes"] = {}
         regs = registros_chebi(compostos, hoje)
+        stats["traducoes"]["chebi"] = aplicar_traducoes(regs, "chebi", pasta_trad)
         if regs:
             rels += escrever_lotes(novo, "chebi", regs, "en", indice_textos)
         n_textos["chebi"] = len(regs)
@@ -538,6 +620,9 @@ def construir(opts, log=print):
             return coleta_textos.coletar_gutenberg(html, hoje, nomes_en)
         regs, st = tentar(stats, "faraday", faraday, log, vazio=([], {}))
         stats["familias"]["faraday"].update(st)
+        stats["traducoes"][coleta_textos.FONTE_GUTENBERG_DIR] = aplicar_traducoes(regs, coleta_textos.FONTE_GUTENBERG_DIR, pasta_trad)
+        if any(st_["aplicadas"] for st_ in stats["traducoes"].values()):
+            log(f"  traduções aplicadas: {stats['traducoes']}")
         if regs:
             rels += escrever_lotes(novo, coleta_textos.FONTE_GUTENBERG_DIR, regs, "en", indice_textos)
             fontes_usadas.add("gutenberg-14474")
@@ -561,6 +646,7 @@ def construir(opts, log=print):
         stats["contagens"]["textosPorFonte"] = n_textos
         indice_textos["lotes"].sort(key=lambda l: l["caminho"])
         rels.append(escrever_json(novo, INDEX_TEXTOS, indice_textos))
+        fontes_usadas.add("wikipedia-en-dados")  # valores de referência de regras.json (E°, bases pouco solúveis, pKw)
         textos_por_idioma = {}
         for lote in indice_textos["lotes"]:
             textos_por_idioma[lote["idioma"]] = textos_por_idioma.get(lote["idioma"], 0) + len(lote["trechos"])
@@ -636,6 +722,9 @@ def main(argv=None):
     ap.add_argument("--sem-textos-idiomas", action="store_true",
                     help="não coleta a Wikipédia em en/es/de/fr (nomes, GHS e rótulos por idioma continuam)")
     ap.add_argument("--topicos", default=str(TOPICOS_PADRAO))
+    ap.add_argument("--traducoes", default=str(TRADUCOES_PADRAO),
+                    help="pasta com <fonte>.jsonl de traduções automáticas (pipeline/traduzir_textos.py); padrão: %(default)s")
+    ap.add_argument("--sem-traducoes", action="store_true", help="não aplica as traduções automáticas (textos em inglês ficam pendentes)")
     ap.add_argument("--gutenberg-zip", help="zip local do HTML do Gutenberg #14474 (reserva se a web falhar)")
     ap.add_argument("--hoje", help="data de acesso AAAA-MM-DD (padrão: hoje, UTC)")
     a = ap.parse_args(argv)
