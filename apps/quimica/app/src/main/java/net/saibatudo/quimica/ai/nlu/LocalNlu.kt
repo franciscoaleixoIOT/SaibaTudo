@@ -227,6 +227,10 @@ object LocalNlu {
             }
             return fim(Intent.PROPRIEDADE)
         }
+        // "o que é um sal?": a classe (CONCEITO), não a ficha do composto do apelido; o composto fica em p.composto como sugestão de ficha.
+        // "ponto de fusão do sal", "massa molar do sal", "o sal é perigoso?" continuam no composto (regras acima).
+        val classe = if (cue && tem) classeGenerica(compostos, p, n, d, lex) else null
+        if (classe != null) return fim(Intent.CONCEITO) { it.copy(conceito = classe) }
         if (tem) {
             // "e do ferro?" / "and gold?" depois de uma pergunta de propriedade
             if (pista("continuacao") && n.split(' ').size <= 5 && contexto?.propriedade != null && contexto.intent == Intent.PROPRIEDADE) {
@@ -278,6 +282,18 @@ object LocalNlu {
             s = t
         }
         return s
+    }
+
+    /**
+     * "o que é um sal?" / "what is sugar?": a pergunta é só o gatilho de conceito + UM nome de classe de compostos que o pacote também usa como
+     * apelido de um composto (sal → NaCl, açúcar → sacarose). Devolve o tema (a chave casada) ou null. Espelho de `classeGenerica` do site.
+     */
+    private fun classeGenerica(compostos: List<Achado>, p: ParsedQuery, n: String, d: Dicionario, lex: Lexico): String? {
+        if (compostos.size != 1 || p.elementos.isNotEmpty() || p.formulas.isNotEmpty()) return null
+        val c = compostos[0]
+        val chave = c.chave ?: return null
+        if (c.via != "nome" || !d.ehClasseDeCompostos(chave)) return null
+        return if (temaDoConceito(n, lex) == chave) chave else null
     }
 
     /** Composto citado logo depois de uma quantidade ("16 g de metano"): é a substância à qual a quantidade se refere. */

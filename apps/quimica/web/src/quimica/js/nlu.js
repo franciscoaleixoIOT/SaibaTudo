@@ -156,6 +156,32 @@ function limparConceito(n, lex) {
 }
 
 /**
+ * Tema "limpo" (como `LocalNlu.temaDoConceito` do Android): repete gatilho + limpeza do léxico, aparando, até estabilizar ("o que e um sal" → "sal").
+ * O ParsedQuery guarda `limparConceito` (contrato com o Android); este só decide a regra da classe genérica.
+ */
+export function temaDoConceito(conceito, lex = lexico()) {
+  let s = normalizar(conceito).trim();
+  for (let k = 0; k < 4; k++) {
+    let t = s.replace(lex.intencoes.conceitoCue, '').trim();
+    for (const rx of lex.pistas.limparConceito) t = t.replace(rx, '').trim();
+    if (t === s || !t) return t || s;
+    s = t;
+  }
+  return s;
+}
+
+/**
+ * "o que é um sal?" / "what is sugar?": a pergunta é só o gatilho de conceito + UM nome de classe de compostos que o pacote também usa como
+ * apelido de um composto (sal → NaCl, açúcar → sacarose). Devolve o tema (a chave casada) ou null. O composto fica no ParsedQuery como sugestão.
+ */
+function classeGenerica(compostos, p, n, dic, lex) {
+  if (compostos.length !== 1 || p.elementos.length || p.formulas.length || typeof dic.ehClasseDeCompostos !== 'function') return null;
+  const c = compostos[0];
+  if (c.via !== 'nome' || !c.chave || !dic.ehClasseDeCompostos(c.chave)) return null;
+  return temaDoConceito(n, lex) === c.chave ? c.chave : null;
+}
+
+/**
  * @param {string} pergunta
  * @param {import('./dicionario.js').Dicionario} dic
  * @param {object|null} [contexto] ParsedQuery da última pergunta resolvida (para "e o ponto de ebulição?")
@@ -307,6 +333,10 @@ export function parse(pergunta, dic, contexto = null, lex = dic?.lex ?? lexico()
     }
     return fim('PROPRIEDADE');
   }
+  // "o que é um sal?": a classe (CONCEITO), não a ficha do composto do apelido; o composto fica em p.composto como sugestão de ficha.
+  // "ponto de fusão do sal", "massa molar do sal", "o sal é perigoso?" continuam no composto (regras acima).
+  const classe = cue && tem ? classeGenerica(compostos, p, n, dic, lex) : null;
+  if (classe) return fim('CONCEITO', { conceito: classe });
   if (tem && (p.compostos.length || p.elementos.length || p.formulas.length)) {
     // "e do ferro?" / "and gold?" depois de uma pergunta de propriedade
     if (P.continuacao.test(n) && n.split(' ').length <= 5 && contexto?.propriedade && contexto.intent === 'PROPRIEDADE') {

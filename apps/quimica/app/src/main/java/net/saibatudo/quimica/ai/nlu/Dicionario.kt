@@ -22,7 +22,9 @@ data class Achado(
     val cid: Long? = null,
     val nome: String? = null,
     /** Fórmula na grafia normalizada (para tipo FORMULA e para composto achado por fórmula). */
-    val texto: String? = null
+    val texto: String? = null,
+    /** Nome normalizado que casou (composto achado por nome): decide se é um apelido genérico de classe ("sal" → NaCl). */
+    val chave: String? = null
 ) {
     enum class Tipo { ELEMENTO, COMPOSTO, FORMULA }
 }
@@ -185,6 +187,14 @@ class Dicionario private constructor(
     /** A pergunta fala em "elemento"/"símbolo" (no idioma)? Então um símbolo de uma letra ("O", "C") vale como elemento. */
     fun cueElemento(texto: String) = lexico.pista("cueElemento").containsMatchIn(Texto.nlu(texto))
 
+    /** Uma palavra só (normalizada) que nomeia uma CLASSE de compostos: tema de conceito do léxico do idioma ou de [CLASSES_DE_COMPOSTOS]. */
+    fun ehClasseDeCompostos(palavra: String): Boolean {
+        val k = Texto.nlu(palavra)
+        if (k.isEmpty() || ' ' in k) return false
+        if (k in CLASSES_DE_COMPOSTOS) return true
+        return lexico.intencao("conceitoTemas").find(k)?.value == k
+    }
+
     fun entidades(original: String): Entidades {
         val texto = original
         val n = Texto.nlu(texto)
@@ -214,7 +224,7 @@ class Dicionario private constructor(
         }
 
         // 2) nomes de compostos (mais longos primeiro) e de elementos
-        for ((chave, cid) in nomesComposto) procurar(chave) { i -> achados += Achado(Achado.Tipo.COMPOSTO, "nome", i / tamN, cid = cid, nome = nomesPorCid[cid]) }
+        for ((chave, cid) in nomesComposto) procurar(chave) { i -> achados += Achado(Achado.Tipo.COMPOSTO, "nome", i / tamN, cid = cid, nome = nomesPorCid[cid], chave = chave) }
         for ((chave, simbolo) in nomesElemento) procurar(chave) { i -> achados += Achado(Achado.Tipo.ELEMENTO, "nome", i / tamN, simbolo = simbolo, nome = nomeDoElemento(simbolo)) }
 
         // 3) fórmulas e símbolos digitados (na caixa original)
@@ -302,6 +312,8 @@ class Dicionario private constructor(
                 val frase = janela.joinToString(" ")
                 i++
                 if (frase.length < 5 || janela.all { it in lexico.palavrasFuncionais }) continue
+                // uma palavra que já é o nome de uma classe ("açúcar", "álcool") não é erro de digitação ("acucar" ≈ "acular", marca do cetorolaco)
+                if (tam == 1 && ehClasseDeCompostos(frase)) continue
                 // frases com mais de uma palavra só aproximam com 1 edição (evita "ácido fraco" → "ácido úrico")
                 val lim = if (frase.length >= 10 && tam == 1) 2 else 1
                 for ((chave, simbolo) in nomesElemento) {
@@ -415,6 +427,16 @@ class Dicionario private constructor(
 
     /** Categoria de elemento citada (halogênios, gases nobres…): a primeira que casar, como no site. */
     companion object {
+        /**
+         * Substantivos de CLASSE de compostos (normalizados, dos cinco idiomas) além dos temas de conceito do léxico (`conceitoTemas`): o pacote usa
+         * alguns como apelido de UM composto ("sal" → NaCl, "açúcar" → sacarose, "álcool" → etanol), mas "o que é um sal?" pergunta pela classe.
+         * Mesma lista de `CLASSES_DE_COMPOSTOS` em web/src/quimica/js/dicionario.js.
+         */
+        val CLASSES_DE_COMPOSTOS: Set<String> = setOf(
+            "sal", "salt", "sel", "salz", "acucar", "sugar", "azucar", "sucre", "zucker", "acido", "acid", "acide", "saure", "base",
+            "oxido", "oxide", "oxyde", "oxid", "alcool", "alcohol", "alkohol"
+        )
+
         fun chaveFormula(texto: String): String = FormulaQuimica.normalizarEntrada(texto).replace("^", "").lowercase()
 
         /** Tokens do texto original separados por espaço, sem pontuação final (preserva parênteses internos). */

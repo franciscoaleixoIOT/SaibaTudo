@@ -25,6 +25,14 @@ export function tokensOriginais(texto) {
  *  apelido en do 1,4-diclorobenzeno no Wikidata) nunca vira nome de composto, senão qualquer pergunta com "para" acha o composto. */
 const PALAVRAS_FUNCIONAIS = new Set(Object.values(LEXICOS_BRUTOS).flatMap((l) => [...(l.stopPalavras ?? []), ...(l.palavrasFuncionais ?? [])]).map(normalizar));
 
+/** Substantivos de CLASSE de compostos (normalizados, dos cinco idiomas) além dos temas de conceito do léxico (`conceitoTemas`, que já traz
+ *  sal/salt/sel/Salz, ácido, base, óxido): o pacote usa alguns como apelido de UM composto ("sal" → NaCl, "açúcar" → sacarose, "álcool" →
+ *  etanol), mas "o que é um sal?" pergunta pela classe. Mesma lista em Dicionario.kt. (Candidata a ir para o léxico, em `conceitoTemas`.) */
+export const CLASSES_DE_COMPOSTOS = new Set([
+  'sal', 'salt', 'sel', 'salz', 'acucar', 'sugar', 'azucar', 'sucre', 'zucker', 'acido', 'acid', 'acide', 'saure', 'base',
+  'oxido', 'oxide', 'oxyde', 'oxid', 'alcool', 'alcohol', 'alkohol'
+]);
+
 export class Dicionario {
   /**
    * @param {import('./data.js').DataStore} store
@@ -152,7 +160,7 @@ export class Dicionario {
 
     // 2) nomes de compostos (mais longos primeiro) e de elementos
     for (const { chave, cid } of this.nomesComposto) {
-      procurar(chave, (i) => achados.push({ tipo: 'composto', cid, nome: this.nomeDaEntrada(cid), via: 'nome', pos: i / Math.max(n.length, 1) }));
+      procurar(chave, (i) => achados.push({ tipo: 'composto', cid, nome: this.nomeDaEntrada(cid), via: 'nome', chave, pos: i / Math.max(n.length, 1) }));
     }
     for (const { chave, simbolo } of this.nomesElemento) {
       procurar(chave, (i) => achados.push({ tipo: 'elemento', simbolo, nome: this.nomeDoElemento(simbolo), via: 'nome', pos: i / Math.max(n.length, 1) }));
@@ -234,6 +242,15 @@ export class Dicionario {
 
   cueElemento(texto) { return this.lex.pistas.cueElemento.test(normalizar(texto)); }
 
+  /** Uma palavra só (normalizada) que nomeia uma CLASSE de compostos: tema de conceito do léxico do idioma ou de [CLASSES_DE_COMPOSTOS]. */
+  ehClasseDeCompostos(palavra) {
+    const k = normalizar(palavra);
+    if (!k || k.includes(' ')) return false;
+    if (CLASSES_DE_COMPOSTOS.has(k)) return true;
+    const m = this.lex.intencoes.conceitoTemas.exec(k);
+    return !!m && m[0] === k;
+  }
+
   /** Erro de digitação em nomes (distância de edição 1 ou 2): "oxigenio" → "oxigênio", "acido sulfuico". */
   aproximar(n) {
     const palavras = n.split(' ').filter(Boolean);
@@ -243,6 +260,8 @@ export class Dicionario {
       for (let i = 0; i + tam <= palavras.length; i++) {
         const frase = palavras.slice(i, i + tam).join(' ');
         if (frase.length < 5 || palavras.slice(i, i + tam).every((p) => funcionais.has(p))) continue;
+        // uma palavra que já é o nome de uma classe ("açúcar", "álcool") não é erro de digitação ("acucar" ≈ "acular", marca do cetorolaco)
+        if (tam === 1 && this.ehClasseDeCompostos(frase)) continue;
         // frases com mais de uma palavra só aproximam com 1 edição (evita "ácido fraco" → "ácido úrico")
         const lim = frase.length >= 10 && tam === 1 ? 2 : 1;
         const cand = [
