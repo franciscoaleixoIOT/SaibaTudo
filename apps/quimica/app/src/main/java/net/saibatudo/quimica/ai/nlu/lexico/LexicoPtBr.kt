@@ -711,7 +711,9 @@ internal object LexicoPtBr {
         "constante de dissociacao acida",
         "constante de ionizacao do acido",
         "constante de dissociacao do acido",
-        "ka"
+        "ka de",
+        "ka do",
+        "ka da"
     )
 
     private fun n_propriedades(): Map<String, Any?> = linkedMapOf<String, Any?>(

@@ -544,3 +544,34 @@ def parse_lista(texto=LISTA_FIXA_TXT):
             item["popular"] = partes[3]
         itens.append(item)
     return itens
+
+
+# ------------------------------------------------------------------------------------------------ apelidos por idioma (autoria própria)
+# Nomes de uso corrente que o Wikidata não traz (ou traz só em alguns idiomas): "sal" é o cloreto de sódio em pt/fr como já é em es/de/en,
+# "Salzsäure" é o ácido clorídrico em de, "eau de Javel" o hipoclorito em fr… São fatos de vocabulário, não texto criativo (docs/I18N.md §8).
+# Chave = CID do PubChem. Como o CID não é digitado na lista fixa acima, cada entrada leva a fórmula convencional e o build só aplica os
+# apelidos se a composição bate com a fórmula Hill do PubChem (`coleta_compostos.apelidos_manuais`): CID trocado por engano não vira nome errado.
+# `apelidos[idioma]` entra NA FRENTE dos apelidos do Wikidata (o teto é de 10 por idioma) e, em pt-BR, também em `sinonimos`. O matcher do
+# cliente prefere o nome MAIS LONGO, então "sal de Epsom" (sulfato de magnésio) e "sal amoníaco" (cloreto de amônio) não viram "sal".
+APELIDOS_POR_IDIOMA = {
+    5234: {"nome": "Cloreto de sódio", "formula": "NaCl", "apelidos": {
+        "pt-BR": ["sal", "sal de mesa", "sal comum"],
+        "en": ["table salt", "salt"],
+        "es": ["sal de mesa", "sal común", "sal de cocina", "sal"],
+        "de": ["Kochsalz", "Speisesalz", "Tafelsalz", "Salz"],
+        "fr": ["sel de table", "sel de cuisine", "sel"]}},
+    313: {"nome": "Ácido clorídrico", "formula": "HCl", "apelidos": {
+        "pt-BR": ["ácido muriático"], "es": ["ácido clorhídrico"], "de": ["Salzsäure"], "fr": ["acide chlorhydrique"]}},
+    14798: {"nome": "Hidróxido de sódio", "formula": "NaOH", "apelidos": {"es": ["sosa cáustica"], "de": ["Natronlauge"]}},
+    176: {"nome": "Ácido acético", "formula": "CH3COOH", "apelidos": {"de": ["Essig"]}},
+    5988: {"nome": "Sacarose", "formula": "C12H22O11", "apelidos": {
+        "pt-BR": ["açúcar"], "en": ["sugar"], "es": ["azúcar"], "de": ["Zucker", "Haushaltszucker", "Kristallzucker"], "fr": ["sucre"]}},
+    23665760: {"nome": "Hipoclorito de sódio", "formula": "NaClO", "apelidos": {"fr": ["eau de Javel", "Javel"]}},
+    5793: {"nome": "Glicose", "formula": "C6H12O6", "apelidos": {
+        "pt-BR": ["glucose"], "en": ["glucose", "dextrose"], "es": ["glucosa", "dextrosa"],
+        "de": ["Glukose", "Glucose", "Traubenzucker", "Dextrose"], "fr": ["glucose", "dextrose"]}},
+    24083: {"nome": "Sulfato de magnésio", "formula": "MgSO4", "apelidos": {
+        "pt-BR": ["sal de Epsom", "sal inglês"], "es": ["sal de Epsom", "sal inglesa"], "de": ["Bittersalz", "Epsomsalz"], "fr": ["sel d'Epsom"]}},
+    25517: {"nome": "Cloreto de amônio", "formula": "NH4Cl", "apelidos": {
+        "pt-BR": ["sal amoníaco"], "es": ["sal amoníaco"], "de": ["Salmiak", "Salmiaksalz"], "fr": ["sel ammoniac"]}},
+}

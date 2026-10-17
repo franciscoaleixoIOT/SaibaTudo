@@ -33,6 +33,7 @@ import re
 from decimal import Decimal, InvalidOperation
 
 import quimica_util as Q
+import regras
 import wikidata as W
 
 LOTE = 100
@@ -463,8 +464,10 @@ def escolher(declaracoes, hoje, stats=None, exigir_referencia=None, acido_forte=
     est = estado_a_298(props.get("pontoFusaoK"), props.get("pontoEbulicaoK"))
     if est:
         props["estadoPadrao"] = est
-        fontes["estadoPadrao"] = {"nome": "derivado (SaibaTudo Química)", "licenca": "CC0",
-                                  "metodo": "pontoFusaoK e pontoEbulicaoK do pacote comparados com 298,15 K (1 atm)",
+        fontes["estadoPadrao"] = {"nome": regras.NOME_FONTE_DERIVADA_PT, "licenca": "CC0",
+                                  "metodo": regras.METODO_ESTADO_PADRAO_PT,
+                                  "nomePorIdioma": dict(regras.NOME_FONTE_DERIVADA_I18N),
+                                  "metodoPorIdioma": dict(regras.METODO_ESTADO_PADRAO_I18N),
                                   "acessadoEm": hoje}
     return props, fontes, alternativas
 
@@ -484,7 +487,6 @@ def estado_a_298(fusao_k, ebulicao_k, margem=2):
 # ------------------------------------------------------------------------------------------------ etapa do build
 def _acidos_fortes():
     try:
-        import regras
         return {Q.sem_subscritos(a["formula"]) for a in regras.ACIDOS_FORTES}
     except Exception:  # noqa: BLE001
         return set()

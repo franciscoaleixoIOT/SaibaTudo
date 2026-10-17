@@ -511,6 +511,29 @@ export default {
   "tpsa": [
    "tpsa",
    "polar surface area"
+  ],
+  "solubilidade": [
+   "solubility",
+   "water solubility",
+   "solubility in water",
+   "soluble in water",
+   "insoluble in water",
+   "soluble",
+   "insoluble",
+   "how much dissolves",
+   "how much will dissolve",
+   "does it dissolve",
+   "dissolves in water",
+   "dissolve in water"
+  ],
+  "pka": [
+   "pka",
+   "acid dissociation constant",
+   "acidity constant",
+   "acid ionization constant",
+   "acid ionisation constant",
+   "acid constant",
+   "ka of"
   ]
  },
  "rotulosPropriedadeNormalizados": true,
@@ -711,7 +734,8 @@ export default {
   "NO",
   "US",
   "WHO",
-  "FAQ"
+  "FAQ",
+  "SAL"
  ],
  "seguranca": {
   "acao": [

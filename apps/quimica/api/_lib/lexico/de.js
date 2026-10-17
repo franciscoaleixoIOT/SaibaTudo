@@ -523,6 +523,30 @@ export default {
   "tpsa": [
    "tpsa",
    "polare oberflache"
+  ],
+  "solubilidade": [
+   "loslichkeit",
+   "wasserloslichkeit",
+   "loslichkeit in wasser",
+   "wasserloslich",
+   "loslich in wasser",
+   "unloslich in wasser",
+   "loslich",
+   "unloslich",
+   "wie viel lost sich",
+   "lost sich in wasser",
+   "lost sich"
+  ],
+  "pka": [
+   "pka",
+   "pks",
+   "pka-wert",
+   "pka wert",
+   "pks-wert",
+   "pks wert",
+   "saurekonstante",
+   "sauredissoziationskonstante",
+   "aciditatskonstante"
   ]
  },
  "rotulosPropriedadeNormalizados": true,
@@ -730,7 +754,8 @@ export default {
   "CIP",
   "OH",
   "NO",
-  "WO"
+  "WO",
+  "SAL"
  ],
  "seguranca": {
   "acao": [

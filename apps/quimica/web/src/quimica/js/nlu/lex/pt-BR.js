@@ -10,7 +10,7 @@ export default {
   "fontes": "\\b(?:quais (?:sao )?as (?:fontes|licencas)|licencas? dos dados|qual (?:e )?a fonte|fontes? (?:das? )?(?:informac\\w+|respostas?)|de onde (?:tirou|vem) (?:essa|esta|a) (?:informacao|resposta)|referencias?)\\b",
   "balancear": "\\bbalanc\\w*|\\bequilibr\\w+ (?:a |uma )?equacao\\b|\\bacert\\w+ (?:os )?coeficientes\\b",
   "conversao": "\\b(?:convert\\w+|converta|transform\\w+|passar|passe|equivale\\w*|quantos? \\S+(?: \\S+)? (?:tem|ha|sao|equivalem|existem|correspondem)|quantas? \\S+(?: \\S+)? (?:tem|ha|sao|equivalem|existem|correspondem)|em quantos?)\\b",
-  "ph": "\\b(?:ph|poh)\\b|\\bacidez de\\b|\\bbasicidade\\b",
+  "ph": "\\b(?:ph|poh)\\b|(?<!constante de )\\bacidez de\\b|\\bbasicidade\\b",
   "gas": "\\b(?:gas(?:es)? ideais?|gas ideal|pv ?= ?nrt|pvnrt|lei dos gases|equacao (?:de clapeyron|dos gases|geral dos gases)|clapeyron|volume (?:molar|de um gas|de gas)|pressao (?:de um gas|do gas)|lei de boyle|lei de charles|gay lussac)\\b",
   "gasVariavel": "\\bgas(?:es)?\\b",
   "concentracao": "\\b(?:molaridade|concentracao|concentrad[ao]|diluic\\w*|diluir|dilua|diluido|c1 ?v1|c1v1|titulo (?:em massa|da solucao)|percentual (?:em )?massa|porcentagem em massa|partes por milhao|ppm|normalidade|molalidade|solucao de|gramas por litro|mol l|mol por litro|g l)\\b",
@@ -495,6 +495,34 @@ export default {
   "tpsa": [
    "tpsa",
    "area de superficie polar"
+  ],
+  "solubilidade": [
+   "solubilidade",
+   "solubilidade em agua",
+   "solubilidade na agua",
+   "coeficiente de solubilidade",
+   "soluvel em agua",
+   "soluvel na agua",
+   "insoluvel em agua",
+   "insoluvel na agua",
+   "soluvel",
+   "insoluvel",
+   "quanto dissolve",
+   "quanto se dissolve",
+   "se dissolve",
+   "dissolve em agua",
+   "dissolve na agua"
+  ],
+  "pka": [
+   "pka",
+   "constante de acidez",
+   "constante de ionizacao acida",
+   "constante de dissociacao acida",
+   "constante de ionizacao do acido",
+   "constante de dissociacao do acido",
+   "ka de",
+   "ka do",
+   "ka da"
   ]
  },
  "rotulosPropriedadeNormalizados": true,
@@ -661,7 +689,8 @@ export default {
   "PIS",
   "SP",
   "CIP",
-  "OH"
+  "OH",
+  "SAL"
  ],
  "seguranca": {
   "acao": [

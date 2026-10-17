@@ -10,7 +10,7 @@ export default {
   "fontes": "\\b(?:quelles (?:sont )?(?:les )?(?:sources|licences)|quelle licence|sous quelle licence|licences? des donnees|quelle est la source|sources? (?:de (?:l |la |cette )?)?(?:information|reponses?)|d ou (?:vient|sort|provient) (?:cette|la) (?:information|reponse)|references?|bibliographie)\\b",
   "balancear": "\\bequilibr\\w*|\\bajust\\w+ (?:l |une |cette )?equation\\b|\\bajust\\w+ (?:les )?coefficients\\b|\\bbalanc\\w*",
   "conversao": "\\b(?:convert\\w+|convertis|transform\\w+|passer|passe|equivau\\w+|equival\\w+|combien (?:de |d )?\\S+(?: \\S+)? (?:y a[- ]t[- ]il|il y a|font|valent|dans|correspondent|font[- ]ils)|en combien)\\b",
-  "ph": "\\b(?:ph|poh)\\b|\\bacidite de\\b|\\bbasicite\\b|\\balcalinite\\b",
+  "ph": "\\b(?:ph|poh)\\b|(?<!constante d )\\bacidite de\\b|\\bbasicite\\b|\\balcalinite\\b",
   "gas": "\\b(?:gaz parfaits?|gaz ideal|gaz ideaux|pv ?= ?nrt|pvnrt|loi des gaz|equation (?:de clapeyron|des gaz parfaits|d etat)|clapeyron|volume (?:molaire|d un gaz|du gaz)|pression (?:d un gaz|du gaz)|loi de boyle|loi de mariotte|boyle mariotte|loi de charles|gay lussac)\\b",
   "gasVariavel": "\\bgaz\\b",
   "concentracao": "\\b(?:molarite|concentration|concentre\\w*|dilu\\w*|c1 ?v1|c1v1|fraction massique|titre massique|pourcentage (?:en |de )?masse|pourcentage massique|pour ?cent (?:en |de )?masse|pour ?cent massique|parties par million|ppm|normalite|molalite|solution de|grammes? par litre|mol l|mol par litre|moles par litre|g l)\\b",
@@ -519,6 +519,28 @@ export default {
    "tpsa",
    "surface polaire",
    "aire de surface polaire"
+  ],
+  "solubilidade": [
+   "solubilite",
+   "solubilite dans l eau",
+   "soluble dans l eau",
+   "insoluble dans l eau",
+   "soluble",
+   "insoluble",
+   "combien se dissout",
+   "se dissout dans l eau",
+   "se dissout",
+   "dissout dans l eau"
+  ],
+  "pka": [
+   "pka",
+   "constante d acidite",
+   "constante d ionisation acide",
+   "constante de dissociation acide",
+   "constante de dissociation de l acide",
+   "ka de",
+   "ka du",
+   "ka de l"
   ]
  },
  "rotulosPropriedadeNormalizados": true,
@@ -753,7 +775,8 @@ export default {
   "SP",
   "CIP",
   "OH",
-  "NON"
+  "NON",
+  "SAL"
  ],
  "seguranca": {
   "acao": [

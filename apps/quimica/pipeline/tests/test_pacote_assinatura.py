@@ -276,7 +276,8 @@ class RegrasEFontesTest(unittest.TestCase):
         self.assertIn("NaOH", [b["formula"] for b in r["basesFortes"]])
         for pid, p in r["propriedades"].items():
             base = {"nome", "unidade", "origem", "escopo", "sinonimos", "rotulos", "sinonimosPorIdioma"}
-            self.assertTrue(base <= set(p) <= base | {"origens", "escopos", "unidades", "nota", "escala"}, pid)
+            self.assertTrue(base <= set(p) <= base | {"origens", "escopos", "unidades", "nota", "notaPorIdioma", "escala"}, pid)
+            self.assertEqual("nota" in p, "notaPorIdioma" in p, pid)  # `nota` (pt-BR) e `notaPorIdioma` andam juntas
             if "origens" in p:
                 self.assertIn(p["origem"], p["origens"], pid)
             self.assertEqual(p["rotulos"]["pt-BR"], p["nome"])

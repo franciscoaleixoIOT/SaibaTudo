@@ -712,7 +712,8 @@ internal object LexicoEs {
         "constante de disociacion acida",
         "constante de ionizacion del acido",
         "constante de disociacion del acido",
-        "ka"
+        "ka de",
+        "ka del"
     )
 
     private fun n_propriedades(): Map<String, Any?> = linkedMapOf<String, Any?>(

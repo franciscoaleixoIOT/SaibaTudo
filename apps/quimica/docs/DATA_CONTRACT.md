@@ -68,7 +68,9 @@ Nome em PT: do Wikidata (rótulo `pt`/`pt-br`) quando existir; senão o nome IUP
                    "referencia": "Basic Laboratory and Industrial Chemicals: A CRC Quick Reference Handbook (Q22236188)",
                    "valorOriginal": -114.1, "unidadeOriginal": "°C" },
   "pontoEbulicaoK": { "...": "...", "condicoes": { "pressaoPa": 101325 } },
-  "estadoPadrao": { "nome": "derivado (SaibaTudo Química)", "licenca": "CC0", "metodo": "pontoFusaoK e pontoEbulicaoK do pacote comparados com 298,15 K (1 atm)", "acessadoEm": "2026-10-16" } }
+  "estadoPadrao": { "nome": "derivado (SaibaTudo Química)", "licenca": "CC0", "metodo": "pontoFusaoK e pontoEbulicaoK do pacote comparados com 298,15 K (1 atm)", "acessadoEm": "2026-10-16",
+                    "nomePorIdioma": { "pt-BR": "derivado (SaibaTudo Química)", "en": "derived (SaibaTudo Química)", "...": "..." },
+                    "metodoPorIdioma": { "pt-BR": "pontoFusaoK e pontoEbulicaoK do pacote comparados com 298,15 K (1 atm)", "en": "pontoFusaoK and pontoEbulicaoK from the package compared with 298.15 K (1 atm)", "...": "..." } } }
 ```
 | Campo | Unidade | Wikidata | Observação |
 | :-- | :-- | :-- | :-- |
@@ -85,6 +87,14 @@ Nome em PT: do Wikidata (rótulo `pt`/`pt-br`) quando existir; senão o nome IUP
   `referencia` (o que a declaração cita: "afirmado em" e/ou URL), `valorOriginal`/`unidadeOriginal` (como está no Wikidata), `condicoes` (`temperaturaK`,
   `pressaoPa`, `fase`) e, raramente, `semReferencia: true` + `corroboradoPor: n` (duas ou mais declarações sem referência que concordam, quando nenhuma tem).
   Campo medido sem origem é erro de validação; origem que diga "computed" do PubChem também.
+- **Textos das origens e das notas por idioma (17/10/2026).** Os textos de origem que eram só em português ganham a forma por idioma que o contrato já usa em
+  `rotulos`, `sinonimosPorIdioma` e `textoPorIdioma`: um objeto `{ "pt-BR": …, "en": …, "es": …, "de": …, "fr": … }` ao lado do campo antigo, que **continua**
+  em português (clientes antigos ignoram o novo; `pt-BR` do objeto = o campo antigo). Campos: `avisoPorIdioma` (em `aviso`, afinidade eletrônica a revisar),
+  `notaPorIdioma` (em `nota`, escala de Pauling), `nomePorIdioma` e `metodoPorIdioma` (em `nome`/`metodo` da origem `derivado (SaibaTudo Química)` do `estadoPadrao`) em
+  `elementos[].fontesPorPropriedade[campo]` e `compostos[].fontesPorPropriedade.estadoPadrao`, e `notaPorIdioma` em `regras.propriedades[id]` (ao lado de `nota`;
+  só nos idiomas pedidos ao build, pt-BR sempre). O cliente deve preferir `…PorIdioma[idioma]` e, sem ele, cair para o campo antigo (pt-BR) — a leitura nos clientes é uma pendência deles. Tradução de agente com o glossário de
+  `I18N.md` §8 (`propriedadesRevisao: pendente`): números iguais (só o separador decimal muda), nomes de campo, "PubChem", "Wikidata", "NIST ASD" e "SaibaTudo Química" ficam.
+  Fonte das tabelas: `pipeline/regras.py` (`AVISO_AFINIDADE_I18N`, `NOTA_ELETRONEGATIVIDADE_I18N`, `NOME_FONTE_DERIVADA_I18N`, `METODO_ESTADO_PADRAO_I18N`, `NOTAS_PROPRIEDADES_I18N`).
 - Ids em `regras.propriedades`: `pontoFusaoK`, `pontoEbulicaoK`, `densidadeKgm3` e `estadoPadrao` ganharam `origens` (elemento **e** composto) e
   `escopos: ["elemento", "composto"]` (`origem`/`escopo` antigos ficam iguais); novos `solubilidade` (as duas origens, com `unidades` por origem) e `pka`,
   os mesmos ids do vocabulário do modelo (`nlu_core.PROPRIEDADES`, `api/_lib/vocab.js`). Os clientes antigos ignoram os campos novos (o Android lê só os
@@ -97,6 +107,10 @@ Nome em PT: do Wikidata (rótulo `pt`/`pt-br`) quando existir; senão o nome IUP
 - `sinonimosPorIdioma` (opcional): `{ idioma: [até 10] }` — apelidos (`skos:altLabel`) do item no idioma (`pt-BR` = pt + pt-br; `en` também recebe os sinônimos em
   inglês do ChEBI), sem repetir o nome, sem CAS, códigos de banco nem a **fórmula do próprio composto** (nem com subscritos). Idioma sem apelido = chave ausente.
   `sinonimos` (pt + en misturados, até 10) continua por compatibilidade. `nomeIupac` (inglês) e `nomePopular` (pt-BR) ficam.
+  **Apelidos de autoria própria (17/10/2026):** nomes de uso corrente que o Wikidata não traz ("sal"/"sal de mesa" em pt-BR, "sel de table" em fr, "Salzsäure",
+  "Natronlauge", "Essig", "Zucker" em de, "eau de Javel" em fr, glicose em es/de/fr…) vêm de `pipeline/lista_fixa.APELIDOS_POR_IDIOMA` (por CID, com a fórmula
+  conferida contra a fórmula Hill do PubChem no build), entram **na frente** dos apelidos do Wikidata em `sinonimosPorIdioma[idioma]` (o teto de 10 nunca os corta)
+  e, em pt-BR, também em `sinonimos`. O formato do registro não muda. Nomes mais longos vencem no cliente ("sal de Epsom" não vira "sal").
 - `compostos/index.json`: `{ "porCid": { "2244": "lote-001" }, "nomes": [["aspirina", 2244], ...], "nomesPorIdioma": { "en": [["aspirin", 2244], ...], "es": [...],
   "de": [...], "fr": [...] }, "lotes": ["lote-001", ...] }`. `nomes` = chaves normalizadas (minúsculas, sem acento) de nome, popular, IUPAC, sinônimos e fórmulas.
   `nomesPorIdioma[idioma]` = chaves de `nomes[idioma]` + `sinonimosPorIdioma[idioma]` **que ainda não estão em `nomes`** (deduplicado para o índice não dobrar de
@@ -214,7 +228,8 @@ trecho com `traducao: "pendente"` **só quando o hash bate** (texto mudou = trad
   "propriedadesRevisao": { "pt-BR": "humana", "en": "pendente", "es": "pendente", "de": "pendente", "fr": "pendente" }
   ```
   `nome` e `sinonimos` (pt-BR) continuam; `rotulos[idioma]` e `sinonimosPorIdioma[idioma]` trazem os termos fixos de química do glossário (I18N §8) nos idiomas do
-  build (`pt-BR` sempre = `nome`/`sinonimos`). As traduções são de agente, marcadas `pendente` em `propriedadesRevisao` até revisão humana. `nomenclatura` segue só em
+  build (`pt-BR` sempre = `nome`/`sinonimos`). Onde a propriedade tem `nota`, `notaPorIdioma` traz o texto nos mesmos idiomas (ver §3.1); `nota` continua em pt-BR.
+  As traduções são de agente, marcadas `pendente` em `propriedadesRevisao` até revisão humana. `nomenclatura` segue só em
   português (pendência).
 - `fontes.json`: `{ "fontes": [...] }`, **uma entrada por fonte e idioma** (`wikipedia-pt`, `wikipedia-en`, `wikipedia-es`, `wikipedia-de`, `wikipedia-fr`, `wikibooks-pt`,
   `chebi`, `gutenberg-14474`…), cada fonte de texto com `idioma` (código do projeto) além de `nome`, `mantenedor`, `url`, `licenca`, `uso`, `acessadoEm`, `atribuicao` e a lista

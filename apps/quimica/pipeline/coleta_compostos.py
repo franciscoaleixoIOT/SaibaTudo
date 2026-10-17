@@ -12,6 +12,8 @@ Fontes por campo (política de docs/FONTES_E_LICENCAS.md §5):
   títulos de artigo por idioma (sitelinks) para a coleta da Wikipédia. Composto sem item no Wikidata (ou sem rótulo no idioma)
   fica sem `nomes[idioma]` — o cliente cai para `nomeIupac`/`nome` e rotula; `nomes["pt-BR"]` só quando há nome em português de verdade.
 - ChEBI (CC BY 4.0): `definicaoChebi` (texto em inglês) e nomes alternativos.
+- Apelidos de autoria própria (`lista_fixa.APELIDOS_POR_IDIOMA`, por CID e conferidos pela fórmula): nomes de uso corrente que o Wikidata não
+  traz ("sal" em pt/fr, "Salzsäure", "eau de Javel"…); entram na frente dos apelidos do Wikidata em `sinonimosPorIdioma` (e em `sinonimos` no pt-BR).
 - ICSC: nada é copiado; cada composto com CAS recebe `icscBuscaUrl` (link de busca por CAS no site da OIT, em português).
 """
 import json
@@ -20,6 +22,7 @@ from pathlib import Path
 
 import coleta_chebi
 import coleta_icsc
+import lista_fixa
 import pubchem as P
 import quimica_util as Q
 import wikidata as W
@@ -225,13 +228,24 @@ def montar_sinonimos(exclui, *listas, maximo=10, formula=None):
 
 
 # ------------------------------------------------------------------------------------------------ montagem
-def nomes_por_idioma(c, ent, idiomas, sinonimos_chebi=(), formula=None):
+def apelidos_manuais(cid, formula_pubchem):
+    """`{idioma: [apelidos]}` de `lista_fixa.APELIDOS_POR_IDIOMA` para o CID, ou `{}` se não há entrada ou se a fórmula declarada não
+    tem a composição da fórmula Hill do PubChem (CID trocado por engano nunca vira apelido errado)."""
+    reg = lista_fixa.APELIDOS_POR_IDIOMA.get(cid)
+    if not reg or not formula_pubchem or not Q.hill_igual(reg["formula"], formula_pubchem):
+        return {}
+    return reg["apelidos"]
+
+
+def nomes_por_idioma(c, ent, idiomas, sinonimos_chebi=(), formula=None, manuais=None):
     """`nomes` e `sinonimosPorIdioma` do composto a partir da entidade do Wikidata (`ent` = saída de wikidata.entidades).
 
     pt-BR: `nome` (só quando não é pendente) e apelidos pt/pt-br; en/es/de/fr: rótulo e apelidos do item (en também recebe os
     sinônimos do ChEBI). Sem rótulo no idioma, a chave fica ausente (nunca se copia o IUPAC para `nomes.en`: o cliente faz isso
-    e rotula). Até 10 sinônimos por idioma, sem fórmulas, CAS ou códigos (sinonimo_valido), sem repetir o nome."""
+    e rotula). Até 10 sinônimos por idioma, sem fórmulas, CAS ou códigos (sinonimo_valido), sem repetir o nome.
+    `manuais` (de `apelidos_manuais`) entra na frente dos apelidos do Wikidata: o teto de 10 nunca os corta."""
     ent = ent or {}
+    manuais = manuais or {}
     rot, ape = ent.get("rotulos") or {}, ent.get("apelidos") or {}
     nomes, sin = {}, {}
     excl_base = [c.get("nome"), c.get("nomePopular"), c.get("nomeIupac")]
@@ -242,7 +256,7 @@ def nomes_por_idioma(c, ent, idiomas, sinonimos_chebi=(), formula=None):
         elif rot.get(idioma):
             nomes[idioma] = rot[idioma]
         extras = list(sinonimos_chebi) if idioma == "en" else []
-        lista = montar_sinonimos(excl_base + [nomes.get(idioma)], ape.get(idioma, []), extras, formula=formula)
+        lista = montar_sinonimos(excl_base + [nomes.get(idioma)], manuais.get(idioma, []), ape.get(idioma, []), extras, formula=formula)
         if lista:
             sin[idioma] = lista
     return nomes, sin
@@ -274,12 +288,14 @@ def montar(sel, props, wd, ghs, chebi, hoje, pesos=None, sinonimos_pubchem=None,
     if iupac:
         c["nomeIupac"] = iupac
     excl = [c["nome"], c.get("nomePopular"), iupac]
-    sin = montar_sinonimos(excl, wd.get("apt", []), [Q.capitalizar(x) for x in (wd.get("pbr", []) + wd.get("ppt", []))
+    manuais = apelidos_manuais(cid, p["MolecularFormula"])
+    sin = montar_sinonimos(excl, manuais.get("pt-BR", []), wd.get("apt", []), [Q.capitalizar(x) for x in (wd.get("pbr", []) + wd.get("ppt", []))
                                                       if Q.norm(x) != Q.norm(c["nome"])],
                            ([en] if en else []), wd.get("aen", []), (chebi or {}).get("sinonimos", []), formula=p["MolecularFormula"])
     if sin:
         c["sinonimos"] = sin
-    nomes, sin_idioma = nomes_por_idioma(c, ent, idiomas or IDIOMAS, (chebi or {}).get("sinonimos", []), formula=p["MolecularFormula"])
+    nomes, sin_idioma = nomes_por_idioma(c, ent, idiomas or IDIOMAS, (chebi or {}).get("sinonimos", []), formula=p["MolecularFormula"],
+                                         manuais=manuais)
     if nomes:
         c["nomes"] = nomes
     if sin_idioma:

@@ -724,7 +724,7 @@ internal object LexicoEn {
         "acid ionization constant",
         "acid ionisation constant",
         "acid constant",
-        "ka"
+        "ka of"
     )
 
     private fun n_propriedades(): Map<String, Any?> = linkedMapOf<String, Any?>(

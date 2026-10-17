@@ -729,7 +729,9 @@ internal object LexicoFr {
         "constante d ionisation acide",
         "constante de dissociation acide",
         "constante de dissociation de l acide",
-        "ka"
+        "ka de",
+        "ka du",
+        "ka de l"
     )
 
     private fun n_propriedades(): Map<String, Any?> = linkedMapOf<String, Any?>(

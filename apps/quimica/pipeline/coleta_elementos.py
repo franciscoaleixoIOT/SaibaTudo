@@ -20,6 +20,7 @@ import re
 from decimal import Decimal
 
 import quimica_util as Q
+import regras
 import wikidata as W
 from common import IDIOMAS
 
@@ -49,10 +50,9 @@ LIMITE_TROCA = 0.05  # diferença maior que 5 % contra o PubChem não é atualiz
 KJ_MOL = "Q752197"
 # afinidade eletrônica do PubChem que difere das tabelas atuais (conferência com os livros de referência, 11/10/2026)
 AFINIDADE_DESATUALIZADA = {"B", "F", "Al", "Fe", "Ga", "Ge", "Rb", "Nb", "Sn", "Sb", "La", "Ce", "Tl", "Pb", "Fr"}
-AVISO_AFINIDADE = ("valor do PubChem possivelmente desatualizado (difere das tabelas atuais; conferência de 11/10/2026); "
-                   "o Wikidata não tem a propriedade")
-NOTA_ELETRONEGATIVIDADE = ("escala de Pauling com os valores revisados (Allred, 1961), como no PubChem; livros que usam os valores "
-                           "originais de Pauling diferem (ex.: W 1,7 × 2,36; Pb 1,8 × 2,33)")
+# textos em pt-BR (campos `aviso` e `nota`, compatibilidade) e por idioma (`avisoPorIdioma`, `notaPorIdioma`): tabelas em regras.py
+AVISO_AFINIDADE = regras.AVISO_AFINIDADE_PT
+NOTA_ELETRONEGATIVIDADE = regras.NOTA_ELETRONEGATIVIDADE_PT
 
 CONSULTA_IONIZACAO = """
 SELECT ?z ?sym ?item ?st ?rank ?amt ?unit (GROUP_CONCAT(DISTINCT ?ord; separator="|") AS ?ords)
@@ -261,12 +261,14 @@ def marcar_origens_pubchem(e, hoje):
         f = Q.fonte("PubChem Periodic Table", URL_PUBCHEM_PAGINA, LICENCA_PUBCHEM, hoje)
         if e["simbolo"] in AFINIDADE_DESATUALIZADA:
             f["aviso"] = AVISO_AFINIDADE
+            f["avisoPorIdioma"] = dict(regras.AVISO_AFINIDADE_I18N)
             f["revisar"] = True
         fpp["afinidadeEletronicaKJmol"] = f
     if "eletronegatividade" in e:
         f = Q.fonte("PubChem Periodic Table", URL_PUBCHEM_PAGINA, LICENCA_PUBCHEM, hoje)
         f["escala"] = "Pauling"
         f["nota"] = NOTA_ELETRONEGATIVIDADE
+        f["notaPorIdioma"] = dict(regras.NOTA_ELETRONEGATIVIDADE_I18N)
         fpp["eletronegatividade"] = f
     if "energiaIonizacaoKJmol" in e and "energiaIonizacaoKJmol" not in fpp:
         fpp["energiaIonizacaoKJmol"] = Q.fonte("PubChem Periodic Table", URL_PUBCHEM_PAGINA, LICENCA_PUBCHEM, hoje)

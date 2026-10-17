@@ -269,6 +269,80 @@ PROPRIEDADES_EXTRA = {
 }
 
 
+# Textos do pacote que antes só existiam em português (17/10/2026): `regras.propriedades[id].notaPorIdioma`,
+# `elementos[].fontesPorPropriedade[campo].avisoPorIdioma`/`notaPorIdioma` e, nos compostos, `fontesPorPropriedade.estadoPadrao.nomePorIdioma`/
+# `metodoPorIdioma`. O campo antigo (`nota`, `aviso`, `nome`, `metodo`) continua em português por compatibilidade. Mesma forma de
+# `rotulos`/`sinonimosPorIdioma`: `{ "pt-BR": ..., "en": ..., "es": ..., "de": ..., "fr": ... }`, com `pt-BR` igual ao campo antigo.
+# Traduções de agente com o glossário de docs/I18N.md §8 (marcadas `pendente` em `propriedadesRevisao`); os números são os mesmos, só o separador
+# decimal muda por idioma; nomes de campo (`pontoFusaoK`, `fontesPorPropriedade`…), "PubChem", "Wikidata", "NIST ASD" e "SaibaTudo Química" não se traduzem.
+AVISO_AFINIDADE_PT = ("valor do PubChem possivelmente desatualizado (difere das tabelas atuais; conferência de 11/10/2026); "
+                      "o Wikidata não tem a propriedade")
+NOTA_ELETRONEGATIVIDADE_PT = ("escala de Pauling com os valores revisados (Allred, 1961), como no PubChem; livros que usam os valores "
+                              "originais de Pauling diferem (ex.: W 1,7 × 2,36; Pb 1,8 × 2,33)")
+NOME_FONTE_DERIVADA_PT = "derivado (SaibaTudo Química)"
+METODO_ESTADO_PADRAO_PT = "pontoFusaoK e pontoEbulicaoK do pacote comparados com 298,15 K (1 atm)"
+
+AVISO_AFINIDADE_I18N = {
+    "pt-BR": AVISO_AFINIDADE_PT,
+    "en": "PubChem value possibly outdated (differs from current tables; checked on 11 Oct 2026); Wikidata does not have this property",
+    "es": "valor de PubChem posiblemente desactualizado (difiere de las tablas actuales; comprobado el 11/10/2026); Wikidata no tiene la propiedad",
+    "de": "PubChem-Wert möglicherweise veraltet (weicht von aktuellen Tabellen ab; geprüft am 11.10.2026); Wikidata hat diese Eigenschaft nicht",
+    "fr": "valeur de PubChem peut-être périmée (diffère des tableaux actuels ; vérifiée le 11/10/2026) ; Wikidata n'a pas cette propriété",
+}
+NOTA_ELETRONEGATIVIDADE_I18N = {
+    "pt-BR": NOTA_ELETRONEGATIVIDADE_PT,
+    "en": "Pauling scale with the revised values (Allred, 1961), as in PubChem; books that use Pauling's original values differ (e.g. W 1.7 × 2.36; Pb 1.8 × 2.33)",
+    "es": "escala de Pauling con los valores revisados (Allred, 1961), como en PubChem; los libros que usan los valores originales de Pauling difieren (p. ej., W 1,7 × 2,36; Pb 1,8 × 2,33)",
+    "de": "Pauling-Skala mit den revidierten Werten (Allred, 1961), wie in PubChem; Lehrbücher mit den ursprünglichen Pauling-Werten weichen ab (z. B. W 1,7 × 2,36; Pb 1,8 × 2,33)",
+    "fr": "échelle de Pauling avec les valeurs révisées (Allred, 1961), comme dans PubChem ; les manuels qui utilisent les valeurs originales de Pauling diffèrent (p. ex. W 1,7 × 2,36 ; Pb 1,8 × 2,33)",
+}
+NOME_FONTE_DERIVADA_I18N = {
+    "pt-BR": NOME_FONTE_DERIVADA_PT, "en": "derived (SaibaTudo Química)", "es": "derivado (SaibaTudo Química)",
+    "de": "abgeleitet (SaibaTudo Química)", "fr": "dérivé (SaibaTudo Química)",
+}
+METODO_ESTADO_PADRAO_I18N = {
+    "pt-BR": METODO_ESTADO_PADRAO_PT,
+    "en": "pontoFusaoK and pontoEbulicaoK from the package compared with 298.15 K (1 atm)",
+    "es": "pontoFusaoK y pontoEbulicaoK del paquete comparados con 298,15 K (1 atm)",
+    "de": "pontoFusaoK und pontoEbulicaoK des Pakets, verglichen mit 298,15 K (1 atm)",
+    "fr": "pontoFusaoK et pontoEbulicaoK du jeu de données comparés à 298,15 K (1 atm)",
+}
+
+# `regras.propriedades[id].nota` por idioma (id -> {idioma: texto}); o pt-BR é a própria `nota` de PROPRIEDADES_EXTRA.
+NOTAS_PROPRIEDADES_I18N = {
+    "eletronegatividade": {
+        "en": "Pauling scale, with the revised values (Allred, 1961) as in PubChem; books that use Pauling's original values differ for some elements (e.g. W 1.7 × 2.36; Pb 1.8 × 2.33).",
+        "es": "Escala de Pauling, con los valores revisados (Allred, 1961) como en PubChem; los libros que usan los valores originales de Pauling difieren en algunos elementos (p. ej., W 1,7 × 2,36; Pb 1,8 × 2,33).",
+        "de": "Pauling-Skala mit den revidierten Werten (Allred, 1961) wie in PubChem; Lehrbücher mit den ursprünglichen Pauling-Werten weichen bei einigen Elementen ab (z. B. W 1,7 × 2,36; Pb 1,8 × 2,33).",
+        "fr": "Échelle de Pauling, avec les valeurs révisées (Allred, 1961) comme dans PubChem ; les manuels qui utilisent les valeurs originales de Pauling diffèrent pour certains éléments (p. ex. W 1,7 × 2,36 ; Pb 1,8 × 2,33)."},
+    "energiaIonizacaoKJmol": {
+        "en": "First ionization energy of the neutral gas-phase atom (NIST ASD value via Wikidata when available; otherwise PubChem). The origin of each value is in elementos[].fontesPorPropriedade.",
+        "es": "Primera energía de ionización del átomo neutro en fase gaseosa (valor del NIST ASD vía Wikidata cuando existe; si no, PubChem). El origen de cada valor está en elementos[].fontesPorPropriedade.",
+        "de": "Erste Ionisierungsenergie des neutralen Atoms in der Gasphase (NIST-ASD-Wert über Wikidata, wenn vorhanden; sonst PubChem). Die Herkunft jedes Werts steht in elementos[].fontesPorPropriedade.",
+        "fr": "Première énergie d'ionisation de l'atome neutre en phase gazeuse (valeur du NIST ASD via Wikidata quand elle existe ; sinon PubChem). L'origine de chaque valeur figure dans elementos[].fontesPorPropriedade."},
+    "afinidadeEletronicaKJmol": {
+        "en": "From PubChem (Wikidata does not have this property). Some values differ from current tables and carry a warning in elementos[].fontesPorPropriedade.",
+        "es": "De PubChem (Wikidata no tiene la propiedad). Algunos valores difieren de las tablas actuales y llevan un aviso en elementos[].fontesPorPropriedade.",
+        "de": "Aus PubChem (Wikidata hat diese Eigenschaft nicht). Einige Werte weichen von aktuellen Tabellen ab und tragen einen Hinweis in elementos[].fontesPorPropriedade.",
+        "fr": "De PubChem (Wikidata n'a pas cette propriété). Certaines valeurs diffèrent des tableaux actuels et portent un avertissement dans elementos[].fontesPorPropriedade."},
+    "estadoPadrao": {
+        "en": "For compounds, derived at 298.15 K and 1 atm from the melting and boiling points in the package.",
+        "es": "En los compuestos, derivado a 298,15 K y 1 atm de los puntos de fusión y de ebullición del paquete.",
+        "de": "Bei Verbindungen bei 298,15 K und 1 atm aus Schmelz- und Siedepunkt des Pakets abgeleitet.",
+        "fr": "Pour les composés, dérivé à 298,15 K et 1 atm du point de fusion et du point d'ébullition du jeu de données."},
+    "solubilidade": {
+        "en": "Solubility in water (solvent as declared in Wikidata), at the temperature given in fontesPorPropriedade.condicoes.",
+        "es": "Solubilidad en agua (disolvente declarado en Wikidata), a la temperatura indicada en fontesPorPropriedade.condicoes.",
+        "de": "Löslichkeit in Wasser (in Wikidata angegebenes Lösungsmittel) bei der Temperatur aus fontesPorPropriedade.condicoes.",
+        "fr": "Solubilité dans l'eau (solvant déclaré dans Wikidata), à la température indiquée dans fontesPorPropriedade.condicoes."},
+    "pka": {
+        "en": "Lowest recorded pKa (first dissociation); `pkaValores` has all of them when there is more than one. For bases, Wikidata usually records the pKa of the conjugate acid. Strong acids have no pKa.",
+        "es": "Menor pKa registrado (primera disociación); `pkaValores` trae todos cuando hay más de uno. Para las bases, Wikidata suele registrar el pKa del ácido conjugado. Los ácidos fuertes no tienen pKa.",
+        "de": "Kleinster erfasster pKs-Wert (erste Dissoziation); `pkaValores` enthält alle Werte, wenn es mehrere gibt. Für Basen erfasst Wikidata meist den pKs-Wert der konjugierten Säure. Starke Säuren haben keinen pKs-Wert.",
+        "fr": "Plus petit pKa enregistré (première dissociation) ; `pkaValores` les contient tous quand il y en a plusieurs. Pour les bases, Wikidata enregistre en général le pKa de l'acide conjugué. Les acides forts n'ont pas de pKa."},
+}
+
+
 # Rótulos e sinônimos das propriedades em en/es/de/fr (docs/I18N.md §8: termos fixos de química, não são texto criativo; a
 # tradução inicial é de agente e fica marcada "revisao": "pendente" em `propriedades.revisao`). pt-BR vem de PROPRIEDADES.
 # id -> {idioma: (rótulo, [sinônimos])}
@@ -363,8 +437,9 @@ PROPRIEDADES_I18N = {
 
 
 def propriedades(idiomas=None):
-    """Tabela `propriedades` do regras.json: campos de sempre (nome, unidade, origem, escopo, sinonimos — pt-BR) mais `rotulos`
-    e `sinonimosPorIdioma` ({idioma: ...}) para os idiomas pedidos (pt-BR sempre). Quem não tem tradução fica sem a chave."""
+    """Tabela `propriedades` do regras.json: campos de sempre (nome, unidade, origem, escopo, sinonimos — pt-BR) mais `rotulos`,
+    `sinonimosPorIdioma` e, onde há `nota`, `notaPorIdioma` ({idioma: ...}) para os idiomas pedidos (pt-BR sempre). Quem não tem
+    tradução fica sem a chave."""
     idiomas = [i for i in IDIOMAS if i in (idiomas or IDIOMAS) or i == "pt-BR"]
     out = {}
     for pid, (nome, un, orig, esc, sin) in PROPRIEDADES.items():
@@ -373,8 +448,12 @@ def propriedades(idiomas=None):
             tr = PROPRIEDADES_I18N.get(pid, {}).get(idioma)
             if tr:
                 rot[idioma], sin_i[idioma] = tr[0], list(tr[1])
+        extra = PROPRIEDADES_EXTRA.get(pid, {})
         out[pid] = {"nome": nome, "unidade": un, "origem": orig, "escopo": esc, "sinonimos": sin, "rotulos": rot, "sinonimosPorIdioma": sin_i,
-                    **PROPRIEDADES_EXTRA.get(pid, {})}
+                    **extra}
+        if "nota" in extra:  # `nota` (pt-BR) fica; as outras línguas vão em `notaPorIdioma`, como `rotulos` e `sinonimosPorIdioma`
+            out[pid]["notaPorIdioma"] = {"pt-BR": extra["nota"], **{i: NOTAS_PROPRIEDADES_I18N[pid][i] for i in idiomas
+                                                                    if i != "pt-BR" and i in NOTAS_PROPRIEDADES_I18N.get(pid, {})}}
     return out
 
 

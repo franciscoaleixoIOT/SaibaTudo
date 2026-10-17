@@ -10,7 +10,7 @@ export default {
   "fontes": "\\b(?:cuales son las (?:fuentes|licencias)|que (?:fuentes|licencias)|licencias? (?:tienen|usan|tiene|usa) los datos|con que licencias?|licencias? de los datos|cual es la fuente|fuentes? (?:de (?:la )?)?(?:informacion|respuestas?)|de donde (?:sacaste|viene|sale) (?:esa|esta|la) (?:informacion|respuesta)|referencias?)\\b",
   "balancear": "\\bbalance\\w*|\\bajust\\w+ (?:la |una )?ecuacion\\b|\\bigual\\w+ (?:la |una )?ecuacion\\b|\\bajust\\w+ (?:los )?coeficientes\\b|\\bequilibr\\w+ (?:la |una )?ecuacion\\b",
   "conversao": "\\b(?:convert\\w+|convierte|transform\\w+|pasar|pasa|equival\\w+|cuantos? \\S+(?: \\S+)? (?:tiene|hay|son|equivalen|existen|corresponden|caben)|cuantas? \\S+(?: \\S+)? (?:tiene|hay|son|equivalen|existen|corresponden|caben)|en cuantos?)\\b",
-  "ph": "\\b(?:ph|poh)\\b|\\bacidez de\\b|\\bbasicidad\\b|\\balcalinidad\\b",
+  "ph": "\\b(?:ph|poh)\\b|(?<!constante de )\\bacidez de\\b|\\bbasicidad\\b|\\balcalinidad\\b",
   "gas": "\\b(?:gas(?:es)? ideal(?:es)?|gas perfecto|pv ?= ?nrt|pvnrt|ley de los gases|ecuacion (?:de clapeyron|de los gases|general de los gases|de estado)|clapeyron|volumen (?:molar|de un gas|del gas)|presion (?:de un gas|del gas)|ley de boyle|ley de charles|gay lussac|(?:volumen|presion|temperatura) de .{0,24}\\bgas(?:es)?)\\b",
   "gasVariavel": "\\bgas(?:es)?\\b",
   "concentracao": "\\b(?:molaridad|concentracion|concentrad[ao]|diluci\\w*|diluir|diluye|diluido|c1 ?v1|c1v1|fraccion (?:en masa|masica)|porcentaje (?:en )?masa|tanto por ciento en masa|partes por millon|ppm|normalidad|molalidad|solucion de|disolucion de|gramos por litro|mol l|mol por litro|moles por litro|g l)\\b",
@@ -499,6 +499,30 @@ export default {
   "tpsa": [
    "tpsa",
    "area de superficie polar"
+  ],
+  "solubilidade": [
+   "solubilidad",
+   "solubilidad en agua",
+   "coeficiente de solubilidad",
+   "soluble en agua",
+   "insoluble en agua",
+   "soluble",
+   "insoluble",
+   "cuanto se disuelve",
+   "cuanto disuelve",
+   "se disuelve",
+   "se disuelve en agua",
+   "disuelve en agua"
+  ],
+  "pka": [
+   "pka",
+   "constante de acidez",
+   "constante de ionizacion acida",
+   "constante de disociacion acida",
+   "constante de ionizacion del acido",
+   "constante de disociacion del acido",
+   "ka de",
+   "ka del"
   ]
  },
  "rotulosPropriedadeNormalizados": true,
@@ -663,7 +687,8 @@ export default {
   "PIS",
   "SP",
   "CIP",
-  "OH"
+  "OH",
+  "SAL"
  ],
  "seguranca": {
   "acao": [
