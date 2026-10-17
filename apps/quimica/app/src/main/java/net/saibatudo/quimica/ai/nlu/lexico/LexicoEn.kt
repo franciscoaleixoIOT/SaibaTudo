@@ -702,6 +702,31 @@ internal object LexicoEn {
         "polar surface area"
     )
 
+    private fun n_propriedades_solubilidade(): List<Any?> = listOf<Any?>(
+        "solubility",
+        "water solubility",
+        "solubility in water",
+        "soluble in water",
+        "insoluble in water",
+        "soluble",
+        "insoluble",
+        "how much dissolves",
+        "how much will dissolve",
+        "does it dissolve",
+        "dissolves in water",
+        "dissolve in water"
+    )
+
+    private fun n_propriedades_pka(): List<Any?> = listOf<Any?>(
+        "pka",
+        "acid dissociation constant",
+        "acidity constant",
+        "acid ionization constant",
+        "acid ionisation constant",
+        "acid constant",
+        "ka"
+    )
+
     private fun n_propriedades(): Map<String, Any?> = linkedMapOf<String, Any?>(
         "numeroAtomico" to n_propriedades_numeroAtomico(),
         "massaAtomica" to n_propriedades_massaAtomica(),
@@ -734,7 +759,9 @@ internal object LexicoEn {
         "aceptoresH" to n_propriedades_aceptoresH(),
         "ligacoesRotaveis" to n_propriedades_ligacoesRotaveis(),
         "carga" to n_propriedades_carga(),
-        "tpsa" to n_propriedades_tpsa()
+        "tpsa" to n_propriedades_tpsa(),
+        "solubilidade" to n_propriedades_solubilidade(),
+        "pka" to n_propriedades_pka()
     )
 
     private fun n_stopwordsBusca(): List<Any?> = listOf<Any?>(
@@ -938,7 +965,8 @@ internal object LexicoEn {
         "NO",
         "US",
         "WHO",
-        "FAQ"
+        "FAQ",
+        "SAL"
     )
 
     private fun n_seguranca_acao(): List<Any?> = listOf<Any?>(

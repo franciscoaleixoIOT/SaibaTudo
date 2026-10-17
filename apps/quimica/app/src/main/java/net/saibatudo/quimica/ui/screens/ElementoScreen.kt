@@ -78,7 +78,12 @@ fun ElementoScreen(z: Int, pacote: Pacote?, nivel: Nivel, onAbrirElemento: (Int)
         Cartao {
             TituloSecao(t(R.string.ui_elemento_propriedades))
             if (linhas.isEmpty()) Text(t(R.string.ui_elemento_sem_propriedades), style = MaterialTheme.typography.bodyMedium)
-            linhas.forEach { LinhaCampo(it.rotulo, it.valor) }
+            linhas.forEach { l ->
+                LinhaCampo(l.rotulo, l.valor)
+                // aviso de revisão do valor (fontesPorPropriedade[campo].aviso/revisar) e a nota da escala de Pauling, junto do valor
+                l.aviso?.let { AvisoBox(it) }
+                l.nota?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+            }
             e.massaAtomicaIncerteza?.let { LinhaCampo(t(R.string.ui_elemento_incerteza_massa), "± ${t.sig(it, 3)} u") }
             if (nivel != Nivel.SUPERIOR) {
                 Text(t(R.string.ui_elemento_dica_nivel, t(Nivel.SUPERIOR.rotulo)), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)

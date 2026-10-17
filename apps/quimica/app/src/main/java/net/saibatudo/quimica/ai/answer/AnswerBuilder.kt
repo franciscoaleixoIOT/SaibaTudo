@@ -14,6 +14,7 @@ import net.saibatudo.quimica.ai.nlu.LocalNlu
 import net.saibatudo.quimica.data.model.Composto
 import net.saibatudo.quimica.data.model.Elemento
 import net.saibatudo.quimica.data.model.Fonte
+import net.saibatudo.quimica.data.model.PropriedadeDef
 import net.saibatudo.quimica.data.prefs.Nivel
 import net.saibatudo.quimica.data.repository.Pacote
 import net.saibatudo.quimica.domain.GhsFonte
@@ -41,6 +42,11 @@ class AnswerBuilder(
     internal val nivel: Nivel = Nivel.MEDIO
 ) {
     internal var sugestoesCache: List<String>? = null
+
+    private companion object {
+        /** CID da água no PubChem: em "solubilidade do X em água", ela é o solvente. */
+        const val CID_AGUA = 962L
+    }
 
     /** Interpreta e responde. [contexto] é a pergunta anterior (para "e o ponto de ebulição?"). */
     suspend fun responder(pergunta: String, contexto: ParsedQuery? = null): Pair<ParsedQuery, Resposta> {
@@ -267,51 +273,130 @@ class AnswerBuilder(
         c.nomePopular?.takeIf { !it.equals(c.nome, true) }?.let { blocos += Bloco.Campo(t(R.string.rot_conhecido_como), it) }
         Propriedades.fichaComposto(t, c, dic.propriedades, un, nivel).forEach { blocos += Bloco.Campo(it.rotulo, it.valor) }
         c.cas?.let { blocos += Bloco.Campo(t(R.string.rot_numero_cas), it) }
+        // propriedades físicas medidas (Wikidata): cada valor com as condições da medida; a fonte de cada valor vai na lista de fontes
+        val medidas = Propriedades.medidasDoComposto(c, dic.propriedades, t, un)
+        if (medidas.isNotEmpty()) {
+            blocos += Bloco.Paragrafo(t(R.string.prop_medida_titulo))
+            medidas.forEach { m -> blocos += Bloco.Campo(Texto.capitalizar(Propriedades.rotuloMedida(m.def, t)), Propriedades.textoMedida(m, t)) }
+            if (medidas.any { it.def.id == "pka" }) blocos += Bloco.Aviso(t(R.string.prop_medida_nota_pka))
+        }
+        val fontesMedidas = medidas.flatMap { m -> m.fontes.map { it.fonte } }
         c.smiles?.let { blocos += Bloco.Estrutura(it, "${nomeDe(c)}${c.formula?.let { f -> ", ${Texto.formulaUnicode(f)}" } ?: ""}") }
         c.definicaoChebi?.let { blocos += Bloco.Paragrafo(t(R.string.resp_definicao_chebi, it.licenca, it.texto)) }
         return Resposta(
-            Intent.COMPOSTO, nomeDe(c), blocos, fontes = c.fontes.ifEmpty { fontesDoPacote() },
+            Intent.COMPOSTO, nomeDe(c), blocos, fontes = (c.fontes + fontesMedidas).distinctBy { "${it.nome}|${it.url}|${it.detalhe}" }.ifEmpty { fontesDoPacote() },
             acoes = listOf(acaoFichaComposto(c)) + listOfNotNull(c.icscBuscaUrl?.let { acaoIcsc(it) }),
             sugestoes = listOf(t(R.string.sug_perigos_de, nomeCru(c)), t(R.string.sug_estrutura_de, nomeCru(c)))
         )
     }
 
+    /**
+     * PROPRIEDADE (espelha `propriedade` do site, answers.js): cada propriedade pedida, em cada escopo em que existe (fusão, ebulição, densidade e
+     * estado valem para elemento E composto), para cada entidade citada. A medida de um composto (Wikidata) sai com as condições da medida e a fonte
+     * POR VALOR (referência citada, "sem referência no Wikidata"); o pKa leva a nota da 1ª dissociação; a eletronegatividade, a nota de Pauling; um
+     * valor marcado no pacote, "valor a revisar". Sem o dado, a resposta diz o que falta e o que o pacote traz do composto. Em "solubilidade do X em
+     * água", a água é o solvente, não o composto perguntado.
+     */
     private suspend fun propriedade(q: ParsedQuery): Resposta {
-        val def = q.propriedade?.let { dic.propriedade(it) } ?: return naoEntendi(q)
-        val e = elementoDe(q)
-        val c = if (e == null) compostoDe(q) else null
-        if (e == null && c == null) {
+        val ids = q.propriedades.ifEmpty { listOfNotNull(q.propriedade) }.filter { dic.propriedade(it) != null }.distinct()
+        if (ids.isEmpty()) return naoEntendi(q)
+        val elementos = q.elementos.ifEmpty { listOfNotNull(q.elemento) }.distinct().mapNotNull { pacote.porSimbolo[it] }
+        var compostos = q.compostos.ifEmpty { listOfNotNull(q.composto) }.distinct().mapNotNull { it.toLongOrNull() }.mapNotNull { pacote.composto(it) }
+        if ("solubilidade" in ids && compostos.isNotEmpty()) {
+            val semAgua = compostos.filter { it.cid != CID_AGUA }
+            if (semAgua.isNotEmpty() || elementos.isEmpty()) compostos = semAgua
+        }
+        val def0 = dic.propriedade(ids.first())!!
+        if (elementos.isEmpty() && compostos.isEmpty()) {
+            if (ids == listOf("solubilidade")) {
+                return Resposta(Intent.PROPRIEDADE, Texto.capitalizar(def0.rotulo), listOf(Bloco.Paragrafo(t(R.string.resp_prop_solubilidade_de_qual))), entendida = false)
+            }
             val exemplos = pacote.elementos.take(40).mapNotNull { el ->
-                if (Propriedades.formatar(t, def, Propriedades.bruto(def, el), un) != null) {
-                    val pergunta = t(R.string.sug_propriedade_de, t.minusNoMeio(def.rotulo), nomeCru(el))
+                if (Propriedades.formatar(t, def0, Propriedades.bruto(def0, el), un) != null) {
+                    val pergunta = t(R.string.sug_propriedade_de, t.minusNoMeio(def0.rotulo), nomeCru(el))
                     // português: "Qual ponto de fusão de X?" vira "Qual o ponto de fusão de X?" (nos outros idiomas o par de ajuste é vazio)
                     val de = t(R.string.sug_propriedade_ajuste_de)
                     if (de.isEmpty()) pergunta else pergunta.replace(de, t(R.string.sug_propriedade_ajuste_para))
                 } else null
             }.take(3)
             return Resposta(
-                Intent.PROPRIEDADE, def.rotulo.replaceFirstChar { it.uppercase() },
+                Intent.PROPRIEDADE, Texto.capitalizar(def0.rotulo),
                 listOf(Bloco.Paragrafo(t(R.string.resp_prop_de_qual))),
                 sugestoes = exemplos, entendida = false
             )
         }
-        val nome = e?.let { "${nomeDe(it)} (${it.simbolo})" } ?: nomeDe(c!!)
-        val valor = if (e != null) Propriedades.formatar(t, def, Propriedades.bruto(def, e), un, nivel) else Propriedades.formatar(t, def, Propriedades.bruto(def, c!!), un, nivel)
-        if (valor == null) {
-            return Resposta(
-                Intent.PROPRIEDADE, "$nome: ${def.rotulo}",
-                listOf(Bloco.Paragrafo(t(R.string.resp_prop_sem_valor, def.rotulo, nome))),
-                fontes = if (e != null) e.fontes else c!!.fontes,
-                acoes = if (e != null) listOf(acaoFichaElemento(e)) else listOf(acaoFichaComposto(c!!)),
-                entendida = false
-            )
+        val umaEntidade = elementos.size + compostos.size == 1
+        val campos = mutableListOf<Bloco.Campo>()
+        val fontes = mutableListOf<Fonte>()
+        val avisos = LinkedHashSet<String>()
+        val ausentes = mutableListOf<Pair<PropriedadeDef, String>>()
+        val semMedida = LinkedHashMap<Long, Composto>()   // compostos sem a medida pedida: a resposta diz o que o pacote traz deles
+        for (id in ids) {
+            val def = dic.propriedade(id) ?: continue
+            for (alvo in def.escoposEfetivos) {
+                if (alvo == "elemento") for (e in elementos) {
+                    val nome = "${nomeDe(e)} (${e.simbolo})"
+                    val rotulo = if (umaEntidade) Texto.capitalizar(def.rotulo) else t(R.string.resp_prop_de, Texto.capitalizar(def.rotulo), nome)
+                    val v = Propriedades.formatar(t, def, Propriedades.bruto(def, e), un, nivel)
+                    if (v == null) { ausentes += def to nome; continue }
+                    campos += Bloco.Campo(rotulo, v.texto)
+                    fontes += e.fontes
+                    Propriedades.avisoDoValor(e, def.campo, t)?.let { avisos += if (umaEntidade) it else "${nomeDe(e)}: $it" }
+                    if (def.id == "eletronegatividade") Propriedades.notaEletronegatividade(def, e, t)?.let { avisos += it }
+                }
+                if (alvo == "composto") for (c in compostos) {
+                    val nome = nomeDe(c)
+                    val rotuloBase = if (def.medida) Propriedades.rotuloMedida(def, t) else def.rotulo
+                    val rotulo = if (umaEntidade) Texto.capitalizar(rotuloBase) else t(R.string.resp_prop_de, Texto.capitalizar(rotuloBase), nome)
+                    if (def.medida) {
+                        // medida do composto (Wikidata): o valor com as condições da medida e a fonte deste valor
+                        val m = Propriedades.medida(c, def, t, un)
+                        if (m == null) { ausentes += def to nome; semMedida[c.cid] = c; continue }
+                        campos += Bloco.Campo(rotulo, Propriedades.textoMedida(m, t))
+                        fontes += m.fontes.map { it.fonte }.ifEmpty { c.fontes }
+                        if (def.id == "pka") avisos += t(R.string.prop_medida_nota_pka)
+                        continue
+                    }
+                    val v = Propriedades.formatar(t, def, Propriedades.bruto(def, c), un, nivel)
+                    if (v == null) { ausentes += def to nome; continue }
+                    campos += Bloco.Campo(rotulo, v.texto)
+                    fontes += c.fontes
+                }
+            }
+            // propriedade de elemento perguntada para um composto (ou o contrário): conta como ausente
+            val escopos = def.escoposEfetivos
+            if (("elemento" !in escopos || elementos.isEmpty()) && ("composto" !in escopos || compostos.isEmpty())) {
+                (if ("composto" in escopos) elementos.map { "${nomeDe(it)} (${it.simbolo})" } else compostos.map { nomeDe(it) }).forEach { ausentes += def to it }
+            }
         }
-        val blocos = mutableListOf<Bloco>(Bloco.Campo(def.rotulo.replaceFirstChar { it.uppercase() }, valor.texto))
-        if (def.id == "estadosOxidacao" || def.id == "configuracaoEletronica") blocos += Bloco.Paragrafo(t(R.string.resp_valor_do_pacote))
+        val nomeTitulo = (elementos.map { "${nomeDe(it)} (${it.simbolo})" } + compostos.map { nomeDe(it) })
+        val acoes = if (elementos.isNotEmpty() && ids.any { dic.propriedade(it)?.temEscopo("elemento") == true }) listOf(acaoFichaElemento(elementos[0]))
+        else compostos.firstOrNull()?.let { listOf(acaoFichaComposto(it)) } ?: elementos.firstOrNull()?.let { listOf(acaoFichaElemento(it)) }.orEmpty()
+        val blocos = mutableListOf<Bloco>()
+        blocos += campos
+        if (campos.isNotEmpty() && ids.any { it == "estadosOxidacao" || it == "configuracaoEletronica" }) blocos += Bloco.Paragrafo(t(R.string.resp_valor_do_pacote))
+        avisos.forEach { blocos += Bloco.Aviso(it) }
+        if (ausentes.isNotEmpty()) {
+            blocos += if (campos.isEmpty() && ausentes.size == 1) Bloco.Paragrafo(t(R.string.resp_prop_sem_valor, t.minusNoMeio(ausentes[0].first.rotulo), ausentes[0].second))
+            else Bloco.Aviso(t(R.string.resp_prop_nao_tem, ausentes.joinToString("; ") { (d, n) -> t(R.string.resp_prop_de, t.minusNoMeio(d.rotulo), n) }))
+        }
+        // o que o pacote traz dos compostos sem a medida pedida ("o pacote não traz a densidade do etanol, mas traz…")
+        for (c in semMedida.values) {
+            val tem = Propriedades.medidasDoComposto(c, dic.propriedades, t, un).filter { it.def.id !in ids }
+            if (tem.isNotEmpty()) {
+                blocos += Bloco.Paragrafo(t(R.string.resp_prop_oferece, nomeDe(c), Propriedades.listar(t, tem.map { "${t.minusNoMeio(Propriedades.rotuloMedida(it.def, t))} (${it.formatado.curto})" })))
+                fontes += tem.flatMap { m -> m.fontes.map { it.fonte } }
+            } else fontes += c.fontes
+        }
+        if (campos.isEmpty() && fontes.isEmpty()) fontes += (elementos.flatMap { it.fontes } + compostos.flatMap { it.fontes })
+        val titulo = when {
+            umaEntidade -> "${nomeTitulo.first()}: ${if (compostos.isNotEmpty() && def0.medida) Propriedades.rotuloMedida(def0, t) else def0.rotulo}"
+            else -> t(R.string.resp_prop_propriedades_de, Propriedades.listar(t, nomeTitulo))
+        }
         return Resposta(
-            Intent.PROPRIEDADE, "$nome: ${def.rotulo}", blocos,
-            fontes = (if (e != null) e.fontes else c!!.fontes).ifEmpty { fontesDoPacote() },
-            acoes = if (e != null) listOf(acaoFichaElemento(e)) else listOf(acaoFichaComposto(c!!))
+            Intent.PROPRIEDADE, titulo, blocos,
+            fontes = fontes.distinctBy { "${it.nome}|${it.url}|${it.detalhe}" }.ifEmpty { fontesDoPacote() },
+            acoes = acoes, entendida = campos.isNotEmpty()
         )
     }
 
@@ -387,25 +472,43 @@ class AnswerBuilder(
                 val d = dic.propriedade(id) ?: continue
                 val valores = elementos.map { Propriedades.formatar(t, d, Propriedades.bruto(d, it), un, nivel)?.curto }
                 if (valores.all { it == null }) continue
-                blocos += Bloco.Campo(d.rotulo.replaceFirstChar { it.uppercase() }, elementos.indices.joinToString(" | ") { i -> "${nomeDe(elementos[i])}: ${valores[i] ?: semDado}" })
+                blocos += Bloco.Campo(Texto.capitalizar(d.rotulo), elementos.indices.joinToString(" | ") { i -> "${nomeDe(elementos[i])}: ${valores[i] ?: semDado}" })
             }
             elementos.forEach { fontes += it.fontes; acoes += acaoAbrir(it) }
         } else if (compostos.size >= 2) {
-            val ids = listOf("formula", "massaMolar", "pontoFusaoK", "pontoEbulicaoK", "densidadeKgm3", "xlogp")
-            for (id in ids) {
+            for (id in listOf("formula", "massaMolar", "xlogp")) {
                 val d = dic.propriedade(id) ?: continue
                 val valores = compostos.map { Propriedades.formatar(t, d, Propriedades.bruto(d, it), un, nivel)?.curto }
                 if (valores.all { it == null }) continue
-                blocos += Bloco.Campo(d.rotulo.replaceFirstChar { it.uppercase() }, compostos.indices.joinToString(" | ") { i -> "${nomeDe(compostos[i])}: ${valores[i] ?: semDado}" })
+                blocos += Bloco.Campo(Texto.capitalizar(d.rotulo), compostos.indices.joinToString(" | ") { i -> "${nomeDe(compostos[i])}: ${valores[i] ?: semDado}" })
             }
-            compostos.forEach { fontes += it.fontes; acoes += acaoAbrir(it) }
+            // como no site: a fonte principal de cada composto (PubChem) e, abaixo, a origem de cada valor medido
+            compostos.forEach { fontes += it.fontes.take(1); acoes += acaoAbrir(it) }
+            // propriedades físicas medidas (Wikidata, como no site): linha só quando pelo menos dois compostos têm o valor; fonte de cada valor
+            val medidas = compostos.map { c -> Propriedades.medidasDoComposto(c, dic.propriedades, t, un).associateBy { it.def.id } }
+            val pedidas = q.propriedades.ifEmpty { listOfNotNull(q.propriedade) }.toSet()
+            val frases = mutableListOf<String>()
+            for (id in Propriedades.MEDIDAS_COMPOSTO) {
+                val ms = medidas.map { it[id] }
+                if (ms.count { it != null } < 2) continue
+                val def = ms.firstNotNullOf { it }.def
+                blocos += Bloco.Campo(Texto.capitalizar(Propriedades.rotuloMedida(def, t)), compostos.indices.joinToString(" | ") { i -> "${nomeDe(compostos[i])}: ${ms[i]?.formatado?.curto ?: semDado}" })
+                ms.filterNotNull().forEach { m -> fontes += m.fontes.map { it.fonte } }
+                // a propriedade pedida ("compare a densidade da água e do ácido acético"): qual é maior, só entre valores da mesma unidade
+                val num = ms.withIndex().mapNotNull { (i, m) -> (m?.valor as? Number)?.toDouble()?.let { Triple(i, m, it) } }
+                if (id in pedidas && num.size >= 2 && num.map { it.second.campo }.distinct().size == 1) {
+                    val topo = num.maxBy { it.third }
+                    if (num.count { it.third == topo.third } == 1) frases += t(R.string.resp_comparar_maior, Texto.capitalizar(def.rotulo), nomeDe(compostos[topo.first]), topo.second.formatado.curto)
+                }
+            }
+            frases.forEach { blocos += Bloco.Paragrafo(it) }
         } else {
             return semDado(q, t(R.string.resp_comparar_cite_dois))
         }
         val titulo = if (elementos.size >= 2) elementos.joinToString(" × ") { nomeDe(it) } else compostos.joinToString(" × ") { nomeDe(it) }
         return Resposta(
             Intent.COMPARAR, t(R.string.resp_comparar_titulo, titulo), blocos.ifEmpty { listOf(Bloco.Paragrafo(t(R.string.resp_comparar_sem_comum))) },
-            fontes = fontes.distinctBy { it.nome }.take(3), acoes = acoes
+            fontes = fontes.distinctBy { "${it.nome}|${it.url}|${it.detalhe}" }.take(12), acoes = acoes
         )
     }
 

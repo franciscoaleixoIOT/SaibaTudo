@@ -32,7 +32,7 @@ internal object LexicoEs {
         "fontes" to "\\b(?:cuales son las (?:fuentes|licencias)|que (?:fuentes|licencias)|licencias? (?:tienen|usan|tiene|usa) los datos|con que licencias?|licencias? de los datos|cual es la fuente|fuentes? (?:de (?:la )?)?(?:informacion|respuestas?)|de donde (?:sacaste|viene|sale) (?:esa|esta|la) (?:informacion|respuesta)|referencias?)\\b",
         "balancear" to "\\bbalance\\w*|\\bajust\\w+ (?:la |una )?ecuacion\\b|\\bigual\\w+ (?:la |una )?ecuacion\\b|\\bajust\\w+ (?:los )?coeficientes\\b|\\bequilibr\\w+ (?:la |una )?ecuacion\\b",
         "conversao" to "\\b(?:convert\\w+|convierte|transform\\w+|pasar|pasa|equival\\w+|cuantos? \\S+(?: \\S+)? (?:tiene|hay|son|equivalen|existen|corresponden|caben)|cuantas? \\S+(?: \\S+)? (?:tiene|hay|son|equivalen|existen|corresponden|caben)|en cuantos?)\\b",
-        "ph" to "\\b(?:ph|poh)\\b|\\bacidez de\\b|\\bbasicidad\\b|\\balcalinidad\\b",
+        "ph" to "\\b(?:ph|poh)\\b|(?<!constante de )\\bacidez de\\b|\\bbasicidad\\b|\\balcalinidad\\b",
         "gas" to "\\b(?:gas(?:es)? ideal(?:es)?|gas perfecto|pv ?= ?nrt|pvnrt|ley de los gases|ecuacion (?:de clapeyron|de los gases|general de los gases|de estado)|clapeyron|volumen (?:molar|de un gas|del gas)|presion (?:de un gas|del gas)|ley de boyle|ley de charles|gay lussac|(?:volumen|presion|temperatura) de .{0,24}\\bgas(?:es)?)\\b",
         "gasVariavel" to "\\bgas(?:es)?\\b",
         "concentracao" to "\\b(?:molaridad|concentracion|concentrad[ao]|diluci\\w*|diluir|diluye|diluido|c1 ?v1|c1v1|fraccion (?:en masa|masica)|porcentaje (?:en )?masa|tanto por ciento en masa|partes por millon|ppm|normalidad|molalidad|solucion de|disolucion de|gramos por litro|mol l|mol por litro|moles por litro|g l)\\b",
@@ -690,6 +690,31 @@ internal object LexicoEs {
         "area de superficie polar"
     )
 
+    private fun n_propriedades_solubilidade(): List<Any?> = listOf<Any?>(
+        "solubilidad",
+        "solubilidad en agua",
+        "coeficiente de solubilidad",
+        "soluble en agua",
+        "insoluble en agua",
+        "soluble",
+        "insoluble",
+        "cuanto se disuelve",
+        "cuanto disuelve",
+        "se disuelve",
+        "se disuelve en agua",
+        "disuelve en agua"
+    )
+
+    private fun n_propriedades_pka(): List<Any?> = listOf<Any?>(
+        "pka",
+        "constante de acidez",
+        "constante de ionizacion acida",
+        "constante de disociacion acida",
+        "constante de ionizacion del acido",
+        "constante de disociacion del acido",
+        "ka"
+    )
+
     private fun n_propriedades(): Map<String, Any?> = linkedMapOf<String, Any?>(
         "numeroAtomico" to n_propriedades_numeroAtomico(),
         "massaAtomica" to n_propriedades_massaAtomica(),
@@ -722,7 +747,9 @@ internal object LexicoEs {
         "aceptoresH" to n_propriedades_aceptoresH(),
         "ligacoesRotaveis" to n_propriedades_ligacoesRotaveis(),
         "carga" to n_propriedades_carga(),
-        "tpsa" to n_propriedades_tpsa()
+        "tpsa" to n_propriedades_tpsa(),
+        "solubilidade" to n_propriedades_solubilidade(),
+        "pka" to n_propriedades_pka()
     )
 
     private fun n_stopwordsBusca(): List<Any?> = listOf<Any?>(
@@ -890,7 +917,8 @@ internal object LexicoEs {
         "PIS",
         "SP",
         "CIP",
-        "OH"
+        "OH",
+        "SAL"
     )
 
     private fun n_seguranca_acao(): List<Any?> = listOf<Any?>(

@@ -184,3 +184,55 @@ são os dos catálogos do site, nos cinco idiomas.
 Testes: `CorrecoesQuimicaSiteTest` (12). `./gradlew.bat :app:testDebugUnitTest :app:lintRelease` deu **192 testes, 0 falhas**, com o
 pacote real presente. O lint de release fechou sem erro e com os mesmos 19 avisos de versão de dependência. Os testes que usam
 `local/pacote-j/regras.json` (fora do Git) são pulados se o arquivo não existir.
+
+## Propriedades físicas medidas dos compostos (17/10/2026, frente M, onda 2)
+Paridade com o site (commit 88cedda: `propriedades.js`, `ui/compostos.js`, `ui/elemento.js`, `answers.js`). Os textos novos são os dos catálogos
+do site nos cinco idiomas (`prop_medida_*`, `prop_solubilidade`, `prop_pka`, `resp_prop_de|nao_tem|oferece|solubilidade_de_qual|propriedades_de`,
+`resp_comparar_maior`, `lista_e`).
+1. **Modelos** (`Models.kt`, `PacoteJson.kt`):
+   - `compostos[].propriedades` com números, textos (`estadoPadrao`) e listas (`pkaValores` → `propriedadesListas`);
+   - `fontesPorPropriedade` de compostos e elementos (`FonteValor`: nome, url, licença, data, declaração, referência, valor e unidade
+     originais, `condicoes {temperaturaK, pressaoPa, fase}`, `semReferencia` + `corroboradoPor`, `metodo`, `aviso`/`revisar`, `escala`, `nota`);
+   - `regras.propriedades[]` com `escopos`, `origens` e `escala`. O formato antigo continua aceito (`escopo`/`origem`, `alvo: "ambos"` do fixture).
+2. **Domínio** (`Propriedades.kt`): ids novos `solubilidade` (lê `solubilidadeAguaG100g` ou `solubilidadeAguaGL`, com a unidade do campo) e
+   `pka` (lista quando há mais de um). Fusão, ebulição, densidade e estado valem para elemento E composto. Funções novas, com os nomes do site:
+   `lerValor`, `condicoesDaMedida`, `fonteDoValor`, `fontesDoCampo`, `medidasDoComposto`, `avisoDoValor`, `notaEletronegatividade`.
+   `Texto.capitalizar` não transforma "pKa" em "PKa". `Fonte.detalhe` leva a referência citada, "sem referência no Wikidata", "valor
+   derivado" e "valor a revisar".
+3. **Ficha do composto:** novo cartão "Propriedades físicas", no lugar das medidas soltas entre as propriedades calculadas. Cada valor
+   aparece com K e °C, kg/m³ e g/cm³, as condições da medida e a sua fonte (link, licença e referência).
+4. **Ficha do elemento:**
+   - aviso "Valor a revisar" junto da afinidade eletrônica (15 elementos marcados no pacote);
+   - nota da escala de Pauling na eletronegatividade;
+   - a energia de ionização e a afinidade eletrônica passaram a aparecer também no nível médio.
+5. **Assistente:**
+   - PROPRIEDADE trata várias propriedades e entidades, por escopo, como o site;
+   - medida do composto com fonte por valor e condições, e nota do pKa;
+   - "O pacote não traz X para Y" seguido de "Para Y, o pacote traz: …";
+   - em "solubilidade do X em água", a água não é o alvo;
+   - COMPARAR entre compostos inclui as medidas que dois ou mais deles têm, com a frase "maior em…" para a propriedade pedida;
+   - a ficha resumida (COMPOSTO) inclui as medidas;
+   - o NLU (`LocalNlu`, `Dicionario.propriedadesEm`, `CloudNlu`) decide o alvo pelos escopos.
+6. **Pacote embutido:** o snapshot `app/src/main/assets/quimica/` (que tem prioridade no Gradle) ainda era o de 12/10. Ele foi
+   atualizado com `app/tools/copiar_pacote_para_assets.py` para `20261017T034210Z-2a180a93a84a`. Sem essa troca, o app sairia sem as
+   medidas, e o `verificar_release.py` recusaria a versão.
+
+Exemplos com o pacote real:
+- "qual o ponto de fusão do NaCl?" → 1.073,85 K (800,7 °C). Fonte: Wikidata – CC0 (referência: Basic Laboratory and Industrial Chemicals: A CRC
+  Quick Reference Handbook).
+- "pKa do ácido acético" → 4,76 — a 298,15 K (25 °C), com a nota da 1ª dissociação.
+- "densidade do etanol" → o pacote não traz a densidade para Etanol. Ele traz: estado físico a 25 °C e 1 atm (líquido), ponto de fusão
+  (159,05 K), ponto de ebulição (351,44 K) e pKa (16).
+- "compare a densidade da água e do ácido acético" → a tabela traz Densidade 997,048 kg/m³ | 1.044,6 kg/m³ e a frase "Densidade: maior em Ácido acético".
+
+Testes: `PropriedadesMedidasTest` (15 testes) cobre modelos, escopos, formatação, origem por valor, fichas, o boro, as respostas acima em
+pt/en/es e uma varredura de todas as medidas do pacote real. `./gradlew.bat :app:testDebugUnitTest :app:lintRelease` deu **207 testes, 0
+falhas**. O lint de release fechou sem erro, com os 19 avisos de versão de dependência de antes. O texto "N declarações concordam" virou
+`<plurals>`, com `many` em es e fr.
+
+Conferido no emulador (Pixel 9, debug):
+- a pergunta do NaCl e a ficha do NaCl, com "Propriedades físicas" e a fonte por valor;
+- a ficha do boro, com a nota de Pauling e "Valor a revisar".
+
+Achado fora do app: o GHS do NaCl no pacote é GHS05/H318/H412, que vem de uma entrada errada do CLP ("product-by-process… polyazodyestuff").
+Isso é para o pipeline corrigir.

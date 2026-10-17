@@ -520,6 +520,38 @@
     <string name="prop_tpsa">polar surface area (TPSA)</string>
     <string name="prop_descoberta_por">by %1$s</string>
 
+    <!-- propriedades físicas medidas (fontesPorPropriedade, 17/10/2026; textos dos catálogos do site) -->
+    <string name="prop_solubilidade">solubility in water</string>
+    <string name="prop_pka">pKa</string>
+    <string name="prop_medida_titulo">Physical properties</string>
+    <string name="prop_medida_intro">Measured values, each with its source and the measurement conditions.</string>
+    <string name="prop_medida_unidade_g100g">g/100 g of water</string>
+    <string name="prop_medida_unidade_gl">g/L (in water)</string>
+    <string name="prop_medida_a_temperatura">at %1$s K (%2$s °C)</string>
+    <string name="prop_medida_a_pressao">at %1$s Pa (%2$s atm)</string>
+    <string name="prop_medida_fase">phase: %1$s</string>
+    <string name="prop_medida_referencia">reference: %1$s</string>
+    <string name="prop_medida_sem_referencia">no reference in Wikidata</string>
+    <plurals name="prop_medida_sem_referencia_corroborado">
+        <item quantity="one">no reference in Wikidata (%1$d statement agrees)</item>
+        <item quantity="other">no reference in Wikidata (%1$d statements agree)</item>
+    </plurals>
+    <string name="prop_medida_derivado">derived from the melting and boiling points in the package, at 25 °C and 1 atm</string>
+    <string name="prop_medida_derivado_nome">SaibaTudo Química (derived value)</string>
+    <string name="prop_medida_fonte_pacote">data package</string>
+    <string name="prop_medida_revisar">value under review</string>
+    <string name="prop_medida_aviso_revisar">Value under review: the PubChem value may be outdated (it differs from current tables) and Wikidata does not have this property.</string>
+    <string name="prop_medida_nota_pauling">Pauling scale, with the revised values of Allred (1961), as in PubChem; books that use Pauling’s original values differ for some elements.</string>
+    <string name="prop_medida_nota_pka">Lowest recorded pKa (first dissociation); for bases, Wikidata usually records the pKa of the conjugate acid, and strong acids have no pKa.</string>
+    <string name="prop_medida_estado_a25">physical state at 25 °C and 1 atm</string>
+    <string name="resp_prop_de">%1$s of %2$s</string>
+    <string name="resp_prop_nao_tem">The data package does not have: %1$s.</string>
+    <string name="resp_prop_oferece">For %1$s, the package has: %2$s.</string>
+    <string name="resp_prop_solubilidade_de_qual">Tell me which compound you want the water solubility of. For example: \"solubility of urea\".</string>
+    <string name="resp_prop_propriedades_de">Properties of %1$s</string>
+    <string name="resp_comparar_maior">%1$s: higher for %2$s (%3$s).</string>
+    <string name="lista_e">%1$s and %2$s</string>
+
     <!-- 24_categorias_estados -->
     <string name="categoria_metal_alcalino">Alkali metal</string>
     <string name="categoria_metal_alcalino_terroso">Alkaline earth metal</string>

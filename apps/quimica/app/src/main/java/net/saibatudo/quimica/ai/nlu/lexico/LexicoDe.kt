@@ -714,6 +714,32 @@ internal object LexicoDe {
         "polare oberflache"
     )
 
+    private fun n_propriedades_solubilidade(): List<Any?> = listOf<Any?>(
+        "loslichkeit",
+        "wasserloslichkeit",
+        "loslichkeit in wasser",
+        "wasserloslich",
+        "loslich in wasser",
+        "unloslich in wasser",
+        "loslich",
+        "unloslich",
+        "wie viel lost sich",
+        "lost sich in wasser",
+        "lost sich"
+    )
+
+    private fun n_propriedades_pka(): List<Any?> = listOf<Any?>(
+        "pka",
+        "pks",
+        "pka-wert",
+        "pka wert",
+        "pks-wert",
+        "pks wert",
+        "saurekonstante",
+        "sauredissoziationskonstante",
+        "aciditatskonstante"
+    )
+
     private fun n_propriedades(): Map<String, Any?> = linkedMapOf<String, Any?>(
         "numeroAtomico" to n_propriedades_numeroAtomico(),
         "massaAtomica" to n_propriedades_massaAtomica(),
@@ -746,7 +772,9 @@ internal object LexicoDe {
         "aceptoresH" to n_propriedades_aceptoresH(),
         "ligacoesRotaveis" to n_propriedades_ligacoesRotaveis(),
         "carga" to n_propriedades_carga(),
-        "tpsa" to n_propriedades_tpsa()
+        "tpsa" to n_propriedades_tpsa(),
+        "solubilidade" to n_propriedades_solubilidade(),
+        "pka" to n_propriedades_pka()
     )
 
     private fun n_stopwordsBusca(): List<Any?> = listOf<Any?>(
@@ -957,7 +985,8 @@ internal object LexicoDe {
         "CIP",
         "OH",
         "NO",
-        "WO"
+        "WO",
+        "SAL"
     )
 
     private fun n_seguranca_acao(): List<Any?> = listOf<Any?>(

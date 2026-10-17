@@ -212,7 +212,9 @@ object LocalNlu {
 
         // 8) propriedades e perfis
         if (p.propriedade != null && tem) {
-            val alvos = props.map { it.alvo }.toSet()
+            // escopos (DATA_CONTRACT §3.1): fusão, ebulição, densidade e estado valem para elemento E composto; propriedade de composto
+            // com um elemento citado prefere o composto
+            val alvos = props.flatMap { it.escopos }.toSet()
             return fim(Intent.PROPRIEDADE) { it.copy(alvoPropriedade = if ("composto" in alvos && p.compostos.isNotEmpty()) "composto" else if (p.elementos.isNotEmpty()) "elemento" else "composto") }
         }
         val cue = i("conceitoCue")

@@ -99,8 +99,8 @@ object NluValidator {
         q = when (intent) {
             Intent.CONCEITO -> q.copy(conceito = base.conceito ?: LocalNlu.conceitoDe(n, d.lexico).ifEmpty { null })
             Intent.PROPRIEDADE -> {
-                val alvo = q.propriedade?.let { d.propriedade(it)?.alvo }
-                q.copy(alvoPropriedade = if (alvo == "composto" && (q.composto != null || q.formula != null)) "composto" else if (q.elemento != null) "elemento" else "composto")
+                val escopos = q.propriedade?.let { d.propriedade(it)?.escoposEfetivos }.orEmpty()
+                q.copy(alvoPropriedade = if ("composto" in escopos && (q.composto != null || q.formula != null)) "composto" else if (q.elemento != null) "elemento" else "composto")
             }
             Intent.SEGURANCA -> q.copy(mistura = base.mistura || d.lexico.pista("mistura").containsMatchIn(n))
             else -> q

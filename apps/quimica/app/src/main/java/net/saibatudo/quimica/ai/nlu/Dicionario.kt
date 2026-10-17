@@ -34,7 +34,8 @@ data class Entidades(
     val formulas: List<Achado> = emptyList()
 )
 
-data class PropriedadeAchada(val id: String, val alvo: String, val pos: Int)
+/** Propriedade citada: id, escopo principal, posição no texto e os escopos em que existe (elemento e/ou composto). */
+data class PropriedadeAchada(val id: String, val alvo: String, val pos: Int, val escopos: List<String> = listOf(alvo))
 
 /** Resultado da busca por nome, símbolo, fórmula, CAS ou CID. */
 data class ResultadoBusca(val ehElemento: Boolean, val titulo: String, val detalhe: String, val z: Int? = null, val cid: Long? = null, val pontos: Int = 0)
@@ -76,7 +77,7 @@ class Dicionario private constructor(
     private val nomesCompostoAproximaveis: List<Pair<String, Long>>
     private val formulaParaCid = HashMap<String, Long>()
     private val casParaCid = HashMap<String, Long>()
-    private val sinonimosPropriedade: List<Triple<String, String, String>>
+    private val sinonimosPropriedade: List<Pair<String, PropriedadeDef>>
     val totalCompostos: Int = entradas.size
 
     init {
@@ -130,7 +131,7 @@ class Dicionario private constructor(
             e.formula?.let { f -> formulaParaCid.putIfAbsent(chaveFormula(f), e.cid) }
             e.cas?.let { casParaCid[it] = e.cid }
         }
-        sinonimosPropriedade = propriedades.flatMap { p -> (listOf(p.rotulo) + p.sinonimos).map { Triple(Texto.nlu(it), p.id, p.alvo) } }
+        sinonimosPropriedade = propriedades.flatMap { p -> (listOf(p.rotulo) + p.sinonimos).map { Texto.nlu(it) to p } }
             .filter { it.first.isNotEmpty() }.sortedByDescending { it.first.length }
     }
 
@@ -395,14 +396,14 @@ class Dicionario private constructor(
     fun propriedadesEm(n: String): List<PropriedadeAchada> {
         val usado = BooleanArray(n.length)
         val out = mutableListOf<PropriedadeAchada>()
-        for ((chave, id, alvo) in sinonimosPropriedade) {
+        for ((chave, def) in sinonimosPropriedade) {
             var i = n.indexOf(chave)
             while (i != -1) {
                 val j = i + chave.length
                 val ok = (i == 0 || n[i - 1] == ' ') && (j == n.length || n[j] == ' ')
                 if (ok && (i until j).none { usado[it] }) {
                     for (k in i until j) usado[k] = true
-                    out += PropriedadeAchada(id, alvo, i)
+                    out += PropriedadeAchada(def.id, def.alvo, i, def.escoposEfetivos)
                 }
                 i = n.indexOf(chave, i + 1)
             }

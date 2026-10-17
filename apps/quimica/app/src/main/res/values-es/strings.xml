@@ -522,6 +522,39 @@
     <string name="prop_tpsa">área de superficie polar (TPSA)</string>
     <string name="prop_descoberta_por">por %1$s</string>
 
+    <!-- propriedades físicas medidas (fontesPorPropriedade, 17/10/2026; textos dos catálogos do site) -->
+    <string name="prop_solubilidade">solubilidad en agua</string>
+    <string name="prop_pka">pKa</string>
+    <string name="prop_medida_titulo">Propiedades físicas</string>
+    <string name="prop_medida_intro">Valores medidos, cada uno con su fuente y las condiciones de la medida.</string>
+    <string name="prop_medida_unidade_g100g">g/100 g de agua</string>
+    <string name="prop_medida_unidade_gl">g/L (en agua)</string>
+    <string name="prop_medida_a_temperatura">a %1$s K (%2$s °C)</string>
+    <string name="prop_medida_a_pressao">a %1$s Pa (%2$s atm)</string>
+    <string name="prop_medida_fase">fase: %1$s</string>
+    <string name="prop_medida_referencia">referencia: %1$s</string>
+    <string name="prop_medida_sem_referencia">sin referencia en Wikidata</string>
+    <plurals name="prop_medida_sem_referencia_corroborado">
+        <item quantity="one">sin referencia en Wikidata (%1$d declaración coincide)</item>
+        <item quantity="many">sin referencia en Wikidata (%1$d declaraciones coinciden)</item>
+        <item quantity="other">sin referencia en Wikidata (%1$d declaraciones coinciden)</item>
+    </plurals>
+    <string name="prop_medida_derivado">derivado del punto de fusión y del punto de ebullición del paquete, a 25 °C y 1 atm</string>
+    <string name="prop_medida_derivado_nome">SaibaTudo Química (valor derivado)</string>
+    <string name="prop_medida_fonte_pacote">paquete de datos</string>
+    <string name="prop_medida_revisar">valor por revisar</string>
+    <string name="prop_medida_aviso_revisar">Valor por revisar: el de PubChem puede estar desactualizado (difiere de las tablas actuales) y Wikidata no tiene esta propiedad.</string>
+    <string name="prop_medida_nota_pauling">Escala de Pauling, con los valores revisados de Allred (1961), como en PubChem; los libros que usan los valores originales de Pauling difieren en algunos elementos.</string>
+    <string name="prop_medida_nota_pka">Menor pKa registrado (primera disociación); para las bases, Wikidata suele registrar el pKa del ácido conjugado, y los ácidos fuertes no tienen pKa.</string>
+    <string name="prop_medida_estado_a25">estado físico a 25 °C y 1 atm</string>
+    <string name="resp_prop_de">%1$s: %2$s</string>
+    <string name="resp_prop_nao_tem">El paquete de datos no tiene: %1$s.</string>
+    <string name="resp_prop_oferece">Para %1$s, el paquete trae: %2$s.</string>
+    <string name="resp_prop_solubilidade_de_qual">Dime de qué compuesto quieres la solubilidad en agua. Por ejemplo: \"solubilidad de la urea\".</string>
+    <string name="resp_prop_propriedades_de">Propiedades de %1$s</string>
+    <string name="resp_comparar_maior">%1$s: mayor en %2$s (%3$s).</string>
+    <string name="lista_e">%1$s y %2$s</string>
+
     <!-- 24_categorias_estados -->
     <string name="categoria_metal_alcalino">Metal alcalino</string>
     <string name="categoria_metal_alcalino_terroso">Metal alcalinotérreo</string>

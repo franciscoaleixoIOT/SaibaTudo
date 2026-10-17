@@ -27,6 +27,7 @@ import net.saibatudo.quimica.domain.ClassesCompostos
 import net.saibatudo.quimica.domain.Idiomas
 import net.saibatudo.quimica.domain.Nomes
 import net.saibatudo.quimica.domain.Propriedades
+import net.saibatudo.quimica.domain.Texto
 import net.saibatudo.quimica.domain.calc.Unidades
 import net.saibatudo.quimica.ui.LocalTextos
 import net.saibatudo.quimica.ui.components.AvisoBox
@@ -66,6 +67,7 @@ fun CompostoScreen(
     val un = Unidades.de(pacote.regras)
     val tabela = Propriedades.tabela(pacote.regras, t)
     val linhas = Propriedades.fichaComposto(t, c, tabela, un, nivel)
+    val medidas = Propriedades.medidasDoComposto(c, tabela, t, un)
     val nome = t.nomeRotulado(Nomes.composto(c, t.idioma))
     // frases H no idioma do app; os textos do registro do composto são em português (só valem em pt-BR; nos outros, completam o que faltar)
     val textosH = LinkedHashMap<String, String>().apply {
@@ -99,6 +101,27 @@ fun CompostoScreen(
             val rotuloMassaExata = tabela.firstOrNull { it.id == "massaExata" }?.rotulo?.replaceFirstChar { it.uppercase() }
             c.massaExata?.takeIf { nivel == Nivel.SUPERIOR && linhas.none { l -> l.rotulo == rotuloMassaExata } }?.let { LinhaCampo(t(R.string.ui_composto_massa_exata), "${t.num(it, 5)} u") }
             if (c.classes.isNotEmpty()) LinhaCampo(t(R.string.ui_composto_classes), c.classes.joinToString(", ") { ClassesCompostos.nome(it, t) })
+        }
+
+        // propriedades físicas medidas (Wikidata, DATA_CONTRACT §3.1): cada valor com as condições da medida e a sua fonte (referência citada,
+        // "sem referência no Wikidata"), como a seção "Propriedades físicas" do site
+        if (medidas.isNotEmpty()) {
+            Cartao {
+                TituloSecao(t(R.string.prop_medida_titulo))
+                Text(t(R.string.prop_medida_intro), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                medidas.forEach { m ->
+                    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        LinhaCampo(Texto.capitalizar(Propriedades.rotuloMedida(m.def, t)), m.formatado.texto)
+                        if (m.condicoes.isNotEmpty()) {
+                            Text(m.condicoes.joinToString("; "), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        FontesView(m.fontes.map { it.fonte }, onAbrirUrl, comTitulo = false)
+                    }
+                }
+                if (medidas.any { it.def.id == "pka" }) {
+                    Text(t(R.string.prop_medida_nota_pka), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
         }
 
         Cartao {

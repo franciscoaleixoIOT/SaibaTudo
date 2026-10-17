@@ -5,6 +5,9 @@ import java.util.Locale
 
 /** Utilitários de texto: normalização para busca/NLU, formatação de números no idioma (pt-BR por padrão) e fórmulas com sub/sobrescrito. */
 object Texto {
+    /** Primeira letra maiúscula; símbolos como "pKa" e "pH" (minúscula seguida de maiúscula) ficam como estão (igual a `capitalizar` do site). */
+    fun capitalizar(s: String): String = if (s.length >= 2 && s[0].isLowerCase() && s[1].isUpperCase()) s else s.replaceFirstChar { it.uppercase() }
+
     private val RX_COMBINANTES = Regex("\\p{Mn}+")
     private val RX_ESPACOS = Regex("\\s+")
     private val RX_NAO_ALNUM = Regex("[^a-z0-9+\\-()\\[\\]./,%°]+")

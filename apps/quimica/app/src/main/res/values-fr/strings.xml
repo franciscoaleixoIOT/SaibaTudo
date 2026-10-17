@@ -522,6 +522,39 @@
     <string name="prop_tpsa">surface polaire (TPSA)</string>
     <string name="prop_descoberta_por">par %1$s</string>
 
+    <!-- propriedades físicas medidas (fontesPorPropriedade, 17/10/2026; textos dos catálogos do site) -->
+    <string name="prop_solubilidade">solubilité dans l’eau</string>
+    <string name="prop_pka">pKa</string>
+    <string name="prop_medida_titulo">Propriétés physiques</string>
+    <string name="prop_medida_intro">Valeurs mesurées, chacune avec sa source et les conditions de la mesure.</string>
+    <string name="prop_medida_unidade_g100g">g/100 g d’eau</string>
+    <string name="prop_medida_unidade_gl">g/L (dans l’eau)</string>
+    <string name="prop_medida_a_temperatura">à %1$s K (%2$s °C)</string>
+    <string name="prop_medida_a_pressao">à %1$s Pa (%2$s atm)</string>
+    <string name="prop_medida_fase">phase : %1$s</string>
+    <string name="prop_medida_referencia">référence : %1$s</string>
+    <string name="prop_medida_sem_referencia">sans référence dans Wikidata</string>
+    <plurals name="prop_medida_sem_referencia_corroborado">
+        <item quantity="one">sans référence dans Wikidata (%1$d déclaration concorde)</item>
+        <item quantity="many">sans référence dans Wikidata (%1$d déclarations concordent)</item>
+        <item quantity="other">sans référence dans Wikidata (%1$d déclarations concordent)</item>
+    </plurals>
+    <string name="prop_medida_derivado">déduit des points de fusion et d’ébullition du jeu de données, à 25 °C et 1 atm</string>
+    <string name="prop_medida_derivado_nome">SaibaTudo Química (valeur déduite)</string>
+    <string name="prop_medida_fonte_pacote">jeu de données</string>
+    <string name="prop_medida_revisar">valeur à vérifier</string>
+    <string name="prop_medida_aviso_revisar">Valeur à vérifier : celle de PubChem est peut-être obsolète (elle diffère des tables actuelles) et Wikidata n’a pas cette propriété.</string>
+    <string name="prop_medida_nota_pauling">Échelle de Pauling, avec les valeurs révisées d’Allred (1961), comme dans PubChem ; les livres qui utilisent les valeurs originales de Pauling diffèrent pour quelques éléments.</string>
+    <string name="prop_medida_nota_pka">Plus petit pKa enregistré (première dissociation) ; pour les bases, Wikidata enregistre en général le pKa de l’acide conjugué, et les acides forts n’ont pas de pKa.</string>
+    <string name="prop_medida_estado_a25">état physique à 25 °C et 1 atm</string>
+    <string name="resp_prop_de">%1$s (%2$s)</string>
+    <string name="resp_prop_nao_tem">Le jeu de données ne contient pas : %1$s.</string>
+    <string name="resp_prop_oferece">Pour %1$s, le jeu de données contient : %2$s.</string>
+    <string name="resp_prop_solubilidade_de_qual">Indiquez le composé dont vous voulez la solubilité dans l’eau. Par exemple : « solubilité de l’urée ».</string>
+    <string name="resp_prop_propriedades_de">Propriétés : %1$s</string>
+    <string name="resp_comparar_maior">%1$s : plus élevé pour %2$s (%3$s).</string>
+    <string name="lista_e">%1$s et %2$s</string>
+
     <!-- 24_categorias_estados -->
     <string name="categoria_metal_alcalino">Métal alcalin</string>
     <string name="categoria_metal_alcalino_terroso">Métal alcalino-terreux</string>

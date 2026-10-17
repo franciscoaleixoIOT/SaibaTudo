@@ -109,6 +109,32 @@ object PacoteJson {
 
     fun fontes(e: JsonElement?): List<Fonte> = e.arr()?.mapNotNull { it.obj()?.let(::fonte) }.orEmpty()
 
+    /** Origem de um valor (`fontesPorPropriedade[campo]`, DATA_CONTRACT §2 e §3.1); objeto sem nenhum campo conhecido = null. */
+    fun fonteValor(o: JsonObject): FonteValor? {
+        val c = o.get("condicoes").obj()?.let { x ->
+            CondicoesMedida(x.numero("temperaturaK"), x.numero("pressaoPa"), x.texto("fase")).takeIf { !it.vazia }
+        }
+        val f = FonteValor(
+            nome = o.texto("nome"), url = o.texto("url"), licenca = o.texto("licenca", "licença"), acessadoEm = o.texto("acessadoEm"),
+            declaracao = o.texto("declaracao"), referencia = o.texto("referencia"), valorOriginal = o.numero("valorOriginal"),
+            unidadeOriginal = o.texto("unidadeOriginal"), condicoes = c, semReferencia = o.booleano("semReferencia") == true,
+            corroboradoPor = o.inteiro("corroboradoPor"), metodo = o.texto("metodo"), aviso = o.texto("aviso"), revisar = o.booleano("revisar") == true,
+            escala = o.texto("escala"), nota = o.texto("nota")
+        )
+        return f.takeIf { it.nome != null || it.url != null || it.metodo != null || it.precisaRevisar || it.escala != null }
+    }
+
+    /** `fontesPorPropriedade`: campo → objeto (uma origem) ou lista alinhada (`pkaValores`). Campos sem origem legível ficam de fora. */
+    fun fontesPorPropriedade(e: JsonElement?): Map<String, List<FonteValor>> {
+        val o = e.obj() ?: return emptyMap()
+        val out = linkedMapOf<String, List<FonteValor>>()
+        for ((campo, v) in o.entrySet()) {
+            val l = (v.arr()?.mapNotNull { it.obj()?.let(::fonteValor) } ?: v.obj()?.let(::fonteValor)?.let { listOf(it) }).orEmpty()
+            if (l.isNotEmpty()) out[campo] = l
+        }
+        return out
+    }
+
     fun fontesDeArquivo(raiz: JsonElement): List<Fonte> = listaDeObjetos(raiz, "fontes", "sources").mapNotNull(::fonte)
 
     // ---- elementos ----------------------------------------------------------------------------------------------
@@ -144,7 +170,8 @@ object PacoteJson {
             estadosOxidacao = o.get("estadosOxidacao").arr()?.mapNotNull { if (it.isJsonPrimitive) it.asDouble.toInt() else null }.orEmpty(),
             descobertaAno = desc?.inteiro("ano"),
             descobertaPor = desc?.texto("por"),
-            fontes = fontes(o.get("fontes"))
+            fontes = fontes(o.get("fontes")),
+            fontesPorPropriedade = fontesPorPropriedade(o.get("fontesPorPropriedade"))
         )
     }
 
@@ -159,11 +186,16 @@ object PacoteJson {
         val nome = o.texto("nome") ?: nomeIupac ?: return null
         val propsNum = linkedMapOf<String, Double>()
         val propsTxt = linkedMapOf<String, String>()
+        val propsLista = linkedMapOf<String, List<Double>>()
         o.get("propriedades").obj()?.entrySet()?.forEach { (k, v) ->
             if (v.isJsonPrimitive) {
                 val p = v.asJsonPrimitive
                 if (p.isNumber) propsNum[k] = p.asDouble
                 else if (p.isString) p.asString.trim().takeIf { it.isNotEmpty() }?.let { propsTxt[k] = it }
+            } else if (v.isJsonArray) {
+                // listas de números (pkaValores); outros formatos são ignorados
+                val l = v.asJsonArray.mapNotNull { x -> if (x.isJsonPrimitive && x.asJsonPrimitive.isNumber) x.asDouble.takeIf { it.isFinite() } else null }
+                if (l.isNotEmpty()) propsLista[k] = l
             }
         }
         val g = o.get("ghs").obj()
@@ -185,6 +217,8 @@ object PacoteJson {
             cas = o.texto("cas"),
             propriedades = propsNum,
             propriedadesTexto = propsTxt,
+            propriedadesListas = propsLista,
+            fontesPorPropriedade = fontesPorPropriedade(o.get("fontesPorPropriedade")),
             ghs = g?.let { ghs(it) },
             classes = o.textos("classes"),
             wikidata = o.texto("wikidata"),
@@ -348,7 +382,8 @@ object PacoteJson {
             val id = p.texto("id") ?: return@mapNotNull null
             PropriedadeDef(
                 id, p.texto("rotulo", "nome") ?: id, p.texto("campo"), p.texto("alvo", "escopo") ?: "", p.texto("tipo") ?: "", p.texto("unidade"), p.textos("sinonimos"),
-                rotulos = porIdioma(p.get("rotulos")), sinonimosPorIdioma = listasPorIdioma(p.get("sinonimosPorIdioma")), origem = p.texto("origem")
+                rotulos = porIdioma(p.get("rotulos")), sinonimosPorIdioma = listasPorIdioma(p.get("sinonimosPorIdioma")), origem = p.texto("origem"),
+                escopos = p.textos("escopos"), origens = p.textos("origens"), escala = p.texto("escala")
             )
         }
         val unidades = unidadesDeRegras(o)

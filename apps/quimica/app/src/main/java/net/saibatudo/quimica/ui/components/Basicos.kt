@@ -157,13 +157,13 @@ fun ChipsLinha(itens: List<String>, selecionado: String?, onClick: (String) -> U
     }
 }
 
-/** Lista de fontes com licença; o endereço é um botão que abre no navegador. */
+/** Lista de fontes com licença (e o detalhe da origem do valor, quando houver); o endereço é um botão que abre no navegador. */
 @Composable
-fun FontesView(fontes: List<Fonte>, onAbrirUrl: (String) -> Unit, modifier: Modifier = Modifier) {
+fun FontesView(fontes: List<Fonte>, onAbrirUrl: (String) -> Unit, modifier: Modifier = Modifier, comTitulo: Boolean = true) {
     if (fontes.isEmpty()) return
     val t = LocalTextos.current
     Column(modifier, verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(t(if (fontes.size > 1) R.string.ui_fontes else R.string.ui_fonte), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        if (comTitulo) Text(t(if (fontes.size > 1) R.string.ui_fontes else R.string.ui_fonte), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         fontes.forEach { f ->
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(f.rotulo(), Modifier.weight(1f), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)

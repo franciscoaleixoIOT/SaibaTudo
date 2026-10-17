@@ -10,13 +10,49 @@ data class Fonte(
     val licenca: String? = null,
     val acessadoEm: String? = null,
     val uso: String? = null,
-    val id: String? = null
+    val id: String? = null,
+    /** Detalhe da origem de UM valor, já no idioma: referência citada, "sem referência no Wikidata", "valor a revisar" (fontesPorPropriedade). */
+    val detalhe: String? = null
 ) {
-    /** "PubChem CID 2244 – domínio público (NIH)". */
+    /** "PubChem CID 2244 – domínio público (NIH)"; com [detalhe], "Wikidata – CC0 (referência: CRC Handbook…)" (como `fonteEl` do site). */
     fun rotulo(): String = buildString {
         append(nome)
         if (!licenca.isNullOrBlank()) append(" – ").append(licenca)
+        if (!detalhe.isNullOrBlank()) append(" (").append(detalhe).append(')')
     }
+}
+
+/** Condições de uma medida (`fontesPorPropriedade[campo].condicoes`, docs/DATA_CONTRACT.md §3.1). */
+data class CondicoesMedida(val temperaturaK: Double? = null, val pressaoPa: Double? = null, val fase: String? = null) {
+    val vazia: Boolean get() = temperaturaK == null && pressaoPa == null && fase.isNullOrBlank()
+}
+
+/**
+ * Origem de UM valor (`fontesPorPropriedade[campo]` de elementos e compostos, docs/DATA_CONTRACT.md §2 e §3.1): a fonte (`nome`, `url`, `licenca`,
+ * `acessadoEm`) e o que o Wikidata registra da declaração (`declaracao`, `referencia`, `valorOriginal`/`unidadeOriginal`, `condicoes`,
+ * `semReferencia` + `corroboradoPor`), o método de um valor derivado (`metodo`), o aviso de revisão dos elementos (`aviso`/`revisar`) e a escala
+ * da eletronegatividade (`escala`, `nota`). Campo ausente = null.
+ */
+data class FonteValor(
+    val nome: String? = null,
+    val url: String? = null,
+    val licenca: String? = null,
+    val acessadoEm: String? = null,
+    val declaracao: String? = null,
+    val referencia: String? = null,
+    val valorOriginal: Double? = null,
+    val unidadeOriginal: String? = null,
+    val condicoes: CondicoesMedida? = null,
+    val semReferencia: Boolean = false,
+    val corroboradoPor: Int? = null,
+    val metodo: String? = null,
+    val aviso: String? = null,
+    val revisar: Boolean = false,
+    val escala: String? = null,
+    val nota: String? = null
+) {
+    /** O pacote marcou o valor para revisão (`revisar: true` ou um `aviso`). */
+    val precisaRevisar: Boolean get() = revisar || !aviso.isNullOrBlank()
 }
 
 /**
@@ -79,7 +115,9 @@ data class Elemento(
     val estadosOxidacao: List<Int> = emptyList(),
     val descobertaAno: Int? = null,
     val descobertaPor: String? = null,
-    val fontes: List<Fonte> = emptyList()
+    val fontes: List<Fonte> = emptyList(),
+    /** Origem por valor (`elementos[].fontesPorPropriedade`): energia de ionização, eletronegatividade (escala) e afinidade eletrônica (aviso). */
+    val fontesPorPropriedade: Map<String, List<FonteValor>> = emptyMap()
 )
 
 /** Classificação GHS harmonizada (CLP/UE, Anexo VI) do composto, quando existe no dado. */
@@ -116,8 +154,12 @@ data class Composto(
     val cas: String? = null,
     /** Propriedades numéricas em SI (chave do contrato → valor). */
     val propriedades: Map<String, Double> = emptyMap(),
-    /** Propriedades textuais, se houver. */
+    /** Propriedades textuais, se houver (ex.: `estadoPadrao`). */
     val propriedadesTexto: Map<String, String> = emptyMap(),
+    /** Propriedades que são listas de números (`pkaValores`, crescente). */
+    val propriedadesListas: Map<String, List<Double>> = emptyMap(),
+    /** Origem por valor das propriedades medidas (`fontesPorPropriedade`; `pkaValores` traz uma por valor, alinhada). */
+    val fontesPorPropriedade: Map<String, List<FonteValor>> = emptyMap(),
     val ghs: Ghs? = null,
     val classes: List<String> = emptyList(),
     val wikidata: String? = null,
@@ -179,7 +221,10 @@ data class LoteTextos(val caminho: String, val fonte: String, val idioma: String
 /** `textos/index.json` (docs/DATA_CONTRACT.md §5): os lotes de trechos por fonte e idioma. */
 data class TextosIndice(val versao: Int, val lotes: List<LoteTextos>)
 
-/** Definição de propriedade pesquisável (regras.propriedades). `alvo`: elemento ou composto; `tipo` define a formatação. */
+/**
+ * Definição de propriedade pesquisável (regras.propriedades). `alvo`: escopo principal (elemento, composto ou "ambos" no fixture); [escopos] diz em
+ * que registros a propriedade existe (DATA_CONTRACT §3.1: fusão, ebulição, densidade e estado valem para elemento E composto); `tipo` define a formatação.
+ */
 data class PropriedadeDef(
     val id: String,
     val rotulo: String,
@@ -193,8 +238,31 @@ data class PropriedadeDef(
     /** Sinônimos por idioma (`regras.propriedades[id].sinonimosPorIdioma`); `sinonimos` continua sendo pt-BR. */
     val sinonimosPorIdioma: Map<String, List<String>> = emptyMap(),
     /** Campo de origem no formato do pipeline ("elementos.pontoFusaoK", "compostos.propriedades.xlogp"). */
-    val origem: String? = null
-)
+    val origem: String? = null,
+    /** Escopos declarados (`escopos` do pacote ou da lista padrão); vazio = só [alvo]. */
+    val escopos: List<String> = emptyList(),
+    /** Origens declaradas (`origens`: "compostos.propriedades.pontoFusaoK"…); o prefixo também dá escopo. */
+    val origens: List<String> = emptyList(),
+    /** Campos possíveis no registro do composto, em ordem de preferência (solubilidade em g/100 g ou g/L; pKa em lista ou único). */
+    val campos: List<String> = emptyList(),
+    /** Propriedade física MEDIDA do composto (Wikidata, com origem por valor em `fontesPorPropriedade`). */
+    val medida: Boolean = false,
+    /** Escala declarada (`regras.propriedades.eletronegatividade.escala`: "Pauling"). */
+    val escala: String? = null
+) {
+    /** Escopos efetivos: [escopos] + prefixos de [origens]; sem nenhum, o [alvo] ("ambos" = os dois). */
+    val escoposEfetivos: List<String> get() {
+        val s = LinkedHashSet<String>()
+        escopos.filter { it == "elemento" || it == "composto" }.forEach { s += it }
+        origens.forEach { o -> when (o.substringBefore('.')) { "elementos" -> s += "elemento"; "compostos" -> s += "composto" } }
+        if (s.isEmpty()) when (alvo) { "ambos" -> { s += "elemento"; s += "composto" }; "composto" -> s += "composto"; else -> s += "elemento" }
+        if (alvo == "ambos") { s += "elemento"; s += "composto" }
+        return s.toList()
+    }
+
+    /** A propriedade existe neste escopo ("elemento" | "composto")? */
+    fun temEscopo(escopo: String): Boolean = escopo in escoposEfetivos
+}
 
 /** Unidade de medida: base = valor × fator + offset (unidade-base da grandeza). */
 data class UnidadeDef(

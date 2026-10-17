@@ -32,7 +32,7 @@ internal object LexicoPtBr {
         "fontes" to "\\b(?:quais (?:sao )?as (?:fontes|licencas)|licencas? dos dados|qual (?:e )?a fonte|fontes? (?:das? )?(?:informac\\w+|respostas?)|de onde (?:tirou|vem) (?:essa|esta|a) (?:informacao|resposta)|referencias?)\\b",
         "balancear" to "\\bbalanc\\w*|\\bequilibr\\w+ (?:a |uma )?equacao\\b|\\bacert\\w+ (?:os )?coeficientes\\b",
         "conversao" to "\\b(?:convert\\w+|converta|transform\\w+|passar|passe|equivale\\w*|quantos? \\S+(?: \\S+)? (?:tem|ha|sao|equivalem|existem|correspondem)|quantas? \\S+(?: \\S+)? (?:tem|ha|sao|equivalem|existem|correspondem)|em quantos?)\\b",
-        "ph" to "\\b(?:ph|poh)\\b|\\bacidez de\\b|\\bbasicidade\\b",
+        "ph" to "\\b(?:ph|poh)\\b|(?<!constante de )\\bacidez de\\b|\\bbasicidade\\b",
         "gas" to "\\b(?:gas(?:es)? ideais?|gas ideal|pv ?= ?nrt|pvnrt|lei dos gases|equacao (?:de clapeyron|dos gases|geral dos gases)|clapeyron|volume (?:molar|de um gas|de gas)|pressao (?:de um gas|do gas)|lei de boyle|lei de charles|gay lussac)\\b",
         "gasVariavel" to "\\bgas(?:es)?\\b",
         "concentracao" to "\\b(?:molaridade|concentracao|concentrad[ao]|diluic\\w*|diluir|dilua|diluido|c1 ?v1|c1v1|titulo (?:em massa|da solucao)|percentual (?:em )?massa|porcentagem em massa|partes por milhao|ppm|normalidade|molalidade|solucao de|gramas por litro|mol l|mol por litro|g l)\\b",
@@ -686,6 +686,34 @@ internal object LexicoPtBr {
         "area de superficie polar"
     )
 
+    private fun n_propriedades_solubilidade(): List<Any?> = listOf<Any?>(
+        "solubilidade",
+        "solubilidade em agua",
+        "solubilidade na agua",
+        "coeficiente de solubilidade",
+        "soluvel em agua",
+        "soluvel na agua",
+        "insoluvel em agua",
+        "insoluvel na agua",
+        "soluvel",
+        "insoluvel",
+        "quanto dissolve",
+        "quanto se dissolve",
+        "se dissolve",
+        "dissolve em agua",
+        "dissolve na agua"
+    )
+
+    private fun n_propriedades_pka(): List<Any?> = listOf<Any?>(
+        "pka",
+        "constante de acidez",
+        "constante de ionizacao acida",
+        "constante de dissociacao acida",
+        "constante de ionizacao do acido",
+        "constante de dissociacao do acido",
+        "ka"
+    )
+
     private fun n_propriedades(): Map<String, Any?> = linkedMapOf<String, Any?>(
         "numeroAtomico" to n_propriedades_numeroAtomico(),
         "massaAtomica" to n_propriedades_massaAtomica(),
@@ -718,7 +746,9 @@ internal object LexicoPtBr {
         "aceptoresH" to n_propriedades_aceptoresH(),
         "ligacoesRotaveis" to n_propriedades_ligacoesRotaveis(),
         "carga" to n_propriedades_carga(),
-        "tpsa" to n_propriedades_tpsa()
+        "tpsa" to n_propriedades_tpsa(),
+        "solubilidade" to n_propriedades_solubilidade(),
+        "pka" to n_propriedades_pka()
     )
 
     private fun n_stopwordsBusca(): List<Any?> = listOf<Any?>(
@@ -888,7 +918,8 @@ internal object LexicoPtBr {
         "PIS",
         "SP",
         "CIP",
-        "OH"
+        "OH",
+        "SAL"
     )
 
     private fun n_seguranca_acao(): List<Any?> = listOf<Any?>(

@@ -520,6 +520,38 @@
     <string name="prop_tpsa">polare Oberfläche (TPSA)</string>
     <string name="prop_descoberta_por">von %1$s</string>
 
+    <!-- propriedades físicas medidas (fontesPorPropriedade, 17/10/2026; textos dos catálogos do site) -->
+    <string name="prop_solubilidade">Löslichkeit in Wasser</string>
+    <string name="prop_pka">pKs-Wert</string>
+    <string name="prop_medida_titulo">Physikalische Eigenschaften</string>
+    <string name="prop_medida_intro">Gemessene Werte, jeweils mit Quelle und Messbedingungen.</string>
+    <string name="prop_medida_unidade_g100g">g/100 g Wasser</string>
+    <string name="prop_medida_unidade_gl">g/L (in Wasser)</string>
+    <string name="prop_medida_a_temperatura">bei %1$s K (%2$s °C)</string>
+    <string name="prop_medida_a_pressao">bei %1$s Pa (%2$s atm)</string>
+    <string name="prop_medida_fase">Phase: %1$s</string>
+    <string name="prop_medida_referencia">Beleg: %1$s</string>
+    <string name="prop_medida_sem_referencia">ohne Beleg in Wikidata</string>
+    <plurals name="prop_medida_sem_referencia_corroborado">
+        <item quantity="one">ohne Beleg in Wikidata (%1$d Aussage stimmt überein)</item>
+        <item quantity="other">ohne Beleg in Wikidata (%1$d Aussagen stimmen überein)</item>
+    </plurals>
+    <string name="prop_medida_derivado">abgeleitet aus Schmelz- und Siedepunkt des Pakets, bei 25 °C und 1 atm</string>
+    <string name="prop_medida_derivado_nome">SaibaTudo Química (abgeleiteter Wert)</string>
+    <string name="prop_medida_fonte_pacote">Datenpaket</string>
+    <string name="prop_medida_revisar">Wert wird geprüft</string>
+    <string name="prop_medida_aviso_revisar">Wert wird geprüft: Der PubChem-Wert ist möglicherweise veraltet (er weicht von aktuellen Tabellen ab), und Wikidata hat diese Eigenschaft nicht.</string>
+    <string name="prop_medida_nota_pauling">Pauling-Skala mit den revidierten Werten von Allred (1961), wie bei PubChem; Bücher mit den ursprünglichen Pauling-Werten weichen bei einigen Elementen ab.</string>
+    <string name="prop_medida_nota_pka">Kleinster erfasster pKs-Wert (erste Dissoziation); für Basen erfasst Wikidata meist den pKs-Wert der konjugierten Säure, und starke Säuren haben keinen.</string>
+    <string name="prop_medida_estado_a25">Aggregatzustand bei 25 °C und 1 atm</string>
+    <string name="resp_prop_de">%1$s von %2$s</string>
+    <string name="resp_prop_nao_tem">Das Datenpaket enthält nicht: %1$s.</string>
+    <string name="resp_prop_oferece">Für %1$s enthält das Paket: %2$s.</string>
+    <string name="resp_prop_solubilidade_de_qual">Sagen Sie, von welcher Verbindung Sie die Löslichkeit in Wasser wissen möchten. Zum Beispiel: „Löslichkeit von Harnstoff“.</string>
+    <string name="resp_prop_propriedades_de">Eigenschaften von %1$s</string>
+    <string name="resp_comparar_maior">%1$s: höher bei %2$s (%3$s).</string>
+    <string name="lista_e">%1$s und %2$s</string>
+
     <!-- 24_categorias_estados -->
     <string name="categoria_metal_alcalino">Alkalimetall</string>
     <string name="categoria_metal_alcalino_terroso">Erdalkalimetall</string>

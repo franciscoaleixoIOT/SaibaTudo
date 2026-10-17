@@ -32,7 +32,7 @@ internal object LexicoFr {
         "fontes" to "\\b(?:quelles (?:sont )?(?:les )?(?:sources|licences)|quelle licence|sous quelle licence|licences? des donnees|quelle est la source|sources? (?:de (?:l |la |cette )?)?(?:information|reponses?)|d ou (?:vient|sort|provient) (?:cette|la) (?:information|reponse)|references?|bibliographie)\\b",
         "balancear" to "\\bequilibr\\w*|\\bajust\\w+ (?:l |une |cette )?equation\\b|\\bajust\\w+ (?:les )?coefficients\\b|\\bbalanc\\w*",
         "conversao" to "\\b(?:convert\\w+|convertis|transform\\w+|passer|passe|equivau\\w+|equival\\w+|combien (?:de |d )?\\S+(?: \\S+)? (?:y a[- ]t[- ]il|il y a|font|valent|dans|correspondent|font[- ]ils)|en combien)\\b",
-        "ph" to "\\b(?:ph|poh)\\b|\\bacidite de\\b|\\bbasicite\\b|\\balcalinite\\b",
+        "ph" to "\\b(?:ph|poh)\\b|(?<!constante d )\\bacidite de\\b|\\bbasicite\\b|\\balcalinite\\b",
         "gas" to "\\b(?:gaz parfaits?|gaz ideal|gaz ideaux|pv ?= ?nrt|pvnrt|loi des gaz|equation (?:de clapeyron|des gaz parfaits|d etat)|clapeyron|volume (?:molaire|d un gaz|du gaz)|pression (?:d un gaz|du gaz)|loi de boyle|loi de mariotte|boyle mariotte|loi de charles|gay lussac)\\b",
         "gasVariavel" to "\\bgaz\\b",
         "concentracao" to "\\b(?:molarite|concentration|concentre\\w*|dilu\\w*|c1 ?v1|c1v1|fraction massique|titre massique|pourcentage (?:en |de )?masse|pourcentage massique|pour ?cent (?:en |de )?masse|pour ?cent massique|parties par million|ppm|normalite|molalite|solution de|grammes? par litre|mol l|mol par litre|moles par litre|g l)\\b",
@@ -710,6 +710,28 @@ internal object LexicoFr {
         "aire de surface polaire"
     )
 
+    private fun n_propriedades_solubilidade(): List<Any?> = listOf<Any?>(
+        "solubilite",
+        "solubilite dans l eau",
+        "soluble dans l eau",
+        "insoluble dans l eau",
+        "soluble",
+        "insoluble",
+        "combien se dissout",
+        "se dissout dans l eau",
+        "se dissout",
+        "dissout dans l eau"
+    )
+
+    private fun n_propriedades_pka(): List<Any?> = listOf<Any?>(
+        "pka",
+        "constante d acidite",
+        "constante d ionisation acide",
+        "constante de dissociation acide",
+        "constante de dissociation de l acide",
+        "ka"
+    )
+
     private fun n_propriedades(): Map<String, Any?> = linkedMapOf<String, Any?>(
         "numeroAtomico" to n_propriedades_numeroAtomico(),
         "massaAtomica" to n_propriedades_massaAtomica(),
@@ -742,7 +764,9 @@ internal object LexicoFr {
         "aceptoresH" to n_propriedades_aceptoresH(),
         "ligacoesRotaveis" to n_propriedades_ligacoesRotaveis(),
         "carga" to n_propriedades_carga(),
-        "tpsa" to n_propriedades_tpsa()
+        "tpsa" to n_propriedades_tpsa(),
+        "solubilidade" to n_propriedades_solubilidade(),
+        "pka" to n_propriedades_pka()
     )
 
     private fun n_stopwordsBusca(): List<Any?> = listOf<Any?>(
@@ -980,7 +1004,8 @@ internal object LexicoFr {
         "SP",
         "CIP",
         "OH",
-        "NON"
+        "NON",
+        "SAL"
     )
 
     private fun n_seguranca_acao(): List<Any?> = listOf<Any?>(
