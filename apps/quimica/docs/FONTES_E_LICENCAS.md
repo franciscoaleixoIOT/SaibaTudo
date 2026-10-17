@@ -226,6 +226,10 @@ Pesquisa web por agente (P = lido na página de termos; S = só em resultado de 
 
 **Lacunas sem fonte aberta estruturada:** Kps, entalpias de formação padrão, polímeros, espectros em escala. Caminho: tabelas de fatos compiladas à mão em `regras.json` a partir de fontes abertas múltiplas, com citação por valor.
 
+## 7.1 Páginas de dados da Wikipédia em inglês e tradução automática (17/10/2026)
+- **`wikipedia-en-dados`** (CC BY-SA 4.0, com link permanente `oldid` e a referência primária citada pela página): potenciais padrão de eletrodo da série de reatividade, solubilidade/Kps de Ca(OH)₂, Mg(OH)₂, Sr(OH)₂ e Ba(OH)₂ (`regras.solubilidadeBases`) e pKw por temperatura (`regras.agua`). Atribuição em `fontes.json` e por tabela em `regras.fontes`.
+- **Tradução automática** dos trechos em inglês do ChEBI (CC BY 4.0) e do Gutenberg (domínio público) para o português, feita pelo modelo Qwen3.8 Max via kilo em 16/10/2026 (`pipeline/traducoes/`): é adaptação da obra — o pacote guarda o original (`textoOriginal`), marca `traducao: "automatica"`, `traducaoModelo` e acrescenta "traduzido automaticamente para o português (não revisado por pessoa)" à atribuição; a licença da fonte não muda (CC BY exige indicar a adaptação).
+
 ## 8. Propriedades físicas e energia de ionização do Wikidata (16/10/2026)
 Decisão: as propriedades físicas **medidas** dos compostos e a 1ª energia de ionização dos elementos entram pelo **Wikidata (CC0)**, que é a
 fonte de licença limpa; a referência que cada declaração cita no Wikidata (CRC Handbook, HSDB, NIOSH Pocket Guide, Jean-Claude Bradley Open
