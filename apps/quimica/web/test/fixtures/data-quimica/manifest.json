@@ -4,12 +4,12 @@
  "schemaVersion": 1,
  "files": {
   "compostos/index.json": {
-   "bytes": 9369,
-   "sha256": "f33cb9bf04c223cee723dadea17d21c1a6a1dc1dfe42bc9981e680f49426eba9"
+   "bytes": 9472,
+   "sha256": "5d58ab744dfa6cc02ab09c72b938cf96b70b50429e3ac21feff4f374b59e56e2"
   },
   "compostos/lote-001.json": {
-   "bytes": 21196,
-   "sha256": "8c3ae5fbcfa0d839ce286a24873233daa0f63ad5512e1220b11fa8a18f1cab6b"
+   "bytes": 21242,
+   "sha256": "cf4ec557191bc8e71ffd296e51a4627b68e09cf43031e6c455baab56e9e57f99"
   },
   "constantes.json": {
    "bytes": 703,

@@ -4387,13 +4387,15 @@
       "q": "is salt soluble in water?",
       "idioma": "en",
       "intent": "PROPRIEDADE",
-      "propriedade": "solubilidade"
+      "propriedade": "solubilidade",
+      "composto": 5234
     },
     {
       "q": "melting point of salt",
       "idioma": "en",
       "intent": "PROPRIEDADE",
-      "propriedade": "pontoFusaoK"
+      "propriedade": "pontoFusaoK",
+      "composto": 5234
     },
     {
       "q": "¿qué es una sal?",

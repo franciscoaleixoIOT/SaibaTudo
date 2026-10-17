@@ -153,6 +153,7 @@
   },
   "sinonimosPorIdioma": {
    "en": [
+    "salt",
     "table salt",
     "halite",
     "rock salt"
@@ -167,7 +168,10 @@
     "Speisesalz",
     "Salz"
    ],
-   "fr": []
+   "fr": [
+    "sel",
+    "sel de table"
+   ]
   },
   "formula": "NaCl",
   "formulaHill": "ClNa",
