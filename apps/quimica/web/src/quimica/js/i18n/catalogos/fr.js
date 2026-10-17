@@ -683,6 +683,9 @@ export default {
         passoMassa: 'Convertissez en masse (m = n × M) :', sobra: 'Ce qui reste des réactifs en excès (initial − consommé) :',
         reagenteLimitante: 'Réactif limitant', formado: 'Quantité formée : {formula}', emExcesso: 'Excès (reste) : {formula}', necessario: 'Quantité nécessaire : {formula}',
         coeficientesIgnorados: 'Les coefficients saisis ont été ignorés : l’application équilibre l’équation.',
+        produtoComRendimento: (p) => `La quantité souhaitée de ${p.formula} est celle obtenue avec un rendement de ${p.rend} % : divisez par le rendement pour trouver l’avancement que la réaction doit atteindre (ξ = n ÷ coefficient ÷ rendement) ; la quantité de produit indiquée ne change pas.`,
+        passoNecessarios: 'Réactifs nécessaires (n = coefficient × ξ) :',
+        notaCntp: 'CNTP (0 °C, 1 atm) : {vm} L/mol, le volume molaire utilisé ici.', notaIupac: 'Dans la condition standard actuelle de l’IUPAC (0 °C, 1 bar), le volume molaire est de {vmIupac} L/mol.',
         notaTabela: 'Le volume et les particules des produits figurent dans le tableau ; le volume ne s’applique qu’aux gaz parfaits aux CNTP (0 °C et 1 atm).'
       },
       gas: {
@@ -701,6 +704,9 @@ export default {
         boyleNota: 'Valable pour un gaz parfait de même quantité de matière et de même température dans les deux états.'
       },
       ph: {
+        nota25C: 'pKw = {pKw} et pH neutre = {neutro} valent à 25 °C ; à d’autres températures, les deux changent (l’eau pure reste neutre).',
+        saturada: 'Attention : {formula} est peu soluble dans l’eau{temp} : il s’en dissout au plus environ {s} mol/L{kps}{fonte}. La concentration indiquée dépasse cette valeur : la solution est saturée (il reste du solide) et le pH réel ne dépasse pas environ {phMax}.',
+        saturadaTemp: ' (à {temp} °C)', saturadaKps: ' (calculé à partir du Ks)', saturadaFonte: ', selon {fonte}',
         tipos: { 'acido-forte': 'Acide fort', 'base-forte': 'Base forte', 'acido-fraco': 'Acide faible (Ka donné)', 'base-fraca': 'Base faible (Kb donné)', converter: 'Convertir pH, pOH, [H⁺], [OH⁻]' },
         classes: { neutra: 'neutre', acida: 'acide', basica: 'basique' }, solucao: 'Solution', pKw: 'Produit ionique de l’eau : pKw = {valor} ({origem}).',
         umValor: 'Indiquez exactement une valeur : pH, pOH, [H⁺] ou [OH⁻].', concPositiva: 'La concentration doit être supérieure à zéro.', phInformado: 'Le pH a été donné.',

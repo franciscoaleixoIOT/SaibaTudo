@@ -1,6 +1,6 @@
 // Contexto das calculadoras: monta, a partir do pacote de dados (elementos, constantes, regras), as funções que os cálculos usam.
 // Nenhum valor numérico é embutido aqui, exceto convenções documentadas (CNTP e pKw a 25 °C), usadas só quando o pacote não as traz.
-import { SIMBOLOS_SET } from './formula.js';
+import { SIMBOLOS_SET, chaveFormula, parseFormula } from './formula.js';
 import { paraBase, tabelaDeUnidades } from './unidades.js';
 import { t } from '../i18n/index.js';
 
@@ -76,6 +76,40 @@ export function criarContexto({ elementos = [], constantes = null, regras = null
     return { valor: (R.valor * T) / P, T, P, R };
   }
 
+  /** Volume molar (m³/mol) na condição padrão atual da IUPAC (0 °C e 1 bar), só para a nota ao lado das CNTP. */
+  function volumeMolarIUPAC() {
+    const R = gasR();
+    const T = zeroCelsius();
+    let P = null;
+    try { P = paraBase(unidades, 'bar', 'pressao', 1); } catch { P = null; }
+    if (!R || !P || !T) return null;
+    return { valor: (R.valor * T) / P, T, P, R };
+  }
+
+  // Solubilidade de bases pouco solúveis (Ca(OH)₂, Mg(OH)₂, Sr(OH)₂…): só do pacote (`regras.solubilidadeBases`, lista de
+  // {formula, kps?, solubilidadeMolL?, temperaturaC?, fonte}); sem a tabela, nenhum aviso de saturação é dado.
+  const solubilidades = new Map();
+  const brutoSol = regras?.solubilidadeBases;
+  const listaSol = Array.isArray(brutoSol) ? brutoSol
+    : brutoSol && typeof brutoSol === 'object' ? Object.entries(brutoSol).map(([formula, v]) => ({ formula, ...v })) : [];
+  for (const it of listaSol) {
+    if (!it?.formula) continue;
+    let k;
+    try { k = chaveFormula(String(it.formula)); } catch { continue; }
+    const kps = Number(it.kps ?? it.Kps);
+    let s = Number(it.solubilidadeMolL ?? it.solubilidade);
+    let n = null;
+    try { n = parseFormula(String(it.formula)).atomos.get('H') ?? null; } catch { n = null; }
+    // M(OH)n: Kps = s·(n·s)^n → s = (Kps / n^n)^(1/(n+1))
+    if (!(s > 0) && kps > 0 && n) s = (kps / n ** n) ** (1 / (n + 1));
+    if (!(s > 0)) continue;
+    solubilidades.set(k, { formula: String(it.formula), solubilidadeMolL: s, kps: kps > 0 ? kps : null, n, temperaturaC: Number.isFinite(Number(it.temperaturaC)) ? Number(it.temperaturaC) : null, fonte: it.fonte ?? null, deKps: !(Number(it.solubilidadeMolL ?? it.solubilidade) > 0) });
+  }
+  const solubilidadeBase = (formula) => {
+    if (!formula || !solubilidades.size) return null;
+    try { return solubilidades.get(chaveFormula(String(formula))) ?? null; } catch { return null; }
+  };
+
   const regrasPKw = Number(regras?.agua?.pKw ?? regras?.pKw ?? regras?.constantes?.pKw);
   const kwCons = constante('Kw');
   // `origem` é uma chave do catálogo (respostas.unidades.pKw.*), resolvida no idioma ativo por ph.js
@@ -86,7 +120,7 @@ export function criarContexto({ elementos = [], constantes = null, regras = null
   const fonteElemento = elementos.find((e) => e.fontes?.length)?.fontes[0] ?? null;
 
   return {
-    elementos, porSimbolo, unidades, constante, gasR, volumeMolarCNTP, pKw, fonteElemento,
+    elementos, porSimbolo, unidades, constante, gasR, volumeMolarCNTP, volumeMolarIUPAC, solubilidadeBase, pKw, fonteElemento,
     simbolos: porSimbolo.size ? new Set([...SIMBOLOS_SET]) : SIMBOLOS_SET,
     massaDe: (s) => porSimbolo.get(s)?.massaAtomica,
     nomeDe: (s) => porSimbolo.get(s)?.nome ?? s,

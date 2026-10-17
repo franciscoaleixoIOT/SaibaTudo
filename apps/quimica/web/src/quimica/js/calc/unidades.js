@@ -20,7 +20,7 @@ export const UNIDADES_PADRAO = {
   massa: T('kg', [['kg', 1, 'quilograma'], ['g', 1e-3, 'grama', true], ['t', 1e3, 'tonelada'], ['lb', 0.45359237, 'libra'], ['oz', 0.028349523125, 'onça'], ['µg', 1e-9, 'micrograma', false, ['ug', 'mcg']]]),
   volume: T('m3', [['m3', 1, 'metro cúbico', false, ['m³']], ['L', 1e-3, 'litro', true, ['l']], ['cm3', 1e-6, 'centímetro cúbico', false, ['cm³', 'cc']], ['dm3', 1e-3, 'decímetro cúbico', false, ['dm³']], ['µL', 1e-9, 'microlitro', false, ['uL']], ['gal', 0.003785411784, 'galão (EUA)']]),
   comprimento: T('m', [['m', 1, 'metro', true], ['Å', 1e-10, 'ångström', false, ['A°', 'angstrom']], ['in', 0.0254, 'polegada', false, ['pol']], ['ft', 0.3048, 'pé'], ['mi', 1609.344, 'milha']]),
-  pressao: T('Pa', [['Pa', 1, 'pascal', true], ['bar', 1e5, 'bar', true], ['atm', 101325, 'atmosfera'], ['mmHg', 101325 / 760, 'milímetro de mercúrio', false, ['torr', 'Torr']], ['psi', 6894.757293168, 'libra-força por polegada quadrada']]),
+  pressao: T('Pa', [['Pa', 1, 'pascal', true], ['bar', 1e5, 'bar', true], ['atm', 101325, 'atmosfera'], ['mmHg', 133.322387415, 'milímetro de mercúrio'], ['Torr', 101325 / 760, 'torr', false, ['torr']], ['psi', 6894.757293168, 'libra-força por polegada quadrada']]),
   energia: T('J', [['J', 1, 'joule', true], ['cal', 4.184, 'caloria termoquímica', true], ['eV', 1.602176634e-19, 'elétron-volt', true], ['kWh', 3.6e6, 'quilowatt-hora']]),
   temperatura: T('K', [['K', 1, 'kelvin'], ['°C', 1, 'grau Celsius', false, ['ºC', 'oC', 'C', '℃'], 273.15], ['°F', 5 / 9, 'grau Fahrenheit', false, ['ºF', 'oF', 'F', '℉'], (459.67 * 5) / 9]]),
   tempo: T('s', [['s', 1, 'segundo', true], ['min', 60, 'minuto'], ['h', 3600, 'hora'], ['d', 86400, 'dia']]),
@@ -122,7 +122,7 @@ export function converter(valor, de, para, tabela, grandeza = null) {
   const b = B.find((x) => x.grupo === a.grupo);
   const emBase = valor * a.fator + a.offset;
   const resultado = (emBase - b.offset) / b.fator;
-  const unid = (u) => `\\mathrm{${u.replace(/°/g, '^{\\circ}').replace(/µ/g, '\\mu ').replace(/Å/g, '\\text{Å}').replace(/(\d)/g, '_$1').replace(/\//g, '/')}}`;
+  const unid = unidadeTex;
   const baseNome = tabela.grupos[a.grupo].base;
   const passos = [];
   if (a.offset || b.offset) {
@@ -133,6 +133,19 @@ export function converter(valor, de, para, tabela, grandeza = null) {
     passos.push({ texto: TU('passoFator'), tex: `${fmtTex(valor)}\\,${unid(a.rotulo)} \\times \\dfrac{${fmtTex(a.fator)}}{${fmtTex(b.fator)}} = ${fmtTex(resultado)}\\,${unid(b.rotulo)}` });
   }
   return { ok: true, valor, de: a.rotulo, para: b.rotulo, resultado, grupo: a.grupo, passos, origem: tabela.origem, origemChave: tabela.origemChave ?? 'padrao' };
+}
+
+const SOBRESCRITOS = { '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9', '⁻': '-' };
+
+/**
+ * Símbolo de unidade em TeX: o número depois do símbolo é EXPOENTE (m3 → m^{3}, s-1 → s^{-1}, mol/m3 → mol/m^{3}), nunca subscrito;
+ * °, µ e Å viram comandos do KaTeX. Só para unidades (fórmulas químicas usam formulaTex).
+ */
+export function unidadeTex(u) {
+  const s = String(u).replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁻]/g, (c) => SOBRESCRITOS[c])
+    .replace(/([^\d\s.,^{}-])(-?\d+)/g, '$1^{$2}')
+    .replace(/°/g, '^{\\circ}').replace(/µ/g, '\\mu ').replace(/Å/g, '\\text{Å}');
+  return `\\mathrm{${s}}`;
 }
 
 /** Lista [{grupo, unidades:[símbolos]}] para montar os seletores. */

@@ -59,7 +59,7 @@
 - [~] **Achados da preparação da ficha (14/10/2026, agente) — resolvidos na mesma noite, exceto (f) e (g):** (a) ~~Android sem "Relatar problema nesta resposta"~~ (feito: botão no rodapé de cada resposta que abre a issue pública pré-preenchida, `domain/Relato.kt` + `RelatoTest`; nunca em recusa de segurança); (b) ~~`BuildConfig.SOURCE_URL` apontava para o repositório arquivado~~ (corrigido 14/10 para `franciscoaleixoIOT/SaibaTudo`); (c) ~~`.vercelignore` sem `/store/`~~ (corrigido 14/10: 63 imagens, 11 MB, não vão mais para a Vercel); (d) ~~PWA: em 432 px o cabeçalho passa de 60 px e cobre parte da barra de abas ao rolar~~ (feito: barra + abas num só bloco fixo `.topo-fixo`, título numa linha; conferido ao vivo em 432 px); (e) ~~linha "Classificação: Regulation (EC) No 1272/2008…" em inglês e repetida~~ (feito no site, `perigos.js` `fonteGhs`, e no Android, `domain/GhsFonte.kt`: a entrada localizada da lista de fontes do composto vence o texto cru do PubChem); (f) capturas da Play são do emulador (Pixel 9); falta a recusa de pedido perigoso no Android (só há a do PWA); (g) conta de serviço da Play API não existe (`PLAY_STORE.md` §8).
 
 ## 7. Operação (fase 7)
-- [ ] `docs/OPERACAO.md` (alertas, chaves de desligamento, ciclo de auto-melhoria) adaptado do app de eleições; captura opt-in de perguntas não entendidas com filtro de dado pessoal; painel noturno de qualidade do modelo.
+- [~] ~~`docs/OPERACAO.md`~~ (feito 16/10/2026, frente F) e ~~captura opt-in de perguntas não entendidas com filtro de dado pessoal~~ (feito 16/10 no site e na API: `POST /quimica/api/melhoria`, lista Redis `quimica:melhoria:<mês>`, `MELHORIA_ENABLED=1` na Vercel; falta o leitor/revisor da fila como o `colher_sinais` do Eleições e o Android, frente B); painel noturno de qualidade do modelo.
 - [ ] `CLAUDE.md` e este arquivo atualizados a cada mudança de estado.
 
 ## 8. Melhorias identificadas na revisão de 10/10/2026 (23h) — por impacto
@@ -88,9 +88,9 @@ Diagnóstico sobre o pacote e o dataset reais (números em `PROJECT_MEMORY.md` �
 - [ ] **Avaliação**: holdout por família + conjunto "perguntas reais" (capturadas opt-in quando o site estiver no ar) como no app de eleições; gate de alucinação numérica já existe (`eval_fidelidade.py`).
 
 ### 8.3 Produto e operação
-- [~] ~~Cliente web/Android ainda **não chamam a API**~~ (nuvem opt-in ligada no site e no Android em 14/10/2026, §4). Falta só o `MelhoriaClient` (captura opt-in com filtro de dado pessoal; aqui sem filtro político, mas com filtro de **pedidos perigosos** — nunca capturar texto de síntese recusada).
+- [~] ~~Cliente web/Android ainda **não chamam a API**~~ (nuvem opt-in ligada no site e no Android em 14/10/2026, §4). ~~Falta só o `MelhoriaClient`~~ (site feito em 16/10; Android na 1.0.1) (captura opt-in com filtro de dado pessoal; aqui sem filtro político, mas com filtro de **pedidos perigosos** — nunca capturar texto de síntese recusada).
 - [ ] Deploy: se a cota da Vercel voltar a estourar, ligar o repositório ao projeto (Git integration) ou usar lotes de textos (8.1).
-- [ ] Monitoramento: `quimica-data-freshness.yml` já alerta por idade (240 h); acrescentar alerta de **divergência de números** entre pacote novo e anterior (ex.: massa molar mudou > 0,5 %) antes de assinar.
+- [x] Monitoramento: `quimica-data-freshness.yml` já alerta por idade (240 h); ~~acrescentar alerta de **divergência de números**~~ (feito 16/10: `tools/comparar_pacotes.py` + passo bloqueante no `quimica-data-refresh.yml`, issue `divergencia-dados-quimica`) entre pacote novo e anterior (ex.: massa molar mudou > 0,5 %) antes de assinar.
 
 ## 8.4 Paridade do assistente com o app de Eleições (`docs/PADRAO_ASSISTENTE.md`, 12/10/2026)
 Feito na web em 12/10: campo que cresce (1–3 linhas, Enter envia), campo limpo ao enviar, histórico de perguntas com cartão ▲▼ e
@@ -104,7 +104,7 @@ dados na resposta, copiar resposta, fechar resposta, relatar problema (issue com
       equação anterior ("balanceie de novo com O3"), e limpar o contexto ao fechar a resposta/trocar de tela (`engine.limparContexto`
       existe e ninguém chama). Molde: `resolverContinuacao` em eleições.
 - [ ] **Chips da home mudam a cada resposta** (hoje são 11 fixos) e "Limpar histórico" nas configurações.
-- [~] **IA na nuvem** ~~(botão, consentimento)~~ feita na web em 14/10/2026 (§4; sem gate pelo manifesto: o kill switch é o `MODAL_ENDPOINT` da Vercel, 503 `disabled` = aviso de indisponível). Falta **"Ajudar a melhorar o app"** (endpoint novo com filtro de dado
+- [~] **IA na nuvem** ~~(botão, consentimento)~~ feita na web em 14/10/2026 (§4; sem gate pelo manifesto: o kill switch é o `MODAL_ENDPOINT` da Vercel, 503 `disabled` = aviso de indisponível). ~~Falta **"Ajudar a melhorar o app"**~~ (feito no site em 16/10/2026; Android na 1.0.1) (endpoint novo com filtro de dado
       pessoal; sem filtro político aqui, mas nunca capturar texto de pedido perigoso).
 - [ ] **Relatar problema com diálogo e `/api/report`** (hoje é link para a issue) — copiar `apps/eleicoes2026/api/report.js`.
 - [ ] **Nível (fundamental/médio/superior) na web** como preferência que muda o motor (o Android já tem; `nlu.nivelDe` existe e é ignorado).

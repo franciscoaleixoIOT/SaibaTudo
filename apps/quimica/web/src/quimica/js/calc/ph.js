@@ -1,6 +1,7 @@
 // pH de ácidos e bases fortes (ionização total) e de ácidos/bases fracos monopróticos (Ka ou Kb dados), e conversões pH ↔ pOH ↔ [H+] ↔ [OH-].
 // A 25 °C o produto iônico da água vem do pacote quando existir; senão vale a convenção pH + pOH = 14 (dita no resultado).
 import { fmt, fmtTex } from '../formato.js';
+import { formulaUnicode } from './formula.js';
 import { t } from '../i18n/index.js';
 
 const TP = (chave, params) => t(`respostas.calc.ph.${chave}`, params);
@@ -43,7 +44,7 @@ function montar({ pH, pKw, passos, notas, extras = [], pKwOrigem }) {
       ...extras
     ],
     passos,
-    notas: [...notas, TP('pKw', { valor: fm(pKw), origem: t(`respostas.unidades.pKw.${pKwOrigem}`) })],
+    notas: [...notas, TP('pKw', { valor: fm(pKw), origem: t(`respostas.unidades.pKw.${pKwOrigem}`) }), TP('nota25C', { pKw: dec(pKw), neutro: dec(pKw / 2) })],
     fontes: []
   };
 }
@@ -98,7 +99,24 @@ export function calcularPH(e, ctx) {
       passos.push({ texto: TP('pohDeOh'), tex: `\\mathrm{pOH} = -\\log_{10}(${ft(x)}) = ${ft(pOH)}, \\quad \\mathrm{pH} = ${ft(pKw)} - ${ft(pOH)} = ${ft(pH)}`, destaque: true });
     }
     if (n > 1 && ac) notas.push(TP('notaEscolar'));
-    return montar({ pH, pKw, passos, notas, pKwOrigem: origem });
+    // base pouco solúvel: a solubilidade vem do pacote (regras.solubilidadeBases); acima dela a solução satura
+    const sol = !ac && e.formula ? ctx.solubilidadeBase?.(e.formula) : null;
+    let saturada = false;
+    if (sol && C > sol.solubilidadeMolL * (1 + 1e-9)) {
+      saturada = true;
+      const nSat = sol.n ?? n;
+      const pHmax = pKw + log10(nSat * sol.solubilidadeMolL);
+      const fonte = sol.fonte ? (typeof sol.fonte === 'string' ? sol.fonte : sol.fonte.nome ?? '') : '';
+      notas.unshift(TP('saturada', {
+        formula: formulaUnicode(sol.formula), s: fm(sol.solubilidadeMolL, 3), phMax: dec(pHmax),
+        temp: sol.temperaturaC != null ? TP('saturadaTemp', { temp: fmt(sol.temperaturaC) }) : '',
+        kps: sol.deKps ? TP('saturadaKps') : '',
+        fonte: fonte ? TP('saturadaFonte', { fonte }) : ''
+      }));
+    }
+    const r = montar({ pH, pKw, passos, notas, pKwOrigem: origem });
+    if (sol) r.saturada = saturada;
+    return r;
   }
 
   if (T === 'acido-fraco' || T === 'base-fraca') {

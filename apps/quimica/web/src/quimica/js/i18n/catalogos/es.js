@@ -681,6 +681,9 @@ export default {
         passoMassa: 'Convierte a masa (m = n × M):', sobra: 'Lo que queda de los reactivos en exceso (inicial − consumido):',
         reagenteLimitante: 'Reactivo limitante', formado: 'Cantidad formada de {formula}', emExcesso: 'Cantidad en exceso de {formula} (restante)', necessario: 'Cantidad necesaria de {formula}',
         coeficientesIgnorados: 'Se ignoraron los coeficientes escritos: la app balancea la ecuación.',
+        produtoComRendimento: (p) => `La cantidad deseada de ${p.formula} es la que se obtiene con un rendimiento del ${p.rend} %: divide entre el rendimiento para hallar el avance que debe alcanzar la reacción (ξ = n ÷ coeficiente ÷ rendimiento); la cantidad de producto indicada no cambia.`,
+        passoNecessarios: 'Reactivos necesarios (n = coeficiente × ξ):',
+        notaCntp: 'CN (0 °C, 1 atm): {vm} L/mol, el volumen molar usado aquí.', notaIupac: 'En la condición estándar actual de la IUPAC (0 °C, 1 bar), el volumen molar es {vmIupac} L/mol.',
         notaTabela: 'El volumen y las partículas de los productos aparecen en la tabla; el volumen solo vale para gases ideales en CN (0 °C y 1 atm).'
       },
       gas: {
@@ -699,6 +702,9 @@ export default {
         boyleNota: 'Válido para un gas ideal con la misma cantidad de sustancia y la misma temperatura en ambos estados.'
       },
       ph: {
+        nota25C: 'pKw = {pKw} y pH neutro = {neutro} valen a 25 °C; a otras temperaturas ambos cambian (el agua pura sigue siendo neutra).',
+        saturada: 'Atención: {formula} es poco soluble en agua{temp}: se disuelven como máximo unos {s} mol/L{kps}{fonte}. La concentración indicada lo supera: la disolución queda saturada (sobra sólido) y el pH real no pasa de aproximadamente {phMax}.',
+        saturadaTemp: ' (a {temp} °C)', saturadaKps: ' (calculado a partir del Kps)', saturadaFonte: ', según {fonte}',
         tipos: { 'acido-forte': 'Ácido fuerte', 'base-forte': 'Base fuerte', 'acido-fraco': 'Ácido débil (con Ka)', 'base-fraca': 'Base débil (con Kb)', converter: 'Convertir pH, pOH, [H⁺], [OH⁻]' },
         classes: { neutra: 'neutra', acida: 'ácida', basica: 'básica' }, solucao: 'Disolución', pKw: 'Producto iónico del agua: pKw = {valor} ({origem}).',
         umValor: 'Indica exactamente un valor: pH, pOH, [H⁺] o [OH⁻].', concPositiva: 'La concentración debe ser mayor que cero.', phInformado: 'Se indicó el pH.',

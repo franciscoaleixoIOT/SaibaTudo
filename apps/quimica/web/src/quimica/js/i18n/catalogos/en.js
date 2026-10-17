@@ -681,6 +681,9 @@ export default {
         passoMassa: 'Convert to mass (m = n × M):', sobra: 'What remains of the reactants in excess (initial − consumed):',
         reagenteLimitante: 'Limiting reagent', formado: '{formula} formed', emExcesso: '{formula} in excess (remaining)', necessario: '{formula} needed',
         coeficientesIgnorados: 'The typed coefficients were ignored: the app balances the equation.',
+        produtoComRendimento: (p) => `The desired amount of ${p.formula} is what is obtained at ${p.rend} % yield: divide by the yield to find the extent the reaction must reach (ξ = n ÷ coefficient ÷ yield); the given product amount does not change.`,
+        passoNecessarios: 'Reagents needed (n = coefficient × ξ):',
+        notaCntp: 'STP (0 °C, 1 atm): {vm} L/mol, the molar volume used here.', notaIupac: 'Under the current IUPAC standard condition (0 °C, 1 bar), the molar volume is {vmIupac} L/mol.',
         notaTabela: 'Volume and particles of the products appear in the table; the volume applies only to ideal gases at STP (0 °C and 1 atm).'
       },
       gas: {
@@ -699,6 +702,9 @@ export default {
         boyleNota: 'Valid for an ideal gas with the same amount of substance and the same temperature in both states.'
       },
       ph: {
+        nota25C: 'pKw = {pKw} and neutral pH = {neutro} hold at 25 °C; at other temperatures both change (pure water stays neutral).',
+        saturada: 'Warning: {formula} is only slightly soluble in water{temp}: at most about {s} mol/L dissolves{kps}{fonte}. The given concentration exceeds this: the solution is saturated (solid remains) and the actual pH does not go above about {phMax}.',
+        saturadaTemp: ' (at {temp} °C)', saturadaKps: ' (calculated from Ksp)', saturadaFonte: ', according to {fonte}',
         tipos: { 'acido-forte': 'Strong acid', 'base-forte': 'Strong base', 'acido-fraco': 'Weak acid (Ka given)', 'base-fraca': 'Weak base (Kb given)', converter: 'Convert pH, pOH, [H⁺], [OH⁻]' },
         classes: { neutra: 'neutral', acida: 'acidic', basica: 'basic' }, solucao: 'Solution', pKw: 'Ionic product of water: pKw = {valor} ({origem}).',
         umValor: 'Give exactly one value: pH, pOH, [H⁺] or [OH⁻].', concPositiva: 'The concentration must be greater than zero.', phInformado: 'The pH was given.',

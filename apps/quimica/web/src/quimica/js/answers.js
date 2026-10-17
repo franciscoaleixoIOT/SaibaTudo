@@ -3,7 +3,7 @@
 // Formato de uma resposta: { intent, resolvida, origem, titulo, blocos[], directAnswer, fontes[], acoes[], sugestoes[], ... } (ver `montar`).
 import { balancear } from './calc/balancear.js';
 import { calcularConcentracao } from './calc/concentracao.js';
-import { calcularEstequiometria, converterQuantidade } from './calc/estequiometria.js';
+import { calcularEstequiometria, converterQuantidade, notasCntp } from './calc/estequiometria.js';
 import { calcularBoyle, calcularGas } from './calc/gas.js';
 import { calcularMassaMolar } from './calc/massa.js';
 import { calcularPH } from './calc/ph.js';
@@ -492,7 +492,8 @@ export class AnswerBuilder {
         intent: 'ESTEQUIOMETRIA', titulo: t('respostas.estequiometria.volumeTitulo', { valor: fmt(mol.valor, { sig: 6 }), unidade: mol.unidade }),
         blocos: [
           B.resultado(null, [{ rotulo: t('respostas.estequiometria.volumeCntp'), valor: fmt(L, { sig: 6 }), unidade: 'L', destaque: true }, { rotulo: t('respostas.estequiometria.volumeMolar'), valor: fmt(vm.valor * 1000, { sig: 6 }), unidade: 'L/mol' }], { nome: t('respostas.fontes.constanteR') }),
-          B.passos(t('respostas.blocos.comoCalcular'), [{ texto: t('respostas.estequiometria.passoVolume'), tex: `V = n\\dfrac{RT}{P} = ${fmtTex(nMol, { sig: 6 })} \\times ${fmtTex(vm.valor * 1000, { sig: 6 })}\\ \\mathrm{L/mol} = ${fmtTex(L, { sig: 6 })}\\ \\mathrm{L}` }])
+          B.passos(t('respostas.blocos.comoCalcular'), [{ texto: t('respostas.estequiometria.passoVolume'), tex: `V = n\\dfrac{RT}{P} = ${fmtTex(nMol, { sig: 6 })} \\times ${fmtTex(vm.valor * 1000, { sig: 6 })}\\ \\mathrm{L/mol} = ${fmtTex(L, { sig: 6 })}\\ \\mathrm{L}` }]),
+          ...notasCntp(this.ctx).map((n) => B.aviso(n))
         ],
         acoes: [rota('/quimica/calculadoras/gas-ideal', t('respostas.estequiometria.abrirGas'))], sugestoes: [sug('molsAgua')]
       });
@@ -602,7 +603,7 @@ export class AnswerBuilder {
     const regra = formula ? this.regraAcidoBase(formula) : null;
     if (k.Ka != null || k.pKa != null) entrada = { tipo: 'acido-fraco', C, Ka: k.Ka, pKa: k.pKa };
     else if (k.Kb != null || k.pKb != null) entrada = { tipo: 'base-fraca', C, Kb: k.Kb, pKb: k.pKb };
-    else if (regra) entrada = { tipo: regra.tipo === 'acido' ? 'acido-forte' : 'base-forte', C, n: regra.n ?? 1 };
+    else if (regra) entrada = { tipo: regra.tipo === 'acido' ? 'acido-forte' : 'base-forte', C, n: regra.n ?? 1, formula: regra.formula ?? formula };
     if (!entrada) {
       return montar({
         intent: 'PH', resolvida: false, titulo: t('respostas.ph.maisDados'),

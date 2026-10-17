@@ -410,3 +410,15 @@ test('com o pacote REAL (se existir): sugestões respondidas e golden cases com 
     }
   } finally { definirIdioma('pt-BR'); }
 });
+
+test('CNTP nas respostas: "0 °C, 1 atm: 22,4 L/mol" e a nota da IUPAC (1 bar: 22,7 L/mol); pH com a nota dos 25 °C', async () => {
+  const e = await motor();
+  const R = async (q) => { const r = await e.responder(q); validarResposta(r, q); e.limparContexto(); return r; };
+  const texto = (r) => r.blocos.map((b) => [b.texto, b.titulo, ...(b.itens ?? []).map((i) => `${i.rotulo} ${i.valor}`)].filter(Boolean).join(' ')).join(' ');
+  for (const q of ['qual o volume de 2 mol de gás nas CNTP?', 'quantos mols tem em 18 g de água?']) {
+    const r = await R(q);
+    assert.match(texto(r), /CNTP \(0 °C, 1 atm\): 22,4 L\/mol/, q);
+    assert.match(texto(r), /IUPAC \(0 °C, 1 bar\), o volume molar é 22,7 L\/mol/, q);
+  }
+  assert.match(texto(await R('pH de NaOH 0,001 mol/L')), /pKw = 14,00 e pH neutro = 7,00 valem a 25 °C/);
+});

@@ -370,7 +370,7 @@ test('unidades: tabela do pacote (regras.json) e tabela padrão dão os mesmos r
     perto(converter(100, '°C', 'K', t).resultado, 373.15, 1e-12);
     perto(converter(0, '°C', '°F', t).resultado, 32, 1e-9);
     perto(converter(212, '°F', '°C', t).resultado, 100, 1e-9);
-    perto(converter(760, 'mmHg', 'atm', t).resultado, 1, t.doPacote ? 1e-6 : 1e-12); // o pacote usa 133,322387415 Pa por mmHg
+    perto(converter(760, 'mmHg', 'atm', t).resultado, 1, 1e-6); // 133,322387415 Pa por mmHg (≠ Torr = 101325/760 Pa) nas duas tabelas
     perto(converter(1, 'cal', 'J', t).resultado, 4.184, 1e-12);
     perto(converter(1, 'kcal', 'kJ', t).resultado, 4.184, 1e-12);
     perto(converter(1, 'nm', 'Å', t).resultado, 10, 1e-12);
@@ -399,4 +399,102 @@ test('números: formatação pt-BR e leitura tolerante', () => {
   assert.equal(lerNumero('10^-3'), 1e-3);
   assert.ok(Number.isNaN(lerNumero('abc')));
   assert.ok(Number.isNaN(lerNumero('')));
+});
+
+// ------------------------------------------------------------------------------------------------ correções da revisão de 16/10 (onda 2, frente H)
+test('estequiometria: produto desejado com rendimento < 100 % → reagentes = teóricos ÷ rendimento; o produto informado não muda', async () => {
+  const c = await ctxDe();
+  const eq = 'N2 + H2 -> NH3';
+  const r = calcularEstequiometria({ equacao: eq, dados: [{ especie: 'NH3', valor: 10, unidade: 'g' }], rendimento: 80 }, c);
+  assert.ok(r.ok, r.erro);
+  const nh3 = r.tabela.find((x) => x.formula === 'H3N' || x.formula === 'NH3');
+  const n2 = r.tabela.find((x) => x.formula === 'N2');
+  const h2 = r.tabela.find((x) => x.formula === 'H2');
+  const nNH3 = 10 / nh3.massaMolar;
+  perto(nh3.formadoMol, nNH3, 1e-12); // o que se quer obter é o que se obtém
+  perto(nh3.formadoG, 10, 1e-12);
+  perto(n2.necessarioMol, (nNH3 / 2) / 0.8, 1e-12); // N2 + 3 H2 → 2 NH3
+  perto(h2.necessarioMol, (3 * nNH3 / 2) / 0.8, 1e-12);
+  perto(nh3.teoricoMol, nNH3 / 0.8, 1e-12); // a reação "rende" como se fossem 100 %
+  // massa: reagentes consumidos × rendimento = produto obtido
+  perto((n2.consumidoG + h2.consumidoG) * 0.8, 10, 1e-9);
+  validarPassos(r, 'NH3 80 %');
+  assert.ok(r.passos.some((p) => /rendimento/i.test(p.texto) && /divid/i.test(p.texto)), 'falta o passo que divide pelo rendimento');
+  // sem rendimento, o resultado é o teórico
+  const r100 = calcularEstequiometria({ equacao: eq, dados: [{ especie: 'NH3', valor: 10, unidade: 'g' }] }, c);
+  perto(r100.tabela.find((x) => x.formula === 'N2').necessarioMol, nNH3 / 2, 1e-12);
+  // partindo de reagente com rendimento continua como antes: produto = teórico × rendimento
+  const rr = calcularEstequiometria({ equacao: eq, dados: [{ especie: 'N2', valor: 28.014, unidade: 'g' }], rendimento: 80 }, c);
+  const prod = rr.tabela.find((x) => x.lado === 'produto');
+  perto(prod.formadoMol, 0.8 * prod.teoricoMol, 1e-12);
+});
+
+test('unidades: expoentes das unidades em TeX (m³, cm³, dm³, m², s⁻¹) sem quebrar °C, µ, Å e mmHg', async () => {
+  const { unidadeTex } = await import('../src/quimica/js/calc/unidades.js');
+  assert.equal(unidadeTex('m3'), String.raw`\mathrm{m^{3}}`);
+  assert.equal(unidadeTex('cm3'), String.raw`\mathrm{cm^{3}}`);
+  assert.equal(unidadeTex('dm3'), String.raw`\mathrm{dm^{3}}`);
+  assert.equal(unidadeTex('m2'), String.raw`\mathrm{m^{2}}`);
+  assert.equal(unidadeTex('s-1'), String.raw`\mathrm{s^{-1}}`);
+  assert.equal(unidadeTex('mol/m3'), String.raw`\mathrm{mol/m^{3}}`);
+  assert.equal(unidadeTex('m³'), String.raw`\mathrm{m^{3}}`);
+  assert.equal(unidadeTex('mmHg'), String.raw`\mathrm{mmHg}`);
+  assert.equal(unidadeTex('°C'), String.raw`\mathrm{^{\circ}C}`);
+  for (const u of ['m3', 'cm3', 'dm3', 'm2', 's-1', 'mol/m3', 'm³', 'mmHg', '°C', '°F', 'µL', 'Å', 'kWh', 'mol/L']) validarTex(unidadeTex(u), u);
+  const t = tabelaDeUnidades(null);
+  const r = converter(1, 'm3', 'L', t);
+  assert.ok(r.passos.every((p) => !/_\d/.test(p.tex)), r.passos.map((p) => p.tex).join(' | '));
+  assert.ok(r.passos.some((p) => p.tex.includes('m^{3}')));
+  validarPassos(converter(250, 'cm3', 'dm3', t), 'cm3→dm3');
+});
+
+test('unidades: mmHg (133,322387415 Pa) e Torr (101325/760 Pa) separados, "torr" é Torr, nas duas tabelas', async () => {
+  const store = await loja();
+  for (const t of [tabelaDeUnidades(store.regras), tabelaDeUnidades(null)]) {
+    perto(converter(1, 'mmHg', 'Pa', t).resultado, 133.322387415, 1e-12);
+    perto(converter(1, 'Torr', 'Pa', t).resultado, 101325 / 760, 1e-12);
+    perto(converter(1, 'torr', 'Pa', t).resultado, 101325 / 760, 1e-12);
+    perto(converter(760, 'Torr', 'atm', t).resultado, 1, 1e-12);
+    assert.equal(converter(1, 'torr', 'Pa', t).de, 'Torr');
+  }
+  assert.ok(UNIDADES_PADRAO.pressao.itens.some((i) => i.simbolo === 'Torr'));
+});
+
+test('CNTP: a resposta diz 0 °C e 1 atm (22,4 L/mol) e dá a nota da IUPAC (0 °C, 1 bar: 22,7 L/mol)', async () => {
+  const c = await ctxDe();
+  const q = converterQuantidade({ formula: 'CO2', valor: 1, unidade: 'mol' }, c);
+  const r = calcularEstequiometria({ equacao: 'CaCO3 -> CaO + CO2', dados: [{ especie: 'CaCO3', valor: 100, unidade: 'g' }] }, c);
+  for (const x of [q, r]) {
+    const notas = x.notas.join(' ');
+    assert.match(notas, /CNTP \(0 °C, 1 atm\): 22,4 L\/mol/);
+    assert.match(notas, /0 °C, 1 bar\)[^.]*22,7 L\/mol/);
+  }
+  perto(c.volumeMolarCNTP().valor, 0.0224139695, 1e-6);
+  perto(c.volumeMolarIUPAC().valor, 0.0227109546, 1e-6);
+});
+
+test('pH: nota de que pKw = 14,00 e pH neutro = 7,00 valem a 25 °C em todas as respostas', async () => {
+  const c = await ctxDe();
+  const casos = [
+    calcularPH({ tipo: 'acido-forte', C: 0.01 }, c), calcularPH({ tipo: 'base-forte', C: 0.01 }, c),
+    calcularPH({ tipo: 'acido-fraco', C: 0.1, Ka: 1.8e-5 }, c), calcularPH({ tipo: 'base-fraca', C: 0.1, Kb: 1.8e-5 }, c),
+    calcularPH({ tipo: 'converter', pH: 3 }, c)
+  ];
+  for (const r of casos) assert.ok(r.notas.some((n) => /pKw = 14,00/.test(n) && /7,00/.test(n) && /25 °C/.test(n)), r.notas.join(' | '));
+});
+
+test('pH: aviso de saturação para base pouco solúvel quando regras.solubilidadeBases traz a solubilidade (sem constante no código)', async () => {
+  const { criarContexto } = await import('../src/quimica/js/calc/contexto.js');
+  const store = await loja();
+  const regras = { ...store.regras, solubilidadeBases: [{ formula: 'Ca(OH)2', kps: 5.02e-6, solubilidadeMolL: 0.0108, temperaturaC: 25, fonte: { nome: 'fonte de teste' } }] };
+  const c = criarContexto({ elementos: store.elementos, constantes: store.constantes, regras });
+  const acima = calcularPH({ tipo: 'base-forte', C: 0.1, n: 2, formula: 'Ca(OH)2' }, c);
+  assert.ok(acima.ok);
+  assert.ok(acima.notas.some((n) => /satur/i.test(n) && /0,0108/.test(n)), acima.notas.join(' | '));
+  assert.equal(acima.saturada, true);
+  const abaixo = calcularPH({ tipo: 'base-forte', C: 0.005, n: 2, formula: 'Ca(OH)2' }, c);
+  assert.ok(!abaixo.notas.some((n) => /satur/i.test(n)));
+  // sem a tabela no pacote: nenhum aviso inventado
+  const semTabela = calcularPH({ tipo: 'base-forte', C: 0.1, n: 2, formula: 'Ca(OH)2' }, await ctxDe());
+  assert.ok(!semTabela.notas.some((n) => /satur/i.test(n)));
 });

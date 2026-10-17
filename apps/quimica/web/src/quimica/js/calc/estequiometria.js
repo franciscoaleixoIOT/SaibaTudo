@@ -98,13 +98,22 @@ export function converterQuantidade(e, ctx) {
     ];
     return {
       ok: true, formula: f.texto, massaMolar: M, ...eq, resultados, passos,
-      notas: [T('notaVolume')],
+      notas: [T('notaVolume'), ...notasCntp(ctx)],
       fontes: fontesDe(ctx, NA)
     };
   } catch (err) {
     if (err instanceof ErroFormula) return { ok: false, erro: err.message };
     throw err;
   }
+}
+
+/** Nota das condições: CNTP adotada (0 °C, 1 atm) e, ao lado, a condição padrão atual da IUPAC (0 °C, 1 bar); ambos de RT/P. */
+export function notasCntp(ctx) {
+  const vm = ctx.volumeMolarCNTP();
+  if (!vm) return [];
+  const iu = ctx.volumeMolarIUPAC?.();
+  const cntp = T('notaCntp', { vm: fmt(vm.valor * 1000, { sig: 3 }) });
+  return [iu ? `${cntp} ${T('notaIupac', { vmIupac: fmt(iu.valor * 1000, { sig: 3 }) })}` : cntp];
 }
 
 function fontesDe(ctx, NA) {
@@ -158,7 +167,10 @@ export function calcularEstequiometria(entrada, ctx) {
     // 2. extensão da reação
     const razoes = molIni.map((d) => ({ ...d, razao: d.mol / d.e.coef }));
     const lim = razoes.reduce((a, b) => (b.razao < a.razao ? b : a));
-    const xi = lim.razao;
+    // Partindo de um PRODUTO desejado com rendimento < 100 %: a quantidade informada é a obtida (real); a reação precisa avançar,
+    // como se rendesse 100 %, numa extensão maior (ξ = n ÷ coeficiente ÷ rendimento), e os reagentes necessários saem dela.
+    const doProduto = lim.e.lado === 'produto' && rend < 100;
+    const xi = doProduto ? lim.razao / (rend / 100) : lim.razao;
     if (razoes.length > 1) {
       passos.push({
         texto: T('passoRazoes'),
@@ -166,6 +178,12 @@ export function calcularEstequiometria(entrada, ctx) {
         lista: true
       });
       passos.push({ texto: T('limitante', { formula: formulaUnicode(lim.e.formula) }), tex: `\\xi = ${ft(xi)}\\ \\mathrm{mol}`, destaque: true });
+    } else if (doProduto) {
+      passos.push({
+        texto: T('produtoComRendimento', { formula: formulaUnicode(lim.e.formula), rend: fm(rend) }),
+        tex: `\\xi = \\dfrac{${ft(lim.mol)}}{${lim.e.coef} \\times ${ft(rend / 100)}} = ${ft(xi)}\\ \\mathrm{mol}`,
+        destaque: true
+      });
     } else {
       passos.push({ texto: T('umaQuantidade', { formula: formulaUnicode(lim.e.formula) }), tex: `\\xi = \\dfrac{${ft(lim.mol)}}{${lim.e.coef}} = ${ft(xi)}\\ \\mathrm{mol}`, destaque: true });
     }
@@ -208,6 +226,14 @@ export function calcularEstequiometria(entrada, ctx) {
       tex: produtos.map((p) => `m(${formulaTex(p.formula)}) = ${ft(p.formadoMol)} \\times ${ft(p.massaMolar)} = ${ft(p.formadoG)}\\ \\mathrm{g}`),
       lista: true, destaque: true
     });
+    const necessarios = tabela.filter((x) => x.lado === 'reagente' && !x.informado);
+    if (necessarios.length) {
+      passos.push({
+        texto: T('passoNecessarios'),
+        tex: necessarios.map((x) => `n(${formulaTex(x.formula)}) = ${x.coef} \\times ${ft(xi)} = ${ft(x.necessarioMol)}\\ \\mathrm{mol} \\;(${ft(x.necessarioG)}\\ \\mathrm{g})`),
+        lista: true
+      });
+    }
     const sobras = tabela.filter((x) => x.lado === 'reagente' && x.informado && x.sobraMol > 1e-12 * Math.max(1, x.inicialMol));
     if (sobras.length) {
       passos.push({
@@ -227,7 +253,8 @@ export function calcularEstequiometria(entrada, ctx) {
       xi, rendimento: rend, tabela, resultados, passos,
       notas: [
         ...(eq.digitouCoeficientes ? [T('coeficientesIgnorados')] : []),
-        T('notaTabela')
+        T('notaTabela'),
+        ...notasCntp(ctx)
       ],
       fontes: fontesDe(ctx, NA)
     };
