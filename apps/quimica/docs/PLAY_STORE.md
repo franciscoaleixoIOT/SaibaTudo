@@ -462,3 +462,6 @@ script não os envia; dá para acrescentar `edits.listings` e `edits.images` da 
 8. **Backup** da chave de upload (`secrets/upload-keystore.p12`, senhas em `keystore.properties`).
 9. **`.vercelignore` do app** não lista `/store/`: um `vercel deploy --prod` feito de `apps/quimica` enviaria as ~60 imagens desta pasta (11 MB)
    e gastaria a cota de uploads da conta. Acrescentar `/store/` (o Eleições ignora `store/`) antes do próximo deploy da Química.
+
+## Atualização 1.0.2 (17/10/2026)
+Enviar o AAB da **1.0.2 (versionCode 3)** — `app/build/outputs/bundle/release/app-release.aab` — no lugar da 1.0.1, que não foi enviada. Notas da versão (5 idiomas, ≤500 caracteres): `store/play/release-notes-1.0.2.json`. A política de privacidade subiu para 1.3 (interpretação da pergunta anterior pode ir à nuvem em perguntas de continuação); a seção "Segurança dos dados" não muda (continua: dados enviados só com consentimento, sem identificador pessoal). Detalhes: `RELEASE_1.0.2.md`.

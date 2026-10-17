@@ -19,6 +19,17 @@ segue o mesmo padrão desde 12/10/2026. Quando um app ganhar uma melhoria desta 
 - A pergunta seguinte herda o que faltar da anterior: entidade ("e o do potássio?"), atributo ("e o ponto de ebulição?"), lugar
   ("e em SP?"). Resolvido **no aparelho**, antes de qualquer envio à nuvem; a nuvem recebe a pergunta já completada
   (`_comContexto` em eleições) e um resumo da resposta anterior, nunca o histórico inteiro.
+- **Nuvem opt-in com NLU multi-turno (Química, 17/10/2026): pergunta de continuação manda a interpretação anterior.** Quando a pergunta
+  é de continuação — o NLU local não a entendeu, entendeu a intenção sem a entidade obrigatória ("qual o raio atômico?", "desenhe",
+  "é perigoso?") ou ela é curta e começa/termina com conectivo do idioma ("e o…", "também", "and for…", "too", "y el…", "und für…",
+  "auch", "et pour…", "aussi", "em gramas?"; `pistas.continuacaoNuvem` do léxico) — e há uma interpretação anterior na conversa (local ou
+  da nuvem, nem DESCONHECIDA nem recusa), o corpo do pedido leva `contexto`: o objeto do NLU da pergunta anterior (intenção + entidades
+  como texto, composto por nome/fórmula e nunca o CID, só as chaves que a intenção admite, até 400 caracteres). Nunca o texto da pergunta
+  anterior nem o histórico. Se a heurística local já respondeu a continuação, o modo automático não chama a nuvem; o botão "Perguntar à
+  IA na nuvem" manda o contexto quando a regra vale. Servidor recusou (`400 {error:"contexto"}`) = repete uma vez só com a pergunta.
+  Referência: `contextoDaPergunta`/`ehContinuacao`/`contextoParaNuvem` em `apps/quimica/web/src/quimica/js/nuvem.js` e
+  `ContextoNuvem.kt` no Android; casos compartilhados em `apps/quimica/contracts/nlu_contexto_cases.json` (do holdout v3.4). Eleições
+  adota depois do congelamento, quando o NLU de lá for multi-turno.
 - O contexto é limpo ao fechar a resposta, trocar de tela ou fazer uma pergunta sem relação. Uma pergunta de esclarecimento
   ("de qual estado?") nunca vira contexto da nuvem; se a intenção já está clara, resolva a ambiguidade localmente (lição do
   "deputado mais votado", 12/10/2026).
@@ -67,3 +78,8 @@ houver regra de interpretação. Checklist por app em `apps/<app>/docs/PENDENCIA
   o app instalado; o clique abre o prompt nativo ou leva às instruções em Configurações (`#instalar`). Regra: toda melhoria de casca
   (barra, instalação, preferências) também é padrão e se porta para os outros apps, como as da caixa de pergunta.
 - Química web: lista de compostos paginada (40 por página, página na URL), também um padrão para listas longas nos outros apps.
+
+## 9. Atualização de 17/10/2026
+- Química (site e Android): a IA na nuvem opt-in recebe, numa pergunta de continuação, a interpretação da pergunta anterior (§2). Textos
+  de consentimento (`ui.nuvem.nota`/`notaConferir`, `ui.config.iaAviso`/`nuvemAutomaticaAjuda`; Android `nuvem_nota_*`,
+  `ui_config_nuvem_descricao`, `ui_privacidade_nuvem_texto`) e a política de privacidade (versão 1.3, cinco idiomas) dizem isso.

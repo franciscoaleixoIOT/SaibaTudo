@@ -363,3 +363,68 @@ def format_output(nlu: dict) -> str:
     if not partes or not partes[0].startswith('"intent"'):
         raise ValueError("intent ausente")
     return "{" + ", ".join(partes) + "}"
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Contexto multi-turno (desde o NLU v3.4; serviço e proxy desde 17/10/2026)
+# ---------------------------------------------------------------------------------------------------------
+# Espelho de ia/corpus/contexto_nlu.py (a definição de TREINO e do gate; este app não pode importar de ia/). O teste
+# ia/corpus/test_contexto_nlu.py confere que as duas implementações montam a mesma string. Mensagem do usuário com contexto:
+#     contexto: {"intent": "MASSA_MOLAR", "composto": "NaCl"}
+#     e a do KCl?
+# Sem contexto, a mensagem é só a pergunta (idêntica ao v3.3).
+PREFIXO_CONTEXTO = "contexto: "
+SEPARADOR_CONTEXTO = "\n"
+MAX_CONTEXTO_CHARS = 400  # da forma canônica (format_output); o proxy aplica o mesmo limite
+_CTX = re.compile(r"^contexto: (\{.*\})\n(.*)$", re.S)
+_PROIBIDOS_NO_CONTEXTO = re.compile(r"[\r\n]|<\||\|>")
+
+
+def montar_entrada(contexto_json: str, pergunta: str) -> str:
+    """Mensagem do usuário com contexto. `contexto_json` já na forma canônica (format_output); `pergunta` já limpa."""
+    if not contexto_json:
+        return pergunta
+    if "\n" in contexto_json or "\n" in pergunta:
+        raise ValueError("contexto e pergunta não podem ter quebra de linha")
+    json.loads(contexto_json)  # tem de ser JSON
+    return f"{PREFIXO_CONTEXTO}{contexto_json}{SEPARADOR_CONTEXTO}{pergunta}"
+
+
+def separar_entrada(texto: str):
+    """(contexto_json | None, pergunta). Inverso de montar_entrada; texto sem a linha de contexto devolve (None, texto)."""
+    m = _CTX.match(texto or "")
+    if not m:
+        return None, texto
+    return m.group(1), m.group(2)
+
+
+def validate_contexto(contexto) -> str:
+    """Interpretação da pergunta anterior (dict no formato do contrato, ou o JSON dela) -> forma canônica (format_output).
+    Levanta ValueError (o endpoint responde 400) se não tiver a forma do contrato (has_valid_shape), se algum texto trouxer
+    controle, quebra de linha ou delimitador de token especial (`<|`, `|>`), ou se passar de MAX_CONTEXTO_CHARS."""
+    if isinstance(contexto, str):
+        try:
+            contexto = json.loads(contexto)
+        except ValueError:
+            raise ValueError("contexto não é JSON") from None
+    if not isinstance(contexto, dict):
+        raise ValueError("contexto deve ser um objeto")
+    obj = {k: v for k, v in contexto.items() if v is not None}
+    if not has_valid_shape(obj):
+        raise ValueError("contexto fora do contrato")
+    for k in ("composto", "equacao"):
+        if k in obj and (_CONTROLES.search(obj[k]) or _PROIBIDOS_NO_CONTEXTO.search(obj[k])):
+            raise ValueError("contexto com caracteres proibidos")
+    canonico = format_output(obj)
+    if len(canonico) > MAX_CONTEXTO_CHARS:
+        raise ValueError(f"contexto excede {MAX_CONTEXTO_CHARS} caracteres")
+    return canonico
+
+
+def build_user_message(pergunta, contexto=None) -> str:
+    """Mensagem do usuário que o serviço manda ao modelo: pergunta validada sozinha (validate_question) e, se houver, o contexto
+    validado e canônico na linha de cima. É o que ia/corpus/contexto_nlu.limpar_entrada faz no gate."""
+    q = validate_question(pergunta)
+    if contexto is None:
+        return q
+    return montar_entrada(validate_contexto(contexto), q)

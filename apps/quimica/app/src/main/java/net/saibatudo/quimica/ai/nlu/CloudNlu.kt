@@ -46,8 +46,12 @@ object NluValidator {
     /**
      * [nlu] é o objeto `nlu` da resposta; [resolucao] o objeto `resolucao` (pode faltar); [local] é a interpretação local da MESMA
      * pergunta (traz os campos auxiliares que a nuvem não manda: constantes, fórmulas, filtros da tabela…). Sem [local], é calculada aqui.
+     * [herdado]: a interpretação anterior que foi como `contexto` (pergunta de continuação, [ContextoNuvem]); as entidades dela também
+     * contam como evidência (o elemento, o composto — com o CID já resolvido nela —, as quantidades e a equação herdados).
      */
-    fun validar(nlu: JsonObject, resolucao: JsonObject?, d: Dicionario, pergunta: String, local: ParsedQuery? = null): InterpretacaoNuvem {
+    fun validar(
+        nlu: JsonObject, resolucao: JsonObject?, d: Dicionario, pergunta: String, local: ParsedQuery? = null, herdado: ParsedQuery? = null
+    ): InterpretacaoNuvem {
         val original = Regex("""\s+""").replace(pergunta, " ").trim().take(LocalNlu.TAMANHO_MAXIMO)
         val base = local ?: LocalNlu.parse(original, d)
         // a segurança local vem antes de tudo: se o aparelho recusa, a nuvem não muda isso
@@ -62,12 +66,16 @@ object NluValidator {
         if (intent == Intent.DESCONHECIDA) return InterpretacaoNuvem(null, sugestoes, compostoTexto)
 
         // ---- entidades, uma a uma ----
-        val elemento = nlu.str("elemento")?.let { validarElemento(it, d, original, n, base) }
+        val elemento = nlu.str("elemento")?.let { validarElemento(it, d, original, n, base) ?: it.takeIf { s -> herdado?.elemento == s } }
         var cid: Long? = null
         var formula: String? = null
-        if (compostoTexto != null && temEvidencia(compostoTexto, n)) {
+        // composto herdado: o mesmo texto que o app mandou no contexto (a nuvem o copia de lá, não da pergunta)
+        val textoHerdado = herdado?.let { ContextoNuvem.textoDoComposto(it, d) }
+        val herdou = compostoTexto != null && textoHerdado != null && Texto.nlu(textoHerdado) == Texto.nlu(compostoTexto)
+        if (compostoTexto != null && (temEvidencia(compostoTexto, n) || herdou)) {
             cid = d.compostoPorNome(compostoTexto) ?: d.compostoPorFormula(compostoTexto)
                 ?: cidResolvido(resolucao)?.takeIf { d.nomeDoComposto(it) != null }
+                ?: herdado?.composto?.takeIf { herdou }?.toLongOrNull()?.takeIf { d.nomeDoComposto(it) != null }
             if (cid == null && FormulaQuimica.tentar(Texto.paraAscii(compostoTexto).trim()) != null && compostoTexto.none { it.isWhitespace() }) {
                 formula = Texto.paraAscii(compostoTexto).trim()
             }
@@ -75,8 +83,8 @@ object NluValidator {
         val propriedade = nlu.str("propriedade")?.takeIf { d.propriedade(it) != null }
         val unidadeDestino = nlu.str("unidadeDestino")?.let { unidade(it, d) }
         val nivel = nlu.str("nivel")?.lowercase()?.takeIf { it in NIVEIS }
-        val equacao = nlu.str("equacao")?.take(200)?.let { validarEquacao(it, ascii) }
-        val quantidades = validarQuantidades(nlu.get("quantidades"), d, original)
+        val equacao = nlu.str("equacao")?.take(200)?.let { validarEquacao(it, ascii + (herdado?.equacao?.let { e -> " " + Texto.paraAscii(e) } ?: "")) }
+        val quantidades = validarQuantidades(nlu.get("quantidades"), d, original, herdado?.quantidades.orEmpty())
 
         // ---- junta com a interpretação local (os campos que a nuvem não manda) ----
         val elementos = (listOfNotNull(elemento) + base.elementos).distinct()
@@ -147,16 +155,16 @@ object NluValidator {
     private fun unidade(texto: String, d: Dicionario): String? =
         d.unidades.porSimbolo(texto.trim())?.simbolo ?: Quantidades.lerUnidade(texto, d.unidades, d.lexico)
 
-    private fun validarQuantidades(el: JsonElement?, d: Dicionario, original: String): List<Quantidade> {
+    private fun validarQuantidades(el: JsonElement?, d: Dicionario, original: String, herdadas: List<Quantidade> = emptyList()): List<Quantidade> {
         if (el == null || !el.isJsonArray) return emptyList()
-        val lidas = Quantidades.ler(original, d.unidades, d.lexico)
+        val lidas = Quantidades.ler(original, d.unidades, d.lexico) + herdadas.map { QuantidadeLida(it.valor, it.unidade, it.texto, IntRange.EMPTY) }
         val out = mutableListOf<Quantidade>()
         for (item in el.asJsonArray.take(MAX_QUANTIDADES)) {
             val o = item.takeIf { it.isJsonObject }?.asJsonObject ?: continue
             val p = o.get("valor")?.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isNumber } ?: continue
             val valor = p.asDouble.takeIf { it.isFinite() } ?: continue
             val u = o.str("unidade")?.let { unidade(it, d) } ?: continue
-            // o número tem de estar escrito na pergunta
+            // o número tem de estar escrito na pergunta (ou vir da quantidade herdada do contexto)
             val lida = lidas.firstOrNull { abs(it.valor - valor) <= 1e-9 * max(1.0, abs(valor)) } ?: continue
             out += Quantidade(lida.valor, u, lida.texto)
         }
@@ -186,7 +194,8 @@ object NluValidator {
 /**
  * Cliente do NLU na nuvem (`POST <API_BASE_URL>nlu`, api/README.md). Só é chamado com consentimento: o toque em "Perguntar à IA na
  * nuvem" (por pergunta) ou a opção "IA na nuvem automática" (só nas perguntas que o app não entendeu). Envia apenas o texto da pergunta
- * (até 300 caracteres) e o identificador aleatório da instalação; nada mais.
+ * (até 300 caracteres), o identificador aleatório da instalação e, numa pergunta de continuação, o `contexto` ([ContextoNuvem]: a
+ * interpretação da pergunta anterior, sem o texto dela); nada mais.
  */
 class CloudNluClient(
     private val http: OkHttpClient,
@@ -196,7 +205,10 @@ class CloudNluClient(
     private val json = "application/json; charset=utf-8".toMediaType()
 
     sealed interface Resultado {
-        data class Ok(val nlu: JsonObject, val resolucao: JsonObject?, val modelo: String?) : Resultado
+        /** [contextoEnviado]: a requisição que valeu levou o `contexto`; [contextoUsado]: o servidor confirmou (`"contexto": true`). */
+        data class Ok(
+            val nlu: JsonObject, val resolucao: JsonObject?, val modelo: String?, val contextoEnviado: Boolean = false, val contextoUsado: Boolean = false
+        ) : Resultado
         /** `503 {"error":"disabled"}`: a nuvem está desligada no servidor. */
         data object Desligada : Resultado
         /** `429` (limite por IP/instalação) ou `503 budget` (orçamento do dia). */
@@ -207,42 +219,55 @@ class CloudNluClient(
         data object Invalida : Resultado
     }
 
-    suspend fun consultar(pergunta: String, installId: String, timeoutMs: Long): Resultado = withContext(Dispatchers.IO) {
+    /**
+     * [contexto]: o objeto `contexto` do contrato ([ContextoNuvem.daPergunta]) ou null. Se o servidor o recusar (`400 {"error":"contexto"}`),
+     * repete UMA vez só com a pergunta.
+     */
+    suspend fun consultar(pergunta: String, installId: String, timeoutMs: Long, contexto: JsonObject? = null): Resultado = withContext(Dispatchers.IO) {
+        val (primeira, contextoRecusado) = enviar(pergunta, installId, timeoutMs, contexto)
+        if (contexto != null && contextoRecusado) enviar(pergunta, installId, timeoutMs, null).first else primeira
+    }
+
+    /** Resultado e se o servidor recusou o `contexto` (400 com `"error":"contexto"`). */
+    private fun enviar(pergunta: String, installId: String, timeoutMs: Long, contexto: JsonObject?): Pair<Resultado, Boolean> {
         val corpo = JsonObject().apply {
             addProperty("q", pergunta.take(LocalNlu.TAMANHO_MAXIMO))
             addProperty("v", 1)
             addProperty("client", clientName)
             addProperty("iid", installId)
+            if (contexto != null) add("contexto", contexto)
         }.toString()
         val req = Request.Builder().url(endpoint).post(corpo.toRequestBody(json)).build()
         val cliente = http.newBuilder()
             .callTimeout(timeoutMs, TimeUnit.MILLISECONDS)
             .readTimeout(timeoutMs, TimeUnit.MILLISECONDS)
             .build()
-        try {
+        return try {
             cliente.newCall(req).execute().use { r ->
                 val txt = r.body?.string().orEmpty().take(20_001)
                 if (!r.isSuccessful) {
                     val erro = runCatching { JsonParser.parseString(txt).asJsonObject.get("error")?.asString }.getOrNull()
-                    return@withContext when {
+                    return (when {
                         r.code == 503 && erro == "disabled" -> Resultado.Desligada
                         r.code == 503 && erro == "budget" -> Resultado.Limite
                         r.code == 429 -> Resultado.Limite
                         else -> Resultado.Indisponivel(r.code)
-                    }
+                    }) to (r.code == 400 && erro == "contexto")
                 }
-                if (txt.length > 20_000) return@withContext Resultado.Invalida
-                val raiz = JsonParser.parseString(txt).takeIf { it.isJsonObject }?.asJsonObject ?: return@withContext Resultado.Invalida
-                if (raiz.get("ok")?.takeIf { it.isJsonPrimitive }?.asBoolean != true) return@withContext Resultado.Invalida
-                val nlu = raiz.get("nlu")?.takeIf { it.isJsonObject }?.asJsonObject ?: return@withContext Resultado.Invalida
+                val invalida = Resultado.Invalida to false
+                if (txt.length > 20_000) return invalida
+                val raiz = JsonParser.parseString(txt).takeIf { it.isJsonObject }?.asJsonObject ?: return invalida
+                if (raiz.get("ok")?.takeIf { it.isJsonPrimitive }?.asBoolean != true) return invalida
+                val nlu = raiz.get("nlu")?.takeIf { it.isJsonObject }?.asJsonObject ?: return invalida
                 val resolucao = raiz.get("resolucao")?.takeIf { it.isJsonObject }?.asJsonObject
                 val modelo = raiz.get("model")?.takeIf { it.isJsonPrimitive }?.asString
-                Resultado.Ok(nlu, resolucao, modelo)
+                val usado = contexto != null && raiz.get("contexto")?.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isBoolean }?.asBoolean == true
+                Resultado.Ok(nlu, resolucao, modelo, contextoEnviado = contexto != null, contextoUsado = usado) to false
             }
         } catch (_: IOException) {
-            Resultado.Indisponivel()
+            Resultado.Indisponivel() to false
         } catch (_: RuntimeException) {
-            Resultado.Invalida // JSON malformado / campos com tipo inesperado
+            Resultado.Invalida to false // JSON malformado / campos com tipo inesperado
         }
     }
 }

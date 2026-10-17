@@ -46,6 +46,7 @@ export default {
   "periodo": "\\bperiodo\\s+(\\d)\\b",
   "bloco": "\\bbloque\\s+([spdf])\\b",
   "continuacao": "^y (?:el |la |los |las )?(?:de |del |de la |de los |de las )?",
+  "continuacaoNuvem": "^(?:y|que tal|ahora|ok|vale|bien|gracias|entonces|tambien|en|con|igual|lo mismo|hazlo|haz|dibuja|dibujalo|muestra|muestrame|dime mas)(?: |$)|(?:^| )(?:tambien|igualmente|su|sus|eso|esto)(?: |$)",
   "limparConceito": [
    "^(?:es |son |significa |quiere decir |seria )",
    "^(?:un |una |el |la |los |las |de |del )+"

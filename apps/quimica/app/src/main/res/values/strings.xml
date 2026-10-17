@@ -736,7 +736,7 @@
     <string name="ui_privacidade_nao_tem_titulo">O que o app não tem</string>
     <string name="ui_privacidade_nao_tem_texto">Sem login, sem anúncios, sem análise de uso, sem localização, sem acesso a contatos, câmera ou microfone.</string>
     <string name="ui_privacidade_nuvem_titulo">IA na nuvem</string>
-    <string name="ui_privacidade_nuvem_texto">Opcional e desligada por padrão. Quando você toca em “Perguntar à IA na nuvem” (ou liga a opção automática em Configurações), o app envia a saibatudo.net só o texto daquela pergunta (até 300 caracteres) e um identificador aleatório desta instalação, que não identifica você e serve só para o limite de uso. O modelo apenas interpreta a pergunta: cada nome, símbolo e unidade é conferido nos dados do aparelho, e os números vêm sempre do pacote assinado. O servidor não registra a pergunta nos logs; ela fica só num cache temporário em memória.</string>
+    <string name="ui_privacidade_nuvem_texto">Opcional e desligada por padrão. Quando você toca em “Perguntar à IA na nuvem” (ou liga a opção automática em Configurações), o app envia a saibatudo.net só o texto daquela pergunta (até 300 caracteres) e um identificador aleatório desta instalação, que não identifica você e serve só para o limite de uso. Numa pergunta de continuação (“e o do potássio?”), vai também a interpretação da pergunta anterior (intenção e entidades, como “massa molar” e “NaCl”), nunca o texto dela nem o histórico. O modelo apenas interpreta a pergunta: cada nome, símbolo e unidade é conferido nos dados do aparelho, e os números vêm sempre do pacote assinado. O servidor não registra a pergunta nos logs; ela fica só num cache temporário em memória.</string>
     <string name="ui_privacidade_politica_completa">Política de privacidade completa</string>
     <string name="ui_privacidade_relatar">Relatar um problema ou erro nos dados</string>
     <string name="ui_config_titulo">Configurações</string>
@@ -903,8 +903,8 @@
     <string name="origem_nuvem">IA na nuvem • interpretação; dados do pacote</string>
     <string name="ui_origem_nuvem">IA na nuvem: o modelo só interpretou a pergunta. A resposta e os números foram montados no aparelho a partir do pacote de dados assinado.</string>
     <string name="nuvem_botao_perguntar">Perguntar à IA na nuvem</string>
-    <string name="nuvem_nota_nao_entendida">Envia só o texto desta pergunta ao servidor do SaibaTudo (saibatudo.net) para interpretar; a resposta continua sendo montada no aparelho com os dados do pacote. Pode levar até 25 s.</string>
-    <string name="nuvem_nota_entendida">A resposta acima veio do app. Se não era o que você queria, a IA na nuvem tenta entender a pergunta de outro jeito; a resposta continua vindo dos dados do pacote. Envia só o texto desta pergunta. Pode levar até 25 s.</string>
+    <string name="nuvem_nota_nao_entendida">Envia só o texto desta pergunta ao servidor do SaibaTudo (saibatudo.net) para interpretar; a resposta continua sendo montada no aparelho com os dados do pacote. Numa continuação (“e o do potássio?”), vai também a interpretação da pergunta anterior, sem o texto dela. Pode levar até 25 s.</string>
+    <string name="nuvem_nota_entendida">A resposta acima veio do app. Se não era o que você queria, a IA na nuvem tenta entender a pergunta de outro jeito; a resposta continua vindo dos dados do pacote. Envia só o texto desta pergunta. Numa continuação (“e o do potássio?”), vai também a interpretação da pergunta anterior, sem o texto dela. Pode levar até 25 s.</string>
     <string name="nuvem_consultando">Consultando a IA na nuvem…</string>
     <string name="nuvem_falha_desligada">A IA na nuvem está desligada agora. A resposta acima continua valendo.</string>
     <string name="nuvem_falha_limite">O limite de perguntas à IA na nuvem foi atingido. Tente de novo mais tarde; a resposta acima continua valendo.</string>
@@ -915,7 +915,7 @@
     <string name="nuvem_falha_invalida">A IA na nuvem devolveu uma resposta fora do formato esperado e ela foi descartada. Tente de novo em instantes.</string>
     <string name="nuvem_voce_quis_dizer">Você quis dizer:</string>
     <string name="ui_config_nuvem_titulo">IA na nuvem automática</string>
-    <string name="ui_config_nuvem_descricao">Desligada por padrão. Ligada, as perguntas que o app não entender são enviadas (só o texto) à IA na nuvem para interpretação; a resposta continua sendo montada no aparelho com os dados do pacote. Desligada, você ainda pode tocar em “Perguntar à IA na nuvem” em cada resposta.</string>
+    <string name="ui_config_nuvem_descricao">Desligada por padrão. Ligada, as perguntas que o app não entender são enviadas (só o texto) à IA na nuvem para interpretação; a resposta continua sendo montada no aparelho com os dados do pacote. Numa continuação (“e o do potássio?”), vai também a interpretação da pergunta anterior, sem o texto dela. Desligada, você ainda pode tocar em “Perguntar à IA na nuvem” em cada resposta.</string>
     <!-- Relatar problema nesta resposta (issue pública pré-preenchida no GitHub) -->
     <string name="ui_relatar_resposta">Relatar problema nesta resposta</string>
     <string name="ui_relatar_resposta_desc">Relatar problema nesta resposta. Abre no navegador uma issue pública no GitHub já preenchida; nada é enviado sem você confirmar lá.</string>

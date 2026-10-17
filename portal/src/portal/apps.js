@@ -13,7 +13,7 @@ export const GOOGLE_PLAY_URL = '';
  * Números do app de química citados no cartão da home ({num:chave} nos catálogos → <span data-num="chave">).
  * Devem bater com apps/quimica/data/quimica/manifest.json (contagens): o teste da raiz (tests/rotas.test.mjs) confere.
  */
-export const NUMEROS_QUIMICA = { elementos: 118, compostos: 1971, compostosComGhsHarmonizado: 485 };
+export const NUMEROS_QUIMICA = { elementos: 118, compostos: 1971, compostosComGhsHarmonizado: 481 };
 
 /**
  * Apps disponíveis além dos cartões principais (Eleições 2026, Química e AchaVagaIA, fixos no HTML da home).

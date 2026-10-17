@@ -267,3 +267,10 @@ Entidades: `elemento` (símbolo), `composto` (cid ou nome canônico), `proprieda
 admitem nenhuma). A gramática do modelo em nuvem só gera essas combinações; o proxy (`api/_lib/normalize.js`) ainda revalida e ancora.
 **Resposta da nuvem (`/api/nlu`):** além de `nlu`, traz `resolucao.composto` — o `composto` copiado resolvido no índice do pacote (`{cid, nome}`) ou
 `{cid: null, sugestoes: [{cid, nome}]}` (até 3) para o cliente perguntar "você quis dizer…?"; `null` sem composto. Detalhes em `api/README.md`.
+**Contexto multi-turno (`/api/nlu`, 17/10/2026; NLU v3.4+):** o corpo aceita `contexto` = a interpretação da pergunta anterior no formato desta
+seção (o objeto `nlu` da própria API: `intent` + entidades como texto, composto como nome/fórmula, nunca CID; só chaves admitidas pela intenção;
+`null` = ausente). Validado no proxy (`api/_lib/contexto.js`) e no serviço (`nlu_core.validate_contexto`): forma canônica de `format_output` com
+até 400 caracteres, sem quebra de linha; inválido → `400 { ok:false, error:"contexto" }`. No prompt a mensagem do usuário vira
+`contexto: <json canônico>\n<pergunta>` (`ia/corpus/contexto_nlu.py`). A resposta é a interpretação COMPLETA da nova pergunta (a entidade herdada
+aparece nela) e traz `contexto: true`. **Ancoragem herdada:** a entidade que não está na pergunta só passa se for igual (normalizada) à da mesma
+chave no contexto. O cliente só manda `contexto` em perguntas de continuação.

@@ -45,6 +45,7 @@
   "periodo": "\\bperiode\\s+(\\d)\\b",
   "bloco": "\\bblocks?\\s+([spdf])\\b|\\b([spdf])[- ]blocks?\\b",
   "continuacao": "^und (?:der |die |das |den |dem )?(?:von |des |der )?",
+  "continuacaoNuvem": "^(?:und|jetzt|nun|ok|okay|super|alles klar|gut|dann|auch|in|mit|dasselbe|das gleiche|zeichne|zeig|zeige|mehr)(?: |$)|(?:^| )(?:auch|ebenfalls|noch|sein|seine|seinen|davon|dasselbe|es)(?: |$)",
   "limparConceito": [
    "^\\s*(?:mir |uns |bitte |doch |mal |kurz |genau |eigentlich |noch |einmal )+",
    "^\\s*(?:was|wie|wer|wo)\\s+(?=\\S)",

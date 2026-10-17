@@ -77,6 +77,7 @@ internal object LexicoDe {
         "periodo" to "\\bperiode\\s+(\\d)\\b",
         "bloco" to "\\bblocks?\\s+([spdf])\\b|\\b([spdf])[- ]blocks?\\b",
         "continuacao" to "^und (?:der |die |das |den |dem )?(?:von |des |der )?",
+        "continuacaoNuvem" to "^(?:und|jetzt|nun|ok|okay|super|alles klar|gut|dann|auch|in|mit|dasselbe|das gleiche|zeichne|zeig|zeige|mehr)(?: |\$)|(?:^| )(?:auch|ebenfalls|noch|sein|seine|seinen|davon|dasselbe|es)(?: |\$)",
         "limparConceito" to n_pistas_limparConceito(),
         "constantes" to "\\b(pka|pkb|ka|kb)\\s*(?:=|:|von|ist|gleich|betragt)?\\s*([0-9][0-9.,]*(?:\\s*(?:[x×*]\\s*10\\s*\\^?\\s*\\{?-?\\d+\\}?|e-?\\d+))?)",
         "quantidadeComplemento" to "(?:pro|an)",

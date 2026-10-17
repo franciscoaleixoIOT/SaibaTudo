@@ -730,7 +730,7 @@
     <string name="ui_privacidade_nao_tem_titulo">What the app does not have</string>
     <string name="ui_privacidade_nao_tem_texto">No login, no ads, no usage analytics, no location, no access to contacts, camera or microphone.</string>
     <string name="ui_privacidade_nuvem_titulo">Cloud AI</string>
-    <string name="ui_privacidade_nuvem_texto">Optional and off by default. When you tap “Ask the cloud AI” (or turn on the automatic option in Settings), the app sends saibatudo.net only the text of that question (up to 300 characters) and a random identifier of this installation, which does not identify you and is used only for the usage limit. The model only interprets the question: every name, symbol and unit is checked against the data on the device, and the numbers always come from the signed package. The server does not log the question; it is kept only in a temporary in-memory cache.</string>
+    <string name="ui_privacidade_nuvem_texto">Optional and off by default. When you tap “Ask the cloud AI” (or turn on the automatic option in Settings), the app sends saibatudo.net only the text of that question (up to 300 characters) and a random identifier of this installation, which does not identify you and is used only for the usage limit. In a follow-up question (“and for potassium?”), the interpretation of the previous question (intent and entities, such as “molar mass” and “NaCl”) is sent too, never its text or the history. The model only interprets the question: every name, symbol and unit is checked against the data on the device, and the numbers always come from the signed package. The server does not log the question; it is kept only in a temporary in-memory cache.</string>
     <string name="ui_privacidade_politica_completa">Full privacy policy</string>
     <string name="ui_privacidade_relatar">Report a problem or an error in the data</string>
     <string name="ui_config_titulo">Settings</string>
@@ -897,8 +897,8 @@
     <string name="origem_nuvem">Cloud AI • interpretation; data from the package</string>
     <string name="ui_origem_nuvem">Cloud AI: the model only interpreted the question. The answer and the numbers were put together on the device from the signed data package.</string>
     <string name="nuvem_botao_perguntar">Ask the cloud AI</string>
-    <string name="nuvem_nota_nao_entendida">Sends only the text of this question to the SaibaTudo server (saibatudo.net) for interpretation; the answer is still put together on the device from the data package. It can take up to 25 s.</string>
-    <string name="nuvem_nota_entendida">The answer above was built on your device. If it is not what you wanted, the cloud AI can try to understand the question another way; the answer still comes from the data package. Only the text of this question is sent. It can take up to 25 s.</string>
+    <string name="nuvem_nota_nao_entendida">Sends only the text of this question to the SaibaTudo server (saibatudo.net) for interpretation; the answer is still put together on the device from the data package. In a follow-up (“and for potassium?”), the interpretation of the previous question is sent too, without its text. It can take up to 25 s.</string>
+    <string name="nuvem_nota_entendida">The answer above was built on your device. If it is not what you wanted, the cloud AI can try to understand the question another way; the answer still comes from the data package. Only the text of this question is sent. In a follow-up (“and for potassium?”), the interpretation of the previous question is sent too, without its text. It can take up to 25 s.</string>
     <string name="nuvem_consultando">Asking the cloud AI…</string>
     <string name="nuvem_falha_desligada">The cloud AI is turned off right now. The answer above still stands.</string>
     <string name="nuvem_falha_limite">The limit of questions to the cloud AI has been reached. Try again later; the answer above still stands.</string>
@@ -909,7 +909,7 @@
     <string name="nuvem_falha_invalida">The cloud AI returned a reply in an unexpected format and it was discarded. Try again in a moment.</string>
     <string name="nuvem_voce_quis_dizer">Did you mean:</string>
     <string name="ui_config_nuvem_titulo">Automatic cloud AI</string>
-    <string name="ui_config_nuvem_descricao">Off by default. When on, questions the app does not understand are sent (text only) to the cloud AI for interpretation; the answer is still put together on the device from the data package. When off, you can still tap “Ask the cloud AI” on each answer.</string>
+    <string name="ui_config_nuvem_descricao">Off by default. When on, questions the app does not understand are sent (text only) to the cloud AI for interpretation; the answer is still put together on the device from the data package. In a follow-up (“and for potassium?”), the interpretation of the previous question is sent too, without its text. When off, you can still tap “Ask the cloud AI” on each answer.</string>
     <!-- Relatar problema nesta resposta (issue pública pré-preenchida no GitHub) -->
     <string name="ui_relatar_resposta">Report a problem with this answer</string>
     <string name="ui_relatar_resposta_desc">Report a problem with this answer. Opens a prefilled public GitHub issue in the browser; nothing is sent unless you confirm there.</string>

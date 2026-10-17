@@ -1,10 +1,12 @@
 // Motor LOCAL e DETERMINÍSTICO: segurança por regras → NLU por regras + dicionário dos dados → resposta montada dos dados. Funciona offline.
 // IA na nuvem (desde 14/10/2026, opt-in): só INTERPRETA a pergunta quando a pessoa pede (botão) ou liga o modo automático; a resposta continua
 // sendo montada aqui, dos dados do pacote (js/nuvem.js). Pedido perigoso nunca é enviado: a segurança roda antes.
+// Multi-turno (17/10/2026): numa pergunta de continuação, a nuvem recebe também a INTERPRETAÇÃO da pergunta anterior (`contextoDaPergunta`).
 import { AnswerBuilder } from './answers.js';
 import { Dicionario } from './dicionario.js';
 import { idiomaAtual } from './i18n/index.js';
 import { parse } from './nlu.js';
+import { contextoDaPergunta } from './nuvem.js';
 import { avaliarSeguranca } from './seguranca.js';
 
 const SEM_CONTEXTO = new Set(['RECUSA_PERIGO', 'AJUDA', 'SOBRE_DADOS', 'FONTES']);
@@ -17,6 +19,11 @@ export class Engine {
     this._dic = null;
     this._rev = -1;
     this._ultimoContexto = null;
+    /**
+     * Última interpretação RESPONDIDA da conversa (local ou da nuvem; qualquer intenção menos DESCONHECIDA, recusa e institucionais), mais
+     * larga que `_ultimoContexto` (que só guarda o que o NLU local sabe herdar). É a que vai como `contexto` à nuvem numa continuação.
+     */
+    this._ultimaInterpretacao = null;
     /** Motivo do último pedido à nuvem sem resposta nova: 'igual' (entendeu como o app) | 'nao_entendeu' | 'indisponivel' | null. */
     this.ultimoMotivoNuvem = null;
     /** Compostos sugeridos pela API quando o texto citado não bate com o pacote ("quis dizer…?"): [{cid, nome}]. */
@@ -40,13 +47,14 @@ export class Engine {
   /** Responde uma pergunta. Nunca lança: erros viram uma resposta não resolvida. */
   async responder(pergunta, { contexto = undefined } = {}) {
     const ctx = contexto !== undefined ? contexto : this._ultimoContexto;
+    const anterior = this._ultimaInterpretacao; // a da pergunta ANTERIOR (o botão da nuvem reinterpreta esta pergunta com ela)
     // 1) segurança primeiro: nenhuma outra etapa vê o pedido recusado
     const seg = avaliarSeguranca(pergunta);
     if (!seg.recusar) await this.resolverCas(pergunta);
     const p = seg.recusar
       ? { ...parse('', this.dicionario()), intent: 'RECUSA_PERIGO', textoOriginal: String(pergunta ?? '').slice(0, 300), seguranca: seg }
       : parse(pergunta, this.dicionario(), ctx);
-    const r = await this._montar(p);
+    const r = { ...(await this._montar(p)), interpretacaoAnterior: seg.recusar ? null : anterior };
     // 2) modo automático (consentimento contínuo em Configurações): pergunta não entendida vai à nuvem sem toque
     if (!r.resolvida && !seg.recusar && this.nuvem?.habilitada?.()) {
       const nova = await this.perguntarANuvem(pergunta, r, { explicito: false });
@@ -59,6 +67,7 @@ export class Engine {
     const builder = new AnswerBuilder({ store: this.store, dic: this.dicionario() });
     const r = await builder.construir(p);
     if (r.resolvida && !SEM_CONTEXTO.has(r.intent) && (p.elemento || p.composto || p.propriedade)) this._ultimoContexto = p;
+    if (r.resolvida && !SEM_CONTEXTO.has(p.intent) && p.intent !== 'DESCONHECIDA') this._ultimaInterpretacao = p;
     return { ...r, pergunta: p.textoOriginal, parsed: p };
   }
 
@@ -66,6 +75,8 @@ export class Engine {
    * Pede à IA na nuvem uma interpretação da pergunta e monta a resposta DOS DADOS LOCAIS com ela (origem 'NUVEM'). Nunca lança.
    * `explicito` = toque no botão (consentimento desta pergunta; espera até 25 s); false = modo automático (só com a chave ligada).
    * Devolve null quando não houve interpretação útil; o motivo fica em `ultimoMotivoNuvem` e as sugestões em `ultimasSugestoesNuvem`.
+   * Pergunta de continuação (`contextoDaPergunta`): manda junto a interpretação anterior à pergunta de `atual` (ou, sem `atual`, a última da
+   * conversa) — só intenção e entidades.
    */
   async perguntarANuvem(pergunta, atual = null, { explicito = true } = {}) {
     this.ultimoMotivoNuvem = null;
@@ -74,9 +85,11 @@ export class Engine {
     const q = String(pergunta ?? '').trim();
     if (!q || avaliarSeguranca(q).recusar) { this.ultimoMotivoNuvem = 'nao_entendeu'; return null; }
     const dic = this.dicionario();
+    const anterior = atual && 'interpretacaoAnterior' in atual ? atual.interpretacaoAnterior : this._ultimaInterpretacao;
+    const herdar = contextoDaPergunta(q, anterior, dic) ? anterior : null;
     let p = null;
     try {
-      p = explicito ? await this.nuvem.interpretarAgora(q, dic) : await this.nuvem.interpretar(q, dic);
+      p = explicito ? await this.nuvem.interpretarAgora(q, dic, herdar) : await this.nuvem.interpretar(q, dic, herdar);
     } catch { p = null; }
     this.ultimasSugestoesNuvem = this.nuvem.ultimasSugestoes ?? [];
     if (!p) { this.ultimoMotivoNuvem = this.nuvem.ultimoResultado === 'ok' ? 'nao_entendeu' : (this.nuvem.ultimoResultado ?? 'indisponivel'); return null; }
@@ -85,7 +98,7 @@ export class Engine {
     await this.resolverCas(q);
     const r = await this._montar(p);
     if (!r.resolvida) { this.ultimoMotivoNuvem = 'nao_entendeu'; return null; }
-    return { ...r, origem: 'NUVEM', modelo: this.nuvem.ultimoModelo ?? null };
+    return { ...r, origem: 'NUVEM', modelo: this.nuvem.ultimoModelo ?? null, interpretacaoAnterior: anterior ?? null, contextoUsado: this.nuvem.ultimoContextoUsado === true };
   }
 
   /** Número CAS citado na pergunta e ausente do dicionário (o índice do pipeline não tem CAS): procura nos lotes e ensina o dicionário. */
@@ -97,7 +110,7 @@ export class Engine {
     }
   }
 
-  limparContexto() { this._ultimoContexto = null; }
+  limparContexto() { this._ultimoContexto = null; this._ultimaInterpretacao = null; }
 }
 
 /**

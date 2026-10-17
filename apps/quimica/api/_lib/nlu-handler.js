@@ -3,6 +3,8 @@
 //   -> SEGURANÇA (regra, antes do modelo) -> cache -> orçamento diário -> Modal (timeout, 1 retry só em 5xx)
 //   -> normalização + ancoragem -> cache -> resposta.
 // O TEXTO DA PERGUNTA NUNCA É REGISTRADO em log (só status, latência, cache, client, motivo).
+// Multi-turno (17/10/2026): `contexto` opcional = a interpretação da pergunta anterior (contexto.js). Entra na chave do cache (forma
+// canônica), vai ao Modal junto com a pergunta e autoriza a ancoragem da entidade herdada (normalize.js). Nunca vai para o log (só `ctx`).
 
 import { nluAtivo, readConfig } from './config.js';
 import { avaliarCors, clientIp, json, readJsonBody } from './http.js';
@@ -16,8 +18,8 @@ import { validateNluBody } from './validate.js';
 
 export function defaultLog(evento) {
   // Whitelist de campos: status, latência, cache, client, motivo — nunca pergunta, IP ou iid.
-  const { evt, status, ms, cache, client, err, drop } = evento;
-  console.log(JSON.stringify({ evt, status, ms, cache, client, err, drop }));
+  const { evt, status, ms, cache, client, err, drop, ctx } = evento;
+  console.log(JSON.stringify({ evt, status, ms, cache, client, err, drop, ctx }));
 }
 
 /** Estado em memória da instância (limitadores, orçamento, cache, requisições em andamento). */
@@ -39,7 +41,7 @@ export function createNluState({ now = Date.now, cacheMax = 500, cacheTtlMs = 36
  * ocorre se sobrar tempo). Timeouts/erros de rede não são repetidos.
  * @returns {Promise<{ok:true, output:any} | {ok:false, kind:'timeout'|'upstream'|'auth'|'bad_output'|'budget'}>}
  */
-export async function chamarModal(cfg, q, { doFetch, now, budget }) {
+export async function chamarModal(cfg, q, { doFetch, now, budget, contexto = null }) {
   const limite = now() + cfg.timeoutMs;
   for (let tentativa = 0; tentativa < 2; tentativa++) {
     const restante = limite - now();
@@ -53,7 +55,7 @@ export async function chamarModal(cfg, q, { doFetch, now, budget }) {
       const resp = await doFetch(cfg.modalEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Modal-Key': cfg.modalKey, 'Modal-Secret': cfg.modalSecret },
-        body: JSON.stringify({ q, v: 1 }),
+        body: JSON.stringify(contexto ? { q, v: 1, contexto } : { q, v: 1 }),
         signal: ctl.signal,
       });
       if (resp.status >= 500) continue; // 5xx: 1 retry
@@ -129,8 +131,9 @@ export function createNluHandler(deps = {}) {
       meta.err = `invalid_${v.field ?? 'body'}`;
       return responder(v.status, { ok: false, error: v.error, field: v.field });
     }
-    const { q, client, iid } = v.value;
+    const { q, client, iid, contexto } = v.value;
     meta.client = client;
+    if (contexto) meta.ctx = true; // só o fato de haver contexto; o conteúdo nunca é registrado
 
     // --- rate limit (IP por minuto e iid por dia). Só consome se ambos permitirem.
     const ip = clientIp(request);
@@ -153,25 +156,28 @@ export function createNluHandler(deps = {}) {
     }
 
     // --- segurança química: pedido perigoso NUNCA chega ao modelo (sem custo); o cliente mostra a recusa padrão
+    // Com contexto, a continuação também é avaliada junto com o composto/equação herdados ("e como fazer em casa?" depois de um explosivo).
+    const herdado = contexto ? [contexto.ctx.composto, contexto.ctx.equacao].filter(Boolean).join(' ') : '';
     const seg = avaliarPedido(q);
-    if (seg.recusar) {
+    if (seg.recusar || (herdado && avaliarPedido(`${q} ${herdado}`).recusar)) {
       meta.err = 'seguranca';
       return responder(200, { ok: true, nlu: { intent: 'RECUSA_PERIGO' }, model: 'regra', cached: false });
     }
 
-    // --- cache (chave inclui a versão do modelo: promoção de versão invalida o cache)
-    const chave = `${cfg.modelVersion}|${normalizeQuestion(q)}`;
+    // --- cache (chave inclui a versão do modelo — promoção de versão invalida o cache — e a forma canônica do contexto)
+    const chave = `${cfg.modelVersion}|${contexto?.canonico ?? ''}|${normalizeQuestion(q)}`;
+    const marcaContexto = contexto ? { contexto: true } : {};
     const emCache = state.cache.get(chave);
     if (emCache) {
       meta.cache = 'hit';
-      return responder(200, { ok: true, nlu: emCache.nlu, resolucao: emCache.resolucao ?? null, model: cfg.modelVersion, cached: true });
+      return responder(200, { ok: true, nlu: emCache.nlu, resolucao: emCache.resolucao ?? null, model: cfg.modelVersion, cached: true, ...marcaContexto });
     }
     meta.cache = 'miss';
 
     // --- chamada ao modelo (coalescida: perguntas idênticas simultâneas compartilham 1 chamada)
     let pendente = state.inflight.get(chave);
     if (!pendente) {
-      pendente = chamarModal(cfg, q, { doFetch, now, budget: state.budget }).finally(() => state.inflight.delete(chave));
+      pendente = chamarModal(cfg, q, { doFetch, now, budget: state.budget, contexto: contexto?.ctx ?? null }).finally(() => state.inflight.delete(chave));
       state.inflight.set(chave, pendente);
     }
     const r = await pendente;
@@ -183,7 +189,7 @@ export function createNluHandler(deps = {}) {
       return responder(502, { ok: false, error: 'upstream' });
     }
 
-    const n = normalizeModelOutput(r.output, { question: q });
+    const n = normalizeModelOutput(r.output, { question: q, contexto: contexto?.ctx ?? null });
     if (!n.ok) {
       meta.err = n.error;
       return responder(502, { ok: false, error: 'bad_model_output' });
@@ -194,6 +200,6 @@ export function createNluHandler(deps = {}) {
     const resolucao = n.nlu.composto ? resolver(n.nlu.composto) : null;
     const entrada = { nlu: n.nlu, resolucao };
     state.cache.set(chave, entrada, cfg.cacheTtlMs);
-    return responder(200, { ok: true, nlu: n.nlu, resolucao, model: cfg.modelVersion, cached: false });
+    return responder(200, { ok: true, nlu: n.nlu, resolucao, model: cfg.modelVersion, cached: false, ...marcaContexto });
   };
 }

@@ -46,6 +46,7 @@ export default {
   "periodo": "\\bperiode\\s+(\\d)\\b",
   "bloco": "\\bbloc\\s+([spdf])\\b",
   "continuacao": "^et (?:le |la |les |l |celui |celle |ceux )?(?:de |du |des |d |pour )?",
+  "continuacaoNuvem": "^(?:et|maintenant|ok|d accord|super|bien|alors|aussi|en|avec|pareil|refais|fais le|dessine|montre|dis m en plus|dis moi en plus|qu en est il)(?: |$)|(?:^| )(?:aussi|egalement|son|sa|ses|en plus)(?: |$)",
   "limparConceito": [
    "^[- ]*(?:est |sont |signifie |veut dire |serait |ce que |que |moi )*",
    "^(?:un |une |le |la |les |l |de |du |des |d )+"

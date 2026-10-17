@@ -8,9 +8,14 @@ publicada) com llama-cpp-python e a gramática GBNF de nlu_core.py, atrás de um
 raciocínio vazio `<think>\n\n</think>\n\n`, igual ao treino e ao gate `ia/treino/avaliar_gguf.py`). Quem chama é SÓ o
 proxy serverless da Vercel (api/nlu.js), que guarda o segredo; o app/site nunca falam com o Modal.
 
-  POST <url>  {"q": "<pergunta, no máximo 300 caracteres>"}
-  -> 200 {"ok": true, "output": {...JSON bruto do modelo...}, "model": "<versão>", "format": "v1", "ms": n, "tokens": n}
-  -> 400 pergunta inválida | ok=false se o modelo não produziu JSON completo
+  POST <url>  {"q": "<pergunta, no máximo 300 caracteres>", "contexto": {...interpretação anterior, opcional...}}
+  -> 200 {"ok": true, "output": {...JSON bruto do modelo...}, "model": "<versão>", "format": "v1", "ms": n, "tokens": n[, "contexto": true]}
+  -> 400 pergunta ou contexto inválidos | ok=false se o modelo não produziu JSON completo
+
+Multi-turno (NLU v3.4+, serviço desde 17/10/2026): com `contexto` (o objeto `nlu` da pergunta anterior, no formato do contrato), a mensagem
+do usuário vira `contexto: <format_output(contexto)>
+<pergunta limpa>` (nlu_core.build_user_message, igual a ia/corpus/contexto_nlu.py).
+A gramática NÃO depende do contexto (a intenção pode mudar de uma pergunta para a outra).
 
 O proxy normaliza `output` e ANCORA cada entidade na pergunta (api/_lib/normalize.js). O texto da pergunta NÃO é registrado em log.
 
@@ -143,33 +148,38 @@ class Nlu:
         escolha = out["choices"][0]
         return escolha["text"], out["usage"]["completion_tokens"], escolha.get("finish_reason")
 
-    def _infer(self, q) -> dict:
-        """Núcleo comum ao endpoint HTTP e ao `bench`. Lança ValueError se a pergunta é inválida."""
-        pergunta = core.validate_question(q)
+    def _infer(self, q, contexto=None) -> dict:
+        """Núcleo comum ao endpoint HTTP e ao `bench`. Lança ValueError se a pergunta ou o contexto são inválidos.
+        `contexto` (dict opcional): a interpretação da pergunta anterior; a pergunta é validada sozinha e o contexto, pela forma do
+        contrato (nlu_core.validate_contexto), e a mensagem do usuário ganha a linha `contexto: ...` (nlu_core.build_user_message)."""
+        entrada = core.build_user_message(q, contexto)
         t0 = time.time()
-        texto, tokens, motivo = self._gerar(pergunta)
+        texto, tokens, motivo = self._gerar(entrada)
         ms = int((time.time() - t0) * 1000)
         obj = core.parse_model_output(texto)
         ok = core.has_valid_shape(obj) and motivo != "length"
         # Log SEM o texto da pergunta nem da saída: só métricas
-        print(json.dumps({"evt": "infer", "ok": ok, "ms": ms, "tokens": tokens, "stop": motivo}))
+        print(json.dumps({"evt": "infer", "ok": ok, "ms": ms, "tokens": tokens, "stop": motivo, "ctx": contexto is not None}))
         base = {"model": self.version, "format": self.fmt, "ms": ms, "tokens": tokens}
+        if contexto is not None:
+            base["contexto"] = True
         if not ok:
             return {"ok": False, "error": "incomplete_output" if motivo == "length" else "invalid_output", **base}
         return {"ok": True, "output": obj, **base}
 
     @modal.method()
-    def generate(self, q: str) -> dict:
+    def generate(self, q: str, contexto: dict = None) -> dict:
         """Chamada remota (usada pelo `bench`)."""
-        return self._infer(q)
+        return self._infer(q, contexto)
 
     @modal.fastapi_endpoint(method="POST", requires_proxy_auth=True)
     def infer(self, item: dict):
-        """Endpoint HTTP (protegido por Modal-Key/Modal-Secret). Corpo: {"q": "..."}."""
+        """Endpoint HTTP (protegido por Modal-Key/Modal-Secret). Corpo: {"q": "...", "contexto": {...}?}."""
         from fastapi import HTTPException
 
+        corpo = item if isinstance(item, dict) else {}
         try:
-            return self._infer(item.get("q") if isinstance(item, dict) else None)
+            return self._infer(corpo.get("q"), corpo.get("contexto"))
         except ValueError as e:
             raise HTTPException(status_code=400, detail=str(e)) from None
 

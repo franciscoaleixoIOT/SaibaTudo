@@ -74,6 +74,7 @@ internal object LexicoFr {
         "periodo" to "\\bperiode\\s+(\\d)\\b",
         "bloco" to "\\bbloc\\s+([spdf])\\b",
         "continuacao" to "^et (?:le |la |les |l |celui |celle |ceux )?(?:de |du |des |d |pour )?",
+        "continuacaoNuvem" to "^(?:et|maintenant|ok|d accord|super|bien|alors|aussi|en|avec|pareil|refais|fais le|dessine|montre|dis m en plus|dis moi en plus|qu en est il)(?: |\$)|(?:^| )(?:aussi|egalement|son|sa|ses|en plus)(?: |\$)",
         "limparConceito" to n_pistas_limparConceito(),
         "constantes" to "\\b(pka|pkb|ka|kb)\\s*(?:=|:|de|egal a|egale a|vaut|est)?\\s*([0-9][0-9.,]*(?:\\s*(?:[x×*]\\s*10\\s*\\^?\\s*\\{?-?\\d+\\}?|e-?\\d+))?)",
         "quantidadeComplemento" to "(?:de|d|par)",

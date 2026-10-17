@@ -1,0 +1,213 @@
+{
+ "versao": 1,
+ "descricao": "Multi-turno da IA na nuvem (NLU v3.4+, 17/10/2026): casos para os DOIS clientes (web/test/nuvem.test.mjs e app/src/test/.../ContextoNuvemTest.kt). Cada caso vem de ia/corpus/out/v34/holdout_v34_multiturno.json (campo `q` = \"contexto: {...}\\npergunta\"): `contexto` e a interpretacao da pergunta anterior e `pergunta` a atual. Os clientes montam a interpretacao anterior a partir de `contexto` com o dicionario do fixture e devem devolver o MESMO objeto (contextoParaNuvem / ContextoNuvem.paraNuvem); `continuacao` diz se a pergunta atual leva o contexto (ehContinuacao / ContextoNuvem.ehContinuacao).",
+ "fonte": "ia/corpus/out/v34/holdout_v34_multiturno.json",
+ "casos": [
+  {
+   "holdout": 0,
+   "idioma": "pt-BR",
+   "cenario": "ent_el",
+   "contexto": {
+    "intent": "ELEMENTO",
+    "elemento": "H"
+   },
+   "pergunta": "e quanto ao carbono?",
+   "continuacao": true
+  },
+  {
+   "holdout": 9,
+   "idioma": "pt-BR",
+   "cenario": "ent_co",
+   "contexto": {
+    "intent": "NOMENCLATURA",
+    "composto": "H2SO4"
+   },
+   "pergunta": "E quanto à Hidrocortisona?",
+   "continuacao": true
+  },
+  {
+   "holdout": 15,
+   "idioma": "pt-BR",
+   "cenario": "quant",
+   "contexto": {
+    "intent": "GAS_IDEAL",
+    "quantidades": [
+     {
+      "valor": 5,
+      "unidade": "mol"
+     },
+     {
+      "valor": 0.5,
+      "unidade": "L"
+     },
+     {
+      "valor": 20,
+      "unidade": "°C"
+     }
+    ]
+   },
+   "pergunta": "agora com 1 mol",
+   "continuacao": true
+  },
+  {
+   "holdout": 28,
+   "idioma": "pt-BR",
+   "cenario": "acao",
+   "contexto": {
+    "intent": "PROPRIEDADE",
+    "composto": "Ca(OH)2",
+    "propriedade": "pontoEbulicaoK"
+   },
+   "pergunta": "e a segurança?",
+   "continuacao": true
+  },
+  {
+   "holdout": 31,
+   "idioma": "pt-BR",
+   "cenario": "ent_el",
+   "contexto": {
+    "intent": "PROPRIEDADE",
+    "elemento": "Cu",
+    "propriedade": "configuracaoEletronica"
+   },
+   "pergunta": "entendi, e do hidrogenio?",
+   "continuacao": true
+  },
+  {
+   "holdout": 40,
+   "idioma": "en",
+   "cenario": "acao",
+   "contexto": {
+    "intent": "PROPRIEDADE",
+    "elemento": "S",
+    "propriedade": "energiaIonizacaoKJmol"
+   },
+   "pergunta": "is it safe?",
+   "continuacao": true
+  },
+  {
+   "holdout": 63,
+   "idioma": "es",
+   "cenario": "acao",
+   "contexto": {
+    "intent": "MASSA_MOLAR",
+    "composto": "CCl2F2"
+   },
+   "pergunta": "¿y la estructura?",
+   "continuacao": true
+  },
+  {
+   "holdout": 92,
+   "idioma": "de",
+   "cenario": "prop",
+   "contexto": {
+    "intent": "MASSA_MOLAR",
+    "elemento": "Na"
+   },
+   "pergunta": "Wie ist der Schmelzpunkt?",
+   "continuacao": true
+  },
+  {
+   "holdout": 102,
+   "idioma": "de",
+   "cenario": "quant",
+   "contexto": {
+    "intent": "ESTEQUIOMETRIA",
+    "composto": "C6H12O6",
+    "quantidades": [
+     {
+      "valor": 250,
+      "unidade": "mg"
+     }
+    ]
+   },
+   "pergunta": "ok, dasselbe mit 250 Gramm",
+   "continuacao": true
+  },
+  {
+   "holdout": 112,
+   "idioma": "fr",
+   "cenario": "quant",
+   "contexto": {
+    "intent": "PH",
+    "composto": "lessive de soude",
+    "quantidades": [
+     {
+      "valor": 3,
+      "unidade": "mol/L"
+     }
+    ]
+   },
+   "pergunta": "refais avec 0,5 mol/L",
+   "continuacao": true
+  },
+  {
+   "holdout": 4,
+   "idioma": "pt-BR",
+   "cenario": "nova",
+   "contexto": {
+    "intent": "CONVERSAO_UNIDADE",
+    "quantidades": [
+     {
+      "valor": 100,
+      "unidade": "mL"
+     }
+    ],
+    "unidadeDestino": "L"
+   },
+   "pergunta": "A que temperatura o elemento Al ferve?",
+   "continuacao": false
+  },
+  {
+   "holdout": 70,
+   "idioma": "es",
+   "cenario": "nova",
+   "contexto": {
+    "intent": "CONVERSAO_UNIDADE",
+    "quantidades": [
+     {
+      "valor": 5,
+      "unidade": "kg"
+     }
+    ],
+    "unidadeDestino": "mg"
+   },
+   "pergunta": "¿El ácido acetilsalicílico es inflamable?",
+   "continuacao": false
+  },
+  {
+   "holdout": 96,
+   "idioma": "de",
+   "cenario": "nova",
+   "contexto": {
+    "intent": "CONVERSAO_UNIDADE",
+    "quantidades": [
+     {
+      "valor": 150,
+      "unidade": "°C"
+     }
+    ],
+    "unidadeDestino": "K"
+   },
+   "pergunta": "Wie hoch ist der pKa-Wert von BaCrO4?",
+   "continuacao": false
+  },
+  {
+   "holdout": 122,
+   "idioma": "fr",
+   "cenario": "nova",
+   "contexto": {
+    "intent": "CONVERSAO_UNIDADE",
+    "quantidades": [
+     {
+      "valor": 10,
+      "unidade": "L"
+     }
+    ],
+    "unidadeDestino": "mL"
+   },
+   "pergunta": "Donne-moi la masse molaire de H2S",
+   "continuacao": false
+  }
+ ]
+}

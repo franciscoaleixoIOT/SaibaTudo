@@ -74,6 +74,7 @@ internal object LexicoEs {
         "periodo" to "\\bperiodo\\s+(\\d)\\b",
         "bloco" to "\\bbloque\\s+([spdf])\\b",
         "continuacao" to "^y (?:el |la |los |las )?(?:de |del |de la |de los |de las )?",
+        "continuacaoNuvem" to "^(?:y|que tal|ahora|ok|vale|bien|gracias|entonces|tambien|en|con|igual|lo mismo|hazlo|haz|dibuja|dibujalo|muestra|muestrame|dime mas)(?: |\$)|(?:^| )(?:tambien|igualmente|su|sus|eso|esto)(?: |\$)",
         "limparConceito" to n_pistas_limparConceito(),
         "constantes" to "\\b(pka|pkb|ka|kb)\\s*(?:=|:|de|igual a|vale)?\\s*([0-9][0-9.,]*(?:\\s*(?:[x×*]\\s*10\\s*\\^?\\s*\\{?-?\\d+\\}?|e-?\\d+))?)",
         "quantidadeComplemento" to "(?:de|por)",

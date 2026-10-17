@@ -74,6 +74,7 @@ internal object LexicoPtBr {
         "periodo" to "\\bperiodo\\s+(\\d)\\b",
         "bloco" to "\\bbloco\\s+([spdf])\\b",
         "continuacao" to "^e (?:o |a |os |as )?(?:de |do |da |dos |das )?",
+        "continuacaoNuvem" to "^(?:e|ok|certo|beleza|entendi|agora|entao|mas|tambem|em|com|faz|faca|refaz|refaca|repete|repita|desenhe|desenha|mostre|mostra|me fala mais|fala mais|e se)(?: |\$)|(?:^| )(?:tambem|tb|idem|dele|dela|disso|desse|dessa|nele|nela)(?: |\$)",
         "limparConceito" to n_pistas_limparConceito(),
         "constantes" to "\\b(pka|pkb|ka|kb)\\s*(?:=|:|de|igual a|vale)?\\s*([0-9][0-9.,]*(?:\\s*(?:[x×*]\\s*10\\s*\\^?\\s*\\{?-?\\d+\\}?|e-?\\d+))?)",
         "quantidadeComplemento" to "(?:de|por)",

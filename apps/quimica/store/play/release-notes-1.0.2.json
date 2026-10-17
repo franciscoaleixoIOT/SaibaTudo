@@ -1,0 +1,22 @@
+[
+  {
+    "language": "pt-BR",
+    "text": "Caixa de pergunta igual à do site: campo limpo ao enviar, histórico com setas, origem e data dos dados em cada resposta. Opção \"Ajudar a melhorar o app\" (desligada por padrão) e \"Apagar os dados deste aparelho\". Perguntas de continuação (\"e o do potássio?\", \"desenhe\") com a IA na nuvem opcional, que recebe só a interpretação da pergunta anterior. Dados de 17/10/2026, com propriedades medidas e perigos GHS revisados."
+  },
+  {
+    "language": "en-US",
+    "text": "Question box like the website: field cleared on send, history with arrows, data source and date in every answer. \"Help improve the app\" option (off by default) and \"Delete this device's data\". Follow-up questions (\"and potassium?\", \"draw it\") with the optional cloud AI, which only receives the interpretation of the previous question. Data from 17 Oct 2026, with measured properties and revised GHS hazards."
+  },
+  {
+    "language": "es-419",
+    "text": "Caja de preguntas igual a la del sitio: campo limpio al enviar, historial con flechas, origen y fecha de los datos en cada respuesta. Opción \"Ayudar a mejorar la app\" (desactivada por defecto) y \"Borrar los datos de este dispositivo\". Preguntas de continuación (\"¿y el del potasio?\", \"dibuja\") con la IA en la nube opcional, que solo recibe la interpretación de la pregunta anterior. Datos del 17/10/2026, con propiedades medidas y peligros SGA revisados."
+  },
+  {
+    "language": "de-DE",
+    "text": "Fragefeld wie auf der Website: Feld wird beim Senden geleert, Verlauf mit Pfeilen, Datenquelle und Datum in jeder Antwort. Option „App verbessern helfen“ (standardmäßig aus) und „Daten dieses Geräts löschen“. Anschlussfragen („und Kalium?“, „zeichne“) mit der optionalen Cloud-KI, die nur die Interpretation der vorherigen Frage erhält. Daten vom 17.10.2026 mit gemessenen Eigenschaften und überprüften GHS-Gefahren."
+  },
+  {
+    "language": "fr-FR",
+    "text": "Zone de question comme sur le site : champ vidé à l'envoi, historique avec flèches, source et date des données dans chaque réponse. Option « Aider à améliorer l'appli » (désactivée par défaut) et « Effacer les données de cet appareil ». Questions de suite (« et le potassium ? », « dessine ») avec l'IA dans le cloud facultative, qui ne reçoit que l'interprétation de la question précédente. Données du 17/10/2026, avec propriétés mesurées et dangers GHS revus."
+  }
+]

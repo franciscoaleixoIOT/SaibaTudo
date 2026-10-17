@@ -74,6 +74,7 @@ internal object LexicoEn {
         "periodo" to "\\bperiod\\s+(\\d)\\b",
         "bloco" to "\\bblock\\s+([spdf])\\b|\\b([spdf])[- ]block\\b",
         "continuacao" to "^(?:and|what about) (?:the |that |this )?(?:of |for )?",
+        "continuacaoNuvem" to "^(?:and|what about|how about|now|ok|okay|cool|got it|so|then|also|too|in|with|same|redo|draw|show|tell me more)(?: |\$)|(?:^| )(?:too|also|as well|its|it)(?: |\$)",
         "limparConceito" to n_pistas_limparConceito(),
         "constantes" to "\\b(pka|pkb|ka|kb)\\s*(?:=|:|of|is|equal to|equals)?\\s*([0-9][0-9.,]*(?:\\s*(?:[x×*]\\s*10\\s*\\^?\\s*\\{?-?\\d+\\}?|e-?\\d+))?)",
         "quantidadeComplemento" to "(?:of|per)",

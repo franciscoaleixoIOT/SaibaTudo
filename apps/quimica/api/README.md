@@ -42,6 +42,23 @@ aceita artigo/preposição à frente). Achou: `"resolucao": { "composto": { "cid
 você quis dizer Y?" com os nomes de exibição do próprio dicionário, em vez de inventar. `null` quando não há composto ou o índice não veio junto.
 A resolução vai junto no cache e nunca derruba a resposta (erro interno vira `null`). A API continua sem fornecer fatos: só CID e nome de busca.
 
+**`contexto` — multi-turno (desde 17/10/2026, NLU `nlu-v3.4-20261017`+; `_lib/contexto.js`):** campo opcional do corpo com a interpretação da
+pergunta ANTERIOR, numa pergunta de continuação ("e a do KCl?", "e em fahrenheit?"): o mesmo objeto `nlu` que esta rota devolve —
+`intent` + entidades como **texto** (composto como nome/fórmula, **nunca o CID**), ex.: `{ "q": "e a do KCl?", "v": 1, "client": "web", "iid": "…",
+"contexto": { "intent": "MASSA_MOLAR", "composto": "NaCl" } }`. Ausente ou `null` = comportamento de antes. Regras: objeto plano; `intent` do
+contrato; só as chaves de `nlu_core.KEYS` **admitidas pela intenção** (`ENTIDADES_POR_INTENCAO`; as obrigatórias não são exigidas); `elemento`,
+`propriedade`, `nivel` e `unidadeDestino` do vocabulário fechado; `composto` (até 60) e `equacao` (até 120) texto sem quebra de linha, controle, aspas,
+`\` nem `<|`/`|>`; `quantidades` 1 a 4 `{valor: número finito, unidade}`; valor `null` = chave ausente; a forma canônica (a de `nlu_core.format_output`:
+ordem do contrato, separadores `", "`/`": "`, acentos sem escape) com no máximo **400 caracteres**. Inválido → **`400 { "ok": false, "error": "contexto" }`**
+(o Modal não é chamado). A forma canônica entra na chave do cache (`<MODEL_VERSION>|<contexto canônico ou vazio>|<pergunta normalizada>`); o
+objeto saneado vai ao Modal (`{ q, v, contexto }`), que monta a mensagem `contexto: <json canônico>\n<pergunta>` (igual ao treino,
+`ia/corpus/contexto_nlu.py`). **Ancoragem herdada:** com contexto, uma entidade do modelo que não está na pergunta também passa se for **igual**
+(mesma normalização: símbolo, id, unidade, composto sem acento/caixa ou mesma fórmula, equação sem espaços, quantidade com o mesmo valor e
+unidade) à entidade **da mesma chave** no contexto; o que não está nem na pergunta nem no contexto continua caindo. **Segurança:** além da pergunta,
+a regra avalia a pergunta junto com o `composto`/`equacao` do contexto ("como fazer em casa?" depois de um explosivo → `RECUSA_PERIGO`, sem
+modelo). A resposta tem a mesma forma, mais **`"contexto": true`** quando o contexto entrou no prompt (também no `cached: true`); o log só
+registra `ctx: true`, nunca o conteúdo.
+
 ### `POST /api/melhoria` ("Ajudar a melhorar o app", desde 16/10/2026)
 Captura **opcional**, com consentimento **próprio** (separado do da IA na nuvem), das perguntas que o app não entendeu. Diferente do `/api/nlu`,
 aqui o texto é **guardado** para uma pessoa revisar. Porte de `apps/eleicoes2026/api/melhoria.js` (lá: hash por dia e filtro de opinião política; aqui: lista

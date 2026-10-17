@@ -45,6 +45,7 @@
     "periodo": "\\bperiod\\s+(\\d)\\b",
     "bloco": "\\bblock\\s+([spdf])\\b|\\b([spdf])[- ]block\\b",
     "continuacao": "^(?:and|what about) (?:the |that |this )?(?:of |for )?",
+    "continuacaoNuvem": "^(?:and|what about|how about|now|ok|okay|cool|got it|so|then|also|too|in|with|same|redo|draw|show|tell me more)(?: |$)|(?:^| )(?:too|also|as well|its|it)(?: |$)",
     "limparConceito": [
       "^(?:is |are |does |do |mean |means |a |an |the )+",
       "^(?:a |an |the |of |for )+"

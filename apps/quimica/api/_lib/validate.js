@@ -1,6 +1,7 @@
 // Validação de entrada de /api/nlu e /api/ask. Todas as funções são puras e devolvem { ok:true, value } ou { ok:false, status, error, field? }.
 
 import { CLIENTS } from './vocab.js';
+import { validarContexto } from './contexto.js';
 
 export const MAX_Q = 300;
 export const MIN_Q = 3;
@@ -53,9 +54,19 @@ function validarBase(body) {
   return { ok: true, value: { q: limpa, client, iid: iid.toLowerCase() } };
 }
 
-/** Valida o corpo (já parseado) de POST /api/nlu: { q, v:1, client, iid }. */
+/**
+ * Valida o corpo (já parseado) de POST /api/nlu: { q, v:1, client, iid, contexto? }. `contexto` (multi-turno, 17/10/2026) é a
+ * interpretação da pergunta anterior (contexto.js); ausente ou null = sem contexto. Inválido -> 400 { error: "contexto" }.
+ * `value.contexto` = { ctx, canonico } ou null.
+ */
 export function validateNluBody(body) {
-  return validarBase(body);
+  const base = validarBase(body);
+  if (!base.ok) return base;
+  const bruto = body.contexto;
+  if (bruto === undefined || bruto === null) return { ok: true, value: { ...base.value, contexto: null } };
+  const c = validarContexto(bruto);
+  if (!c.ok) return { ok: false, status: 400, error: 'contexto' };
+  return { ok: true, value: { ...base.value, contexto: c.value } };
 }
 
 /** Valida o corpo de POST /api/ask: { q, context?, trechos?: [{id, texto}], v:1, client, iid }. */

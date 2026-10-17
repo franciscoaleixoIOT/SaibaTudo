@@ -4,7 +4,8 @@
 // Princípios:
 //  - A nuvem NUNCA fornece fatos: só intenção e entidades; qualquer outro campo do modelo é ignorado.
 //  - Valores fora dos vocabulários fechados (vocab.js) são descartados.
-//  - Com `question`, cada entidade só é mantida se houver evidência textual na pergunta (ground.js).
+//  - Com `question`, cada entidade só é mantida se houver evidência textual na pergunta (ground.js) OU, com `contexto` (multi-turno,
+//    17/10/2026), se for IGUAL à entidade da mesma chave na interpretação anterior (entidade herdada: "e em gramas?" mantém o composto).
 //  - Se a intenção É a entidade (perfil, ficha, massa molar...) e ela não sobreviveu, vira DESCONHECIDA (o cliente cai no NLU local).
 //  - JSON inválido ou sem `intent` => { ok:false }. Intenção fora do vocabulário => DESCONHECIDA.
 // O cliente ainda revalida tudo contra o pacote de dados assinado.
@@ -14,6 +15,7 @@ import {
 } from './vocab.js';
 import {
   fold, groundComposto, groundElemento, groundEquacao, groundNivel, groundPropriedade, groundQuantidade, groundUnidadeDestino,
+  normEquacao, normFormula,
 } from './ground.js';
 
 const ORDEM_CAMPOS = ['elemento', 'composto', 'propriedade', 'quantidades', 'equacao', 'nivel', 'unidadeDestino'];
@@ -111,6 +113,34 @@ export function normQuantidades(v) {
   return { itens, descartadas };
 }
 
+// ------------------------------------------------------------------ entidade herdada do contexto (multi-turno)
+
+const iguaisNum = (a, b) => Math.abs(a - b) <= 1e-9 * Math.max(1, Math.abs(a), Math.abs(b));
+const formaComposto = (v) => fold(v).replace(/\s+/g, ' ').trim();
+
+/**
+ * A entidade `campo` do modelo é IGUAL à da mesma chave no contexto? Comparação com as normalizações de sempre: vocabulário
+ * (elemento, propriedade, nível, unidade), composto sem acento/caixa (ou a mesma fórmula), equação sem espaços e com setas unificadas.
+ */
+export function herdadaDoContexto(campo, valor, contexto) {
+  if (!contexto || valor === null || valor === undefined) return false;
+  const c = contexto[campo];
+  if (c === null || c === undefined) return false;
+  switch (campo) {
+    case 'elemento': return normElemento(c) === valor;
+    case 'propriedade': return normPropriedade(c) === valor;
+    case 'nivel': return normNivel(c) === valor;
+    case 'unidadeDestino': return normUnidade(c) === valor;
+    case 'composto': {
+      const nc = normComposto(c);
+      return Boolean(nc) && (formaComposto(nc) === formaComposto(valor) || normFormula(nc) === normFormula(valor));
+    }
+    case 'equacao': return normEquacao(c) === normEquacao(valor);
+    case 'quantidades': return Array.isArray(c) && c.some((x) => normUnidade(x?.unidade) === valor.unidade && typeof x?.valor === 'number' && iguaisNum(x.valor, valor.valor));
+    default: return false;
+  }
+}
+
 // ------------------------------------------------------------------ requisitos por intenção
 
 // Intenções cuja resposta É a entidade (perfil, ficha, estrutura, nome, massa molar, propriedade): se a entidade não sobreviveu à ancoragem,
@@ -141,7 +171,8 @@ function montar(intent, e) {
 
 /**
  * @param {string|object} raw  saída do modelo (texto com JSON ou objeto já parseado)
- * @param {{question?: string}} [opts]  com `question`, as entidades são ancoradas no texto da pergunta
+ * @param {{question?: string, contexto?: object|null}} [opts]  com `question`, as entidades são ancoradas no texto da pergunta; com
+ *   `contexto` (já validado, contexto.js), a entidade igual à da mesma chave no contexto também passa (herdada)
  * @returns {{ok:true, nlu:object, dropped:string[]} | {ok:false, error:string}}
  */
 export function normalizeModelOutput(raw, opts = {}) {
@@ -154,6 +185,8 @@ export function normalizeModelOutput(raw, opts = {}) {
   if (INTENTS_SEM_ENTIDADES.has(intent)) return { ok: true, nlu: { intent }, dropped: [] };
 
   const question = typeof opts.question === 'string' ? opts.question : null;
+  const contexto = opts.contexto && typeof opts.contexto === 'object' ? opts.contexto : null;
+  const herdada = (campo, valor) => herdadaDoContexto(campo, valor, contexto);
   const dropped = [];
   const e = {
     elemento: normElemento(obj.elemento),
@@ -178,19 +211,19 @@ export function normalizeModelOutput(raw, opts = {}) {
       e[campo] = null;
       dropped.push(campo);
     };
-    if (e.elemento && !groundElemento(e.elemento, question)) solta('elemento');
-    if (e.composto && !groundComposto(e.composto, question)) solta('composto');
-    if (e.propriedade && !groundPropriedade(e.propriedade, question)) solta('propriedade');
-    if (e.nivel && !groundNivel(e.nivel, question)) solta('nivel');
+    if (e.elemento && !groundElemento(e.elemento, question) && !herdada('elemento', e.elemento)) solta('elemento');
+    if (e.composto && !groundComposto(e.composto, question) && !herdada('composto', e.composto)) solta('composto');
+    if (e.propriedade && !groundPropriedade(e.propriedade, question) && !herdada('propriedade', e.propriedade)) solta('propriedade');
+    if (e.nivel && !groundNivel(e.nivel, question) && !herdada('nivel', e.nivel)) solta('nivel');
     if (e.equacao) {
       const g = groundEquacao(e.equacao, question);
       if (g) e.equacao = g.valor;
-      else solta('equacao');
+      else if (!herdada('equacao', e.equacao)) solta('equacao');
     }
     const antes = e.quantidades.length;
-    e.quantidades = e.quantidades.filter((x) => groundQuantidade(x, question)).slice(0, MAX_QUANTIDADES);
+    e.quantidades = e.quantidades.filter((x) => groundQuantidade(x, question) || herdada('quantidades', x)).slice(0, MAX_QUANTIDADES);
     if (e.quantidades.length < antes) dropped.push('quantidades');
-    if (e.unidadeDestino && !groundUnidadeDestino(e.unidadeDestino, question, e.quantidades)) solta('unidadeDestino');
+    if (e.unidadeDestino && !groundUnidadeDestino(e.unidadeDestino, question, e.quantidades) && !herdada('unidadeDestino', e.unidadeDestino)) solta('unidadeDestino');
   } else {
     e.quantidades = e.quantidades.slice(0, MAX_QUANTIDADES);
   }

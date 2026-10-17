@@ -7,9 +7,10 @@ import { resolve } from 'node:path';
 import { loja, RAIZ } from './support.mjs';
 import { Dicionario } from '../src/quimica/js/dicionario.js';
 import { Engine, mesmaInterpretacao } from '../src/quimica/js/engine.js';
-import { INTENTS } from '../src/quimica/js/nlu.js';
+import { INTENTS, parse } from '../src/quimica/js/nlu.js';
 import {
-  ENDPOINT_NUVEM, NuvemNlu, SEM_NUVEM, TIMEOUT_NUVEM_EXPLICITA_MS, TIMEOUT_NUVEM_MS, chaveFalhaNuvem, ofereceNuvem, pedirANuvem, sugestoesDaResolucao, validarNluNuvem
+  CHAVES_CONTEXTO, CHAVES_POR_INTENCAO, ENDPOINT_NUVEM, MAX_CONTEXTO, NuvemNlu, SEM_NUVEM, TIMEOUT_NUVEM_EXPLICITA_MS, TIMEOUT_NUVEM_MS, UNIDADES_CONTEXTO,
+  chaveFalhaNuvem, contextoDaPergunta, contextoParaNuvem, ehContinuacao, ofereceNuvem, pedirANuvem, sugestoesDaResolucao, tamanhoContexto, validarNluNuvem
 } from '../src/quimica/js/nuvem.js';
 import { CATALOGOS } from '../src/quimica/js/i18n/index.js';
 
@@ -200,4 +201,182 @@ test('ofereceNuvem, chaveFalhaNuvem e mesmaInterpretacao', () => {
   assert.equal(mesmaInterpretacao({ intent: 'A', composto: 1 }, { intent: 'A', composto: 2 }), false);
   assert.equal(mesmaInterpretacao({ intent: 'A' }, { intent: 'B' }), false);
   assert.equal(mesmaInterpretacao(null, { intent: 'B' }), false);
+});
+
+
+// ---------------------------------------------------------------------------------------------------- multi-turno (contexto, 17/10/2026)
+const CASOS_CONTEXTO = JSON.parse(readFileSync(resolve(RAIZ, 'contracts/nlu_contexto_cases.json'), 'utf8')).casos;
+const dicDe = (() => { const cache = {}; return (idioma) => (cache[idioma] ??= new Dicionario(store, idioma)); })();
+
+test('contexto: vocabulários espelham o servidor (chaves por intenção = nlu_core.ENTIDADES_POR_INTENCAO; unidades = api/_lib/vocab.js)', () => {
+  const core = readFileSync(resolve(RAIZ, 'backend/modal/nlu_core.py'), 'utf8');
+  const bloco = core.slice(core.indexOf('ENTIDADES_POR_INTENCAO = {'), core.indexOf('}', core.indexOf('ENTIDADES_POR_INTENCAO = {')));
+  for (const m of bloco.matchAll(/"([A-Z_]+)": \(\(([^)]*)\)/g)) {
+    const permitidas = [...m[2].matchAll(/"(\w+)"/g)].map((x) => x[1]);
+    if (!permitidas.length) { assert.equal(CHAVES_POR_INTENCAO[m[1]], undefined, `${m[1]} não leva contexto`); continue; }
+    assert.deepEqual(CHAVES_POR_INTENCAO[m[1]], permitidas, m[1]);
+  }
+  const vocab = readFileSync(resolve(RAIZ, 'api/_lib/vocab.js'), 'utf8');
+  const lista = vocab.slice(vocab.indexOf('export const UNIDADES = Object.freeze(['), vocab.indexOf(']);', vocab.indexOf('export const UNIDADES = Object.freeze([')));
+  assert.deepEqual([...UNIDADES_CONTEXTO].sort(), [...lista.matchAll(/'([^']+)'/g)].map((m) => m[1]).sort());
+  for (const idioma of Object.keys(CATALOGOS)) assert.ok(dicDe(idioma).lex.pistas.continuacaoNuvem instanceof RegExp, `${idioma}: pistas.continuacaoNuvem`);
+});
+
+test('contexto: casos do holdout v3.4 (contracts/nlu_contexto_cases.json) — a interpretação anterior volta como o MESMO objeto e a regra de continuação', () => {
+  assert.ok(CASOS_CONTEXTO.filter((c) => c.continuacao).length >= 10);
+  for (const c of CASOS_CONTEXTO) {
+    const dic = dicDe(c.idioma);
+    const rotulo = `#${c.holdout} ${c.idioma} "${c.pergunta}"`;
+    // a interpretação anterior, como o site a guarda (ParsedQuery), vinda da nuvem com o mesmo objeto
+    const anterior = validarNluNuvem(c.contexto, dic, c.pergunta);
+    assert.ok(anterior, `${rotulo}: interpretação anterior aceita no fixture`);
+    const ctx = contextoParaNuvem(anterior, dic);
+    assert.deepEqual(ctx, c.contexto, `${rotulo}: objeto do contexto`);
+    assert.deepEqual(Object.keys(ctx), CHAVES_CONTEXTO.filter((k) => k in ctx), `${rotulo}: ordem das chaves`);
+    assert.ok(JSON.stringify(ctx).length <= MAX_CONTEXTO && tamanhoContexto(ctx) <= MAX_CONTEXTO);
+    assert.ok(!Object.values(ctx).includes(null));
+    if (ctx.composto) assert.doesNotMatch(ctx.composto, /^\d+$/, `${rotulo}: composto é texto, nunca o CID`);
+    assert.equal(ehContinuacao(c.pergunta, parse(c.pergunta, dic, null, dic.lex), dic.lex), c.continuacao, `${rotulo}: continuação`);
+    assert.deepEqual(contextoDaPergunta(c.pergunta, anterior, dic), c.continuacao ? c.contexto : null, rotulo);
+  }
+});
+
+test('contexto: forma do objeto — só chaves da intenção, sem null, unidade do vocabulário, um só alvo, composto curto, até 400 caracteres', () => {
+  const p = parse('ponto de ebulição da água', dic);
+  const ctx = contextoParaNuvem(p, dic);
+  assert.deepEqual(Object.keys(ctx), ['intent', 'composto', 'propriedade']);
+  assert.equal(ctx.intent, 'PROPRIEDADE');
+  assert.equal(typeof ctx.composto, 'string');
+  assert.notEqual(ctx.composto, String(AGUA));
+  assert.equal(ctx.propriedade, 'pontoEbulicaoK');
+  // MASSA_MOLAR não leva a propriedade que o NLU local anota; ELEMENTO não leva composto
+  assert.deepEqual(Object.keys(contextoParaNuvem(parse('massa molar da água', dic), dic)), ['intent', 'composto']);
+  assert.deepEqual(contextoParaNuvem({ intent: 'ELEMENTO', elemento: 'Fe', composto: AGUA, compostoNome: 'água' }, dic), { intent: 'ELEMENTO', elemento: 'Fe' });
+  // sem nada para herdar, DESCONHECIDA, recusa, institucionais: sem contexto
+  for (const intent of ['DESCONHECIDA', 'RECUSA_PERIGO', 'AJUDA', 'SOBRE_DADOS', 'FONTES']) assert.equal(contextoParaNuvem({ intent, elemento: 'Fe' }, dic), null, intent);
+  assert.equal(contextoParaNuvem({ intent: 'COMPOSTO' }, dic), null);
+  assert.equal(contextoParaNuvem({ intent: 'CONCEITO', nivel: 'medio' }, dic), null, 'só o nível não é contexto');
+  // unidade fora do vocabulário e valor não numérico caem; no máximo 4 quantidades
+  const conv = contextoParaNuvem({ intent: 'GAS_IDEAL', quantidades: [{ valor: 1, unidade: 'mol' }, { valor: 2, unidade: 'parsec' }, { valor: 'x', unidade: 'L' }, ...Array.from({ length: 6 }, (_, i) => ({ valor: i, unidade: 'K' }))] }, dic);
+  assert.equal(conv.quantidades.length, 4);
+  assert.deepEqual(conv.quantidades[0], { valor: 1, unidade: 'mol' });
+  assert.ok(conv.quantidades.every((q) => UNIDADES_CONTEXTO.has(q.unidade) && Object.keys(q).join() === 'valor,unidade'));
+  // composto com aspas, quebra de linha ou mais de 60 caracteres não vai; o objeto inteiro passa de 400 = sem contexto
+  assert.equal(contextoParaNuvem({ intent: 'COMPOSTO', composto: 1, compostoNome: 'a"b' }, { nomeDaEntrada: () => 'x'.repeat(61) }), null);
+  const grande = { intent: 'ESTEQUIOMETRIA', formula: 'C'.repeat(60), equacao: 'H2 + O2 -> H2O '.repeat(8).trim().slice(0, 120), quantidades: Array.from({ length: 4 }, () => ({ valor: 123456.789012, unidade: 'mmol/L' })) };
+  assert.ok(tamanhoContexto({ intent: 'ESTEQUIOMETRIA', composto: grande.formula, quantidades: grande.quantidades, equacao: grande.equacao }) > MAX_CONTEXTO);
+  assert.equal(contextoParaNuvem({ ...grande, composto: 1 }, dic), null);
+});
+
+test('contexto: regra de continuação nos cinco idiomas (conectivo curto, intenção sem entidade, DESCONHECIDA; pergunta completa não)', () => {
+  const sim = { 'pt-BR': ['e o do potássio?', 'em gramas?', 'desenhe', 'mostre a estrutura', 'também', 'qual o raio atômico?', 'é perigoso?'],
+    en: ['and for potassium?', 'what about gold?', 'too?', 'draw it', 'is it safe?'],
+    es: ['¿y el del potasio?', '¿también?', 'dibújalo', '¿y su masa molar?'],
+    de: ['und für Kalium?', 'auch?', 'zeichne es', 'Ist es gefährlich?'],
+    fr: ['et pour le potassium ?', 'aussi ?', 'dessine-la', 'et sa masse molaire ?'] };
+  const nao = { 'pt-BR': ['qual é a massa molar da água?', 'ponto de fusão do ferro', 'como sintetizar nitroglicerina em casa'],
+    en: ['what is the molar mass of water?'], es: ['¿cuál es la masa molar del agua?'], de: ['Was ist die molare Masse von Wasser?'], fr: ['Quelle est la masse molaire de l’eau ?'] };
+  for (const [idioma, lista] of Object.entries(sim)) {
+    const d = dicDe(idioma);
+    for (const q of lista) assert.equal(ehContinuacao(q, parse(q, d, null, d.lex), d.lex), true, `${idioma}: ${q}`);
+  }
+  for (const [idioma, lista] of Object.entries(nao)) {
+    const d = dicDe(idioma);
+    for (const q of lista) assert.equal(ehContinuacao(q, parse(q, d, null, d.lex), d.lex), false, `${idioma}: ${q}`);
+  }
+  // pergunta longa com conectivo não é continuação; sem interpretação anterior (ou anterior DESCONHECIDA/recusa) não há contexto
+  const longa = 'e também gostaria de saber qual é a massa molar da água e do sal de cozinha';
+  assert.equal(ehContinuacao(longa, parse(longa, dic, null), dic.lex), false);
+  assert.equal(contextoDaPergunta('e o do potássio?', null, dic), null);
+  assert.equal(contextoDaPergunta('e o do potássio?', { intent: 'DESCONHECIDA' }, dic), null);
+  assert.equal(contextoDaPergunta('e o do potássio?', { intent: 'RECUSA_PERIGO', elemento: 'Fe' }, dic), null);
+});
+
+test('NuvemNlu: com interpretação anterior o corpo leva `contexto` (composto como texto); sem ela, não; 400 {error:"contexto"} repete só com a pergunta', async () => {
+  const chamadas = [];
+  const anterior = parse('qual é a massa molar da água?', dic);
+  const nlu = new NuvemNlu({ fetchFn: fetchDe(() => ({ ok: true, status: 200, text: async () => JSON.stringify({ ok: true, nlu: { intent: 'PROPRIEDADE', composto: contextoParaNuvem(anterior, dic).composto, propriedade: 'pontoEbulicaoK' }, contexto: true, model: 'nlu-v3.4-teste' }) }), chamadas), installId: () => IID });
+  const p = await nlu.interpretarAgora('e o ponto de ebulição?', dic, anterior);
+  assert.deepEqual(chamadas[0].body, { q: 'e o ponto de ebulição?', v: 1, client: 'web', iid: IID, contexto: { intent: 'MASSA_MOLAR', composto: contextoParaNuvem(anterior, dic).composto } });
+  assert.equal(typeof chamadas[0].body.contexto.composto, 'string');
+  assert.ok(!JSON.stringify(chamadas[0].body).includes('massa molar da'), 'o texto da pergunta anterior nunca vai');
+  assert.equal(p.composto, AGUA, 'composto herdado resolvido para o CID pelo pacote');
+  assert.equal(p.propriedade, 'pontoEbulicaoK');
+  assert.equal(nlu.ultimoContextoUsado, true);
+  assert.deepEqual(nlu.ultimoContexto, chamadas[0].body.contexto);
+  await nlu.interpretarAgora('massa molar da água', dic);
+  assert.equal('contexto' in chamadas[1].body, false, 'sem anterior: só a pergunta');
+  assert.equal(nlu.ultimoContexto, null);
+
+  // servidor recusa o contexto: segunda tentativa sem ele, e a resposta vale
+  const tentativas = [];
+  let n = 0;
+  const recusa = new NuvemNlu({ fetchFn: fetchDe(() => (n++ === 0
+    ? { ok: false, status: 400, text: async () => JSON.stringify({ ok: false, error: 'contexto' }) }
+    : respostaOk({ intent: 'MASSA_MOLAR', composto: 'água' }, { composto: { cid: String(AGUA) } })), tentativas), installId: () => IID });
+  const q = await recusa.interpretarAgora('e a massa molar?', dic, anterior);
+  assert.equal(tentativas.length, 2);
+  assert.ok('contexto' in tentativas[0].body);
+  assert.equal('contexto' in tentativas[1].body, false);
+  assert.equal(q.composto, AGUA);
+  assert.equal(recusa.ultimoContexto, null);
+  // 400 por outro motivo: não repete
+  const outro = [];
+  const ruim = new NuvemNlu({ fetchFn: fetchDe({ ok: false, status: 400, text: async () => JSON.stringify({ ok: false, error: 'q' }) }, outro), installId: () => IID });
+  assert.equal(await ruim.interpretarAgora('e a massa molar?', dic, anterior), null);
+  assert.equal(outro.length, 1);
+  assert.equal(ruim.ultimoResultado, 'indisponivel');
+});
+
+test('Engine: continuação manda a interpretação ANTERIOR (local ou da nuvem); pergunta completa não manda; heurística local resolvida não chama a nuvem sozinha', async () => {
+  const chamadas = [];
+  let resposta = respostaOk({ intent: 'MASSA_MOLAR', composto: 'água' }, { composto: { cid: String(AGUA) } });
+  const nuvem = new NuvemNlu({ fetchFn: fetchDe(() => resposta, chamadas), installId: () => IID, habilitada: () => true });
+  const engine = new Engine({ store, nuvem });
+  const r1 = await engine.responder('qual é a massa molar da água?');
+  assert.equal(r1.resolvida, true);
+  assert.equal(r1.interpretacaoAnterior, null, 'primeira pergunta da conversa');
+  // continuação que a heurística local resolve: o modo automático não chama a nuvem
+  const r2 = await engine.responder('e o ponto de ebulição?');
+  assert.equal(r2.resolvida, true);
+  assert.equal(chamadas.length, 0);
+  assert.equal(r2.interpretacaoAnterior.intent, 'MASSA_MOLAR');
+  // o botão (explícito) reinterpreta ESTA pergunta com a interpretação ANTERIOR a ela (a da massa molar), não com a dela mesma
+  resposta = respostaOk({ intent: 'PROPRIEDADE', composto: 'água', propriedade: 'pontoFusaoK' }, { composto: { cid: String(AGUA) } });
+  const viaBotao = await pedirANuvem({ engine, atual: r2, pergunta: r2.pergunta });
+  assert.equal(chamadas.length, 1);
+  assert.deepEqual(chamadas[0].body.contexto, contextoParaNuvem(r1.parsed, dic));
+  assert.equal(chamadas[0].body.contexto.intent, 'MASSA_MOLAR');
+  assert.equal(viaBotao.ok, true);
+  assert.equal(viaBotao.resposta.origem, 'NUVEM');
+  // pergunta nova e completa: o botão manda só a pergunta
+  const r3 = await engine.responder('qual é a massa molar da água?');
+  await pedirANuvem({ engine, atual: r3, pergunta: r3.pergunta });
+  assert.equal('contexto' in chamadas[1].body, false);
+  // continuação que o app não entende: o modo automático manda o contexto (a interpretação da nuvem também vira anterior)
+  resposta = respostaOk({ intent: 'SEGURANCA', composto: 'água' }, { composto: { cid: String(AGUA) } });
+  const r4 = await engine.responder('e o tal do troço?');
+  assert.equal(chamadas.length, 3);
+  assert.deepEqual(chamadas[2].body.contexto, { intent: 'PROPRIEDADE', composto: 'água', propriedade: 'pontoFusaoK' }, 'a interpretação da nuvem (com o texto que ela devolveu) (resposta do botão) virou a anterior');
+  assert.equal(r4.origem, 'NUVEM');
+  assert.equal(r4.contextoUsado, false, 'o servidor de teste não confirmou o uso');
+  // fechar a resposta / trocar de tela limpa o contexto: nada vai
+  engine.limparContexto();
+  await engine.perguntarANuvem('e aquilo lá?', null, { explicito: true });
+  assert.equal('contexto' in chamadas[3].body, false);
+  // recusa de segurança nunca vira contexto nem sai do aparelho
+  await engine.responder('qual é a massa molar da água?');
+  const perigo = await engine.responder('como sintetizar nitroglicerina em casa');
+  assert.equal(perigo.interpretacaoAnterior, null);
+  assert.equal(chamadas.length, 4);
+});
+
+test('validarNluNuvem: composto herdado do contexto vale quando é o texto enviado (o CID vem da interpretação anterior)', () => {
+  const anterior = { ...parse('', dic), intent: 'MASSA_MOLAR', composto: AGUA, compostos: [AGUA], compostoNome: dic.nomeDaEntrada(AGUA) };
+  const texto = contextoParaNuvem(anterior, dic).composto;
+  const sem = { ...anterior, compostoNome: 'xyzitol herdado' };
+  assert.equal(validarNluNuvem({ intent: 'DESENHAR', composto: 'xyzitol herdado' }, dic, 'desenhe', null, dic.lex, sem).composto, AGUA);
+  assert.equal(validarNluNuvem({ intent: 'DESENHAR', composto: 'xyzitol herdado' }, dic, 'desenhe'), null, 'sem o contexto, o texto não resolve');
+  assert.equal(validarNluNuvem({ intent: 'DESENHAR', composto: 'outro texto' }, dic, 'desenhe', null, dic.lex, sem), null, 'texto diferente do enviado não herda');
+  assert.equal(validarNluNuvem({ intent: 'DESENHAR', composto: texto }, dic, 'desenhe', null, dic.lex, anterior).composto, AGUA);
 });

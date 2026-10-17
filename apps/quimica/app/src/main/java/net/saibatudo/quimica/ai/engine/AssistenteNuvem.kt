@@ -6,6 +6,7 @@ import net.saibatudo.quimica.ai.model.OrigemResposta
 import net.saibatudo.quimica.ai.model.ParsedQuery
 import net.saibatudo.quimica.ai.model.Resposta
 import net.saibatudo.quimica.ai.nlu.CloudNluClient
+import net.saibatudo.quimica.ai.nlu.ContextoNuvem
 import net.saibatudo.quimica.ai.nlu.LocalNlu
 import net.saibatudo.quimica.ai.nlu.NluValidator
 
@@ -22,6 +23,8 @@ sealed interface DesfechoNuvem {
  * IA na nuvem como APOIO DE INTERPRETAÇÃO (opt-in). O NLU local responde primeiro; a nuvem só é consultada com consentimento (toque no
  * botão ou opção automática) e só devolve intenção + entidades, que o [NluValidator] revalida nos dados do aparelho. A resposta é montada
  * pelo [AnswerBuilder] local, com a origem [OrigemResposta.NUVEM]: nenhum número vem do modelo.
+ * Multi-turno (17/10/2026): numa pergunta de continuação, [contexto] (a interpretação ANTERIOR à pergunta, local ou da nuvem) vai junto
+ * como `contexto` ([ContextoNuvem.daPergunta]: só intenção e entidades, nunca o texto da pergunta anterior).
  */
 class AssistenteNuvem(
     private val cliente: CloudNluClient,
@@ -41,7 +44,8 @@ class AssistenteNuvem(
         val local = LocalNlu.parseComContexto(pergunta, builder.dic, contexto)
         // pedido perigoso nunca sai do aparelho
         if (local.intent == Intent.RECUSA_PERIGO) return DesfechoNuvem.Falhou(FalhaNuvem.NAO_ENTENDEU)
-        val r = cliente.consultar(pergunta, idInstalacao(), if (explicito) timeoutExplicitoMs else timeoutAutomaticoMs)
+        val ctx = ContextoNuvem.daPergunta(pergunta, contexto, builder.dic)
+        val r = cliente.consultar(pergunta, idInstalacao(), if (explicito) timeoutExplicitoMs else timeoutAutomaticoMs, ctx)
         val ok = when (r) {
             is CloudNluClient.Resultado.Ok -> r
             CloudNluClient.Resultado.Desligada -> return DesfechoNuvem.Falhou(FalhaNuvem.DESLIGADA)
@@ -49,7 +53,7 @@ class AssistenteNuvem(
             is CloudNluClient.Resultado.Indisponivel -> return DesfechoNuvem.Falhou(FalhaNuvem.INDISPONIVEL)
             CloudNluClient.Resultado.Invalida -> return DesfechoNuvem.Falhou(FalhaNuvem.INVALIDA)
         }
-        val interp = NluValidator.validar(ok.nlu, ok.resolucao, builder.dic, pergunta, local)
+        val interp = NluValidator.validar(ok.nlu, ok.resolucao, builder.dic, pergunta, local, herdado = contexto.takeIf { ok.contextoEnviado })
         val q = interp.query
         if (q == null) {
             val perguntas = interp.compostoTexto?.let { texto ->
