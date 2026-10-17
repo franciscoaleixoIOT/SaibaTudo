@@ -36,6 +36,11 @@ textos e `textos/index.json` (§5), com SHA-256; `stats.json` fica fora.
 Nomes em PT seguem a **SBQ/IUPAC-PT** (ex.: "Oxigênio", "Hidrogênio"); `nomeEn` fica para busca.
 `nomes` (opcional): `pt-BR` = `nome` (SBQ continua a autoridade), `en` = `nomeEn` (PubChem), `es`/`de`/`fr` = rótulo (`rdfs:label`) do item do elemento no Wikidata,
 **como está lá** (minúsculas em es/fr, maiúscula em de — o cliente capitaliza na exibição). Idioma sem rótulo = chave ausente. O validador exige `nomes["pt-BR"] == nome`.
+- `energiaIonizacaoKJmol` = **1ª** energia de ionização. Desde 16/10/2026 vem do Wikidata (P2260, número de ordem 1, referência ao NIST ASD, Z ≤ 103) quando há;
+  senão do PubChem. `eletronegatividade` = escala de Pauling (valores revisados de Allred, como no PubChem). `afinidadeEletronicaKJmol` = PubChem.
+- `fontesPorPropriedade` (opcional, mesmo formato de §3.1): origem de `energiaIonizacaoKJmol` (Wikidata com `declaracao`, `referencia`, `valorOriginal`
+  em eV e `substituiu: {valor, fonte}` quando trocou o do PubChem; ou PubChem), `eletronegatividade` (`escala: "Pauling"`, `nota`) e `afinidadeEletronicaKJmol`
+  (PubChem; `aviso` + `revisar: true` nos valores achados desatualizados na conferência de 11/10/2026). A lista `fontes` do registro continua valendo.
 
 ## 3. `compostos/<lote>.json` — compostos (núcleo: ~2.000; lotes de 200 por arquivo, `compostos/index.json` com `{ porCid, nomes, nomesPorIdioma, lotes }`)
 ```json
@@ -49,6 +54,41 @@ Nomes em PT seguem a **SBQ/IUPAC-PT** (ex.: "Oxigênio", "Hidrogênio"); `nomeEn
   "fontes": [ { "nome": "PubChem CID 2244", "url": "https://pubchem.ncbi.nlm.nih.gov/compound/2244", "licenca": "domínio público (NIH)", "acessadoEm": "2026-10-10" } ] }
 ```
 Nome em PT: do Wikidata (rótulo `pt`/`pt-br`) quando existir; senão o nome IUPAC em inglês com `nomePtPendente: true` (a interface mostra o IUPAC).
+- `propriedades`: os 6 campos **calculados** do PubChem (`xlogp`, `tpsa`, `doadoresH`, `aceptoresH`, `ligacoesRotaveis`, `carga`) e, desde 16/10/2026, as
+  propriedades **medidas** de §3.1 (cada uma com a sua origem em `fontesPorPropriedade`).
+
+### 3.1 Propriedades medidas e origem por valor (`fontesPorPropriedade`, 16/10/2026)
+```json
+"propriedades": { "xlogp": -0.1, "pontoFusaoK": 159.05, "pontoEbulicaoK": 351.44, "pka": 16, "estadoPadrao": "liquido" },
+"fontesPorPropriedade": {
+  "pontoFusaoK": { "nome": "Wikidata", "url": "https://www.wikidata.org/wiki/Q153#P2101", "licenca": "CC0", "acessadoEm": "2026-10-16",
+                   "declaracao": "Q153$7ebc8bac-4fbb-6f40-72e8-d99b593d7a5a",
+                   "referencia": "Basic Laboratory and Industrial Chemicals: A CRC Quick Reference Handbook (Q22236188)",
+                   "valorOriginal": -114.1, "unidadeOriginal": "°C" },
+  "pontoEbulicaoK": { "...": "...", "condicoes": { "pressaoPa": 101325 } },
+  "estadoPadrao": { "nome": "derivado (SaibaTudo Química)", "licenca": "CC0", "metodo": "pontoFusaoK e pontoEbulicaoK do pacote comparados com 298,15 K (1 atm)", "acessadoEm": "2026-10-16" } }
+```
+| Campo | Unidade | Wikidata | Observação |
+| :-- | :-- | :-- | :-- |
+| `pontoFusaoK` | K | P2101 | sem pressão declarada ou a 1 atm |
+| `pontoEbulicaoK` | K | P2102 | idem; outra pressão fica fora |
+| `densidadeKgm3` | kg/m³ | P2054 | temperatura em `condicoes.temperaturaK` (a mais próxima de 298,15 K vence); `condicoes.fase` quando declarada |
+| `solubilidadeAguaG100g` | g por 100 g de água | P2177 (g/100 g ou g/kg **de solvente**) | só solvente = água; temperatura em `condicoes` |
+| `solubilidadeAguaGL` | g/L (= kg/m³) | P2177 (g/L, mg/L, g/m³, kg/m³) | idem |
+| `pka` | — | P1117 | o **menor** pKa aceito (1ª dissociação); para bases o Wikidata costuma dar o pKa do ácido conjugado; ácidos fortes ficam sem |
+| `pkaValores` | — | P1117 | lista crescente, só quando há mais de um valor distinto (agrupados a < 0,5); `fontesPorPropriedade.pkaValores` é lista alinhada |
+| `estadoPadrao` | `solido`/`liquido`/`gas` | derivado | a 298,15 K e 1 atm, de `pontoFusaoK`/`pontoEbulicaoK`; ausente a ±2 K de 298,15 K |
+
+- **Origem por valor** (`fontesPorPropriedade[campo]`): `{nome, url, licenca, acessadoEm}` (como `fontes`) + `declaracao` (id da declaração no Wikidata),
+  `referencia` (o que a declaração cita: "afirmado em" e/ou URL), `valorOriginal`/`unidadeOriginal` (como está no Wikidata), `condicoes` (`temperaturaK`,
+  `pressaoPa`, `fase`) e, raramente, `semReferencia: true` + `corroboradoPor: n` (duas ou mais declarações sem referência que concordam, quando nenhuma tem).
+  Campo medido sem origem é erro de validação; origem que diga "computed" do PubChem também.
+- Ids em `regras.propriedades`: `pontoFusaoK`, `pontoEbulicaoK`, `densidadeKgm3` e `estadoPadrao` ganharam `origens` (elemento **e** composto) e
+  `escopos: ["elemento", "composto"]` (`origem`/`escopo` antigos ficam iguais); novos `solubilidade` (as duas origens, com `unidades` por origem) e `pka`,
+  os mesmos ids do vocabulário do modelo (`nlu_core.PROPRIEDADES`, `api/_lib/vocab.js`). Os clientes antigos ignoram os campos novos (o Android lê só os
+  números de `propriedades`; listas e objetos são ignorados).
+- Regras de aceitação e escolha (referência obrigatória, qualificadores excluídos, divergências): `pipeline/coleta_propriedades.py` e `FONTES_E_LICENCAS.md` §8.
+  As declarações aceitas e **não escolhidas** ficam fora do pacote, em `<cache>/propriedades_wikidata_alternativas.json`.
 - `nomes` (opcional): `pt-BR` = `nome` **só quando é um nome em português de verdade** (ausente se `nomePtPendente`); `en`/`es`/`de`/`fr` = rótulo do item do
   Wikidata naquele idioma, como está lá. O pipeline **nunca** copia `nomeIupac` para `nomes.en`: composto sem item no Wikidata (ou sem rótulo no idioma) fica sem a
   chave e o cliente cai para `nomeIupac`/`nome` **rotulando** a reserva.

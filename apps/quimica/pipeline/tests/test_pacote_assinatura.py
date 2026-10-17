@@ -275,7 +275,10 @@ class RegrasEFontesTest(unittest.TestCase):
         self.assertIn("HCl", [a["formula"] for a in r["acidosFortes"]])
         self.assertIn("NaOH", [b["formula"] for b in r["basesFortes"]])
         for pid, p in r["propriedades"].items():
-            self.assertEqual(set(p), {"nome", "unidade", "origem", "escopo", "sinonimos", "rotulos", "sinonimosPorIdioma"}, pid)
+            base = {"nome", "unidade", "origem", "escopo", "sinonimos", "rotulos", "sinonimosPorIdioma"}
+            self.assertTrue(base <= set(p) <= base | {"origens", "escopos", "unidades", "nota", "escala"}, pid)
+            if "origens" in p:
+                self.assertIn(p["origem"], p["origens"], pid)
             self.assertEqual(p["rotulos"]["pt-BR"], p["nome"])
             self.assertEqual(p["sinonimosPorIdioma"]["pt-BR"], p["sinonimos"])
             self.assertEqual(set(p["rotulos"]), {"pt-BR", "en", "es", "de", "fr"}, pid)  # toda propriedade traduzida

@@ -31,6 +31,7 @@ import coleta_chebi  # noqa: E402
 import coleta_compostos  # noqa: E402
 import coleta_constantes  # noqa: E402
 import coleta_elementos  # noqa: E402
+import coleta_propriedades  # noqa: E402
 import coleta_textos  # noqa: E402
 import coleta_wikimedia  # noqa: E402
 import fontes as F  # noqa: E402
@@ -63,6 +64,11 @@ DECISOES = [
     "ICSC fora dos dados (sem licença de reuso; versão PT © ACT): cada composto com CAS leva só icscBuscaUrl (link de busca da OIT).",
     "PubChem: só campos calculados pelo NLM e identificadores; sinônimos de depositantes não são lidos.",
     "GHS: só a classificação harmonizada da UE (Regulamento 1272/2008, Anexo VI); notificada (ECHA C&L) e NITE-CMC ficam fora.",
+    "Propriedades físicas dos compostos (fusão, ebulição, densidade, solubilidade em água, pKa): só declarações MEDIDAS do Wikidata (CC0) "
+    "com referência, condições e origem por valor (fontesPorPropriedade); nada calculado pelo PubChem; estadoPadrao derivado localmente.",
+    "Elementos: energia de ionização do Wikidata (P2260, 1ª ionização, referência NIST ASD) quando houver; afinidade eletrônica do PubChem "
+    "(o Wikidata não tem a propriedade), com aviso nos valores que a conferência de 11/10/2026 achou desatualizados.",
+    "GHS do Wikidata (P4952) avaliado e NÃO usado: ~70 itens do pacote, quase todos de fichas de fornecedor (classificação notificada).",
     "Frases H/EUH em português: Anexo III do CLP consolidado (EUR-Lex/Cellar); combinadas ausentes viram junção dos textos oficiais.",
     "CAS: só do Wikidata (identificador, CC0), validado pelo dígito verificador; elementos não levam CAS (CAS do átomo != substância).",
     "Textos: Wikipédia pt e Wikilivros pt (CC BY-SA 4.0), ChEBI (CC BY 4.0), Faraday (domínio público). Gold Book: bloqueado por Cloudflare.",
@@ -109,12 +115,15 @@ def novo_indice_textos():
 
 
 def registros_chebi(compostos, hoje):
-    regs = []
+    regs, por_num = [], {}
     for c in compostos:
         d = c.get("definicaoChebi")
         if not d:
             continue
         num = d["chebiId"].split(":")[1]
+        if num in por_num:  # dois compostos com o mesmo ChEBI no Wikidata (16/10/2026: chebi-58048): um trecho, as duas entidades
+            por_num[num]["entidades"]["compostos"].append(c["cid"])
+            continue
         regs.append({
             "_arquivo": f"{num}.json", "_chave": coleta_wikimedia.slug(c["nome"]), "id": f"chebi-{num}", "fonte": "ChEBI", "licenca": d["licenca"],
             "url": coleta_chebi.URL_PAGINA.format(id=num), "capitulo": "", "secao": "Definição", "titulo": c["nome"],
@@ -122,6 +131,7 @@ def registros_chebi(compostos, hoje):
             "palavrasChave": [c["nome"].lower(), c["formula"]], "entidades": {"elementos": [], "compostos": [c["cid"]]},
             "fontes": [Q.fonte(f"ChEBI {d['chebiId']}", coleta_chebi.URL_PAGINA.format(id=num), d["licenca"], hoje)],
         })
+        por_num[num] = regs[-1]
     return regs
 
 
@@ -263,6 +273,7 @@ def validar(out: Path, previo=None, minimos=None):
                         erros.append(f"composto {c['cid']}: {campo} inválido")
                 if "nomes" in c and "pt-BR" in c["nomes"] and c["nomes"]["pt-BR"] != c.get("nome"):
                     erros.append(f"composto {c['cid']}: nomes.pt-BR diverge de nome")
+                erros.extend(coleta_propriedades.validar_registro(c))
     if total < mn["compostos"]:
         erros.append(f"compostos insuficientes: {total}")
     if previo and previo.get("contagens", {}).get("compostos") and total < 0.8 * previo["contagens"]["compostos"]:
@@ -433,7 +444,15 @@ def construir(opts, log=print):
 
         log("== compostos")
         # --pubchem-offline: o PubChem só responde do cache (útil quando ele bloqueia o IP com 429); as outras fontes seguem na rede
-        pubchem = PubChem(HttpCache(pasta=opts.cache, offline=True, log=log) if opts.pubchem_offline else http)
+        # --pubchem-cache-primeiro: qualquer entrada do cache vale (sem TTL) e só o que falta vai à rede (compostos novos da seleção)
+        if opts.pubchem_offline:
+            pubchem = PubChem(HttpCache(pasta=opts.cache, offline=True, log=log))
+        elif getattr(opts, "pubchem_cache_primeiro", False):
+            pc_http = HttpCache(pasta=opts.cache, offline=False, log=log, ttl_s=10 ** 10, **paciente)
+            pc_http.limitador.reduzir('pubchem.ncbi.nlm.nih.gov', fator=0.5, minimo=0.5)
+            pubchem = PubChem(pc_http)
+        else:
+            pubchem = PubChem(http)
         rapido_n = opts.limite_compostos if opts.limite_compostos is not None else (300 if opts.rapido else None)
         selecao, st_sel = tentar(stats, "selecaoCompostos",
                                  lambda: selecao_compostos.selecionar(http, pubchem, alvo=opts.alvo, rapido_n=rapido_n, log=log),
@@ -452,6 +471,12 @@ def construir(opts, log=print):
         stats["familias"]["compostos"]["excluidosPorSeguranca"] = excluidos
         if any("definicaoChebi" in c for c in compostos):
             fontes_usadas.add("chebi")
+
+        log("== propriedades físicas medidas (Wikidata)")
+        if not getattr(opts, "sem_propriedades", False):
+            st = tentar(stats, "propriedadesFisicas", lambda: coleta_propriedades.coletar(
+                http, compostos, hoje, log=log, alternativas_em=Path(opts.cache) / "propriedades_wikidata_alternativas.json"), log, vazio={})
+            stats["familias"]["propriedadesFisicas"].update(st or {})
 
         ghs_json, sem_texto = montar_ghs_frases(frases_h, compostos, hoje, st_clp, idiomas)
         stats["familias"]["clp"]["codigosSemTextoPt"] = sem_texto
@@ -550,6 +575,8 @@ def construir(opts, log=print):
                      "lotesDeTextos": len(indice_textos["lotes"]),
                      "compostosComGhsHarmonizado": sum(1 for c in compostos if "ghs" in c),
                      "compostosComCas": sum(1 for c in compostos if "cas" in c),
+                     "compostosComPropriedadeMedida": {campo: sum(1 for c in compostos if campo in c.get("fontesPorPropriedade", {}))
+                                                       for campo in coleta_propriedades.CAMPOS},
                      "compostosComNomePorIdioma": {i: sum(1 for c in compostos if i in c.get("nomes", {})) for i in idiomas},
                      "elementosComNomePorIdioma": {i: sum(1 for e in elementos if i in e.get("nomes", {})) for i in idiomas}}
         stats["contagens"].update(contagens)
@@ -597,10 +624,13 @@ def main(argv=None):
     ap.add_argument("--offline", action="store_true", help="nunca usa a rede; falha se faltar entrada no cache")
     ap.add_argument("--paciente", action="store_true", help="espera o PubChem desbloquear (até 15 min por tentativa, 40 tentativas) e pede a 1 req/s")
     ap.add_argument("--pubchem-offline", action="store_true", help="PubChem só do cache (ele bloqueia o IP com 429 depois de muitas requisições)")
+    ap.add_argument("--pubchem-cache-primeiro", action="store_true",
+                    help="PubChem: usa o cache de qualquer idade e só busca na rede o que falta (ex.: compostos novos da seleção do Wikidata)")
     ap.add_argument("--alvo", type=int, default=selecao_compostos.ALVO_PADRAO, help="tamanho do núcleo de compostos")
     ap.add_argument("--limite-compostos", type=int, help="limita o núcleo a N compostos da lista fixa (testes)")
     ap.add_argument("--limite-textos", type=int, help="limita os textos da Wikimedia (testes)")
     ap.add_argument("--sem-wikimedia", action="store_true", help="não coleta Wikipédia/Wikilivros")
+    ap.add_argument("--sem-propriedades", action="store_true", help="não coleta as propriedades físicas medidas do Wikidata")
     ap.add_argument("--idiomas", default=",".join(IDIOMAS),
                     help="idiomas do pacote, separados por vírgula (pt-BR sempre entra); padrão: %(default)s")
     ap.add_argument("--sem-textos-idiomas", action="store_true",

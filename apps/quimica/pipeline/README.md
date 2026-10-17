@@ -17,7 +17,7 @@ e as pastas `textos/wikipedia-<lang>/` (mesmos artigos da coleta em português, 
 en/es/de/fr (build rápido). Os textos saem em **lotes** (`textos/<fonte>/lote-NNN.json`, até 200 trechos ordenados por id) + `textos/index.json`.
 Custo da parte multilíngue no build completo (medido em 12/10/2026, PubChem do cache): ~50 chamadas ao Wikidata (3 elementos + 40 compostos + 7 conceitos) e ~29 por
 idioma à Wikipédia (20 títulos por chamada), tudo a 1 req/s em série: ~30-45 s por idioma, ~3 min no total; a Wikipédia pt continua ~55 chamadas.
-Opções úteis: `--offline` (só cache), `--cache DIR`, `--out DIR`, `--alvo N` (tamanho do núcleo, padrão 2000),
+Opções úteis: `--offline` (só cache), `--pubchem-cache-primeiro` (PubChem: cache de qualquer idade, só o que falta vai à rede — quando a seleção do Wikidata traz CIDs novos e o PubChem está lento), `--sem-propriedades` (pula as propriedades medidas do Wikidata), `--cache DIR`, `--out DIR`, `--alvo N` (tamanho do núcleo, padrão 2000),
 `--limite-compostos N`, `--limite-textos N`, `--sem-wikimedia`, `--hoje AAAA-MM-DD`, `--gutenberg-zip ARQ` (reserva).
 A saída é atômica: o pacote é montado em `<out>.novo`, validado e só então troca `<out>`; se a validação falha, o anterior fica.
 `stats.json` (contagens, fontes, descartes, tempos, falhas por família) fica ao lado do manifesto, fora dele.
@@ -30,11 +30,12 @@ A saída é atômica: o pacote é montado em `<out>.novo`, validado e só então
 | `fontes.py` | `FONTES` (nome, mantenedor, url, licença, uso, `idioma`, `acessadoEm`, lista de permissão; uma entrada por fonte e idioma) -> `fontes.json` e `manifest.licencas` |
 | `common.py` | utilidades + `IDIOMAS`/`WIKI_POR_IDIOMA`/`normalizar_idiomas` (códigos do projeto) |
 | `wikidata.py` | SPARQL (WDQS) e `entidades()` (`wbgetentities`: rótulos, apelidos e sitelinks por idioma, 50 ids por chamada, URL determinística para o cache) |
-| `coleta_elementos.py` | 118 elementos: PubChem Periodic Table + Wikidata; nomes da SBQ em `quimica_util.py`; `nomes` por idioma (pt-BR = SBQ, en = PubChem, es/de/fr = rótulo do Wikidata) |
+| `coleta_elementos.py` | 118 elementos: PubChem Periodic Table + Wikidata; nomes da SBQ em `quimica_util.py`; `nomes` por idioma (pt-BR = SBQ, en = PubChem, es/de/fr = rótulo do Wikidata); 1ª energia de ionização do Wikidata (P2260, NIST ASD, Z ≤ 103, troca só até 5 %) e `fontesPorPropriedade` (afinidade com aviso, eletronegatividade de Pauling) |
 | `lista_fixa.py`, `selecao_compostos.py` | núcleo de ~2.000 compostos: lista fixa (CID conferido pela fórmula) + Wikidata (P662, ptwiki) por sitelinks |
 | `pubchem.py`, `coleta_compostos.py` | PUG REST (campos calculados), GHS harmonizado (CLP Anexo VI), nomes/CAS/fórmula (Wikidata), `nomes`/`sinonimosPorIdioma` (rótulos e apelidos do Wikidata por idioma), `definicaoChebi`, lotes de 200, índice com `nomesPorIdioma` |
 | `clp.py` | frases H/EUH em pt-BR/en/es/de/fr: linhas PT/EN/ES/DE/FR do Anexo III multilíngue do Regulamento CLP (EUR-Lex/Cellar) -> `ghs_frases.json` (`texto` pt + `textoPorIdioma`; pictogramas e palavras de advertência por idioma) |
 | `coleta_chebi.py` | definições e nomes do ChEBI (CC BY 4.0) pela API pública em lote |
+| `coleta_propriedades.py` | propriedades **medidas** dos compostos do Wikidata (CC0): fusão P2101, ebulição P2102, densidade P2054, solubilidade em água P2177, pKa P1117 -> `propriedades` + `fontesPorPropriedade` (origem por valor, DATA_CONTRACT §3.1); só com referência, condições padrão, qualificadores de aproximação/cálculo fora; `estadoPadrao` derivado; ~20 consultas SPARQL de 100 itens; `--sem-propriedades` pula |
 | `coleta_constantes.py` | CODATA 2022 (NIST) -> `constantes.json` |
 | `coleta_wikimedia.py` | Wikipédia pt (introduções) e Wikilivros pt, CC BY-SA 4.0, com `revisao` e `tema`; `coletar_wikipedia_idioma()` repete os mesmos artigos em en/es/de/fr pelo item do Wikidata (sitelinks), sem busca nem tradução |
 | `coleta_textos.py` | trechos de 400-1.200 caracteres; Faraday (Gutenberg #14474); sonda do Gold Book |

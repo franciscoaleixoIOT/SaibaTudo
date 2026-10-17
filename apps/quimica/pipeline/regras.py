@@ -168,6 +168,34 @@ PROPRIEDADES = {
     "pictogramas_ghs": ("Pictogramas GHS (classificação harmonizada)", "", "compostos.ghs.pictogramas", "composto", ["pictogramas", "perigos"]),
     "frases_h": ("Frases de perigo H (classificação harmonizada)", "", "compostos.ghs.frasesH", "composto", ["frases h", "advertências de perigo"]),
     "palavra_sinal": ("Palavra de advertência GHS", "", "compostos.ghs.palavraSinal", "composto", ["palavra de advertência"]),
+    # propriedades medidas dos compostos (Wikidata, com origem por valor em compostos[].fontesPorPropriedade; DATA_CONTRACT §3.1).
+    # Os ids seguem o vocabulário do modelo (`pka`, `solubilidade`: backend/modal/nlu_core.py, api/_lib/vocab.js).
+    "solubilidade": ("Solubilidade em água", "g/100 g de água", "compostos.propriedades.solubilidadeAguaG100g", "composto",
+                     ["solubilidade", "solubilidade em água", "coeficiente de solubilidade"]),
+    "pka": ("pKa", "", "compostos.propriedades.pka", "composto", ["pka", "constante de acidez", "constante de dissociação ácida"]),
+}
+
+# Campos complementares por id (16/10/2026): a mesma propriedade pode existir em elementos E compostos. `origem`/`escopo` continuam
+# como sempre (clientes antigos); `origens`/`escopos` listam todos os lugares; `unidades` dá a unidade de cada origem quando difere;
+# `nota` explica a escala ou a definição (exibida em "Sobre os dados").
+_PARA_COMPOSTOS = ("pontoFusaoK", "pontoEbulicaoK", "densidadeKgm3", "estadoPadrao")
+PROPRIEDADES_EXTRA = {
+    **{pid: {"origens": [f"elementos.{pid}", f"compostos.propriedades.{pid}"], "escopos": ["elemento", "composto"]} for pid in _PARA_COMPOSTOS},
+    "eletronegatividade": {"nota": "Escala de Pauling, com os valores revisados (Allred, 1961) como no PubChem; livros que usam os valores "
+                                   "originais de Pauling diferem em alguns elementos (ex.: W 1,7 × 2,36; Pb 1,8 × 2,33).", "escala": "Pauling"},
+    "energiaIonizacaoKJmol": {"nota": "Primeira energia de ionização do átomo neutro em fase gasosa (valor do NIST ASD via Wikidata quando "
+                                      "disponível; senão PubChem). Origem de cada valor em elementos[].fontesPorPropriedade."},
+    "afinidadeEletronicaKJmol": {"nota": "Do PubChem (o Wikidata não tem a propriedade). Alguns valores diferem das tabelas atuais e vêm "
+                                         "com aviso em elementos[].fontesPorPropriedade."},
+    "estadoPadrao": {"origens": ["elementos.estadoPadrao", "compostos.propriedades.estadoPadrao"], "escopos": ["elemento", "composto"],
+                     "nota": "Nos compostos, derivado a 298,15 K e 1 atm do ponto de fusão e de ebulição do pacote."},
+    "solubilidade": {"origens": ["compostos.propriedades.solubilidadeAguaG100g", "compostos.propriedades.solubilidadeAguaGL"],
+                     "unidades": {"compostos.propriedades.solubilidadeAguaG100g": "g/100 g de água",
+                                  "compostos.propriedades.solubilidadeAguaGL": "g/L"},
+                     "nota": "Solubilidade em água (solvente declarado no Wikidata), na temperatura de fontesPorPropriedade.condicoes."},
+    "pka": {"origens": ["compostos.propriedades.pka", "compostos.propriedades.pkaValores"],
+            "nota": "Menor pKa registrado (primeira dissociação); `pkaValores` traz todos quando há mais de um. Para bases, o Wikidata "
+                    "costuma registrar o pKa do ácido conjugado. Ácidos fortes ficam sem pKa."},
 }
 
 
@@ -255,6 +283,12 @@ PROPRIEDADES_I18N = {
                  "fr": ("Mentions de danger H (classification harmonisée)", ["mentions h", "mentions de danger"])},
     "palavra_sinal": {"en": ("GHS signal word", ["signal word"]), "es": ("Palabra de advertencia GHS", ["palabra de advertencia"]),
                       "de": ("GHS-Signalwort", ["signalwort"]), "fr": ("Mention d'avertissement SGH", ["mention d'avertissement"])},
+    "solubilidade": {"en": ("Solubility in water", ["solubility", "water solubility", "solubility in water"]),
+                     "es": ("Solubilidad en agua", ["solubilidad", "solubilidad en agua"]),
+                     "de": ("Löslichkeit in Wasser", ["löslichkeit", "wasserlöslichkeit"]),
+                     "fr": ("Solubilité dans l'eau", ["solubilité", "solubilité dans l'eau"])},
+    "pka": {"en": ("pKa", ["pka", "acid dissociation constant"]), "es": ("pKa", ["pka", "constante de acidez"]),
+            "de": ("pKs-Wert", ["pka", "pks", "pks-wert", "säurekonstante"]), "fr": ("pKa", ["pka", "constante d'acidité"])},
 }
 
 
@@ -269,7 +303,8 @@ def propriedades(idiomas=None):
             tr = PROPRIEDADES_I18N.get(pid, {}).get(idioma)
             if tr:
                 rot[idioma], sin_i[idioma] = tr[0], list(tr[1])
-        out[pid] = {"nome": nome, "unidade": un, "origem": orig, "escopo": esc, "sinonimos": sin, "rotulos": rot, "sinonimosPorIdioma": sin_i}
+        out[pid] = {"nome": nome, "unidade": un, "origem": orig, "escopo": esc, "sinonimos": sin, "rotulos": rot, "sinonimosPorIdioma": sin_i,
+                    **PROPRIEDADES_EXTRA.get(pid, {})}
     return out
 
 

@@ -26,7 +26,8 @@ FONTES = [
     {"id": "pubchem", "nome": "PubChem (NCBI/NLM)", "mantenedor": "National Library of Medicine / NCBI (EUA)",
      "url": "https://pubchem.ncbi.nlm.nih.gov/", "licenca": "domínio público (NCBI/NLM)", "uso": "dados",
      "atribuicao": "Source: National Library of Medicine (PubChem). Só campos calculados pelo próprio PubChem e identificadores: "
-                   "fórmula, massa, massa exata, SMILES, InChIKey, IUPACName, XLogP, TPSA, contagens, carga.",
+                   "fórmula, massa, massa exata, SMILES, InChIKey, IUPACName, XLogP, TPSA, contagens, carga. Elementos: PubChem "
+                   "Periodic Table; a eletronegatividade é a escala de Pauling com os valores revisados (Allred, 1961).",
      "exibir": "sim", "dataset": "sim", "treino": "sim"},
     {"id": "codata", "nome": "CODATA 2022 (NIST)", "mantenedor": "NIST (EUA)",
      "url": "https://physics.nist.gov/cuu/Constants/", "licenca": "domínio público (NIST); valores de constantes são fatos físicos",
@@ -36,7 +37,9 @@ FONTES = [
      "exibir": "sim", "dataset": "sim", "treino": "sim"},
     {"id": "wikidata", "nome": "Wikidata", "mantenedor": "Wikimedia Foundation", "url": "https://www.wikidata.org/",
      "licenca": "CC0", "uso": "dados",
-     "atribuicao": "Nomes em português, número CAS (identificador), fórmula convencional, descobridores, QID e ChEBI ID.",
+     "atribuicao": "Nomes em português, número CAS (identificador), fórmula convencional, descobridores, QID e ChEBI ID; "
+                   "propriedades físicas medidas dos compostos (fusão, ebulição, densidade, solubilidade em água, pKa) e a 1ª energia de "
+                   "ionização dos elementos, cada valor com a declaração do Wikidata e a referência que ela cita (fontesPorPropriedade).",
      "exibir": "sim", "dataset": "sim", "treino": "sim"},
     {"id": "clp-eurlex", "nome": "Regulamento (CE) n.º 1272/2008 (CLP) — EUR-Lex", "mantenedor": "União Europeia",
      "url": "https://eur-lex.europa.eu/legal-content/PT/TXT/?uri=CELEX:32008R1272",

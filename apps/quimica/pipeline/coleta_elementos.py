@@ -8,6 +8,12 @@ quando o PubChem a entrega com poucas casas (ex.: Li "7.0", Fe "55.84").
 Nomes por idioma (`nomes`, docs/I18N.md §4): pt-BR = tabela da SBQ (`nome`), en = `nomeEn` do PubChem; es/de/fr = rótulo do
 item do Wikidata (`wbgetentities`, CC0). Idioma sem rótulo = chave ausente (o cliente cai para o inglês e rotula).
 
+Energia de ionização (1ª): Wikidata P2260 com qualificador "número de ordem" (P1545) = 1, posto não depreciado e referência
+(no Wikidata elas citam o NIST ASD, que é "todos os direitos reservados": o valor é fato e vem do Wikidata, CC0; o NIST fica só
+como referência citada). Sem declaração assim, fica o valor do PubChem. A origem de cada valor vai em `fontesPorPropriedade`.
+Afinidade eletrônica: o Wikidata não tem a propriedade; fica o PubChem e, nos elementos que a conferência de 11/10/2026 achou
+desatualizados (PENDENCIAS §10), `fontesPorPropriedade.afinidadeEletronicaKJmol.aviso`.
+
 Unidades de saída (SI/contrato): K, kg/m³, pm, kJ/mol (eV x 96,485).
 """
 import re
@@ -35,6 +41,30 @@ CATEGORIAS = {
     "Actinide": "actinideo",
 }
 ESTADOS = {"Solid": "solido", "Liquid": "liquido", "Gas": "gas"}
+
+URL_WIKIDATA_ITEM = "https://www.wikidata.org/wiki/{q}"
+EV = "Q83327"
+Z_MAX_MEDIDO = 103  # Rf (104) em diante: o NIST ASD só tem valores teóricos; não entram como medidos (Lr, 103, foi medido em 2015)
+LIMITE_TROCA = 0.05  # diferença maior que 5 % contra o PubChem não é atualização, é outro dado: fica o PubChem e vai para stats
+KJ_MOL = "Q752197"
+# afinidade eletrônica do PubChem que difere das tabelas atuais (conferência com os livros de referência, 11/10/2026)
+AFINIDADE_DESATUALIZADA = {"B", "F", "Al", "Fe", "Ga", "Ge", "Rb", "Nb", "Sn", "Sb", "La", "Ce", "Tl", "Pb", "Fr"}
+AVISO_AFINIDADE = ("valor do PubChem possivelmente desatualizado (difere das tabelas atuais; conferência de 11/10/2026); "
+                   "o Wikidata não tem a propriedade")
+NOTA_ELETRONEGATIVIDADE = ("escala de Pauling com os valores revisados (Allred, 1961), como no PubChem; livros que usam os valores "
+                           "originais de Pauling diferem (ex.: W 1,7 × 2,36; Pb 1,8 × 2,33)")
+
+CONSULTA_IONIZACAO = """
+SELECT ?z ?sym ?item ?st ?rank ?amt ?unit (GROUP_CONCAT(DISTINCT ?ord; separator="|") AS ?ords)
+       (GROUP_CONCAT(DISTINCT ?rr; separator="|") AS ?refs) WHERE {
+  ?item wdt:P31 wd:Q11344 ; wdt:P246 ?sym ; wdt:P1086 ?z . FILTER(xsd:integer(?z) <= 118)
+  ?item p:P2260 ?st . ?st psv:P2260 ?v ; wikibase:rank ?rank . FILTER(?rank != wikibase:DeprecatedRank)
+  ?v wikibase:quantityAmount ?amt . OPTIONAL { ?v wikibase:quantityUnit ?unit }
+  OPTIONAL { ?st pq:P1545 ?ord }
+  OPTIONAL { ?st prov:wasDerivedFrom ?ref . { ?ref pr:P854 ?rv } UNION { ?ref pr:P248 ?rv } UNION { ?ref pr:P1476 ?rv }
+             BIND(STR(?rv) AS ?rr) }
+} GROUP BY ?z ?sym ?item ?st ?rank ?amt ?unit ORDER BY xsd:integer(?z)
+"""
 
 CONSULTA_WIKIDATA = """
 SELECT ?item ?sym ?z ?cas ?lpt ?lptbr ?len ?mass ?ano
@@ -173,6 +203,75 @@ def ler_wikidata(http):
             if nome not in d["por"]:
                 d["por"].append(nome)
     return por_z
+
+
+def ler_ionizacao(http):
+    """{z: {...}} da 1ª energia de ionização (P2260, P1545 = 1, com referência; preferido > normal; empate = mais algarismos)."""
+    melhor = {}
+    for l in W.sparql(http, CONSULTA_IONIZACAO):
+        refs_txt = l.get("refs") or ""
+        # só o valor ATÔMICO do NIST ASD: as declarações referenciadas ao NIOSH são do gás diatômico (Cl₂ 11,48 eV, I₂ 9,31 eV)
+        if "1" not in W.valores(l.get("ords")) or not ("physics.nist.gov/asd" in refs_txt or "NIST Atomic Spectra Database" in refs_txt):
+            continue
+        amt = numero(l.get("amt"))
+        unit = W.qid(l.get("unit")) if l.get("unit") else None
+        if amt is None or unit not in (EV, KJ_MOL):
+            continue
+        kj = float(round(amt * EV_PARA_KJ_MOL, 1)) if unit == EV else float(round(amt, 1))
+        if kj <= 0:
+            continue
+        z = int(l["z"])
+        if z > Z_MAX_MEDIDO:
+            continue
+        refs = W.valores(l.get("refs"))
+        legiveis = [r for r in refs if not r.startswith("http://www.wikidata.org/entity/")] or refs
+        cand = {"kJmol": kj, "valorOriginal": _nu(amt), "unidadeOriginal": "eV" if unit == EV else "kJ/mol",
+                "declaracao": l["st"].rsplit("/", 1)[-1].replace("-", "$", 1), "qid": W.qid(l["item"]), "simbolo": l["sym"],
+                "referencia": "; ".join(sorted(set(legiveis))[:2]),
+                "_ordem": (l.get("rank", "").endswith("PreferredRank"), len(str(amt).replace(".", "").lstrip("0-")))}
+        if z not in melhor or cand["_ordem"] > melhor[z]["_ordem"]:
+            melhor[z] = cand
+    return melhor
+
+
+def aplicar_ionizacao(e, ie, hoje):
+    """Troca `energiaIonizacaoKJmol` pelo valor do Wikidata e registra a origem. Devolve (antigo, novo) ou None."""
+    if not ie or ie.get("simbolo") != e["simbolo"]:
+        return None
+    antigo = e.get("energiaIonizacaoKJmol")
+    if antigo and abs(ie["kJmol"] - antigo) > LIMITE_TROCA * antigo:
+        return "conflito", antigo, ie["kJmol"]
+    e["energiaIonizacaoKJmol"] = ie["kJmol"]
+    f = Q.fonte("Wikidata", URL_WIKIDATA_ITEM.format(q=ie["qid"]) + "#P2260", "CC0", hoje)
+    f.update({"declaracao": ie["declaracao"], "valorOriginal": ie["valorOriginal"], "unidadeOriginal": ie["unidadeOriginal"]})
+    if ie.get("referencia"):
+        f["referencia"] = ie["referencia"]
+    if antigo is not None and antigo != ie["kJmol"]:
+        f["substituiu"] = {"valor": antigo, "fonte": "PubChem Periodic Table"}
+    e.setdefault("fontesPorPropriedade", {})["energiaIonizacaoKJmol"] = f
+    if not any(x["nome"] == "Wikidata" for x in e["fontes"]):
+        e["fontes"].append(Q.fonte("Wikidata", URL_WIKIDATA_ITEM.format(q=ie["qid"]), "CC0", hoje))
+    return antigo, ie["kJmol"]
+
+
+def marcar_origens_pubchem(e, hoje):
+    """Origem por valor dos campos que continuam do PubChem e pedem nota (afinidade desatualizada, escala de Pauling)."""
+    fpp = e.setdefault("fontesPorPropriedade", {})
+    if "afinidadeEletronicaKJmol" in e:
+        f = Q.fonte("PubChem Periodic Table", URL_PUBCHEM_PAGINA, LICENCA_PUBCHEM, hoje)
+        if e["simbolo"] in AFINIDADE_DESATUALIZADA:
+            f["aviso"] = AVISO_AFINIDADE
+            f["revisar"] = True
+        fpp["afinidadeEletronicaKJmol"] = f
+    if "eletronegatividade" in e:
+        f = Q.fonte("PubChem Periodic Table", URL_PUBCHEM_PAGINA, LICENCA_PUBCHEM, hoje)
+        f["escala"] = "Pauling"
+        f["nota"] = NOTA_ELETRONEGATIVIDADE
+        fpp["eletronegatividade"] = f
+    if "energiaIonizacaoKJmol" in e and "energiaIonizacaoKJmol" not in fpp:
+        fpp["energiaIonizacaoKJmol"] = Q.fonte("PubChem Periodic Table", URL_PUBCHEM_PAGINA, LICENCA_PUBCHEM, hoje)
+    if not fpp:
+        e.pop("fontesPorPropriedade")
 
 
 # A 1 atm estes elementos sublimam: o "ponto de fusão" do PubChem é de outra pressão e a sublimação aparece como "ebulição".
@@ -322,6 +421,26 @@ def coletar(http, hoje, idiomas=None):
             stats["semEstadoPadrao"].append(z)
         elementos.append(e)
     elementos.sort(key=lambda x: x["z"])
+    try:
+        ies = ler_ionizacao(http)
+        stats["ionizacaoWikidata"] = "ok"
+    except Exception as exc:  # noqa: BLE001  (complemento: sem ele fica o PubChem)
+        ies = {}
+        stats["ionizacaoWikidata"] = f"falhou: {exc}"
+    trocas, conflitos = [], []
+    for e in elementos:
+        r = aplicar_ionizacao(e, ies.get(e["z"]), hoje)
+        if r and r[0] == "conflito":
+            conflitos.append({"simbolo": e["simbolo"], "pubchem": r[1], "wikidata": r[2]})
+        elif r and r[0] != r[1]:
+            trocas.append({"simbolo": e["simbolo"], "pubchem": r[0], "wikidata": r[1]})
+        marcar_origens_pubchem(e, hoje)
+    stats["ionizacaoDoWikidata"] = sum(1 for e in elementos
+                                       if e.get("fontesPorPropriedade", {}).get("energiaIonizacaoKJmol", {}).get("nome") == "Wikidata")
+    stats["ionizacaoTrocada"] = trocas
+    stats["ionizacaoConflitoMantidoPubchem"] = conflitos
+    stats["afinidadeComAviso"] = sorted(e["simbolo"] for e in elementos
+                                        if e.get("fontesPorPropriedade", {}).get("afinidadeEletronicaKJmol", {}).get("aviso"))
     stats["_artigos"] = rotular(http, elementos, idiomas, stats)
     stats["elementos"] = len(elementos)
     return elementos, stats
