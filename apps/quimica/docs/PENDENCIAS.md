@@ -88,7 +88,7 @@ Diagnóstico sobre o pacote e o dataset reais (números em `PROJECT_MEMORY.md` �
 - [ ] **Avaliação**: holdout por família + conjunto "perguntas reais" (capturadas opt-in quando o site estiver no ar) como no app de eleições; gate de alucinação numérica já existe (`eval_fidelidade.py`).
 
 ### 8.3 Produto e operação
-- [ ] Cliente web/Android ainda **não chamam a API** (`/quimica/api/*` fica ocioso até a fase 5): quando ligar, copiar de eleições `cloud.js` (botão sempre após a resposta, contexto da sequência, `textoFalhaNuvem`) e `MelhoriaClient` (captura opt-in com filtro de dado pessoal; aqui sem filtro político, mas com filtro de **pedidos perigosos** — nunca capturar texto de síntese recusada).
+- [~] ~~Cliente web/Android ainda **não chamam a API**~~ (nuvem opt-in ligada no site e no Android em 14/10/2026, §4). Falta só o `MelhoriaClient` (captura opt-in com filtro de dado pessoal; aqui sem filtro político, mas com filtro de **pedidos perigosos** — nunca capturar texto de síntese recusada).
 - [ ] Deploy: se a cota da Vercel voltar a estourar, ligar o repositório ao projeto (Git integration) ou usar lotes de textos (8.1).
 - [ ] Monitoramento: `quimica-data-freshness.yml` já alerta por idade (240 h); acrescentar alerta de **divergência de números** entre pacote novo e anterior (ex.: massa molar mudou > 0,5 %) antes de assinar.
 
@@ -197,7 +197,7 @@ Etapas (A–F em `I18N.md` §9):
 - [ ] Pipeline: apelidos comuns em de (Salzsäure, Natronlauge, Essig, Zucker) e fr ("eau de Javel") não vêm do Wikidata; glicose sem es/de/fr.
 - [ ] Pipeline, miúdos: `regras.nomenclatura` por idioma; H281/H351/EUH211 sem texto em algum idioma (formato da linha no
       EUR-Lex); glicose (CID 5793) cai no item "D-glucopyranose" do Wikidata (sem es/de) — conferir o casamento do item.
-- [ ] **E** Android: `strings.xml` por idioma (~770 textos fixos), léxico gerado do mesmo JSON, lotes de textos, seletor.
+- [~] **E** Android: ~~`strings.xml` por idioma, léxico gerado do mesmo JSON, seletor~~ (feitos: `values-{en,es,de,fr}`, `LexicosGerados.kt`, Configurações > Idioma); falta a leitura dos lotes de textos por idioma e a revisão nativa dos ~770 textos antigos (só os de 14/10 foram revisados).
 - [ ] **F** dataset e avaliação por idioma; retreino do NLU em nuvem com os cinco idiomas.
 - [ ] Revisão humana das traduções (catálogos marcados `revisao: pendente`). **Conferência com o DeepL feita em 12/10**
       (`REVISAO_DEEPL_2026-10-12.md`: 771 textos × 4 idiomas, nenhum parâmetro errado, divergências concentradas em
@@ -210,4 +210,4 @@ Etapas (A–F em `I18N.md` §9):
 2. Origem da chave `apikey-sabetudo.txt`.
 3. Permissão da OpenStax (opcional).
 4. ~~Tokens do Modal~~ (par de Proxy Auth criado pelo mantenedor em 13/10, em `secrets/modal_proxy_quimica.env` da raiz e na Vercel); conta do Hugging Face para o explicador; **teto de gasto no Modal** (ainda não definido).
-5. Chave de upload e conta da Play para o Android.
+5. ~~Chave de upload~~ (criada em 14/10, fazer backup) e conta da Play para o Android (criar o app, subir o AAB, teste interno → fechado).
