@@ -41,6 +41,8 @@ PROP_COMPOSTO = {
     "pontoFusaoK": [("o", "ponto de fusão")],
     "pontoEbulicaoK": [("o", "ponto de ebulição")],
     "densidadeKgm3": [("a", "densidade")],
+    # 17/10/2026 (docs/CALCULADORAS_2026-10-17.md §1): ΔHf° do composto; "entalpia da REAÇÃO/combustão" é a intenção ENTALPIA, não esta propriedade
+    "entalpiaFormacaoKJmol": [("a", "entalpia de formação"), ("a", "entalpia padrão de formação"), ("o", "calor de formação")],
 }
 
 # unidade canônica -> formas escritas

@@ -8,6 +8,9 @@ import net.saibatudo.quimica.domain.calc.Unidades
 /** Quantidade "valor + unidade" lida de uma pergunta; [unidade] é nula quando o texto depois do número não é uma unidade. */
 data class QuantidadeLida(val valor: Double, val unidade: String?, val texto: String, val faixa: IntRange)
 
+/** Concentração entre colchetes ("[N2] = 0,5 mol/L"): espécie como foi escrita, valor, unidade (ou null) e o trecho [inicio, fim). */
+data class ConcentracaoLida(val especie: String, val valor: Double, val unidade: String?, val inicio: Int, val fim: Int)
+
 /**
  * Leitura de números e de quantidades com unidade (espelha lerNumero/lerQuantidades/lerUnidade do site). Os nomes de unidade por extenso
  * vêm do léxico do idioma (contracts/lexico/<idioma>.json, `unidades`); os números aceitam vírgula e ponto em qualquer idioma (I18N §1.3).
@@ -213,6 +216,31 @@ object Quantidades {
             if (lidas.all { it != null && it != "%" }) return lidas.filterNotNull().distinct()
         }
         return emptyList()
+    }
+
+    private val cacheColchete = java.util.concurrent.ConcurrentHashMap<String, Regex>()
+
+    /** "[N2] = 0,5 mol/L", "[H2] é 1,5 mol/L": a espécie entre colchetes, o conector do léxico (`pistas.concentracaoColchete`) e o número. */
+    private fun rxColchete(lex: Lexico): Regex = cacheColchete.getOrPut(lex.idioma) {
+        Regex("""\[\s*([^\[\]\s]{1,24})\s*]\s*(?:${lex.pista("concentracaoColchete").pattern})\s*$NUM""")
+    }
+
+    /**
+     * Concentrações escritas com colchetes, na ordem (docs/CALCULADORAS_2026-10-17.md §1): a espécie com a caixa original, o valor, a unidade
+     * (ou null) e o trecho que ocupam (o fim inclui a unidade). Espelho de `lerConcentracoes` do site (nlu.js).
+     */
+    fun lerConcentracoes(texto: String, un: Unidades?, lex: Lexico = Lexico.de(Idiomas.PADRAO)): List<ConcentracaoLida> {
+        val dobrado = dobrarMesmoComprimento(texto)
+        val out = mutableListOf<ConcentracaoLida>()
+        for (m in rxColchete(lex).findAll(dobrado)) {
+            val gEsp = m.groups[1]!!
+            val gNum = m.groups[2]!!
+            val valor = lerNumero(texto.substring(gNum.range.first, gNum.range.last + 1), lex.idioma) ?: continue
+            val fimMatch = m.range.last + 1
+            val achada = unidadeNoInicio(texto.substring(fimMatch), un, lex)
+            out += ConcentracaoLida(texto.substring(gEsp.range.first, gEsp.range.last + 1), valor, achada?.first, m.range.first, fimMatch + (achada?.third ?: 0))
+        }
+        return out
     }
 
     /** Constantes de equilíbrio citadas ("Ka 1,8e-5", "pKa = 4,76"); o padrão vem do léxico (`pistas.constantes`). */

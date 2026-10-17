@@ -60,11 +60,12 @@ _CONTROLES = re.compile(
 
 # Normalização ANTES do modelo (14/10/2026): o mesmo texto chega ao modelo, ao gate (avaliar_gguf/eval_golden) e ao cache do proxy.
 # Só variantes tipográficas que não mudam o sentido: subscritos (H₂O -> H2O), aspas e apóstrofos curvos, traços longos e sinal de menos,
-# setas exóticas (⟶ ⇒ ➔ => --> -> '→' da equação continua '→'; '=' NÃO vira seta: 'pH = 7'), espaços especiais (NBSP), '×' -> 'x',
+# setas exóticas (⟶ ⇒ ➔ => --> -> '→' da equação continua '→'; '=' NÃO vira seta: 'pH = 7'), setas de equilíbrio (<=> <-> ⇄ -> '⇌'), espaços especiais (NBSP), '×' -> 'x',
 # pontuação repetida ('???' -> '?'). Nada é posto em minúsculas e acentos ficam: o modelo copia o composto como está na pergunta.
 _SUBSCRITOS = str.maketrans("₀₁₂₃₄₅₆₇₈₉", "0123456789")
 _TIPOGRAFIA = str.maketrans({"’": "'", "‘": "'", "´": "'", "`": "'", "“": '"', "”": '"', "„": '"', "−": "-", "–": "-", "—": "-", "‐": "-",
                              "\u00A0": " ", "\u202F": " ", "\u2009": " ", "\u3000": " ", "×": "x", "⟶": "→", "⇒": "→", "➔": "→", "⇾": "→", "⟹": "→"})
+_SETA_EQUILIBRIO = re.compile(r"<=>|<->|⇄")  # 17/10/2026: setas de equilíbrio viram "⇌" (EQUILIBRIO); "->", "→" e "=" isolado ficam
 _SETA_ASCII = re.compile(r"(?<![-<])(?:-->|=>)(?!>)")  # "-->" e "=>" entre espécies viram "→" ("->" e "→" já são as formas do treino)
 _PONTUACAO_REPETIDA = re.compile(r"([?!.,;:])\1+")
 
@@ -72,6 +73,7 @@ _PONTUACAO_REPETIDA = re.compile(r"([?!.,;:])\1+")
 def normalize_question(q: str) -> str:
     """Variantes tipográficas -> forma canônica (ver _TIPOGRAFIA). Idempotente; não altera letras, maiúsculas nem acentos."""
     q = unicodedata.normalize("NFC", str(q)).translate(_SUBSCRITOS).translate(_TIPOGRAFIA)
+    q = _SETA_EQUILIBRIO.sub("⇌", q)
     q = _SETA_ASCII.sub("→", q)
     return _PONTUACAO_REPETIDA.sub(r"\1", q)
 
@@ -116,8 +118,8 @@ def build_training_text(question: str, output_json: str) -> str:
 # ---------------------------------------------------------------------------------------------------------
 INTENTS = [
     "ELEMENTO", "COMPOSTO", "PROPRIEDADE", "MASSA_MOLAR", "BALANCEAR", "ESTEQUIOMETRIA", "CONCENTRACAO", "PH", "GAS_IDEAL",
-    "CONVERSAO_UNIDADE", "NOMENCLATURA", "DESENHAR", "COMPARAR", "TABELA_PERIODICA", "SEGURANCA", "CONCEITO", "RECUSA_PERIGO",
-    "SOBRE_DADOS", "FONTES", "AJUDA", "DESCONHECIDA",
+    "CONVERSAO_UNIDADE", "NOMENCLATURA", "DESENHAR", "COMPARAR", "TABELA_PERIODICA", "SEGURANCA", "CONCEITO", "NOX", "ENTALPIA",
+    "EQUILIBRIO", "LIGACAO", "RECUSA_PERIGO", "SOBRE_DADOS", "FONTES", "AJUDA", "DESCONHECIDA",
 ]
 NIVEIS = ["fundamental", "medio", "superior"]
 SIMBOLOS = [
@@ -132,7 +134,7 @@ PROPRIEDADES = [
     "massaAtomica", "massaMolar", "massaExata", "numeroAtomico", "grupo", "periodo", "bloco", "categoria", "configuracaoEletronica",
     "eletronegatividade", "raioAtomicoPm", "afinidadeEletronicaKJmol", "energiaIonizacaoKJmol", "pontoFusaoK", "pontoEbulicaoK",
     "densidadeKgm3", "estadoPadrao", "estadosOxidacao", "descoberta", "formula", "smiles", "cas", "xlogp", "tpsa", "doadoresH",
-    "aceptoresH", "ligacoesRotaveis", "carga", "pka", "solubilidade",
+    "aceptoresH", "ligacoesRotaveis", "carga", "pka", "solubilidade", "entalpiaFormacaoKJmol",
 ]
 # Vazio desde a unificação (10/10/2026, 21h30): cliente, modelo, golden e `regras.propriedades` usam os MESMOS ids — os nomes dos campos do
 # contrato, com unidade (`pontoFusaoK`, `densidadeKgm3`, ...). Espelha PROPRIEDADE_CLIENTE do vocab.js (test_nlu_core.py confere).
@@ -181,6 +183,11 @@ ENTIDADES_POR_INTENCAO = {
     "TABELA_PERIODICA": (("propriedade",), ()),
     "SEGURANCA": (("elemento", "composto"), ()),
     "CONCEITO": (("composto", "nivel"), ()),
+    # 17/10/2026 (docs/CALCULADORAS_2026-10-17.md §1): calculadoras novas. LIGACAO com dois elementos leva o PRIMEIRO citado (como COMPARAR).
+    "NOX": (("elemento", "composto"), ("composto",)),
+    "ENTALPIA": (("composto", "quantidades", "equacao"), ()),
+    "EQUILIBRIO": (("equacao", "quantidades"), ("equacao",)),
+    "LIGACAO": (("elemento", "composto"), ()),
     "RECUSA_PERIGO": ((), ()),
     "SOBRE_DADOS": ((), ()),
     "FONTES": ((), ()),

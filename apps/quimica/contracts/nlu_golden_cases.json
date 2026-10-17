@@ -5029,6 +5029,348 @@
       "idioma": "fr",
       "intent": "NOMENCLATURA",
       "formula": "C3H7Cl"
+    },
+    {
+      "q": "Qual o NOX do enxofre no H2SO4?",
+      "intent": "NOX",
+      "elemento": "S",
+      "formula": "H2SO4",
+      "composto": 1118
+    },
+    {
+      "q": "nox do nitrogênio no HNO3",
+      "intent": "NOX",
+      "elemento": "N",
+      "formula": "HNO3",
+      "composto": 944
+    },
+    {
+      "q": "calcule o nox do cromo no K2Cr2O7",
+      "intent": "NOX",
+      "elemento": "Cr",
+      "formula": "K2Cr2O7",
+      "composto": 24502
+    },
+    {
+      "q": "estados de oxidação de cada elemento no KMnO4",
+      "intent": "NOX",
+      "elemento": null,
+      "formula": "KMnO4",
+      "composto": 516875
+    },
+    {
+      "q": "nox do carbono em C3H8",
+      "intent": "NOX",
+      "elemento": "C",
+      "formula": "C3H8",
+      "composto": 6334
+    },
+    {
+      "q": "qual é o número de oxidação do oxigênio no H2O2?",
+      "intent": "NOX",
+      "elemento": "O",
+      "formula": "H2O2",
+      "composto": 784
+    },
+    {
+      "q": "qual o número de oxidação do cloro no KClO3?",
+      "intent": "NOX",
+      "elemento": "Cl",
+      "formula": "KClO3",
+      "composto": 6426889
+    },
+    {
+      "q": "What is the oxidation number of sulfur in H2SO4?",
+      "idioma": "en",
+      "intent": "NOX",
+      "elemento": "S",
+      "formula": "H2SO4",
+      "composto": 1118
+    },
+    {
+      "q": "oxidation state of chlorine in KClO3",
+      "idioma": "en",
+      "intent": "NOX",
+      "elemento": "Cl",
+      "formula": "KClO3",
+      "composto": 6426889
+    },
+    {
+      "q": "número de oxidación del cromo en el K2Cr2O7",
+      "idioma": "es",
+      "intent": "NOX",
+      "elemento": "Cr",
+      "formula": "K2Cr2O7",
+      "composto": 24502
+    },
+    {
+      "q": "Oxidationszahl von Mangan in KMnO4",
+      "idioma": "de",
+      "intent": "NOX",
+      "elemento": "Mn",
+      "formula": "KMnO4",
+      "composto": 516875
+    },
+    {
+      "q": "Quel est le nombre d’oxydation de l’azote dans NH3 ?",
+      "idioma": "fr",
+      "intent": "NOX",
+      "elemento": "N",
+      "formula": "NH3",
+      "composto": 222
+    },
+    {
+      "q": "ΔH da combustão do metano",
+      "intent": "ENTALPIA",
+      "composto": 297
+    },
+    {
+      "q": "qual a entalpia de combustão do etanol?",
+      "intent": "ENTALPIA",
+      "composto": 702
+    },
+    {
+      "q": "variação de entalpia da reação CH4 + 2 O2 -> CO2 + 2 H2O",
+      "intent": "ENTALPIA",
+      "equacao": "CH4 + 2 O2 -> CO2 + 2 H2O"
+    },
+    {
+      "q": "calor liberado na queima de 10 g de etanol",
+      "intent": "ENTALPIA",
+      "composto": 702
+    },
+    {
+      "q": "entalpia da reação pela lei de Hess",
+      "intent": "ENTALPIA",
+      "equacao": null
+    },
+    {
+      "q": "a reação 2 H2 + O2 -> 2 H2O é exotérmica?",
+      "intent": "ENTALPIA",
+      "equacao": "2 H2 + O2 -> 2 H2O"
+    },
+    {
+      "q": "enthalpy of combustion of methane",
+      "idioma": "en",
+      "intent": "ENTALPIA",
+      "composto": 297
+    },
+    {
+      "q": "heat of reaction for N2 + 3 H2 -> 2 NH3",
+      "idioma": "en",
+      "intent": "ENTALPIA",
+      "equacao": "N2 + 3 H2 -> 2 NH3"
+    },
+    {
+      "q": "entalpía de combustión del metano",
+      "idioma": "es",
+      "intent": "ENTALPIA",
+      "composto": 297
+    },
+    {
+      "q": "Verbrennungsenthalpie von Ethanol",
+      "idioma": "de",
+      "intent": "ENTALPIA",
+      "composto": 702
+    },
+    {
+      "q": "enthalpie de combustion du méthane",
+      "idioma": "fr",
+      "intent": "ENTALPIA",
+      "composto": 297
+    },
+    {
+      "q": "expressão do Kc para N2 + 3 H2 ⇌ 2 NH3",
+      "intent": "EQUILIBRIO",
+      "equacao": "N2 + 3 H2 ⇌ 2 NH3"
+    },
+    {
+      "q": "calcule Kc de N2 + 3 H2 <=> 2 NH3 com [N2] = 0,5 mol/L, [H2] = 1,5 mol/L e [NH3] = 0,2 mol/L",
+      "intent": "EQUILIBRIO",
+      "equacao": "N2 + 3 H2 ⇌ 2 NH3"
+    },
+    {
+      "q": "Kp em função de Kc para 2 SO2 + O2 ⇌ 2 SO3 a 500 K",
+      "intent": "EQUILIBRIO",
+      "equacao": "2 SO2 + O2 ⇌ 2 SO3"
+    },
+    {
+      "q": "constante de equilíbrio da reação H2 + I2 <-> 2 HI",
+      "intent": "EQUILIBRIO",
+      "equacao": "H2 + I2 ⇌ 2 HI"
+    },
+    {
+      "q": "escreva a expressão de Kc para CaCO3(s) ⇌ CaO(s) + CO2(g)",
+      "intent": "EQUILIBRIO",
+      "equacao": "CaCO3(s) ⇌ CaO(s) + CO2(g)"
+    },
+    {
+      "q": "com [N2O4] = 0,04 mol/L e [NO2] = 0,12 mol/L, qual o Kc de N2O4 ⇌ 2 NO2?",
+      "intent": "EQUILIBRIO",
+      "equacao": "N2O4 ⇌ 2 NO2"
+    },
+    {
+      "q": "Kp for H2 + I2 <=> 2 HI at 700 K",
+      "idioma": "en",
+      "intent": "EQUILIBRIO",
+      "equacao": "H2 + I2 ⇌ 2 HI"
+    },
+    {
+      "q": "equilibrium expression for N2O4 ⇌ 2 NO2",
+      "idioma": "en",
+      "intent": "EQUILIBRIO",
+      "equacao": "N2O4 ⇌ 2 NO2"
+    },
+    {
+      "q": "constante de equilibrio Kc de N2 + 3 H2 ⇌ 2 NH3 con [N2] = 0,5 mol/L, [H2] = 1,5 mol/L y [NH3] = 0,2 mol/L",
+      "idioma": "es",
+      "intent": "EQUILIBRIO",
+      "equacao": "N2 + 3 H2 ⇌ 2 NH3"
+    },
+    {
+      "q": "Massenwirkungsgesetz für 2 SO2 + O2 ⇌ 2 SO3",
+      "idioma": "de",
+      "intent": "EQUILIBRIO",
+      "equacao": "2 SO2 + O2 ⇌ 2 SO3"
+    },
+    {
+      "q": "constante d’équilibre de la réaction H2 + I2 ⇌ 2 HI",
+      "idioma": "fr",
+      "intent": "EQUILIBRIO",
+      "equacao": "H2 + I2 ⇌ 2 HI"
+    },
+    {
+      "q": "tipo de ligação do NaCl",
+      "intent": "LIGACAO",
+      "formula": "NaCl",
+      "composto": 5234
+    },
+    {
+      "q": "que ligação há entre H e Cl?",
+      "intent": "LIGACAO",
+      "elemento": "H"
+    },
+    {
+      "q": "a ligação no CO2 é polar ou apolar?",
+      "intent": "LIGACAO",
+      "formula": "CO2"
+    },
+    {
+      "q": "qual o tipo de ligação entre ferro e cobre?",
+      "intent": "LIGACAO",
+      "elemento": "Fe"
+    },
+    {
+      "q": "o HCl é iônico ou covalente?",
+      "intent": "LIGACAO",
+      "formula": "HCl"
+    },
+    {
+      "q": "ligação química no Cl2",
+      "intent": "LIGACAO",
+      "formula": "Cl2"
+    },
+    {
+      "q": "what type of bond is in NaCl?",
+      "idioma": "en",
+      "intent": "LIGACAO",
+      "formula": "NaCl"
+    },
+    {
+      "q": "is the bond between carbon and oxygen polar?",
+      "idioma": "en",
+      "intent": "LIGACAO",
+      "elemento": "C"
+    },
+    {
+      "q": "tipo de enlace entre sodio y cloro",
+      "idioma": "es",
+      "intent": "LIGACAO",
+      "elemento": "Na"
+    },
+    {
+      "q": "Welche Bindung liegt in HCl vor?",
+      "idioma": "de",
+      "intent": "LIGACAO",
+      "formula": "HCl"
+    },
+    {
+      "q": "type de liaison dans CO2",
+      "idioma": "fr",
+      "intent": "LIGACAO",
+      "formula": "CO2"
+    },
+    {
+      "q": "elétrons de valência do enxofre",
+      "intent": "PROPRIEDADE",
+      "elemento": "S",
+      "propriedade": "configuracaoEletronica"
+    },
+    {
+      "q": "qual é a camada de valência do cloro?",
+      "intent": "PROPRIEDADE",
+      "elemento": "Cl",
+      "propriedade": "configuracaoEletronica"
+    },
+    {
+      "q": "diagrama de Linus Pauling do cálcio",
+      "intent": "PROPRIEDADE",
+      "elemento": "Ca",
+      "propriedade": "configuracaoEletronica"
+    },
+    {
+      "q": "valence electrons of oxygen",
+      "idioma": "en",
+      "intent": "PROPRIEDADE",
+      "elemento": "O",
+      "propriedade": "configuracaoEletronica"
+    },
+    {
+      "q": "electrones de valencia del nitrógeno",
+      "idioma": "es",
+      "intent": "PROPRIEDADE",
+      "elemento": "N",
+      "propriedade": "configuracaoEletronica"
+    },
+    {
+      "q": "Valenzelektronen von Natrium",
+      "idioma": "de",
+      "intent": "PROPRIEDADE",
+      "elemento": "Na",
+      "propriedade": "configuracaoEletronica"
+    },
+    {
+      "q": "couche de valence du soufre",
+      "idioma": "fr",
+      "intent": "PROPRIEDADE",
+      "elemento": "S",
+      "propriedade": "configuracaoEletronica"
+    },
+    {
+      "q": "entalpia de formação da água",
+      "intent": "PROPRIEDADE",
+      "composto": 962,
+      "propriedade": "entalpiaFormacaoKJmol"
+    },
+    {
+      "q": "qual a entalpia padrão de formação do CO2?",
+      "intent": "PROPRIEDADE",
+      "composto": 280,
+      "propriedade": "entalpiaFormacaoKJmol"
+    },
+    {
+      "q": "standard enthalpy of formation of methane",
+      "idioma": "en",
+      "intent": "PROPRIEDADE",
+      "composto": 297,
+      "propriedade": "entalpiaFormacaoKJmol"
+    },
+    {
+      "q": "entalpía de formación del amoníaco",
+      "idioma": "es",
+      "intent": "PROPRIEDADE",
+      "composto": 222,
+      "propriedade": "entalpiaFormacaoKJmol"
     }
   ]
 }

@@ -155,6 +155,8 @@ const REQUISITOS = {
   NOMENCLATURA: (e) => Boolean(e.composto),
   DESENHAR: (e) => Boolean(e.composto),
   COMPARAR: (e) => Boolean(e.elemento || e.composto || e.propriedade),
+  NOX: (e) => Boolean(e.composto), // 17/10/2026 (CALCULADORAS §1): obrigatórias de nlu_core.ENTIDADES_POR_INTENCAO
+  EQUILIBRIO: (e) => Boolean(e.equacao),
 };
 
 function montar(intent, e) {

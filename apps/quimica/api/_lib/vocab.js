@@ -23,6 +23,10 @@ export const INTENTS = Object.freeze([
   'TABELA_PERIODICA',
   'SEGURANCA',
   'CONCEITO',
+  'NOX',
+  'ENTALPIA',
+  'EQUILIBRIO',
+  'LIGACAO',
   'RECUSA_PERIGO',
   'SOBRE_DADOS',
   'FONTES',
@@ -131,6 +135,7 @@ export const PROPRIEDADES = Object.freeze([
   'carga',
   'pka',
   'solubilidade',
+  'entalpiaFormacaoKJmol',
 ]);
 export const PROPRIEDADE_SET = new Set(PROPRIEDADES);
 
@@ -173,6 +178,7 @@ export const FORMAS_PROPRIEDADE = Object.freeze({
   carga: ['carga do', 'carga da', 'carga formal', 'carga eletrica', 'carga total'],
   pka: ['pka', 'constante de acidez', 'ka do', 'ka da'],
   solubilidade: ['solubilidade', 'soluvel', 'solubiliza', 'dissolve', 'dissolvem', 'dissolver'],
+  entalpiaFormacaoKJmol: ['entalpia de formacao', 'entalpia padrao de formacao', 'calor de formacao'],
 });
 
 /** [paridade] Unidades canônicas aceitas em `quantidades` e `unidadeDestino`. */

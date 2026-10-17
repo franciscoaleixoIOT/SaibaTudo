@@ -24,6 +24,8 @@ Saídas (ia/corpus/out/, fora do Git):
   contagens.json     por app, idioma, intenção, origem e divisão; descartes e limites aplicados
 
 Uso (da raiz):  python -I ia/corpus/montar_corpus.py [--teto-intencao-quimica-pt 2400] [--val-pct-quimica 3]
+  v3.4: --out ia/corpus/out/v34 --escala-v34 0.69 --escala-v35 0
+  v3.5: ver ia/corpus/README.md (seção v3.5)
 """
 import argparse
 import hashlib
@@ -301,7 +303,77 @@ def v34():
 
 
 _V34 = None
+_V35 = None
 ENTIDADES_MT = ("elemento", "composto", "propriedade", "quantidades", "unidadeDestino")
+ISENTAS_DO_TETO = frozenset({"RECUSA_PERIGO"})  # recusas de segurança nunca são cortadas pelo teto por intenção
+
+
+def v35():
+    """Geradores do NLU v3.5 (calculadoras NOX/ENTALPIA/EQUILIBRIO/LIGACAO + entalpiaFormacaoKJmol e famílias de superfície)."""
+    global _V35
+    if _V35 is None:
+        spec = importlib.util.spec_from_file_location("quimica_v35", AQUI / "quimica_v35.py")
+        _V35 = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(_V35)
+    return _V35
+
+
+def carregar_v35(bq, gv, stats, idiomas, escala) -> tuple:
+    """Pares do v3.5, validados aqui com as regras do construtor do app (pergunta por validate_question, pergunta repetida, filtro dos
+    contratos, forma + combinacao_valida do contrato, composto/equação copiados do texto normalizado) e a evidência das quantidades:
+    build_nlu_dataset.evidencia_basica, ou quimica_v35.evidencia_v35 nas famílias de notação científica e números por extenso (a do app
+    não lê "meio mol", "1/2", "½" nem "1,5·10⁻³"). Devolve (treino, {família: casos de holdout})."""
+    treino, holdouts = [], {f: [] for f in gv.FAMILIAS}
+    if escala <= 0:
+        return treino, holdouts
+    dc, core = bq.dc, bq.nlu
+    filtro = dc.FiltroDeContrato(dc.perguntas_dos_contratos(QUIMICA / "contracts"))
+    ds = gv._dataset()
+    pac = ds[1].localizar(None)
+    if pac.eh_fixture:
+        raise SystemExit("pacote data/quimica ausente: o gerador v3.5 caiu na fixture de teste")
+    for idioma in ["pt-BR"] + list(idiomas):
+        for fam in gv.FAMILIAS:
+            regs, st = gv.gerar_familia(pac, idioma, fam, SEED, escala, ds)
+            cont, vistos = Counter(), set()
+            for r in regs:
+                try:
+                    q = core.validate_question(r["q"])
+                except ValueError:
+                    cont["pergunta_invalida"] += 1
+                    continue
+                chave = bq.ask_core.normalizar_pergunta(q)
+                if chave in vistos:
+                    cont["pergunta_repetida"] += 1
+                    continue
+                vistos.add(chave)
+                if filtro.veredito(q):
+                    cont["contrato_removido"] += 1
+                    continue
+                plano = bq.alvo_normalizado(r["alvo"])
+                for k in ("composto", "equacao"):  # a pergunta foi normalizada (subscritos, setas): o rótulo copia o texto normalizado
+                    if k in plano and plano[k] not in q and core.normalize_question(plano[k]) in q:
+                        plano[k] = core.normalize_question(plano[k])
+                if not core.has_valid_shape(plano) or not core.combinacao_valida(plano):
+                    cont["alvo_invalido"] += 1
+                    continue
+                if any(k in plano and plano[k] not in q for k in ("composto", "equacao")):
+                    cont["entidade_fora_do_texto"] += 1
+                    continue
+                sem = gv.evidencia_v35(q, plano, idioma, bq) if r.get("_ev") == "v35" else bq.evidencia_basica(q, plano)
+                if sem:
+                    cont[f"sem_evidencia_{sem}"] += 1
+                    continue
+                if r["_lado"] == "holdout":
+                    holdouts[fam].append({"q": q, "intent": plano["intent"], **{k: plano[k] for k in core.KEYS if k != "intent" and k in plano},
+                                          "idioma": idioma, "familia": fam})
+                    cont["holdout"] += 1
+                else:
+                    treino.append({"app": "quimica", "idioma": idioma, "entrada": q, "saida": core.format_output(plano), "intent": plano["intent"],
+                                   "fonte": gv.FONTE, "licenca": gv.LICENCA, "origem": "template", "divisao": "treino", "familia": fam})
+                    cont["treino"] += 1
+            stats["quimica_build"][f"v35-{fam}/{idioma}"] = {**dict(cont), "gerador": {k: v for k, v in st.items() if k != "por_intencao"}}
+    return treino, holdouts
 
 
 def carregar_v34(bq, gv, stats, idiomas, escala, completas_por_idioma) -> tuple:
@@ -366,8 +438,9 @@ def carregar_v34(bq, gv, stats, idiomas, escala, completas_por_idioma) -> tuple:
     return treino, holdouts
 
 
-def limitar_por_intencao(regs, teto: int, stats, rotulo: str):
-    """Teto de exemplos por intenção (escolha estável por hash da pergunta), para um app/idioma não enviesar o modelo."""
+def limitar_por_intencao(regs, teto: int, stats, rotulo: str, isentas=ISENTAS_DO_TETO):
+    """Teto de exemplos por intenção (escolha estável por hash da pergunta), para um app/idioma não enviesar o modelo. As `isentas` (recusas)
+    nunca são cortadas."""
     if not teto:
         return regs
     por = defaultdict(list)
@@ -375,7 +448,7 @@ def limitar_por_intencao(regs, teto: int, stats, rotulo: str):
         por[r["intent"]].append(r)
     saida = []
     for it, lst in por.items():
-        if len(lst) > teto:
+        if len(lst) > teto and it not in isentas:
             lst = sorted(lst, key=lambda r: balde(r["entrada"], 10 ** 9))[:teto]
             stats["limite_por_intencao"].setdefault(rotulo, {})[it] = {"antes": len(por[it]), "depois": teto}
         saida += lst
@@ -411,6 +484,9 @@ def montar(args) -> dict:
     pt = [r for r in q_tr if r["idioma"] == "pt-BR"]
     resto = [r for r in q_tr if r["idioma"] != "pt-BR"]
     pt = limitar_por_intencao(pt, args.teto_intencao_quimica_pt, stats, "quimica/pt-BR")
+    teto_est = getattr(args, "teto_intencao_quimica_estrangeiros", 0)
+    if teto_est:  # por idioma, só no gerador multilíngue base (os populares e os v3.4/v3.5 ficam inteiros)
+        resto = [r for i in idiomas for r in limitar_por_intencao([x for x in resto if x["idioma"] == i], teto_est, stats, f"quimica/{i}")]
     p_tr, p_hold = carregar_populares(bq, populares(), stats, idiomas, args.escala_populares)  # fora do teto: correção do gate do v3
     q_hold += p_hold
     completas = defaultdict(list)  # perguntas completas (sem contexto) do treino da química, para o multi-turno "contexto ignorado"
@@ -418,13 +494,15 @@ def montar(args) -> dict:
         if len(completas[r["idioma"]]) < 4000:
             completas[r["idioma"]].append((r["entrada"], r["saida"]))
     v_tr, v_hold = carregar_v34(bq, v34(), stats, idiomas, getattr(args, "escala_v34", 1.0), completas)
-    q_tr, q_va = separar_val(pt + resto + p_tr + v_tr, args.val_pct_quimica)
+    w_tr, w_hold = carregar_v35(bq, v35(), stats, idiomas, getattr(args, "escala_v35", 1.0))
+    q_tr, q_va = separar_val(pt + resto + p_tr + v_tr + w_tr, args.val_pct_quimica)
 
     # filtro de teste (todos os apps), validade do rótulo, duplicatas e conflitos
     filtro = FiltroDeTeste(perguntas_de(TESTES_ELEICOES + TESTES_QUIMICA) + [c["q"] for c in e_hold])
     # holdout da química: cada gerador já separa por entidade, mas dois geradores podem produzir a MESMA pergunta (um no treino, outro no
     # holdout); o texto exato do holdout nunca treina (só exato: a quase-igualdade removeria metade dos moldes)
-    holdout_quimica_exato = {chave_texto(c["q"]) for c in q_hold} | {chave_texto(c["q"]) for cs in v_hold.values() for c in cs}
+    holdout_quimica_exato = ({chave_texto(c["q"]) for c in q_hold} | {chave_texto(c["q"]) for cs in v_hold.values() for c in cs}
+                             | {chave_texto(c["q"]) for cs in w_hold.values() for c in cs})
     validos = {"eleicoes2026": lambda s: rotulo_valido_eleicoes(ecore, s), "quimica": lambda s: rotulo_valido_quimica(qcore, s)}
     vistos, finais = {}, []
     for r in e_tr + e_va + q_tr + q_va:
@@ -479,6 +557,11 @@ def montar(args) -> dict:
             alvo = {k: v for k, v in c.items() if k in qcore.KEYS and v not in (None, "", [])}
             corpus.append({"app": "quimica", "idioma": c["idioma"], "tarefa": "nlu", "entrada": c["q"], "saida": qcore.format_output(alvo),
                            "fonte": v34().FONTE, "licenca": LICENCA_QUIMICA, "origem": "holdout", "divisao": "holdout"})
+    for nome, casos in w_hold.items():
+        for c in casos:
+            alvo = {k: v for k, v in c.items() if k in qcore.KEYS and v not in (None, "", [])}
+            corpus.append({"app": "quimica", "idioma": c["idioma"], "tarefa": "nlu", "entrada": c["q"], "saida": qcore.format_output(alvo),
+                           "fonte": v35().FONTE, "licenca": LICENCA_QUIMICA, "origem": "holdout", "divisao": "holdout"})
     with open(OUT / "corpus_nlu.jsonl", "w", encoding="utf-8", newline="\n") as f:
         for r in corpus:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
@@ -499,12 +582,24 @@ def montar(args) -> dict:
     for nome, casos in v_hold.items():
         (OUT / f"holdout_v34_{nome}.json").write_text(json.dumps({"app": "quimica", "conjunto": f"v34-{nome}", "cases": casos}, ensure_ascii=False, indent=1),
                                                       encoding="utf-8")
+    for nome, casos in w_hold.items():
+        (OUT / f"holdout_v35_{nome}.json").write_text(json.dumps({"app": "quimica", "conjunto": f"v35-{nome}", "cases": casos}, ensure_ascii=False, indent=1),
+                                                      encoding="utf-8")
     cont = contagens(corpus, finais)
     cont["holdouts_v34"] = {nome: {"total": len(cs), "por_idioma": dict(sorted(Counter(c["idioma"] for c in cs).items())),
                                    "por_intencao": dict(sorted(Counter(c["intent"] for c in cs).items()))} for nome, cs in v_hold.items()}
     cont["treino_v34"] = dict(sorted(Counter(f"{r['idioma']}/{r['intent']}" for r in finais if r["fonte"] == v34().FONTE and r["divisao"] == "treino").items()))
+    cont["holdouts_v35"] = {nome: {"total": len(cs), "por_idioma": dict(sorted(Counter(c["idioma"] for c in cs).items())),
+                                   "por_intencao": dict(sorted(Counter(c["intent"] for c in cs).items()))} for nome, cs in w_hold.items()}
+    w_fin = [r for r in finais if r["fonte"] == v35().FONTE and r["divisao"] == "treino"]
+    cont["treino_v35"] = {"total": len(w_fin), "por_familia_idioma": dict(sorted(Counter(f"{r['familia']}/{r['idioma']}" for r in w_fin).items())),
+                          "por_intencao_idioma": dict(sorted(Counter(f"{r['idioma']}/{r['intent']}" for r in w_fin).items()))}
+    novas = ("NOX", "ENTALPIA", "EQUILIBRIO", "LIGACAO")
+    cont["intencoes_novas_treino"] = {it: dict(sorted(Counter(r["idioma"] for r in finais if r["app"] == "quimica" and r["divisao"] == "treino"
+                                                              and r["intent"] == it).items())) for it in novas}
     cont["config"] = {"teto_intencao_quimica_pt": args.teto_intencao_quimica_pt, "val_pct_quimica": args.val_pct_quimica, "idiomas_estrangeiros": args.idiomas,
-                      "escala_estrangeiros": args.escala, "escala_populares": args.escala_populares, "escala_v34": getattr(args, "escala_v34", 1.0), "linha_idioma_quimica": bool(args.linha_idioma_quimica),
+                      "escala_estrangeiros": args.escala, "escala_populares": args.escala_populares, "escala_v34": getattr(args, "escala_v34", 1.0), "escala_v35": getattr(args, "escala_v35", 1.0),
+                      "teto_intencao_quimica_estrangeiros": getattr(args, "teto_intencao_quimica_estrangeiros", 0), "linha_idioma_quimica": bool(args.linha_idioma_quimica),
                       "seed": SEED, "jaccard_quase_igual": JACCARD_QUASE_IGUAL}
     cont["prompts"] = prompts
     cont["filtros"] = {k: (dict(sorted(v.items())) if isinstance(v, Counter) else v) for k, v in stats.items()}
@@ -548,6 +643,9 @@ def main(argv=None):
     ap.add_argument("--teto-intencao-quimica-pt", type=int, default=2400, help="teto por intenção na química pt (0 = sem teto)")
     ap.add_argument("--val-pct-quimica", type=float, default=3.0, help="%% do lado de treino da química que vira val.json")
     ap.add_argument("--escala-v34", type=float, default=1.0, help="escala dos geradores do v3.4 (multi-turno, comparação, conceitos; 0 desliga = corpus do v3.3)")
+    ap.add_argument("--escala-v35", type=float, default=1.0, help="escala dos geradores do v3.5 (calculadoras e famílias de superfície; 0 desliga = corpus do v3.4)")
+    ap.add_argument("--teto-intencao-quimica-estrangeiros", type=int, default=0,
+                    help="teto por intenção e idioma no gerador multilíngue base da química (0 = sem teto; recusas isentas)")
     ap.add_argument("--out", help="pasta de saída (padrão ia/corpus/out)")
     ap.add_argument("--linha-idioma-quimica", action="store_true", help="acrescenta ao prompt da química a linha de idioma PROPOSTA (não está em produção)")
     a = ap.parse_args(argv)
@@ -559,6 +657,8 @@ def main(argv=None):
                       "proporcao_treino": cont["proporcao_treino"], "por_app": resumo}, ensure_ascii=False, indent=1))
     print(f"-> {OUT}")
     print(json.dumps(cont.get("holdouts_v34"), ensure_ascii=False))
+    print(json.dumps({k: v["total"] for k, v in (cont.get("holdouts_v35") or {}).items()}, ensure_ascii=False))
+    print(json.dumps(cont.get("intencoes_novas_treino"), ensure_ascii=False))
 
 
 if __name__ == "__main__":

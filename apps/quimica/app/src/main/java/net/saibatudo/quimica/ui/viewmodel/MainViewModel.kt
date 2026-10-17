@@ -204,6 +204,9 @@ class MainViewModel(
 
     // ---- perguntas ---------------------------------------------------------------------------------------------------------------
 
+    /** O construtor de respostas do idioma ativo, para as calculadoras que mostram as mesmas respostas do assistente (NOX, entalpia…). */
+    suspend fun construtorDeRespostas(): AnswerBuilder? = withContext(Dispatchers.Default) { montador() }
+
     private suspend fun montador(): AnswerBuilder? {
         val pacote = (dados.estado.value as? EstadoDados.Pronto)?.pacote ?: return null
         val nivel = prefs.atual().nivel

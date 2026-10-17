@@ -1,6 +1,7 @@
 package net.saibatudo.quimica.ai.nlu
 
 import net.saibatudo.quimica.ai.Seguranca
+import net.saibatudo.quimica.ai.model.Concentracao
 import net.saibatudo.quimica.ai.model.Intent
 import net.saibatudo.quimica.ai.model.ParsedQuery
 import net.saibatudo.quimica.ai.model.Quantidade
@@ -19,9 +20,11 @@ import net.saibatudo.quimica.domain.calc.FormulaQuimica
  * Ordem (a primeira regra que casa vence):
  *  1. segurança química (RECUSA_PERIGO), antes de qualquer outra coisa;
  *  2. conversa e meta: AJUDA (saudação), SOBRE_DADOS, FONTES, AJUDA ("o que você faz");
+ *  2b. EQUILIBRIO e ENTALPIA (antes da equação, senão viram BALANCEAR); "ΔHf do X" = PROPRIEDADE entalpiaFormacaoKJmol;
  *  3. equação química: ESTEQUIOMETRIA (com quantidades) ou BALANCEAR;
  *  4. CONVERSAO_UNIDADE (duas unidades da mesma grandeza);
  *  5. cálculos: PH, GAS_IDEAL, CONCENTRACAO, ESTEQUIOMETRIA, MASSA_MOLAR;
+ *  5b. NOX e LIGACAO (antes de COMPARAR);
  *  6. COMPARAR, DESENHAR, SEGURANCA, NOMENCLATURA;
  *  7. TABELA_PERIODICA;
  *  8. PROPRIEDADE, ELEMENTO, COMPOSTO;
@@ -136,6 +139,31 @@ object LocalNlu {
         if (i("fontes") && !tem) return fim(Intent.FONTES)
         if (i("ajuda")) return fim(Intent.AJUDA)
 
+        // 2b) equilíbrio e entalpia (docs/CALCULADORAS_2026-10-17.md §1): antes da equação química, senão a equação viraria BALANCEAR.
+        // EQUILIBRIO exige a equação (⇌, <=>, <->, ⇄, → ou = entre espécies); as concentrações entre colchetes ficam em `concentracoes`.
+        val concentracoes = Quantidades.lerConcentracoes(original, unidades, lex)
+        val setaDupla = RX_SETA_DUPLA.containsMatchIn(original)
+        if (i("equilibrio") || (setaDupla && concentracoes.isNotEmpty())) {
+            val eqE = if (concentracoes.isNotEmpty()) extrairEquacao(semConcentracoes(original, concentracoes)) ?: equacao else equacao
+            // com seta dupla na pergunta (⇌, <=>, <->, ⇄), a equação fica com ⇌ (a mesma forma que a normalização do serviço usa)
+            if (eqE != null) return fim(Intent.EQUILIBRIO) {
+                it.copy(equacao = if (setaDupla) eqE.replaceFirst(" -> ", " ⇌ ") else eqE, concentracoes = concentracoes.map { c -> Concentracao(c.especie, c.valor, c.unidade) })
+            }
+        }
+        val temComposto = p.compostos.isNotEmpty() || p.formulas.isNotEmpty()
+        // "ΔHf do metano": a propriedade (entalpia padrão de formação), como "entalpia de formação do metano"
+        if (RX_DELTA_HF.containsMatchIn(original) && temComposto && equacao == null && p.propriedade == null) {
+            return fim(Intent.PROPRIEDADE) { it.copy(propriedade = "entalpiaFormacaoKJmol", propriedades = listOf("entalpiaFormacaoKJmol"), alvoPropriedade = "composto") }
+        }
+        if (i("entalpia") || RX_DELTA_H.containsMatchIn(original)) {
+            val combustao = pista("entalpiaCombustao")
+            val hess = pista("hess")
+            // "entalpia de formação da água" é PROPRIEDADE (entalpiaFormacaoKJmol); "o que é entalpia?" é CONCEITO
+            val soFormacao = pista("entalpiaFormacao") && temComposto && !combustao && !hess && equacao == null
+            val definicao = equacao == null && !temComposto && (pista("prefixoDefinicao") || i("conceitoCue"))
+            if (!soFormacao && !definicao && (equacao != null || temComposto || combustao || hess)) return fim(Intent.ENTALPIA) { it.copy(equacao = equacao) }
+        }
+
         // 3) equação química
         if (equacao != null || i("balancear")) {
             val querCalcular = temQuant && pista("querCalcular")
@@ -197,6 +225,31 @@ object LocalNlu {
                 else it.copy(equacao = equacao, composto = ligado, compostos = listOf(ligado) + it.compostos.filter { c -> c != ligado })
             }
         }
+
+        // 5b) NOX e tipo de ligação (docs/CALCULADORAS_2026-10-17.md §1). NOX exige o composto (fórmula ou nome); o `elemento` é só o átomo pedido
+        // ("do enxofre no H2SO4"). "Estados de oxidação do ferro" (sem composto) continua PROPRIEDADE estadosOxidacao. O gatilho "nox" também é o
+        // nome de um composto do pacote (óxidos de nitrogênio, NOx): dentro do gatilho ele não conta como composto citado.
+        val outraPropriedade = p.propriedades.any { it != "estadosOxidacao" }
+        val mNox = lex.intencao("nox").find(n)
+        if (mNox != null && !outraPropriedade) {
+            val gatilho = " ${mNox.value} "
+            val compNox = compostos.filter { c -> !(c.via == "nome" && c.chave != null && gatilho.contains(" ${c.chave} ")) }
+            val formulaNox = p.formulas.firstOrNull() ?: compNox.firstOrNull { it.via == "formula" }?.texto
+            if (compNox.isNotEmpty() || formulaNox != null) {
+                val elementoNox = elementoDoNox(n, original, d, lex)
+                val cids = compNox.map { it.cid.toString() }
+                return fim(Intent.NOX) {
+                    it.copy(
+                        composto = cids.firstOrNull(), compostos = cids, compostoNome = compNox.firstOrNull()?.nome, formula = formulaNox,
+                        elemento = elementoNox, elementos = listOfNotNull(elementoNox), propriedade = null, propriedades = emptyList(),
+                        cargaFormula = cargaDepoisDa(formulaNox, original)
+                    )
+                }
+            }
+        }
+        // LIGACAO: com composto/fórmula, ou com dois elementos (`elemento` = o primeiro, como em COMPARAR; os dois ficam em `elementos`)
+        val pistaLigacao = i("ligacao") || (pista("ligacaoPolaridade") && !i("comparar"))
+        if (pistaLigacao && p.propriedade == null && !i("seguranca") && (temComposto || p.elementos.size >= 2)) return fim(Intent.LIGACAO)
 
         // 6) representação, comparação, segurança, nomenclatura
         if (i("comparar") && p.compostos.size + p.elementos.size + p.formulas.size >= 2) {
@@ -291,6 +344,45 @@ object LocalNlu {
             if (conceito.isNotEmpty()) return fim(Intent.CONCEITO) { it.copy(conceito = conceito) }
         }
         return p
+    }
+
+    // ---- calculadoras novas (17/10/2026) --------------------------------------------------------------------------------------------
+    // O símbolo Δ/∆ de "ΔH" não é palavra de nenhum idioma (a normalização o apaga): estes padrões olham o texto original.
+    private val RX_DELTA_H = Regex("""[Δ∆]\s*H(?![a-z])""")
+    private val RX_DELTA_HF = Regex("""[Δ∆]\s*H\s*°?\s*f(?![a-z])""")
+    private val RX_SETA_DUPLA = Regex("""<=>|<->|⇌|⇄|↔""")
+    private val RX_BORDA_INICIO = Regex("""^[^\p{L}\d]+""")
+    private val RX_BORDA_FIM = Regex("""[^\p{L}\d+-]+$""")
+    private val RX_CARGA_SEPARADA = Regex("""^\s+(\d?)([+-])(?![\w.,])|^\s+([+-])(\d)(?![\w.,])""")
+
+    /** O texto sem as concentrações entre colchetes (para achar a equação mesmo quando elas vêm antes dela). */
+    private fun semConcentracoes(original: String, concentracoes: List<ConcentracaoLida>): String {
+        var s = original
+        for (c in concentracoes.reversed()) s = s.substring(0, c.inicio) + " ".repeat(c.fim - c.inicio) + s.substring(c.fim)
+        return s
+    }
+
+    /** Elemento pedido no NOX ("do enxofre no H2SO4", "of Mn in MnO4-"): o símbolo, ou null. Só pela pista do léxico (`pistas.noxAlvo`). */
+    private fun elementoDoNox(n: String, original: String, d: Dicionario, lex: Lexico): String? {
+        val toks = original.split(Regex("""\s+""")).map { RX_BORDA_FIM.replace(RX_BORDA_INICIO.replace(it, ""), "") }.filter { it.isNotEmpty() }
+        for (m in lex.pista("noxAlvo").findAll(n)) {
+            val alvo = m.groupValues[1]
+            // a palavra com a caixa original ("Mn"), achada pela forma normalizada
+            val orig = alvo.split(' ').joinToString(" ") { w -> toks.firstOrNull { Texto.nlu(it) == w } ?: w }
+            val e = d.entidades(orig)
+            if (e.elementos.size == 1 && e.formulas.isEmpty() && e.compostos.none { it.via == "formula" }) return e.elementos[0].simbolo
+        }
+        return null
+    }
+
+    /** Carga escrita separada logo depois da fórmula ("Cr2O7 2-", "SO4 2-", "NH4 +"): número ou null. */
+    private fun cargaDepoisDa(formula: String?, original: String): Int? {
+        if (formula == null) return null
+        val i = original.indexOf(formula)
+        if (i < 0) return null
+        val m = RX_CARGA_SEPARADA.find(original.substring(i + formula.length)) ?: return null
+        val sinal = if (m.groupValues[2].ifEmpty { m.groupValues[3] } == "-") -1 else 1
+        return sinal * (m.groupValues[1].ifEmpty { m.groupValues[4] }.ifEmpty { "1" }).toInt()
     }
 
     private val RX_PV_NRT = Regex("""pv\s*=\s*nrt""", RegexOption.IGNORE_CASE)

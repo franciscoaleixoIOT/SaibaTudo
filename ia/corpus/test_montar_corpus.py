@@ -17,6 +17,8 @@ AQUI = Path(__file__).resolve().parent
 OUT = Path(os.environ["CORPUS_OUT"]) if os.environ.get("CORPUS_OUT") else AQUI / "out"  # CORPUS_OUT=ia/corpus/out/v34 testa outro corpus
 ESTRANGEIROS = ["en", "es", "de", "fr"]
 ENTIDADES_QUIMICA = ["elemento", "composto", "propriedade", "quantidades", "equacao", "nivel", "unidadeDestino"]
+# Intenções das calculadoras (17/10/2026, apps/quimica/docs/CALCULADORAS_2026-10-17.md §1): desde o v3.5 têm famílias no corpus nos 5 idiomas.
+INTENCOES_CALCULADORAS = ("NOX", "ENTALPIA", "EQUILIBRIO", "LIGACAO")
 
 
 def _mod(nome, caminho):
@@ -129,8 +131,8 @@ class Corpus(unittest.TestCase):
         self.assertEqual(c["total"], len(self.corpus))
         self.assertEqual(c["treino"], len(self.train))
         self.assertEqual(c["val"], len(self.val))
-        extras = sum(len(json.loads(a.read_text(encoding="utf-8"))["cases"]) for a in OUT.glob("holdout_v34_*.json")
-                     if a.name != "holdout_v34_revisor.json")  # conjuntos do v3.4 (o do revisor é externo ao montador)
+        extras = sum(len(json.loads(a.read_text(encoding="utf-8"))["cases"]) for a in [*OUT.glob("holdout_v34_*.json"), *OUT.glob("holdout_v35_*.json")]
+                     if a.name != "holdout_v34_revisor.json")  # conjuntos do v3.4 e do v3.5 (o do revisor é externo ao montador)
         self.assertEqual(c["holdout"], sum(len(v) for v in self.hold.values()) + extras)
         for app, a in c["por_app"].items():
             regs = [r for r in self.corpus if r["app"] == app]
@@ -154,13 +156,62 @@ class Corpus(unittest.TestCase):
         q = self.cont["por_app"]["quimica"]["por_idioma"]
         for idioma in ["pt-BR"] + ESTRANGEIROS:
             self.assertIn(idioma, q)
-            self.assertEqual(set(q[idioma]["por_intencao"]), set(self.qcore.INTENTS), idioma)
+            usadas = set(q[idioma]["por_intencao"])
+            self.assertLessEqual(usadas, set(self.qcore.INTENTS), idioma)
+            self.assertEqual(set(self.qcore.INTENTS) - usadas, set(), idioma)
             treino = [json.loads(ex["output"]) for ex in self.train if ex["app"] == "quimica" and ex["idioma"] == idioma]
             for ent in ENTIDADES_QUIMICA:
                 self.assertTrue(any(ent in a for a in treino), f"{idioma}: nenhuma amostra com {ent}")
             if idioma != "pt-BR":
                 self.assertGreaterEqual(len(treino), 3000, idioma)
                 self.assertTrue(any(c["idioma"] == idioma for c in self.hold["quimica"]), idioma)
+
+    def test_v35_calculadoras_e_familias(self):
+        """v3.5: as 4 intenções novas treinam em todos os idiomas (>= 400 no total cada), a propriedade nova aparece, os holdouts do v3.5
+        nunca treinam e as famílias de superfície têm presença útil (>= 150 no pt)."""
+        if not self.cont.get("treino_v35"):
+            self.skipTest("corpus sem o v3.5 (--escala-v35 0)")
+        novas = self.cont["intencoes_novas_treino"]
+        for it in INTENCOES_CALCULADORAS:
+            self.assertGreaterEqual(sum(novas[it].values()), 400, it)
+            for idioma in ["pt-BR"] + ESTRANGEIROS:
+                self.assertGreater(novas[it].get(idioma, 0), 0, (it, idioma))
+        saidas = [json.loads(ex["output"]) for ex in self.train if ex["app"] == "quimica"]
+        self.assertTrue(any(a.get("propriedade") == "entalpiaFormacaoKJmol" and a["intent"] == "PROPRIEDADE" for a in saidas))
+        self.assertTrue(any(a.get("propriedade") == "entalpiaFormacaoKJmol" and a["intent"] == "COMPARAR" for a in saidas))
+        fam = self.cont["treino_v35"]["por_familia_idioma"]
+        for f in ("notacao", "extenso", "esteq_formada", "nomenclatura_nome", "mistura", "ordenacao"):
+            self.assertGreaterEqual(fam.get(f"{f}/pt-BR", 0), 150, f)
+            for idioma in ESTRANGEIROS:
+                self.assertGreater(fam.get(f"{f}/{idioma}", 0), 0, (f, idioma))
+        entradas = {MC.chave_texto(ex["input"]) for ex in self.train + self.val}
+        arquivos = sorted(OUT.glob("holdout_v35_*.json"))
+        self.assertEqual(len(arquivos), len(MC.v35().FAMILIAS))
+        for a in arquivos:
+            casos = json.loads(a.read_text(encoding="utf-8"))["cases"]
+            self.assertTrue(casos, a.name)
+            for c in casos:
+                self.assertNotIn(MC.chave_texto(c["q"]), entradas, (a.name, c["q"]))
+                self.assertIsNone(self.filtro.veredito(c["q"]), c["q"])
+                alvo = {k: v for k, v in c.items() if k in self.qcore.KEYS and v is not None}
+                self.assertTrue(self.qcore.has_valid_shape(alvo) and self.qcore.combinacao_valida(alvo), c)
+                for k in ("composto", "equacao"):
+                    if k in alvo:
+                        self.assertIn(alvo[k], c["q"], c)
+
+    def test_v35_rotulos_pelo_contrato(self):
+        """Exemplos do v3.5: combinação de chaves válida por intenção, composto/equação copiados do texto e quantidades com evidência."""
+        gv = MC.v35()
+        por_entrada = {r["entrada"]: r for r in self.corpus if r["fonte"] == gv.FONTE and r["divisao"] != "holdout"}
+        self.assertTrue(por_entrada or not self.cont.get("treino_v35"))
+        for q, r in por_entrada.items():
+            alvo = json.loads(r["saida"])
+            self.assertTrue(self.qcore.combinacao_valida(alvo), r)
+            for k in ("composto", "equacao"):
+                if k in alvo:
+                    self.assertIn(alvo[k], q, r)
+            if alvo.get("quantidades"):
+                self.assertIsNone(gv.evidencia_v35(q, alvo, r["idioma"], self.bq), r)
 
     def test_nenhum_app_domina(self):
         for app, p in self.cont["proporcao_treino"].items():
@@ -176,6 +227,40 @@ class Moldes(unittest.TestCase):
     def test_modulos_de_idioma_conferem_com_o_lexico(self):
         for i in ESTRANGEIROS:
             self.assertEqual(VM.problemas(i), [], i)
+
+
+class EvidenciaV35(unittest.TestCase):
+    """A evidência das famílias de notação e números por extenso (quimica_v35.evidencia_v35) lê o que a do app não lê, e só isso."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.bq = MC.modulos_quimica()
+        cls.gv = MC.v35()
+
+    def _tem(self, q, valor, idioma="pt-BR"):
+        return self.gv._chave(valor) in self.gv.numeros_v35(self.bq.nlu.validate_question(q), idioma, self.bq.ask_core)
+
+    def test_le_extenso_fracoes_e_notacao(self):
+        for q, v, i in [("massa de meio mol de NaCl", 0.5, "pt-BR"), ("2,5 × 10³ g de água", 2500, "pt-BR"), ("1,5·10⁻³ mol/L", 0.0015, "pt-BR"),
+                        ("3x10^-2 mol", 0.03, "pt-BR"), ("um quarto de mol", 0.25, "pt-BR"), ("dois mols de CO2", 2, "pt-BR"), ("1/2 mol", 0.5, "pt-BR"),
+                        ("½ mol", 0.5, "pt-BR"), ("half a mole of water", 0.5, "en"), ("medio mol de agua", 0.5, "es"), ("ein halbes Mol Wasser", 0.5, "de"),
+                        ("einem halben Mol", 0.5, "de"), ("une demi-mole d'eau", 0.5, "fr"), ("un litre et demi", 1.5, "fr"), ("um mol e meio", 1.5, "pt-BR")]:
+            self.assertTrue(self._tem(q, v, i), (q, v))
+
+    def test_nao_inventa_numero(self):
+        self.assertFalse(self._tem("massa de meio mol de NaCl", 2))
+        self.assertFalse(self._tem("dois mols de CO2", 0.5))
+        self.assertFalse(self._tem("2,5 × 10³ g", 25))
+        alvo = {"intent": "ESTEQUIOMETRIA", "composto": "NaCl", "quantidades": [{"valor": 0.25, "unidade": "mol"}]}
+        self.assertEqual(self.gv.evidencia_v35("massa de meio mol de NaCl", alvo, "pt-BR", self.bq), "quantidades")
+        alvo["quantidades"][0]["valor"] = 0.5
+        self.assertIsNone(self.gv.evidencia_v35("massa de meio mol de NaCl", alvo, "pt-BR", self.bq))
+
+    def test_a_evidencia_do_app_nao_le_estas_formas(self):
+        """Documenta por que a família tem a própria evidência (apps/ não muda: congelamento das eleições e outro agente no site)."""
+        for q in ("massa de meio mol de NaCl", "1,5·10⁻³ mol/L", "half a mole"):
+            alvo = {"intent": "ESTEQUIOMETRIA", "quantidades": [{"valor": 0.5 if "mol" in q and "·" not in q else 0.0015, "unidade": "mol"}]}
+            self.assertEqual(self.bq.evidencia_basica(self.bq.nlu.validate_question(q), alvo), "quantidades", q)
 
 
 class Gerador(unittest.TestCase):

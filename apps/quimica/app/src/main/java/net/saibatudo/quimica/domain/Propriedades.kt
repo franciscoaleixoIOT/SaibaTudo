@@ -84,7 +84,9 @@ object Propriedades {
         Padrao("tpsa", R.string.prop_tpsa, "composto", "tpsa", "numero", "Å²"),
         // medidas do composto (Wikidata, DATA_CONTRACT §3.1): sem valor no pacote = sem valor na resposta
         Padrao("solubilidade", R.string.prop_solubilidade, "composto", "solubilidadeAguaG100g", "solubilidade", medida = true, campos = listOf("solubilidadeAguaG100g", "solubilidadeAguaGL")),
-        Padrao("pka", R.string.prop_pka, "composto", "pka", "pka", medida = true, campos = listOf("pkaValores", "pka"))
+        Padrao("pka", R.string.prop_pka, "composto", "pka", "pka", medida = true, campos = listOf("pkaValores", "pka")),
+        // 17/10/2026 (docs/CALCULADORAS_2026-10-17.md §3): ΔHf° a 298,15 K, Wikidata P3078 (CC0), em `propriedades.entalpiaFormacaoKJmol`
+        Padrao("entalpiaFormacaoKJmol", R.string.prop_entalpia_formacao, "composto", "entalpiaFormacaoKJmol", "numero", "kJ/mol", medida = true)
     )
 
     /** Ids das propriedades físicas medidas dos compostos, na ordem da ficha (igual a `MEDIDAS_COMPOSTO` do site). */

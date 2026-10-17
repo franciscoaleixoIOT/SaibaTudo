@@ -8,7 +8,12 @@ import { calcularBoyle, calcularGas } from './calc/gas.js';
 import { calcularMassaMolar } from './calc/massa.js';
 import { calcularPH } from './calc/ph.js';
 import { acharUnidade, converter, paraBase } from './calc/unidades.js';
-import { chaveFormula, formulaUnicode, tentarFormula } from './calc/formula.js';
+import { chaveFormula, formulaTex, formulaUnicode, massaMolar as somaMassaMolar, parseFormula, tentarFormula } from './calc/formula.js';
+import { distribuicaoEletronica, textoSubniveis } from './calc/eletronica.js';
+import { calcularNox, dadosElementosDoContexto } from './calc/nox.js';
+import { ligacoesDe } from './calc/ligacao.js';
+import { calcularKc, estadoNaTemperatura, expressaoEquilibrio, kpDeKc, lerEquacaoComEstados, rLitroAtm, temperaturaEmK } from './calc/equilibrio.js';
+import { calorDaAmostra, combinarHess, ehSubstanciaSimplesPadrao, equacaoDeCombustao, especiesDaEquacao, somaPorFormacao } from './calc/entalpia.js';
 import { respostaRecusa } from './seguranca.js';
 import { fmt, fmtTex } from './formato.js';
 import { fmtData, idiomaAtual, nomeDoIdioma, t, tl } from './i18n/index.js';
@@ -121,6 +126,10 @@ export class AnswerBuilder {
         case 'TABELA_PERIODICA': return this.tabela(p);
         case 'SEGURANCA': return await this.seguranca(p);
         case 'CONCEITO': return await this.conceito(p);
+        case 'NOX': return await this.nox(p);
+        case 'ENTALPIA': return await this.entalpia(p);
+        case 'EQUILIBRIO': return await this.equilibrio(p);
+        case 'LIGACAO': return await this.ligacao(p);
         default: return this.naoEntendi(p);
       }
     } catch (e) {
@@ -401,10 +410,13 @@ export class AnswerBuilder {
       const tem = medidasDoComposto(c, this.dic.props, this.ctx).filter((m) => !ids.includes(m.prop.id));
       if (tem.length) blocos.push(B.texto(t('respostas.propriedade.oferece', { nome: this.nomeComposto(c), lista: listar(tem.map((m) => `${minus(m.prop.id === 'estadoPadrao' ? t('propriedades.medidas.estadoA25') : m.prop.rotulo)} (${m.f.curto})`)) }), dado(c.fontes?.[0])[0] ?? fonteApp()));
     }
+    // configuração eletrônica (§2.2 de docs/CALCULADORAS_2026-10-17.md): além do valor do pacote, a distribuição calculada
+    if (ids.includes('configuracaoEletronica')) for (const e of elementos.slice(0, 3)) blocos.push(...this.blocosEletronica(e));
     const primeiro = elementos[0] ?? compostos[0];
     const acoes = elementos[0] && ids.some((i) => temEscopo(this.dic.propPorId.get(i), 'elemento'))
       ? [rota(this.rotaElemento(elementos[0].simbolo), t('respostas.propriedade.fichaDe', { nome: this.nomeElemento(elementos[0]) }))]
       : compostos[0] ? [rota(this.rotaComposto(compostos[0].cid), t('respostas.propriedade.fichaDe', { nome: this.nomeComposto(compostos[0]) }))] : [];
+    if (ids.includes('configuracaoEletronica') && elementos[0]?.configuracaoEletronica) acoes.push(rota(`/quimica/calculadoras/configuracao-eletronica?el=${encodeURIComponent(elementos[0].simbolo)}`, t('respostas.eletronica.abrir')));
     return montar({
       intent: 'PROPRIEDADE', titulo: linhas.length === 1 ? linhas[0].rotulo : t('respostas.propriedade.propriedadesDe', { nomes: listar([...elementos.map((e) => this.nomeElemento(e)), ...compostos.map((c) => this.nomeComposto(c))]) }),
       blocos, acoes,
@@ -1051,6 +1063,351 @@ export class AnswerBuilder {
     });
   }
 
+  // ------------------------------------------------------------------------------------------------ calculadoras novas (17/10/2026)
+  // NOX, entalpia, equilíbrio, tipo de ligação e distribuição eletrônica (docs/CALCULADORAS_2026-10-17.md §2). Os métodos `resposta*` recebem as
+  // entradas já separadas e também servem à tela Calculadoras (ui/calculadoras.js); os de intenção só leem o ParsedQuery.
+  fonteRegra(chave) { return { nome: t(`respostas.fontes.${chave}`) }; }
+
+  /** CID do composto do pacote com esta fórmula (índice do dicionário), ou null. */
+  cidDaFormula(formula) {
+    try { return this.dic.entidades(String(formula)).compostos.find((x) => x.via === 'formula')?.cid ?? null; } catch { return null; }
+  }
+
+  /** Nome do elemento no idioma (ou o símbolo, se o pacote não o tem). */
+  nomeDoSimbolo(s) { const e = this.store.porSimbolo.get(s); return e ? this.nomeElemento(e) : s; }
+  /** O mesmo, para o meio da frase (minúscula onde o idioma pede). */
+  nomeDoSimboloMeio(s) { return minus(this.nomeDoSimbolo(s)); }
+
+  /** Mensagem de erro de leitura de equação (códigos de calc/equilibrio.js). */
+  erroDeEquacao(r) { return r.mensagem ?? t(`respostas.equacaoErros.${r.erro}`); }
+
+  /** Equação montada das espécies [{formula, coef, lado}]: {texto: "CH₄ + 2 O₂ → CO₂ + 2 H₂O", tex}. */
+  equacaoDasEspecies(especies, { equilibrio = false } = {}) {
+    const lado = (l, tex) => especies.filter((x) => x.lado === l).map((x) => {
+      const c = x.coef === 1 ? '' : tex ? `${fmtTex(x.coef)}\\,` : `${fmt(x.coef)} `;
+      return `${c}${tex ? formulaTex(x.formula) : formulaUnicode(x.formula)}`;
+    }).join(' + ');
+    return { texto: `${lado('r', false)} ${equilibrio ? '⇌' : '→'} ${lado('p', false)}`, tex: `${lado('r', true)} ${equilibrio ? '\\rightleftharpoons' : '\\rightarrow'} ${lado('p', true)}` };
+  }
+
+  // ---- distribuição eletrônica
+  /** Blocos da distribuição eletrônica de um elemento (ou íon, com `carga`). */
+  blocosEletronica(e, carga = 0) {
+    const nome = minus(this.nomeElemento(e));
+    if (!e.configuracaoEletronica) return [B.aviso(t('respostas.eletronica.semConfiguracao', { nome }))];
+    const r = distribuicaoEletronica({ configuracao: e.configuracaoEletronica, z: e.z, carga, bloco: e.bloco ?? null });
+    if (!r.ok) {
+      if (r.erro === 'totalDiferente') return [B.aviso(t('respostas.eletronica.totalDiferente', { total: String(r.total), z: String(r.esperado) }))];
+      return [B.aviso(t(`respostas.eletronica.${r.erro}`, { nome }))];
+    }
+    const sup = (lista) => textoSubniveis(lista, { sobrescrito: true });
+    const cv = r.camadaValencia;
+    const valencia = r.valenciaTipo === 'camada' ? String(r.eletronsValencia) : t(r.valenciaTipo === 'ns+(n-1)d' ? 'respostas.eletronica.valenciaTransicao' : 'respostas.eletronica.valenciaF', { e: String(r.eletronsValencia) });
+    const itens = [
+      { rotulo: t('respostas.eletronica.pacote'), valor: r.configuracaoPacote },
+      { rotulo: t('respostas.eletronica.completa'), valor: sup(r.ordemPauling) },
+      { rotulo: t('respostas.eletronica.camadasOrdem'), valor: sup(r.ordemCamadas) },
+      { rotulo: t('respostas.eletronica.porCamada'), valor: `${r.camadas.map((c) => c.eletrons).join(', ')} (${r.camadas.map((c) => c.camada).join(', ')})` },
+      { rotulo: t('respostas.eletronica.camadaValencia'), valor: t('respostas.eletronica.camadaValenciaValor', { camada: cv.camada, n: String(cv.n), e: String(cv.eletrons) }) },
+      ...(carga ? [] : [{ rotulo: t('respostas.eletronica.eletronsValencia'), valor: valencia }]),
+      { rotulo: t('respostas.eletronica.maisEnergetico'), valor: sup([r.subnivelMaisEnergetico]) },
+      { rotulo: t('respostas.eletronica.bloco'), valor: r.bloco ?? '—' }
+    ];
+    const titulo = carga ? t('respostas.eletronica.tituloIon', { simbolo: e.simbolo, carga: textoCarga(carga) }) : t('respostas.eletronica.titulo', { nome });
+    const blocos = [B.kv(titulo, itens, [...dado(e.fontes?.[0]), this.fonteRegra('distribuicao')])];
+    if (r.ignorados.length) blocos.push(B.aviso(t('respostas.eletronica.ignorados', { lista: r.ignorados.join(' ') })));
+    return blocos;
+  }
+
+  /** Resposta da calculadora de configuração eletrônica (elemento + carga). */
+  respostaEletronica({ simbolo, carga = 0 }) {
+    const e = this.store.porSimbolo.get(simbolo);
+    if (!e) return montar({ intent: 'PROPRIEDADE', resolvida: false, titulo: t('respostas.eletronica.deQual'), blocos: [B.texto(t('respostas.eletronica.digite'))] });
+    const blocos = this.blocosEletronica(e, carga);
+    return montar({ intent: 'PROPRIEDADE', resolvida: blocos[0]?.tipo === 'kv', titulo: blocos[0]?.titulo ?? t('respostas.eletronica.titulo', { nome: this.nomeElemento(e) }), blocos });
+  }
+
+  // ---- NOX
+  async nox(p) {
+    const { compostos } = await this.entidades(p);
+    const formula = p.formula ?? compostos[0]?.formula ?? null;
+    return this.respostaNox({ formula, carga: p.cargaFormula ?? null, elemento: p.elemento ?? null });
+  }
+
+  respostaNox({ formula, carga = null, elemento = null }) {
+    const acao = (f) => [rota('/quimica/calculadoras/nox' + (f ? `?f=${encodeURIComponent(f)}` : ''), t('respostas.nox.abrir'))];
+    if (!formula) return montar({ intent: 'NOX', resolvida: false, titulo: t('respostas.nox.deQual'), blocos: [B.texto(t('respostas.nox.digite'))], acoes: acao(null), sugestoes: [sug('noxSulfurico')] });
+    const r = calcularNox(formula, { carga: Number.isInteger(carga) ? carga : null, dados: dadosElementosDoContexto(this.ctx), simbolos: this.ctx.simbolos });
+    const fu = formatarFormulaTexto(formula);
+    if (!r.ok) {
+      const msg = r.erro === 'formula' ? r.mensagem : t(`respostas.nox.${r.erro}`, { lista: listar(r.faltam ?? []), soma: r.soma ?? '', carga: textoCarga(r.carga ?? 0), formula: fu });
+      return montar({ intent: 'NOX', resolvida: false, titulo: t('respostas.nox.naoConsegui'), blocos: [B.aviso(msg, this.fonteRegra('regrasNox'))], acoes: acao(formula), sugestoes: [sug('noxSulfurico')] });
+    }
+    const fuR = formulaUnicode(r.carga ? `${r.corpo}^${Math.abs(r.carga) === 1 ? '' : Math.abs(r.carga)}${r.carga > 0 ? '+' : '-'}` : r.corpo);
+    const alvo = elemento ? r.itens.find((i) => i.simbolo === elemento) : null;
+    const usouEN = r.itens.some((i) => i.regra === 'eletronegatividade');
+    const fonteRes = [this.fonteRegra('regrasNox'), ...(usouEN ? r.itens.map((i) => dado(this.store.porSimbolo.get(i.simbolo)?.fontes?.[0])[0]).filter(Boolean) : [])];
+    const itens = r.itens.map((i) => ({ rotulo: `${capitalizar(this.nomeDoSimbolo(i.simbolo))} (${i.simbolo})`, valor: i.texto, extra: i.medio ? t('respostas.nox.medio') : t(`respostas.nox.regras.${i.regra}`), destaque: i.simbolo === elemento }));
+    const soma = r.itens.map((i) => `${i.atomos}\\times(${texNox(i.nox)})`).join(' + ');
+    const blocos = [
+      B.resultado(null, itens, fonteRes),
+      B.passos(t('respostas.blocos.comoCalcular'), [
+        { texto: t('respostas.nox.passoRegras') },
+        { texto: t('respostas.nox.passoSoma', { carga: textoCarga(r.carga) }), tex: `${soma} = ${r.carga}` }
+      ], this.fonteRegra('regrasNox'))
+    ];
+    if (elemento && !alvo) blocos.push(B.aviso(t('respostas.nox.elementoAusente', { el: elemento, formula: fuR })));
+    if (r.itens.some((i) => i.medio)) blocos.push(B.aviso(t('respostas.nox.avisoMedio')));
+    return montar({
+      intent: 'NOX', titulo: alvo ? t('respostas.nox.tituloElemento', { el: this.nomeDoSimboloMeio(alvo.simbolo), formula: fuR, nox: alvo.texto }) : t('respostas.nox.titulo', { formula: fuR }),
+      blocos, acoes: acao(formula), sugestoes: [sug('ligacaoHCl')], extra: { nox: r.itens.map((i) => ({ simbolo: i.simbolo, nox: i.nox.toString() })) }
+    });
+  }
+
+  // ---- tipo de ligação
+  async ligacao(p) {
+    const { compostos } = await this.entidades(p);
+    const formula = compostos[0]?.formula ?? p.formula ?? p.formulas?.[0] ?? null;
+    const n = normalizar(p.textoOriginal ?? '');
+    return this.respostaLigacao({
+      formula, simbolos: formula ? null : p.elementos ?? [], nome: compostos[0] ? this.nomeComposto(compostos[0]) : null,
+      polaridade: this.dic.lex.pistas.ligacaoPolaridade.test(n)
+    });
+  }
+
+  respostaLigacao({ formula = null, simbolos = null, nome = null, polaridade = false }) {
+    const acao = [rota('/quimica/calculadoras/ligacao' + (formula ? `?f=${encodeURIComponent(formula)}` : ''), t('respostas.ligacao.abrir'))];
+    if (!formula && !(simbolos?.length >= 2)) return montar({ intent: 'LIGACAO', resolvida: false, titulo: t('respostas.ligacao.deQual'), blocos: [B.texto(t('respostas.ligacao.digite'))], acoes: acao, sugestoes: [sug('ligacaoHCl')] });
+    const r = ligacoesDe({ formula, simbolos, elemento: (s) => this.store.porSimbolo.get(s) ?? null, simbolosValidos: this.ctx.simbolos });
+    const falha = !r.ok ? r : r.ligacoes.find((l) => !l.ok);
+    if (falha) {
+      const msg = falha.erro === 'formula' ? falha.mensagem : t(`respostas.ligacao.${falha.erro}`, { lista: listar(falha.faltam ?? []) });
+      return montar({ intent: 'LIGACAO', resolvida: false, titulo: t('respostas.ligacao.naoConsegui'), blocos: [B.aviso(msg, this.fonteRegra('regraLigacao'))], acoes: acao, sugestoes: [sug('ligacaoHCl')] });
+    }
+    const alvo = nome ?? (formula ? formatarFormulaTexto(formula) : listar(simbolos.slice(0, 2).map((s) => this.nomeDoSimboloMeio(s))));
+    const usados = [...new Set(r.ligacoes.flatMap((l) => [l.a, l.b]))];
+    const fontes = [...usados.map((s) => dado(this.store.porSimbolo.get(s)?.fontes?.[0])[0]).filter(Boolean), this.fonteRegra('regraLigacao')];
+    const itens = r.ligacoes.map((l) => ({
+      rotulo: `${l.a}–${l.b}`, valor: t(`respostas.ligacao.tipos.${l.tipo}`), destaque: r.ligacoes.length === 1,
+      extra: l.tipo === 'metalica' ? t('respostas.ligacao.metalMetal') : l.deltaEN != null ? t('respostas.ligacao.delta', { d: fmt(l.deltaEN, { sig: 3 }), a: l.a, ea: fmt(l.enA, { sig: 3 }), b: l.b, eb: fmt(l.enB, { sig: 3 }) }) : undefined
+    }));
+    const blocos = [B.resultado(null, itens, fontes), B.aviso(t('respostas.ligacao.convencao'))];
+    if (r.estimado) blocos.push(B.aviso(t('respostas.ligacao.estimado')));
+    if (polaridade && formula && usados.length >= 2 && r.ligacoes.every((l) => l.tipo !== 'ionica' && l.tipo !== 'metalica')) blocos.push(B.aviso(t('respostas.ligacao.polaridadeMolecula')));
+    return montar({ intent: 'LIGACAO', titulo: t('respostas.ligacao.titulo', { alvo }), blocos, acoes: acao, sugestoes: [sug('noxSulfurico')], extra: { ligacoes: r.ligacoes.map((l) => ({ a: l.a, b: l.b, tipo: l.tipo, deltaEN: l.deltaEN })) } });
+  }
+
+  // ---- equilíbrio
+  async equilibrio(p) {
+    const temperatura = (p.quantidades ?? []).find((q) => q.unidade && temperaturaEmK(q, this.ctx) != null) ?? null;
+    return this.respostaEquilibrio({ equacao: p.equacao, concentracoes: p.concentracoes ?? [], temperatura });
+  }
+
+  /**
+   * Fase de cada espécie sem rótulo, pelo composto do pacote: a `temperaturaK`, pelos pontos de fusão e de ebulição; sem ela, o `estadoPadrao`.
+   * Map(chave da fórmula → 'solido'|'liquido'|'gas').
+   */
+  async fasesDoPacote(equacao, temperaturaK = null) {
+    const fases = new Map();
+    let eq;
+    try { eq = lerEquacaoComEstados(equacao, { simbolos: this.ctx.simbolos }); } catch { return fases; }
+    const ler = (id, c) => { const prop = this.dic.propPorId.get(id); return c && prop ? lerValor(prop, c)?.valor ?? null : null; };
+    for (const x of [...eq.reagentes, ...eq.produtos]) {
+      if (x.estado || fases.has(x.chave)) continue;
+      const cid = this.cidDaFormula(x.formula);
+      const c = cid != null ? await this.store.composto(cid) : null;
+      if (!c) continue;
+      const v = estadoNaTemperatura({ estadoPadrao: ler('estadoPadrao', c), pontoFusaoK: ler('pontoFusaoK', c), pontoEbulicaoK: ler('pontoEbulicaoK', c) }, temperaturaK);
+      if (v) fases.set(x.chave, v);
+    }
+    return fases;
+  }
+
+  async respostaEquilibrio({ equacao, concentracoes = [], temperatura = null }) {
+    const acao = [rota('/quimica/calculadoras/equilibrio' + (equacao ? `?eq=${encodeURIComponent(equacao)}` : ''), t('respostas.equilibrio.abrir'))];
+    if (!equacao) return montar({ intent: 'EQUILIBRIO', resolvida: false, titulo: t('respostas.equilibrio.deQual'), blocos: [B.texto(t('respostas.equilibrio.digite'))], acoes: acao, sugestoes: [sug('kcAmonia')] });
+    const T = temperatura ? temperaturaEmK(temperatura, this.ctx) : null;
+    const fases = await this.fasesDoPacote(equacao, T);
+    const expr = expressaoEquilibrio(equacao, { estadoDoPacote: (f) => { try { return fases.get(chaveFormula(f)) ?? null; } catch { return null; } }, simbolos: this.ctx.simbolos });
+    if (!expr.ok) return montar({ intent: 'EQUILIBRIO', resolvida: false, titulo: t('respostas.equilibrio.naoConsegui'), blocos: [B.aviso(this.erroDeEquacao(expr))], acoes: acao, sugestoes: [sug('kcAmonia')] });
+    const regra = this.fonteRegra('acaoDasMassas');
+    const eqTxt = this.equacaoDasEspecies(expr.especies, { equilibrio: true });
+    const blocos = [B.equacao(expr.tex, expr.texto, regra)];
+    const lista = (f) => listar(expr.especies.filter(f).map((x) => formulaUnicode(x.formula)));
+    if (expr.balanceada) blocos.push(B.aviso(t('respostas.equilibrio.balanceada', { equacao: eqTxt.texto })));
+    if (expr.especies.some((x) => !x.entra)) blocos.push(B.aviso(t('respostas.equilibrio.semSolidoLiquido', { lista: lista((x) => !x.entra) })));
+    if (expr.especies.some((x) => x.origem === 'pacote')) blocos.push(B.aviso(t(T != null ? 'respostas.equilibrio.faseNaTemperatura' : 'respostas.equilibrio.faseDoPacote', { t: fmt(T ?? 0, { sig: 6 }), lista: listar(expr.especies.filter((x) => x.origem === 'pacote').map((x) => `${formulaUnicode(x.formula)} (${t(`propriedades.estados.${x.fase === 's' ? 'solido' : x.fase === 'l' ? 'liquido' : 'gas'}`)})`)) })));
+    if (expr.especies.some((x) => x.origem === 'hipotese')) blocos.push(B.aviso(t('respostas.equilibrio.gasPorHipotese', { lista: lista((x) => x.origem === 'hipotese') })));
+    const itens = [{ rotulo: t('respostas.equilibrio.deltaN'), valor: fmt(expr.deltaN, { sig: 6 }) }];
+    let resolvida = true;
+    let kc = null;
+    const passos = [];
+    if (concentracoes.length) {
+      const r = calcularKc(expr, concentracoes);
+      if (r.ok) {
+        kc = r.kc;
+        itens.push({ rotulo: t('respostas.equilibrio.kc'), valor: fmt(kc, { sig: 4 }), extra: t('respostas.equilibrio.unidadeKc'), destaque: true });
+        const termo = (u) => `(${fmtTex(u.valor)})${u.coef === 1 ? '' : `^{${fmtTex(u.coef)}}`}`;
+        const num = r.usadas.filter((u) => u.lado === 'p').map(termo).join('\\,') || '1';
+        const den = r.usadas.filter((u) => u.lado === 'r').map(termo).join('\\,') || '1';
+        passos.push({ texto: t('respostas.equilibrio.passoKc'), tex: `K_c = \\dfrac{${num}}{${den}} = ${fmtTex(kc, { sig: 4 })}` });
+      } else {
+        resolvida = false;
+        blocos.push(B.aviso(r.erro === 'faltamConcentracoes' ? t('respostas.equilibrio.faltam', { lista: listar(r.faltam.map(formulaUnicode)) }) : t('respostas.equilibrio.invalida')));
+      }
+    }
+    const R = rLitroAtm(this.ctx);
+    const fonteR = { nome: t('respostas.fontes.constanteR') };
+    if (!R) blocos.push(B.aviso(t('respostas.equilibrio.semR')));
+    else if (T != null) {
+      const k = kpDeKc({ deltaN: expr.deltaN, T, rLatm: R.valor, kc });
+      if (k.ok) {
+        itens.push({ rotulo: t('respostas.equilibrio.temperatura'), valor: fmt(T, { sig: 6 }), unidade: 'K' });
+        itens.push({ rotulo: t('respostas.equilibrio.fatorRT'), valor: fmt(k.fator, { sig: 4 }) });
+        if (k.kp != null) itens.push({ rotulo: t('respostas.equilibrio.kp'), valor: fmt(k.kp, { sig: 4 }), destaque: true });
+        passos.push({ texto: t('respostas.equilibrio.passoKp', { R: fmt(R.valor, { sig: 6 }) }), tex: `K_p = K_c\\,(RT)^{${fmtTex(expr.deltaN)}} = K_c\\,(${fmtTex(R.valor, { sig: 6 })} \\times ${fmtTex(T, { sig: 6 })})^{${fmtTex(expr.deltaN)}}${k.kp != null ? ` = ${fmtTex(k.kp, { sig: 4 })}` : ` = ${fmtTex(k.fator, { sig: 4 })}\\,K_c`}` });
+      } else blocos.push(B.aviso(t('respostas.equilibrio.semT')));
+    } else {
+      blocos.push(B.equacao(`K_p = K_c\\,(RT)^{${fmtTex(expr.deltaN)}}`, `Kp = Kc·(RT)^${fmt(expr.deltaN, { sig: 6 })}`, fonteR));
+      blocos.push(B.texto(t('respostas.equilibrio.semT'), fonteR));
+    }
+    blocos.splice(1, 0, B.resultado(null, itens, T != null ? [regra, fonteR] : regra));
+    if (passos.length) blocos.push(B.passos(t('respostas.blocos.comoCalcular'), passos, T != null ? [regra, fonteR] : regra));
+    return montar({ intent: 'EQUILIBRIO', resolvida, titulo: t('respostas.equilibrio.titulo', { equacao: eqTxt.texto }), blocos, acoes: acao, sugestoes: [sug('ligacaoHCl')], extra: { deltaN: expr.deltaN, kc } });
+  }
+
+  // ---- entalpia
+  async entalpia(p) {
+    if (p.equacao) return this.respostaEntalpiaReacao(p.equacao);
+    const { compostos } = await this.entidades(p);
+    const c = compostos[0] ?? null;
+    const formula = c?.formula ?? p.formulas?.[0] ?? null;
+    const n = normalizar(p.textoOriginal ?? '');
+    const P = this.dic.lex.pistas;
+    if (formula && (P.entalpiaCombustao.test(n) || !P.entalpiaFormacao.test(n))) {
+      const quantidade = (p.quantidades ?? []).find((q) => q.unidade && acharUnidade(this.ctx.unidades, q.unidade).some((u) => u.grupo === 'massa' || u.grupo === 'quantidade')) ?? null;
+      return this.respostaCombustao({ formula, composto: c, quantidade });
+    }
+    // só a lei de Hess (ou a pergunta sem reação): o método e a calculadora
+    return montar({
+      intent: 'ENTALPIA', titulo: t('respostas.entalpia.tituloHess'),
+      blocos: [B.texto(t('respostas.entalpia.hess'), this.fonteRegra('entalpiaCalculo')), B.texto(t('respostas.entalpia.digite'))],
+      acoes: [rota('/quimica/calculadoras/entalpia?modo=hess', t('respostas.entalpia.abrirHess'))], sugestoes: [sug('kcAmonia')]
+    });
+  }
+
+  /** ΔHf° de uma espécie: 0 por regra (substância simples no estado padrão) ou o valor do pacote com a fonte; `valor: null` se o pacote não tem. */
+  async entalpiaFormacaoDe(formula) {
+    if (ehSubstanciaSimplesPadrao(formula, { simbolos: this.ctx.simbolos })) return { valor: 0, origem: 'regra', fontes: [this.fonteRegra('substanciaSimples')], condicoes: [] };
+    const cid = this.cidDaFormula(formula);
+    const c = cid != null ? await this.store.composto(cid) : null;
+    const v = c?.propriedades?.entalpiaFormacaoKJmol;
+    if (typeof v !== 'number' || !Number.isFinite(v)) return { valor: null, origem: null, fontes: [], condicoes: [] };
+    const fontes = fontesDoCampo(c, 'entalpiaFormacaoKJmol', this.ctx);
+    return { valor: v, origem: 'pacote', fontes: fontes.length ? fontes : dado(c.fontes?.[0]), condicoes: [...new Set(fontes.flatMap((f) => f.condicoes ?? []))] };
+  }
+
+  /** Soma por formação com os ΔHf° resolvidos: {r, blocos} (tabela dos valores usados + passos). */
+  async calculoPorFormacao(especies) {
+    const resolvidas = [];
+    for (const x of especies) { const h = await this.entalpiaFormacaoDe(x.formula); resolvidas.push({ ...x, dHf: h.valor, origem: h.origem, fontes: h.fontes, condicoes: h.condicoes }); }
+    const r = somaPorFormacao(resolvidas);
+    const valores = resolvidas.map((x) => ({
+      rotulo: t('respostas.entalpia.dHfDe', { formula: formulaUnicode(x.formula) }),
+      valor: x.dHf == null ? t('respostas.entalpia.semValor') : x.origem === 'regra' ? t('respostas.entalpia.simples') : `${fmt(x.dHf, { sig: 6 })} kJ/mol${x.condicoes.length ? ` — ${x.condicoes.join('; ')}` : ''}`
+    }));
+    const fontes = resolvidas.flatMap((x) => x.fontes ?? []);
+    const blocos = [B.kv(t('respostas.entalpia.valores'), valores, fontes.length ? fontes : fonteApp())];
+    const termoTex = (x, numero) => `${x.coef === 1 ? '' : `${fmtTex(x.coef)}\\,`}${numero ? `(${fmtTex(x.dHf)})` : `\\Delta H_f^{\\circ}(${formulaTex(x.formula)})`}`;
+    const lado = (l, numero) => resolvidas.filter((x) => x.lado === l).map((x) => termoTex(x, numero)).join(' + ') || '0';
+    const passos = [{ texto: t('respostas.entalpia.expressao'), tex: `\\Delta H^{\\circ} = [${lado('p', false)}] - [${lado('r', false)}]` }];
+    if (r.ok) passos.push({ texto: t('respostas.entalpia.passoSoma'), tex: `\\Delta H^{\\circ} = [${lado('p', true)}] - [${lado('r', true)}] = ${fmtTex(r.dH, { sig: 6 })}\\ \\mathrm{kJ}` });
+    blocos.push(B.passos(t('respostas.blocos.comoCalcular'), passos, this.fonteRegra('entalpiaCalculo')));
+    return { r, blocos };
+  }
+
+  async respostaEntalpiaReacao(equacao) {
+    const acao = [rota(`/quimica/calculadoras/entalpia?eq=${encodeURIComponent(equacao)}`, t('respostas.entalpia.abrir'))];
+    const e = especiesDaEquacao(equacao, { simbolos: this.ctx.simbolos });
+    if (!e.ok) return montar({ intent: 'ENTALPIA', resolvida: false, titulo: t('respostas.entalpia.naoConsegui'), blocos: [B.aviso(this.erroDeEquacao(e))], acoes: acao, sugestoes: [sug('entalpiaHess')] });
+    const eq = this.equacaoDasEspecies(e.especies);
+    const { r, blocos } = await this.calculoPorFormacao(e.especies);
+    const topo = [B.equacao(eq.tex, eq.texto)];
+    if (e.balanceada) topo.push(B.aviso(t('respostas.entalpia.balanceada', { equacao: eq.texto })));
+    const titulo = t('respostas.entalpia.tituloReacao', { equacao: eq.texto });
+    if (!r.ok) return montar({ intent: 'ENTALPIA', resolvida: false, titulo, blocos: [...topo, B.aviso(t('respostas.entalpia.falta', { lista: listar(r.faltam.map(formulaUnicode)) })), ...blocos], acoes: acao, sugestoes: [sug('entalpiaHess')] });
+    return montar({
+      intent: 'ENTALPIA', titulo,
+      blocos: [...topo, B.resultado(null, [{ rotulo: t('respostas.entalpia.resultado'), valor: fmt(r.dH, { sig: 6 }), unidade: 'kJ', destaque: true }], this.fonteRegra('entalpiaCalculo')), ...blocos, B.aviso(t(r.exotermica ? 'respostas.entalpia.exotermica' : 'respostas.entalpia.endotermica'))],
+      acoes: acao, sugestoes: [sug('entalpiaHess')], extra: { dH: r.dH }
+    });
+  }
+
+  async respostaCombustao({ formula, composto = null, quantidade = null }) {
+    const acao = [rota('/quimica/calculadoras/entalpia?modo=hess', t('respostas.entalpia.abrirHess'))];
+    const nome = composto ? minus(this.nomeComposto(composto)) : formatarFormulaTexto(formula);
+    const comb = equacaoDeCombustao(formula, { simbolos: this.ctx.simbolos });
+    if (!comb.ok) return montar({ intent: 'ENTALPIA', resolvida: false, titulo: t('respostas.entalpia.naoConsegui'), blocos: [B.aviso(comb.mensagem ?? t('respostas.entalpia.naoQueima'))], acoes: acao, sugestoes: [sug('entalpiaHess')] });
+    const { r, blocos } = await this.calculoPorFormacao(comb.especies);
+    const titulo = t('respostas.entalpia.tituloCombustao', { nome });
+    const topo = [B.equacao(comb.equacaoTex, comb.equacao), B.aviso(t('respostas.entalpia.combustaoCompleta'))];
+    if (!r.ok) return montar({ intent: 'ENTALPIA', resolvida: false, titulo, blocos: [...topo, B.aviso(t('respostas.entalpia.falta', { lista: listar(r.faltam.map(formulaUnicode)) })), ...blocos], acoes: acao, sugestoes: [sug('entalpiaHess')] });
+    const porMol = r.dH / comb.coefComposto;
+    const itens = [{ rotulo: t('respostas.entalpia.porMol', { nome }), valor: fmt(porMol, { sig: 6 }), unidade: 'kJ/mol', destaque: true }];
+    if (comb.coefComposto !== 1) itens.push({ rotulo: t('respostas.entalpia.resultado'), valor: fmt(r.dH, { sig: 6 }), unidade: 'kJ' });
+    const passosAmostra = [];
+    if (quantidade) {
+      let mol = null;
+      try {
+        const u = acharUnidade(this.ctx.unidades, quantidade.unidade)[0];
+        if (u?.grupo === 'quantidade') mol = paraBase(this.ctx.unidades, quantidade.unidade, 'quantidade', quantidade.valor);
+        else if (u?.grupo === 'massa') {
+          const M = somaMassaMolar(parseFormula(formula, { simbolos: this.ctx.simbolos }), this.ctx.massaDe);
+          if (!M.faltando.length) mol = (paraBase(this.ctx.unidades, quantidade.unidade, 'massa', quantidade.valor) * 1000) / M.total;
+        }
+      } catch { mol = null; }
+      if (mol != null && Number.isFinite(mol)) {
+        const { q } = calorDaAmostra({ dH: r.dH, coefComposto: comb.coefComposto, mol });
+        itens.push({ rotulo: t('respostas.entalpia.amostra', { valor: fmt(quantidade.valor, { sig: 6 }), unidade: quantidade.unidade, nome }), valor: fmt(q, { sig: 6 }), unidade: 'kJ', destaque: true });
+        passosAmostra.push({ texto: t('respostas.entalpia.passoAmostra', { mol: fmt(mol, { sig: 6 }) }), tex: `q = \\dfrac{n}{${comb.coefComposto}} \\times \\Delta H^{\\circ} = \\dfrac{${fmtTex(mol, { sig: 6 })}}{${comb.coefComposto}} \\times (${fmtTex(r.dH, { sig: 6 })}) = ${fmtTex(q, { sig: 6 })}\\ \\mathrm{kJ}` });
+      } else blocos.push(B.aviso(t('respostas.entalpia.semMol')));
+    }
+    if (passosAmostra.length) blocos.push(B.passos(t('respostas.entalpia.tituloAmostra'), passosAmostra, [fonteCalculo(), this.fonteRegra('entalpiaCalculo')]));
+    return montar({
+      intent: 'ENTALPIA', titulo,
+      blocos: [...topo, B.resultado(null, itens, this.fonteRegra('entalpiaCalculo')), ...blocos, B.aviso(t(r.exotermica ? 'respostas.entalpia.exotermica' : 'respostas.entalpia.endotermica'))],
+      acoes: acao, sugestoes: [sug('entalpiaHess')], extra: { dH: r.dH, dHporMol: porMol }
+    });
+  }
+
+  /** Resposta da calculadora de Hess: equação alvo + equações com ΔH. */
+  respostaHess(alvo, equacoes) {
+    const r = combinarHess(alvo, equacoes, { simbolos: this.ctx.simbolos });
+    if (!r.ok) {
+      const msg = r.erro === 'alvo' ? t('respostas.entalpia.hessAlvo', { msg: r.mensagem ?? t('respostas.equacaoErros.semSeta') })
+        : r.erro === 'equacao' ? t('respostas.entalpia.hessEquacao', { n: String(r.indice + 1), msg: r.mensagem ?? t('respostas.equacaoErros.semSeta') })
+          : t(`respostas.entalpia.${r.erro}`, { n: String((r.indice ?? 0) + 1) });
+      return montar({ intent: 'ENTALPIA', resolvida: false, titulo: t('respostas.entalpia.naoConsegui'), blocos: [B.aviso(msg, this.fonteRegra('entalpiaCalculo'))] });
+    }
+    const passos = r.passos.map((x) => ({
+      texto: t(x.invertida ? 'respostas.entalpia.hessInvertida' : 'respostas.entalpia.hessPasso', { n: String(x.indice + 1), fator: textoFrac(x.invertida ? x.fator.neg() : x.fator), dH: fmt(x.dH, { sig: 6 }) }),
+      tex: `${texFrac(x.fator)} \\times (${fmtTex(equacoes[x.indice].dH, { sig: 6 })}) = ${fmtTex(x.dH, { sig: 6 })}\\ \\mathrm{kJ}`
+    }));
+    passos.push({ texto: t('respostas.entalpia.hessSoma'), tex: `\\Delta H = ${r.passos.map((x) => `(${fmtTex(x.dH, { sig: 6 })})`).join(' + ')} = ${fmtTex(r.dH, { sig: 6 })}\\ \\mathrm{kJ}`, destaque: true });
+    return montar({
+      intent: 'ENTALPIA', titulo: t('respostas.entalpia.tituloHessResultado'),
+      blocos: [
+        B.resultado(null, [{ rotulo: t('respostas.entalpia.hessResultado'), valor: fmt(r.dH, { sig: 6 }), unidade: 'kJ', destaque: true }], this.fonteRegra('entalpiaCalculo')),
+        B.passos(t('respostas.blocos.passoAPasso'), passos, this.fonteRegra('entalpiaCalculo')),
+        B.aviso(t(r.exotermica ? 'respostas.entalpia.exotermica' : 'respostas.entalpia.endotermica'))
+      ],
+      extra: { dH: r.dH }
+    });
+  }
+
+  /** Resposta da calculadora por formação (equação digitada). */
+  async respostaFormacao(equacao) { return this.respostaEntalpiaReacao(equacao); }
+
   // ------------------------------------------------------------------------------------------------ conceitos (trechos licenciados)
   async conceito(p) {
     const termos = termosDeBusca(p.conceito || p.textoOriginal, this.dic.lex);
@@ -1108,6 +1465,23 @@ export class AnswerBuilder {
 }
 
 const formatarFormulaTexto = (f) => (tentarFormula(f) ? formulaUnicode(f) : f);
+
+/** Carga como texto: "+1", "−2", "0". */
+const textoCarga = (q) => (q === 0 ? '0' : `${q > 0 ? '+' : '−'}${Math.abs(q)}`);
+/** NOX (Frac) em TeX: "+6", "-2", "-\frac{8}{3}". */
+function texNox(f) {
+  if (f.zero) return '0';
+  const sinal = f.sinal() > 0 ? '+' : '-';
+  const a = f.sinal() < 0 ? f.neg() : f;
+  return a.inteiro ? `${sinal}${a.n}` : `${sinal}\\frac{${a.n}}{${a.d}}`;
+}
+/** Fração (Frac) como texto ("1/2", "2") e em TeX (com sinal). */
+const textoFrac = (f) => f.toString().replace('-', '−');
+function texFrac(f) {
+  const sinal = f.sinal() < 0 ? '-' : '';
+  const a = f.sinal() < 0 ? f.neg() : f;
+  return a.inteiro ? `${sinal}${a.n}` : `${sinal}\\frac{${a.n}}{${a.d}}`;
+}
 
 function cortarEmFrase(texto, max) {
   const x = String(texto).replace(/\s+/g, ' ').trim();

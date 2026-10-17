@@ -44,7 +44,11 @@ object ContextoNuvem {
         Intent.COMPARAR to listOf("elemento", "composto", "propriedade"),
         Intent.TABELA_PERIODICA to listOf("propriedade"),
         Intent.SEGURANCA to listOf("elemento", "composto"),
-        Intent.CONCEITO to listOf("composto", "nivel")
+        Intent.CONCEITO to listOf("composto", "nivel"),
+        Intent.NOX to listOf("elemento", "composto"),
+        Intent.ENTALPIA to listOf("composto", "quantidades", "equacao"),
+        Intent.EQUILIBRIO to listOf("equacao", "quantidades"),
+        Intent.LIGACAO to listOf("elemento", "composto")
     )
 
     /** Unidades do contrato (espelho de UNIDADES em api/_lib/vocab.js; o teste confere): outra unidade não vai no contexto. */

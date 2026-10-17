@@ -16,7 +16,7 @@ cliente). Contrato completo: [`docs/I18N.md`](docs/I18N.md). Nunca escreva texto
 `docs/PLANO.md` (fases e divisão por agente).
 
 ## Regras que não se negociam
-1. **Só fontes com licença de reuso** (PubChem, CODATA, Wikidata, OpenStax CC BY, LibreTexts CC BY-NC-SA, ICSC, fatos da IUPAC). Os livros da pasta `LivrosQuimica`
+1. **Só fontes com licença de reuso** (PubChem, CODATA, Wikidata, Wikipédia/Wikilivros CC BY-SA, ICSC, fatos da IUPAC; **OpenStax e LibreTexts só como link** — CC BY-NC-SA e cláusula anti-IA, ver `docs/FONTES_E_LICENCAS.md` §4). Os livros da pasta `LivrosQuimica`
    do projeto irmão são **obras protegidas**: nunca extrair texto, tabelas ou exercícios deles para o repositório, o dataset ou o modelo. Fonte sem licença = só link.
 2. **Nenhum número sai do modelo.** Massa, constante, propriedade, perigo: do pacote assinado ou de cálculo local testado. O texto gerado é rotulado e verificado.
 3. **Segurança química.** Rotas de síntese/purificação de explosivos, armas químicas, drogas ilícitas e precursores, ou "como fazer em casa" com reagentes perigosos são

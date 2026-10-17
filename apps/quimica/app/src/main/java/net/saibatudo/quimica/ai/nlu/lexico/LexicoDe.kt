@@ -45,7 +45,11 @@ internal object LexicoDe {
         "nomenclatura" to "\\b(?:wie (?:hei(?:ss| )t|lautet) der name|wie hei(?:ss| )t|wie nennt man|name (?:von|des|der|fur)|chemische\\w* name|iupac name|systematische\\w* name|wissenschaftliche\\w* name|offizielle\\w* name|nomenklatur|wie schreibt man|wie lautet die (?:chemische |molekulare |summen)?formel|was ist die (?:chemische |summen)?formel|formel (?:von|des|der|fur)|summenformel|name der verbindung)\\b",
         "tabela" to "\\b(?:periodensystem|pse|periodizitat|trends?|gruppe \\d{1,2}|familie \\d{1,2}|periode \\d|block [spdf]|[spdf][- ]block|elemente? (?:der|des|aus der|aus dem|in der|in) (?:gruppe|periode|block|familie)|welche elemente|wie ?viele elemente|(?:gasformige|flussige|feste) elemente|metalle|nichtmetalle|halbmetalle|metalloide|halogene?|edelgase?|erdalkalimetalle?|alkalimetalle?|lanthanoide?|lanthanide?|actinoide?|actinide?|element mit (?:der|dem) (?:hochsten|gro(?:ss| )ten|niedrigsten|kleinsten)|aufsteigend\\w* reihenfolge|absteigend\\w* reihenfolge|(?:hochste|gro(?:ss| )te|niedrigste|kleinste)r? (?:atomradius|radius|elektronegativitat|energie|punkt|masse|dichte))\\b",
         "conceitoCue" to "^(?:was (?:ist|sind|bedeutet|hei(?:ss| )t|bedeuten)|erklar\\w*|definier\\w*|definition (?:von|des|der)|begriff|konzept|erzahl\\w* mir|wie funktioniert|wie funktionieren|warum|wieso|weshalb|wozu (?:dient|braucht man)|was ist (?:die |der )?(?:definition|unterschied|bedeutung|funktion|rolle)|unterschied zwischen|bring\\w* mir .{1,20} bei|zusammenfass\\w*|fasse .{1,30} zusammen)\\b",
-        "conceitoTemas" to "\\b(?:mol|ph|stochiometrie|(?:ionen|atom|metall|kovalente|chemische) ?bindung|elektronegativitat|oxidation|reduktion|redox|chemisches gleichgewicht|enthalpie|entropie|isomerie|saure|base|salz|oxid|losung|konzentration|molaritat|verdunnung|periodensystem|chemische reaktion|kinetik|katalysator|elektrolyse|batterie|galvanische zelle|polaritat|zwischenmolekulare krafte|intermolekulare krafte)\\b"
+        "conceitoTemas" to "\\b(?:mol|ph|stochiometrie|(?:ionen|atom|metall|kovalente|chemische) ?bindung|elektronegativitat|oxidation|reduktion|redox|chemisches gleichgewicht|enthalpie|entropie|isomerie|saure|base|salz|oxid|losung|konzentration|molaritat|verdunnung|periodensystem|chemische reaktion|kinetik|katalysator|elektrolyse|batterie|galvanische zelle|polaritat|zwischenmolekulare krafte|intermolekulare krafte)\\b",
+        "nox" to "\\b(?:oxidationszahl\\w*|oxidationsstufe\\w*)\\b",
+        "entalpia" to "\\b(?:\\w*enthalpie\\w*|reaktionswarme|verbrennungswarme|(?:freigesetzte|frei werdende|abgegebene|aufgenommene) (?:warme|energie)|satz von hess|hess\\w*|delta h|exotherm\\w*|endotherm\\w*)\\b",
+        "equilibrio" to "\\b(?:kc|kp|gleichgewichtskonstante\\w*|massenwirkungsgesetz\\w*|im gleichgewicht|chemisch\\w* gleichgewicht\\w*|reaktionsquotient\\w*)\\b",
+        "ligacao" to "\\b(?:bindungsart\\w*|bindungstyp\\w*|art der bindung|ionenbindung\\w*|atombindung\\w*|metallbindung\\w*|elektronenpaarbindung\\w*|kovalente bindung\\w*|polare bindung\\w*|unpolare bindung\\w*|welche bindung\\w*|bindung\\w* (?:zwischen|in|im))\\b"
     )
 
     private fun n_pistas_limparConceito(): List<Any?> = listOf<Any?>(
@@ -98,7 +102,14 @@ internal object LexicoDe {
         "misturaTema" to "\\b(gemisch|mischung|gemenge)(?:e|en|es)?\\b",
         "misturaConceito" to "\\b(?:reinstoff\\w*|stoff\\w*|substanz\\w*|rein|homogen\\w*|heterogen\\w*|system\\w*|einteil\\w*|teile? \\S+ ein|klassifizier\\w*|ordne\\w*|arten von|was (?:ist|sind)|unterschied zwischen|phasen?)\\b",
         "nomenclaturaPedido" to "\\b(?:wie hei(?:ss| )t|wie nennt man|wie lautet der (?:iupac[- ]?)?name|benenne\\w*|gib den (?:iupac[- ]?)?namen|(?:iupac|systematische\\w*|offizielle\\w*)[- ]?name\\w*)\\b",
-        "nomenclaturaAlvo" to "\\b(?:verbindung\\w*|stoff\\w*|substanz\\w*|molekul\\w*|kohlenwasserstoff\\w*|organisch\\w*|kette\\w*|struktur\\w*|\\w*(?:meth|eth|prop|but|pent|hex|hept|oct|non|dec|phen|benz)\\w*(?:an|en|in|ol|on|yl|amin))\\b"
+        "nomenclaturaAlvo" to "\\b(?:verbindung\\w*|stoff\\w*|substanz\\w*|molekul\\w*|kohlenwasserstoff\\w*|organisch\\w*|kette\\w*|struktur\\w*|\\w*(?:meth|eth|prop|but|pent|hex|hept|oct|non|dec|phen|benz)\\w*(?:an|en|in|ol|on|yl|amin))\\b",
+        "noxAlvo" to "\\b(?:von|vom|des|der|fur) (\\S+(?: \\S+)?) (?:in|im|innerhalb)\\b",
+        "entalpiaCombustao" to "\\b(?:verbrennung\\w*|verbrenn\\w*|verbrannt\\w*)\\b",
+        "entalpiaFormacao" to "\\b(?:\\w*bildungsenthalpie\\w*|bildungswarme)\\b",
+        "hess" to "\\b(?:satz von hess|hess\\w*)\\b",
+        "kcKp" to "\\b(?:kp|partialdruck\\w*)\\b",
+        "concentracaoColchete" to "=|:|ist|betragt|gleich|von",
+        "ligacaoPolaridade" to "\\b(?:ionisch\\w*|kovalent\\w*|polar\\w*|unpolar\\w*|metallisch\\w*)\\b"
     )
 
     private fun n_nivel(): Map<String, Any?> = linkedMapOf<String, Any?>(
@@ -648,7 +659,14 @@ internal object LexicoDe {
     private fun n_propriedades_configuracaoEletronica(): List<Any?> = listOf<Any?>(
         "elektronenkonfiguration",
         "elektronenverteilung",
-        "elektronenanordnung"
+        "elektronenanordnung",
+        "valenzelektronen",
+        "valenzschale",
+        "aussenelektronen",
+        "elektronenschalen",
+        "schalenbesetzung",
+        "elektronen pro schale",
+        "unterschalen"
     )
 
     private fun n_propriedades_eletronegatividade(): List<Any?> = listOf<Any?>(
@@ -840,6 +858,12 @@ internal object LexicoDe {
         "aciditatskonstante"
     )
 
+    private fun n_propriedades_entalpiaFormacaoKJmol(): List<Any?> = listOf<Any?>(
+        "standardbildungsenthalpie",
+        "bildungsenthalpie",
+        "bildungswarme"
+    )
+
     private fun n_propriedades(): Map<String, Any?> = linkedMapOf<String, Any?>(
         "numeroAtomico" to n_propriedades_numeroAtomico(),
         "massaAtomica" to n_propriedades_massaAtomica(),
@@ -874,7 +898,8 @@ internal object LexicoDe {
         "carga" to n_propriedades_carga(),
         "tpsa" to n_propriedades_tpsa(),
         "solubilidade" to n_propriedades_solubilidade(),
-        "pka" to n_propriedades_pka()
+        "pka" to n_propriedades_pka(),
+        "entalpiaFormacaoKJmol" to n_propriedades_entalpiaFormacaoKJmol()
     )
 
     private fun n_stopwordsBusca(): List<Any?> = listOf<Any?>(

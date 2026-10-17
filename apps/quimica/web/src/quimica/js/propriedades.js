@@ -53,7 +53,9 @@ export const PROPRIEDADES_PADRAO = [
   { id: 'tpsa', rotulo: 'área de superfície polar (TPSA)', alvo: 'composto', campo: 'tpsa', tipo: 'numero', unidade: 'Å²' },
   // medidas do composto (Wikidata, DATA_CONTRACT §3.1): sem valor no pacote = sem valor na resposta
   { id: 'solubilidade', rotulo: 'solubilidade em água', alvo: 'composto', campo: 'solubilidadeAguaG100g', campos: ['solubilidadeAguaG100g', 'solubilidadeAguaGL'], tipo: 'solubilidade', medida: true },
-  { id: 'pka', rotulo: 'pKa', alvo: 'composto', campo: 'pka', campos: ['pkaValores', 'pka'], tipo: 'pka', medida: true }
+  { id: 'pka', rotulo: 'pKa', alvo: 'composto', campo: 'pka', campos: ['pkaValores', 'pka'], tipo: 'pka', medida: true },
+  // 17/10/2026 (docs/CALCULADORAS_2026-10-17.md §3): ΔHf° a 298,15 K, Wikidata P3078 (CC0), em `propriedades.entalpiaFormacaoKJmol`
+  { id: 'entalpiaFormacaoKJmol', rotulo: 'entalpia padrão de formação', alvo: 'composto', campo: 'entalpiaFormacaoKJmol', tipo: 'numero', unidade: 'kJ/mol', medida: true }
 ];
 
 /** Ids das propriedades físicas medidas dos compostos, na ordem da ficha. */

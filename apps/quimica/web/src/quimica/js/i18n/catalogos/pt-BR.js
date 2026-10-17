@@ -240,7 +240,35 @@ export default {
         concentracao: { titulo: 'Concentração e diluição', descricao: 'Molaridade, g/L, percentuais e C₁V₁ = C₂V₂.' },
         ph: { titulo: 'pH', descricao: 'Ácidos e bases fortes, fracos (com Ka ou Kb) e conversões.' },
         'gas-ideal': { titulo: 'Gás ideal', descricao: 'PV = nRT com a constante R do pacote (CODATA).' },
-        unidades: { titulo: 'Conversão de unidades', descricao: 'Pressão, volume, massa, temperatura, energia e mais.' }
+        unidades: { titulo: 'Conversão de unidades', descricao: 'Pressão, volume, massa, temperatura, energia e mais.' },
+        entalpia: { titulo: 'Entalpia (formação e Hess)', descricao: 'ΔH da reação pelas entalpias de formação do pacote ou pela lei de Hess, com até 4 equações.' },
+        'configuracao-eletronica': { titulo: 'Configuração eletrônica', descricao: 'Diagrama de Linus Pauling, camadas e elétrons de valência; também para íons.' },
+        nox: { titulo: 'Número de oxidação (NOX)', descricao: 'NOX de cada elemento pelas regras, com íons e NOX médio.' },
+        equilibrio: { titulo: 'Equilíbrio (Kc e Kp)', descricao: 'Expressão de Kc, Δn, Kp = Kc·(RT)^Δn e o valor de Kc pelas concentrações.' },
+        ligacao: { titulo: 'Tipo de ligação', descricao: 'Iônica, covalente polar, covalente apolar ou metálica, pela eletronegatividade.' }
+      },
+      entalpia: {
+        modo: 'Cálculo', formacao: 'Pelas entalpias de formação', hess: 'Lei de Hess', equacao: 'Equação da reação', placeholder: 'Ex.: CH4 + 2 O2 -> CO2 + 2 H2O',
+        ajuda: 'Sem coeficientes, o aplicativo balanceia. Os ΔHf° vêm do pacote de dados; substâncias simples (O2, N2, Fe…) valem 0.',
+        alvo: 'Equação alvo', placeholderAlvo: 'Ex.: C + 2 H2 -> CH4', equacaoN: 'Equação {n}', dH: 'ΔH da equação {n} (kJ)',
+        ajudaHess: 'Digite as equações balanceadas como estão no enunciado, cada uma com o seu ΔH. Frações valem (1/2 O2). Deixe em branco as que não usar.', calcular: 'Calcular ΔH'
+      },
+      eletronica: {
+        elemento: 'Elemento (símbolo ou nome)', placeholder: 'Ex.: Fe, ferro, Cl', carga: 'Carga do íon', ajudaCarga: '0 para o átomo neutro; 2 para Fe²⁺, -1 para Cl⁻.',
+        calcular: 'Distribuir', naoEncontrei: 'Não encontrei esse elemento no pacote de dados.'
+      },
+      nox: {
+        formula: 'Fórmula (com a carga, se for íon)', placeholder: 'Ex.: H2SO4, MnO4-, Cr2O7 2-', ajuda: 'Carga no fim: MnO4-, SO4^2-, NH4+ ou "Cr2O7 2-". Hidratos não valem.',
+        elemento: 'Elemento em destaque (opcional)', placeholderElemento: 'Ex.: S', calcular: 'Calcular NOX'
+      },
+      equilibrio: {
+        equacao: 'Equação', placeholder: 'Ex.: N2 + 3 H2 ⇌ 2 NH3', ajuda: 'Aceita ⇌, <=>, -> ou =. Estados (s), (l), (g), (aq) valem: sólidos e líquidos puros saem da expressão.',
+        concentracoes: 'Concentrações no equilíbrio (opcional)', placeholderConc: 'Ex.: [N2] = 0,5; [H2] = 1,5; [NH3] = 0,2', ajudaConc: 'Uma por espécie, em mol/L, separadas por ponto e vírgula.',
+        temperatura: 'Temperatura (opcional, para o Kp)', calcular: 'Calcular'
+      },
+      ligacao: {
+        modo: 'Entrada', porFormula: 'Fórmula', porElementos: 'Dois elementos', formula: 'Fórmula', placeholder: 'Ex.: NaCl, HCl, Cl2, NaOH',
+        a: 'Elemento 1', b: 'Elemento 2', placeholderA: 'Ex.: H', placeholderB: 'Ex.: Cl', calcular: 'Classificar'
       },
       massaMolar: {
         formula: 'Fórmula química', placeholder: 'Ex.: Ca(OH)2, CuSO4·5H2O, Fe2(SO4)3', ajuda: 'Parênteses, hidratos com "·" (ou "."), cargas no fim: Fe3+, SO4^2-.',
@@ -391,7 +419,8 @@ export default {
       densidadeKgm3: 'densidade', estadoPadrao: 'estado físico (condições padrão)', estadosOxidacao: 'estados de oxidação', descoberta: 'descoberta',
       massaMolar: 'massa molar', massaExata: 'massa exata (monoisotópica)', formula: 'fórmula', cas: 'número CAS', cid: 'CID no PubChem', smiles: 'SMILES', inchiKey: 'InChIKey',
       nomeIupac: 'nome IUPAC', xlogp: 'XLogP (lipofilicidade calculada)', doadoresH: 'doadores de ligação de hidrogênio', aceptoresH: 'aceptores de ligação de hidrogênio',
-      ligacoesRotaveis: 'ligações rotáveis', carga: 'carga elétrica', tpsa: 'área de superfície polar (TPSA)', solubilidade: 'solubilidade em água', pka: 'pKa'
+      ligacoesRotaveis: 'ligações rotáveis', carga: 'carga elétrica', tpsa: 'área de superfície polar (TPSA)', solubilidade: 'solubilidade em água', pka: 'pKa',
+      entalpiaFormacaoKJmol: 'entalpia padrão de formação'
     },
     medidas: {
       titulo: 'Propriedades físicas', intro: 'Valores medidos, cada um com a sua fonte e as condições da medida.',
@@ -450,7 +479,13 @@ export default {
       constantes: 'Constantes do pacote de dados (constantes.json)',
       boyle: 'Cálculo local do aplicativo, com a tabela de unidades do pacote de dados',
       wikipedia: 'Wikipédia em {idioma}',
-      trechoEm: 'Texto em {idioma} (ainda sem tradução).'
+      trechoEm: 'Texto em {idioma} (ainda sem tradução).',
+      regrasNox: 'Regras de NOX dos livros didáticos (convenção), aplicadas pelo aplicativo',
+      regraLigacao: 'Regra didática da diferença de eletronegatividade (escala de Pauling; limites 0,4 e 1,7 por convenção)',
+      acaoDasMassas: 'Lei da ação das massas (regra), cálculo local do aplicativo',
+      distribuicao: 'Distribuição calculada pelo aplicativo a partir da configuração do pacote (regra de Madelung, diagrama de Linus Pauling)',
+      substanciaSimples: 'Convenção: ΔHf° = 0 para substância simples no estado padrão',
+      entalpiaCalculo: 'Cálculo local do aplicativo (lei de Hess), com os ΔHf° do pacote de dados'
     },
     unidades: {
       origem: { pacote: 'regras.json (pacote de dados assinado)', padrao: 'tabela padrão do aplicativo (definições do SI)' },
@@ -469,7 +504,8 @@ export default {
       formulaSulfurico: 'Qual a fórmula do ácido sulfúrico?', compareNaCl: 'Compare sódio e cloro', maisEletronegativo: 'Elemento mais eletronegativo',
       molaridade: 'Molaridade de 5,85 g de NaCl em 500 mL', volumeGas: 'Qual o volume de 2 mols de gás a 300 K e 1 atm?',
       fusaoDe: 'Ponto de fusão de {nome}', configuracaoDe: 'Configuração eletrônica de {nome}', massaMolarDe: 'Massa molar de {nome}', estruturaDe: 'Estrutura de {nome}',
-      perigosDe: 'Perigos de {nome}', densidadeDe: 'Densidade de {nome}'
+      perigosDe: 'Perigos de {nome}', densidadeDe: 'Densidade de {nome}',
+      noxSulfurico: 'NOX do enxofre no H2SO4', ligacaoHCl: 'Tipo de ligação do HCl', kcAmonia: 'Expressão do Kc para N2 + 3 H2 ⇌ 2 NH3', entalpiaHess: 'Entalpia da reação pela lei de Hess'
     },
     orientacaoGeral: [
       'Leia o rótulo e a ficha de segurança (FISPQ) do produto antes de usar e siga as instruções do fabricante.',
@@ -622,6 +658,83 @@ export default {
       semTexto: 'Ainda não tenho um texto sobre isso',
       naoEncontrei: 'Não encontrei, entre os trechos licenciados do pacote de dados, uma explicação sobre "{termo}". Os dados de elementos, compostos e as calculadoras continuam disponíveis.',
       traducaoAutomatica: 'Tradução automática, ainda não revisada por uma pessoa.', emIngles: 'Texto em inglês (ainda sem tradução).', padrao: 'Conceito'
+    },
+    equacaoErros: {
+      semSeta: 'Não encontrei a seta da reação. Escreva reagentes -> produtos, por exemplo: N2 + 3 H2 ⇌ 2 NH3.', duasSetas: 'A equação tem mais de uma seta. Digite uma reação por vez.',
+      lado: 'Falta um dos lados da equação (reagentes ou produtos).', eletron: 'Semirreações (com elétrons) não entram neste cálculo: use a equação completa.',
+      formula: 'Há uma fórmula inválida na equação.', balancear: 'Não consegui balancear a equação.', expressao: 'Não consegui montar a expressão.'
+    },
+    nox: {
+      titulo: 'NOX em {formula}', tituloElemento: 'NOX de {el} em {formula}: {nox}', deQual: 'NOX de qual composto?',
+      digite: 'Diga a fórmula (com a carga, se for um íon). Exemplos: "NOX do enxofre no H2SO4", "NOX do Mn no MnO4-", "NOX do cromo no Cr2O7 2-".',
+      naoConsegui: 'Não consegui calcular o NOX', hidrato: 'Hidratos não entram neste cálculo: digite a fórmula sem a água de cristalização.',
+      indeterminado: 'Indeterminado pelas regras: {lista} ficam sem regra que fixe o NOX. Use a fórmula estrutural (ligação por ligação) para atribuir o NOX.',
+      inconsistente: 'As regras dão soma {soma}, diferente da carga {carga}: confira a fórmula e a carga.',
+      semDados: 'O pacote de dados não tem a eletronegatividade de: {lista}.', medio: 'NOX médio',
+      regras: {
+        substanciaSimples: 'substância simples: 0', ionMonoatomico: 'íon de um só elemento: carga ÷ átomos', fluor: 'flúor: sempre −1', grupo1: 'grupo 1: +1', grupo2: 'grupo 2: +2',
+        aluminio: 'alumínio: +3', hidrogenio: 'hidrogênio: +1', hidretoMetalico: 'hidreto metálico: H −1', oxigenio: 'oxigênio: −2', peroxido: 'peróxido: O −1',
+        superoxido: 'superóxido: O −1/2', halogenio: 'halogênio mais eletronegativo do composto: −1', eletronegatividade: 'o mais eletronegativo recebe o NOX negativo usual do grupo',
+        balanco: 'pelo balanço (soma dos NOX = carga)'
+      },
+      passoRegras: 'Aplique as regras na ordem (substância simples, íon, F, grupos 1 e 2, Al, H, O, halogênios); o elemento que sobra sai do balanço.',
+      passoSoma: 'A soma dos NOX vezes o número de átomos é igual à carga ({carga}):',
+      avisoMedio: 'NOX fracionário é um NOX médio: os átomos desse elemento podem ter NOX diferentes entre si (veja a fórmula estrutural).',
+      elementoAusente: '{el} não aparece em {formula}.', abrir: 'Abrir a calculadora de NOX'
+    },
+    ligacao: {
+      titulo: 'Tipo de ligação: {alvo}', deQual: 'Ligação de quê?', digite: 'Diga a fórmula ou dois elementos. Exemplos: "tipo de ligação do NaCl", "que ligação há entre H e Cl".',
+      naoConsegui: 'Não consegui classificar a ligação', semCategoria: 'O pacote de dados não tem a categoria (metal ou não metal) de: {lista}.',
+      semEletronegatividade: 'O pacote de dados não tem a eletronegatividade de: {lista}.', semElemento: 'Não encontrei no pacote de dados o elemento: {lista}.',
+      semEntrada: 'Diga a fórmula ou dois elementos.',
+      tipos: { metalica: 'metálica', ionica: 'iônica', covalentePolar: 'covalente polar', covalenteApolar: 'covalente apolar', nenhuma: 'não forma ligação em condições comuns (gás nobre)' },
+      delta: 'ΔEN = {d} ({a}: {ea}; {b}: {eb})', metalMetal: 'metal com metal',
+      convencao: 'Regra didática: metal com metal → metálica; metal com não metal e ΔEN ≥ 1,7 → iônica; 0,4 ≤ ΔEN < 1,7 → covalente polar; ΔEN < 0,4 → covalente apolar. Os limites 0,4 e 1,7 são convenção (escala de Pauling); semimetais contam como não metais.',
+      estimado: 'Com três ou mais elementos, os pares foram estimados pela fórmula (cada metal e cada não metal com o não metal mais eletronegativo); a estrutura real pode ter outras ligações.',
+      polaridadeMolecula: 'A polaridade da molécula depende também da geometria: ligações polares podem se anular (como no CO₂, que é apolar).',
+      abrir: 'Abrir a calculadora de tipo de ligação'
+    },
+    equilibrio: {
+      titulo: 'Equilíbrio: {equacao}', deQual: 'Equilíbrio de qual reação?',
+      digite: 'Escreva a equação com ⇌ (ou <=>, ->). Exemplos: "expressão do Kc para N2 + 3 H2 ⇌ 2 NH3", "Kc de N2 + 3 H2 ⇌ 2 NH3 com [N2] = 0,5 mol/L, [H2] = 1,5 mol/L e [NH3] = 0,2 mol/L".',
+      naoConsegui: 'Não consegui montar a expressão do equilíbrio', balanceada: 'A equação foi balanceada antes: {equacao}.',
+      semSolidoLiquido: 'Sólidos e líquidos puros não entram na expressão: {lista}.', gasPorHipotese: 'Sem o estado físico escrito nem dado no pacote, considerei gasosas: {lista}.',
+      faseDoPacote: 'Estado físico tirado do pacote de dados (condições padrão): {lista}.', faseNaTemperatura: 'Estado físico a {t} K pelos pontos de fusão e de ebulição do pacote de dados: {lista}.', deltaN: 'Δn (gases): produtos − reagentes',
+      kc: 'Kc', kp: 'Kp', fatorRT: '(RT)^Δn', temperatura: 'Temperatura', unidadeKc: 'concentrações em mol/L',
+      faltam: 'Faltam as concentrações no equilíbrio de: {lista}. Sem elas, só a expressão de Kc.', invalida: 'As concentrações devem ser maiores que zero.',
+      passoKc: 'Substitua as concentrações no equilíbrio (mol/L) na expressão:', passoKp: 'Kp = Kc·(RT)^Δn, com R = {R} L·atm/(mol·K) e T em kelvin:',
+      semT: 'Para o valor de Kp, diga a temperatura (por exemplo, "a 500 K").', semR: 'A constante R não está no pacote de dados (constantes.json).',
+      abrir: 'Abrir a calculadora de Kc e Kp'
+    },
+    entalpia: {
+      tituloReacao: 'Entalpia da reação: {equacao}', tituloCombustao: 'Entalpia de combustão: {nome}', tituloHess: 'Entalpia da reação (lei de Hess)', tituloHessResultado: 'Lei de Hess',
+      tituloAmostra: 'Calor da amostra', naoConsegui: 'Não consegui calcular a entalpia',
+      digite: 'Diga a reação ou o composto. Exemplos: "ΔH da combustão do metano", "variação de entalpia de 2 H2 + O2 -> 2 H2O". Para a lei de Hess (várias equações com ΔH), use a calculadora.',
+      hess: 'A lei de Hess soma equações conhecidas (multiplicadas por um fator ou invertidas) até chegar à reação desejada, e o ΔH se soma do mesmo jeito. Na calculadora você digita a equação alvo e até 4 equações com ΔH, e o aplicativo acha a combinação.',
+      falta: 'O pacote de dados não tem a entalpia padrão de formação (ΔHf°) de: {lista}. Sem esse dado o ΔH não é calculado (nenhum valor é inventado).',
+      expressao: 'ΔH° = Σ n·ΔHf°(produtos) − Σ n·ΔHf°(reagentes):', passoSoma: 'Com os valores do pacote de dados (kJ/mol):',
+      valores: 'Entalpias padrão de formação usadas (298,15 K)', dHfDe: 'ΔHf° de {formula}', semValor: 'sem valor no pacote de dados',
+      simples: '0 (substância simples no estado padrão, por definição)', resultado: 'ΔH° da reação', porMol: 'ΔH° de combustão por mol de {nome}',
+      amostra: 'Calor de {valor} {unidade} de {nome}', passoAmostra: 'Quantidade de matéria da amostra: n = {mol} mol; o calor é a extensão da reação vezes o ΔH:',
+      semMol: 'Não consegui converter a quantidade informada em mol.',
+      exotermica: 'ΔH < 0: reação exotérmica (libera calor).', endotermica: 'ΔH > 0: reação endotérmica (absorve calor).',
+      combustaoCompleta: 'Combustão completa, com os produtos no estado padrão (CO₂, H₂O, N₂, SO₂).', balanceada: 'A equação foi balanceada antes: {equacao}.',
+      naoQueima: 'A combustão completa aqui só vale para compostos de C, H, O, N e S.',
+      hessAlvo: 'Equação alvo: {msg}', hessEquacao: 'Equação {n}: {msg}', naoBalanceada: 'A equação {n} não está balanceada como foi escrita.',
+      semDH: 'Falta o ΔH da equação {n}.', semCombinacao: 'Não há combinação das equações dadas que resulte na reação alvo.',
+      hessPasso: 'Equação {n} × {fator}: ΔH = {dH} kJ', hessInvertida: 'Equação {n} invertida, × {fator}: ΔH = {dH} kJ', hessSoma: 'Some os ΔH das equações combinadas:',
+      hessResultado: 'ΔH da reação alvo', abrir: 'Abrir a calculadora de entalpia', abrirHess: 'Abrir a calculadora (Hess)'
+    },
+    eletronica: {
+      titulo: 'Distribuição eletrônica de {nome}', tituloIon: 'Distribuição eletrônica do íon {simbolo} ({carga})', deQual: 'Configuração eletrônica de qual elemento?',
+      digite: 'Diga o elemento (símbolo ou nome), por exemplo "configuração eletrônica do ferro".',
+      pacote: 'Configuração no pacote de dados', completa: 'Notação completa (ordem de preenchimento, Linus Pauling)', camadasOrdem: 'Em ordem de camadas',
+      porCamada: 'Elétrons por camada', camadaValencia: 'Camada de valência', camadaValenciaValor: '{camada} (n = {n}), {e} elétron(s)',
+      eletronsValencia: 'Elétrons de valência', valenciaTransicao: '{e} (convenção para metais de transição: ns + (n−1)d)', valenciaF: '{e} (convenção: ns + (n−1)d + (n−2)f)',
+      maisEnergetico: 'Subnível mais energético', bloco: 'Bloco',
+      totalDiferente: 'A configuração do pacote de dados soma {total} elétrons, mas o número atômico é {z}: a distribuição não foi calculada (o dado não é corrigido à mão).',
+      semConfiguracao: 'O pacote de dados não tem a configuração eletrônica de {nome}.', cargaInvalida: 'Carga inválida para {nome}.',
+      ignorados: 'Observação do pacote de dados: {lista}.', abrir: 'Abrir a calculadora de configuração eletrônica'
     },
     calc: {
       formula: {

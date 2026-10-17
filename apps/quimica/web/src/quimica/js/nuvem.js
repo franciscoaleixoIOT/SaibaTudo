@@ -30,7 +30,9 @@ const EXIGE = {
   NOMENCLATURA: (p) => p.composto != null || p.formula != null,
   COMPARAR: (p) => p.compostos.length + p.elementos.length + p.formulas.length >= 2,
   CONVERSAO_UNIDADE: (p) => p.unidadeDestino != null && p.quantidades.some((q) => q.unidade),
-  BALANCEAR: (p) => p.equacao != null
+  BALANCEAR: (p) => p.equacao != null,
+  NOX: (p) => p.composto != null || p.formula != null,
+  EQUILIBRIO: (p) => p.equacao != null
 };
 
 const sv = (o, k) => {
@@ -66,7 +68,11 @@ export const CHAVES_POR_INTENCAO = Object.freeze({
   COMPARAR: ['elemento', 'composto', 'propriedade'],
   TABELA_PERIODICA: ['propriedade'],
   SEGURANCA: ['elemento', 'composto'],
-  CONCEITO: ['composto', 'nivel']
+  CONCEITO: ['composto', 'nivel'],
+  NOX: ['elemento', 'composto'],
+  ENTALPIA: ['composto', 'quantidades', 'equacao'],
+  EQUILIBRIO: ['equacao', 'quantidades'],
+  LIGACAO: ['elemento', 'composto']
 });
 /** Unidades do contrato (espelho de UNIDADES em api/_lib/vocab.js; o teste confere): outra unidade não vai no contexto. */
 export const UNIDADES_CONTEXTO = new Set([

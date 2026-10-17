@@ -9,7 +9,30 @@ Propriedades (Wikidata -> campo em `compostos[].propriedades`, unidades do contr
 - P2177 solubilidade em água      -> `solubilidadeAguaGL` (g/L; g/L, mg/L, g/m³, kg/m³) ou `solubilidadeAguaG100g` (g por 100 g de água;
                                      g/100 g e g/kg **de solvente**); só com o qualificador solvente (P2178) = água (Q283)
 - P1117 pKa                       -> `pka` (o menor valor aceito = a primeira dissociação) e `pkaValores` (todos, crescente, quando há mais de um)
-- derivado                        -> `estadoPadrao` ("solido" | "liquido" | "gas") a 298,15 K, comparando `pontoFusaoK`/`pontoEbulicaoK`
+- P3078 entalpia padrão de formação -> `entalpiaFormacaoKJmol` (kJ/mol, 2 casas, a 298,15 K; kJ/mol, J/mol e kcal/mol termoquímica = 4,184 kJ).
+                                     Só vale a 298,15 K (± 1 K) e a ~1 atm/1 bar (95-107 kPa); outra temperatura/pressão fica fora. A **fase** (P515) fica em
+                                     `fontesPorPropriedade.entalpiaFormacaoKJmol.condicoes.fase` ("solido" | "liquido" | "gas"). ΔHf° é a do ESTADO PADRÃO:
+                                     com o estado a 298,15 K conhecido (derivado de fusão/ebulição, abaixo), a declaração de OUTRA fase fica fora (vai para as
+                                     alternativas: a água tem -241,8 kJ/mol no gás e -285,8 no líquido) e a da mesma fase vence a sem fase; com o estado
+                                     desconhecido e fases que discordam (> 5 %), nada é publicado (empate = nenhuma), nunca o "primeiro" valor; |ΔHf| >= 10 000 kJ/mol
+                                     é descartado (J/mol gravado como kJ/mol). Elemento no estado padrão (0) é válido.
+                                     **Prioridade (17/10/2026):** a entalpia de formação do chembox da Wikipédia em inglês (coleta_termo_wikipedia, que roda
+                                     DEPOIS desta coleta, também grava `energiaGibbsFormacaoKJmol` e `entropiaPadraoJmolK`) é a fonte primária e substitui o valor
+                                     do P3078; o do Wikidata (referência forte) só fica onde o artigo não tem o campo.
+                                     **Referência fraca (só para P3078; implementada mas DESLIGADA por padrão, `ENTALPIA_ACEITA_REFERENCIA_FRACA = False`;
+                                     vale o que segue quando ligada):** a declaração sem "afirmado em"/URL, só com "importado de"
+                                     (P143/P4656) ou sem referência nenhuma, também entra (a Wikipédia é a fonte da maioria das entalpias do Wikidata), mas
+                                     (a) só se nenhuma declaração de referência forte aceita cobre a mesma fase (a forte vence e a fraca vai para as
+                                     alternativas, com `referenciaFraca`); (b) todos os outros filtros valem (fase, 298,15 K, pressão, magnitude); (c) qualquer
+                                     discordância > 5 % que envolva um valor fraco da mesma condição de fase não publica nada (nem por maioria); (d) "inferido de"
+                                     (P3452) e "baseado em heurística" (P887) nunca entram. A origem ganha `referenciaFraca: true` (sem `referencia`), o
+                                     texto do "importado de" em `importadoDe` e, se não há referência nenhuma, também `semReferencia: true`. Os clientes avisam
+                                     "valor do Wikidata sem fonte primária declarada". Desligada, volta à regra das demais. Na fase (P515), "valor desconhecido" do Wikidata conta como sem fase; outro item que não
+                                     sólido/líquido/gás (solução aquosa, supercrítico) ou fases em conflito descartam a declaração.
+                                     CUIDADO (conferência de 17/10/2026 contra valores de tabela): as declarações fracas são importações da Wikipédia russa
+                                     e armênia e ~10 % têm erro visível (sinal trocado: CO2 +394, ZnO +350,8, HgO +90,5, etino -227,4; valor errado: NaCl
+                                     -234,8, Na2O -2131); por isso a chave vem desligada e só deve ser ligada com uma conferência independente dos valores.
+- derivado                       -> `estadoPadrao` ("solido" | "liquido" | "gas") a 298,15 K, comparando `pontoFusaoK`/`pontoEbulicaoK`
                                      (cálculo local; só fora de uma faixa de ±2 K em volta de 298,15 K)
 
 Regras de aceitação de uma declaração (nada de valor calculado como se fosse medido):
@@ -40,8 +63,12 @@ LOTE = 100
 URL_ITEM = "https://www.wikidata.org/wiki/{q}"
 LICENCA = "CC0"
 
-PROPS = {"P2101": "pontoFusaoK", "P2102": "pontoEbulicaoK", "P2054": "densidadeKgm3", "P2177": "solubilidade", "P1117": "pka"}
-CAMPOS = ("pontoFusaoK", "pontoEbulicaoK", "densidadeKgm3", "solubilidadeAguaGL", "solubilidadeAguaG100g", "pka", "pkaValores", "estadoPadrao")
+PROPS = {"P2101": "pontoFusaoK", "P2102": "pontoEbulicaoK", "P2054": "densidadeKgm3", "P2177": "solubilidade", "P1117": "pka",
+         "P3078": "entalpiaFormacaoKJmol"}
+CAMPOS = ("pontoFusaoK", "pontoEbulicaoK", "densidadeKgm3", "solubilidadeAguaGL", "solubilidadeAguaG100g", "pka", "pkaValores",
+          "entalpiaFormacaoKJmol", "estadoPadrao")
+# campos que vêm do chembox da Wikipédia em inglês (coleta_termo_wikipedia); ΔHf também pode vir do Wikidata (P3078, acima)
+CAMPOS_TERMO_WIKIPEDIA = ("entalpiaFormacaoKJmol", "energiaGibbsFormacaoKJmol", "entropiaPadraoJmolK")
 
 AGUA = "Q283"
 # unidade (QID) -> (símbolo, função para a unidade do contrato)
@@ -56,6 +83,13 @@ SOLUBILIDADE_GL = {"Q834105": ("g/L", 1), "Q55726194": ("mg/L", Decimal("0.001")
                    "Q844211": ("kg/m³", 1)}
 SOLUBILIDADE_G100G = {"Q21127659": ("g/100 g de solvente", 1), "Q60606516": ("g/kg de solvente", Decimal("0.1"))}
 ADIMENSIONAL = {"Q199": ("1", 1), None: ("", 1)}
+# energia molar -> kJ/mol (a kcal é a termoquímica: 1 kcal = 4,184 kJ)
+ENERGIA_MOLAR = {"Q752197": ("kJ/mol", 1), "Q13035094": ("J/mol", Decimal("0.001")), "Q6408112": ("kcal/mol", Decimal("4.184"))}
+FASES = {"Q11438": "solido", "Q11435": "liquido", "Q11432": "gas"}  # P515: sólido, líquido, gás
+CAMPO_REFERENCIA_FRACA = "entalpiaFormacaoKJmol"  # único campo que aceita declaração só com "importado de" (P143/P4656) ou sem referência
+REFERENCIAS_INFERIDAS = {"P3452", "P887"}          # "inferido de" / "baseado em heurística": nunca entram, nem como fracas
+ENTALPIA_ACEITA_REFERENCIA_FRACA = False           # DESLIGADA (17/10/2026: CO2 +394, NaCl -234,8...). False = regra das demais: referência forte
+                                                   # obrigatória; sem ela, só por corroboração de duas declarações. True liga a referência fraca.
 
 # qualificadores que tiram a declaração do pacote (P459/P1013 têm exceções)
 QUALIF_EXCLUI = {"P1480", "P5102", "P518", "P2241"}
@@ -72,7 +106,7 @@ CONSULTA = """SELECT ?item ?prop ?st ?rank ?amt ?unit
   (GROUP_CONCAT(DISTINCT ?qX; separator="|") AS ?quals) (GROUP_CONCAT(DISTINCT ?rr; separator="|") AS ?refs) WHERE {
   VALUES ?item { %s }
   VALUES (?prop ?p ?psv) { ("P2101" p:P2101 psv:P2101) ("P2102" p:P2102 psv:P2102) ("P2054" p:P2054 psv:P2054)
-                           ("P2177" p:P2177 psv:P2177) ("P1117" p:P1117 psv:P1117) }
+                           ("P2177" p:P2177 psv:P2177) ("P1117" p:P1117 psv:P1117) ("P3078" p:P3078 psv:P3078) }
   ?item ?p ?st . ?st ?psv ?v ; wikibase:rank ?rank . FILTER(?rank != wikibase:DeprecatedRank)
   ?v wikibase:quantityAmount ?amt . OPTIONAL { ?v wikibase:quantityUnit ?unit }
   OPTIONAL { ?st pqv:P2076 ?t . ?t wikibase:quantityAmount ?ta . OPTIONAL { ?t wikibase:quantityUnit ?tu }
@@ -214,7 +248,7 @@ def converter(dec):
         cond["pressaoPa"] = pa
     fases = [val for p, val in dec["qualificadores"] if p == "P515"]
     if fases:
-        cond["fase"] = {"Q11438": "solido", "Q11435": "liquido", "Q11432": "gas"}.get(fases[0], fases[0])
+        cond["fase"] = FASES.get(fases[0], fases[0])
     if prop in ("P2101", "P2102"):
         if u not in TEMPERATURA:
             return None, f"unidade desconhecida {u}"
@@ -241,6 +275,21 @@ def converter(dec):
         if u not in ADIMENSIONAL:
             return None, f"unidade desconhecida {u}"
         return ("pka", v, "", cond), None
+    if prop == "P3078":
+        if u not in ENERGIA_MOLAR:
+            return None, f"unidade desconhecida {u}"
+        if "temperaturaK" in cond and abs(cond["temperaturaK"] - T_PADRAO) > 1:
+            return None, "entalpia de formação fora de 298,15 K"
+        if "pressaoPa" in cond and not (Decimal(95000) <= cond["pressaoPa"] <= Decimal(107000)):
+            return None, "pressão diferente de 1 atm"
+        # fase (P515): "valor desconhecido" (nó anônimo do Wikidata, não um item) = fase não informada; outro item que não sólido/líquido/gás
+        # (solução aquosa, fluido supercrítico...) ou fases em conflito não são a entalpia do estado padrão
+        brutas = {val for p, val in dec["qualificadores"] if p == "P515"}
+        if any(re.fullmatch(r"Q\d+", x) and x not in FASES for x in brutas) or len({x for x in brutas if x in FASES}) > 1:
+            return None, "fase de matéria não reconhecida ou ambígua"
+        if not any(x in FASES for x in brutas):
+            cond.pop("fase", None)
+        return ("entalpiaFormacaoKJmol", v * ENERGIA_MOLAR[u][1], ENERGIA_MOLAR[u][0], cond), None
     return None, "propriedade fora do escopo"
 
 
@@ -253,13 +302,20 @@ def plausivel(campo, v):
         return v >= 0
     if campo == "pka":
         return Decimal(-15) <= v <= Decimal(60)
+    if campo == "entalpiaFormacaoKJmol":
+        return abs(v) < Decimal(10000)
     return True
 
 
-def _pontuacao(dec, campo, cond, unidade_orig):
-    """Maior = melhor (ver docstring do módulo)."""
+def _pontuacao(dec, campo, cond, unidade_orig, estado=None):
+    """Maior = melhor (ver docstring do módulo). `estado`: estado a 298,15 K (só pesa na entalpia de formação)."""
     if campo in ("pontoFusaoK", "pontoEbulicaoK"):
         condicao = 2 if "pressaoPa" in cond else 1
+        dist = Decimal(0)
+    elif campo == "entalpiaFormacaoKJmol":
+        # fase igual ao estado padrão > sem fase declarada > fase declarada com o estado desconhecido (essas só valem se concordam)
+        fase = cond.get("fase")
+        condicao = 3 if fase is not None and fase == estado else 2 if fase is None else 1
         dist = Decimal(0)
     else:
         tk = cond.get("temperaturaK")
@@ -308,7 +364,30 @@ def fonte_valor(dec, unidade_orig, cond, hoje):
     if cond.get("_corroborado"):
         f["semReferencia"] = True
         f["corroboradoPor"] = cond["_corroborado"]
+    if cond.get("_fraca"):
+        # sem "afirmado em"/URL: o valor é do Wikidata, mas sem fonte primária declarada (a interface avisa); `referencia` fica ausente
+        f["referenciaFraca"] = True
+        origem = _importado_de(dec)
+        if origem:
+            f["importadoDe"] = origem
+        else:
+            f["semReferencia"] = True
     return f
+
+
+def _importado_de(dec):
+    """Texto curto do "importado de" (P143: projeto Wikimedia; P4656: URL da Wikipédia) de uma declaração sem referência forte, ou None."""
+    vistos = []
+    for r in dec["referenciasFracas"]:
+        if r["prop"] == "P143":
+            txt = f"{r['rotulo']} ({r['valor']})" if r.get("rotulo") else r["valor"]
+        elif r["prop"] == "P4656":
+            txt = r["valor"]
+        else:
+            continue
+        if txt not in vistos:
+            vistos.append(txt)
+    return "; ".join(vistos[:2]) or None
 
 
 def _contar(stats, motivo):
@@ -334,11 +413,13 @@ def _consenso(campo, lista):
     densidade/solubilidade diferente não é divergência: só se comparam candidatas com a mesma condição de pontuação."""
     topo = lista[0]
     temperatura = campo in ("pontoFusaoK", "pontoEbulicaoK")
-    pares = [x for x in lista if x[1]["referencias"] and (temperatura or x[0][2] == topo[0][2])]
+    pares = [x for x in lista if (x[1]["referencias"] or x[4].get("_fraca")) and (temperatura or x[0][2] == topo[0][2])]
     if topo not in pares:
         pares.insert(0, topo)
     if not any(_divergem(campo, topo[2], x[2]) for x in pares):
         return topo
+    if any(x[4].get("_fraca") for x in pares):
+        return None  # discordância que envolve valor de referência fraca: nada é publicado (nem por maioria)
     grupos = []
     for x in pares:
         for g in grupos:
@@ -353,7 +434,31 @@ def _consenso(campo, lista):
     return grupos[0][0]
 
 
-CASAS = {"pontoFusaoK": 2, "pontoEbulicaoK": 2, "densidadeKgm3": 3, "solubilidadeAguaGL": 4, "solubilidadeAguaG100g": 4, "pka": 2}
+CASAS = {"pontoFusaoK": 2, "pontoEbulicaoK": 2, "densidadeKgm3": 3, "solubilidadeAguaGL": 4, "solubilidadeAguaG100g": 4, "pka": 2,
+         "entalpiaFormacaoKJmol": 2}
+
+
+def _fase_da_entalpia(lista, campo, estado):
+    """Entalpia de formação: reordena pela fase em relação ao estado padrão, separa as declarações de OUTRA fase (só com o estado
+    conhecido) e põe de lado as de referência fraca quando há uma de referência forte na mesma fase (a fase efetiva de uma declaração
+    sem fase é o estado padrão; com o estado desconhecido, sem fase só casa com sem fase). Devolve (aceitas, fora_de_fase, fracas_preteridas)."""
+    novas = [(_pontuacao(x[1], campo, x[4], x[3], estado), *x[1:]) for x in lista]
+    dentro = [x for x in novas if estado is None or x[4].get("fase") in (None, estado)]
+    fora = [x for x in novas if not (estado is None or x[4].get("fase") in (None, estado))]
+    fases_fortes = {x[4].get("fase") or estado for x in dentro if not x[4].get("_fraca")}
+    preteridas = [x for x in dentro if x[4].get("_fraca") and (x[4].get("fase") or estado) in fases_fortes]
+    return [x for x in dentro if not any(x is q for q in preteridas)], fora, preteridas
+
+
+def _alternativa(x, campo):
+    """Declaração aceita mas não escolhida, para a auditoria (`propriedades_wikidata_alternativas.json`; fora do pacote)."""
+    alt = {"valor": _num(x[2], CASAS[campo]), "declaracao": x[1]["id"], "temReferencia": bool(x[1]["referencias"])}
+    if campo == CAMPO_REFERENCIA_FRACA:
+        if x[4].get("fase"):
+            alt["fase"] = x[4]["fase"]
+        if x[4].get("_fraca"):
+            alt["referenciaFraca"] = True
+    return alt
 
 
 def escolher(declaracoes, hoje, stats=None, exigir_referencia=None, acido_forte=False):
@@ -372,6 +477,11 @@ def escolher(declaracoes, hoje, stats=None, exigir_referencia=None, acido_forte=
                 conv, m = None, "fora da faixa física plausível"
             elif campo == "pka" and acido_forte:
                 conv, m = None, "pKa de ácido forte"
+            elif exigir_referencia and not dec["referencias"] and campo == CAMPO_REFERENCIA_FRACA and ENTALPIA_ACEITA_REFERENCIA_FRACA:
+                if any(r["prop"] in REFERENCIAS_INFERIDAS for r in dec["referenciasFracas"]):
+                    conv, m = None, "referência inferida (P3452/P887)"
+                else:
+                    cond["_fraca"] = True  # aceita como referência fraca; só vale se nenhuma forte cobre a mesma fase
             elif exigir_referencia and not dec["referencias"]:
                 sem_ref.setdefault(campo, []).append((_pontuacao(dec, campo, cond, uo), dec, v, uo, cond))
                 continue
@@ -413,7 +523,19 @@ def escolher(declaracoes, hoje, stats=None, exigir_referencia=None, acido_forte=
             aceitas["densidadeKgm3"] = [x for x in aceitas["densidadeKgm3"] if x not in fora]
             if not aceitas["densidadeKgm3"]:
                 del aceitas["densidadeKgm3"]
+    fora_de_fase, fracas_preteridas = [], []
+    if "entalpiaFormacaoKJmol" in aceitas:
+        aceitas["entalpiaFormacaoKJmol"], fora_de_fase, fracas_preteridas = _fase_da_entalpia(
+            aceitas["entalpiaFormacaoKJmol"], "entalpiaFormacaoKJmol", est_prev)
+        for chave, lst in (("entalpia de outra fase", fora_de_fase), ("entalpia fraca preterida pela forte", fracas_preteridas)):
+            if lst:
+                stats.setdefault("descartadas", {}).setdefault(chave, 0)
+                stats["descartadas"][chave] += len(lst)
+        if not aceitas["entalpiaFormacaoKJmol"]:
+            del aceitas["entalpiaFormacaoKJmol"]
     props, fontes, alternativas = {}, {}, {}
+    if fora_de_fase or fracas_preteridas:
+        alternativas["entalpiaFormacaoKJmol"] = [_alternativa(x, "entalpiaFormacaoKJmol") for x in fora_de_fase + fracas_preteridas]
     for campo, lista in aceitas.items():
         lista.sort(key=lambda x: x[0], reverse=True)
         if campo == "pka":
@@ -436,17 +558,15 @@ def escolher(declaracoes, hoje, stats=None, exigir_referencia=None, acido_forte=
             if escolhida is None:
                 stats["divergentes"] = stats.get("divergentes", 0) + 1
                 stats.setdefault("divergentesPorCampo", {})[campo] = stats.get("divergentesPorCampo", {}).get(campo, 0) + 1
-                alternativas[campo] = [{"valor": _num(x[2], CASAS[campo]), "declaracao": x[1]["id"], "temReferencia": bool(x[1]["referencias"])}
-                                       for x in lista]
+                alternativas[campo] = alternativas.get(campo, []) + [_alternativa(x, campo) for x in lista]
                 continue
             _, dec, v, uo, cond = escolhida
             props[campo] = _num(v, CASAS[campo])
             fontes[campo] = fonte_valor(dec, uo, cond, hoje)
             usados = {dec["id"]}
-        resto = [{"valor": _num(x[2], CASAS[campo]), "declaracao": x[1]["id"], "temReferencia": bool(x[1]["referencias"])}
-                 for x in lista if x[1]["id"] not in usados]
+        resto = [_alternativa(x, campo) for x in lista if x[1]["id"] not in usados]
         if resto:
-            alternativas[campo] = resto
+            alternativas[campo] = alternativas.get(campo, []) + resto
     # densidade incoerente com o estado a 298,15 K: < 20 kg/m³ só para gás (unidade trocada: g/cm³ gravado como kg/m³); gás com
     # > 20 kg/m³ é a densidade do líquido sem a fase declarada
     est = estado_a_298(props.get("pontoFusaoK"), props.get("pontoEbulicaoK"))
@@ -524,6 +644,8 @@ def coletar(http, compostos, hoje, log=print, alternativas_em=None):
         if alt:
             alts[str(c["cid"])] = {"wikidata": c.get("wikidata"), **alt}
     stats["compostosComPropriedade"] = contagem
+    stats["entalpiaReferenciaFraca"] = sum(1 for c in compostos if (c.get("fontesPorPropriedade", {}).get("entalpiaFormacaoKJmol") or {})
+                                           .get("referenciaFraca"))
     stats["compostosComAlguma"] = sum(1 for c in compostos if c.get("fontesPorPropriedade"))
     stats["comReferencia"] = {campo: sum(1 for c in compostos if isinstance(c.get("fontesPorPropriedade", {}).get(campo), dict)
                                          and c["fontesPorPropriedade"][campo].get("referencia")) for campo in CAMPOS}
@@ -561,11 +683,23 @@ def validar_registro(c):
                 erros.append(f"composto {c.get('cid')}: fontesPorPropriedade.{campo} sem nome/licença/data")
             elif "PubChem" in x.get("nome", "") and "comput" in json.dumps(x).lower():
                 erros.append(f"composto {c.get('cid')}: {campo} calculado pelo PubChem não pode passar por medido")
-    for campo in ("pontoFusaoK", "pontoEbulicaoK", "densidadeKgm3", "solubilidadeAguaGL", "solubilidadeAguaG100g", "pka"):
+    for campo in ("pontoFusaoK", "pontoEbulicaoK", "densidadeKgm3", "solubilidadeAguaGL", "solubilidadeAguaG100g", "pka",
+                  "entalpiaFormacaoKJmol", "energiaGibbsFormacaoKJmol", "entropiaPadraoJmolK"):
         if campo in props and campo not in fpp:
             erros.append(f"composto {c.get('cid')}: {campo} sem fonte por valor")
         if campo in props and not isinstance(props[campo], (int, float)):
             erros.append(f"composto {c.get('cid')}: {campo} não numérico")
+    for campo, f in fpp.items():
+        for x in (f if isinstance(f, list) else [f]):
+            if not isinstance(x, dict):
+                continue
+            if x.get("referenciaFraca") and (campo != CAMPO_REFERENCIA_FRACA or x.get("referencia")):
+                erros.append(f"composto {c.get('cid')}: {campo} com referenciaFraca indevida (só {CAMPO_REFERENCIA_FRACA}, sem `referencia`)")
+            if campo == CAMPO_REFERENCIA_FRACA and not x.get("referencia") and not x.get("referenciaFraca") and not x.get("revisao"):
+                erros.append(f"composto {c.get('cid')}: {campo} sem referencia, referenciaFraca nem revisao (Wikipédia)")
+            if x.get("revisao") is not None:  # origem Wikipédia (chembox): permalink da revisão e licença CC BY-SA
+                if x.get("licenca") != "CC BY-SA 4.0" or "oldid=" not in str(x.get("url", "")) or not x.get("campoOriginal"):
+                    erros.append(f"composto {c.get('cid')}: {campo} com origem Wikipédia sem oldid, CC BY-SA 4.0 ou campoOriginal")
     if "estadoPadrao" in props and props["estadoPadrao"] not in ("solido", "liquido", "gas"):
         erros.append(f"composto {c.get('cid')}: estadoPadrao inválido")
     return erros

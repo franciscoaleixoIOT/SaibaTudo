@@ -33,6 +33,7 @@ import coleta_compostos  # noqa: E402
 import coleta_constantes  # noqa: E402
 import coleta_elementos  # noqa: E402
 import coleta_propriedades  # noqa: E402
+import coleta_termo_wikipedia  # noqa: E402
 import coleta_textos  # noqa: E402
 import coleta_wikimedia  # noqa: E402
 import fontes as F  # noqa: E402
@@ -559,11 +560,16 @@ def construir(opts, log=print):
         if any("definicaoChebi" in c for c in compostos):
             fontes_usadas.add("chebi")
 
-        log("== propriedades físicas medidas (Wikidata)")
+        log("== propriedades físicas medidas (Wikidata) e termoquímica (chembox da Wikipédia em inglês)")
         if not getattr(opts, "sem_propriedades", False):
             st = tentar(stats, "propriedadesFisicas", lambda: coleta_propriedades.coletar(
                 http, compostos, hoje, log=log, alternativas_em=Path(opts.cache) / "propriedades_wikidata_alternativas.json"), log, vazio={})
             stats["familias"]["propriedadesFisicas"].update(st or {})
+            # termoquímica padrão do chembox da Wikipédia em inglês (CC BY-SA, fonte `wikipedia-en-dados`): DEPOIS do Wikidata (precisa do
+            # estadoPadrao e tem prioridade sobre o P3078); os títulos são os sitelinks en de `meta`
+            st = tentar(stats, "termoquimicaWikipedia", lambda: coleta_termo_wikipedia.coletar(http, compostos, meta, hoje, log=log),
+                        log, vazio={})
+            stats["familias"]["termoquimicaWikipedia"].update(st or {})
 
         ghs_json, sem_texto = montar_ghs_frases(frases_h, compostos, hoje, st_clp, idiomas)
         stats["familias"]["clp"]["codigosSemTextoPt"] = sem_texto
@@ -671,7 +677,7 @@ def construir(opts, log=print):
                      "compostosComGhsHarmonizado": sum(1 for c in compostos if "ghs" in c),
                      "compostosComCas": sum(1 for c in compostos if "cas" in c),
                      "compostosComPropriedadeMedida": {campo: sum(1 for c in compostos if campo in c.get("fontesPorPropriedade", {}))
-                                                       for campo in coleta_propriedades.CAMPOS},
+                                                       for campo in dict.fromkeys(coleta_propriedades.CAMPOS + coleta_propriedades.CAMPOS_TERMO_WIKIPEDIA)},
                      "compostosComNomePorIdioma": {i: sum(1 for c in compostos if i in c.get("nomes", {})) for i in idiomas},
                      "elementosComNomePorIdioma": {i: sum(1 for e in elementos if i in e.get("nomes", {})) for i in idiomas}}
         stats["contagens"].update(contagens)
@@ -725,7 +731,7 @@ def main(argv=None):
     ap.add_argument("--limite-compostos", type=int, help="limita o núcleo a N compostos da lista fixa (testes)")
     ap.add_argument("--limite-textos", type=int, help="limita os textos da Wikimedia (testes)")
     ap.add_argument("--sem-wikimedia", action="store_true", help="não coleta Wikipédia/Wikilivros")
-    ap.add_argument("--sem-propriedades", action="store_true", help="não coleta as propriedades físicas medidas do Wikidata")
+    ap.add_argument("--sem-propriedades", action="store_true", help="não coleta as propriedades físicas medidas (Wikidata) nem a termoquímica do chembox (Wikipédia em inglês)")
     ap.add_argument("--idiomas", default=",".join(IDIOMAS),
                     help="idiomas do pacote, separados por vírgula (pt-BR sempre entra); padrão: %(default)s")
     ap.add_argument("--sem-textos-idiomas", action="store_true",

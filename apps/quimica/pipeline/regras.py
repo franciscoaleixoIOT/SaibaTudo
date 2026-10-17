@@ -243,6 +243,9 @@ PROPRIEDADES = {
     "solubilidade": ("Solubilidade em água", "g/100 g de água", "compostos.propriedades.solubilidadeAguaG100g", "composto",
                      ["solubilidade", "solubilidade em água", "coeficiente de solubilidade"]),
     "pka": ("pKa", "", "compostos.propriedades.pka", "composto", ["pka", "constante de acidez", "constante de dissociação ácida"]),
+    # 17/10/2026 (docs/CALCULADORAS_2026-10-17.md §3): ΔHf° do chembox da Wikipédia en (CC BY-SA 4.0) e, onde falta, do Wikidata (P3078, CC0); base da calculadora de entalpia.
+    "entalpiaFormacaoKJmol": ("Entalpia padrão de formação", "kJ/mol", "compostos.propriedades.entalpiaFormacaoKJmol", "composto",
+                              ["entalpia de formação", "entalpia padrão de formação", "calor de formação"]),
 }
 
 # Campos complementares por id (16/10/2026): a mesma propriedade pode existir em elementos E compostos. `origem`/`escopo` continuam
@@ -266,6 +269,8 @@ PROPRIEDADES_EXTRA = {
     "pka": {"origens": ["compostos.propriedades.pka", "compostos.propriedades.pkaValores"],
             "nota": "Menor pKa registrado (primeira dissociação); `pkaValores` traz todos quando há mais de um. Para bases, o Wikidata "
                     "costuma registrar o pKa do ácido conjugado. Ácidos fortes ficam sem pKa."},
+    "entalpiaFormacaoKJmol": {"nota": "Entalpia padrão de formação (ΔHf°) a 298,15 K, em kJ/mol (chembox da Wikipédia em inglês; Wikidata P3078 onde o artigo não tem o campo); a fase da medida fica em "
+                                      "fontesPorPropriedade.condicoes. Substância simples no estado padrão tem ΔHf° = 0 por definição."},
 }
 
 
@@ -340,6 +345,11 @@ NOTAS_PROPRIEDADES_I18N = {
         "es": "Menor pKa registrado (primera disociación); `pkaValores` trae todos cuando hay más de uno. Para las bases, Wikidata suele registrar el pKa del ácido conjugado. Los ácidos fuertes no tienen pKa.",
         "de": "Kleinster erfasster pKs-Wert (erste Dissoziation); `pkaValores` enthält alle Werte, wenn es mehrere gibt. Für Basen erfasst Wikidata meist den pKs-Wert der konjugierten Säure. Starke Säuren haben keinen pKs-Wert.",
         "fr": "Plus petit pKa enregistré (première dissociation) ; `pkaValores` les contient tous quand il y en a plusieurs. Pour les bases, Wikidata enregistre en général le pKa de l'acide conjugué. Les acides forts n'ont pas de pKa."},
+    "entalpiaFormacaoKJmol": {
+        "en": "Standard enthalpy of formation (ΔHf°) at 298.15 K, in kJ/mol (English Wikipedia chembox; Wikidata P3078 where the article lacks the field); the phase of the measurement is in fontesPorPropriedade.condicoes. An element in its standard state has ΔHf° = 0 by definition.",
+        "es": "Entalpía estándar de formación (ΔHf°) a 298,15 K, en kJ/mol (chembox de la Wikipedia en inglés; Wikidata P3078 donde el artículo no tiene el campo); la fase de la medida está en fontesPorPropriedade.condicoes. Una sustancia simple en su estado estándar tiene ΔHf° = 0 por definición.",
+        "de": "Standardbildungsenthalpie (ΔHf°) bei 298,15 K in kJ/mol (Chembox der englischen Wikipedia; Wikidata P3078, wo der Artikel das Feld nicht hat); die Phase der Messung steht in fontesPorPropriedade.condicoes. Ein Element im Standardzustand hat per Definition ΔHf° = 0.",
+        "fr": "Enthalpie standard de formation (ΔHf°) à 298,15 K, en kJ/mol (chembox de la Wikipédia en anglais ; Wikidata P3078 là où l'article n'a pas le champ) ; la phase de la mesure figure dans fontesPorPropriedade.condicoes. Un corps simple dans son état standard a ΔHf° = 0 par définition."},
 }
 
 
@@ -433,6 +443,10 @@ PROPRIEDADES_I18N = {
                      "fr": ("Solubilité dans l'eau", ["solubilité", "solubilité dans l'eau"])},
     "pka": {"en": ("pKa", ["pka", "acid dissociation constant"]), "es": ("pKa", ["pka", "constante de acidez"]),
             "de": ("pKs-Wert", ["pka", "pks", "pks-wert", "säurekonstante"]), "fr": ("pKa", ["pka", "constante d'acidité"])},
+    "entalpiaFormacaoKJmol": {"en": ("Standard enthalpy of formation", ["enthalpy of formation", "standard enthalpy of formation", "heat of formation"]),
+                              "es": ("Entalpía estándar de formación", ["entalpía de formación", "entalpía estándar de formación", "calor de formación"]),
+                              "de": ("Standardbildungsenthalpie", ["bildungsenthalpie", "standardbildungsenthalpie", "bildungswärme"]),
+                              "fr": ("Enthalpie standard de formation", ["enthalpie de formation", "enthalpie standard de formation", "chaleur de formation"])},
 }
 
 

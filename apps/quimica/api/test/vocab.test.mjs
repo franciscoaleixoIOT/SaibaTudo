@@ -10,9 +10,9 @@ import { simbolosDaFormula } from '../_lib/ground.js';
 
 const semAcento = (s) => s.normalize('NFD').replace(/\p{M}/gu, '');
 
-test('21 intenções do contrato, sem repetição, e as sem entidades existem', () => {
-  assert.equal(INTENTS.length, 21);
-  assert.equal(new Set(INTENTS).size, 21);
+test('25 intenções do contrato (21 + NOX, ENTALPIA, EQUILIBRIO e LIGACAO de 17/10/2026), sem repetição, e as sem entidades existem', () => {
+  assert.equal(INTENTS.length, 25);
+  assert.equal(new Set(INTENTS).size, 25);
   for (const i of INTENTS_SEM_ENTIDADES) assert.ok(INTENTS.includes(i), i);
   for (const i of ['ELEMENTO', 'COMPOSTO', 'RECUSA_PERIGO', 'DESCONHECIDA', 'CONVERSAO_UNIDADE']) assert.ok(INTENTS.includes(i), i);
 });

@@ -11,7 +11,9 @@ import gerar_nlu
 from comum import AQUI, REPO, fold, jaccard, ler_json, norm_question, tokens
 
 INTENTS = ["ELEMENTO", "COMPOSTO", "PROPRIEDADE", "MASSA_MOLAR", "BALANCEAR", "ESTEQUIOMETRIA", "CONCENTRACAO", "PH", "GAS_IDEAL", "CONVERSAO_UNIDADE",
-           "NOMENCLATURA", "DESENHAR", "COMPARAR", "TABELA_PERIODICA", "SEGURANCA", "CONCEITO", "RECUSA_PERIGO", "SOBRE_DADOS", "FONTES", "AJUDA", "DESCONHECIDA"]
+           "NOMENCLATURA", "DESENHAR", "COMPARAR", "TABELA_PERIODICA", "SEGURANCA", "CONCEITO", "NOX", "ENTALPIA", "EQUILIBRIO", "LIGACAO",
+           "RECUSA_PERIGO", "SOBRE_DADOS", "FONTES", "AJUDA", "DESCONHECIDA"]
+# NOX, ENTALPIA, EQUILIBRIO e LIGACAO: moldes das calculadoras de 17/10/2026 (docs/CALCULADORAS_2026-10-17.md §1), gerar_nlu.COTA_CALCULADORAS.
 
 
 class TestNluGerado(unittest.TestCase):
@@ -41,6 +43,39 @@ class TestNluGerado(unittest.TestCase):
             t = tokens(q)
             self.assertFalse(any(jaccard(t, x) >= 0.8 for x in toks), q)
         self.assertGreater(self.descartes["golden_exact_removed"] + self.descartes["golden_near_removed"], 0)
+
+    def test_intencoes_iguais_as_do_contrato(self):
+        """Todas as intenções do nlu_core têm moldes (INTENTS), e as amostras das calculadoras respeitam a combinação por intenção."""
+        core = gerar_nlu.core
+        if core is None:
+            self.skipTest("backend/modal/nlu_core.py indisponível")
+        self.assertEqual(set(INTENTS), set(core.INTENTS))
+        self.assertEqual(set(gerar_nlu.COTA_CALCULADORAS), {"NOX", "ENTALPIA", "EQUILIBRIO", "LIGACAO"})
+        for q, alvo, _ in self.amostras:
+            if alvo["intent"] in gerar_nlu.COTA_CALCULADORAS:
+                self.assertTrue(core.combinacao_valida(alvo), (q, alvo))
+        for p in gerar_nlu.V.PROP_ELEMENTO.keys() | gerar_nlu.V.PROP_COMPOSTO.keys():
+            self.assertIn(p, core.PROPRIEDADES, p)
+        self.assertIn("entalpiaFormacaoKJmol", gerar_nlu.V.PROP_COMPOSTO)
+
+    def test_calculadoras_entidades_do_pacote(self):
+        """NOX: o elemento está na fórmula do composto/íon; íons derivados do pacote; EQUILIBRIO sempre com a equação; concentrações na ordem."""
+        ions = {b for b, _ in gerar_nlu.ions_do_pacote(self.pac)}
+        for q, alvo, _ in self.amostras:
+            if alvo["intent"] == "NOX" and "elemento" in alvo:
+                comp = alvo["composto"]
+                base = re.sub(r"\s*\(?\d?[+-]\)?$", "", comp).translate(str.maketrans("₀₁₂₃₄₅₆₇₈₉", "0123456789"))
+                c = next((x for x in self.pac.compostos if comp in (x.get("nome"), x.get("nomePopular"), self.pac.formula_exibicao(x))
+                          or comp in (x.get("sinonimos") or [])), None)
+                formula = self.pac.formula_exibicao(c) if c else base
+                if c is None and base not in ions:
+                    continue  # superfície informal/sem acento do nome (variação de caixa); a fórmula não é conferível pelo texto
+                self.assertIn(alvo["elemento"], gerar_nlu.elementos_da_formula(formula), (q, alvo))
+            if alvo["intent"] == "EQUILIBRIO":
+                self.assertIn("equacao", alvo, q)
+        self.assertIn("MnO4", ions)
+        self.assertIn("NH4", ions)
+        self.assertTrue(all(gerar_nlu.calculo.conserva(r, p, k) for r, p, k in gerar_nlu.equacoes_balanceadas()))
 
     def test_alvo_no_formato_do_modelo(self):
         core = gerar_nlu.core
@@ -96,7 +131,8 @@ class TestContratos(unittest.TestCase):
         intents = Counter(c["intent"] for c in cs)
         for i in ("RECUSA_PERIGO", "SEGURANCA", "CONCEITO", "DESCONHECIDA"):
             self.assertGreaterEqual(intents[i], 3, i)
-        self.assertEqual(set(INTENTS) - set(intents), set())
+        # os casos golden das calculadoras (CALCULADORAS_2026-10-17.md §4) chegam pelo site; até lá elas podem faltar no golden
+        self.assertEqual(set(INTENTS) - set(intents) - set(gerar_nlu.COTA_CALCULADORAS), set())
         qs = [norm_question(c["q"]) for c in cs]
         self.assertEqual(len(qs) - len(set(qs)), 0, "perguntas repetidas no golden")
         for c in cs:

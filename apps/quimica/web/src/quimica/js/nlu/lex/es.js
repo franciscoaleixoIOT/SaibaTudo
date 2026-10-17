@@ -22,7 +22,11 @@ export default {
   "nomenclatura": "\\b(?:cual es (?:el )?nombre|como se llama|nombre (?:quimico|iupac|sistematico|cientifico|oficial)|nomenclatura|como se escribe|cual es (?:la )?formula(?: quimica| molecular)?|formula (?:del|de la|de|quimica del|quimica de la|molecular del|molecular de la)|nombre del compuesto)\\b",
   "tabela": "\\b(?:tabla periodica|periodicidad|tendencia\\w*|grupo \\d{1,2}|familia \\d{1,2}|periodo \\d|bloque [spdf]|elementos? (?:del|de la|de los|de las) (?:grupo|periodo|bloque|familia)|cuales (?:son )?(?:los )?elementos|cuantos elementos|elementos (?:gaseosos|liquidos|solidos)|metales|no metales|semimetales|metaloides|halogenos?|gases? nobles?|alcalinoterreos?|alcalino terreos?|alcalinos?|lantanidos?|actinidos?|elemento mas|elementos mas|orden creciente|orden decreciente|mayor (?:radio|electronegatividad|energia|punto|masa|densidad)|menor (?:radio|electronegatividad|energia|punto|masa|densidad))\\b",
   "conceitoCue": "^(?:que (?:es|son|significa|quiere decir|seria)|explic\\w*|defin\\w+|concepto de|definicion de|explicame|como funciona\\w*|por que|porque|para que sirve|cual es (?:la )?(?:definicion|diferencia|importancia|funcion)|diferencia entre|ensen\\w+|resum\\w+)\\b",
-  "conceitoTemas": "\\b(?:mol|ph|estequiometria|enlace (?:ionico|covalente|metalico|quimico)|electronegatividad|oxidacion|reduccion|oxidorreduccion|redox|equilibrio quimico|entalpia|entropia|isomeria|acido|base|sal|oxido|solucion|disolucion|concentracion|molaridad|dilucion|tabla periodica|reaccion quimica|cinetica|catalizador|electrolisis|pila|polaridad|fuerzas? intermoleculares?)\\b"
+  "conceitoTemas": "\\b(?:mol|ph|estequiometria|enlace (?:ionico|covalente|metalico|quimico)|electronegatividad|oxidacion|reduccion|oxidorreduccion|redox|equilibrio quimico|entalpia|entropia|isomeria|acido|base|sal|oxido|solucion|disolucion|concentracion|molaridad|dilucion|tabla periodica|reaccion quimica|cinetica|catalizador|electrolisis|pila|polaridad|fuerzas? intermoleculares?)\\b",
+  "nox": "\\b(?:nox|numeros? de oxidacion|estados? de oxidacion|grados? de oxidacion)\\b",
+  "entalpia": "\\b(?:entalpias?|variacion de entalpia|delta h|calor (?:de reaccion|de la reaccion|de combustion|liberado|absorbido|desprendido)|energia (?:liberada|absorbida)|ley de hess|hess|reaccion (?:exotermica|endotermica)|exotermic[oa]s?|endotermic[oa]s?)\\b",
+  "equilibrio": "\\b(?:kc|kp|constantes? de equilibrio|equilibrio quimico|expresion (?:de|del|de la) (?:kc|kp|constante)|ley de (?:accion de masas|accion de las masas)|en (?:el )?equilibrio|cociente de reaccion)\\b",
+  "ligacao": "\\b(?:tipos? de enlaces?|enlaces? (?:quimicos?|ionicos?|covalentes?|metalicos?|polar(?:es)?|apolar(?:es)?)|(?:que|cual|cuales) (?:tipo de )?enlaces?|enlaces? (?:entre|en|del|de la|de los))\\b"
  },
  "pistas": {
   "querCalcular": "\\b(?:limitante|rendimiento|cuantos?|cuantas?|masa de|gramos?|moles?|mols?|produc\\w*|form\\w*|obt\\w+|reaccion\\w*|consum\\w+|sobra\\w*|exceso|volumen|litros?)\\b",
@@ -69,7 +73,14 @@ export default {
   "misturaTema": "\\b(mezcla)s?\\b",
   "misturaConceito": "\\b(?:sustancias?|pura|puras|puro|puros|homogene\\w*|heterogene\\w*|sistemas?|clasifi\\w*|tipos? de|que (?:es|son)|diferencia entre|fases?)\\b",
   "nomenclaturaPedido": "\\b(?:como se llama|como se nombra|como nombrar|nombra|nombrar|nombre (?:este|esta|estos|estas|el siguiente)|da el nombre|de el nombre|cual es el nombre|nombre (?:oficial|iupac|usual|sistematico|correcto))\\b",
-  "nomenclaturaAlvo": "\\b(?:compuestos?|sustancias?|moleculas?|hidrocarburos?|organic[oa]s?|cadenas?|estructuras?|\\w*(?:met|et|prop|but|pent|hex|hept|oct|non|dec|fen|benc)\\w*(?:ano|eno|ino|ol|ona|oico|il|amina))\\b"
+  "nomenclaturaAlvo": "\\b(?:compuestos?|sustancias?|moleculas?|hidrocarburos?|organic[oa]s?|cadenas?|estructuras?|\\w*(?:met|et|prop|but|pent|hex|hept|oct|non|dec|fen|benc)\\w*(?:ano|eno|ino|ol|ona|oico|il|amina))\\b",
+  "noxAlvo": "\\b(?:del|de la|de los|de|para el|para la) (\\S+(?: \\S+)?) (?:en|dentro del|dentro de)\\b",
+  "entalpiaCombustao": "\\b(?:combustion|combustiones|quema|quemar|quemad[oa]s?|quemando)\\b",
+  "entalpiaFormacao": "\\b(?:entalpias? (?:estandar )?de formacion|calor(?:es)? de formacion)\\b",
+  "hess": "\\b(?:ley de hess|hess)\\b",
+  "kcKp": "\\b(?:kp|presiones parciales)\\b",
+  "concentracaoColchete": "=|:|es|vale|igual a|de",
+  "ligacaoPolaridade": "\\b(?:ionic[oa]s?|covalentes?|polar(?:es)?|apolar(?:es)?|metalic[oa]s?)\\b"
  },
  "nivel": {
   "fundamental": "\\b(?:primaria|escuela primaria|secundaria basica|nino|ninos|simple|muy simple|facil de entender|para principiantes)\\b",
@@ -443,7 +454,16 @@ export default {
   ],
   "configuracaoEletronica": [
    "configuracion electronica",
-   "distribucion electronica"
+   "distribucion electronica",
+   "diagrama de linus pauling",
+   "diagrama de moeller",
+   "capas electronicas",
+   "electrones por capa",
+   "electrones de valencia",
+   "capa de valencia",
+   "subniveles",
+   "subnivel mas energetico",
+   "distribucion por capas"
   ],
   "eletronegatividade": [
    "electronegatividad"
@@ -593,6 +613,11 @@ export default {
    "constante de disociacion del acido",
    "ka de",
    "ka del"
+  ],
+  "entalpiaFormacaoKJmol": [
+   "entalpia estandar de formacion",
+   "entalpia de formacion",
+   "calor de formacion"
   ]
  },
  "rotulosPropriedadeNormalizados": true,

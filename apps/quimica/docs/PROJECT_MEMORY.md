@@ -229,6 +229,25 @@ sobrescritos, conversão com unidades por extenso/vários destinos, "mistura" s�
 fora do pacote. Lição: o mapa mostra que o app cobre bem dado/cálculo do ensino médio e quase nada de termoquímica, atomística, equilíbrio e
 NOX — candidatos a calculadoras (PENDENCIAS §13).
 
+## 6.s Calculadoras novas, termoquímica no pacote, corpus v3.5 (17/10/2026, noite)
+Decisão do mantenedor (três itens, "pode seguir com o sugerido"): (1) calculadoras na ordem entalpia → configuração eletrônica → NOX → Kc/Kp
+→ tipo de ligação; (2) rebuild local do pacote (o refresh na nuvem falha no PubChem); (3) padrões novos no corpus v3.5 sem frase de livro.
+**Como foi feito:** especificação primeiro (`docs/CALCULADORAS_2026-10-17.md`: contrato das intenções NOX/ENTALPIA/EQUILIBRIO/LIGACAO, propriedade
+`entalpiaFormacaoKJmol`, configuração eletrônica como resposta enriquecida de PROPRIEDADE sem intenção nova, regras de cada cálculo), depois
+cinco subagentes em camadas para evitar conflito de arquivo: contrato em todos os espelhos (opus) → site (opus) → Android (opus), com corpus
+(opus) e pipeline (sonnet) em paralelo. **Pacote:** `--paciente --pubchem-cache-primeiro` 473 s, lista fixa sem descartes; termoquímica em
+`pipeline/coleta_termo_wikipedia.py` (chembox en, CC BY-SA, `oldid` por valor) + Wikidata P3078 só com referência forte. Dois caminhos
+descartados com evidência: Wikidata com referência fraca (CO₂ +394, NaCl −234,8 — importações ru/hy erradas; chave
+`ENTALPIA_ACEITA_REFERENCIA_FRACA` fica desligada) e OpenStax Apêndice G (o agente lembrou que é CC BY-NC-SA com cláusula anti-IA,
+`FONTES_E_LICENCAS.md` §4; o CLAUDE.md dizia "CC BY" por engano e foi corrigido). Cobertura: ΔHf 281, ΔGf 81, S° 258 compostos; CO₂ −393,5,
+NaCl −411,12, CH₄ −74,6, glicose −1271, H₂O −285,83 (l). **Site:** calc/{entalpia,eletronica,nox,equilibrio,ligacao}.js, regras 2b/5b no
+nlu.js, campos só do cliente `concentracoes`/`cargaFormula`/`elementos`, seta ⇌ na equação de EQUILIBRIO, tela Calculadoras com 5 cartões,
+catálogos nos 5 idiomas (revisão pendente), golden 929, 217 testes + E2E; combustão do metano −890,56 kJ/mol com o pacote real. **Android:**
+Android portado em paridade (domain/calc/{Entalpia,Eletronica,Nox,Equilibrio,Ligacao}.kt, RespostasCalculadoras.kt, LocalNlu 2b/5b, 5 cartões em Calculadoras.kt, 196 strings × 5 idiomas; 242 testes, golden 929, lint sem aviso novo; tela ainda não testada no aparelho). **Corpus v3.5:** `ia/corpus/quimica_v35.py` (12 famílias) + moldes pt em `dataset/gerar_nlu.py`; 75.041 pares, holdouts 472,
+dataset do app regerado (22.257/1.091); não treinado — comando e riscos em `ia/treino/README.md` e PENDENCIAS §13. **Modal não foi
+redeployado** (o modelo v3.4 não conhece as intenções novas; a gramática nova só vai com o v3.5). Mapa reavaliado: 61 perguntas derivadas
+mudaram para as intenções novas; EQUILIBRIO 1/45 por desenho (sem equação). Home: `NUMEROS_QUIMICA.compostosComGhsHarmonizado` 481 → 482.
+
 ## 7. Contas e segredos
 Vercel `saibatudo-quimica` (time `franciscoaleixo-9696`); GitHub `franciscoaleixoIOT`; Hugging Face `franciscoaleixo` (PRO, 40 min/dia de ZeroGPU); Modal `franciscoaleixo/main` (US$ 30/mês grátis; já usados pelo app de eleições, ~US$ 5/mês).
 `secrets/data_signing_key.pem` (nova, exclusiva deste app; pública em `pipeline/data_signing_public.pem`). Fazer backup offline. Modal: app `SaibaTudoIA-NLU-Quimica`, Volume `SaibaTudoIA-Models-Quimica` (nomes desde 14/10/2026; os antigos `saibatudo-quimica-*` foram apagados), par de Proxy Auth Token criado pelo mantenedor em 13/10/2026 (guardado em `secrets/modal_proxy_quimica.env` da raiz do monorepo, ignorado, e como variáveis sensíveis na Vercel; nunca no Git nem no chat).

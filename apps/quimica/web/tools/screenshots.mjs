@@ -191,6 +191,21 @@ const CENARIOS = {
     await avaliar("document.querySelector('.form-calc').requestSubmit()");
     await esperar("document.querySelector('.res-calc .katex')");
     await foto(`${p}-calc-unidades`);
+    // calculadoras novas (17/10/2026): a resposta é a do assistente (blocos com fonte), autoexecutada pela query
+    await abrir('/quimica/calculadoras/nox?f=' + encodeURIComponent('Cr2O7 2-'), "document.querySelector('.res-calc .katex')");
+    await foto(`${p}-calc-nox`);
+    await abrir('/quimica/calculadoras/configuracao-eletronica?el=Fe', "document.querySelector('.res-calc .bloco-kv')");
+    await foto(`${p}-calc-configuracao`);
+    await abrir('/quimica/calculadoras/equilibrio?eq=' + encodeURIComponent('N2 + 3 H2 ⇌ 2 NH3'), "document.querySelector('.res-calc .katex')");
+    await foto(`${p}-calc-equilibrio`);
+    await abrir('/quimica/calculadoras/ligacao?f=NaCl', "document.querySelector('.res-calc .bloco-resultado')");
+    await foto(`${p}-calc-ligacao`);
+    await abrir('/quimica/calculadoras/entalpia?eq=' + encodeURIComponent('CH4 + 2 O2 -> CO2 + 2 H2O'), "document.querySelector('.res-calc .bloco')");
+    await abrir('/quimica/calculadoras/entalpia?modo=hess');
+    await avaliar("(() => { const i = [...document.querySelectorAll('.form-calc input[type=text]')]; i[0].value = 'C + 1/2 O2 -> CO'; i[1].value = 'C + O2 -> CO2'; i[2].value = '-393,5'; i[3].value = 'CO + 1/2 O2 -> CO2'; i[4].value = '-283'; })()");
+    await avaliar("document.querySelector('.form-calc').requestSubmit()");
+    await esperar("document.querySelector('.res-calc .katex')");
+    await foto(`${p}-calc-hess`);
   },
   async offline(p) {
     // instala o service worker, visita as telas online (para guardar o lote do composto) e recarrega SEM rede

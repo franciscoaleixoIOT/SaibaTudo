@@ -45,7 +45,11 @@ internal object LexicoPtBr {
         "nomenclatura" to "\\b(?:qual (?:e )?(?:o )?nome|como (?:se )?chama|nome (?:quimico|iupac|sistematico|cientifico|oficial)|nomenclatura|como (?:se )?escreve|qual (?:e )?a? ?formula(?: quimica| molecular)?|formula (?:do|da|de|quimica do|quimica da|molecular do|molecular da)|nome do composto)\\b",
         "tabela" to "\\b(?:tabela periodica|periodicidade|tendencia\\w*|grupo \\d{1,2}|familia \\d{1,2}|periodo \\d|bloco [spdf]|elementos? (?:do|da|dos|das) (?:grupo|periodo|bloco|familia)|quais (?:sao )?(?:os )?elementos|quantos elementos|elementos (?:gasosos|liquidos|solidos)|metais|nao metais|ametais|semimetais|metaloides|halogenios?|gases? nobres?|alcalino terrosos?|alcalinos?|lantanideos?|lantanidios?|actinideos?|actinidios?|elemento mais|elementos mais|ordem crescente|ordem decrescente|maior (?:raio|eletronegatividade|energia|ponto|massa|densidade)|menor (?:raio|eletronegatividade|energia|ponto|massa|densidade))\\b",
         "conceitoCue" to "^(?:o que (?:e|eh|sao|significa|quer dizer|seria)|oque e|expli(?:c|qu)\\w*|defin\\w+|conceito de|definicao de|me explica\\w*|como funciona\\w*|por que|por qu[eê]|porque|para que serve|qual (?:e )?a? ?(?:definicao|diferenca|importancia|funcao)|diferenca entre|ensin\\w+|resum\\w+)\\b",
-        "conceitoTemas" to "\\b(?:mol|ph|estequiometria|ligacao (?:ionica|covalente|metalica|quimica)|eletronegatividade|oxidacao|reducao|oxirreducao|redox|equilibrio quimico|entalpia|entropia|isomeria|acido|base|sal|oxido|solucao|concentracao|molaridade|diluicao|tabela periodica|reacao quimica|cinetica|catalisador|eletrolise|pilha|polaridade|forca intermolecular|forcas intermoleculares)\\b"
+        "conceitoTemas" to "\\b(?:mol|ph|estequiometria|ligacao (?:ionica|covalente|metalica|quimica)|eletronegatividade|oxidacao|reducao|oxirreducao|redox|equilibrio quimico|entalpia|entropia|isomeria|acido|base|sal|oxido|solucao|concentracao|molaridade|diluicao|tabela periodica|reacao quimica|cinetica|catalisador|eletrolise|pilha|polaridade|forca intermolecular|forcas intermoleculares)\\b",
+        "nox" to "\\b(?:nox|numeros? de oxidacao|estados? de oxidacao|graus? de oxidacao)\\b",
+        "entalpia" to "\\b(?:entalpias?|variacao de entalpia|delta h|calor (?:de reacao|da reacao|de combustao|da combustao|liberado|absorvido|envolvido|desprendido)|energia (?:liberada|absorvida)|lei de hess|reacao (?:exotermica|endotermica)|exotermic[oa]s?|endotermic[oa]s?)\\b",
+        "equilibrio" to "\\b(?:kc|kp|constantes? de equilibrio|equilibrio quimico|expressao (?:do|de|da) (?:kc|kp|constante)|lei (?:da acao das massas|de guldberg)|no equilibrio|em equilibrio|quociente de reacao)\\b",
+        "ligacao" to "\\b(?:tipos? de ligac(?:ao|oes)|ligac(?:ao|oes) (?:quimicas?|ionicas?|covalentes?|metalicas?|polar(?:es)?|apolar(?:es)?)|(?:que|qual|quais) (?:tipo de )?ligac(?:ao|oes)|ligac(?:ao|oes) (?:entre|no|na|nos|nas|do|da|dos|das|em)|natureza da ligacao)\\b"
     )
 
     private fun n_pistas_limparConceito(): List<Any?> = listOf<Any?>(
@@ -95,7 +99,14 @@ internal object LexicoPtBr {
         "misturaTema" to "\\b(mistura)s?\\b",
         "misturaConceito" to "\\b(?:substancias?|pura|puras|puro|puros|homogene\\w*|heterogene\\w*|sistemas?|classifi\\w*|tipos? de|o que (?:e|sao)|diferenca entre|fases?)\\b",
         "nomenclaturaPedido" to "\\b(?:como (?:se )?chama|como (?:se )?nomeia|como nomear|nomei(?:e|a|em)|nomear|de o nome|da o nome|qual (?:e )?o nome|nome (?:oficial|iupac|usual|sistematico|correto))\\b",
-        "nomenclaturaAlvo" to "\\b(?:compostos?|substancias?|moleculas?|hidrocarbonetos?|organic[oa]s?|cadeias?|estruturas?|\\w*(?:met|et|prop|but|pent|hex|hept|oct|non|dec|fen|benz)\\w*(?:ano|eno|ino|ol|ona|oico|il|amina))\\b"
+        "nomenclaturaAlvo" to "\\b(?:compostos?|substancias?|moleculas?|hidrocarbonetos?|organic[oa]s?|cadeias?|estruturas?|\\w*(?:met|et|prop|but|pent|hex|hept|oct|non|dec|fen|benz)\\w*(?:ano|eno|ino|ol|ona|oico|il|amina))\\b",
+        "noxAlvo" to "\\b(?:do|da|de|dos|das) (\\S+(?: \\S+)?) (?:no|na|nos|nas|em|dentro do|dentro da)\\b",
+        "entalpiaCombustao" to "\\b(?:combustao|combustoes|queima|queimar|queimad[oa]s?|queimando)\\b",
+        "entalpiaFormacao" to "\\b(?:entalpias? (?:padrao )?de formacao|calor(?:es)? de formacao)\\b",
+        "hess" to "\\b(?:lei de hess|hess)\\b",
+        "kcKp" to "\\b(?:kp|pressoes parciais)\\b",
+        "concentracaoColchete" to "=|:|e|eh|vale|igual a|de",
+        "ligacaoPolaridade" to "\\b(?:ionic[oa]s?|covalentes?|polar(?:es)?|apolar(?:es)?|metalic[oa]s?)\\b"
     )
 
     private fun n_nivel(): Map<String, Any?> = linkedMapOf<String, Any?>(
@@ -638,7 +649,20 @@ internal object LexicoPtBr {
 
     private fun n_propriedades_configuracaoEletronica(): List<Any?> = listOf<Any?>(
         "configuracao eletronica",
-        "distribuicao eletronica"
+        "distribuicao eletronica",
+        "diagrama de linus pauling",
+        "diagrama de pauling",
+        "linus pauling",
+        "camadas eletronicas",
+        "distribuicao em camadas",
+        "distribuicao por camadas",
+        "eletrons por camada",
+        "eletrons de valencia",
+        "eletrons na camada de valencia",
+        "camada de valencia",
+        "subniveis",
+        "subnivel mais energetico",
+        "distribuicao em subniveis"
     )
 
     private fun n_propriedades_eletronegatividade(): List<Any?> = listOf<Any?>(
@@ -816,6 +840,12 @@ internal object LexicoPtBr {
         "ka da"
     )
 
+    private fun n_propriedades_entalpiaFormacaoKJmol(): List<Any?> = listOf<Any?>(
+        "entalpia padrao de formacao",
+        "entalpia de formacao",
+        "calor de formacao"
+    )
+
     private fun n_propriedades(): Map<String, Any?> = linkedMapOf<String, Any?>(
         "numeroAtomico" to n_propriedades_numeroAtomico(),
         "massaAtomica" to n_propriedades_massaAtomica(),
@@ -850,7 +880,8 @@ internal object LexicoPtBr {
         "carga" to n_propriedades_carga(),
         "tpsa" to n_propriedades_tpsa(),
         "solubilidade" to n_propriedades_solubilidade(),
-        "pka" to n_propriedades_pka()
+        "pka" to n_propriedades_pka(),
+        "entalpiaFormacaoKJmol" to n_propriedades_entalpiaFormacaoKJmol()
     )
 
     private fun n_stopwordsBusca(): List<Any?> = listOf<Any?>(

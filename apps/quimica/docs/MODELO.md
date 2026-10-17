@@ -196,3 +196,10 @@ igual à do contexto na ancoragem e responde `contexto: true` (`api/README.md`).
 já mediu o multi-turno com esse formato: 99,3 %); publicar exige `modal deploy` com `SNAPSHOT_EPOCH` novo e `vercel deploy`.
 
 **Renome no Modal (14/10/2026, manhã):** o app `saibatudo-quimica-nlu` e o Volume `saibatudo-quimica-models` viraram `SaibaTudoIA-NLU-Quimica` e `SaibaTudoIA-Models-Quimica` (padrão `SaibaTudoIA-<Papel>-<App>` com hífen, decidido pelo mantenedor). O Modal não renomeia: Volume novo criado, os três arquivos da `nlu-v3.3-20261013` e o `current.json` copiados (sha256 do GGUF conferido), `modal deploy` com o nome novo, `MODAL_ENDPOINT` trocado na Vercel (produção) e redeploy; o app e o Volume antigos foram apagados depois do teste ao vivo. Medidas no endpoint novo: primeira chamada 22,2 s (cria o snapshot), quente 3,6–4,3 s direto no Modal e 3,0–4,9 s pela Vercel. O par de Proxy Auth Token é do workspace e não mudou.
+
+**Corpus v3.5 pronto, não treinado (17/10/2026, noite):** intenções novas NOX, ENTALPIA, EQUILIBRIO e LIGACAO e a propriedade
+`entalpiaFormacaoKJmol` entraram no contrato (`nlu_core.py` INTENTS/ENTIDADES_POR_INTENCAO/gramática, API, clientes) e no corpus
+(`ia/corpus/quimica_v35.py`, famílias de superfície: notação científica, numerais por extenso, estequiometria sem "quantos", nomenclatura por
+nome sistemático, mistura, ordenação). O serviço no Modal **continua com o `nlu_core.py` anterior** de propósito: o v3.4 não foi treinado nas
+intenções novas e a gramática nova só deve ir ao ar junto com o v3.5 aprovado no gate (golden 929 agora inclui 56 casos das intenções novas —
+o v3.4 vai errar esses; comparar por intenção). Treino: `ia/treino/README.md` §v3.5 (continuação do LoRA v3.4, `max_length 288`, ~4 h).

@@ -226,13 +226,25 @@ Etapas (A–F em `I18N.md` §9):
 Livros protegidos usados só como bússola (derivados locais em `local/mapa_livros/`, fora do Git). 15.382 exercícios segmentados, 2.052
 classificados por modelo local; 70 % caem em intenções do app. Feito em 17/10: lista fixa corrigida (9 compostos descartados por 404 do
 PubChem voltam com `cid=`), +11 compostos e 2 apelidos; 7 lacunas das regras do NLU corrigidas (site + Android + léxico + golden).
-- [ ] **Rebuild do pacote** com a lista fixa nova (local, `--paciente`) e conferir no `stats.json` que `listaFixaDescartadas` ficou vazia.
-- [ ] **Corpus v3.5**: famílias novas no gerador (notação científica, frações/numerais, "massa de X formada a partir de", "como se chama
-  <nome IUPAC>", "é mistura ou substância pura", ordenação de listas) — só o padrão, nenhuma frase dos livros; depois reavaliar
-  `local/mapa_livros/cache/perguntas_app.jsonl` com `70_nlu_cobertura.py`.
-- [ ] **Calculadoras/intenções novas por rendimento** (fora do app hoje, resposta de cálculo na maioria): entalpia (Hess/formação; fonte
-  aberta de ΔHf a confirmar), configuração eletrônica (dado já existe por elemento), NOX por regra, Kc/Kp simples, tipo de ligação por
-  diferença de eletronegatividade. Decidir com o mantenedor a ordem.
+- [x] **Rebuild do pacote** (17/10, noite): local, `--alvo 2000 --paciente --pubchem-cache-primeiro` (473 s); `listaFixaDescartadas`
+  vazia, 20 compostos novos/recuperados no pacote; total segue 1.971 (o Wikidata cede 20 vagas). Depois, com `--pubchem-offline` (44 s),
+  o pacote `20261017T200629Z` ganhou a **termoquímica padrão** (`entalpiaFormacaoKJmol` 281, `energiaGibbsFormacaoKJmol` 81,
+  `entropiaPadraoJmolK` 258; chembox da Wikipédia en + Wikidata forte; `DATA_CONTRACT.md` §3.1) e foi copiado para os assets do Android.
+  O `quimica-data-refresh.yml` na nuvem continua a falhar no PubChem: publicar o pacote pelo commit + deploy local até ele voltar.
+- [x] **Corpus v3.5** montado (17/10, noite; `ia/corpus/quimica_v35.py`, 12 famílias × 5 idiomas + moldes pt das 4 intenções em
+  `dataset/gerar_nlu.py`): 75.041 pares (treino 68.589; química 69,9 %), holdouts `holdout_v35_*` 472 casos, 36 testes verdes, vazamento
+  golden × treino limpo. **Não treinado.** Decisões a confirmar antes do treino: tetos de 850 (pt) e 180 (estrangeiros) por intenção para
+  caber abaixo de 70 % (cortam PROPRIEDADE, CONCEITO, SEGURANCA…); família `configuracao` extra; comando em `ia/treino/README.md` (~4 h).
+- [ ] **Treinar e passar no gate o NLU v3.5** (continuação do LoRA v3.4; `max_length 288`), depois `modal deploy` do `nlu_app.py` — o
+  serviço Modal ainda roda o `nlu_core.py` ANTERIOR (sem as 4 intenções): só vale redeployar junto com o modelo treinado nelas.
+- [x] **Calculadoras novas** (17/10, noite, ordem do mantenedor: entalpia, configuração eletrônica, NOX, Kc/Kp, tipo de ligação) —
+  contrato, fontes e decisões em `docs/CALCULADORAS_2026-10-17.md`; intenções NOX/ENTALPIA/EQUILIBRIO/LIGACAO em todos os espelhos;
+  site (calc/, nlu.js, answers.js, tela Calculadoras, catálogos 5 idiomas; 217 testes, E2E Chrome), golden 873 → 929; Android portado em paridade (domain/calc/{Entalpia,Eletronica,Nox,Equilibrio,Ligacao}.kt, RespostasCalculadoras.kt, LocalNlu 2b/5b, 5 cartões em Calculadoras.kt, 196 strings × 5 idiomas; 242 testes, golden 929, lint sem aviso novo; tela ainda não testada no aparelho).
+  Reavaliação do mapa (`MAPA_LIVROS.md` §3): 61 perguntas derivadas passaram a ENTALPIA/LIGACAO/NOX; EQUILIBRIO segue 1/45 porque a
+  pergunta derivada perde a equação (exigida pelo contrato).
+- [ ] Lacunas que o mapa ainda mostra nos temas novos: Kc/constante de equilíbrio sem equação (→ CONCEITO com ação "abrir calculadora"),
+  prótons/nêutrons/elétrons de íon ("Fe2+" cai em COMPOSTO), Kps/solubilidade de sais; `energiaGibbsFormacaoKJmol` e `entropiaPadraoJmolK`
+  ainda sem id no NLU nem na ficha do composto (só no pacote); `MEDIDAS_COMPOSTO` da ficha do site sem a entalpia de formação.
 - [ ] **Classes de compostos** (éster, alceno, amida, álcoois…) no léxico/CONCEITO — item de 6.b, sobe de prioridade (citadas 20+ vezes).
 - [ ] OCR dos 3 livros só imagem (Levine, Martha Reis FQ, McQuarrie) se o mapa precisar de físico-química de nível superior em pt.
 - [ ] Conferência de respostas × gabaritos ficou inconclusiva por desenho (pergunta derivada é 1 passo; alternativa tem valores
@@ -241,6 +253,6 @@ PubChem voltam com `cid=`), +11 compostos e 2 apelidos; 7 lacunas das regras do 
 ## Pendente com o mantenedor (resumo)
 1. ~~`VERCEL_TOKEN_TIME`~~ criado em 11/10.
 2. Origem da chave `apikey-sabetudo.txt`.
-3. Permissão da OpenStax (opcional).
+3. Permissão da OpenStax (opcional; em 17/10 a termoquímica foi resolvida sem ela, pelo chembox da Wikipédia en — o CLAUDE.md da química passou a dizer "OpenStax e LibreTexts só como link").
 4. ~~Tokens do Modal~~ (par de Proxy Auth criado pelo mantenedor em 13/10, em `secrets/modal_proxy_quimica.env` da raiz e na Vercel); conta do Hugging Face para o explicador; **teto de gasto no Modal** (ainda não definido).
 5. ~~Chave de upload~~ (criada em 14/10, fazer backup) e conta da Play para o Android (criar o app, subir o AAB, teste interno → fechado).

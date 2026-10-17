@@ -1,7 +1,8 @@
 // NLU LOCAL determinístico (regras): converte uma pergunta em ParsedQuery (intenção + entidades). Não consulta nem produz fatos.
 // Mesma ordem de regras do Android (LocalNlu.kt); os casos de referência estão em contracts/nlu_golden_cases.json (campo `idioma`; ausente = pt-BR).
 // Intenções (docs/DATA_CONTRACT.md §8): ELEMENTO, COMPOSTO, PROPRIEDADE, MASSA_MOLAR, BALANCEAR, ESTEQUIOMETRIA, CONCENTRACAO, PH, GAS_IDEAL,
-// CONVERSAO_UNIDADE, NOMENCLATURA, DESENHAR, COMPARAR, TABELA_PERIODICA, SEGURANCA, CONCEITO, RECUSA_PERIGO, SOBRE_DADOS, FONTES, AJUDA, DESCONHECIDA.
+// CONVERSAO_UNIDADE, NOMENCLATURA, DESENHAR, COMPARAR, TABELA_PERIODICA, SEGURANCA, CONCEITO, NOX, ENTALPIA, EQUILIBRIO, LIGACAO, RECUSA_PERIGO,
+// SOBRE_DADOS, FONTES, AJUDA, DESCONHECIDA. NOX, ENTALPIA, EQUILIBRIO e LIGACAO (17/10/2026): contrato em docs/CALCULADORAS_2026-10-17.md §1.
 // Todo texto em língua natural (gatilhos, unidades por extenso, categorias…) vem do LÉXICO do idioma (contracts/lexico/<idioma>.json → js/nlu/lex/),
 // recebido em `parse(pergunta, dic, contexto, lex)`; o padrão é o léxico do idioma ativo. Nada de português fixo aqui.
 import { dividirEspecies } from './calc/balancear.js';
@@ -15,7 +16,8 @@ import { lexico } from './nlu/lex/index.js';
 
 export const INTENTS = [
   'ELEMENTO', 'COMPOSTO', 'PROPRIEDADE', 'MASSA_MOLAR', 'BALANCEAR', 'ESTEQUIOMETRIA', 'CONCENTRACAO', 'PH', 'GAS_IDEAL', 'CONVERSAO_UNIDADE',
-  'NOMENCLATURA', 'DESENHAR', 'COMPARAR', 'TABELA_PERIODICA', 'SEGURANCA', 'CONCEITO', 'RECUSA_PERIGO', 'SOBRE_DADOS', 'FONTES', 'AJUDA', 'DESCONHECIDA'
+  'NOMENCLATURA', 'DESENHAR', 'COMPARAR', 'TABELA_PERIODICA', 'SEGURANCA', 'CONCEITO', 'NOX', 'ENTALPIA',
+  'EQUILIBRIO', 'LIGACAO', 'RECUSA_PERIGO', 'SOBRE_DADOS', 'FONTES', 'AJUDA', 'DESCONHECIDA'
 ];
 
 export const TAMANHO_MAXIMO = 300;
@@ -202,12 +204,80 @@ export function extrairEquacao(texto) {
   return `${L.join(' ')} -> ${R.join(' ')}`;
 }
 
+// ---------------------------------------------------------------------------------------------------- calculadoras novas (17/10/2026)
+// Contrato: docs/CALCULADORAS_2026-10-17.md §1. Campos só do cliente (como `unidadesDestino`): `concentracoes` ([X] = v mol/L, na ordem) e
+// `cargaFormula` (carga escrita separada da fórmula: "Cr2O7 2-"). O símbolo Δ/∆ de "ΔH" não é palavra de nenhum idioma (a normalização o apaga).
+const RX_DELTA_H = /[Δ∆]\s*H(?![a-z])/;
+const RX_DELTA_HF = /[Δ∆]\s*H\s*°?\s*f(?![a-z])/;
+const RX_SETA_DUPLA = /<=>|<->|⇌|⇄|↔/;
+
+const rxColcheteCache = new WeakMap();
+/** "[N2] = 0,5 mol/L", "[H2] é 1,5 mol/L": a espécie entre colchetes, o conector do léxico (`pistas.concentracaoColchete`) e o número. */
+function rxColchete(lex) {
+  if (!rxColcheteCache.has(lex)) rxColcheteCache.set(lex, new RegExp(String.raw`\[\s*([^\[\]\s]{1,24})\s*\]\s*(?:${lex.pistas.concentracaoColchete.source})\s*${NUM}`, 'gu'));
+  return rxColcheteCache.get(lex);
+}
+
+/**
+ * Concentrações escritas com colchetes, na ordem: [{especie, valor, unidade, inicio, fim}] (a espécie com a caixa original; `fim` inclui a unidade).
+ * Espelho de `Quantidades.lerConcentracoes` (Android, a portar).
+ */
+export function lerConcentracoes(texto, unidades, lex = lexico()) {
+  const original = String(texto ?? '');
+  const dobrado = dobrarMesmoComprimento(original);
+  const out = [];
+  for (const m of dobrado.matchAll(rxColchete(lex))) {
+    const iEsp = m.index + m[0].indexOf(m[1]);
+    const iNum = m.index + m[0].length - m[2].length;
+    const valor = lerNumero(original.slice(iNum, iNum + m[2].length), lex.idioma);
+    if (!Number.isFinite(valor)) continue;
+    const resto = original.slice(m.index + m[0].length);
+    const { unidade, usado } = unidadeNoInicio(resto, unidades, lex);
+    const fim = m.index + m[0].length + (usado ? resto.indexOf(usado) + usado.length : 0);
+    out.push({ especie: original.slice(iEsp, iEsp + m[1].length), valor, unidade, inicio: m.index, fim });
+  }
+  return out;
+}
+
+/** O texto sem as concentrações entre colchetes (para achar a equação mesmo quando elas vêm antes dela). */
+function semConcentracoes(original, concentracoes) {
+  let s = original;
+  for (const c of [...concentracoes].reverse()) s = `${s.slice(0, c.inicio)}${' '.repeat(c.fim - c.inicio)}${s.slice(c.fim)}`;
+  return s;
+}
+
+/** Elemento pedido no NOX ("do enxofre no H2SO4", "of Mn in MnO4-"): o símbolo, ou null. Só pela pista do léxico (`pistas.noxAlvo`). */
+function elementoDoNox(n, original, dic, lex) {
+  const toks = original.split(/\s+/).map((x) => x.replace(/^[^\p{L}\d]+|[^\p{L}\d+-]+$/gu, '')).filter(Boolean);
+  for (const m of n.matchAll(new RegExp(lex.pistas.noxAlvo.source, 'g'))) {
+    const alvo = m[1];
+    const palavras = alvo.split(' ');
+    // a palavra com a caixa original ("Mn"), achada pela forma normalizada
+    const orig = palavras.map((w) => toks.find((x) => normalizar(x) === w) ?? w).join(' ');
+    const e = dic.entidades(orig);
+    if (e.elementos.length === 1 && !e.formulas.length && !e.compostos.some((c) => c.via === 'formula')) return e.elementos[0].simbolo;
+  }
+  return null;
+}
+
+/** Carga escrita separada logo depois da fórmula ("Cr2O7 2-", "SO4 2-", "NH4 +"): número ou null. */
+function cargaDepoisDa(formula, original) {
+  if (!formula) return null;
+  const i = original.indexOf(formula);
+  if (i < 0) return null;
+  const m = /^\s+(\d?)([+-])(?![\w.,])|^\s+([+-])(\d)(?![\w.,])/.exec(original.slice(i + formula.length));
+  if (!m) return null;
+  const sinal = (m[2] ?? m[3]) === '-' ? -1 : 1;
+  return sinal * Number(m[1] || m[4] || 1);
+}
+
 // ---------------------------------------------------------------------------------------------------- parse
 function parseVazio(original) {
   return {
     intent: 'DESCONHECIDA', textoOriginal: original, elemento: null, elementos: [], composto: null, compostoNome: null, compostos: [], formulas: [], formula: null,
     propriedade: null, propriedades: [], quantidades: [], equacao: null, nivel: null, unidadeDestino: null, unidadesDestino: [], conceito: null,
-    grupo: null, periodo: null, bloco: null, categoria: null, estado: null, extremo: null, tendencia: false, ordem: null, mistura: false, constantes: {}, seguranca: null
+    grupo: null, periodo: null, bloco: null, categoria: null, estado: null, extremo: null, tendencia: false, ordem: null, mistura: false, constantes: {}, seguranca: null,
+    concentracoes: [], cargaFormula: null
   };
 }
 
@@ -327,6 +397,28 @@ export function parse(pergunta, dic, contexto = null, lex = dic?.lex ?? lexico()
   if (I.fontes.test(n) && !tem) return fim('FONTES');
   if (I.ajuda.test(n)) return fim('AJUDA');
 
+  // 2b) equilíbrio e entalpia (docs/CALCULADORAS_2026-10-17.md §1): antes da equação química, senão a equação viraria BALANCEAR.
+  // EQUILIBRIO exige a equação (⇌, <=>, <->, ⇄, → ou = entre espécies); as concentrações entre colchetes ficam em `concentracoes`.
+  const concentracoes = lerConcentracoes(original, unidades, lex);
+  if (I.equilibrio.test(n) || (RX_SETA_DUPLA.test(original) && concentracoes.length)) {
+    const eqE = concentracoes.length ? extrairEquacao(semConcentracoes(original, concentracoes)) ?? equacao : equacao;
+    // com seta dupla na pergunta (⇌, <=>, <->, ⇄), a equação fica com ⇌ (a mesma forma que a normalização do serviço usa)
+    if (eqE) return fim('EQUILIBRIO', { equacao: RX_SETA_DUPLA.test(original) ? eqE.replace(' -> ', ' ⇌ ') : eqE, concentracoes });
+  }
+  const temComposto = p.compostos.length > 0 || p.formulas.length > 0;
+  // "ΔHf do metano": a propriedade (entalpia padrão de formação), como "entalpia de formação do metano"
+  if (RX_DELTA_HF.test(original) && temComposto && !equacao && !p.propriedade) {
+    return fim('PROPRIEDADE', { propriedade: 'entalpiaFormacaoKJmol', propriedades: ['entalpiaFormacaoKJmol'], alvoPropriedade: 'composto' });
+  }
+  if (I.entalpia.test(n) || RX_DELTA_H.test(original)) {
+    const combustao = P.entalpiaCombustao.test(n);
+    const hess = P.hess.test(n);
+    // "entalpia de formação da água" é PROPRIEDADE (entalpiaFormacaoKJmol); "o que é entalpia?" é CONCEITO
+    const soFormacao = P.entalpiaFormacao.test(n) && temComposto && !combustao && !hess && !equacao;
+    const definicao = !equacao && !temComposto && (P.prefixoDefinicao.test(n) || I.conceitoCue.test(n));
+    if (!soFormacao && !definicao && (equacao || temComposto || combustao || hess)) return fim('ENTALPIA', { equacao });
+  }
+
   // 3) equação química
   if (equacao || I.balancear.test(n)) {
     const eq = equacao ?? null;
@@ -377,6 +469,28 @@ export function parse(pergunta, dic, contexto = null, lex = dic?.lex ?? lexico()
   // hidrogênio", "reage com 10 g de Cu2S") ou pedido de massa/mols/volume ("massa de meio mol de NaCl")
   const quantEsteq = unidadesLidas.some((q) => unidades && acharUnidade(unidades, q.unidade).some((x) => GRANDEZAS_ESTEQUIOMETRIA.has(x.grupo)));
   if (tem && quantEsteq && (P.reacaoVerbo.test(n) || P.pedidoQuantidade.test(n)) && !P.prefixoDefinicao.test(n)) return fim('ESTEQUIOMETRIA', { equacao });
+
+  // 5b) NOX e tipo de ligação (docs/CALCULADORAS_2026-10-17.md §1). NOX exige o composto (fórmula ou nome); o `elemento` é só o átomo pedido
+  // ("do enxofre no H2SO4"). "Estados de oxidação do ferro" (sem composto) continua PROPRIEDADE estadosOxidacao. O gatilho "nox" também é o
+  // nome de um composto do pacote (óxidos de nitrogênio, NOx): dentro do gatilho ele não conta como composto citado.
+  const outraPropriedade = p.propriedades.some((x) => x !== 'estadosOxidacao');
+  const mNox = I.nox.exec(n);
+  if (mNox && !outraPropriedade) {
+    const gatilho = ` ${mNox[0]} `;
+    const compNox = compostos.filter((c) => !(c.via === 'nome' && gatilho.includes(` ${c.chave} `)));
+    const formulaNox = p.formulas[0] ?? compNox.find((c) => c.via === 'formula')?.texto ?? null;
+    if (compNox.length || formulaNox) {
+      const elementoNox = elementoDoNox(n, original, dic, lex);
+      const cids = compNox.map((c) => c.cid);
+      return fim('NOX', {
+        composto: cids[0] ?? null, compostos: cids, compostoNome: compNox[0]?.nome ?? null, formula: formulaNox,
+        elemento: elementoNox, elementos: elementoNox ? [elementoNox] : [], propriedade: null, propriedades: [], cargaFormula: cargaDepoisDa(formulaNox, original)
+      });
+    }
+  }
+  // LIGACAO: com composto/fórmula, ou com dois elementos (`elemento` = o primeiro, como em COMPARAR; os dois ficam em `elementos`)
+  const pistaLigacao = I.ligacao.test(n) || (P.ligacaoPolaridade.test(n) && !I.comparar.test(n));
+  if (pistaLigacao && !p.propriedade && !I.seguranca.test(n) && (temComposto || p.elementos.length >= 2)) return fim('LIGACAO');
 
   // 6) representação, comparação, segurança, nomenclatura
   if (I.comparar.test(n) && p.compostos.length + p.elementos.length + p.formulas.length >= 2) {

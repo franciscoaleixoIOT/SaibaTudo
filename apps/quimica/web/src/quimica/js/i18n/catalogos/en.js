@@ -239,7 +239,35 @@ export default {
         concentracao: { titulo: 'Concentration and dilution', descricao: 'Molarity, g/L, percentages and C₁V₁ = C₂V₂.' },
         ph: { titulo: 'pH', descricao: 'Strong and weak acids and bases (with Ka or Kb) and conversions.' },
         'gas-ideal': { titulo: 'Ideal gas', descricao: 'PV = nRT with the R constant from the package (CODATA).' },
-        unidades: { titulo: 'Unit conversion', descricao: 'Pressure, volume, mass, temperature, energy and more.' }
+        unidades: { titulo: 'Unit conversion', descricao: 'Pressure, volume, mass, temperature, energy and more.' },
+        entalpia: { titulo: 'Enthalpy (formation and Hess)', descricao: 'Reaction ΔH from the data package enthalpies of formation, or by Hess’s law with up to 4 equations.' },
+        'configuracao-eletronica': { titulo: 'Electron configuration', descricao: 'Aufbau (Madelung) order, shells and valence electrons; ions too.' },
+        nox: { titulo: 'Oxidation number', descricao: 'Oxidation number of each element by the rules, with ions and average values.' },
+        equilibrio: { titulo: 'Equilibrium (Kc and Kp)', descricao: 'Kc expression, Δn, Kp = Kc·(RT)^Δn and the value of Kc from concentrations.' },
+        ligacao: { titulo: 'Bond type', descricao: 'Ionic, polar covalent, nonpolar covalent or metallic, from electronegativity.' }
+      },
+      entalpia: {
+        modo: 'Method', formacao: 'From enthalpies of formation', hess: 'Hess’s law', equacao: 'Reaction equation', placeholder: 'E.g. CH4 + 2 O2 -> CO2 + 2 H2O',
+        ajuda: 'Without coefficients the app balances it. ΔHf° values come from the data package; elements in their standard state (O2, N2, Fe…) are 0.',
+        alvo: 'Target equation', placeholderAlvo: 'E.g. C + 2 H2 -> CH4', equacaoN: 'Equation {n}', dH: 'ΔH of equation {n} (kJ)',
+        ajudaHess: 'Type the balanced equations as given in the problem, each with its ΔH. Fractions work (1/2 O2). Leave unused ones blank.', calcular: 'Calculate ΔH'
+      },
+      eletronica: {
+        elemento: 'Element (symbol or name)', placeholder: 'E.g. Fe, iron, Cl', carga: 'Ion charge', ajudaCarga: '0 for the neutral atom; 2 for Fe²⁺, -1 for Cl⁻.',
+        calcular: 'Fill the shells', naoEncontrei: 'This element is not in the data package.'
+      },
+      nox: {
+        formula: 'Formula (with the charge, for an ion)', placeholder: 'E.g. H2SO4, MnO4-, Cr2O7 2-', ajuda: 'Charge at the end: MnO4-, SO4^2-, NH4+ or "Cr2O7 2-". Hydrates are not accepted.',
+        elemento: 'Element to highlight (optional)', placeholderElemento: 'E.g. S', calcular: 'Calculate oxidation numbers'
+      },
+      equilibrio: {
+        equacao: 'Equation', placeholder: 'E.g. N2 + 3 H2 ⇌ 2 NH3', ajuda: 'Accepts ⇌, <=>, -> or =. States (s), (l), (g), (aq) work: pure solids and liquids are left out of the expression.',
+        concentracoes: 'Equilibrium concentrations (optional)', placeholderConc: 'E.g. [N2] = 0.5; [H2] = 1.5; [NH3] = 0.2', ajudaConc: 'One per species, in mol/L, separated by semicolons.',
+        temperatura: 'Temperature (optional, for Kp)', calcular: 'Calculate'
+      },
+      ligacao: {
+        modo: 'Input', porFormula: 'Formula', porElementos: 'Two elements', formula: 'Formula', placeholder: 'E.g. NaCl, HCl, Cl2, NaOH',
+        a: 'Element 1', b: 'Element 2', placeholderA: 'E.g. H', placeholderB: 'E.g. Cl', calcular: 'Classify'
       },
       massaMolar: {
         formula: 'Chemical formula', placeholder: 'E.g.: Ca(OH)2, CuSO4·5H2O, Fe2(SO4)3', ajuda: 'Parentheses, hydrates with "·" (or "."), charges at the end: Fe3+, SO4^2-.',
@@ -390,7 +418,8 @@ export default {
       densidadeKgm3: 'density', estadoPadrao: 'physical state (standard conditions)', estadosOxidacao: 'oxidation states', descoberta: 'discovery',
       massaMolar: 'molar mass', massaExata: 'exact mass (monoisotopic)', formula: 'formula', cas: 'CAS number', cid: 'PubChem CID', smiles: 'SMILES', inchiKey: 'InChIKey',
       nomeIupac: 'IUPAC name', xlogp: 'XLogP (computed lipophilicity)', doadoresH: 'hydrogen bond donors', aceptoresH: 'hydrogen bond acceptors',
-      ligacoesRotaveis: 'rotatable bonds', carga: 'electric charge', tpsa: 'polar surface area (TPSA)', solubilidade: 'solubility in water', pka: 'pKa'
+      ligacoesRotaveis: 'rotatable bonds', carga: 'electric charge', tpsa: 'polar surface area (TPSA)', solubilidade: 'solubility in water', pka: 'pKa',
+      entalpiaFormacaoKJmol: 'standard enthalpy of formation'
     },
     medidas: {
       titulo: 'Physical properties', intro: 'Measured values, each with its source and the measurement conditions.',
@@ -449,7 +478,13 @@ export default {
       constantes: 'Constants from the data package (constantes.json)',
       boyle: 'Local calculation by the app, with the unit table from the data package',
       wikipedia: 'Wikipedia in {idioma}',
-      trechoEm: 'Text in {idioma} (not yet translated).'
+      trechoEm: 'Text in {idioma} (not yet translated).',
+      regrasNox: 'Oxidation-number rules from chemistry textbooks (convention), applied by the app',
+      regraLigacao: 'Textbook electronegativity-difference rule (Pauling scale; 0.4 and 1.7 cut-offs by convention)',
+      acaoDasMassas: 'Law of mass action (rule), local calculation by the app',
+      distribuicao: 'Distribution calculated by the app from the data package configuration (Madelung rule, aufbau diagram)',
+      substanciaSimples: 'Convention: ΔHf° = 0 for an element in its standard state',
+      entalpiaCalculo: 'Local calculation by the app (Hess’s law), with ΔHf° values from the data package'
     },
     unidades: {
       origem: { pacote: 'regras.json (signed data package)', padrao: 'the app\'s default table (SI definitions)' },
@@ -468,7 +503,8 @@ export default {
       formulaSulfurico: 'What is the formula of sulfuric acid?', compareNaCl: 'Compare sodium and chlorine', maisEletronegativo: 'Most electronegative element',
       molaridade: 'Molarity of 5.85 g of NaCl in 500 mL', volumeGas: 'What is the volume of 2 moles of gas at 300 K and 1 atm?',
       fusaoDe: 'Melting point of {nome}', configuracaoDe: 'Electron configuration of {nome}', massaMolarDe: 'Molar mass of {nome}', estruturaDe: 'Structure of {nome}',
-      perigosDe: 'Hazards of {nome}', densidadeDe: 'Density of {nome}'
+      perigosDe: 'Hazards of {nome}', densidadeDe: 'Density of {nome}',
+      noxSulfurico: 'Oxidation number of sulfur in H2SO4', ligacaoHCl: 'Bond type in HCl', kcAmonia: 'Equilibrium constant expression for N2 + 3 H2 ⇌ 2 NH3', entalpiaHess: 'Reaction enthalpy by Hess’s law'
     },
     orientacaoGeral: [
       'Read the label and the safety data sheet (SDS) of the product before use and follow the manufacturer\'s instructions.',
@@ -621,6 +657,83 @@ export default {
       semTexto: 'I do not have a text about that yet',
       naoEncontrei: 'I did not find, among the licensed excerpts in the data package, an explanation of "{termo}". Element and compound data and the calculators remain available.',
       traducaoAutomatica: 'Automatic translation, not yet reviewed by a person.', emIngles: 'Text in English (not yet translated).', padrao: 'Concept'
+    },
+    equacaoErros: {
+      semSeta: 'I could not find the reaction arrow. Write reactants -> products, for example: N2 + 3 H2 ⇌ 2 NH3.', duasSetas: 'The equation has more than one arrow. Type one reaction at a time.',
+      lado: 'One side of the equation (reactants or products) is missing.', eletron: 'Half-reactions (with electrons) are not used in this calculation: use the full equation.',
+      formula: 'There is an invalid formula in the equation.', balancear: 'I could not balance the equation.', expressao: 'I could not build the expression.'
+    },
+    nox: {
+      titulo: 'Oxidation numbers in {formula}', tituloElemento: 'Oxidation number of {el} in {formula}: {nox}', deQual: 'Oxidation numbers of which compound?',
+      digite: 'Give the formula (with the charge, for an ion). Examples: "oxidation number of sulfur in H2SO4", "oxidation state of Mn in MnO4-", "oxidation number of chromium in Cr2O7 2-".',
+      naoConsegui: 'I could not work out the oxidation numbers', hidrato: 'Hydrates are not handled here: type the formula without the water of crystallization.',
+      indeterminado: 'Not determined by the rules: no rule fixes the oxidation number of {lista}. Use the structural formula (bond by bond) to assign it.',
+      inconsistente: 'The rules give a sum of {soma}, different from the charge {carga}: check the formula and the charge.',
+      semDados: 'The data package has no electronegativity for: {lista}.', medio: 'average oxidation number',
+      regras: {
+        substanciaSimples: 'element: 0', ionMonoatomico: 'single-element ion: charge ÷ atoms', fluor: 'fluorine: always −1', grupo1: 'group 1: +1', grupo2: 'group 2: +2',
+        aluminio: 'aluminium: +3', hidrogenio: 'hydrogen: +1', hidretoMetalico: 'metal hydride: H −1', oxigenio: 'oxygen: −2', peroxido: 'peroxide: O −1',
+        superoxido: 'superoxide: O −1/2', halogenio: 'most electronegative halogen in the compound: −1', eletronegatividade: 'the most electronegative gets the usual negative value of its group',
+        balanco: 'from the balance (sum of oxidation numbers = charge)'
+      },
+      passoRegras: 'Apply the rules in order (element, ion, F, groups 1 and 2, Al, H, O, halogens); the remaining element comes from the balance.',
+      passoSoma: 'The sum of oxidation numbers times the number of atoms equals the charge ({carga}):',
+      avisoMedio: 'A fractional value is an average oxidation number: atoms of that element may have different oxidation numbers (see the structural formula).',
+      elementoAusente: '{el} is not in {formula}.', abrir: 'Open the oxidation number calculator'
+    },
+    ligacao: {
+      titulo: 'Bond type: {alvo}', deQual: 'Bond between what?', digite: 'Give the formula or two elements. Examples: "bond type in NaCl", "what bond is there between H and Cl".',
+      naoConsegui: 'I could not classify the bond', semCategoria: 'The data package has no category (metal or nonmetal) for: {lista}.',
+      semEletronegatividade: 'The data package has no electronegativity for: {lista}.', semElemento: 'This element is not in the data package: {lista}.',
+      semEntrada: 'Give the formula or two elements.',
+      tipos: { metalica: 'metallic', ionica: 'ionic', covalentePolar: 'polar covalent', covalenteApolar: 'nonpolar covalent', nenhuma: 'forms no bond under ordinary conditions (noble gas)' },
+      delta: 'ΔEN = {d} ({a}: {ea}; {b}: {eb})', metalMetal: 'metal with metal',
+      convencao: 'Textbook rule: metal with metal → metallic; metal with nonmetal and ΔEN ≥ 1.7 → ionic; 0.4 ≤ ΔEN < 1.7 → polar covalent; ΔEN < 0.4 → nonpolar covalent. The 0.4 and 1.7 cut-offs are a convention (Pauling scale); metalloids count as nonmetals.',
+      estimado: 'With three or more elements, the pairs were estimated from the formula (each metal and each nonmetal with the most electronegative nonmetal); the real structure may have other bonds.',
+      polaridadeMolecula: 'The polarity of the molecule also depends on its geometry: polar bonds can cancel out (as in CO₂, which is nonpolar).',
+      abrir: 'Open the bond type calculator'
+    },
+    equilibrio: {
+      titulo: 'Equilibrium: {equacao}', deQual: 'Equilibrium of which reaction?',
+      digite: 'Write the equation with ⇌ (or <=>, ->). Examples: "equilibrium constant expression for N2 + 3 H2 ⇌ 2 NH3", "Kc of N2 + 3 H2 ⇌ 2 NH3 with [N2] = 0.5 mol/L, [H2] = 1.5 mol/L and [NH3] = 0.2 mol/L".',
+      naoConsegui: 'I could not build the equilibrium expression', balanceada: 'The equation was balanced first: {equacao}.',
+      semSolidoLiquido: 'Pure solids and liquids are left out of the expression: {lista}.', gasPorHipotese: 'With no physical state written and no data in the package, I treated these as gases: {lista}.',
+      faseDoPacote: 'Physical state taken from the data package (standard conditions): {lista}.', faseNaTemperatura: 'Physical state at {t} K from the melting and boiling points in the data package: {lista}.', deltaN: 'Δn (gases): products − reactants',
+      kc: 'Kc', kp: 'Kp', fatorRT: '(RT)^Δn', temperatura: 'Temperature', unidadeKc: 'concentrations in mol/L',
+      faltam: 'Missing equilibrium concentrations for: {lista}. Without them, only the Kc expression is given.', invalida: 'Concentrations must be greater than zero.',
+      passoKc: 'Put the equilibrium concentrations (mol/L) into the expression:', passoKp: 'Kp = Kc·(RT)^Δn, with R = {R} L·atm/(mol·K) and T in kelvin:',
+      semT: 'For the value of Kp, give the temperature (for example, "at 500 K").', semR: 'The constant R is not in the data package (constantes.json).',
+      abrir: 'Open the Kc and Kp calculator'
+    },
+    entalpia: {
+      tituloReacao: 'Reaction enthalpy: {equacao}', tituloCombustao: 'Enthalpy of combustion: {nome}', tituloHess: 'Reaction enthalpy (Hess’s law)', tituloHessResultado: 'Hess’s law',
+      tituloAmostra: 'Heat for the sample', naoConsegui: 'I could not calculate the enthalpy',
+      digite: 'Give the reaction or the compound. Examples: "ΔH of combustion of methane", "enthalpy change of 2 H2 + O2 -> 2 H2O". For Hess’s law (several equations with ΔH), use the calculator.',
+      hess: 'Hess’s law adds known equations (multiplied by a factor or reversed) until they give the wanted reaction, and ΔH adds up the same way. In the calculator you type the target equation and up to 4 equations with ΔH, and the app finds the combination.',
+      falta: 'The data package has no standard enthalpy of formation (ΔHf°) for: {lista}. Without it, ΔH is not calculated (no value is made up).',
+      expressao: 'ΔH° = Σ n·ΔHf°(products) − Σ n·ΔHf°(reactants):', passoSoma: 'With the values from the data package (kJ/mol):',
+      valores: 'Standard enthalpies of formation used (298.15 K)', dHfDe: 'ΔHf° of {formula}', semValor: 'no value in the data package',
+      simples: '0 (element in its standard state, by definition)', resultado: 'Reaction ΔH°', porMol: 'ΔH° of combustion per mole of {nome}',
+      amostra: 'Heat for {valor} {unidade} of {nome}', passoAmostra: 'Amount of substance in the sample: n = {mol} mol; the heat is the extent of reaction times ΔH:',
+      semMol: 'I could not convert the given amount to moles.',
+      exotermica: 'ΔH < 0: exothermic reaction (releases heat).', endotermica: 'ΔH > 0: endothermic reaction (absorbs heat).',
+      combustaoCompleta: 'Complete combustion, with products in their standard states (CO₂, H₂O, N₂, SO₂).', balanceada: 'The equation was balanced first: {equacao}.',
+      naoQueima: 'Complete combustion here only covers compounds of C, H, O, N and S.',
+      hessAlvo: 'Target equation: {msg}', hessEquacao: 'Equation {n}: {msg}', naoBalanceada: 'Equation {n} is not balanced as written.',
+      semDH: 'The ΔH of equation {n} is missing.', semCombinacao: 'No combination of the given equations yields the target reaction.',
+      hessPasso: 'Equation {n} × {fator}: ΔH = {dH} kJ', hessInvertida: 'Equation {n} reversed, × {fator}: ΔH = {dH} kJ', hessSoma: 'Add the ΔH of the combined equations:',
+      hessResultado: 'ΔH of the target reaction', abrir: 'Open the enthalpy calculator', abrirHess: 'Open the calculator (Hess)'
+    },
+    eletronica: {
+      titulo: 'Electron configuration of {nome}', tituloIon: 'Electron configuration of the ion {simbolo} ({carga})', deQual: 'Electron configuration of which element?',
+      digite: 'Give the element (symbol or name), for example "electron configuration of iron".',
+      pacote: 'Configuration in the data package', completa: 'Full notation (filling order, aufbau)', camadasOrdem: 'In shell order',
+      porCamada: 'Electrons per shell', camadaValencia: 'Valence shell', camadaValenciaValor: '{camada} (n = {n}), {e} electron(s)',
+      eletronsValencia: 'Valence electrons', valenciaTransicao: '{e} (convention for transition metals: ns + (n−1)d)', valenciaF: '{e} (convention: ns + (n−1)d + (n−2)f)',
+      maisEnergetico: 'Highest-energy subshell', bloco: 'Block',
+      totalDiferente: 'The data package configuration adds up to {total} electrons, but the atomic number is {z}: the distribution was not calculated (the data is not corrected by hand).',
+      semConfiguracao: 'The data package has no electron configuration for {nome}.', cargaInvalida: 'Invalid charge for {nome}.',
+      ignorados: 'Note from the data package: {lista}.', abrir: 'Open the electron configuration calculator'
     },
     calc: {
       formula: {

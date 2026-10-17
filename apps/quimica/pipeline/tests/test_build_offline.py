@@ -118,6 +118,10 @@ class BuildOfflineTest(unittest.TestCase):
         self.assertIn("temasSemArtigo", s["familias"]["wikipedia"])
         self.assertIn("duracaoSegundos", s)
         self.assertEqual(s["erros"], [])
+        # as famílias de propriedades medidas rodam no build (offline não há resposta gravada: o que falha é a rede, não a etapa)
+        self.assertEqual(s["familias"]["termoquimicaWikipedia"]["status"], "ok")
+        self.assertIn("publicados", s["familias"]["termoquimicaWikipedia"])
+        self.assertIn("energiaGibbsFormacaoKJmol", self.lido("manifest.json")["contagens"]["compostosComPropriedadeMedida"])
 
     def test_ghs_frases_em_portugues(self):
         g = self.lido("ghs_frases.json")
@@ -175,3 +179,26 @@ class BuildOfflineTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class BuildSemPropriedadesTest(unittest.TestCase):
+    """`--sem-propriedades` desliga as duas famílias: as propriedades medidas do Wikidata e a termoquímica do chembox."""
+
+    def test_nenhuma_das_duas_roda(self):
+        with tempfile.TemporaryDirectory() as d:
+            tmp = Path(d)
+            cache = tmp / "cache"
+            shutil.copytree(FIXTURES, cache)
+            sign.gerar(tmp / "k.pem", tmp / "pub.pem")
+            orig = clp.coletar
+            clp.coletar = lambda http, hoje, idiomas=None: ({c: dict(x) for c, x in FRASES_MULTI.items()},
+                                                            {"celex": "teste", "url": clp.URL_EURLEX.format(celex="32008R1272")})
+            try:
+                rc = build.main(["--rapido", "--offline", "--cache", str(cache), "--out", str(tmp / "pacote"), "--limite-compostos", "12",
+                                 "--limite-textos", "6", "--hoje", "2026-10-10", "--sem-propriedades", "--assinar-com", str(tmp / "k.pem")])
+            finally:
+                clp.coletar = orig
+            self.assertEqual(rc, 0)
+            s = json.loads((tmp / "pacote" / "stats.json").read_text(encoding="utf-8"))
+            self.assertNotIn("propriedadesFisicas", s["familias"])
+            self.assertNotIn("termoquimicaWikipedia", s["familias"])

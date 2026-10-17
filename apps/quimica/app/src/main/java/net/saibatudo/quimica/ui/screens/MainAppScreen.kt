@@ -135,7 +135,7 @@ private fun MainAppConteudo(vm: MainViewModel) {
             is Tela.Composto -> CompostoScreen(
                 tela.cid, pacote, estado.prefs.nivel, carregar = vm::composto, onAbrirUrl = aberto, onAbrirSeguranca = { vm.abrir(Tela.Seguranca) }, modifier = m
             )
-            is Tela.Calculadora -> CalculadoraTela(tela.tipo, tela.preenchimento, pacote, m)
+            is Tela.Calculadora -> CalculadoraTela(tela.tipo, tela.preenchimento, pacote, m, montador = vm::construtorDeRespostas, onAbrirUrl = aberto)
             Tela.Seguranca -> SegurancaScreen(pacote, onAbrirUrl = aberto, modifier = m)
             Tela.Sobre -> SobreDadosScreen(pacote, estado.prefs, estado.atualizacao, onAtualizar = vm::atualizarAgora, onAbrirUrl = aberto, modifier = m)
             Tela.Privacidade -> PrivacidadeScreen(onAbrirUrl = aberto, onLimparHistorico = vm::limparHistorico, modifier = m)

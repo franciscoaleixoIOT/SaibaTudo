@@ -45,7 +45,11 @@ internal object LexicoEs {
         "nomenclatura" to "\\b(?:cual es (?:el )?nombre|como se llama|nombre (?:quimico|iupac|sistematico|cientifico|oficial)|nomenclatura|como se escribe|cual es (?:la )?formula(?: quimica| molecular)?|formula (?:del|de la|de|quimica del|quimica de la|molecular del|molecular de la)|nombre del compuesto)\\b",
         "tabela" to "\\b(?:tabla periodica|periodicidad|tendencia\\w*|grupo \\d{1,2}|familia \\d{1,2}|periodo \\d|bloque [spdf]|elementos? (?:del|de la|de los|de las) (?:grupo|periodo|bloque|familia)|cuales (?:son )?(?:los )?elementos|cuantos elementos|elementos (?:gaseosos|liquidos|solidos)|metales|no metales|semimetales|metaloides|halogenos?|gases? nobles?|alcalinoterreos?|alcalino terreos?|alcalinos?|lantanidos?|actinidos?|elemento mas|elementos mas|orden creciente|orden decreciente|mayor (?:radio|electronegatividad|energia|punto|masa|densidad)|menor (?:radio|electronegatividad|energia|punto|masa|densidad))\\b",
         "conceitoCue" to "^(?:que (?:es|son|significa|quiere decir|seria)|explic\\w*|defin\\w+|concepto de|definicion de|explicame|como funciona\\w*|por que|porque|para que sirve|cual es (?:la )?(?:definicion|diferencia|importancia|funcion)|diferencia entre|ensen\\w+|resum\\w+)\\b",
-        "conceitoTemas" to "\\b(?:mol|ph|estequiometria|enlace (?:ionico|covalente|metalico|quimico)|electronegatividad|oxidacion|reduccion|oxidorreduccion|redox|equilibrio quimico|entalpia|entropia|isomeria|acido|base|sal|oxido|solucion|disolucion|concentracion|molaridad|dilucion|tabla periodica|reaccion quimica|cinetica|catalizador|electrolisis|pila|polaridad|fuerzas? intermoleculares?)\\b"
+        "conceitoTemas" to "\\b(?:mol|ph|estequiometria|enlace (?:ionico|covalente|metalico|quimico)|electronegatividad|oxidacion|reduccion|oxidorreduccion|redox|equilibrio quimico|entalpia|entropia|isomeria|acido|base|sal|oxido|solucion|disolucion|concentracion|molaridad|dilucion|tabla periodica|reaccion quimica|cinetica|catalizador|electrolisis|pila|polaridad|fuerzas? intermoleculares?)\\b",
+        "nox" to "\\b(?:nox|numeros? de oxidacion|estados? de oxidacion|grados? de oxidacion)\\b",
+        "entalpia" to "\\b(?:entalpias?|variacion de entalpia|delta h|calor (?:de reaccion|de la reaccion|de combustion|liberado|absorbido|desprendido)|energia (?:liberada|absorbida)|ley de hess|hess|reaccion (?:exotermica|endotermica)|exotermic[oa]s?|endotermic[oa]s?)\\b",
+        "equilibrio" to "\\b(?:kc|kp|constantes? de equilibrio|equilibrio quimico|expresion (?:de|del|de la) (?:kc|kp|constante)|ley de (?:accion de masas|accion de las masas)|en (?:el )?equilibrio|cociente de reaccion)\\b",
+        "ligacao" to "\\b(?:tipos? de enlaces?|enlaces? (?:quimicos?|ionicos?|covalentes?|metalicos?|polar(?:es)?|apolar(?:es)?)|(?:que|cual|cuales) (?:tipo de )?enlaces?|enlaces? (?:entre|en|del|de la|de los))\\b"
     )
 
     private fun n_pistas_limparConceito(): List<Any?> = listOf<Any?>(
@@ -95,7 +99,14 @@ internal object LexicoEs {
         "misturaTema" to "\\b(mezcla)s?\\b",
         "misturaConceito" to "\\b(?:sustancias?|pura|puras|puro|puros|homogene\\w*|heterogene\\w*|sistemas?|clasifi\\w*|tipos? de|que (?:es|son)|diferencia entre|fases?)\\b",
         "nomenclaturaPedido" to "\\b(?:como se llama|como se nombra|como nombrar|nombra|nombrar|nombre (?:este|esta|estos|estas|el siguiente)|da el nombre|de el nombre|cual es el nombre|nombre (?:oficial|iupac|usual|sistematico|correcto))\\b",
-        "nomenclaturaAlvo" to "\\b(?:compuestos?|sustancias?|moleculas?|hidrocarburos?|organic[oa]s?|cadenas?|estructuras?|\\w*(?:met|et|prop|but|pent|hex|hept|oct|non|dec|fen|benc)\\w*(?:ano|eno|ino|ol|ona|oico|il|amina))\\b"
+        "nomenclaturaAlvo" to "\\b(?:compuestos?|sustancias?|moleculas?|hidrocarburos?|organic[oa]s?|cadenas?|estructuras?|\\w*(?:met|et|prop|but|pent|hex|hept|oct|non|dec|fen|benc)\\w*(?:ano|eno|ino|ol|ona|oico|il|amina))\\b",
+        "noxAlvo" to "\\b(?:del|de la|de los|de|para el|para la) (\\S+(?: \\S+)?) (?:en|dentro del|dentro de)\\b",
+        "entalpiaCombustao" to "\\b(?:combustion|combustiones|quema|quemar|quemad[oa]s?|quemando)\\b",
+        "entalpiaFormacao" to "\\b(?:entalpias? (?:estandar )?de formacion|calor(?:es)? de formacion)\\b",
+        "hess" to "\\b(?:ley de hess|hess)\\b",
+        "kcKp" to "\\b(?:kp|presiones parciales)\\b",
+        "concentracaoColchete" to "=|:|es|vale|igual a|de",
+        "ligacaoPolaridade" to "\\b(?:ionic[oa]s?|covalentes?|polar(?:es)?|apolar(?:es)?|metalic[oa]s?)\\b"
     )
 
     private fun n_nivel(): Map<String, Any?> = linkedMapOf<String, Any?>(
@@ -638,7 +649,16 @@ internal object LexicoEs {
 
     private fun n_propriedades_configuracaoEletronica(): List<Any?> = listOf<Any?>(
         "configuracion electronica",
-        "distribucion electronica"
+        "distribucion electronica",
+        "diagrama de linus pauling",
+        "diagrama de moeller",
+        "capas electronicas",
+        "electrones por capa",
+        "electrones de valencia",
+        "capa de valencia",
+        "subniveles",
+        "subnivel mas energetico",
+        "distribucion por capas"
     )
 
     private fun n_propriedades_eletronegatividade(): List<Any?> = listOf<Any?>(
@@ -816,6 +836,12 @@ internal object LexicoEs {
         "ka del"
     )
 
+    private fun n_propriedades_entalpiaFormacaoKJmol(): List<Any?> = listOf<Any?>(
+        "entalpia estandar de formacion",
+        "entalpia de formacion",
+        "calor de formacion"
+    )
+
     private fun n_propriedades(): Map<String, Any?> = linkedMapOf<String, Any?>(
         "numeroAtomico" to n_propriedades_numeroAtomico(),
         "massaAtomica" to n_propriedades_massaAtomica(),
@@ -850,7 +876,8 @@ internal object LexicoEs {
         "carga" to n_propriedades_carga(),
         "tpsa" to n_propriedades_tpsa(),
         "solubilidade" to n_propriedades_solubilidade(),
-        "pka" to n_propriedades_pka()
+        "pka" to n_propriedades_pka(),
+        "entalpiaFormacaoKJmol" to n_propriedades_entalpiaFormacaoKJmol()
     )
 
     private fun n_stopwordsBusca(): List<Any?> = listOf<Any?>(

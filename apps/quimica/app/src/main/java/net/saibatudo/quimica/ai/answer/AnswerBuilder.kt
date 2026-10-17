@@ -77,6 +77,11 @@ class AnswerBuilder(
                 Intent.SEGURANCA -> seguranca(q)
                 Intent.TABELA_PERIODICA -> tabelaPeriodica(q)
                 Intent.CONCEITO -> conceito(q)
+                // 17/10/2026 (docs/CALCULADORAS_2026-10-17.md): respostas das calculadoras novas (RespostasCalculadoras.kt)
+                Intent.NOX -> nox(q)
+                Intent.ENTALPIA -> entalpia(q)
+                Intent.EQUILIBRIO -> equilibrio(q)
+                Intent.LIGACAO -> ligacao(q)
                 Intent.DESCONHECIDA -> naoEntendi(q)
             }
         } catch (e: CalculoInvalido) {
@@ -148,6 +153,11 @@ class AnswerBuilder(
                 TipoCalculadora.PH -> R.string.acao_calc_ph
                 TipoCalculadora.GAS_IDEAL -> R.string.acao_calc_gas_ideal
                 TipoCalculadora.UNIDADES -> R.string.acao_calc_unidades
+                TipoCalculadora.ENTALPIA -> R.string.resp_ent_abrir
+                TipoCalculadora.ELETRONICA -> R.string.resp_ele_abrir
+                TipoCalculadora.NOX -> R.string.resp_nox_abrir
+                TipoCalculadora.EQUILIBRIO -> R.string.resp_eqm_abrir
+                TipoCalculadora.LIGACAO -> R.string.resp_lig_abrir
             }
         ),
         preenchimento
@@ -161,6 +171,10 @@ class AnswerBuilder(
             Intent.PH -> TipoCalculadora.PH
             Intent.GAS_IDEAL -> TipoCalculadora.GAS_IDEAL
             Intent.CONVERSAO_UNIDADE -> TipoCalculadora.UNIDADES
+            Intent.NOX -> TipoCalculadora.NOX
+            Intent.ENTALPIA -> TipoCalculadora.ENTALPIA
+            Intent.EQUILIBRIO -> TipoCalculadora.EQUILIBRIO
+            Intent.LIGACAO -> TipoCalculadora.LIGACAO
             else -> TipoCalculadora.MASSA_MOLAR
         }
         return Resposta(
@@ -388,6 +402,16 @@ class AnswerBuilder(
                 fontes += tem.flatMap { m -> m.fontes.map { it.fonte } }
             } else fontes += c.fontes
         }
+        // configuração eletrônica (docs/CALCULADORAS_2026-10-17.md §2.2): além do valor do pacote, a distribuição calculada (como o site)
+        val acoesFinais = acoes.toMutableList()
+        if ("configuracaoEletronica" in ids) {
+            for (e in elementos.take(3)) {
+                val (bl, fs) = blocosEletronica(e)
+                blocos += bl
+                fontes += fs
+            }
+            elementos.firstOrNull()?.takeIf { it.configuracaoEletronica != null }?.let { acoesFinais += acaoCalculadora(TipoCalculadora.ELETRONICA, mapOf("elemento" to it.simbolo)) }
+        }
         if (campos.isEmpty() && fontes.isEmpty()) fontes += (elementos.flatMap { it.fontes } + compostos.flatMap { it.fontes })
         val titulo = when {
             umaEntidade -> "${nomeTitulo.first()}: ${if (compostos.isNotEmpty() && def0.medida) Propriedades.rotuloMedida(def0, t) else def0.rotulo}"
@@ -396,7 +420,7 @@ class AnswerBuilder(
         return Resposta(
             Intent.PROPRIEDADE, titulo, blocos,
             fontes = fontes.distinctBy { "${it.nome}|${it.url}|${it.detalhe}" }.ifEmpty { fontesDoPacote() },
-            acoes = acoes, entendida = campos.isNotEmpty()
+            acoes = acoesFinais, entendida = campos.isNotEmpty()
         )
     }
 

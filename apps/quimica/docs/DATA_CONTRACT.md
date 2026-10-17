@@ -89,7 +89,26 @@ Nome em PT: do Wikidata (rótulo `pt`/`pt-br`) quando existir; senão o nome IUP
 | `pka` | — | P1117 | o **menor** pKa aceito (1ª dissociação); para bases o Wikidata costuma dar o pKa do ácido conjugado; ácidos fortes ficam sem |
 | `pkaValores` | — | P1117 | lista crescente, só quando há mais de um valor distinto (agrupados a < 0,5); `fontesPorPropriedade.pkaValores` é lista alinhada |
 | `estadoPadrao` | `solido`/`liquido`/`gas` | derivado | a 298,15 K e 1 atm, de `pontoFusaoK`/`pontoEbulicaoK`; ausente a ±2 K de 298,15 K |
+| `entalpiaFormacaoKJmol` | kJ/mol (2 casas) | chembox `DeltaHf` da Wikipédia em inglês (primário, CC BY-SA 4.0); Wikidata P3078 (CC0) só onde o artigo não tem o campo | entalpia padrão de formação a 298,15 K (17/10/2026, `CALCULADORAS_2026-10-17.md` §3). Estado padrão: `condicoes.fase` (`solido`/`liquido`/`gas`) quando a fonte marca; valor de fase diferente do `estadoPadrao` fica fora. Wikidata: só referência forte (P248/P854). Id no NLU/`regras.propriedades`: `entalpiaFormacaoKJmol` |
+| `energiaGibbsFormacaoKJmol` | kJ/mol (2 casas) | chembox `DeltaGf` | ΔG de formação padrão a 298,15 K, mesmas regras de fase (ainda sem id no NLU) |
+| `entropiaPadraoJmolK` | J/(mol·K) (2 casas) | chembox `Entropy` | entropia molar padrão a 298,15 K, mesmas regras de fase (ainda sem id no NLU) |
 
+- **Termoquímica padrão (17/10/2026).** `entalpiaFormacaoKJmol`, `energiaGibbsFormacaoKJmol` e `entropiaPadraoJmolK` vêm do `chembox` do artigo do
+  composto na Wikipédia em inglês (CC BY-SA 4.0; `pipeline/coleta_termo_wikipedia.py`): o artigo é o sitelink `enwiki` do item do Wikidata do composto,
+  com o mesmo QID, lido pela API de ações (seção 0). A origem de cada valor em `fontesPorPropriedade` é `{nome: "Wikipedia (en): <artigo>", url:
+  <permalink com oldid>, urlArtigo, licenca: "CC BY-SA 4.0", acessadoEm, revisao, campoOriginal: "DeltaHf"|"DeltaGf"|"Entropy", valorOriginal,
+  unidadeOriginal, condicoes: {fase}, atribuicao}`. Os clientes mostram a fonte com o link e o nome da licença e podem comparar `condicoes.fase` com
+  `estadoPadrao`. Aceitam-se kJ/mol, J/mol e kcal/mol termoquímica (4,184 kJ) para energia e J/(mol·K) para entropia. Ficam fora: valores aproximados
+  (`~`, `ca.`), intervalos, em solução aquosa, de outra fase que o `estadoPadrao`, campo repetido com valores diferentes e fora de escala (|ΔH|, |ΔG| ≥
+  10 000 kJ/mol; S° fora de 10 a 3 000); lista curta `EXCLUIR` de artigos com valor errado conferido a olho (HNO3 aquoso, CCl4/SO3/TiCl4 gás num líquido…).
+  Com várias fases no mesmo campo vale a do `estadoPadrao`. `entalpiaFormacaoKJmol` também pode vir do Wikidata (P3078, só com referência forte P248/P854);
+  onde o chembox existe, ele vale, exceto quando o Wikidata tem fase explícita igual ao `estadoPadrao` e o chembox não tem fase (`mantidoWikidataPorFase`
+  no `stats`). Valores que o Wikidata só importou da Wikipédia (P143/P4656) **não entram**: a conferência de 17/10/2026 achou erros de sinal e de valor
+  (CO2 +394, NaCl −234,8, ZnO +350,8 — importações das Wikipédias russa e armênia); a chave `ENTALPIA_ACEITA_REFERENCIA_FRACA` fica desligada. Cobertura
+  medida no pacote de 17/10/2026: ΔHf em 281 de 1.971 compostos (261 do chembox, 20 do Wikidata), ΔGf em 81, S° em 258; onde falta, a calculadora de
+  entalpia diz "falta ΔHf de X" em vez de estimar. Elemento no estado padrão tem ΔHf° = 0 (regra). Erro residual do artigo da ordem de 3 % (quase sempre
+  fase não marcada); `stats` guarda as divergências com o Wikidata e uma amostra do que não foi reconhecido para a próxima conferência. Validação do build:
+  campo sem origem ou não numérico é erro; origem Wikipédia sem `oldid`, `campoOriginal` ou CC BY-SA 4.0 também.
 - **Origem por valor** (`fontesPorPropriedade[campo]`): `{nome, url, licenca, acessadoEm}` (como `fontes`) + `declaracao` (id da declaração no Wikidata),
   `referencia` (o que a declaração cita: "afirmado em" e/ou URL), `valorOriginal`/`unidadeOriginal` (como está no Wikidata), `condicoes` (`temperaturaK`,
   `pressaoPa`, `fase`) e, raramente, `semReferencia: true` + `corroboradoPor: n` (duas ou mais declarações sem referência que concordam, quando nenhuma tem).
@@ -260,13 +279,44 @@ que **não** podem ser recusados (ex.: "como neutralizar ácido derramado").
 ## 9. Intenções do NLU (v1)
 `ELEMENTO` (perfil), `COMPOSTO` (ficha), `PROPRIEDADE` (de X: ponto de fusão, pKa…), `MASSA_MOLAR`, `BALANCEAR`, `ESTEQUIOMETRIA`, `CONCENTRACAO` (molaridade, diluição),
 `PH`, `GAS_IDEAL`, `CONVERSAO_UNIDADE`, `NOMENCLATURA` (nome ↔ fórmula), `DESENHAR` (estrutura), `COMPARAR`, `TABELA_PERIODICA` (tendências, grupo, período), `SEGURANCA`
-(perigos, EPI, primeiros socorros), `CONCEITO` (explicação), `RECUSA_PERIGO`, `SOBRE_DADOS`, `FONTES`, `AJUDA`, `DESCONHECIDA`.
+(perigos, EPI, primeiros socorros), `CONCEITO` (explicação), `NOX` (número de oxidação num composto), `ENTALPIA` (ΔH de reação/combustão, lei de Hess),
+`EQUILIBRIO` (expressão e valor de Kc/Kp), `LIGACAO` (tipo de ligação), `RECUSA_PERIGO`, `SOBRE_DADOS`, `FONTES`, `AJUDA`, `DESCONHECIDA`.
+As quatro de calculadora entraram em 17/10/2026 (`CALCULADORAS_2026-10-17.md` §1); "entalpia de FORMAÇÃO de X" continua `PROPRIEDADE` +
+`entalpiaFormacaoKJmol`, e configuração eletrônica continua `PROPRIEDADE` + `configuracaoEletronica`.
 Entidades: `elemento` (símbolo), `composto` (cid ou nome canônico), `propriedade` (id de `regras.propriedades`), `quantidades: [{valor, unidade}]`, `equacao` (texto),
 `nivel` (`fundamental|medio|superior`), `unidadeDestino` (e, só nos clientes, `unidadesDestino`: todos os destinos de "para atm, kPa e torr", desde 17/10/2026).
 **Chaves por intenção (14/10/2026):** cada intenção admite só algumas entidades, e algumas são obrigatórias — tabela `ENTIDADES_POR_INTENCAO` em
 `backend/modal/nlu_core.py`, derivada do golden e do corpus (ex.: `ELEMENTO` só `elemento`, obrigatório; `PROPRIEDADE` exige `propriedade` e admite
 `elemento`/`composto`; `MASSA_MOLAR` admite `elemento`/`composto` sem obrigar; `RECUSA_PERIGO`, `SOBRE_DADOS`, `FONTES`, `AJUDA`, `DESCONHECIDA` não
 admitem nenhuma). A gramática do modelo em nuvem só gera essas combinações; o proxy (`api/_lib/normalize.js`) ainda revalida e ancora.
+
+| Intenção | Admite | Obriga |
+| :-- | :-- | :-- |
+| `ELEMENTO` | `elemento` | `elemento` |
+| `COMPOSTO` | `composto` | — |
+| `PROPRIEDADE` | `elemento`, `composto`, `propriedade` | `propriedade` |
+| `MASSA_MOLAR` | `elemento`, `composto` | — |
+| `BALANCEAR` | `equacao` | — |
+| `ESTEQUIOMETRIA` | `elemento`, `composto`, `quantidades`, `equacao` | — |
+| `CONCENTRACAO` | `composto`, `quantidades`, `unidadeDestino` | — |
+| `PH`, `GAS_IDEAL` | `composto`, `quantidades` | — |
+| `CONVERSAO_UNIDADE` | `quantidades`, `unidadeDestino` | `unidadeDestino` |
+| `NOMENCLATURA` | `composto` | — |
+| `DESENHAR` | `composto` | `composto` |
+| `COMPARAR` | `elemento`, `composto`, `propriedade` | — |
+| `TABELA_PERIODICA` | `propriedade` | — |
+| `SEGURANCA` | `elemento`, `composto` | — |
+| `CONCEITO` | `composto`, `nivel` | — |
+| `NOX` | `elemento`, `composto` | `composto` |
+| `ENTALPIA` | `composto`, `quantidades`, `equacao` | — |
+| `EQUILIBRIO` | `equacao`, `quantidades` | `equacao` |
+| `LIGACAO` | `elemento`, `composto` (dois elementos: o PRIMEIRO citado, como em `COMPARAR`) | — |
+| `RECUSA_PERIGO`, `SOBRE_DADOS`, `FONTES`, `AJUDA`, `DESCONHECIDA` | — | — |
+
+Espelhos da tabela: `api/_lib/contexto.js` (`ENTIDADES_POR_INTENCAO`), `web/src/quimica/js/nuvem.js` (`CHAVES_POR_INTENCAO`/`EXIGE`),
+`ai/nlu/ContextoNuvem.kt` e `CloudNlu.temAsEntidadesExigidas` no Android; as obrigatórias também em `REQUISITOS` de `api/_lib/normalize.js`.
+**Setas de equilíbrio (17/10/2026):** `normalize_question` do serviço troca `<=>`, `<->` e `⇄` por `⇌` (`->`, `-->`, `=>` e `→` seguem como antes;
+`=` isolado não vira seta); os clientes aceitam `⇌` e `→`.
 **Resposta da nuvem (`/api/nlu`):** além de `nlu`, traz `resolucao.composto` — o `composto` copiado resolvido no índice do pacote (`{cid, nome}`) ou
 `{cid: null, sugestoes: [{cid, nome}]}` (até 3) para o cliente perguntar "você quis dizer…?"; `null` sem composto. Detalhes em `api/README.md`.
 **Contexto multi-turno (`/api/nlu`, 17/10/2026; NLU v3.4+):** o corpo aceita `contexto` = a interpretação da pergunta anterior no formato desta

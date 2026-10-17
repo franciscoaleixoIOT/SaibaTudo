@@ -128,6 +128,8 @@ object NluValidator {
             Intent.COMPARAR -> q.elementos.size + q.compostos.size + q.formulas.size >= 2
             Intent.BALANCEAR -> q.equacao != null
             Intent.CONVERSAO_UNIDADE -> q.unidadeDestino != null && q.quantidades.isNotEmpty()
+            Intent.NOX -> temComposto // obrigatórias de nlu_core.ENTIDADES_POR_INTENCAO (17/10/2026)
+            Intent.EQUILIBRIO -> q.equacao != null
             Intent.DESCONHECIDA -> false
             else -> true
         }

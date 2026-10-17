@@ -68,7 +68,10 @@ FONTES = [
      "url": "https://en.wikipedia.org/", "licenca": "CC BY-SA 4.0", "uso": "dados",
      "atribuicao": "Valores numéricos de regras.json (potenciais-padrão E° da série de reatividade, solubilidade e Kps de Ca(OH)₂, "
                    "Mg(OH)₂, Sr(OH)₂ e Ba(OH)₂, pKw por temperatura), cada um com o link permanente (oldid) da página lida e a "
-                   "referência primária que ela cita (CRC Handbook; Bandura & Lvov 2006).",
+                   "referência primária que ela cita (CRC Handbook; Bandura & Lvov 2006). Termoquímica padrão dos compostos "
+                   "(entalpia de formação, energia de Gibbs de formação e entropia padrão a 298,15 K) lida do campo ΔfH⦵, ΔfG⦵ ou S⦵ do chembox "
+                   "do artigo de cada composto, com o permalink (oldid) da revisão lida em fontesPorPropriedade; autores no histórico do artigo; "
+                   "valores derivados ficam sob CC BY-SA 4.0.",
      "exibir": "sim", "dataset": "sim", "treino": "sim"},
     {"id": "icsc-oit", "nome": "ICSC — Fichas Internacionais de Segurança Química (OIT/OMS)", "mantenedor": "OIT/OMS (versão em português: ACT, Portugal)",
      "url": "https://chemicalsafety.ilo.org/dyn/icsc/showcard.home",

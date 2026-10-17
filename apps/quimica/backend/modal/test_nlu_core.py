@@ -95,6 +95,21 @@ class TestPergunta(unittest.TestCase):
         self.assertEqual(core.normalize_question(q), q)
         self.assertEqual(core.validate_question(" H₂O  →  H2 + O2 "), "H2O → H2 + O2")
 
+    def test_setas_de_equilibrio(self):
+        """17/10/2026 (CALCULADORAS §1): '<=>', '<->', '⇄' e '⇌' viram '⇌'; '->', '-->', '=>', '→' e '=' isolado não mudam de papel."""
+        for seta in ("<=>", "<->", "⇄", "⇌"):
+            self.assertEqual(core.normalize_question(f"Kc de N2 + 3 H2 {seta} 2 NH3"), "Kc de N2 + 3 H2 ⇌ 2 NH3", seta)
+        self.assertEqual(core.normalize_question("N2 + 3H2<=>2NH3"), "N2 + 3H2⇌2NH3")
+        self.assertEqual(core.normalize_question("H2 + O2 -> H2O"), "H2 + O2 -> H2O")
+        self.assertEqual(core.normalize_question("H2 + O2 --> H2O"), "H2 + O2 → H2O")
+        self.assertEqual(core.normalize_question("H2 + O2 => H2O"), "H2 + O2 → H2O")
+        self.assertEqual(core.normalize_question("H2 + O2 → H2O"), "H2 + O2 → H2O")
+        self.assertEqual(core.normalize_question("2 NO2 = N2O4 e pH = 7"), "2 NO2 = N2O4 e pH = 7")
+        q = core.normalize_question("A <=> B <-> C ⇄ D")
+        self.assertEqual(q, "A ⇌ B ⇌ C ⇌ D")
+        self.assertEqual(core.normalize_question(q), q)  # idempotente
+        self.assertEqual(core.validate_question("Kc  de  A <=> B"), "Kc de A ⇌ B")
+
 
 class TestGramatica(unittest.TestCase):
     @classmethod
@@ -116,7 +131,7 @@ class TestGramatica(unittest.TestCase):
 
     def test_todas_as_intencoes_elementos_propriedades_unidades_e_niveis(self):
         minimo = {"ELEMENTO": {"elemento": "Fe"}, "PROPRIEDADE": {"propriedade": "massaAtomica"}, "DESENHAR": {"composto": "etanol"},
-                  "CONVERSAO_UNIDADE": {"unidadeDestino": "K"}}
+                  "CONVERSAO_UNIDADE": {"unidadeDestino": "K"}, "NOX": {"composto": "H2SO4"}, "EQUILIBRIO": {"equacao": "N2 + 3 H2 ⇌ 2 NH3"}}
         for i in core.INTENTS:
             self.assertIsNotNone(self.rx.match(core.format_output({"intent": i, **minimo.get(i, {})})), i)
         for s in core.SIMBOLOS:
@@ -144,13 +159,29 @@ class TestGramatica(unittest.TestCase):
             {"intent": "CONCEITO", "propriedade": "eletronegatividade"}, {"intent": "BALANCEAR", "composto": "H2O"},
             {"intent": "DESCONHECIDA", "elemento": "Fe"}, {"intent": "AJUDA", "nivel": "medio"}, {"intent": "TABELA_PERIODICA", "elemento": "Fe"},
             {"intent": "MASSA_MOLAR", "propriedade": "massaMolar"}, {"intent": "SEGURANCA", "quantidades": [{"valor": 1, "unidade": "g"}]},
+            # 17/10/2026: intenções das calculadoras (CALCULADORAS §1)
+            {"intent": "NOX"}, {"intent": "NOX", "elemento": "S"}, {"intent": "NOX", "composto": "H2SO4", "propriedade": "estadosOxidacao"},
+            {"intent": "ENTALPIA", "elemento": "C"}, {"intent": "ENTALPIA", "propriedade": "entalpiaFormacaoKJmol"},
+            {"intent": "EQUILIBRIO"}, {"intent": "EQUILIBRIO", "quantidades": [{"valor": 500, "unidade": "K"}]},
+            {"intent": "EQUILIBRIO", "equacao": "N2 + 3 H2 ⇌ 2 NH3", "composto": "NH3"},
+            {"intent": "LIGACAO", "quantidades": [{"valor": 1, "unidade": "g"}]}, {"intent": "LIGACAO", "equacao": "H2 + Cl2 → 2 HCl"},
         ]
         for r in ruins:
             self.assertFalse(core.combinacao_valida(r), r)
             self.assertIsNone(self.rx.match(core.format_output(r)), r)
             self.assertTrue(core.has_valid_shape(r), r)  # a forma em si continua válida: só a gramática barra a combinação
         bons = [{"intent": "MASSA_MOLAR"}, {"intent": "MASSA_MOLAR", "elemento": "S"}, {"intent": "BALANCEAR"}, {"intent": "COMPOSTO"},
-                {"intent": "ESTEQUIOMETRIA", "elemento": "Fe", "quantidades": [{"valor": 1, "unidade": "g"}]}, {"intent": "CONCENTRACAO", "unidadeDestino": "g/L"}]
+                {"intent": "ESTEQUIOMETRIA", "elemento": "Fe", "quantidades": [{"valor": 1, "unidade": "g"}]}, {"intent": "CONCENTRACAO", "unidadeDestino": "g/L"},
+                {"intent": "NOX", "composto": "KMnO4"}, {"intent": "NOX", "elemento": "S", "composto": "H2SO4"},
+                {"intent": "ENTALPIA"}, {"intent": "ENTALPIA", "composto": "metano"}, {"intent": "ENTALPIA", "equacao": "2 H2 + O2 → 2 H2O"},
+                {"intent": "ENTALPIA", "composto": "etanol", "quantidades": [{"valor": 10, "unidade": "g"}]},
+                {"intent": "EQUILIBRIO", "equacao": "N2 + 3 H2 ⇌ 2 NH3"},
+                {"intent": "EQUILIBRIO", "equacao": "N2 + 3 H2 ⇌ 2 NH3", "quantidades": [{"valor": 500, "unidade": "K"}]},
+                {"intent": "EQUILIBRIO", "equacao": "N2 + 3 H2 <=> 2 NH3"}, {"intent": "EQUILIBRIO", "equacao": "2 NO2 = N2O4"},
+                {"intent": "LIGACAO"}, {"intent": "LIGACAO", "composto": "NaCl"}, {"intent": "LIGACAO", "elemento": "H"},
+                {"intent": "LIGACAO", "elemento": "C", "composto": "CO2"},
+                {"intent": "PROPRIEDADE", "composto": "água", "propriedade": "entalpiaFormacaoKJmol"},
+                {"intent": "COMPARAR", "composto": "metano", "propriedade": "entalpiaFormacaoKJmol"}]
         for r in bons:
             self.assertTrue(core.combinacao_valida(r), r)
             self.assertIsNotNone(self.rx.match(core.format_output(r)), r)

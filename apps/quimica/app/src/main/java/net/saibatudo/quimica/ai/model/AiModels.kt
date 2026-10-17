@@ -27,6 +27,11 @@ enum class Intent {
     TABELA_PERIODICA,
     SEGURANCA,
     CONCEITO,
+    /** 17/10/2026 (docs/CALCULADORAS_2026-10-17.md §1): calculadoras de NOX, entalpia, equilíbrio (Kc/Kp) e tipo de ligação. */
+    NOX,
+    ENTALPIA,
+    EQUILIBRIO,
+    LIGACAO,
     RECUSA_PERIGO,
     SOBRE_DADOS,
     FONTES,
@@ -36,6 +41,9 @@ enum class Intent {
 
 /** Quantidade lida da pergunta: valor, unidade (símbolo) e o trecho original ("25 °C"). */
 data class Quantidade(val valor: Double, val unidade: String, val texto: String = "")
+
+/** EQUILIBRIO: concentração no equilíbrio escrita entre colchetes ("[N2] = 0,5 mol/L"), como `concentracoes` do site (campo só do cliente). */
+data class Concentracao(val especie: String, val valor: Double, val unidade: String? = null)
 
 /** Interpretação estruturada de uma pergunta (entidades do contrato §8 e campos auxiliares; mesmos nomes do site). */
 data class ParsedQuery(
@@ -79,7 +87,11 @@ data class ParsedQuery(
     val constantes: Map<String, Double> = emptyMap(),
     val alvoPropriedade: String? = null,
     /** A entidade veio da pergunta anterior ("e o ponto de ebulição?"). */
-    val herdado: Boolean = false
+    val herdado: Boolean = false,
+    /** EQUILIBRIO: concentrações entre colchetes, na ordem (campo só do cliente, docs/CALCULADORAS_2026-10-17.md §1). */
+    val concentracoes: List<Concentracao> = emptyList(),
+    /** NOX: carga escrita separada da fórmula ("Cr2O7 2-" → -2); null quando não há (campo só do cliente). */
+    val cargaFormula: Int? = null
 )
 
 enum class OrigemResposta(@param:StringRes val rotulo: Int) {
@@ -97,7 +109,13 @@ enum class TipoCalculadora(@param:StringRes val rotulo: Int) {
     CONCENTRACAO(R.string.calculadora_concentracao),
     PH(R.string.calculadora_ph),
     GAS_IDEAL(R.string.calculadora_gas_ideal),
-    UNIDADES(R.string.calculadora_unidades)
+    UNIDADES(R.string.calculadora_unidades),
+    /** 17/10/2026 (docs/CALCULADORAS_2026-10-17.md §2): entalpia (formação e Hess), configuração eletrônica, NOX, Kc/Kp e tipo de ligação. */
+    ENTALPIA(R.string.calculadora_entalpia),
+    ELETRONICA(R.string.calculadora_eletronica),
+    NOX(R.string.calculadora_nox),
+    EQUILIBRIO(R.string.calculadora_equilibrio),
+    LIGACAO(R.string.calculadora_ligacao)
 }
 
 sealed interface Bloco {

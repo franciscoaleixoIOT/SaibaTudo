@@ -207,6 +207,63 @@ object Balanceador {
         return ResultadoBalanceamento(bal, passos)
     }
 
+    /**
+     * Só os coeficientes (menores inteiros positivos), sem os passos nem texto: a mesma álgebra de [balancear], para as calculadoras que
+     * balanceiam antes de calcular (entalpia, equilíbrio). Lança [CalculoInvalido] nos mesmos casos (sem solução única ou sem solução positiva).
+     */
+    fun coeficientes(eq: Equacao): List<Int> {
+        val especies = eq.todas
+        val n = especies.size
+        if (n > 26) throw CalculoInvalido(R.string.erro_equacao_grande)
+        val nr = eq.reagentes.size
+        val elementos = LinkedHashSet<String>()
+        especies.forEach { elementos += it.formula.contagem.keys }
+        val temCarga = especies.any { it.formula.carga != 0 }
+        val linhasNome = elementos.toMutableList().also { if (temCarga) it += "carga" }
+        val m = Array(linhasNome.size) { r ->
+            Array(n) { c ->
+                val sp = especies[c]
+                val v = if (linhasNome[r] == "carga") sp.formula.carga else sp.formula.contagem[linhasNome[r]] ?: 0
+                Racional.de(if (c < nr) v.toLong() else -v.toLong())
+            }
+        }
+        val pivotes = mutableListOf<Int>()
+        var linha = 0
+        for (col in 0 until n) {
+            if (linha >= m.size) break
+            val p = (linha until m.size).firstOrNull { !m[it][col].ehZero } ?: continue
+            val tmp = m[linha]; m[linha] = m[p]; m[p] = tmp
+            val div = m[linha][col]
+            for (k in 0 until n) m[linha][k] = m[linha][k] / div
+            for (r in m.indices) {
+                if (r == linha || m[r][col].ehZero) continue
+                val f = m[r][col]
+                for (k in 0 until n) m[r][k] = m[r][k] - f * m[linha][k]
+            }
+            pivotes += col
+            linha++
+        }
+        val livres = (0 until n).filter { it !in pivotes }
+        if (livres.isEmpty()) throw CalculoInvalido(if (temCarga) R.string.erro_bal_sem_combinacao_carga else R.string.erro_bal_sem_combinacao)
+        if (livres.size > 1) throw CalculoInvalido(R.string.erro_bal_varias_solucoes)
+        val f = livres[0]
+        val x = Array(n) { Racional.ZERO }
+        x[f] = Racional.UM
+        for ((i, pc) in pivotes.withIndex()) x[pc] = -m[i][f]
+        var mmc = BigInteger.ONE
+        for (v in x) mmc = mmc / mmc.gcd(v.den) * v.den
+        var inteiros = x.map { (it.num * (mmc / it.den)) }
+        val g = inteiros.fold(BigInteger.ZERO) { acc, v -> acc.gcd(v) }
+        if (g.signum() != 0) inteiros = inteiros.map { it / g }
+        if (inteiros.all { it.signum() <= 0 }) inteiros = inteiros.map { it.negate() }
+        if (inteiros.any { it.signum() <= 0 }) {
+            val ruins = inteiros.indices.filter { inteiros[it].signum() <= 0 }.joinToString(", ") { if (especies[it].eletron) "e⁻" else Texto.formulaUnicode(especies[it].rotulo) }
+            throw CalculoInvalido(R.string.erro_bal_sem_positivos, ruins)
+        }
+        if (inteiros.any { it > BigInteger.valueOf(100_000) }) throw CalculoInvalido(R.string.erro_bal_coef_grandes)
+        return inteiros.map { it.toInt() }
+    }
+
     private fun termo(c: Racional, letra: Char): String {
         val k = c.num.toInt()
         return if (k == 1) "$letra" else "$k$letra"

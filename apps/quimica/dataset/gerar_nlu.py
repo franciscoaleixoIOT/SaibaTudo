@@ -21,6 +21,10 @@ LINGUAGEM: ~10 % dos exemplos ganham uma variante informal (minúsculas, sem ace
 subscrita (H₂SO₄) ou com nome popular conferido no pacote (nomes_populares.py); o `composto`/`equacao` do alvo acompanha o texto copiado e a
 variante herda a chave de divisão do original (nunca cai do outro lado da validação).
 
+Calculadoras de 17/10/2026 (docs/CALCULADORAS_2026-10-17.md §1): moldes T["NOX"], T["ENTALPIA"], T["EQUILIBRIO"] e T["LIGACAO"] (COTA_CALCULADORAS),
+gerados DEPOIS das variantes e com sorteio próprio (seed + 35), de modo que as outras famílias continuam idênticas. Elemento do NOX sai da fórmula
+do composto; íons de ions_do_pacote; equações de equacoes.py balanceadas por calculo.balancear (equacoes_balanceadas).
+
 Uso:
   python dataset/gerar_nlu.py [--data data/quimica] [--out dataset/nlu] [--seed 2026] [--scale 1.0]
 """
@@ -35,6 +39,7 @@ from pathlib import Path
 AQUI = Path(__file__).resolve().parent
 sys.path.insert(0, str(AQUI))
 
+import calculo  # noqa: E402
 import dados_escopo  # noqa: E402
 import dados_recusas  # noqa: E402
 import equacoes  # noqa: E402
@@ -208,6 +213,44 @@ T["SEGURANCA"] = [(t, {}) for t in [
     "O rótulo {co_de} traz Perigo ou Atenção?", "Quais são as frases de precaução {co_de}?", "Quais as frases P {co_de}?", "Que cuidados o rótulo {co_de} recomenda?",
     "O que significa a frase {h}?", "O que quer dizer {h} no rótulo?", "O que indica o pictograma {pic}?", "O que significa o símbolo de {picn} no rótulo?",
 ]]
+# Calculadoras de 17/10/2026 (docs/CALCULADORAS_2026-10-17.md §1). Placeholders novos (só estes moldes os usam): {elf}/{elf_de} = um elemento
+# que ESTÁ na fórmula do composto citado (o rótulo `elemento` é o símbolo dele); {ion} = íon poliatômico derivado de um ácido/sal do pacote
+# (ions_do_pacote: "MnO4-", "Cr2O7 2-", "NH4+"; copiado como `composto`); {eqx} = equação balanceada com seta de equilíbrio (⇌, <=>, <->, → ou =);
+# {conc} = concentrações "[X] = v mol/L" das espécies da {eqx}, na ordem (cada uma vira uma quantidade); {eqb} = equação balanceada com "→"/"->".
+T["NOX"] = [(t, {}) for t in [
+    "Qual o NOX {elf_de} {co_em}?", "NOX {elf_de} {co_em}", "Qual o número de oxidação {elf_de} {co_em}?", "Calcule o nox {elf_de} {co_em}",
+    "Determine o estado de oxidação {elf_de} {co_em}", "Número de oxidação {elf_de} {co_em}", "Qual é o nox {elf_de} no composto {cf_s}?",
+    "Quanto vale o NOX {elf_de} {co_em}?", "Descubra o número de oxidação {elf_de} {co_em}", "Me ajuda a achar o nox {elf_de} {co_em}",
+    "Estados de oxidação de cada elemento {co_em}", "Quais os NOX dos elementos {co_de}?", "Calcule os números de oxidação {co_de}",
+    "Nox de todos os átomos {co_de}", "Determine o NOX de cada átomo {co_em}", "Quais são os números de oxidação {co_em}?",
+    "Qual o NOX {elf_de} no íon {ion}?", "Número de oxidação {elf_de} em {ion}", "Calcule o nox {elf_de} no {ion}", "NOX de cada elemento no íon {ion}",
+    "Quais os números de oxidação no íon {ion}?", "Determine o NOX {elf_de} no ânion {ion}",
+]]
+T["ENTALPIA"] = [(t, {}) for t in [
+    "ΔH da combustão {co_de}", "Qual a entalpia de combustão {co_de}?", "Variação de entalpia na queima {co_de}", "Calcule o ΔH de combustão {co_de}",
+    "Calor de combustão {co_de}", "A combustão {co_de} é exotérmica ou endotérmica?", "Entalpia da reação de combustão {co_de}", "Quanto calor libera a queima {co_de}?",
+    "Calor liberado na queima de {qm} de {co_s}", "Quanta energia sai da combustão de {qm} de {co_s}?", "Quantos kJ libera a queima de {qm} de {co_s}?",
+    "Qual o calor liberado ao queimar {qn} de {co_s}?", "Energia liberada na combustão de {qm} de {co_s}",
+    "Variação de entalpia de {eqb}", "Calcule o ΔH da reação {eqb}", "Qual o ΔH de {eqb}?", "Entalpia da reação {eqb}", "{eqb}: qual o ΔH?",
+    "A reação {eqb} é exotérmica ou endotérmica?", "Calcule o ΔH de {eqb} com as entalpias de formação", "Use a lei de Hess para achar o ΔH de {eqb}",
+    "Na reação {eqb}, quanto calor sai com {qm}?",
+    "Calcule a entalpia da reação pela lei de Hess", "Como achar o ΔH de uma reação pela lei de Hess?", "Lei de Hess: calcule a variação de entalpia",
+]]
+T["EQUILIBRIO"] = [(t, {}) for t in [
+    "Escreva a expressão do Kc para {eqx}", "Qual a expressão da constante de equilíbrio de {eqx}?", "Kc de {eqx}", "Monte a expressão de Kc da reação {eqx}",
+    "Expressão de Kp para {eqx}", "Qual a relação entre Kp e Kc em {eqx}?", "Constante de equilíbrio da reação {eqx}", "Como fica o Kc de {eqx}?",
+    "Calcule Kp a partir de Kc para {eqx} a {qT}", "Kp de {eqx} a {qT}", "Qual o Kp da reação {eqx} a {qT}?", "Kp em função de Kc para {eqx} a {qT}",
+    "Calcule Kc de {eqx} com {conc}", "No equilíbrio {eqx}, {conc}. Qual o Kc?", "Para {eqx} no equilíbrio: {conc}. Calcule Kc",
+    "Calcule a constante de equilíbrio de {eqx} sabendo que {conc}", "Kc de {eqx} com {conc}", "Qual o valor de Kc para {eqx} se {conc}?",
+]]
+T["LIGACAO"] = [(t, {}) for t in [
+    "Que tipo de ligação há entre {el_s} e {el2_s}?", "Ligação entre {el_s} e {el2_s}", "Qual a ligação química formada entre {el_s} e {el2_s}?",
+    "{el_s} e {el2_s} formam ligação iônica ou covalente?", "A ligação entre {el_s} e {el2_s} é iônica, covalente ou metálica?",
+    "Que ligação se forma quando {el} se liga {el2_a}?", "Qual o tipo de ligação entre átomos {el_de} e {el2_de}?",
+    "Qual o tipo de ligação {co_de}?", "Tipo de ligação {co_em}", "{Co} tem ligação iônica ou covalente?", "A ligação {co_em} é polar ou apolar?",
+    "{Co} é iônico ou covalente?", "Que tipo de ligação química existe {co_em}?", "As ligações {co_em} são covalentes polares?", "Classifique a ligação {co_de}",
+    "Qual a polaridade da ligação {co_em}?", "Que ligação une os átomos {co_em}?",
+]]
 T["_HARD_NEG_INTENT"] = {
     "Quais os perigos da nitroglicerina?": "SEGURANCA", "Qual a massa molar do TNT?": "MASSA_MOLAR", "Primeiros socorros em intoxicação por cianeto": "SEGURANCA",
     "O que é o gás mostarda?": "CONCEITO",
@@ -224,11 +267,120 @@ INTENT_COTA = {
     "GAS_IDEAL": 650, "CONVERSAO_UNIDADE": 850, "NOMENCLATURA": 950, "DESENHAR": 750, "COMPARAR": 950, "TABELA_PERIODICA": 800, "SEGURANCA": 1650,
     "CONCEITO": 1700, "RECUSA_PERIGO": 950, "SOBRE_DADOS": 110, "FONTES": 110, "AJUDA": 130, "DESCONHECIDA": 520,
 }
+# Intenções das calculadoras (17/10/2026, docs/CALCULADORAS_2026-10-17.md §1): geradas DEPOIS das variantes de linguagem, com sorteio próprio
+# (seed + 35), para que todas as outras famílias continuem gerando exatamente os mesmos pares.
+COTA_CALCULADORAS = {"NOX": 700, "ENTALPIA": 800, "EQUILIBRIO": 700, "LIGACAO": 650}
 ADJETIVOS = sorted(V.ADJ_PROPRIEDADE)
 FRACAO_VARIANTES_POR_MIL = 100  # 10 % dos exemplos ganham uma variante de linguagem (ver variantes_nlu)
 CODIGOS_H = sorted(ghs_pt.FRASES_H)
 NUMERICAS = {"massaAtomica", "numeroAtomico", "eletronegatividade", "raioAtomicoPm", "afinidadeEletronicaKJmol", "energiaIonizacaoKJmol", "pontoFusaoK",
-             "pontoEbulicaoK", "densidadeKgm3", "massaMolar", "massaExata", "xlogp", "tpsa", "doadoresH", "aceptoresH", "ligacoesRotaveis"}
+             "pontoEbulicaoK", "densidadeKgm3", "massaMolar", "massaExata", "xlogp", "tpsa", "doadoresH", "aceptoresH", "ligacoesRotaveis",
+             "entalpiaFormacaoKJmol"}
+
+
+# ---------------------------------------------------------------------------------------------------------
+# Calculadoras (17/10/2026): entidades derivadas do pacote e das equações do dataset (nada inventado)
+# ---------------------------------------------------------------------------------------------------------
+_SIMBOLO = re.compile(r"[A-Z][a-z]?")
+
+
+def elementos_da_formula(formula) -> list:
+    """Símbolos da fórmula na ordem em que aparecem (sem repetição); [] se não é fórmula."""
+    if not formula or not re.fullmatch(r"[A-Za-z0-9()·]+", formula):
+        return []
+    try:
+        return list(calculo.parse_formula(formula.split("·")[0]))
+    except Exception:
+        return []
+
+
+def combustivel(formula) -> bool:
+    """CxHy, CxHyOz (com N/S opcionais): o que a calculadora de entalpia de combustão monta (CALCULADORAS §2.1)."""
+    els = set(elementos_da_formula(formula))
+    return {"C", "H"} <= els and els <= {"C", "H", "O", "N", "S"}
+
+
+def formula_inorganica_simples(formula, pac=None) -> bool:
+    """2 a 4 elementos, sem C–H (o NOX de orgânicos é "médio" e raro nas perguntas), até 10 caracteres, na ordem usual de escrita: o O é o
+    último elemento (ou só seguido de H, como em NaOH) e nenhum metal vem depois de um não metal (fórmulas em ordem de Hill do PubChem, como
+    "H2O3S2" ou "NNb", ficam de fora)."""
+    els = elementos_da_formula(formula)
+    if not (2 <= len(els) <= 4) or {"C", "H"} <= set(els) or len(formula) > 10 or els[0] == "O":
+        return False
+    if "O" in els and any(x != "H" for x in els[els.index("O") + 1:]):
+        return False
+    if pac is not None:
+        metal = [eh_metal(pac.el_simbolo.get(x)) for x in els]
+        if not metal[0] and any(metal[1:]):
+            return False
+    return True
+
+
+def eh_metal(e) -> bool:
+    cat = (e or {}).get("categoria") or ""
+    return "metal" in cat and cat != "semimetal" and not cat.startswith("nao")
+
+
+# ácidos do pacote cujo número de H ionizáveis = número de H da fórmula (H3PO2/H3PO3 ficam de fora: H ligados ao P não ionizam)
+_ACIDOS_IONIZAVEIS = {"H2SO4", "HNO3", "HClO4", "HClO3", "HClO2", "HClO", "H2CO3", "H3PO4", "HMnO4", "H2CrO4", "HBrO3", "HIO3", "HIO4", "H2SO3", "HNO2"}
+_CATION_SAL = re.compile(r"^(Li|Na|K)(\d?)([A-Z][A-Za-z0-9]*)$")
+
+
+def ions_do_pacote(pac) -> list:
+    """[(fórmula do íon, carga)] dos ânions poliatômicos dos sais de Li/Na/K e dos ácidos de `_ACIDOS_IONIZAVEIS` do pacote, e o NH4+ dos sais
+    de amônio. A carga sai da contagem dos cátions/H da fórmula do pacote."""
+    out = set()
+    for c in pac.compostos:
+        f = c.get("formula") or ""
+        m = _CATION_SAL.match(f) or (re.match(r"^(H)(\d?)([A-Z][A-Za-z0-9]*)$", f) if f in _ACIDOS_IONIZAVEIS else None)
+        if m:
+            base, carga = m.group(3), int(m.group(2) or 1)
+            els = elementos_da_formula(base)
+            if re.fullmatch(r"[A-Z][a-z]?\d?O\d", base) or base == "OH":  # XOn / X2On (MnO4, Cr2O7, SO4, NO3...) e OH
+                out.add((base, -carga))
+        if "NH4" in f:
+            out.add(("NH4", 1))
+    return sorted(out)
+
+
+def superficie_ion(base, carga, rng) -> str:
+    """Como se escreve o íon numa pergunta, só com caracteres que a gramática do modelo copia (sem ^ nem sobrescritos ⁺⁻)."""
+    sinal = "+" if carga > 0 else "-"
+    n = abs(carga)
+    if rng.random() < 0.12:
+        base = re.sub(r"(?<=[A-Za-z)])(\d+)", lambda m: m.group(1).translate(str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")), base)
+    if n == 1:
+        return base + rng.choice([sinal, sinal, " " + sinal])
+    return base + rng.choice([f" {n}{sinal}", f" {n}{sinal}", f"({n}{sinal})"])
+
+
+def equacoes_balanceadas(sem_parenteses=False, max_especies=6, excluir_tipos=()) -> list:
+    """[(reagentes, produtos, coeficientes)] das equações de dataset/equacoes.py, com os coeficientes de calculo.balancear (conferidos)."""
+    out = []
+    for tipo, eq in equacoes.lista_equacoes():
+        if tipo in excluir_tipos:
+            continue
+        try:
+            reag, prod = calculo.parse_equacao(eq)
+            coefs = calculo.balancear(reag, prod)
+        except Exception:
+            continue
+        if not coefs or not calculo.conserva(reag, prod, coefs) or len(reag) + len(prod) > max_especies:
+            continue
+        if sem_parenteses and any("(" in e for e in reag + prod):
+            continue
+        out.append((reag, prod, coefs))
+    return out
+
+
+def equacao_com_coeficientes(reag, prod, coefs, seta, junto=False) -> str:
+    """'N2 + 3 H2 ⇌ 2 NH3' (coeficiente 1 omitido; `junto`: '3H2'); sem coeficientes: 'N2 + H2 ⇌ NH3'."""
+    coefs = coefs or [1] * (len(reag) + len(prod))
+    esp = " " if not junto else ""
+
+    def lado(lst, cs):
+        return " + ".join((f"{k}{esp}" if k != 1 else "") + e for e, k in zip(lst, cs))
+    return f"{lado(reag, coefs[:len(reag)])} {seta} {lado(prod, coefs[len(reag):])}"
 
 
 # ---------------------------------------------------------------------------------------------------------
@@ -247,6 +399,16 @@ class Gerador:
         self.c_ph = [c for c in self.compostos if ph_cls & set(c.get("classes") or [])] or self.compostos
         self.c_sol = [c for c in self.compostos if sol_cls & set(c.get("classes") or [])] or self.compostos
         self.equacoes = [(t, e) for t, e in equacoes.lista_equacoes()]
+        # calculadoras (17/10/2026): pools só usados pelos moldes de NOX/ENTALPIA/EQUILIBRIO/LIGACAO (nenhum sorteio aqui)
+        self.c_comb = [c for c in self.compostos if combustivel(pac.formula_exibicao(c))]
+        self.c_nox = [c for c in self.compostos if formula_inorganica_simples(pac.formula_exibicao(c), pac)]
+        self.c_lig = [c for c in self.compostos if len(elementos_da_formula(pac.formula_exibicao(c))) >= 2 and len(pac.formula_exibicao(c)) <= 9]
+        self.el_lig = [e for e in self.elementos if e.get("eletronegatividade") is not None and e.get("categoria") != "gas_nobre"
+                       and (e["z"] <= 38 or e["simbolo"] in {"Ag", "Sn", "I", "Ba", "Au", "Hg", "Pb", "Cs"})]
+        self.ions = ions_do_pacote(pac)
+        # equilíbrio: sem combustões (coeficientes grandes e nada de equilíbrio) e até 4 espécies, para o par caber em max_length 256
+        self.eq_equilibrio = equacoes_balanceadas(sem_parenteses=True, max_especies=4, excluir_tipos=("combustao",))
+        self.eq_balanceadas = equacoes_balanceadas()
 
     # -- entidades ---------------------------------------------------------------------------------------
     def _bare_el(self, e):
@@ -281,7 +443,7 @@ class Gerador:
 
     @staticmethod
     def _art(g, prep):
-        return {"o": {"": "o", "de": "do", "em": "no"}, "a": {"": "a", "de": "da", "em": "na"}}[g][prep]
+        return {"o": {"": "o", "de": "do", "em": "no", "a": "ao"}, "a": {"": "a", "de": "da", "em": "na", "a": "à"}}[g][prep]
 
     VALS = {
         "g": ["1", "2", "2,5", "5", "10", "20", "25", "40", "50", "100", "0,5", "250", "58,5", "4,0"],
@@ -357,17 +519,17 @@ class Gerador:
         if "propriedade" in estaticos:
             lab["propriedade"] = estaticos["propriedade"]
         for n in nomes:
-            if n in valores:
+            if n in valores or n in ("elf", "elf_de"):  # elf: depois do composto (o elemento sai da fórmula dele)
                 continue
             if n.startswith(("el", "El")):
                 if e1 is None:
-                    e1 = rng.choice(self.elementos)
+                    e1 = rng.choice(self.el_lig if intent == "LIGACAO" else self.elementos)
                     lab["elemento"] = e1["simbolo"]
                 if n.startswith("el2"):
                     if e2 is None:
-                        e2 = rng.choice([x for x in self.elementos if x is not e1])
+                        e2 = rng.choice([x for x in (self.el_lig if intent == "LIGACAO" else self.elementos) if x is not e1])
                     b, g = self._bare_el(e2)
-                    valores[n] = b if n == "el2_s" else f"{self._art(g, 'de')} {b}"
+                    valores[n] = b if n == "el2_s" else f"{self._art(g, 'a' if n == 'el2_a' else 'de')} {b}"
                 elif n.startswith("el3"):
                     if e3 is None:
                         e3 = rng.choice([x for x in self.elementos if x is not e1 and x is not e2])
@@ -382,7 +544,8 @@ class Gerador:
                                   "el_em": f"{self._art(g, 'em')} {b}" if b != e1["simbolo"] else f"no elemento {b}"}[n]
             elif n in ("co", "co_de", "co_em", "co_s", "Co", "cn_s", "cf_s"):
                 if c1 is None:
-                    pool = {"GAS_IDEAL": self.c_gas, "PH": self.c_ph, "CONCENTRACAO": self.c_sol, "ESTEQUIOMETRIA": self.c_sol}.get(intent, self.compostos)
+                    pool = {"GAS_IDEAL": self.c_gas, "PH": self.c_ph, "CONCENTRACAO": self.c_sol, "ESTEQUIOMETRIA": self.c_sol, "ENTALPIA": self.c_comb,
+                            "NOX": self.c_nox, "LIGACAO": self.c_lig}.get(intent, self.compostos)
                     if not pool:
                         return None
                     c1 = rng.choice(pool)
@@ -475,10 +638,55 @@ class Gerador:
                 continue
             elif n == "n":
                 valores[n] = str(rng.randint(1, 18))
+            elif n == "ion":
+                base, carga = rng.choice(self.ions)
+                txt = superficie_ion(base, carga, rng)
+                lab["composto"], lab["_chave"], lab["_formula"] = txt, "ion|" + base, base
+                valores[n] = txt
+                permitir_acento = False
+            elif n in ("eqx", "eqb"):
+                reag, prod, coefs = rng.choice(self.eq_equilibrio if n == "eqx" else self.eq_balanceadas)
+                if n == "eqx":
+                    seta = rng.choices(["⇌", "<=>", "<->", "→", "=", "->"], weights=[45, 20, 8, 15, 7, 5])[0]
+                else:
+                    seta = rng.choices(["→", "->", "="], weights=[6, 3, 1])[0]
+                txt = equacao_com_coeficientes(reag, prod, coefs if rng.random() < 0.8 else None, seta, junto=rng.random() < 0.25)
+                if not EQUACAO_OK.match(txt):
+                    return None
+                lab["equacao"], lab["_chave"], lab["_especies"] = txt, " + ".join(reag) + " -> " + " + ".join(prod), reag + prod
+                valores[n] = txt
+                permitir_acento = False
+            elif n == "conc":
+                especies = lab.get("_especies") or []
+                livres = 4 - len(quant)
+                if not especies or livres < 1:
+                    return None
+                k = min(len(especies), livres, rng.choice([2, 3, 3]))
+                escolhidas = especies if len(especies) <= k else sorted(rng.sample(especies, k), key=especies.index)
+                partes = []
+                for sp in escolhidas:
+                    num = rng.choice(self.VALS["mol/L"])
+                    forma = rng.choice(["mol/L", "mol/L", "M"])
+                    partes.append(f"[{sp}] = {num}{'' if forma == 'M' and rng.random() < 0.5 else ' '}{forma}")
+                    v = float(num.replace(",", "."))
+                    quant.append({"valor": int(v) if v == int(v) else v, "unidade": "mol/L"})
+                valores[n] = partes[0] if len(partes) == 1 else ", ".join(partes[:-1]) + " e " + partes[-1]
             elif n == "b":
                 valores[n] = rng.choice(["s", "p", "d", "f"])
             else:
                 raise KeyError(f"placeholder desconhecido: {n}")
+        if {"elf", "elf_de"} & uso:  # elemento que está na fórmula do composto/íon citado
+            formula = lab.get("_formula") or (self.pac.formula_exibicao(c1) if c1 is not None else lab.get("composto"))
+            simbolos = [s for s in elementos_da_formula(formula) if s in self.pac.el_simbolo]
+            if not simbolos:
+                return None
+            centrais = [s for s in simbolos if s not in ("O", "H")]
+            sim = rng.choice(centrais) if centrais and rng.random() < 0.8 else rng.choice(simbolos)
+            ef = self.pac.el_simbolo[sim]
+            b, g = self._bare_el(ef)
+            valores["elf"] = b
+            valores["elf_de"] = f"{self._art(g, 'de')} {b}" if b != sim else f"do {b}"
+            lab["elemento"] = sim
         # rótulos
         if intent == "COMPARAR":
             lab.pop("composto", None) if e1 is not None and c1 is None else None
@@ -716,6 +924,25 @@ def gerar(pac, seed, scale):
         if guardar(q, {"intent": "DESCONHECIDA"}, None):
             n_desc += 1
     g.variantes = variantes_nlu(amostras, guardar, rng, pac, seed)
+    # calculadoras (17/10/2026): depois das variantes e com sorteio próprio — as famílias acima geram exatamente os mesmos pares de antes
+    gc = Gerador(pac, random.Random(seed + 35))
+    g.calculadoras = {}
+    for intent, cota in COTA_CALCULADORAS.items():
+        meta = int(cota * scale)
+        modelos = T[intent]
+        feitos = tent = 0
+        while feitos < meta and tent < meta * 60:
+            tent += 1
+            t, est = gc.rng.choice(modelos)
+            r = gc.amostra(intent, t, dict(est))
+            if r is None:
+                continue
+            q, alvo, chave = r
+            if core is not None and not core.combinacao_valida(alvo):
+                continue
+            if guardar(q, alvo, chave):
+                feitos += 1
+        g.calculadoras[intent] = feitos
     return list(amostras.values()), g
 
 
@@ -823,7 +1050,7 @@ def main(argv=None):
         "por_intencao_train": dict(sorted(por_i_train.items())), "por_intencao_val": dict(sorted(por_i_val.items())),
         "elementos_no_pool": len(g.elementos), "compostos_no_pool": len(g.compostos), "formulas_livres": len(g.formulas_livres),
         "templates": sum(len(v) for k, v in T.items() if isinstance(v, list)) + len(V.MODELOS_CONCEITO), "sft_gerado": bool(sft),
-        "variantes_de_linguagem": getattr(g, "variantes", {}),
+        "variantes_de_linguagem": getattr(g, "variantes", {}), "calculadoras": getattr(g, "calculadoras", {}),
         **descartes,
     }
     (out / "stats.json").write_text(json.dumps(stats, ensure_ascii=False, indent=1), encoding="utf-8", newline="\n")

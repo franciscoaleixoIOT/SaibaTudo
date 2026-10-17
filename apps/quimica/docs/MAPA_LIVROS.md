@@ -84,6 +84,7 @@ inventar um dado).
 |---|---|---|---|
 | Regras do site (`nlu.js`), ANTES das correções de 17/10 | 1.376 | 693 (50,4 %) | fortes: BALANCEAR 89 %, MASSA_MOLAR 78 %, CONCENTRACAO 77 %, PH 77 %; fracas: CONVERSAO_UNIDADE 5 %, GAS_IDEAL 12 %, ESTEQUIOMETRIA 37 %, CONCEITO 44 % |
 | Regras do site, DEPOIS das correções de 17/10 (mesmas perguntas) | 1.378 | 728 (52,8 %) | NOMENCLATURA 48 → 79 %, CONVERSAO_UNIDADE 5 → 24 %; o resto das discordâncias é recorte ou pergunta que depende de figura |
+| Regras do site, DEPOIS das calculadoras novas (17/10, noite; `CALCULADORAS_2026-10-17.md`) | 1.423 | 723 (50,8 %) | 61 perguntas mudaram: TERMOQUIMICA → ENTALPIA 22 (eram COMPOSTO), LIGACAO_QUIMICA → LIGACAO 13, NOX 5; a base cresceu porque EQUILIBRIO (45) passou a contar como intenção do app — e só 1 bate: a pergunta derivada de um passo perde a equação, que o contrato de EQUILIBRIO exige ("qual a expressão da constante de equilíbrio dessa reação?"). Termoquímica de livro de nível superior (capacidade térmica, ΔG(T), entropia de expansão) continua fora por desenho |
 | NLU v3.4 (GGUF local, gramática de produção) | 1.376 | 800 (58,1 %) | fortes: PH 100 %, NOMENCLATURA 92 %, ELEMENTO 91 %, CONCENTRACAO 88 %, BALANCEAR 86 %, DESENHAR 84 %, CONCEITO 74 %; fracas: PROPRIEDADE 23 % (ver §3.1), CONVERSAO_UNIDADE 33 %, ESTEQUIOMETRIA 40 %, GAS_IDEAL 41 % |
 
 Boa parte das discordâncias é do próprio recorte (o classificador chama de GAS_IDEAL "volume de 2 mol nas CNTP", que o app resolve como
@@ -134,14 +135,20 @@ feita em 11/10 (PENDENCIAS §10); para exercícios completos seria preciso resol
 
 ## 6. Decisões e próximos passos
 
-- **Dados**: lista fixa corrigida e ampliada (§4). Rebuild do pacote pendente (PubChem 429 na nuvem: rodar local com `--paciente`).
-- **Regras do NLU**: 7 lacunas corrigidas (§3). Reavaliar as perguntas derivadas depois (rodar `70_nlu_cobertura.py`) para medir o ganho.
+- **Dados**: lista fixa corrigida e ampliada (§4). **Feito em 17/10 (noite):** rebuild local com `--paciente --pubchem-cache-primeiro` (473 s;
+  `listaFixaDescartadas` vazia, os 20 compostos no pacote; o total fica em 1.971 porque o alvo 2.000 cede 20 vagas do Wikidata à lista fixa) +
+  termoquímica padrão (ΔHf° em 281 compostos, ΔGf° 81, S° 258; chembox da Wikipédia en, `DATA_CONTRACT.md` §3.1).
+- **Regras do NLU**: 7 lacunas corrigidas (§3) e, à noite, as 4 intenções novas + configuração eletrônica enriquecida (tabela de §3, linha
+  "DEPOIS das calculadoras novas").
 - **Corpus do NLU (v3.5)**: os padrões reais que faltam ao gerador — notação científica, frações, "massa de X formada a partir de", "como se
   chama <nome IUPAC>", "é mistura ou substância pura", ordenação de listas — entram como famílias novas em `ia/corpus/` antes do próximo
   treino. Nenhuma frase dos livros entra: só o padrão.
-- **Calculadoras novas por rendimento** (fora do app hoje, maioria com resposta de cálculo): entalpia por Hess/formação (dados de ΔHf do
-  pacote: fonte aberta a confirmar), configuração eletrônica (já temos `configuracaoEletronica` por elemento: falta a intenção), NOX por
-  regra, Kc/Kp simples, tipo de ligação por diferença de eletronegatividade.
+- **Calculadoras novas por rendimento** — **feitas em 17/10 (noite), na ordem decidida pelo mantenedor:** entalpia (formação + combustão +
+  lei de Hess na tela Calculadoras; ΔHf° do pacote), configuração eletrônica (resposta de PROPRIEDADE enriquecida: notação completa, camadas,
+  valência; sem intenção nova), NOX por regra, Kc/Kp (expressão, Δn, Kp = Kc(RT)^Δn, valor com concentrações), tipo de ligação por ΔEN de
+  Pauling. Contrato, fontes e decisões em `docs/CALCULADORAS_2026-10-17.md`. Lacunas que o mapa ainda mostra nesses temas: Kc sem equação na
+  pergunta (hoje DESCONHECIDA/COMPOSTO; candidata a CONCEITO com ação "abrir calculadora"), contagem de prótons/nêutrons/elétrons de um íon
+  ("quantos prótons, nêutrons e elétrons tem o Fe2+?" cai em COMPOSTO), Kps e solubilidade de sais (SOLUBILIDADE 0 %).
 - **Classes de compostos** no léxico e no CONCEITO (éster, alceno, amida…), já pendente, sobe de prioridade.
 - **Livros abertos (CC BY)** da pendência §(UNILA/USP) continuam sendo a fonte certa de TEXTO para os conceitos que os livros fechados
   mostraram faltar.

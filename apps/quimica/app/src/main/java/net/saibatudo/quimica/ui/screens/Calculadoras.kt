@@ -11,16 +11,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -29,7 +32,20 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.saibatudo.quimica.R
+import net.saibatudo.quimica.ai.answer.AnswerBuilder
+import net.saibatudo.quimica.ai.answer.respostaEletronica
+import net.saibatudo.quimica.ai.answer.respostaEntalpiaReacao
+import net.saibatudo.quimica.ai.answer.respostaEquilibrio
+import net.saibatudo.quimica.ai.answer.respostaHess
+import net.saibatudo.quimica.ai.answer.respostaLigacao
+import net.saibatudo.quimica.ai.answer.respostaNox
+import net.saibatudo.quimica.ai.model.Concentracao
+import net.saibatudo.quimica.ai.model.Quantidade
+import net.saibatudo.quimica.ai.model.Resposta
 import net.saibatudo.quimica.ai.model.TipoCalculadora
 import net.saibatudo.quimica.ai.nlu.Quantidades
 import net.saibatudo.quimica.data.model.UnidadeDef
@@ -51,6 +67,8 @@ import net.saibatudo.quimica.domain.calc.Unidades
 import net.saibatudo.quimica.domain.calc.VariavelGas
 import net.saibatudo.quimica.ui.LocalTextos
 import net.saibatudo.quimica.ui.components.AvisoBox
+import net.saibatudo.quimica.ui.components.BlocoView
+import net.saibatudo.quimica.ui.components.FontesView
 import net.saibatudo.quimica.ui.components.CampoNumero
 import net.saibatudo.quimica.ui.components.Cartao
 import net.saibatudo.quimica.ui.components.ChipsLinha
@@ -71,7 +89,12 @@ fun CalculadorasScreen(onAbrir: (TipoCalculadora) -> Unit, modifier: Modifier = 
         TipoCalculadora.CONCENTRACAO to R.string.ui_calc_desc_concentracao,
         TipoCalculadora.PH to R.string.ui_calc_desc_ph,
         TipoCalculadora.GAS_IDEAL to R.string.ui_calc_desc_gas_ideal,
-        TipoCalculadora.UNIDADES to R.string.ui_calc_desc_unidades
+        TipoCalculadora.UNIDADES to R.string.ui_calc_desc_unidades,
+        TipoCalculadora.ENTALPIA to R.string.ui_calc_desc_entalpia,
+        TipoCalculadora.ELETRONICA to R.string.ui_calc_desc_eletronica,
+        TipoCalculadora.NOX to R.string.ui_calc_desc_nox,
+        TipoCalculadora.EQUILIBRIO to R.string.ui_calc_desc_equilibrio,
+        TipoCalculadora.LIGACAO to R.string.ui_calc_desc_ligacao
     )
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text(t(R.string.ui_calc_lista_titulo), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, modifier = Modifier.semantics { heading() })
@@ -160,9 +183,15 @@ private fun ColunaCalculadora(titulo: String, descricao: String, conteudo: @Comp
     }
 }
 
-/** Despacha para a calculadora escolhida. */
+/**
+ * Despacha para a calculadora escolhida. [montador] entrega o construtor de respostas do assistente (as calculadoras novas mostram as mesmas
+ * respostas dele); [onAbrirUrl] abre o endereço de uma fonte.
+ */
 @Composable
-fun CalculadoraTela(tipo: TipoCalculadora, preenchimento: Map<String, String>, pacote: Pacote?, modifier: Modifier = Modifier) {
+fun CalculadoraTela(
+    tipo: TipoCalculadora, preenchimento: Map<String, String>, pacote: Pacote?, modifier: Modifier = Modifier,
+    montador: Montador? = null, onAbrirUrl: (String) -> Unit = {}
+) {
     val t = LocalTextos.current
     if (pacote == null) {
         Text(t(R.string.ui_calc_carregando), modifier.padding(16.dp))
@@ -178,6 +207,11 @@ fun CalculadoraTela(tipo: TipoCalculadora, preenchimento: Map<String, String>, p
             TipoCalculadora.PH -> PhCalc(pacote, un)
             TipoCalculadora.GAS_IDEAL -> GasIdealCalc(pacote, un)
             TipoCalculadora.UNIDADES -> UnidadesCalc(un)
+            TipoCalculadora.ENTALPIA -> EntalpiaCalc(montador, preenchimento, onAbrirUrl)
+            TipoCalculadora.ELETRONICA -> EletronicaCalc(montador, preenchimento, onAbrirUrl)
+            TipoCalculadora.NOX -> NoxCalc(montador, preenchimento, onAbrirUrl)
+            TipoCalculadora.EQUILIBRIO -> EquilibrioCalc(montador, un, preenchimento, onAbrirUrl)
+            TipoCalculadora.LIGACAO -> LigacaoCalc(montador, preenchimento, onAbrirUrl)
         }
     }
 }
@@ -487,5 +521,213 @@ private fun UnidadesCalc(un: Unidades) {
         } else {
             AvisoBox(t(R.string.ui_calc_un_sem_unidades))
         }
+    }
+}
+
+// ---- calculadoras novas (17/10/2026, docs/CALCULADORAS_2026-10-17.md §2 e §4) ---------------------------------------------------------
+// Entalpia (formação e Hess), configuração eletrônica, NOX, Kc/Kp e tipo de ligação. O cálculo é o de domain/calc/ e o texto é o mesmo das
+// respostas do assistente (AnswerBuilder.resposta*, RespostasCalculadoras.kt), mostrado bloco a bloco, como a tela do site (ui/calculadoras.js).
+
+/** Construtor de respostas do idioma ativo (o mesmo do assistente), entregue pela tela principal. */
+typealias Montador = suspend () -> AnswerBuilder?
+
+/** Resposta do construtor (título, blocos e fontes) como resultado da calculadora. */
+@Composable
+private fun RespostaCalcView(resposta: Resposta?, onAbrirUrl: (String) -> Unit) {
+    if (resposta == null) return
+    Cartao {
+        TituloSecao(resposta.titulo)
+        resposta.blocos.forEach { BlocoView(it, onAbrirUrl) }
+        FontesView(resposta.fontes, onAbrirUrl)
+    }
+}
+
+/** Calcula fora da thread da interface e guarda a resposta; [executar] dispara o cálculo com o construtor atual. */
+private class Execucao(private val escopo: kotlinx.coroutines.CoroutineScope, private val montador: Montador?) {
+    var resposta by mutableStateOf<Resposta?>(null)
+    var aviso by mutableStateOf<String?>(null)
+    /** [avisoSeNulo]: o aviso mostrado quando o cálculo não devolve resposta (ex.: elemento não encontrado). */
+    fun executar(avisoSeNulo: String? = null, calculo: suspend (AnswerBuilder) -> Resposta?) {
+        escopo.launch {
+            val b = montador?.invoke() ?: return@launch
+            val r = withContext(Dispatchers.Default) { runCatching { calculo(b) }.getOrNull() }
+            aviso = if (r == null) avisoSeNulo else null
+            resposta = r
+        }
+    }
+}
+
+@Composable
+private fun rememberExecucao(montador: Montador?): Execucao {
+    val escopo = rememberCoroutineScope()
+    return remember(montador) { Execucao(escopo, montador) }
+}
+
+/** Símbolo do elemento digitado (símbolo ou nome no idioma), pelo dicionário do assistente; null se não houver. */
+private fun simboloDe(b: AnswerBuilder, texto: String): String? {
+    val s = texto.trim()
+    if (s.isEmpty()) return null
+    if (b.pacote.porSimbolo.containsKey(s)) return s
+    return b.dic.entidades(s).elementos.firstOrNull()?.simbolo
+}
+
+@Composable
+private fun CampoTexto(valor: String, onValor: (String) -> Unit, rotulo: String, placeholder: String? = null, ajuda: String? = null, linhas: Int = 1) {
+    OutlinedTextField(
+        valor, { onValor(it.take(200)) }, label = { Text(rotulo) }, modifier = Modifier.fillMaxWidth(),
+        placeholder = placeholder?.let { { Text(it) } }, supportingText = ajuda?.let { { Text(it) } },
+        singleLine = linhas == 1, minLines = linhas, maxLines = maxOf(linhas, 4)
+    )
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun Exemplos(exemplos: List<String>, onEscolher: (String) -> Unit) {
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        exemplos.forEach { x -> AssistChip(onClick = { onEscolher(x) }, label = { Text(x) }) }
+    }
+}
+
+@Composable
+private fun BotaoCalcular(rotulo: String, onClick: () -> Unit) {
+    Button(onClick = onClick, modifier = Modifier.fillMaxWidth()) { Text(rotulo) }
+}
+
+private const val ENT_FORMACAO = "formacao"
+private const val ENT_HESS = "hess"
+
+@Composable
+private fun EntalpiaCalc(montador: Montador?, preenchimento: Map<String, String>, onAbrirUrl: (String) -> Unit) {
+    val t = LocalTextos.current
+    val ex = rememberExecucao(montador)
+    var modo by rememberSaveable { mutableStateOf(if (preenchimento["modo"] == ENT_HESS) ENT_HESS else ENT_FORMACAO) }
+    var equacao by rememberSaveable { mutableStateOf(preenchimento["equacao"].orEmpty()) }
+    var alvo by rememberSaveable { mutableStateOf("") }
+    val eqs = remember { mutableStateMapOf<Int, String>() }
+    val dhs = remember { mutableStateMapOf<Int, String>() }
+    fun executar() {
+        if (modo == ENT_FORMACAO) { val e = equacao; ex.executar { it.respostaEntalpiaReacao(e) } }
+        else {
+            val a = alvo
+            val lista = (0 until 4).filter { eqs[it].orEmpty().isNotBlank() }.map { eqs[it]!!.trim() to numero(t, dhs[it].orEmpty()) }
+            ex.executar { it.respostaHess(a, lista) }
+        }
+    }
+    LaunchedEffect(Unit) { if (equacao.isNotBlank()) executar() }
+    ColunaCalculadora(t(TipoCalculadora.ENTALPIA.rotulo), t(R.string.ui_calc_desc_entalpia)) {
+        Text(t(R.string.ui_calc_ent_modo), style = MaterialTheme.typography.labelLarge)
+        ChipsModo(listOf(ENT_FORMACAO to t(R.string.ui_calc_ent_formacao), ENT_HESS to t(R.string.ui_calc_ent_hess)), modo) { modo = it; ex.resposta = null }
+        if (modo == ENT_FORMACAO) {
+            CampoTexto(equacao, { equacao = it }, t(R.string.ui_calc_ent_equacao), t(R.string.ui_calc_ent_placeholder), t(R.string.ui_calc_ent_ajuda), linhas = 2)
+            Exemplos(listOf("CH4 + 2 O2 -> CO2 + 2 H2O", "C2H6O + O2 -> CO2 + H2O", "N2 + 3 H2 -> 2 NH3")) { equacao = it; executar() }
+        } else {
+            CampoTexto(alvo, { alvo = it }, t(R.string.ui_calc_ent_alvo), t(R.string.ui_calc_ent_placeholder_alvo), t(R.string.ui_calc_ent_ajuda_hess))
+            for (i in 0 until 4) {
+                CampoTexto(eqs[i].orEmpty(), { eqs[i] = it }, t(R.string.ui_calc_ent_equacao_n, (i + 1).toString()))
+                CampoNumero(dhs[i].orEmpty(), { dhs[i] = it }, t(R.string.ui_calc_ent_d_h, (i + 1).toString()), Modifier.fillMaxWidth())
+            }
+        }
+        BotaoCalcular(t(R.string.ui_calc_ent_calcular)) { executar() }
+        RespostaCalcView(ex.resposta, onAbrirUrl)
+    }
+}
+
+@Composable
+private fun EletronicaCalc(montador: Montador?, preenchimento: Map<String, String>, onAbrirUrl: (String) -> Unit) {
+    val t = LocalTextos.current
+    val ex = rememberExecucao(montador)
+    var elemento by rememberSaveable { mutableStateOf(preenchimento["elemento"].orEmpty()) }
+    var carga by rememberSaveable { mutableStateOf("0") }
+    val naoEncontrei = t(R.string.ui_calc_ele_nao_encontrei)
+    fun executar() {
+        val texto = elemento
+        val q = numero(t, carga.trim().removePrefix("+"))?.toInt() ?: 0
+        ex.executar(naoEncontrei) { b -> simboloDe(b, texto)?.let { b.respostaEletronica(it, q) } }
+    }
+    LaunchedEffect(Unit) { if (elemento.isNotBlank()) executar() }
+    ColunaCalculadora(t(TipoCalculadora.ELETRONICA.rotulo), t(R.string.ui_calc_desc_eletronica)) {
+        CampoTexto(elemento, { elemento = it }, t(R.string.ui_calc_ele_elemento), t(R.string.ui_calc_ele_placeholder))
+        CampoNumero(carga, { carga = it }, t(R.string.ui_calc_ele_carga), Modifier.fillMaxWidth(), dica = t(R.string.ui_calc_ele_ajuda_carga))
+        Exemplos(listOf("Fe", "Cr", "Cu", "S", "Br")) { elemento = it; carga = "0"; executar() }
+        BotaoCalcular(t(R.string.ui_calc_ele_calcular)) { executar() }
+        ex.aviso?.let { AvisoBox(it) }
+        RespostaCalcView(ex.resposta, onAbrirUrl)
+    }
+}
+
+@Composable
+private fun NoxCalc(montador: Montador?, preenchimento: Map<String, String>, onAbrirUrl: (String) -> Unit) {
+    val t = LocalTextos.current
+    val ex = rememberExecucao(montador)
+    var formula by rememberSaveable { mutableStateOf(preenchimento["formula"].orEmpty()) }
+    var elemento by rememberSaveable { mutableStateOf("") }
+    fun executar() {
+        val f = formula
+        val el = elemento
+        ex.executar { b -> b.respostaNox(f.trim().ifEmpty { null }, null, simboloDe(b, el)) }
+    }
+    LaunchedEffect(Unit) { if (formula.isNotBlank()) executar() }
+    ColunaCalculadora(t(TipoCalculadora.NOX.rotulo), t(R.string.ui_calc_desc_nox)) {
+        CampoTexto(formula, { formula = it }, t(R.string.ui_calc_nox_formula), t(R.string.ui_calc_nox_placeholder), t(R.string.ui_calc_nox_ajuda))
+        CampoTexto(elemento, { elemento = it }, t(R.string.ui_calc_nox_elemento), t(R.string.ui_calc_nox_placeholder_elemento))
+        Exemplos(listOf("H2SO4", "MnO4-", "Cr2O7 2-", "NH4+", "H2O2", "C3H8")) { formula = it; executar() }
+        BotaoCalcular(t(R.string.ui_calc_nox_calcular)) { executar() }
+        RespostaCalcView(ex.resposta, onAbrirUrl)
+    }
+}
+
+@Composable
+private fun EquilibrioCalc(montador: Montador?, un: Unidades, preenchimento: Map<String, String>, onAbrirUrl: (String) -> Unit) {
+    val t = LocalTextos.current
+    val ex = rememberExecucao(montador)
+    var equacao by rememberSaveable { mutableStateOf(preenchimento["equacao"].orEmpty()) }
+    var conc by rememberSaveable { mutableStateOf("") }
+    var temp by rememberSaveable { mutableStateOf("") }
+    var uTemp by rememberSaveable { mutableStateOf("K") }
+    val temps = unidadesDe(un, "temperatura").filter { it.simbolo == "K" || it.simbolo == "°C" }.ifEmpty { unidadesDe(un, "temperatura") }
+    fun executar() {
+        val eq = equacao
+        val concentracoes = Quantidades.lerConcentracoes(conc, un, net.saibatudo.quimica.ai.nlu.lexico.Lexico.de(t.idioma)).map { Concentracao(it.especie, it.valor, it.unidade) }
+        val temperatura = numero(t, temp)?.let { Quantidade(it, uTemp) }
+        ex.executar { it.respostaEquilibrio(eq.trim().ifEmpty { null }, concentracoes, temperatura) }
+    }
+    LaunchedEffect(Unit) { if (equacao.isNotBlank()) executar() }
+    ColunaCalculadora(t(TipoCalculadora.EQUILIBRIO.rotulo), t(R.string.ui_calc_desc_equilibrio)) {
+        CampoTexto(equacao, { equacao = it }, t(R.string.ui_calc_eqm_equacao), t(R.string.ui_calc_eqm_placeholder), t(R.string.ui_calc_eqm_ajuda), linhas = 2)
+        CampoTexto(conc, { conc = it }, t(R.string.ui_calc_eqm_concentracoes), t(R.string.ui_calc_eqm_placeholder_conc), t(R.string.ui_calc_eqm_ajuda_conc), linhas = 2)
+        if (temps.isNotEmpty()) CampoComUnidade(t(R.string.ui_calc_eqm_temperatura), temp, { temp = it }, temps, uTemp, { uTemp = it })
+        Exemplos(listOf("N2 + 3 H2 ⇌ 2 NH3", "H2 + I2 ⇌ 2 HI", "CaCO3(s) ⇌ CaO(s) + CO2(g)", "2 SO2 + O2 ⇌ 2 SO3")) { equacao = it; executar() }
+        BotaoCalcular(t(R.string.ui_calc_eqm_calcular)) { executar() }
+        RespostaCalcView(ex.resposta, onAbrirUrl)
+    }
+}
+
+private const val LIG_FORMULA = "formula"
+private const val LIG_ELEMENTOS = "elementos"
+
+@Composable
+private fun LigacaoCalc(montador: Montador?, preenchimento: Map<String, String>, onAbrirUrl: (String) -> Unit) {
+    val t = LocalTextos.current
+    val ex = rememberExecucao(montador)
+    var modo by rememberSaveable { mutableStateOf(LIG_FORMULA) }
+    var formula by rememberSaveable { mutableStateOf(preenchimento["formula"].orEmpty()) }
+    var a by rememberSaveable { mutableStateOf("") }
+    var b by rememberSaveable { mutableStateOf("") }
+    fun executar() {
+        if (modo == LIG_FORMULA) { val f = formula.trim().ifEmpty { null }; ex.executar { it.respostaLigacao(formula = f) } }
+        else { val ta = a; val tb = b; ex.executar { x -> x.respostaLigacao(simbolos = listOfNotNull(simboloDe(x, ta), simboloDe(x, tb))) } }
+    }
+    LaunchedEffect(Unit) { if (formula.isNotBlank()) executar() }
+    ColunaCalculadora(t(TipoCalculadora.LIGACAO.rotulo), t(R.string.ui_calc_desc_ligacao)) {
+        Text(t(R.string.ui_calc_lig_modo), style = MaterialTheme.typography.labelLarge)
+        ChipsModo(listOf(LIG_FORMULA to t(R.string.ui_calc_lig_por_formula), LIG_ELEMENTOS to t(R.string.ui_calc_lig_por_elementos)), modo) { modo = it; ex.resposta = null }
+        if (modo == LIG_FORMULA) CampoTexto(formula, { formula = it }, t(R.string.ui_calc_lig_formula), t(R.string.ui_calc_lig_placeholder))
+        else Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(Modifier.weight(1f)) { CampoTexto(a, { a = it }, t(R.string.ui_calc_lig_a), t(R.string.ui_calc_lig_placeholder_a)) }
+            Column(Modifier.weight(1f)) { CampoTexto(b, { b = it }, t(R.string.ui_calc_lig_b), t(R.string.ui_calc_lig_placeholder_b)) }
+        }
+        Exemplos(listOf("NaCl", "HCl", "Cl2", "NaOH", "CO2")) { modo = LIG_FORMULA; formula = it; executar() }
+        BotaoCalcular(t(R.string.ui_calc_lig_calcular)) { executar() }
+        RespostaCalcView(ex.resposta, onAbrirUrl)
     }
 }

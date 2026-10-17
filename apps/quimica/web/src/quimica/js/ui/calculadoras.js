@@ -1,4 +1,5 @@
-// Calculadoras com passo a passo (KaTeX): massa molar, balanceamento, estequiometria, concentração, pH, gás ideal e unidades.
+// Calculadoras com passo a passo (KaTeX): massa molar, balanceamento, estequiometria, concentração, pH, gás ideal, unidades, entalpia (formação e Hess),
+// configuração eletrônica, NOX, equilíbrio (Kc e Kp) e tipo de ligação.
 // Todos os cálculos são determinísticos e rodam no aparelho (js/calc/); os números das constantes e massas vêm do pacote de dados. Rótulos pelo catálogo.
 import { balancear, lerEquacao } from '../calc/balancear.js';
 import { calcularConcentracao, modosConcentracao } from '../calc/concentracao.js';
@@ -11,11 +12,15 @@ import { converter } from '../calc/unidades.js';
 import { buscarCompostos } from '../busca.js';
 import { h, icon } from '../dom.js';
 import { fmt, lerNumero } from '../formato.js';
-import { t, tl } from '../i18n/index.js';
+import { idiomaAtual, t, tl } from '../i18n/index.js';
 import { mathEl } from '../math.js';
 import { nomeCompostoExibicao } from '../nomes.js';
 import { nomeUnidade } from '../propriedades.js';
-import { chip, erroEl, fonteEl, formulaEl, linkRota, passosEl, resultadosEl, tabelaEl } from './componentes.js';
+import { blocoEl, chip, erroEl, fonteEl, formulaEl, linkRota, passosEl, resultadosEl, tabelaEl } from './componentes.js';
+import { AnswerBuilder } from '../answers.js';
+import { Dicionario } from '../dicionario.js';
+import { lerConcentracoes } from '../nlu.js';
+import { lexico } from '../nlu/lex/index.js';
 
 const C = (chave, params) => t(`ui.calculadoras.${chave}`, params);
 
@@ -306,6 +311,127 @@ function calcUnidades({ ctx, mostrar }) {
   return { form, autoexecutar: false };
 }
 
+// ------------------------------------------------------------------------------------------------ calculadoras novas (17/10/2026)
+// Entalpia (formação e Hess), configuração eletrônica, NOX, Kc/Kp e tipo de ligação (docs/CALCULADORAS_2026-10-17.md §2 e §4). O cálculo é o
+// de js/calc/ e o texto é o mesmo das respostas do assistente (AnswerBuilder.resposta*), renderizado bloco a bloco.
+const construtores = new WeakMap();
+function construtor(store) {
+  const idioma = idiomaAtual();
+  const atual = construtores.get(store);
+  if (atual && atual.idioma === idioma && atual.rev === store.rev) return atual.ab;
+  const ab = new AnswerBuilder({ store, dic: new Dicionario(store, idioma) });
+  construtores.set(store, { ab, idioma, rev: store.rev });
+  return ab;
+}
+
+/** Resposta do construtor (título + blocos com fonte) como resultado da calculadora. */
+function respostaEl(r) {
+  return h('section', { class: 'res-calc', tabindex: '-1', 'aria-label': C('resultadoAria') },
+    r.titulo ? h('h2', { class: 'bloco-tit' }, r.titulo) : null, r.blocos.map(blocoEl));
+}
+
+/** Símbolo do elemento digitado (símbolo ou nome no idioma); null se não houver. */
+function simboloDe(store, texto) {
+  const s = String(texto ?? '').trim();
+  if (!s) return null;
+  if (store.porSimbolo.has(s)) return s;
+  const e = construtor(store).dic.entidades(s).elementos[0];
+  return e ? e.simbolo : null;
+}
+
+function calcEntalpia({ store, query, mostrar }) {
+  const E = (k, p) => C(`entalpia.${k}`, p);
+  const modo = selecao({ rotulo: E('modo'), opcoes: [['formacao', E('formacao')], ['hess', E('hess')]], valor: query.get('modo') === 'hess' ? 'hess' : 'formacao' });
+  const area = h('div');
+  let executarAtual = () => {};
+  function montarFormacao() {
+    const eq = campo({ rotulo: E('equacao'), valor: query.get('eq') ?? '', placeholder: E('placeholder'), ajuda: E('ajuda') });
+    area.replaceChildren(eq.raiz, exemplos(['CH4 + 2 O2 -> CO2 + 2 H2O', 'C2H6O + O2 -> CO2 + H2O', 'N2 + 3 H2 -> 2 NH3'], (x) => { eq.input.value = x; executarAtual(); }));
+    return async () => mostrar(respostaEl(await construtor(store).respostaFormacao(eq.valor())));
+  }
+  function montarHess() {
+    const alvo = campo({ rotulo: E('alvo'), placeholder: E('placeholderAlvo'), ajuda: E('ajudaHess') });
+    const linhas = [1, 2, 3, 4].map((n) => ({ eq: campo({ rotulo: E('equacaoN', { n }) }), dH: campo({ rotulo: E('dH', { n }), inputmode: 'decimal' }) }));
+    area.replaceChildren(alvo.raiz, ...linhas.map((l) => h('div', { class: 'grade-campos' }, l.eq.raiz, l.dH.raiz)));
+    return () => {
+      const eqs = linhas.filter((l) => l.eq.valor()).map((l) => ({ equacao: l.eq.valor(), dH: l.dH.numero() }));
+      mostrar(respostaEl(construtor(store).respostaHess(alvo.valor(), eqs)));
+    };
+  }
+  function trocar() { executarAtual = modo.valor() === 'hess' ? montarHess() : montarFormacao(); mostrar(null); }
+  modo.select.addEventListener('change', trocar);
+  trocar();
+  const form = h('form', { class: 'form-calc', onSubmit: (e) => { e.preventDefault(); executarAtual(); } }, modo.raiz, area,
+    h('div', { class: 'form-acoes' }, h('button', { class: 'btn btn-primario', type: 'submit' }, E('calcular'))));
+  return { form, autoexecutar: !!query.get('eq'), executar: () => executarAtual() };
+}
+
+function calcEletronica({ store, query, mostrar }) {
+  const E = (k) => C(`eletronica.${k}`);
+  const el = campo({ rotulo: E('elemento'), valor: query.get('el') ?? '', placeholder: E('placeholder') });
+  const carga = campo({ rotulo: E('carga'), valor: query.get('q') ?? '0', inputmode: 'numeric', ajuda: E('ajudaCarga') });
+  const executar = () => {
+    const s = simboloDe(store, el.valor());
+    if (!s) { mostrar(erroEl(E('naoEncontrei'))); return; }
+    const q = carga.valor() === '' ? 0 : Math.trunc(lerNumero(carga.valor()));
+    mostrar(respostaEl(construtor(store).respostaEletronica({ simbolo: s, carga: Number.isFinite(q) ? q : 0 })));
+  };
+  const form = h('form', { class: 'form-calc', onSubmit: (e) => { e.preventDefault(); executar(); } }, h('div', { class: 'grade-campos' }, el.raiz, carga.raiz),
+    exemplos(['Fe', 'Cr', 'Cu', 'S', 'Br'], (x) => { el.input.value = x; carga.input.value = '0'; executar(); }),
+    h('div', { class: 'form-acoes' }, h('button', { class: 'btn btn-primario', type: 'submit' }, E('calcular'))));
+  return { form, autoexecutar: !!el.valor(), executar };
+}
+
+function calcNox({ store, query, mostrar }) {
+  const N = (k) => C(`nox.${k}`);
+  const f = campo({ rotulo: N('formula'), valor: query.get('f') ?? '', placeholder: N('placeholder'), ajuda: N('ajuda') });
+  const el = campo({ rotulo: N('elemento'), valor: query.get('el') ?? '', placeholder: N('placeholderElemento') });
+  const executar = () => mostrar(respostaEl(construtor(store).respostaNox({ formula: f.valor(), elemento: simboloDe(store, el.valor()) })));
+  const form = h('form', { class: 'form-calc', onSubmit: (e) => { e.preventDefault(); executar(); } }, h('div', { class: 'grade-campos' }, f.raiz, el.raiz),
+    exemplos(['H2SO4', 'MnO4-', 'Cr2O7 2-', 'NH4+', 'H2O2', 'C3H8'], (x) => { f.input.value = x; executar(); }),
+    h('div', { class: 'form-acoes' }, h('button', { class: 'btn btn-primario', type: 'submit' }, N('calcular'))));
+  return { form, autoexecutar: !!f.valor(), executar };
+}
+
+function calcEquilibrio({ ctx, store, query, mostrar }) {
+  const Q = (k) => C(`equilibrio.${k}`);
+  const eq = campo({ rotulo: Q('equacao'), valor: query.get('eq') ?? '', placeholder: Q('placeholder'), ajuda: Q('ajuda') });
+  const conc = campo({ rotulo: Q('concentracoes'), placeholder: Q('placeholderConc'), ajuda: Q('ajudaConc') });
+  const temp = valorUnidade({ rotulo: Q('temperatura'), unidades: unidadesDe(ctx, 'temperatura', ['K', '°C']), padrao: 'K' });
+  const executar = async () => {
+    const concentracoes = lerConcentracoes(conc.valor(), ctx.unidades, lexico()).map(({ especie, valor }) => ({ especie, valor }));
+    const temperatura = temp.vazio() ? null : temp.dado();
+    mostrar(respostaEl(await construtor(store).respostaEquilibrio({ equacao: eq.valor(), concentracoes, temperatura })));
+  };
+  const form = h('form', { class: 'form-calc', onSubmit: (e) => { e.preventDefault(); executar(); } }, eq.raiz, conc.raiz, temp.raiz,
+    exemplos(['N2 + 3 H2 ⇌ 2 NH3', 'H2 + I2 ⇌ 2 HI', 'CaCO3(s) ⇌ CaO(s) + CO2(g)', '2 SO2 + O2 ⇌ 2 SO3'], (x) => { eq.input.value = x; executar(); }),
+    h('div', { class: 'form-acoes' }, h('button', { class: 'btn btn-primario', type: 'submit' }, Q('calcular'))));
+  return { form, autoexecutar: !!eq.valor(), executar };
+}
+
+function calcLigacao({ store, query, mostrar }) {
+  const L = (k) => C(`ligacao.${k}`);
+  const modo = selecao({ rotulo: L('modo'), opcoes: [['formula', L('porFormula')], ['elementos', L('porElementos')]], valor: 'formula' });
+  const f = campo({ rotulo: L('formula'), valor: query.get('f') ?? '', placeholder: L('placeholder') });
+  const a = campo({ rotulo: L('a'), placeholder: L('placeholderA') });
+  const b = campo({ rotulo: L('b'), placeholder: L('placeholderB') });
+  const area = h('div');
+  const trocar = () => { area.replaceChildren(...(modo.valor() === 'formula' ? [f.raiz] : [h('div', { class: 'grade-campos' }, a.raiz, b.raiz)])); mostrar(null); };
+  modo.select.addEventListener('change', trocar);
+  trocar();
+  const executar = () => {
+    const ab = construtor(store);
+    if (modo.valor() === 'formula') { mostrar(respostaEl(ab.respostaLigacao({ formula: f.valor() || null }))); return; }
+    const sa = simboloDe(store, a.valor());
+    const sb = simboloDe(store, b.valor());
+    mostrar(respostaEl(ab.respostaLigacao({ simbolos: [sa, sb].filter(Boolean) })));
+  };
+  const form = h('form', { class: 'form-calc', onSubmit: (e) => { e.preventDefault(); executar(); } }, modo.raiz, area,
+    exemplos(['NaCl', 'HCl', 'Cl2', 'NaOH', 'CO2'], (x) => { modo.select.value = 'formula'; trocar(); f.input.value = x; executar(); }),
+    h('div', { class: 'form-acoes' }, h('button', { class: 'btn btn-primario', type: 'submit' }, L('calcular'))));
+  return { form, autoexecutar: !!f.valor(), executar };
+}
+
 /** Ids e ícones das calculadoras (títulos e descrições no catálogo: ui.calculadoras.lista). */
 export const CALCULADORAS = [
   { id: 'massa-molar', icone: 'flask', montar: calcMassaMolar },
@@ -314,7 +440,12 @@ export const CALCULADORAS = [
   { id: 'concentracao', icone: 'molecule', montar: calcConcentracao },
   { id: 'ph', icone: 'info', montar: calcPH },
   { id: 'gas-ideal', icone: 'sparkles', montar: calcGas },
-  { id: 'unidades', icone: 'refresh', montar: calcUnidades }
+  { id: 'unidades', icone: 'refresh', montar: calcUnidades },
+  { id: 'entalpia', icone: 'sparkles', montar: calcEntalpia },
+  { id: 'configuracao-eletronica', icone: 'molecule', montar: calcEletronica },
+  { id: 'nox', icone: 'calculator', montar: calcNox },
+  { id: 'equilibrio', icone: 'swap', montar: calcEquilibrio },
+  { id: 'ligacao', icone: 'flask', montar: calcLigacao }
 ];
 const tituloDe = (c) => C(`lista.${c.id}.titulo`);
 const descricaoDe = (c) => C(`lista.${c.id}.descricao`);

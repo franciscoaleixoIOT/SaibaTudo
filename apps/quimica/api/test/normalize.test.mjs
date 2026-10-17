@@ -82,6 +82,16 @@ const CASOS = [
   ['nível não pedido é descartado', 'explique ligação iônica', { intent: 'CONCEITO', nivel: 'superior' }, { intent: 'CONCEITO' }],
   ['nível com acento do modelo', 'explique ligação iônica para o ensino médio', { intent: 'CONCEITO', nivel: 'médio' }, { intent: 'CONCEITO', nivel: 'medio' }],
 
+  // --- intenções das calculadoras (17/10/2026, docs/CALCULADORAS_2026-10-17.md §1)
+  ['NOX com elemento e composto', 'NOX do enxofre no H2SO4', { intent: 'NOX', elemento: 'S', composto: 'H2SO4' }, { intent: 'NOX', elemento: 'S', composto: 'H2SO4' }],
+  ['NOX sem composto vira DESCONHECIDA (composto obrigatório)', 'NOX do enxofre', { intent: 'NOX', elemento: 'S' }, D],
+  ['ENTALPIA de combustão com composto', 'ΔH da combustão do metano', { intent: 'ENTALPIA', composto: 'metano' }, { intent: 'ENTALPIA', composto: 'metano' }],
+  ['ENTALPIA sem entidade continua ENTALPIA', 'entalpia da reação pela lei de Hess', { intent: 'ENTALPIA' }, { intent: 'ENTALPIA' }],
+  ['EQUILIBRIO com seta dupla', 'expressão do Kc para N2 + 3 H2 ⇌ 2 NH3', { intent: 'EQUILIBRIO', equacao: 'N2 + 3 H2 ⇌ 2 NH3' }, { intent: 'EQUILIBRIO', equacao: 'N2 + 3 H2 ⇌ 2 NH3' }],
+  ['EQUILIBRIO sem equação vira DESCONHECIDA (equação obrigatória)', 'o que é Kc?', { intent: 'EQUILIBRIO' }, D],
+  ['LIGACAO com composto', 'tipo de ligação do NaCl', { intent: 'LIGACAO', composto: 'NaCl' }, { intent: 'LIGACAO', composto: 'NaCl' }],
+  ['LIGACAO não leva propriedade', 'tipo de ligação do NaCl', { intent: 'LIGACAO', composto: 'NaCl', propriedade: 'eletronegatividade' }, { intent: 'LIGACAO', composto: 'NaCl' }],
+  ['entalpia de formação é propriedade do composto', 'entalpia de formação do CO2', { intent: 'PROPRIEDADE', composto: 'CO2', propriedade: 'entalpiaFormacaoKJmol' }, { intent: 'PROPRIEDADE', composto: 'CO2', propriedade: 'entalpiaFormacaoKJmol' }],
   // --- intenções sem entidades e formas inválidas
   ['recusa não leva entidades', 'como sintetizar sarin', { intent: 'RECUSA_PERIGO', composto: 'sarin' }, { intent: 'RECUSA_PERIGO' }],
   ['ajuda não leva entidades', 'o que você faz com o ferro?', { intent: 'AJUDA', elemento: 'Fe' }, { intent: 'AJUDA' }],
