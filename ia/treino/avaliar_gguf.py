@@ -12,6 +12,10 @@ O que faz (só lê os apps; nada é alterado):
      recortado POR IDIOMA (chave `idioma` do caso; ausente = pt-BR) sem gerar de novo (cache por pergunta).
   3. `--holdout`: casos reservados que o treino nunca viu (`ia/corpus/out/holdout_<app>.json`; para eleições é o holdout do v2.3),
      com gramática, também por idioma.
+  3b. `--extra <arquivo>` (repetível, desde o v3.4): conjuntos reservados adicionais (multi-turno com `contexto`, comparação, conceitos,
+     perguntas do revisor), com gramática e por idioma, com a meta própria `--meta_extra` (padrão 90 %) para intenção e cada entidade.
+     Perguntas com contexto (ia/corpus/contexto_nlu.py: "contexto: {json}\n<pergunta>") são limpas como o serviço faria (pergunta por
+     `validate_question`, contexto pelo contrato) e mantêm a quebra de linha, igual ao treino.
   4. Latência em CPU (n_threads como o Modal), p50/p95 por pergunta, e `check_gates` do app (geral e por idioma) como referência.
 
 Uso:
@@ -43,6 +47,9 @@ APPS = {
 # Bloco de raciocínio vazio que o template do Qwen3.5 põe no início do turno do assistente quando enable_thinking=False
 # (e também quando enable_thinking não é passado: no Qwen3.5 o padrão é sem raciocínio).
 THINK_VAZIO = "<think>\n\n</think>\n\n"
+_spec_ctx = importlib.util.spec_from_file_location("contexto_nlu", RAIZ / "ia" / "corpus" / "contexto_nlu.py")
+ctxmod = importlib.util.module_from_spec(_spec_ctx)
+_spec_ctx.loader.exec_module(ctxmod)
 
 
 def _importar(nome, caminho):
@@ -135,7 +142,7 @@ def gerador(llm, app: App, com_gramatica: bool, latencias: list):
     def gen(q):
         if q in cache:
             return cache[q]
-        prompt = app.prompt_servico(app.core.validate_question(q))
+        prompt = app.prompt_servico(ctxmod.limpar_entrada(q, app.core) if app.nome == "quimica" else app.core.validate_question(q))
         kw = dict(prompt=prompt, temperature=0.0, repeat_penalty=1.0, stop=app.core.STOP_TOKENS,
                   max_tokens=app.max_tokens if com_gramatica else 300)
         if gram is not None:
@@ -204,6 +211,10 @@ def main():
     ap.add_argument("--base_hf", default="Qwen/Qwen3.5-2B", help="tokenizer HF para conferir o template ('' desliga)")
     ap.add_argument("--sem_livre", action="store_true", help="não roda a passada sem gramática")
     ap.add_argument("--holdout", action="store_true", help="também roda o holdout reservado do app (com gramática, por idioma)")
+    ap.add_argument("--holdout_arquivo", help="holdout do app no lugar do padrão (ex.: ia/corpus/out/v34/holdout_quimica.json)")
+    ap.add_argument("--extra", action="append", default=[], help="conjunto reservado adicional (repetível): {cases:[...]} no esquema do golden")
+    ap.add_argument("--meta_extra", type=float, default=90.0, help="meta de intenção e de cada entidade nos conjuntos --extra")
+    ap.add_argument("--so_extra", action="store_true", help="só os conjuntos --extra (pula golden e holdout; não serve de gate do app)")
     ap.add_argument("--baseline", help="eval.json de um Q8_0 do MESMO treino: mede a queda de quantização no gate de referência")
     ap.add_argument("--out")
     a = ap.parse_args()
@@ -219,11 +230,42 @@ def main():
     print(json.dumps({k: v for k, v in tpl.items() if k != "gguf_template_render"}, ensure_ascii=False, indent=1))
 
     casos = app.eval.load_cases()
+    if a.holdout_arquivo:
+        app.holdouts = [Path(a.holdout_arquivo)]
     lat_c, lat_l = [], []
     t1 = time.perf_counter()
     gen_c = gerador(llm, app, True, lat_c)
     gen_c("pergunta de aquecimento")  # 1ª chamada (prompt frio) fora da medida
     frio = lat_c.pop()
+    extras = OrderedDict()
+    for arq in a.extra:
+        casos_x = app.eval.load_cases(arq)
+        gen_x = gerador(llm, app, True, [])
+        rx = app.evaluate(gen_x, casos_x, f"extra {Path(arq).name} ({len(casos_x)})")
+        app.eval.print_summary(rx)
+        ix = por_idioma(app, gen_x, casos_x, Path(arq).name)
+        print("   por idioma:")
+        tab = linha_idiomas(app, ix, gates=False)
+        motivos = []
+        for nome_r, r in [("geral", rx)] + list(ix.items()):
+            if r.get("intent_acc_pct") is not None and r["intent_acc_pct"] < a.meta_extra:
+                motivos.append(f"[{nome_r}] intenção {r['intent_acc_pct']}% < {a.meta_extra}%")
+            for k in app.entidades():
+                n_k, acc = r.get(f"{k}_cases") or 0, r.get(f"{k}_acc_pct")
+                if n_k >= 3 and acc is not None and acc < a.meta_extra:
+                    motivos.append(f"[{nome_r}] {k} {acc}% < {a.meta_extra}% ({n_k} casos)")
+                h, n_h = r.get(f"{k}_hallucination_pct"), r.get(f"{k}_null_cases") or 0
+                if n_h >= 3 and h is not None and h > 5.0:
+                    motivos.append(f"[{nome_r}] alucinação de {k} {h}% > 5% ({n_h} casos null)")
+        print(f"   meta {a.meta_extra}%:", "ok" if not motivos else "FALHA: " + "; ".join(motivos))
+        extras[Path(arq).name] = {"arquivo": str(arq), "resultado": rx, "por_idioma": ix, "tabela": tab, "meta_pct": a.meta_extra,
+                                  "passou_meta": not motivos, "motivos": motivos}
+    if a.so_extra:
+        resultado = {"app": a.app, "gguf": str(a.gguf), "template": tpl, "extras": extras, "duracao_total_s": round(time.perf_counter() - t1, 1)}
+        if a.out:
+            Path(a.out).write_text(json.dumps(resultado, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+            print(f"gravado em {a.out}")
+        return 0
     c = app.evaluate(gen_c, casos, "COM gramática (produção)")
     app.eval.print_summary(c)
     c_idiomas = por_idioma(app, gen_c, casos, "golden com gramática")
@@ -271,7 +313,7 @@ def main():
         "gates_por_idioma": {i: {"passou": ok_i, "motivos": ms} for i, (ok_i, ms) in gates_idiomas.items()},
         "golden_por_idioma": c_tabela, "holdout_por_idioma": real_tabela, "holdout_arquivo": str(real_arq) if real_arq else None,
         "duracao_total_s": round(time.perf_counter() - t1, 1),
-        "constrained": c, "unconstrained": u, "real": real,
+        "constrained": c, "unconstrained": u, "real": real, "extras": extras,
         "constrained_por_idioma": c_idiomas, "unconstrained_por_idioma": u_idiomas, "real_por_idioma": real_idiomas,
     }
     print(json.dumps({k: resultado[k] for k in ("prompt_frio_s", "latencia_com_gramatica", "latencia_sem_gramatica",

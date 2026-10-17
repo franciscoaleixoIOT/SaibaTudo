@@ -213,6 +213,8 @@ menos GPU que o 7B atual, então a cota de 40 min/dia rende mais respostas.
 > treinado da SaibaTudo.IA em produção. Próximos passos decididos pelo mantenedor: gramática gerada dos dados, resolução do composto na API e
 > normalização da entrada (código, não treino); depois a etapa 1 do AchaVagaIA.
 >
+> **v3.4 publicado na química (17/10/2026, ~05h; frente E do programa de 16/10):** continuação do LoRA v3.3 com multi-turno por `contexto` (formato em `ia/corpus/contexto_nlu.py`), COMPARAR ancorado e CONCEITO pt; golden 777 98,5 % (v3.3: 98,3 %), holdout 2.371 99,6 %, multi-turno 84,4 % → 99,3 %, eleições 97,4 %/97,0 % sem regressão (gate de lá segue reprovado pelo mesmo caso de `cargo`). `nlu-v3.4-20261017` no Volume `SaibaTudoIA-Models-Quimica`, promovido, `MODEL_VERSION` na Vercel, ao vivo. Serviço e clientes ainda não mandam o `contexto` (onda 3 da química). Lição: com snapshot de memória, promover exige deploy com mudança no código (`SNAPSHOT_EPOCH`). Resumo completo: `ia/treino/README.md` §v3.4.
+>
 > **Melhorias de código publicadas (14/10, madrugada; detalhes em `apps/quimica/docs/MODELO.md` §13 e `PROJECT_MEMORY.md` §6.i):**
 > gramática GBNF **condicionada à intenção** (`ENTIDADES_POR_INTENCAO` em `nlu_core.py`, uma regra por intenção; derivada dos dados e conferida
 > sem violação no golden de 723 e no corpus de 46 mil alvos — MASSA_MOLAR, COMPOSTO e BALANCEAR **não** podem obrigar entidade porque o golden

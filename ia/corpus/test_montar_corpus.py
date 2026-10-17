@@ -5,6 +5,7 @@ Se ia/corpus/out/ não existir (ou estiver incompleto), o corpus é montado uma 
 """
 import importlib.util
 import json
+import os
 import random
 import re
 import sys
@@ -13,7 +14,7 @@ from collections import Counter
 from pathlib import Path
 
 AQUI = Path(__file__).resolve().parent
-OUT = AQUI / "out"
+OUT = Path(os.environ["CORPUS_OUT"]) if os.environ.get("CORPUS_OUT") else AQUI / "out"  # CORPUS_OUT=ia/corpus/out/v34 testa outro corpus
 ESTRANGEIROS = ["en", "es", "de", "fr"]
 ENTIDADES_QUIMICA = ["elemento", "composto", "propriedade", "quantidades", "equacao", "nivel", "unidadeDestino"]
 
@@ -128,7 +129,9 @@ class Corpus(unittest.TestCase):
         self.assertEqual(c["total"], len(self.corpus))
         self.assertEqual(c["treino"], len(self.train))
         self.assertEqual(c["val"], len(self.val))
-        self.assertEqual(c["holdout"], sum(len(v) for v in self.hold.values()))
+        extras = sum(len(json.loads(a.read_text(encoding="utf-8"))["cases"]) for a in OUT.glob("holdout_v34_*.json")
+                     if a.name != "holdout_v34_revisor.json")  # conjuntos do v3.4 (o do revisor é externo ao montador)
+        self.assertEqual(c["holdout"], sum(len(v) for v in self.hold.values()) + extras)
         for app, a in c["por_app"].items():
             regs = [r for r in self.corpus if r["app"] == app]
             self.assertEqual(a["total"], len(regs))

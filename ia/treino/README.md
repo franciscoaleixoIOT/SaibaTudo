@@ -78,3 +78,31 @@ Template do Qwen3.5 com `enable_thinking=False` (no Qwen3.5 também é o padrão
 
 O serviço monta exatamente `nlu_core.build_prompt(pergunta, "v2") + "<think>\n\n</think>\n\n"` e gera com a gramática v2 e parada em
 `<|im_end|>`. `avaliar_gguf.py` confere que o template gravado no GGUF, o do tokenizer HF e essa string são idênticos (e a tokenização).
+
+## v3.4 (16–17/10/2026): multi-turno, comparação ancorada e conceitos — APROVADO e PUBLICADO na química em 17/10
+Registro completo em `ia/treino/out/nlu-v34-cont/` (corpus.log, train_cont.resumo.json, treino.log, medicoes.json, eval_*.json/log,
+baseline_v33_*.json, empacotar.log). Corpus: `ia/corpus/out/v34/` (ver `ia/corpus/README.md`, seção v3.4).
+
+- **Corpus** (`montar_corpus.py --out ia/corpus/out/v34 --escala-v34 0.69`): 74.435 pares (treino 68.630, val 2.662, holdout 3.143); química
+  69,9 % do treino. Novos: multi-turno 1.417 de treino + 135 reservados (5 idiomas), COMPARAR +~1.580 (3.359 no treino), CONCEITO pt 2.366 no
+  treino (meta 2.000), RECUSA_PERIGO 1.630 (sem gerador novo). Holdouts novos: `holdout_v34_{multiturno,comparar,conceito,revisor}.json`
+  (135 / 129 / 73 / 89). O holdout base da química (2.371) difere do v3.3 (2.395) só pela normalização `=>` → `→` de 14/10.
+- **Treino:** continuação do LoRA v3.3 (`--lora_init ia/treino/out/nlu-v33-cont/final --lr 1e-4 --epochs 1 --batch_size 2 --grad_accum 8`),
+  16.065 pares (`misturar_continuacao.py --revisao 2.0 --peso-app eleicoes2026=2.5`: 4.057 novos + 12.008 de revisão, 6.491 das eleições),
+  1.005 passos em 1 h 38 min, perda 0,0102 → 0,0015, máx. 245 tokens (nenhum truncado).
+- **Gate (Q4_K_M, CPU 8 threads):** química golden **777** (o contrato ganhou 54 casos desde o v3.3) intenção 98,5 % (v3.3 no mesmo golden:
+  98,3 %), elemento 98,6, composto 98,7, propriedade 98,0, equação 100, unidadeDestino 97,7, alucinação 0, JSON 100 % / 99,4 % sem gramática,
+  5 idiomas ok; holdout 2.371: 99,6 %; Q8 = Q4 (98,5 %); sem `<think>`; template = serviço. Holdouts novos (meta 90 %): multi-turno 99,3 %
+  de intenção (v3.3: 84,4 %; quantidades 50 % → 100 %), comparar 100 %, conceito 100 %, revisor 100 % (propriedade 84,8 % → 100 %).
+  Eleições: golden 97,4 % (v3.3: 95,6 %), holdout 97,0 % (96,8 %); o gate de lá segue reprovado pelo MESMO caso do v3.3 (cargo em
+  "deputado mais votado") — publicação de eleições só depois de 27/10. A catraca automática do empacotador foi ignorada (golden mudou de 723
+  para 777); a comparação manual no mesmo golden está acima.
+- **Pacote:** `apps/quimica/ai_model/output/gguf/nlu-v3.4-20261017/` (`passed: true`). **Publicado na química em 17/10/2026 (~05h, horário de Brasília):** `modal volume put` ×3 no Volume `SaibaTudoIA-Models-Quimica`, `promover.py --version nlu-v3.4-20261017` (ponteiro `current.json` com sha256 `7797…f62c`), `modal deploy` do `nlu_app.py` (precisou de mudança no código — `SNAPSHOT_EPOCH` — porque o snapshot de memória guardava o v3.3 carregado), `MODEL_VERSION` na Vercel e `vercel deploy --prod`. Ao vivo: `/quimica/api/health` → `model nlu-v3.4-20261017`; 5 perguntas pelo `/quimica/api/nlu` certas (de MASSA_MOLAR "Kochsalz" → CID 5234; pt COMPARAR F/eletronegatividade; pt CONCEITO "o que é um sal?"; en pedido perigoso → RECUSA_PERIGO por regra; fr "formule brute de l'acide acétique" → NOMENCLATURA + CID 176, o único desvio do golden); fria 22,1 s (cria o snapshot), quente 2,3–3,8 s. O `contexto` multi-turno ainda não é enviado por serviço nem clientes (onda 3); sem contexto o modelo se comporta como o v3.3 ou melhor.
+- **Para o multi-turno valer, o serviço e os clientes precisam do `contexto`** (onda 3; o v3.4 já está no ar sem ele) (formato em `ia/corpus/contexto_nlu.py`): (1) `nlu_core.build_prompt`
+  aceitar `contexto` e montar a mensagem do usuário como `contexto: <format_output(contexto)>\n<pergunta limpa>` (validar o contexto com
+  `has_valid_shape` e serializar com `format_output`; a pergunta continua passando por `validate_question` sozinha — ela junta linhas);
+  (2) `nlu_app.py` e o proxy (`api/_lib/nlu-handler.js`) aceitarem `{q, v, contexto}`, com o contexto entrando na chave do cache;
+  (3) a ancoragem do proxy (`ground.js`/`normalize.js`) aceitar entidade herdada do contexto (hoje exige o composto no texto da pergunta);
+  (4) site e Android mandarem a interpretação da pergunta anterior (o JSON do NLU, composto como texto, não o CID) só em perguntas de
+  continuação. Sem contexto o modelo se comporta como o v3.3 (golden e holdout acima); foi assim que ele entrou no ar.
+- **Vazamento corrigido depois do gate:** o golden ganhou em 16/10 (f2ce884) o caso fr "Qu'est-ce que la stœchiométrie ?", que já era um exemplo de treino desde o v3.3 (`test_nenhum_caso_de_teste_no_treino` reprovava). O caso do golden foi reescrito para "Explique-moi ce qu'est la stœchiométrie" (o treino não muda; o golden deixa de medir um exemplo visto). Regra: rodar `python -m pytest ia/corpus` depois de mexer no golden de qualquer app.

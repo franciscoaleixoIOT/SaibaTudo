@@ -103,7 +103,9 @@ def main(argv=None) -> int:
         meta["promoted_at"] = agora
         meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=1), encoding="utf-8")
     campo = "MODEL_VERSION" if alvo == "nlu" else "ASK_MODEL_VERSION"
-    print(f"\nPromovida. Agora: {campo}={a.version} na Vercel (invalida o cache) e deploy.")
+    print(f"\nPromovida. Agora: (1) SNAPSHOT_EPOCH = \"{a.version}\" em backend/modal/nlu_app.py e `python -m modal deploy backend/modal/nlu_app.py`"
+          " (sem mudança no código o deploy é pulado e o snapshot de memória continua servindo a versão anterior);"
+          f" (2) {campo}={a.version} na Vercel (invalida o cache) e deploy do site.")
     return 0
 
 

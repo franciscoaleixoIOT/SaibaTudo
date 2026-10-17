@@ -72,6 +72,27 @@ e regerar o corpus com `--linha-idioma-quimica`, para que treino e serviço usem
 gravada em `contagens.json`. Se a SaibaTudo.IA passar a receber `idioma`, ele entra no mesmo lugar ("Idioma da interface: en."), mas
 isso exige mudar o handler (`{q, v, idioma}`) e o Modal.
 
+## v3.4 (16–17/10/2026): multi-turno, comparação ancorada e conceitos
+`quimica_v34.py` (geradores) e `contexto_nlu.py` (formato da entrada com contexto), chamados pelo `montar_corpus.py` (`--escala-v34`, 0 desliga;
+`--out` escolhe a pasta). Corpus do v3.4: `python -I ia/corpus/montar_corpus.py --out ia/corpus/out/v34 --escala-v34 0.69` (0.69 para a química
+ficar abaixo de 70 % do treino); testes contra ele: `CORPUS_OUT=ia/corpus/out/v34 python -I -m unittest discover -s ia/corpus -p "test_*.py"`.
+- **Multi-turno** (5 idiomas): a mensagem do usuário ganha uma linha `contexto: {JSON do contrato da pergunta anterior}` antes da pergunta de
+  continuação; a saída é a de uma pergunta completa, com a entidade herdada. Cenários: troca de elemento/composto, troca de propriedade,
+  ação sobre a mesma entidade (massa molar, segurança, desenhar, nomenclatura, "o que é"), troca de quantidade, troca de unidade de destino e
+  ~22 % com contexto mas pergunta completa nova (o contexto não pode vazar). Validação: pergunta por `validate_question`, filtro do contrato só
+  na pergunta, forma + `combinacao_valida`, evidência no texto inteiro.
+- **Comparação** (5 idiomas): COMPARAR com o primeiro elemento/composto citado e a propriedade do predicado ("é mais eletronegativo",
+  "ferve a uma temperatura mais alta", "é mais ácido" → `pka`, "é mais lipofílico" → `xlogp`); reatividade fica sem propriedade (não há id).
+  Pares de elementos só com propriedades que todos têm no pacote, com valores diferentes; `massaMolar`/`xlogp`/`tpsa` de compostos também
+  conferidos no pacote. Ebulição/fusão/densidade/solubilidade/pKa de **compostos ainda não estão no pacote** (frente C de 16/10): o NLU só
+  interpreta, a resposta depende do pacote novo.
+- **Conceitos** (pt-BR): títulos da Wikipédia pt (tipo conceito, filtros do `gerar_nlu`) e do Wikilivros pt; "dê um exemplo", "por que",
+  "qual a diferença entre X e Y" (mesmo tema), com nível.
+- **Recusas:** nenhum gerador novo. O corpus já tem 1.630 pares de RECUSA_PERIGO revisados (meta 1.000).
+- Holdouts próprios (nunca treinam; texto exato fora do treino): `holdout_v34_{multiturno,comparar,conceito}.json` (~8 % por hash) e
+  `holdout_v34_revisor.json` (perguntas de um revisor independente conferidas contra o contrato; montado à parte, não pelo montador).
+- Equações: desde a normalização de 14/10 a pergunta chega com `→`; o rótulo agora copia a equação da pergunta normalizada.
+
 ## Arquivos
 - `montar_corpus.py`: monta o corpus.
 - `quimica_populares.py`: gerador focado dos compostos do dia a dia nos cinco idiomas (ver a tabela de fontes); `test_quimica_populares.py`
