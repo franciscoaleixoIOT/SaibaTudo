@@ -1,5 +1,5 @@
 {
-  "geradoEm": "2026-10-17T04:24:52Z",
+  "geradoEm": "2026-10-17T20:06:29Z",
   "modo": "completo",
   "idiomas": [
     "pt-BR",
@@ -324,62 +324,16 @@
     "selecaoCompostos": {
       "status": "ok",
       "segundos": 0.1,
-      "listaFixaEntradas": 490,
-      "listaFixaResolvidas": 481,
-      "listaFixaDescartadas": [
-        {
-          "nome": "Hidróxido de ferro(III)",
-          "termo": "iron(III) hydroxide",
-          "motivo": "sem CID"
-        },
-        {
-          "nome": "Cloreto de cobalto(II)",
-          "termo": "cobalt(II) chloride",
-          "motivo": "sem CID"
-        },
-        {
-          "nome": "Sulfeto de sódio",
-          "termo": "sodium sulfide",
-          "motivo": "fórmula não confere (esperada Na2S; PubChem: 237873=HNa2S+)"
-        },
-        {
-          "nome": "Carbeto de cálcio",
-          "termo": "calcium carbide",
-          "motivo": "sem CID"
-        },
-        {
-          "nome": "Glutamato monossódico",
-          "termo": "monosodium glutamate",
-          "motivo": "fórmula não confere (esperada C5H8NNaO4; PubChem: 23689119=C5H10NNaO5)"
-        },
-        {
-          "nome": "Óxido de ferro(III)",
-          "termo": "iron(III) oxide",
-          "motivo": "sem CID"
-        },
-        {
-          "nome": "Óxido de ferro(II,III)",
-          "termo": "iron(II,III) oxide",
-          "motivo": "sem CID"
-        },
-        {
-          "nome": "Óxido de prata",
-          "termo": "silver oxide",
-          "motivo": "sem CID"
-        },
-        {
-          "nome": "Pentóxido de difósforo",
-          "termo": "phosphorus pentoxide",
-          "motivo": "fórmula não confere (esperada P4O10; PubChem: 6326975=O5P2)"
-        }
-      ],
+      "listaFixaEntradas": 501,
+      "listaFixaResolvidas": 501,
+      "listaFixaDescartadas": [],
       "wikidataItens": 2898,
-      "wikidataAdicionados": 1519,
+      "wikidataAdicionados": 1499,
       "lotesWikidataFalhos": []
     },
     "compostos": {
       "status": "ok",
-      "segundos": 1.5,
+      "segundos": 1.3,
       "compostos": 1990,
       "descartados": [],
       "duplicados": [
@@ -435,10 +389,10 @@
         }
       ],
       "casDesempatadosPeloPubchem": 6,
-      "comGhsHarmonizado": 481,
-      "ghsCandidatosPubchem": 485,
+      "comGhsHarmonizado": 482,
+      "ghsCandidatosPubchem": 486,
       "ghsCasadoPor": {
-        "cas": 480,
+        "cas": 481,
         "ec": 0,
         "indice": 0,
         "nome": 1
@@ -504,7 +458,7 @@
       "comCas": 1973,
       "comWikidata": 1982,
       "nomePtPendente": 7,
-      "comDefinicaoChebi": 1323,
+      "comDefinicaoChebi": 1316,
       "frasesHSemTextoPt": [
         "H350i",
         "H360D",
@@ -518,9 +472,9 @@
       ],
       "wikidataFalhas": [],
       "chebi": {
-        "solicitados": 1776,
-        "encontrados": 1775,
-        "comDefinicao": 1375,
+        "solicitados": 1774,
+        "encontrados": 1773,
+        "comDefinicao": 1368,
         "falhas": []
       },
       "rotulosWikidata": "ok",
@@ -528,15 +482,15 @@
         "pt-BR": 1983,
         "en": 1982,
         "es": 1743,
-        "de": 1954,
+        "de": 1953,
         "fr": 1900
       },
       "comArtigoPorIdioma": {
-        "pt-BR": 1931,
+        "pt-BR": 1924,
         "en": 1951,
         "es": 1722,
-        "de": 1909,
-        "fr": 1853
+        "de": 1908,
+        "fr": 1852
       },
       "sinonimosDePubChem": "não coletados (política de campos calculados do PubChem)",
       "excluidosPorSeguranca": [
@@ -641,13 +595,14 @@
       "status": "ok",
       "segundos": 0.1,
       "itensConsultados": 1963,
-      "itensComDeclaracao": 1035,
+      "itensComDeclaracao": 1048,
       "falhas": [],
       "descartadas": {
         "pKa de ácido forte": 5,
-        "sem referência": 640,
+        "sem referência": 817,
         "densidade de outra fase": 23,
         "densidade incoerente com o estado": 8,
+        "entalpia de outra fase": 10,
         "unidade de solubilidade não convertida": 26,
         "pressão diferente de 1 atm": 24,
         "qualificador P1480=Q5727902": 3,
@@ -662,37 +617,332 @@
         "unidade desconhecida": 1
       },
       "fusaoAcimaDaEbulicao": 0,
-      "divergentes": 38,
+      "divergentes": 39,
       "divergentesPorCampo": {
         "pontoEbulicaoK": 7,
         "solubilidadeAguaG100g": 3,
-        "pontoFusaoK": 26,
+        "pontoFusaoK": 27,
         "densidadeKgm3": 1,
         "solubilidadeAguaGL": 1
       },
-      "corroboradasSemReferencia": 7,
+      "corroboradasSemReferencia": 8,
       "compostosComPropriedade": {
         "pontoFusaoK": 791,
-        "pontoEbulicaoK": 525,
-        "densidadeKgm3": 277,
-        "solubilidadeAguaGL": 24,
-        "solubilidadeAguaG100g": 192,
+        "pontoEbulicaoK": 524,
+        "densidadeKgm3": 278,
+        "solubilidadeAguaGL": 25,
+        "solubilidadeAguaG100g": 191,
         "pka": 93,
         "pkaValores": 5,
-        "estadoPadrao": 720
+        "entalpiaFormacaoKJmol": 27,
+        "estadoPadrao": 721
       },
-      "compostosComAlguma": 872,
+      "entalpiaReferenciaFraca": 0,
+      "compostosComAlguma": 877,
       "comReferencia": {
         "pontoFusaoK": 789,
-        "pontoEbulicaoK": 523,
-        "densidadeKgm3": 274,
-        "solubilidadeAguaGL": 24,
-        "solubilidadeAguaG100g": 192,
+        "pontoEbulicaoK": 522,
+        "densidadeKgm3": 275,
+        "solubilidadeAguaGL": 25,
+        "solubilidadeAguaG100g": 191,
         "pka": 93,
         "pkaValores": 0,
+        "entalpiaFormacaoKJmol": 27,
         "estadoPadrao": 0
       },
-      "compostosComAlternativas": 405
+      "compostosComAlternativas": 406
+    },
+    "termoquimicaWikipedia": {
+      "status": "ok",
+      "segundos": 0.1,
+      "compostos": 1971,
+      "comTituloEn": 1933,
+      "paginasLidas": 1933,
+      "semArtigoEn": 38,
+      "semPagina": 0,
+      "qidDiferente": 9,
+      "semCampo": 1513,
+      "tituloCurado": 1,
+      "publicados": {
+        "entalpiaFormacaoKJmol": 261,
+        "energiaGibbsFormacaoKJmol": 81,
+        "entropiaPadraoJmolK": 258
+      },
+      "descartadas": {
+        "unidade fora da lista": 33,
+        "valor aproximado, limite ou intervalo": 49,
+        "vazio": 86,
+        "fora da faixa física plausível": 2,
+        "campo repetido com valores diferentes": 9,
+        "fase diferente do estado padrão": 1,
+        "sem número no início": 3,
+        "modelo não reconhecido": 2,
+        "fase ambígua": 1
+      },
+      "excluidosPorCuradoria": 12,
+      "substituiuWikidata": 7,
+      "iguaisAoWikidata": 6,
+      "mantidoWikidataPorFase": 0,
+      "divergenteDoWikidata": {
+        "n": 1,
+        "amostra": [
+          {
+            "cid": 6354,
+            "nome": "Óxido de etileno",
+            "chembox": -52.6,
+            "wikidata": -51.04
+          }
+        ]
+      },
+      "naoReconhecidos": [
+        {
+          "cid": 14917,
+          "artigo": "Hydrogen fluoride",
+          "campo": "DeltaHf",
+          "texto": "−13.66 kJ/g (gas) <br /> −14.99 kJ/g (liquid)"
+        },
+        {
+          "cid": 14917,
+          "artigo": "Hydrogen fluoride",
+          "campo": "Entropy",
+          "texto": "8.687 J/g&nbsp;K (gas)"
+        },
+        {
+          "cid": 260,
+          "artigo": "Hydrogen bromide",
+          "campo": "DeltaHf",
+          "texto": "−36.45...−36.13 kJ/mol"
+        },
+        {
+          "cid": 260,
+          "artigo": "Hydrogen bromide",
+          "campo": "Entropy",
+          "texto": "198.696–198.704 J/(K·mol)"
+        },
+        {
+          "cid": 176,
+          "artigo": "Acetic acid",
+          "campo": "DeltaHf",
+          "texto": "−483.88–483.16 kJ/mol"
+        },
+        {
+          "cid": 1175,
+          "artigo": "Uric acid",
+          "campo": "DeltaHf",
+          "texto": "−619.69 to −617.93&nbsp;kJ&nbsp;mol<sup>−1</sup>"
+        },
+        {
+          "cid": 6049,
+          "artigo": "Ethylenediaminetetraacetic acid",
+          "campo": "DeltaHf",
+          "texto": "−1765.4 to −1758.0 kJ&nbsp;mol<sup>−1</sup>"
+        },
+        {
+          "cid": 674,
+          "artigo": "Dimethylamine",
+          "campo": "DeltaHf",
+          "texto": "−21 to −17 kJ mol<sup>−1</sup>"
+        },
+        {
+          "cid": 1146,
+          "artigo": "Trimethylamine",
+          "campo": "DeltaHf",
+          "texto": "−24.5 to −23.0 kJ mol<sup>−1</sup>"
+        },
+        {
+          "cid": 5284359,
+          "artigo": "Calcium chloride",
+          "campo": "DeltaHf",
+          "texto": "{{ubl\n | {{val|-795.42|u=kJ/mol|fmt=commas}} (anhydrous)\n | {{val|-1110.98|u=kJ/mol|fmt=co"
+        },
+        {
+          "cid": 24243,
+          "artigo": "Trisodium phosphate",
+          "campo": "Entropy",
+          "texto": "224.7 J/(mol·K) (anhydrous)<br>660 J/(mol·K) (dodecahydrate)"
+        },
+        {
+          "cid": 24243,
+          "artigo": "Trisodium phosphate",
+          "campo": "DeltaHf",
+          "texto": "−1935.5 kJ/mol (anhydrous)<br>−5480 kJ/mol (dodecahydrate)"
+        },
+        {
+          "cid": 24243,
+          "artigo": "Trisodium phosphate",
+          "campo": "DeltaGf",
+          "texto": "−1819 kJ/mol (anhydrous)"
+        },
+        {
+          "cid": 24456,
+          "artigo": "Tricalcium phosphate",
+          "campo": "DeltaHf",
+          "texto": "−4126 kJ/mol (α-form)"
+        },
+        {
+          "cid": 9317,
+          "artigo": "Lead(II) acetate",
+          "campo": "DeltaHf",
+          "texto": "−960.9 kJ/mol (anhydrous)<br>−1848.6 kJ/mol (trihydrate)"
+        },
+        {
+          "cid": 166630,
+          "artigo": "Lithium oxide",
+          "campo": "DeltaHf",
+          "texto": "−20.01 kJ/g or −595.8 kJ/mol"
+        },
+        {
+          "cid": 1031,
+          "artigo": "1-Propanol",
+          "campo": "DeltaHf",
+          "texto": "−302.79…−302.29 kJ/mol"
+        },
+        {
+          "cid": 6568,
+          "artigo": "2-Butanol",
+          "campo": "DeltaHf",
+          "texto": "−343.3 to −342.1 kJ&nbsp;mol<sup>−1</sup>"
+        },
+        {
+          "cid": 6386,
+          "artigo": "Tert-Butyl alcohol",
+          "campo": "DeltaHf",
+          "texto": "−360.04 to −358.36 kJ/mol"
+        },
+        {
+          "cid": 6276,
+          "artigo": "1-Pentanol",
+          "campo": "DeltaHf",
+          "texto": "−351.90–−351.34 kJ mol<sup>−1</sup>"
+        },
+        {
+          "cid": 6342,
+          "artigo": "Acetonitrile",
+          "campo": "DeltaHf",
+          "texto": "{{val|40.16|to|40.96|u=kJ.mol-1}}"
+        },
+        {
+          "cid": 6334,
+          "artigo": "Propane",
+          "campo": "DeltaHf",
+          "texto": "−105.2–104.2&nbsp;kJ⋅mol<sup>−1</sup>"
+        },
+        {
+          "cid": 7843,
+          "artigo": "Butane",
+          "campo": "DeltaHf",
+          "texto": "−126.3–−124.9 kJ/mol"
+        },
+        {
+          "cid": 8003,
+          "artigo": "Pentane",
+          "campo": "DeltaHf",
+          "texto": "−174.1–−172.9 kJ mol<sup>−1</sup>"
+        },
+        {
+          "cid": 8058,
+          "artigo": "Hexane",
+          "campo": "DeltaHf",
+          "texto": "−199.4–−198.0 kJ mol<sup>−1</sup>"
+        },
+        {
+          "cid": 356,
+          "artigo": "Octane",
+          "campo": "DeltaHf",
+          "texto": "−252.1 to −248.5 kJ/mol"
+        },
+        {
+          "cid": 8141,
+          "artigo": "Nonane",
+          "campo": "DeltaHf",
+          "texto": "−275.7 – −273.7 kJ mol<sup>−1</sup>"
+        },
+        {
+          "cid": 15600,
+          "artigo": "Decane",
+          "campo": "DeltaHf",
+          "texto": "−302.1 – −299.9 kJ mol<sup>−1</sup>"
+        },
+        {
+          "cid": 6360,
+          "artigo": "Isobutane",
+          "campo": "DeltaHf",
+          "texto": "−134.8{{nbsp}}–{{nbsp}}−133.6{{nbsp}}kJ⋅mol<sup>−1</sup>"
+        },
+        {
+          "cid": 6556,
+          "artigo": "Isopentane",
+          "campo": "DeltaHf",
+          "texto": "−179.1–−177.3 kJ mol<sup>−1</sup>"
+        },
+        {
+          "cid": 10041,
+          "artigo": "Neopentane",
+          "campo": "DeltaHf",
+          "texto": "−168.5–−167.3 kJ mol<sup>−1</sup>"
+        },
+        {
+          "cid": 10907,
+          "artigo": "2,2,4-Trimethylpentane",
+          "campo": "DeltaHf",
+          "texto": "−260.6 to −258.0 kJ mol<sup>−1</sup>"
+        },
+        {
+          "cid": 6378,
+          "artigo": "Propylene oxide",
+          "campo": "Entropy",
+          "texto": "196.5{{nbsp}}J·(K·mol)<sup>−1</sup>"
+        },
+        {
+          "cid": 6322,
+          "artigo": "Arginine",
+          "campo": "DeltaHf",
+          "texto": "−624.9–−622.3 kJ mol<sup>−1</sup>"
+        },
+        {
+          "cid": 586,
+          "artigo": "Creatine",
+          "campo": "DeltaHf",
+          "texto": "−538.06–−536.30 kJ mol<sup>−1</sup>"
+        },
+        {
+          "cid": 6374,
+          "artigo": "Iodoform",
+          "campo": "DeltaHf",
+          "texto": "180.1 – 182.1 kJ/mol"
+        },
+        {
+          "cid": 14257,
+          "artigo": "Undecane",
+          "campo": "DeltaHf",
+          "texto": "−329.8 – −324.6 kJ mol<sup>−1</sup>"
+        },
+        {
+          "cid": 6323,
+          "artigo": "Bromomethane",
+          "campo": "DeltaHf",
+          "texto": "−35.1{{nbsp}}–{{nbsp}}−33.5{{nbsp}}kJ·mol<sup>−1</sup>"
+        },
+        {
+          "cid": 8182,
+          "artigo": "Dodecane",
+          "campo": "DeltaHf",
+          "texto": "−353.5–−350.7 kJ mol<sup>−1</sup>"
+        },
+        {
+          "cid": 24560,
+          "artigo": "Uranium hexafluoride",
+          "campo": "DeltaHf",
+          "texto": "{{ubl\n|Solid, −2197.7±1.8{{nbsp}}[[Joule|kJ]] mol<sup>−1</sup>\n|Gaseous, −2148.1±1.8{{nbsp"
+        },
+        {
+          "cid": 24560,
+          "artigo": "Uranium hexafluoride",
+          "campo": "Entropy",
+          "texto": "{{ubl\n|Solid, 227.8±1.3{{nbsp}}J K<sup>−1</sup> mol<sup>−1</sup>\n|Gaseous, 377.8±1.3{{nbsp"
+        }
+      ],
+      "falhas": []
     },
     "wikipedia": {
       "status": "ok",
@@ -800,7 +1050,7 @@
       "elementos": 118,
       "compostos": 150,
       "conceitos": 301,
-      "trechos": 1075,
+      "trechos": 1076,
       "artigos": 569,
       "semArtigoNoIdioma": 14,
       "descartados": [],
@@ -823,7 +1073,7 @@
           "titulo": "Modelo atómico"
         }
       ],
-      "trechosCurtos": 128
+      "trechosCurtos": 127
     },
     "wikipedia-de": {
       "status": "ok",
@@ -836,7 +1086,7 @@
       "artigos": 551,
       "semArtigoNoIdioma": 32,
       "descartados": [],
-      "trechosCurtos": 142
+      "trechosCurtos": 141
     },
     "wikipedia-fr": {
       "status": "ok",
@@ -845,7 +1095,7 @@
       "elementos": 118,
       "compostos": 150,
       "conceitos": 294,
-      "trechos": 804,
+      "trechos": 803,
       "artigos": 562,
       "semArtigoNoIdioma": 24,
       "descartados": [],
@@ -900,51 +1150,54 @@
     },
     "goldBook": {
       "status": "bloqueado",
-      "segundos": 0.6,
+      "segundos": 0.7,
       "motivo": "HTTP 403 em https://goldbook.iupac.org/"
     }
   },
   "contagens": {
     "textosPorFonte": {
       "wikipedia-pt": 925,
-      "wikipedia-en": 1075,
+      "wikipedia-en": 1076,
       "wikipedia-es": 981,
       "wikipedia-de": 767,
-      "wikipedia-fr": 804,
+      "wikipedia-fr": 803,
       "wikibooks-pt": 258,
-      "chebi": 1304,
+      "chebi": 1297,
       "gutenberg-14474": 235,
       "gold-book": 0
     },
     "elementos": 118,
     "compostos": 1971,
     "constantes": 59,
-    "textos": 6349,
+    "textos": 6342,
     "textosPorIdioma": {
       "pt-BR": 1183,
-      "en": 2614,
+      "en": 2608,
       "es": 981,
       "de": 767,
-      "fr": 804
+      "fr": 803
     },
     "lotesDeTextos": 36,
-    "compostosComGhsHarmonizado": 481,
+    "compostosComGhsHarmonizado": 482,
     "compostosComCas": 1954,
     "compostosComPropriedadeMedida": {
       "pontoFusaoK": 791,
-      "pontoEbulicaoK": 525,
-      "densidadeKgm3": 277,
-      "solubilidadeAguaGL": 24,
-      "solubilidadeAguaG100g": 192,
+      "pontoEbulicaoK": 524,
+      "densidadeKgm3": 278,
+      "solubilidadeAguaGL": 25,
+      "solubilidadeAguaG100g": 191,
       "pka": 93,
       "pkaValores": 5,
-      "estadoPadrao": 720
+      "entalpiaFormacaoKJmol": 281,
+      "estadoPadrao": 721,
+      "energiaGibbsFormacaoKJmol": 81,
+      "entropiaPadraoJmolK": 258
     },
     "compostosComNomePorIdioma": {
       "pt-BR": 1964,
       "en": 1963,
       "es": 1724,
-      "de": 1935,
+      "de": 1934,
       "fr": 1881
     },
     "elementosComNomePorIdioma": {
@@ -974,9 +1227,9 @@
   "avisos": [],
   "traducoes": {
     "chebi": {
-      "aplicadas": 1296,
+      "aplicadas": 1285,
       "hashDivergente": 0,
-      "semTraducao": 8
+      "semTraducao": 12
     },
     "gutenberg-14474": {
       "aplicadas": 235,
@@ -1002,7 +1255,7 @@
   ],
   "http": {
     "requisicoes": 2,
-    "doCache": 476,
+    "doCache": 515,
     "revalidadas304": 0,
     "tentativasExtras": 0,
     "erros": 0,
@@ -1011,7 +1264,7 @@
       "goldbook.iupac.org": 2
     }
   },
-  "duracaoSegundos": 3.9,
-  "versao": "20261017T042452Z-16d6ad9a5293",
+  "duracaoSegundos": 3.6,
+  "versao": "20261017T200629Z-4bdcfd55c55a",
   "erros": []
 }

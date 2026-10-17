@@ -1,51 +1,51 @@
 {
-  "version": "20261017T042452Z-16d6ad9a5293",
-  "generatedAt": "2026-10-17T04:24:52Z",
+  "version": "20261017T200629Z-4bdcfd55c55a",
+  "generatedAt": "2026-10-17T20:06:29Z",
   "schemaVersion": 1,
   "files": {
     "compostos/index.json": {
-      "bytes": 818642,
-      "sha256": "8af4da6ff1655716214145dc511d8f0c4b00d17f812519dc80cf1c92856e2904"
+      "bytes": 819578,
+      "sha256": "9abc616b3d8a32c4a6292b820c86ec205948346c8e41cf96dfbb38339d554be1"
     },
     "compostos/lote-001.json": {
-      "bytes": 537762,
-      "sha256": "f6094bdc577f73fb50e940ee0490bf3964613be219e4fe87d6389b65ae0ef018"
+      "bytes": 628902,
+      "sha256": "6557032478c707a9df1559bb3f4a3129525715b05a9d69ece548a7d89a492016"
     },
     "compostos/lote-002.json": {
-      "bytes": 621972,
-      "sha256": "9986c388e1dbc1cb9ce626917b9296bd82818c49beda19e9fb2b9a739e5befc7"
+      "bytes": 703296,
+      "sha256": "2a642d49c6a14df618ac5752e586f71a48285b3463eb92d45267e0f3ecba73ae"
     },
     "compostos/lote-003.json": {
-      "bytes": 493857,
-      "sha256": "8134a6168920288c38244879916df009af059a426ca3e9c3d5a92d9ffa327580"
+      "bytes": 509488,
+      "sha256": "99ff709b550468721bb9d7da29b83bdaa975241801fd8ecff2fb77daa784823b"
     },
     "compostos/lote-004.json": {
-      "bytes": 486603,
-      "sha256": "ecf3807697703f8085fdde314e166d2be5ea2a89374e22d7488b468da3fde3dc"
+      "bytes": 524077,
+      "sha256": "00b991158fd724918ea7dc002745c8f9c26ded4824528827ee15ab73b4b14f1f"
     },
     "compostos/lote-005.json": {
-      "bytes": 454657,
-      "sha256": "69c3fd3e72d235387d9520b404158e607d83d3c82740a611ee172b341a5fd572"
+      "bytes": 480378,
+      "sha256": "91623a8c1e5d9c94a8ec1fd112eced413fb8422d3d2b4ff9f4309181ea7b54e3"
     },
     "compostos/lote-006.json": {
-      "bytes": 420471,
-      "sha256": "8d3b523e9e7c82caa54997cfb7aa442404031be7baaa6a8ede24c4d902220eb5"
+      "bytes": 454644,
+      "sha256": "942061612efaf69643317b32cff89af5a5581bfa1fb3e7ecfa533cb880a30dfe"
     },
     "compostos/lote-007.json": {
-      "bytes": 417876,
-      "sha256": "c533e8f13eeb549dbbb11fa8806327ebf719e5931cc96b61a94f7afd371fb37b"
+      "bytes": 437160,
+      "sha256": "84c42e8510946df2d3e0b177fc1716f3dd4413db9d43f691eab7ed14b4e5245e"
     },
     "compostos/lote-008.json": {
-      "bytes": 391485,
-      "sha256": "d71646ff69bb99263edd8cda71e536935e0856ff479edef8a38d4e1d9e8006e0"
+      "bytes": 410556,
+      "sha256": "6dc40f2f41ba7c14bd4da2dbad808c72bec3c4c6978e707acb48d1f8717965d7"
     },
     "compostos/lote-009.json": {
-      "bytes": 409896,
-      "sha256": "43521e3ed473d758b46ec1448a41aee1ec4203c1d7bfca8bb73e4e5a49467713"
+      "bytes": 418565,
+      "sha256": "74af8d18c2dcb3f8014379f67b16eb06370bd27c4e8a88f6192efc1642c2956b"
     },
     "compostos/lote-010.json": {
-      "bytes": 322442,
-      "sha256": "c3c52a05d85a5df3720747a55ab47a377b4d9b3231d297ad0f3cef84660cc153"
+      "bytes": 325291,
+      "sha256": "d9dd263ce06f889a71ab29544fcabb4cb84f04413ba3ce14eb3f66b2a6b284af"
     },
     "constantes.json": {
       "bytes": 20394,
@@ -56,44 +56,44 @@
       "sha256": "75d3b6519691e36fed9cd2344efd6c5ccbc73f95ae981fb38db7d1fe4e284a12"
     },
     "fontes.json": {
-      "bytes": 6943,
-      "sha256": "26a32a75511328d076e24ab01ee7925e31e43320d1837f93f7aab3d799d38646"
+      "bytes": 7285,
+      "sha256": "036f4e5b16abfb6e5c83b8007de3b681be1fbd3b82c39c47dc525c66ccc6ccc1"
     },
     "ghs_frases.json": {
       "bytes": 61416,
       "sha256": "32fe092cd704e9b5ad24af40a1e49fc9a44826a9205cc4874492ddbde84b2116"
     },
     "regras.json": {
-      "bytes": 44697,
-      "sha256": "744401d8330c9e56dda186922506a61e21e5014b5ac39bf88bf58aa267fb6866"
+      "bytes": 47344,
+      "sha256": "95c9f64663a01418119977eacceefc6f2f2931c88a5956b2fd2fc4de63e5c10a"
     },
     "textos/chebi/lote-001.json": {
-      "bytes": 207306,
-      "sha256": "24817c79b87eb6e1b42511e2eb31dbcb0fe52c79949f4d5bcf66bfadff832e09"
+      "bytes": 206981,
+      "sha256": "d3f914b98a05c391ebe058df08b30f13d6d261343f2eac28e8bb2c56309ecf3b"
     },
     "textos/chebi/lote-002.json": {
-      "bytes": 198299,
-      "sha256": "575020b6d7c34c0d2b1482f2b262fb3e9e44039b8d99ad5a8636f0d4529a11d5"
+      "bytes": 197568,
+      "sha256": "6856b8a018bd5d2be5d0d80ecfd0d2ea67cb3915125758a42aaf4c3aae5347cf"
     },
     "textos/chebi/lote-003.json": {
-      "bytes": 209840,
-      "sha256": "edac316bb2148b11876b55f0eabb60203d1d240c95ca22d3d12f1ae28f5ec30e"
+      "bytes": 209740,
+      "sha256": "3959b02c4c7e708a91e73527c97ce6e3432c7b3ffa90d90ddff08e36d0656c46"
     },
     "textos/chebi/lote-004.json": {
-      "bytes": 210714,
-      "sha256": "a7218dba8d8bf3f2431d5de65981e81a85bc5249e6786d2c38a3973910722465"
+      "bytes": 210946,
+      "sha256": "c3617e39ea38ef8f9c8e8dfb07e122361894adeb5d434d52691fb4d7bda84c5b"
     },
     "textos/chebi/lote-005.json": {
-      "bytes": 213443,
-      "sha256": "ed4d082214317c16edc76eb37919fce1b69f5d3946ee633d12b25c9428ad63cc"
+      "bytes": 213104,
+      "sha256": "2f9474df3c1177b1abc36dbaae82ddb9221f8708efc6fc89e89e1d490e50554c"
     },
     "textos/chebi/lote-006.json": {
-      "bytes": 225027,
-      "sha256": "2565a0ec2fcc508fea94ab9d33bd17cfc9c3c08edc8fe2a345dbfe6930fe4476"
+      "bytes": 223687,
+      "sha256": "ec16c358d85af3fe7a0f8400e334c994b5e1008d9c2ec4f2d9b1f6715bedba5c"
     },
     "textos/chebi/lote-007.json": {
-      "bytes": 113970,
-      "sha256": "fb584f579daa121214349c8374296a83482321de1118df24b80736fc0415f723"
+      "bytes": 106672,
+      "sha256": "3adeb3fab82d95db48056ce5546fd3294d4a53d6e3385dc37080b3bcf9fc43a5"
     },
     "textos/gutenberg-14474/lote-001.json": {
       "bytes": 588811,
@@ -104,8 +104,8 @@
       "sha256": "0039769a5182f7a3dea17397a4c3163a1e00102a3f0bfa68e65cca773c78a642"
     },
     "textos/index.json": {
-      "bytes": 872861,
-      "sha256": "e2c2898bad3a702748549a72607104a8997781ec389e93c86255fbb5dcb20d76"
+      "bytes": 872228,
+      "sha256": "02f9c9cedd950acc3bb4646aad421e6a0183d1e67347f06d09b06648ea66badb"
     },
     "textos/wikibooks-pt/lote-001.json": {
       "bytes": 516829,
@@ -120,12 +120,12 @@
       "sha256": "531bae67be8a106e8cef027c4294b222caaa5c9d16a52314cf9b04d51c588163"
     },
     "textos/wikipedia-de/lote-002.json": {
-      "bytes": 297487,
-      "sha256": "dc39d5bd502bab93d4e2a690f48dead3e144e3ed43d741fc270f86818f942c52"
+      "bytes": 297816,
+      "sha256": "9fe2a718213c8257b7ba283155d086b58d288bfa76540620665262f54de4eb45"
     },
     "textos/wikipedia-de/lote-003.json": {
-      "bytes": 289004,
-      "sha256": "846508d57e31cef55cd59d9b8c4407b151e9424c05debf882b09e2b2863eb49b"
+      "bytes": 289413,
+      "sha256": "ccfa07ad7c6ed8d8bb9486c37cc4a9f0c9435f68b5e468f6f7269798a9985429"
     },
     "textos/wikipedia-de/lote-004.json": {
       "bytes": 246571,
@@ -144,28 +144,28 @@
       "sha256": "814e78ea7bec87f89fc42b9b58191255b6149e323666de5089323176fec4b194"
     },
     "textos/wikipedia-en/lote-004.json": {
-      "bytes": 310713,
-      "sha256": "abc6258e3b4152db2b53852b2b1be8665cb325a604ad2636907163927df93da4"
+      "bytes": 310749,
+      "sha256": "d449ff4f5db3a3c810c5b7decd5c899f9d41b308ac497774f9f71d3115103d6d"
     },
     "textos/wikipedia-en/lote-005.json": {
-      "bytes": 305714,
-      "sha256": "bfae8bc355b686be0e27246418aff805856f4127d4b14d4b08da32d6326221ea"
+      "bytes": 305903,
+      "sha256": "2a4dc618601adf833c0ca87e6cf5a6962e5a439957f18a27c78f0411d2ddebd3"
     },
     "textos/wikipedia-en/lote-006.json": {
-      "bytes": 114193,
-      "sha256": "695431d2a073099b17399eb7b8c8102070f6bbc26fe32fe7c952fa2556cde5ce"
+      "bytes": 115245,
+      "sha256": "93c281b6b17bd770df9e7b0e5b391542cde9476d3d38a2f48394c9bce75e7d73"
     },
     "textos/wikipedia-es/lote-001.json": {
-      "bytes": 296432,
-      "sha256": "f34e5183d9513f337d0d9d0478ce9b20c17c30b198568fa286c15ecacbf6d9ca"
+      "bytes": 297390,
+      "sha256": "e0f50ee1e8899342ef9f76c8630ebdbc95c87e8c87a139a9b04de5c47584729c"
     },
     "textos/wikipedia-es/lote-002.json": {
-      "bytes": 316329,
-      "sha256": "df5ad18cfd560bc4e014290483ece00fc459e12893a29981a91b583f9a267ea8"
+      "bytes": 315989,
+      "sha256": "3ccaccabef166920112a2a41273d8ebb51e16811279317f85d88881d5421f03c"
     },
     "textos/wikipedia-es/lote-003.json": {
-      "bytes": 306709,
-      "sha256": "11f21592fb1242faed07d4c4d07de329b67f5eedc87b393a24a5e587d467621e"
+      "bytes": 306965,
+      "sha256": "3b0bceb9e364827ee077fb0a7c754044cebe5c2b48d924ca2a0622f8f71a89ca"
     },
     "textos/wikipedia-es/lote-004.json": {
       "bytes": 303368,
@@ -180,32 +180,32 @@
       "sha256": "94df728431cceeacc17cc774a366512ac12ecb1a52c8f000dc5e634fe0069165"
     },
     "textos/wikipedia-fr/lote-002.json": {
-      "bytes": 300854,
-      "sha256": "7749ba04e5fe40a85d9a3e31b171fd6d04db5c1dd72c5097882b4553b9cab950"
+      "bytes": 300198,
+      "sha256": "7c6731a2681756b19f502598cb8ad52cef0bcc1d09ec8a7ec816251608b93d05"
     },
     "textos/wikipedia-fr/lote-003.json": {
-      "bytes": 295825,
-      "sha256": "6d2db235f3ec64f29bbb61b8b665f7023491032deed964871d7dd8067ca54a4d"
+      "bytes": 296370,
+      "sha256": "6482d23e32f67afbd670ef1801737c5a956c3b26862e893d20881f3dd44be4b4"
     },
     "textos/wikipedia-fr/lote-004.json": {
-      "bytes": 298576,
-      "sha256": "f74845c8accecbc18f0f37089967d135df54a1b316b71f1cd3d5aa4120d9467f"
+      "bytes": 298633,
+      "sha256": "26cef76e0b3ff84c01092199844bdb01cf766903ecc228deaf1e0dba34b63b95"
     },
     "textos/wikipedia-fr/lote-005.json": {
-      "bytes": 5045,
-      "sha256": "27cdd5d43a55a01aa598176cd3b9f5984a031a364d6fb3f6341bbc1ce8d830d0"
+      "bytes": 3482,
+      "sha256": "619d592f02f4f5baac9c0f9ee1aa2a5c02a6162f30f3a8be5ce569f20c284950"
     },
     "textos/wikipedia-pt/lote-001.json": {
       "bytes": 449164,
       "sha256": "c0c3cbae3fdcf132de5ded1603f6139d1792f41a2f0b123b639cd2d488e638f2"
     },
     "textos/wikipedia-pt/lote-002.json": {
-      "bytes": 477030,
-      "sha256": "2d76bfad4228b4ef892473c4d078570dc39864ab6b0adf82917ad9348be98516"
+      "bytes": 478161,
+      "sha256": "3eb0dc43a6adb613a80766f5765f1e394ef1f0dad7657c04ace275702601682e"
     },
     "textos/wikipedia-pt/lote-003.json": {
-      "bytes": 454153,
-      "sha256": "5e87d5e70388e3cfd479304d6844eed20d4ee693d2a5c497b992208831db0a0e"
+      "bytes": 453425,
+      "sha256": "737d9edc14fa0b9e3f0ed302e2f3e976da6174e11b2f9c4184fc8192e73461ae"
     },
     "textos/wikipedia-pt/lote-004.json": {
       "bytes": 468515,
@@ -397,43 +397,46 @@
     "elementos": 118,
     "compostos": 1971,
     "constantes": 59,
-    "textos": 6349,
+    "textos": 6342,
     "textosPorFonte": {
       "wikipedia-pt": 925,
-      "wikipedia-en": 1075,
+      "wikipedia-en": 1076,
       "wikipedia-es": 981,
       "wikipedia-de": 767,
-      "wikipedia-fr": 804,
+      "wikipedia-fr": 803,
       "wikibooks-pt": 258,
-      "chebi": 1304,
+      "chebi": 1297,
       "gutenberg-14474": 235,
       "gold-book": 0
     },
     "textosPorIdioma": {
       "pt-BR": 1183,
-      "en": 2614,
+      "en": 2608,
       "es": 981,
       "de": 767,
-      "fr": 804
+      "fr": 803
     },
     "lotesDeTextos": 36,
-    "compostosComGhsHarmonizado": 481,
+    "compostosComGhsHarmonizado": 482,
     "compostosComCas": 1954,
     "compostosComPropriedadeMedida": {
       "pontoFusaoK": 791,
-      "pontoEbulicaoK": 525,
-      "densidadeKgm3": 277,
-      "solubilidadeAguaGL": 24,
-      "solubilidadeAguaG100g": 192,
+      "pontoEbulicaoK": 524,
+      "densidadeKgm3": 278,
+      "solubilidadeAguaGL": 25,
+      "solubilidadeAguaG100g": 191,
       "pka": 93,
       "pkaValores": 5,
-      "estadoPadrao": 720
+      "entalpiaFormacaoKJmol": 281,
+      "estadoPadrao": 721,
+      "energiaGibbsFormacaoKJmol": 81,
+      "entropiaPadraoJmolK": 258
     },
     "compostosComNomePorIdioma": {
       "pt-BR": 1964,
       "en": 1963,
       "es": 1724,
-      "de": 1935,
+      "de": 1934,
       "fr": 1881
     },
     "elementosComNomePorIdioma": {
@@ -455,7 +458,7 @@
       "enabled": false
     },
     "melhoria": {
-      "enabled": true
+      "enabled": false
     }
   }
 }
