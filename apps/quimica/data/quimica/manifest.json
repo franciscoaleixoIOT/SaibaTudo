@@ -1,59 +1,59 @@
 {
-  "version": "20261017T034210Z-2a180a93a84a",
-  "generatedAt": "2026-10-17T03:42:10Z",
+  "version": "20261017T042452Z-16d6ad9a5293",
+  "generatedAt": "2026-10-17T04:24:52Z",
   "schemaVersion": 1,
   "files": {
     "compostos/index.json": {
-      "bytes": 818012,
-      "sha256": "cf0344b9e6365070d90f35595e490bd505e5d51886259fa09f719c3ba5847442"
+      "bytes": 818642,
+      "sha256": "8af4da6ff1655716214145dc511d8f0c4b00d17f812519dc80cf1c92856e2904"
     },
     "compostos/lote-001.json": {
-      "bytes": 473572,
-      "sha256": "13721be5035e19b250bc215694224c3020c1f3375c6dd4aef075de3137afae96"
+      "bytes": 537762,
+      "sha256": "f6094bdc577f73fb50e940ee0490bf3964613be219e4fe87d6389b65ae0ef018"
     },
     "compostos/lote-002.json": {
-      "bytes": 536539,
-      "sha256": "9cca0b250915042340bf2a0979abbed886fec6b209f53a89b0c8b6cdf74018f0"
+      "bytes": 621972,
+      "sha256": "9986c388e1dbc1cb9ce626917b9296bd82818c49beda19e9fb2b9a739e5befc7"
     },
     "compostos/lote-003.json": {
-      "bytes": 446511,
-      "sha256": "b3806fd698e5b2119a4ddc1b7774d2ece8ab05038929081f6dd294930f355a07"
+      "bytes": 493857,
+      "sha256": "8134a6168920288c38244879916df009af059a426ca3e9c3d5a92d9ffa327580"
     },
     "compostos/lote-004.json": {
-      "bytes": 433281,
-      "sha256": "6f8fcd86b424c646fff90795fdf55d9b2187e1adb2781140e556deff9d11eed9"
+      "bytes": 486603,
+      "sha256": "ecf3807697703f8085fdde314e166d2be5ea2a89374e22d7488b468da3fde3dc"
     },
     "compostos/lote-005.json": {
-      "bytes": 408469,
-      "sha256": "ecf3fd8216cb014746f1fe249e60f62597660179cc19d1157ba363247ab2dc31"
+      "bytes": 454657,
+      "sha256": "69c3fd3e72d235387d9520b404158e607d83d3c82740a611ee172b341a5fd572"
     },
     "compostos/lote-006.json": {
-      "bytes": 379713,
-      "sha256": "2e93f162b0d6b772628c663d0c275ad072695ca2af4feb6c15d678e3d9b34b69"
+      "bytes": 420471,
+      "sha256": "8d3b523e9e7c82caa54997cfb7aa442404031be7baaa6a8ede24c4d902220eb5"
     },
     "compostos/lote-007.json": {
-      "bytes": 380886,
-      "sha256": "956b12a9c1a3164aa5edef85839771c61eb5c64353279621c88cac08dd76fa5a"
+      "bytes": 417876,
+      "sha256": "c533e8f13eeb549dbbb11fa8806327ebf719e5931cc96b61a94f7afd371fb37b"
     },
     "compostos/lote-008.json": {
-      "bytes": 358977,
-      "sha256": "cc5fb0a672b6614cd5c22a818f510f5a94f1d5041e7840df3d00f1bd2f8f6e8e"
+      "bytes": 391485,
+      "sha256": "d71646ff69bb99263edd8cda71e536935e0856ff479edef8a38d4e1d9e8006e0"
     },
     "compostos/lote-009.json": {
-      "bytes": 367065,
-      "sha256": "7ab3ea65f5c41db6489aaed5a72b21492175ca28f34bdeea11d108b2396b6b59"
+      "bytes": 409896,
+      "sha256": "43521e3ed473d758b46ec1448a41aee1ec4203c1d7bfca8bb73e4e5a49467713"
     },
     "compostos/lote-010.json": {
-      "bytes": 291218,
-      "sha256": "729432da4177640d5e22cae08927be2c374ab96fe8eaf0a63bde1bd1c2a08a33"
+      "bytes": 322442,
+      "sha256": "c3c52a05d85a5df3720747a55ab47a377b4d9b3231d297ad0f3cef84660cc153"
     },
     "constantes.json": {
       "bytes": 20394,
       "sha256": "67b88a0c52de6054aeb360e7715e4d432ed6bb9eb823c01ac2cdd66c15d67a8a"
     },
     "elementos.json": {
-      "bytes": 179670,
-      "sha256": "b99942e28eed742a75a5f31501234c502f4d7dd96f87a373f45f6c22c1dde404"
+      "bytes": 278675,
+      "sha256": "75d3b6519691e36fed9cd2344efd6c5ccbc73f95ae981fb38db7d1fe4e284a12"
     },
     "fontes.json": {
       "bytes": 6943,
@@ -64,8 +64,8 @@
       "sha256": "32fe092cd704e9b5ad24af40a1e49fc9a44826a9205cc4874492ddbde84b2116"
     },
     "regras.json": {
-      "bytes": 39535,
-      "sha256": "a3b23b8c10f2bc6ee5c4a2ca4ce47a7bcc063d85a2fb2b27bcf14a82f352861c"
+      "bytes": 44697,
+      "sha256": "744401d8330c9e56dda186922506a61e21e5014b5ac39bf88bf58aa267fb6866"
     },
     "textos/chebi/lote-001.json": {
       "bytes": 207306,
@@ -84,12 +84,12 @@
       "sha256": "a7218dba8d8bf3f2431d5de65981e81a85bc5249e6786d2c38a3973910722465"
     },
     "textos/chebi/lote-005.json": {
-      "bytes": 213482,
-      "sha256": "093233a36a7d2d9cc9f5044c072ca6862de27348ad2e6923e926a259677f38a4"
+      "bytes": 213443,
+      "sha256": "ed4d082214317c16edc76eb37919fce1b69f5d3946ee633d12b25c9428ad63cc"
     },
     "textos/chebi/lote-006.json": {
-      "bytes": 225128,
-      "sha256": "eca85a464f2fd8ff4e0f346b8a43018baa3b4d464a9daa3c30ed12e5b54d4ca0"
+      "bytes": 225027,
+      "sha256": "2565a0ec2fcc508fea94ab9d33bd17cfc9c3c08edc8fe2a345dbfe6930fe4476"
     },
     "textos/chebi/lote-007.json": {
       "bytes": 113970,
@@ -417,7 +417,7 @@
       "fr": 804
     },
     "lotesDeTextos": 36,
-    "compostosComGhsHarmonizado": 485,
+    "compostosComGhsHarmonizado": 481,
     "compostosComCas": 1954,
     "compostosComPropriedadeMedida": {
       "pontoFusaoK": 791,

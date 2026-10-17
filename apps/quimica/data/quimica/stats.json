@@ -1,5 +1,5 @@
 {
-  "geradoEm": "2026-10-17T03:42:10Z",
+  "geradoEm": "2026-10-17T04:24:52Z",
   "modo": "completo",
   "idiomas": [
     "pt-BR",
@@ -288,7 +288,7 @@
     },
     "clp": {
       "status": "ok",
-      "segundos": 0.1,
+      "segundos": 0.5,
       "celex": "02008R1272-20260701",
       "url": "https://eur-lex.europa.eu/legal-content/PT/TXT/?uri=CELEX:02008R1272-20260701",
       "idiomas": [
@@ -308,6 +308,7 @@
         "de": 74,
         "fr": 75
       },
+      "anexoViEntradas": 4419,
       "codigosSemTextoPt": [
         "H350i",
         "H360D",
@@ -322,7 +323,7 @@
     },
     "selecaoCompostos": {
       "status": "ok",
-      "segundos": 0.2,
+      "segundos": 0.1,
       "listaFixaEntradas": 490,
       "listaFixaResolvidas": 481,
       "listaFixaDescartadas": [
@@ -378,7 +379,7 @@
     },
     "compostos": {
       "status": "ok",
-      "segundos": 1.7,
+      "segundos": 1.5,
       "compostos": 1990,
       "descartados": [],
       "duplicados": [
@@ -434,7 +435,71 @@
         }
       ],
       "casDesempatadosPeloPubchem": 6,
-      "comGhsHarmonizado": 485,
+      "comGhsHarmonizado": 481,
+      "ghsCandidatosPubchem": 485,
+      "ghsCasadoPor": {
+        "cas": 480,
+        "ec": 0,
+        "indice": 0,
+        "nome": 1
+      },
+      "ghsAnexoVi": 4419,
+      "ghsRejeitados": [
+        {
+          "indice": "007-030-00-3",
+          "entrada": "nitric acid …% [C ≤ 70 %]",
+          "motivo": "sem chave forte (CAS/EC ausentes de um dos lados e nome diferente)",
+          "cid": 944,
+          "nome": "Ácido nítrico",
+          "cas": "7697-37-2",
+          "aceita": "007-004-00-1"
+        },
+        {
+          "indice": "607-483-00-2",
+          "entrada": "1,2-benzenedicarboxylic acid; di-C6-8-branched alkylesters, C7-rich",
+          "motivo": "CAS diferente (88-99-3 x 71888-89-6)",
+          "cid": 1017,
+          "nome": "Ácido ftálico",
+          "cas": "88-99-3",
+          "aceita": null
+        },
+        {
+          "indice": "611-142-00-3",
+          "entrada": "product-by-process definition polyazodyestuff obtained by coupling...",
+          "motivo": "entrada não é substância pura (UVCB/produto-por-processo/massa de reação)",
+          "cid": 5234,
+          "nome": "Cloreto de sódio",
+          "cas": "7647-14-5",
+          "aceita": null
+        },
+        {
+          "indice": "029-002-00-X",
+          "entrada": "dicopper oxide; copper (I) oxide",
+          "motivo": "sem chave forte (CAS/EC ausentes de um dos lados e nome diferente)",
+          "cid": 18346908,
+          "nome": "Óxido de cobre(I)",
+          "cas": null,
+          "aceita": null
+        },
+        {
+          "indice": "607-403-00-6",
+          "entrada": "reaction mass of:...",
+          "motivo": "entrada não é substância pura (UVCB/produto-por-processo/massa de reação)",
+          "cid": 3776,
+          "nome": "Propan-2-ol",
+          "cas": "67-63-0",
+          "aceita": "603-117-00-0"
+        },
+        {
+          "indice": "617-022-00-7",
+          "entrada": "reaction mass of: 1,2-dimethylpropylidene dihydroperoxide; dimethyl...",
+          "motivo": "entrada não é substância pura (UVCB/produto-por-processo/massa de reação)",
+          "cid": 8554,
+          "nome": "Ftalato de dimetila",
+          "cas": "131-11-3",
+          "aceita": null
+        }
+      ],
       "ghsFalhasDeRede": [],
       "comCas": 1973,
       "comWikidata": 1982,
@@ -631,7 +696,7 @@
     },
     "wikipedia": {
       "status": "ok",
-      "segundos": 0.2,
+      "segundos": 0.1,
       "elementos": 118,
       "compostos": 150,
       "conceitos": 320,
@@ -863,7 +928,7 @@
       "fr": 804
     },
     "lotesDeTextos": 36,
-    "compostosComGhsHarmonizado": 485,
+    "compostosComGhsHarmonizado": 481,
     "compostosComCas": 1954,
     "compostosComPropriedadeMedida": {
       "pontoFusaoK": 791,
@@ -947,6 +1012,6 @@
     }
   },
   "duracaoSegundos": 3.9,
-  "versao": "20261017T034210Z-2a180a93a84a",
+  "versao": "20261017T042452Z-16d6ad9a5293",
   "erros": []
 }
