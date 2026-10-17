@@ -219,7 +219,7 @@ class SinonimosDeLexicoTest(unittest.TestCase):
 
     PEDIDOS = {
         "pt-BR": {"solubilidade": ["solubilidade", "soluvel em agua", "quanto dissolve", "se dissolve"],
-                  "pka": ["pka", "constante de acidez", "constante de ionizacao acida", "ka"]},
+                  "pka": ["pka", "constante de acidez", "constante de ionizacao acida", "ka de"]},
         "en": {"solubilidade": ["solubility", "soluble", "how much dissolves"], "pka": ["pka", "acid dissociation constant", "acidity constant"]},
         "es": {"solubilidade": ["solubilidad", "soluble"], "pka": ["constante de acidez"]},
         "de": {"solubilidade": ["loslichkeit", "loslich", "wasserloslich"], "pka": ["pks", "pks-wert", "saurekonstante"]},

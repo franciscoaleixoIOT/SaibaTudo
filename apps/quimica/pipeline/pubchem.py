@@ -79,13 +79,20 @@ class PubChem:
         return out
 
     # ---- GHS
-    def ghs_harmonizado(self, cid):
-        """GHS da classificação harmonizada da UE (Regulamento 1272/2008) ou None."""
+    def ghs_harmonizados(self, cid):
+        """Todas as entradas da classificação harmonizada da UE (Regulamento 1272/2008) que o PubChem liga a este CID
+        (lista, talvez vazia). O PubChem liga uma entrada do Anexo VI a cada componente citado nela (o NaCl recebia um
+        corante "produto-por-processo"): quem escolhe a entrada certa é `clp.escolher_ghs`, por chave forte."""
         url = f"{VIEW}/data/compound/{int(cid)}/JSON?heading=GHS+Classification"
         r = self.http.get(url)  # HttpErro (rede/429 persistente) sobe: o chamador conta a falha e decide
         if r.status != 200:   # 404 = sem seção GHS para este CID
-            return None
-        return extrair_ghs_harmonizado(r.json())
+            return []
+        return extrair_ghs_harmonizados(r.json())
+
+    def ghs_harmonizado(self, cid):
+        """Compatibilidade: a 1ª entrada harmonizada SEM conferência do casamento (não usar para o pacote)."""
+        lst = self.ghs_harmonizados(cid)
+        return lst[0] if lst else None
 
 
 def _secao(secoes, titulo):
@@ -99,14 +106,22 @@ def _secao(secoes, titulo):
 
 
 def extrair_ghs_harmonizado(dados):
-    """Lê o JSON do PUG View ("GHS Classification") e devolve o GHS da fonte harmonizada, ou None.
+    """Compatibilidade: a 1ª entrada de `extrair_ghs_harmonizados`, ou None (sem conferência do casamento)."""
+    lst = extrair_ghs_harmonizados(dados)
+    return lst[0] if lst else None
 
-    Resultado: {"pictogramas": ["GHS02", ...], "palavraSinal": "Perigo", "frasesH": ["H225", ...],
-                "fonte": "<SourceName literal do PubChem>", "fonteUrl": "...", "entrada": "<Name literal>"}"""
+
+def extrair_ghs_harmonizados(dados):
+    """Lê o JSON do PUG View ("GHS Classification") e devolve a lista de entradas da fonte harmonizada (pode ser vazia).
+
+    Cada item: {"pictogramas": ["GHS02", ...], "palavraSinal": "Perigo", "frasesH": ["H225", ...],
+                "fonte": "<SourceName literal do PubChem>", "fonteUrl": "...", "entrada": "<Name literal>",
+                "indice": "<SourceID: número de índice do Anexo VI, ex. 016-020-00-8>"}"""
     rec = dados.get("Record", {})
     secao = _secao(rec.get("Section", []), "GHS Classification")
     if not secao:
-        return None
+        return []
+    lista = []
     refs = {r["ReferenceNumber"]: r for r in rec.get("Reference", [])}
     grupos = {}
     for info in secao.get("Information", []):
@@ -143,8 +158,13 @@ def extrair_ghs_harmonizado(dados):
             out["fonteUrl"] = ref["URL"]
         if ref.get("Name"):
             out["entrada"] = ref["Name"].strip()
-        return out
-    return None
+        # SourceID = número de índice do Anexo VI, às vezes com o nº da substância na linha ("612-001-00-9[2]": 2ª de
+        # "monometilamina [1]; dimetilamina [2]; trimetilamina [3]"); a classificação é a da linha inteira: guarda o índice
+        mi = re.fullmatch(r"(\d{3}-\d{3}-\d{2}-[\dX])\s*(?:\[\d+\])?", (ref.get("SourceID") or "").strip())
+        if mi:
+            out["indice"] = mi.group(1)
+        lista.append(out)
+    return lista
 
 
 def numero(v):

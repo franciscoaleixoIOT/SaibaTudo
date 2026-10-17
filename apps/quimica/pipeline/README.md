@@ -56,7 +56,8 @@ explícita (`LimitadorTaxa.intervalo`); `www.wikidata.org` (`wbgetentities`) 1 r
 4. Ligar em `build.py` (`tentar(...)` registra falha em `stats.json` sem derrubar o build) e acrescentar o gate em `validar()` se for obrigatória.
 5. Testes em `pipeline/tests/` (parser com amostra sintética ou pequena resposta real em `fixtures/cache`).
 Regras que o `validar()` impõe: licença de texto só `CC BY-SA 4.0`, `CC BY 4.0` ou `domínio público`; nada de OpenStax; nada de
-`seguranca/` (ICSC); `ghs` só da fonte harmonizada (Regulamento 1272/2008); `icscBuscaUrl` exatamente quando há `cas`.
+`seguranca/` (ICSC); `ghs` só da fonte harmonizada (Regulamento 1272/2008) e casado por chave forte (`casadoPor`: CAS/EC/índice/nome exato, conferido no Anexo VI do
+mesmo documento do CLP; `clp.escolher_ghs`; auditoria: `python tools/auditar_ghs.py`); `icscBuscaUrl` exatamente quando há `cas`.
 
 ## Fixtures dos testes
 `pipeline/tests/fixtures/cache/` guarda respostas reais pequenas (PubChem, Wikidata, CODATA, Wikimedia, ChEBI, Gutenberg) no formato do

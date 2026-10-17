@@ -346,6 +346,10 @@ def validar(out: Path, previo=None, minimos=None):
                     erros.append(f"composto {c['cid']}: ghs inválido")
                 if "ghs" in c and "1272/2008" not in c["ghs"].get("fonte", ""):
                     erros.append(f"composto {c['cid']}: ghs só pode vir da classificação harmonizada (CLP)")
+                if "ghs" in c and c["ghs"].get("casadoPor") not in clp.CASADO_POR:
+                    erros.append(f"composto {c['cid']}: ghs sem chave forte de casamento (casadoPor)")
+                if "ghs" in c and clp.nao_e_substancia_pura(c["ghs"].get("entrada")):
+                    erros.append(f"composto {c['cid']}: ghs de entrada que não é substância pura ({c['ghs'].get('entrada')})")
                 for campo in ("nomes", "sinonimosPorIdioma"):
                     if campo in c and (not isinstance(c[campo], dict) or not set(c[campo]) <= set(IDIOMAS)):
                         erros.append(f"composto {c['cid']}: {campo} inválido")
@@ -518,6 +522,9 @@ def construir(opts, log=print):
         log("== frases H (CLP, EUR-Lex)")
         r = tentar(stats, "clp", lambda: clp.coletar(http, hoje, idiomas), log, vazio=({}, {}))
         frases_h, st_clp = r
+        anexo_vi = st_clp.pop("_anexoVi", None) or {}  # índice -> {nome, ec, cas}: confere o casamento do GHS (fora do stats.json)
+        if not anexo_vi:
+            log("  [clp] Anexo VI indisponível: o GHS só casa por nome exato (CAS/EC não conferíveis)")
         stats["familias"]["clp"].update(st_clp)
         if frases_h:
             fontes_usadas.add("clp-eurlex")
@@ -542,7 +549,7 @@ def construir(opts, log=print):
                                          lambda: coleta_compostos.coletar(http, pubchem, selecao, hoje, frases_h, log=log,
                                                                                   pesos={e["simbolo"]: e["massaAtomica"] for e in elementos if e.get("massaAtomica")},
                                                                                   qids_elementos=frozenset(e["wikidata"] for e in elementos if e.get("wikidata")),
-                                                                                  idiomas=idiomas),
+                                                                                  idiomas=idiomas, anexo_vi=anexo_vi),
                                          log, obrigatoria=True)
         stats["familias"]["compostos"].update(st_cmp)
         # segurança: fora do núcleo os agentes de guerra química e as drogas de uso proscrito que viriam pela popularidade

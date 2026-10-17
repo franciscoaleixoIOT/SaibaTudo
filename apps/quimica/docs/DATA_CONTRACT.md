@@ -51,10 +51,17 @@ Nomes em PT seguem a **SBQ/IUPAC-PT** (ex.: "Oxigênio", "Hidrogênio"); `nomeEn
   "sinonimosPorIdioma": { "en": ["acetylsalicylic acid", "ASA", "o-acetoxybenzoic acid"], "es": ["Cardirene"], "de": ["acesal", "ASS"], "fr": ["aspirine"] },
   "formula": "C9H8O4", "formulaHill": "C9H8O4", "massaMolar": 180.16, "massaExata": 180.0423, "smiles": "CC(=O)OC1=CC=CC=C1C(=O)O", "inchiKey": "BSYNRYMUTXBXSQ-UHFFFAOYSA-N",
   "cas": "50-78-2", "propriedades": { "xlogp": 1.2, "doadoresH": 1, "aceptoresH": 4, "ligacoesRotaveis": 3, "carga": 0, "tpsa": 63.6 },
-  "ghs": { "pictogramas": ["GHS07"], "palavraSinal": "Atenção", "frasesH": ["H302", "H315", "H319"], "fonte": "Regulation (EC) No 1272/2008 ..." },
+  "ghs": { "pictogramas": ["GHS07"], "palavraSinal": "Atenção", "frasesH": ["H302", "H315", "H319"], "fonte": "Regulation (EC) No 1272/2008 ...",
+           "entrada": "<nome da entrada no PubChem>", "indice": "607-xxx-00-x", "casadoPor": "cas" },
   "classes": ["acido_carboxilico", "ester", "aromatico"], "wikidata": "Q18216", "icsc": null,
   "fontes": [ { "nome": "PubChem CID 2244", "url": "https://pubchem.ncbi.nlm.nih.gov/compound/2244", "licenca": "domínio público (NIH)", "acessadoEm": "2026-10-10" } ] }
 ```
+- `ghs` (só a classificação harmonizada do CLP, Anexo VI): `indice` = número de índice do Anexo VI; `casadoPor` = a chave forte que liga o composto à
+  entrada (17/10/2026): `cas` (CAS do composto entre os CAS da linha do Anexo VI), `ec`, `indice` ou `nome` (nome/IUPAC/sinônimo exatamente igual, sem
+  acento/caixa). CAS ou EC presentes dos dois lados e diferentes = sem GHS; entrada UVCB/produto-por-processo/massa de reação nunca casa com composto puro.
+  Sem chave forte, o composto fica **sem** `ghs` (o NaCl recebia o corante poliazo 611-142-00-3). O `validar()` do build recusa `ghs` sem `casadoPor`.
+  Auditoria sem rede: `python tools/auditar_ghs.py [--pacote DIR]`.
+
 Nome em PT: do Wikidata (rótulo `pt`/`pt-br`) quando existir; senão o nome IUPAC em inglês com `nomePtPendente: true` (a interface mostra o IUPAC).
 - `propriedades`: os 6 campos **calculados** do PubChem (`xlogp`, `tpsa`, `doadoresH`, `aceptoresH`, `ligacoesRotaveis`, `carga`) e, desde 16/10/2026, as
   propriedades **medidas** de §3.1 (cada uma com a sua origem em `fontesPorPropriedade`).

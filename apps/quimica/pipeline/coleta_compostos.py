@@ -20,6 +20,7 @@ import json
 import re
 from pathlib import Path
 
+import clp
 import coleta_chebi
 import coleta_icsc
 import lista_fixa
@@ -262,8 +263,11 @@ def nomes_por_idioma(c, ent, idiomas, sinonimos_chebi=(), formula=None, manuais=
     return nomes, sin
 
 
-def montar(sel, props, wd, ghs, chebi, hoje, pesos=None, sinonimos_pubchem=None, ent=None, idiomas=None):
-    """Monta o registro do contrato §3 (ou None se faltar o essencial). `ent`: entidade do Wikidata (rótulos por idioma)."""
+def montar(sel, props, wd, ghs, chebi, hoje, pesos=None, sinonimos_pubchem=None, ent=None, idiomas=None, anexo_vi=None,
+           ghs_rejeitados=None):
+    """Monta o registro do contrato §3 (ou None se faltar o essencial). `ent`: entidade do Wikidata (rótulos por idioma).
+    `ghs`: candidatos harmonizados do PubChem (lista; um dict vale como lista de um). Só entra o que casa por chave forte
+    com o composto (`clp.escolher_ghs`, com o Anexo VI `anexo_vi`); os recusados vão para `ghs_rejeitados` (lista)."""
     cid = sel["cid"]
     p = props
     if not p or not p.get("MolecularFormula") or not p.get("ConnectivitySMILES"):
@@ -331,6 +335,10 @@ def montar(sel, props, wd, ghs, chebi, hoje, pesos=None, sinonimos_pubchem=None,
             prop[campo] = v
     if prop:
         c["propriedades"] = prop
+    candidatos = [ghs] if isinstance(ghs, dict) else list(ghs or [])
+    ghs, rejeitados = clp.escolher_ghs(candidatos, c, anexo_vi) if candidatos else (None, [])
+    if rejeitados and ghs_rejeitados is not None:
+        ghs_rejeitados.extend(dict(r, cid=cid, nome=c["nome"], cas=c.get("cas"), aceita=(ghs or {}).get("indice")) for r in rejeitados)
     if ghs:
         c["ghs"] = ghs
         fontes.append(Q.fonte("Regulamento (CE) n.º 1272/2008, Anexo VI (classificação harmonizada), via PubChem",
@@ -349,7 +357,7 @@ def montar(sel, props, wd, ghs, chebi, hoje, pesos=None, sinonimos_pubchem=None,
 
 
 def coletar(http, pubchem, selecao, hoje, frases_h=None, com_ghs=True, com_chebi=True, log=print, pesos=None,
-            qids_elementos=frozenset(), idiomas=None):
+            qids_elementos=frozenset(), idiomas=None, anexo_vi=None):
     """Devolve (compostos, meta, stats). `meta[cid]` = {"sl", "ptwiki", "qid", "artigos": {idioma: título}} para a etapa de textos.
     `idiomas`: códigos do projeto para `nomes`/`sinonimosPorIdioma` e para os títulos de artigo (padrão: common.IDIOMAS)."""
     idiomas = list(idiomas or IDIOMAS)
@@ -369,7 +377,7 @@ def coletar(http, pubchem, selecao, hoje, frases_h=None, com_ghs=True, com_chebi
     if com_ghs:
         for i, cid in enumerate(cids, 1):
             try:
-                g = pubchem.ghs_harmonizado(cid)
+                g = pubchem.ghs_harmonizados(cid)  # candidatos; o casamento é conferido em montar()
             except CacheMiss as exc:  # --pubchem-offline sem esta entrada: conta como falha (o limite abaixo decide)
                 ghs_falhas.append({"cid": cid, "erro": f"sem cache: {exc}"[:120]})
                 continue
@@ -396,7 +404,7 @@ def coletar(http, pubchem, selecao, hoje, frases_h=None, com_ghs=True, com_chebi
         ids = {int(x) for wd in wd_por_cid.values() for x in wd.get("chebi", []) if str(x).isdigit()}
         chebi_dados, chebi_stats = coleta_chebi.coletar(http, ids, log)
 
-    compostos, meta, descartados = [], {}, []
+    compostos, meta, descartados, ghs_rejeitados = [], {}, [], []
     for sel in selecao:
         cid = sel["cid"]
         wd = wd_por_cid.get(cid)
@@ -408,7 +416,7 @@ def coletar(http, pubchem, selecao, hoje, frases_h=None, com_ghs=True, com_chebi
                     break
         ent = ents.get((wd or {}).get("qid"))
         c, motivo = montar(sel, props.get(cid), wd, ghs_por_cid.get(cid), ch, hoje, pesos=pesos, sinonimos_pubchem=sin_pc.get(cid),
-                           ent=ent, idiomas=idiomas)
+                           ent=ent, idiomas=idiomas, anexo_vi=anexo_vi, ghs_rejeitados=ghs_rejeitados)
         if c is None:
             descartados.append({"cid": cid, "motivo": motivo})
             continue
@@ -420,7 +428,9 @@ def coletar(http, pubchem, selecao, hoje, frases_h=None, com_ghs=True, com_chebi
     if duplicados:
         log(f"  [compostos] {len(duplicados)} repetidos removidos (mesmo InChIKey ou CAS): " + ", ".join(f"{d['nome']} ({d['cid']})" for d in duplicados))
     faltam_h = sorted({h for c in compostos for h in c.get("ghs", {}).get("frasesH", []) if frases_h is not None and h not in frases_h})
-    stats = {"compostos": len(compostos), "descartados": descartados, "duplicados": duplicados, "casDesempatadosPeloPubchem": len(multi), "comGhsHarmonizado": len(ghs_por_cid), "ghsFalhasDeRede": ghs_falhas,
+    stats = {"compostos": len(compostos), "descartados": descartados, "duplicados": duplicados, "casDesempatadosPeloPubchem": len(multi), "comGhsHarmonizado": sum(1 for c in compostos if "ghs" in c),
+             "ghsCandidatosPubchem": len(ghs_por_cid), "ghsCasadoPor": {k: sum(1 for c in compostos if c.get("ghs", {}).get("casadoPor") == k) for k in clp.CASADO_POR},
+             "ghsAnexoVi": len(anexo_vi or {}), "ghsRejeitados": ghs_rejeitados, "ghsFalhasDeRede": ghs_falhas,
              "comCas": sum(1 for c in compostos if "cas" in c), "comWikidata": sum(1 for c in compostos if "wikidata" in c),
              "nomePtPendente": sum(1 for c in compostos if c.get("nomePtPendente")),
              "comDefinicaoChebi": sum(1 for c in compostos if "definicaoChebi" in c),

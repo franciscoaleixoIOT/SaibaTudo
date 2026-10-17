@@ -161,15 +161,160 @@ def coletar(http, hoje, idiomas=None):
     r = http.get(URL_CELLAR.format(celex=celex), cabecalhos={"Accept": "application/xhtml+xml", "Accept-Language": "por"})
     if r.status != 200:
         raise RuntimeError(f"Cellar devolveu HTTP {r.status}")
-    frases = parse_anexo_iii_multi(r.corpo.decode("utf-8", errors="replace"), idiomas)
+    xhtml = r.corpo.decode("utf-8", errors="replace")
+    frases = parse_anexo_iii_multi(xhtml, idiomas)
     frases = {c: d for c, d in frases.items() if d.get("pt-BR")}  # sem texto em português não entra
     if len(frases) < 70:
         raise RuntimeError(f"Anexo III com poucas frases ({len(frases)}): formato mudou?")
-    return frases, {"celex": celex, "url": URL_EURLEX.format(celex=celex), "idiomas": idiomas,
-                    "frasesH": len([c for c in frases if c.startswith("H")]),
-                    "frasesEUH": len([c for c in frases if c.startswith("EUH")]),
-                    "combinadas": len([c for c in frases if "+" in c]),
-                    "frasesPorIdioma": {i: sum(1 for d in frases.values() if d.get(i)) for i in idiomas}}
+    stats = {"celex": celex, "url": URL_EURLEX.format(celex=celex), "idiomas": idiomas,
+             "frasesH": len([c for c in frases if c.startswith("H")]),
+             "frasesEUH": len([c for c in frases if c.startswith("EUH")]),
+             "combinadas": len([c for c in frases if "+" in c]),
+             "frasesPorIdioma": {i: sum(1 for d in frases.values() if d.get(i)) for i in idiomas}}
+    # Anexo VI, Parte 3 (mesmo documento): índice -> nome, EC, CAS, para conferir o casamento composto -> entrada harmonizada.
+    # `_anexoVi` não vai para o stats.json (o build o retira); sem ele o casamento só aceita nome exato.
+    try:
+        anexo_vi = parse_anexo_vi(xhtml)
+        if len(anexo_vi) < 1000:
+            raise ValueError(f"poucas entradas ({len(anexo_vi)})")
+        stats["_anexoVi"] = anexo_vi
+        stats["anexoViEntradas"] = len(anexo_vi)
+    except ValueError as exc:
+        stats["anexoViEntradas"] = 0
+        stats["anexoViErro"] = str(exc)[:200]
+    return frases, stats
+
+
+# ---------------------------------------------------------------- Anexo VI (classificação harmonizada) e casamento
+_INDICE = re.compile(r"^\d{3}-\d{3}-\d{2}-[\dX]$")  # o dígito de controle pode ser X ("006-006-00-X")
+_EC = re.compile(r"(?<![\d-])\d{3}-\d{3}-\d(?![\d-])")
+_CAS = re.compile(r"(?<![\d-])\d{2,7}-\d{2}-\d(?![\d-])")
+# entradas que não são substância pura (UVCB, produto-por-processo, massa/mistura de reação): nunca casam com um composto
+_NAO_PURA = re.compile(r"product[- ]by[- ]process|produto[- ]por[- ]processo|reaction\s+(mass|mixture|products?)|"
+                       r"mistura\s+reac?cional|massa\s+de\s+rea[cç][aã]o|produtos?\s+de\s+rea[cç][aã]o|"
+                       r"\buvcb\b|obtained\s+by|obtid[oa]s?\s+por", re.I)
+CASADO_POR = ("cas", "ec", "indice", "nome")
+# marcas de alteração da versão consolidada ("►C5 022-006-00-2 ◄", "▼M14"): só a marca sai, o conteúdo fica
+_MARCAS_VI = re.compile(r"►\s*[A-Z]\d+|◄|▼\s*[A-Z]\d+")
+
+
+def _celulas(tr):
+    out = []
+    for td in re.finditer(r"<td[^>]*>(.*?)</td>", tr, flags=re.S):
+        ps = [_MARCAS_VI.sub(" ", _texto_p(m.group(1))).strip() for m in re.finditer(r"<p[^>]*>(.*?)</p>", td.group(1), flags=re.S)]
+        ps = [re.sub(r"\s+", " ", x) for x in ps]
+        out.append([x for x in ps if x])
+    return out
+
+
+def parse_anexo_vi(xhtml):
+    """{índice: {"indice", "nome" (português, linhas unidas por espaço), "ec": [...], "cas": [...]}} da Parte 3 do Anexo VI.
+    Só linhas cuja 1ª célula é um número de índice (ddd-ddd-dd-d); EC e CAS só pelos padrões numéricos ("—" = sem número).
+    Levanta ValueError se o Anexo VI não for encontrado."""
+    ini = re.search(r"ANEXO\s*(?:<[^>]*>\s*)*VI(?![IVX])", xhtml)
+    if not ini:
+        raise ValueError("Anexo VI não encontrado (formato do documento mudou?)")
+    fim = re.search(r"ANEXO\s*(?:<[^>]*>\s*)*VII(?![IVX])", xhtml[ini.end():])
+    seg = xhtml[ini.end(): ini.end() + fim.start()] if fim else xhtml[ini.end():]
+    out = {}
+    for tr in re.finditer(r"<tr[^>]*>(.*?)</tr>", seg, flags=re.S):
+        cel = _celulas(tr.group(1))
+        if len(cel) < 4 or len(cel[0]) != 1 or not _INDICE.match(cel[0][0]):
+            continue
+        idx = cel[0][0]
+        if idx in out:
+            continue
+        out[idx] = {"indice": idx, "nome": " ".join(cel[1]),
+                    "ec": [m.group(0) for x in cel[2] for m in _EC.finditer(x)],
+                    "cas": [m.group(0) for x in cel[3] for m in _CAS.finditer(x)]}
+    return out
+
+
+def _norm_nome(s):
+    import unicodedata
+    t = unicodedata.normalize("NFKD", s or "")
+    t = "".join(ch for ch in t if not unicodedata.combining(ch)).lower()
+    t = re.sub(r"\[\d+\]", " ", t)  # "dimetilamina; [2]": nº da substância na linha do Anexo VI
+    t = re.sub(r"\s+(a\s+)?\.\.\.\s*%", "", t)  # "sulphuric acid ... %", "ácido sulfúrico a ... %": concentração variável
+    t = re.sub(r"\s+", " ", t).strip(" ;,.")
+    return t
+
+
+def nomes_da_entrada(*nomes):
+    """Nomes normalizados de uma entrada (o Anexo VI separa sinônimos por ';'); nome truncado ('...') não serve para
+    comparação exata e fica fora."""
+    out = set()
+    for n in nomes:
+        for parte in (n or "").split(";"):
+            parte = parte.strip()
+            if not parte or re.search(r"\.\.\.\s*$", parte):
+                continue
+            k = _norm_nome(parte)
+            if k:
+                out.add(k)
+    return out
+
+
+def nomes_do_composto(c):
+    nomes = [c.get("nome"), c.get("nomePopular"), c.get("nomeIupac")]
+    nomes += list((c.get("nomes") or {}).values()) + list(c.get("sinonimos") or [])
+    for lst in (c.get("sinonimosPorIdioma") or {}).values():
+        nomes += list(lst)
+    return {k for k in (_norm_nome(n) for n in nomes if isinstance(n, str)) if k}
+
+
+def nao_e_substancia_pura(*nomes):
+    return any(_NAO_PURA.search(n or "") for n in nomes)
+
+
+def casar_entrada(cand, composto, anexo_vi=None):
+    """(chave, motivo) do casamento composto -> entrada harmonizada; chave em CASADO_POR ou None (o motivo diz por quê).
+    Regra (17/10/2026: o NaCl recebia um corante poliazo "produto-por-processo" cujo nome termina em "e cloreto de sódio"):
+    - entrada UVCB/produto-por-processo/massa de reação nunca casa com composto puro;
+    - CAS do composto entre os CAS da entrada -> "cas"; os dois presentes e diferentes -> rejeita;
+    - EC do composto (quando houver) entre os EC da entrada -> "ec"; os dois presentes e diferentes -> rejeita;
+    - número de índice do composto (quando houver) = índice da entrada -> "indice";
+    - nome normalizado (sem acento/caixa) exatamente igual a nome/IUPAC/sinônimo do composto -> "nome". Nunca nome parcial."""
+    idx = cand.get("indice")
+    vi = (anexo_vi or {}).get(idx) if idx else None
+    nome_pc, nome_vi = cand.get("entrada") or "", (vi or {}).get("nome") or ""
+    if nao_e_substancia_pura(nome_pc, nome_vi):
+        return None, "entrada não é substância pura (UVCB/produto-por-processo/massa de reação)"
+    cas_c = (composto.get("cas") or "").strip()
+    cas_e = list((vi or {}).get("cas") or [])
+    if cas_c and cas_e:
+        return ("cas", None) if cas_c in cas_e else (None, f"CAS diferente ({cas_c} x {', '.join(cas_e)})")
+    ec_c = (composto.get("ec") or "").strip()
+    ec_e = list((vi or {}).get("ec") or [])
+    if ec_c and ec_e:
+        return ("ec", None) if ec_c in ec_e else (None, f"EC diferente ({ec_c} x {', '.join(ec_e)})")
+    if idx and composto.get("indiceClp") and composto["indiceClp"] == idx:
+        return "indice", None
+    if nomes_da_entrada(nome_pc, nome_vi) & nomes_do_composto(composto):
+        return "nome", None
+    if vi is None:
+        return None, "sem chave forte (entrada fora do Anexo VI lido e nome diferente)"
+    return None, "sem chave forte (CAS/EC ausentes de um dos lados e nome diferente)"
+
+
+def escolher_ghs(candidatos, composto, anexo_vi=None):
+    """(ghs ou None, rejeitados): o candidato que casa pela chave mais forte (cas > ec > indice > nome), com `casadoPor`
+    e `indice`; `rejeitados` = [{indice, entrada, motivo}] para o stats."""
+    aceitos, rejeitados = [], []
+    for ordem, cand in enumerate(candidatos or []):
+        chave, motivo = casar_entrada(cand, composto, anexo_vi)
+        if chave:
+            aceitos.append((CASADO_POR.index(chave), ordem, chave, cand))
+        else:
+            rejeitados.append({"indice": cand.get("indice"), "entrada": cand.get("entrada"), "motivo": motivo})
+    if not aceitos:
+        return None, rejeitados
+    _, _, chave, cand = min(aceitos, key=lambda t: t[:2])
+    g = {k: v for k, v in cand.items() if k != "indice"}
+    if cand.get("indice"):
+        g["indice"] = cand["indice"]
+    g["casadoPor"] = chave
+    return g, rejeitados
 
 
 def texto_pt(frase):

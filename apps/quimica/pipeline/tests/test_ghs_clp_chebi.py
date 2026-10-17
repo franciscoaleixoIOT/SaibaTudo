@@ -145,9 +145,11 @@ class CompostoTest(unittest.TestCase):
 
     def test_montar(self):
         sel = {"cid": 1118, "classes": ["acido"], "origem": "wikidata"}
-        ghs = {"pictogramas": ["GHS05"], "frasesH": ["H314"], "fonte": "Regulation (EC) No 1272/2008", "palavraSinal": "Perigo"}
+        ghs = [{"pictogramas": ["GHS05"], "frasesH": ["H314"], "fonte": "Regulation (EC) No 1272/2008", "palavraSinal": "Perigo",
+                "entrada": "sulphuric acid ... %", "indice": "016-020-00-8"}]
+        anexo_vi = {"016-020-00-8": {"indice": "016-020-00-8", "nome": "ácido sulfúrico a ... %", "ec": ["231-639-5"], "cas": ["7664-93-9"]}}
         ch = {"id": 26836, "definicao": "Um oxiácido de enxofre.", "sinonimos": ["oil of vitriol", "CHEBI:26836"]}
-        c, motivo = CCP.montar(sel, self.PROPS, self.WD, ghs, ch, "2026-10-10")
+        c, motivo = CCP.montar(sel, self.PROPS, self.WD, ghs, ch, "2026-10-10", anexo_vi=anexo_vi)
         self.assertIsNone(motivo)
         self.assertEqual(c["nome"], "Ácido sulfúrico")
         self.assertNotIn("nomePtPendente", c)
@@ -158,6 +160,7 @@ class CompostoTest(unittest.TestCase):
         self.assertEqual(c["icscBuscaUrl"], coleta_icsc.url_busca_cas("7664-93-9"))
         self.assertEqual(c["propriedades"]["tpsa"], 83)
         self.assertEqual(c["ghs"]["frasesH"], ["H314"])
+        self.assertEqual((c["ghs"]["casadoPor"], c["ghs"]["indice"]), ("cas", "016-020-00-8"))
         self.assertEqual(c["definicaoChebi"]["chebiId"], "CHEBI:26836")
         self.assertIn("oil of vitriol", c["sinonimos"])
         self.assertNotIn("CHEBI:26836", c["sinonimos"])
