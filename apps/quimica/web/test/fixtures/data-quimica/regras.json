@@ -1481,7 +1481,14 @@
     ]
    },
    "nota": "Escala de Pauling, com os valores revisados (Allred, 1961) como no PubChem; livros que usam os valores originais de Pauling diferem em alguns elementos (ex.: W 1,7 × 2,36; Pb 1,8 × 2,33).",
-   "escala": "Pauling"
+   "escala": "Pauling",
+   "notaPorIdioma": {
+    "pt-BR": "Escala de Pauling, com os valores revisados (Allred, 1961) como no PubChem; livros que usam os valores originais de Pauling diferem em alguns elementos (ex.: W 1,7 × 2,36; Pb 1,8 × 2,33).",
+    "en": "Pauling scale, with the revised values (Allred, 1961) as in PubChem; books that use Pauling's original values differ for some elements (e.g. W 1.7 × 2.36; Pb 1.8 × 2.33).",
+    "es": "Escala de Pauling, con los valores revisados (Allred, 1961) como en PubChem; los libros que usan los valores originales de Pauling difieren en algunos elementos (p. ej., W 1,7 × 2,36; Pb 1,8 × 2,33).",
+    "de": "Pauling-Skala mit den revidierten Werten (Allred, 1961) wie in PubChem; Lehrbücher mit den ursprünglichen Pauling-Werten weichen bei einigen Elementen ab (z. B. W 1,7 × 2,36; Pb 1,8 × 2,33).",
+    "fr": "Échelle de Pauling, avec les valeurs révisées (Allred, 1961) comme dans PubChem ; les manuels qui utilisent les valeurs originales de Pauling diffèrent pour certains éléments (p. ex. W 1,7 × 2,36 ; Pb 1,8 × 2,33)."
+   }
   },
   "raioAtomicoPm": {
    "nome": "Raio atômico (van der Waals)",
@@ -1556,7 +1563,14 @@
      "affinité électronique"
     ]
    },
-   "nota": "Do PubChem (o Wikidata não tem a propriedade). Alguns valores diferem das tabelas atuais e vêm com aviso em elementos[].fontesPorPropriedade."
+   "nota": "Do PubChem (o Wikidata não tem a propriedade). Alguns valores diferem das tabelas atuais e vêm com aviso em elementos[].fontesPorPropriedade.",
+   "notaPorIdioma": {
+    "pt-BR": "Do PubChem (o Wikidata não tem a propriedade). Alguns valores diferem das tabelas atuais e vêm com aviso em elementos[].fontesPorPropriedade.",
+    "en": "From PubChem (Wikidata does not have this property). Some values differ from current tables and carry a warning in elementos[].fontesPorPropriedade.",
+    "es": "De PubChem (Wikidata no tiene la propiedad). Algunos valores difieren de las tablas actuales y llevan un aviso en elementos[].fontesPorPropriedade.",
+    "de": "Aus PubChem (Wikidata hat diese Eigenschaft nicht). Einige Werte weichen von aktuellen Tabellen ab und tragen einen Hinweis in elementos[].fontesPorPropriedade.",
+    "fr": "De PubChem (Wikidata n'a pas cette propriété). Certaines valeurs diffèrent des tableaux actuels et portent un avertissement dans elementos[].fontesPorPropriedade."
+   }
   },
   "energiaIonizacaoKJmol": {
    "nome": "Energia de ionização",
@@ -1597,7 +1611,14 @@
      "potentiel d'ionisation"
     ]
    },
-   "nota": "Primeira energia de ionização do átomo neutro em fase gasosa (valor do NIST ASD via Wikidata quando disponível; senão PubChem). Origem de cada valor em elementos[].fontesPorPropriedade."
+   "nota": "Primeira energia de ionização do átomo neutro em fase gasosa (valor do NIST ASD via Wikidata quando disponível; senão PubChem). Origem de cada valor em elementos[].fontesPorPropriedade.",
+   "notaPorIdioma": {
+    "pt-BR": "Primeira energia de ionização do átomo neutro em fase gasosa (valor do NIST ASD via Wikidata quando disponível; senão PubChem). Origem de cada valor em elementos[].fontesPorPropriedade.",
+    "en": "First ionization energy of the neutral gas-phase atom (NIST ASD value via Wikidata when available; otherwise PubChem). The origin of each value is in elementos[].fontesPorPropriedade.",
+    "es": "Primera energía de ionización del átomo neutro en fase gaseosa (valor del NIST ASD vía Wikidata cuando existe; si no, PubChem). El origen de cada valor está en elementos[].fontesPorPropriedade.",
+    "de": "Erste Ionisierungsenergie des neutralen Atoms in der Gasphase (NIST-ASD-Wert über Wikidata, wenn vorhanden; sonst PubChem). Die Herkunft jedes Werts steht in elementos[].fontesPorPropriedade.",
+    "fr": "Première énergie d'ionisation de l'atome neutre en phase gazeuse (valeur du NIST ASD via Wikidata quand elle existe ; sinon PubChem). L'origine de chaque valeur figure dans elementos[].fontesPorPropriedade."
+   }
   },
   "pontoFusaoK": {
    "nome": "Ponto de fusão",
@@ -1786,7 +1807,14 @@
     "elemento",
     "composto"
    ],
-   "nota": "Nos compostos, derivado a 298,15 K e 1 atm do ponto de fusão e de ebulição do pacote."
+   "nota": "Nos compostos, derivado a 298,15 K e 1 atm do ponto de fusão e de ebulição do pacote.",
+   "notaPorIdioma": {
+    "pt-BR": "Nos compostos, derivado a 298,15 K e 1 atm do ponto de fusão e de ebulição do pacote.",
+    "en": "For compounds, derived at 298.15 K and 1 atm from the melting and boiling points in the package.",
+    "es": "En los compuestos, derivado a 298,15 K y 1 atm de los puntos de fusión y de ebullición del paquete.",
+    "de": "Bei Verbindungen bei 298,15 K und 1 atm aus Schmelz- und Siedepunkt des Pakets abgeleitet.",
+    "fr": "Pour les composés, dérivé à 298,15 K et 1 atm du point de fusion et du point d'ébullition du jeu de données."
+   }
   },
   "estadosOxidacao": {
    "nome": "Estados de oxidação",
@@ -2555,7 +2583,14 @@
     "compostos.propriedades.solubilidadeAguaG100g": "g/100 g de água",
     "compostos.propriedades.solubilidadeAguaGL": "g/L"
    },
-   "nota": "Solubilidade em água (solvente declarado no Wikidata), na temperatura de fontesPorPropriedade.condicoes."
+   "nota": "Solubilidade em água (solvente declarado no Wikidata), na temperatura de fontesPorPropriedade.condicoes.",
+   "notaPorIdioma": {
+    "pt-BR": "Solubilidade em água (solvente declarado no Wikidata), na temperatura de fontesPorPropriedade.condicoes.",
+    "en": "Solubility in water (solvent as declared in Wikidata), at the temperature given in fontesPorPropriedade.condicoes.",
+    "es": "Solubilidad en agua (disolvente declarado en Wikidata), a la temperatura indicada en fontesPorPropriedade.condicoes.",
+    "de": "Löslichkeit in Wasser (in Wikidata angegebenes Lösungsmittel) bei der Temperatur aus fontesPorPropriedade.condicoes.",
+    "fr": "Solubilité dans l'eau (solvant déclaré dans Wikidata), à la température indiquée dans fontesPorPropriedade.condicoes."
+   }
   },
   "pka": {
    "nome": "pKa",
@@ -2603,7 +2638,14 @@
     "compostos.propriedades.pka",
     "compostos.propriedades.pkaValores"
    ],
-   "nota": "Menor pKa registrado (primeira dissociação); `pkaValores` traz todos quando há mais de um. Para bases, o Wikidata costuma registrar o pKa do ácido conjugado. Ácidos fortes ficam sem pKa."
+   "nota": "Menor pKa registrado (primeira dissociação); `pkaValores` traz todos quando há mais de um. Para bases, o Wikidata costuma registrar o pKa do ácido conjugado. Ácidos fortes ficam sem pKa.",
+   "notaPorIdioma": {
+    "pt-BR": "Menor pKa registrado (primeira dissociação); `pkaValores` traz todos quando há mais de um. Para bases, o Wikidata costuma registrar o pKa do ácido conjugado. Ácidos fortes ficam sem pKa.",
+    "en": "Lowest recorded pKa (first dissociation); `pkaValores` has all of them when there is more than one. For bases, Wikidata usually records the pKa of the conjugate acid. Strong acids have no pKa.",
+    "es": "Menor pKa registrado (primera disociación); `pkaValores` trae todos cuando hay más de uno. Para las bases, Wikidata suele registrar el pKa del ácido conjugado. Los ácidos fuertes no tienen pKa.",
+    "de": "Kleinster erfasster pKs-Wert (erste Dissoziation); `pkaValores` enthält alle Werte, wenn es mehrere gibt. Für Basen erfasst Wikidata meist den pKs-Wert der konjugierten Säure. Starke Säuren haben keinen pKs-Wert.",
+    "fr": "Plus petit pKa enregistré (première dissociation) ; `pkaValores` les contient tous quand il y en a plusieurs. Pour les bases, Wikidata enregistre en général le pKa de l'acide conjugué. Les acides forts n'ont pas de pKa."
+   }
   }
  },
  "propriedadesRevisao": {

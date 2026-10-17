@@ -58,6 +58,19 @@
 
 - [~] **Achados da preparação da ficha (14/10/2026, agente) — resolvidos na mesma noite, exceto (f) e (g):** (a) ~~Android sem "Relatar problema nesta resposta"~~ (feito: botão no rodapé de cada resposta que abre a issue pública pré-preenchida, `domain/Relato.kt` + `RelatoTest`; nunca em recusa de segurança); (b) ~~`BuildConfig.SOURCE_URL` apontava para o repositório arquivado~~ (corrigido 14/10 para `franciscoaleixoIOT/SaibaTudo`); (c) ~~`.vercelignore` sem `/store/`~~ (corrigido 14/10: 63 imagens, 11 MB, não vão mais para a Vercel); (d) ~~PWA: em 432 px o cabeçalho passa de 60 px e cobre parte da barra de abas ao rolar~~ (feito: barra + abas num só bloco fixo `.topo-fixo`, título numa linha; conferido ao vivo em 432 px); (e) ~~linha "Classificação: Regulation (EC) No 1272/2008…" em inglês e repetida~~ (feito no site, `perigos.js` `fonteGhs`, e no Android, `domain/GhsFonte.kt`: a entrada localizada da lista de fontes do composto vence o texto cru do PubChem); (f) capturas da Play são do emulador (Pixel 9); falta a recusa de pedido perigoso no Android (só há a do PWA); (g) conta de serviço da Play API não existe (`PLAY_STORE.md` §8).
 
+## 6.b Onda 3 (depois de 17/10/2026) — o que ficou do programa de 16/10
+- [ ] Resposta de CONCEITO oferecer "ver a ficha de X" quando a pergunta trouxe um apelido de classe (`p.composto` fica preenchido; site `answers.js` e Android `RespostasConhecimento.kt`).
+- [ ] Mover `CLASSES_DE_COMPOSTOS` (nlu.js/LocalNlu.kt) para `conceitoTemas` do léxico; "o que é álcool?" passou a dar conceito (etanol como sugestão) — confirmar com o mantenedor.
+- [ ] `tools/comparar_pacotes.py`: comparar também `ghs` (perdas e trocas de classificação) e `regras.json`.
+- [ ] Cu₂O (CID 18346908) sem CAS no pacote → sem GHS; pôr o CAS 1317-39-1 na lista fixa.
+- [ ] Revisão humana por amostragem das 1.540 traduções automáticas (hidroxi/hidroxila, calcos "portando"); só então tirar o rótulo `automatica`.
+- [ ] Leitor/revisor da fila `quimica:melhoria:<mês>` (porte de `colher_sinais`/`fila`/`revisar` do Eleições) e `nlu_real_cases.json`.
+- [ ] Clientes lerem `notaPorIdioma`/`avisoPorIdioma`/`nomePorIdioma` do pacote (hoje usam textos do catálogo).
+- [ ] Android: isômeros com a mesma fórmula escolhem CIDs diferentes do site (~570 perguntas); calculadora de pH sem campo de fórmula (sem aviso de saturação).
+- [ ] Site: nome de elemento em minúsculas vira fórmula ("bromo" → BrOMo); `quantosUnidade` com acento; "ºC" ordinal; `limparConceito` deixa o artigo.
+- [ ] `ui.config.privacidadeTexto` do site não cita a fila nem o histórico; `<meta description>` das páginas de privacidade.
+- [ ] Retenção da captura (4 meses) e região do Upstash a confirmar com o mantenedor; política de privacidade cita IP/iid nos contadores por 1 dia.
+
 ## 7. Operação (fase 7)
 - [~] ~~`docs/OPERACAO.md`~~ (feito 16/10/2026, frente F) e ~~captura opt-in de perguntas não entendidas com filtro de dado pessoal~~ (feito 16/10 no site e na API: `POST /quimica/api/melhoria`, lista Redis `quimica:melhoria:<mês>`, `MELHORIA_ENABLED=1` na Vercel; falta o leitor/revisor da fila como o `colher_sinais` do Eleições e o Android, frente B); painel noturno de qualidade do modelo.
 - [ ] `CLAUDE.md` e este arquivo atualizados a cada mudança de estado.

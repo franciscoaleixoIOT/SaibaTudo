@@ -236,3 +236,6 @@ Conferido no emulador (Pixel 9, debug):
 
 Achado fora do app: o GHS do NaCl no pacote é GHS05/H318/H412, que vem de uma entrada errada do CLP ("product-by-process… polyazodyestuff").
 Isso é para o pipeline corrigir.
+
+## Build final (17/10/2026, ~01h30)
+`./gradlew.bat :app:testDebugUnitTest :app:lintRelease :app:bundleRelease :app:assembleRelease`: **211 testes, 0 falhas**, lint de release sem erro; `tools/verificar_release.py` OK (classes e pacote embutido `20261017T042452Z` igual a `data/quimica`); AAB 1.0.1 gerado e assinado com a chave de upload (`jarsigner -verify` ok): `app/build/outputs/bundle/release/app-release.aab` (7,7 MB), APK ao lado (5,6 MB). A Play deve mostrar **2 (1.0.1)**. Não testado em aparelho real.
