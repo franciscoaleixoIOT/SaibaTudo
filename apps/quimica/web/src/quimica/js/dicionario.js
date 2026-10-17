@@ -87,7 +87,7 @@ export class Dicionario {
     const sin = [];
     for (const p of this.props) for (const s of [p.rotulo, ...(p.sinonimos ?? [])]) {
       const k = normalizar(s);
-      if (k) sin.push({ chave: k, id: p.id, alvo: p.alvo });
+      if (k) sin.push({ chave: k, id: p.id, alvo: p.alvo, escopos: p.escopos });
     }
     this.sinonimosPropriedade = sin.sort((a, b) => b.chave.length - a.chave.length);
     this.propPorId = new Map(this.props.map((p) => [p.id, p]));
@@ -268,14 +268,14 @@ export class Dicionario {
   propriedadesEm(n) {
     const usado = new Array(n.length).fill(false);
     const out = [];
-    for (const { chave, id, alvo } of this.sinonimosPropriedade) {
+    for (const { chave, id, alvo, escopos } of this.sinonimosPropriedade) {
       let i = n.indexOf(chave);
       while (i !== -1) {
         const j = i + chave.length;
         const ok = (i === 0 || n[i - 1] === ' ') && (j === n.length || n[j] === ' ');
         if (ok && !usado.slice(i, j).some(Boolean)) {
           for (let k = i; k < j; k++) usado[k] = true;
-          out.push({ id, alvo, pos: i });
+          out.push({ id, alvo, escopos, pos: i });
         }
         i = n.indexOf(chave, i + 1);
       }

@@ -15,7 +15,7 @@ import { fmtData, idiomaAtual, nomeDoIdioma, t, tl } from './i18n/index.js';
 import { ligarQuantidades, termosDeBusca } from './nlu.js';
 import { exibirNome, minusNoMeio, nomeComposto as infoNomeComposto, nomeElemento as infoNomeElemento } from './nomes.js';
 import { fonteGhs, descreverGhs, urlSegura } from './perigos.js';
-import { categoriaPlural, categoriaRotulo, classeRotulo, estadoChave, estadoRotulo, formatarValor, valorBruto } from './propriedades.js';
+import { avisoDoValor, categoriaPlural, categoriaRotulo, classeRotulo, escoposDe, estadoChave, estadoRotulo, fontesDoCampo, formatarValor, lerValor, medidasDoComposto, notaEletronegatividade, temEscopo, valorBruto } from './propriedades.js';
 import { capitalizar, listar, normalizar } from './texto.js';
 
 /** Fonte "este aplicativo" no idioma ativo (função: o idioma pode mudar em tempo de execução). */
@@ -38,7 +38,7 @@ const REGRAS_ACIDOS_BASES_PADRAO = [
 ];
 
 const minus = (s) => minusNoMeio(s);
-const fonteDe = (f) => (typeof f === 'string' ? { nome: f } : f && typeof f === 'object' ? { nome: f.nome ?? t('respostas.fontes.pacote'), url: f.url, licenca: f.licenca } : fonteApp());
+const fonteDe = (f) => (typeof f === 'string' ? { nome: f } : f && typeof f === 'object' ? { nome: f.nome ?? t('respostas.fontes.pacote'), url: f.url, licenca: f.licenca, ...(f.detalhe ? { detalhe: f.detalhe } : {}) } : fonteApp());
 const dado = (...fontes) => fontes.filter(Boolean).map(fonteDe);
 const origemUnidades = (tabela) => t(`respostas.unidades.origem.${tabela?.origemChave ?? 'padrao'}`);
 
@@ -278,6 +278,11 @@ export class AnswerBuilder {
     }
     if (c.classes?.length) itens.push({ rotulo: t('respostas.composto.classes'), valor: listar(c.classes.map(classeRotulo)) });
     const blocos = [B.kv(null, itens, fonte)];
+    const medidas = medidasDoComposto(c, this.dic.props, this.ctx);
+    if (medidas.length) {
+      const fontesMedidas = medidas.flatMap((m) => m.fontes);
+      blocos.push(B.kv(t('propriedades.medidas.titulo'), medidas.map((m) => this.itemMedida(m)), fontesMedidas.length ? fontesMedidas : fonte));
+    }
     if (c.smiles) blocos.push(B.molecula(c.smiles, nome, fonte));
     const g = descreverGhs(c.ghs, this.store.regras);
     if (g) blocos.push({ tipo: 'ghs', titulo: t('respostas.composto.perigosGhs'), ...g, fonte: dado(fonteGhs(c) ?? fonte, this.fonteFrases()) });
@@ -311,40 +316,93 @@ export class AnswerBuilder {
   }
 
   // ------------------------------------------------------------------------------------------------ propriedades
+  /** Item {rotulo, valor} de uma medida do composto: valor com unidades, condições da medida e "sem referência" quando for o caso. */
+  itemMedida(m, rotulo = null) {
+    const extras = [...new Set(m.fontes.flatMap((f) => f.condicoes))];
+    if (m.fontes.some((f) => f.semReferencia)) extras.push(t('propriedades.medidas.semReferencia'));
+    const r = rotulo ?? capitalizar(m.prop.id === 'estadoPadrao' ? t('propriedades.medidas.estadoA25') : m.prop.rotulo);
+    return { rotulo: r, valor: `${m.f.texto}${extras.length ? ` — ${extras.join('; ')}` : ''}` };
+  }
+
   async propriedade(p) {
     const ids = p.propriedades?.length ? p.propriedades : p.propriedade ? [p.propriedade] : [];
-    const { compostos, elementos } = await this.entidades(p);
+    let { compostos, elementos } = await this.entidades(p);
+    // "solubilidade do X em água": a água é o solvente, não o composto perguntado
+    if (ids.includes('solubilidade') && compostos.length) {
+      const semAgua = compostos.filter((c) => c.cid !== 962);
+      if (semAgua.length || !elementos.length) compostos = semAgua;
+    }
     if (!ids.length || (!compostos.length && !elementos.length)) {
+      const soSolub = ids.length === 1 && ids[0] === 'solubilidade';
       return montar({
         intent: 'PROPRIEDADE', resolvida: false, titulo: t('respostas.propriedade.deQual'),
-        blocos: [B.texto(ids.length ? t('respostas.propriedade.digaQualElemento', { props: listar(ids.map((i) => this.dic.propPorId.get(i)?.rotulo ?? i)) }) : t('respostas.propriedade.digaQualPropriedade'))],
+        blocos: [B.texto(soSolub ? t('respostas.propriedade.solubilidadeDeQual') : ids.length ? t('respostas.propriedade.digaQualElemento', { props: listar(ids.map((i) => this.dic.propPorId.get(i)?.rotulo ?? i)) }) : t('respostas.propriedade.digaQualPropriedade'))],
         sugestoes: [sug('fusaoFerro'), sug('massaMolarAgua')]
       });
     }
     const linhas = [];
     const ausentes = [];
     const fontes = [];
+    const blocosMedidas = [];
+    const avisos = [];
+    const semMedida = new Map(); // cid → composto sem a medida pedida (para dizer o que o pacote traz dele)
     const nomeDe = (reg, alvo) => (alvo === 'composto' ? this.nomeComposto(reg) : this.nomeElemento(reg));
     for (const id of ids) {
       const prop = this.dic.propPorId.get(id);
       if (!prop) continue;
-      const alvos = prop.alvo === 'composto' ? compostos : elementos;
-      for (const reg of alvos) {
-        const nome = nomeDe(reg, prop.alvo);
-        let f = formatarValor(prop, valorBruto(prop, reg), this.ctx);
-        if (f && prop.id === 'formula') f = { texto: formulaUnicode(String(valorBruto(prop, reg))) };
-        if (f) { linhas.push({ rotulo: t('respostas.propriedade.de', { prop: capitalizar(prop.rotulo), nome }), valor: f.texto }); fontes.push(dado(reg.fontes?.[0])[0]); }
-        else ausentes.push(t('respostas.propriedade.de', { prop: prop.rotulo, nome }));
+      const escopos = escoposDe(prop);
+      let algum = false;
+      for (const alvo of escopos) {
+        const regs = alvo === 'composto' ? compostos : elementos;
+        if (regs.length) algum = true;
+        for (const reg of regs) {
+          const nome = nomeDe(reg, alvo);
+          const rotulo = t('respostas.propriedade.de', { prop: capitalizar(prop.id === 'estadoPadrao' && alvo === 'composto' ? t('propriedades.medidas.estadoA25') : prop.rotulo), nome });
+          if (alvo === 'composto' && prop.medida) {
+            // medida do composto (Wikidata): cada valor com a sua fonte e as condições da medida
+            const lido = lerValor(prop, reg);
+            const f = lido && formatarValor(prop, lido.valor, this.ctx, lido.campo);
+            if (f) {
+              const m = { prop, campo: lido.campo, valor: lido.valor, f, fontes: fontesDoCampo(reg, lido.campo, this.ctx) };
+              blocosMedidas.push(B.kv(null, [this.itemMedida(m, rotulo)], m.fontes.length ? m.fontes : dado(reg.fontes?.[0])[0] ?? fonteApp()));
+              linhas.push({ rotulo, valor: f.texto, medida: true });
+              if (prop.id === 'pka') avisos.push(t('propriedades.medidas.notaPka'));
+            } else { ausentes.push(t('respostas.propriedade.de', { prop: prop.rotulo, nome })); semMedida.set(reg.cid, reg); }
+            continue;
+          }
+          let f = formatarValor(prop, valorBruto(prop, reg), this.ctx);
+          if (f && prop.id === 'formula') f = { texto: formulaUnicode(String(valorBruto(prop, reg))) };
+          if (f) {
+            linhas.push({ rotulo, valor: f.texto });
+            fontes.push(dado(reg.fontes?.[0])[0]);
+            if (alvo === 'elemento') {
+              const aviso = avisoDoValor(reg, prop.campo);
+              if (aviso) avisos.push(`${this.nomeElementoTitulo(reg)}: ${aviso}`);
+              if (prop.id === 'eletronegatividade') { const nota = notaEletronegatividade(this.store.regras, reg); if (nota) avisos.push(nota); }
+            }
+          } else ausentes.push(t('respostas.propriedade.de', { prop: prop.rotulo, nome }));
+        }
       }
       // propriedade de elemento perguntada para um composto (ou o contrário)
-      const outros = prop.alvo === 'composto' ? elementos : compostos;
-      if (!alvos.length && outros.length) ausentes.push(t('respostas.propriedade.outroTipo', { prop: prop.rotulo, alvo: prop.alvo, outros: outros.map((o) => nomeDe(o, prop.alvo === 'composto' ? 'elemento' : 'composto')).join(', '), n: outros.length }));
+      if (!algum) {
+        const alvoProp = escopos[0] ?? prop.alvo;
+        const outros = alvoProp === 'composto' ? elementos : compostos;
+        if (outros.length) ausentes.push(t('respostas.propriedade.outroTipo', { prop: prop.rotulo, alvo: alvoProp, outros: outros.map((o) => nomeDe(o, alvoProp === 'composto' ? 'elemento' : 'composto')).join(', '), n: outros.length }));
+      }
     }
     const blocos = [];
-    if (linhas.length) blocos.push(B.kv(null, linhas, fontes.filter(Boolean).length ? fontes.filter(Boolean) : fonteApp()));
+    const simples = linhas.filter((l) => !l.medida).map(({ rotulo, valor }) => ({ rotulo, valor }));
+    if (simples.length) blocos.push(B.kv(null, simples, fontes.filter(Boolean).length ? fontes.filter(Boolean) : fonteApp()));
+    blocos.push(...blocosMedidas);
+    for (const a of [...new Set(avisos)]) blocos.push(B.aviso(a));
     if (ausentes.length) blocos.push(B.aviso(t('respostas.propriedade.naoTem', { lista: ausentes.join('; ') })));
+    // o que o pacote traz dos compostos sem a medida pedida
+    for (const c of semMedida.values()) {
+      const tem = medidasDoComposto(c, this.dic.props, this.ctx).filter((m) => !ids.includes(m.prop.id));
+      if (tem.length) blocos.push(B.texto(t('respostas.propriedade.oferece', { nome: this.nomeComposto(c), lista: listar(tem.map((m) => `${minus(m.prop.id === 'estadoPadrao' ? t('propriedades.medidas.estadoA25') : m.prop.rotulo)} (${m.f.curto})`)) }), dado(c.fontes?.[0])[0] ?? fonteApp()));
+    }
     const primeiro = elementos[0] ?? compostos[0];
-    const acoes = elementos[0] && ids.some((i) => this.dic.propPorId.get(i)?.alvo === 'elemento')
+    const acoes = elementos[0] && ids.some((i) => temEscopo(this.dic.propPorId.get(i), 'elemento'))
       ? [rota(this.rotaElemento(elementos[0].simbolo), t('respostas.propriedade.fichaDe', { nome: this.nomeElemento(elementos[0]) }))]
       : compostos[0] ? [rota(this.rotaComposto(compostos[0].cid), t('respostas.propriedade.fichaDe', { nome: this.nomeComposto(compostos[0]) }))] : [];
     return montar({
@@ -766,9 +824,29 @@ export class AnswerBuilder {
         [L.sinal, ...compostos.map((c) => descreverGhs(c.ghs)?.palavraSinal ?? '—')],
         [L.pictogramas, ...compostos.map((c) => (c.ghs?.pictogramas?.length ? c.ghs.pictogramas.join(', ') : '—'))]
       ].filter((l) => l.slice(1).some((x) => x !== '—'));
+      // propriedades físicas medidas (Wikidata): linha só quando pelo menos dois compostos têm o valor; fonte por valor no bloco
+      const medidas = compostos.map((c) => new Map(medidasDoComposto(c, this.dic.props, this.ctx).map((m) => [m.prop.id, m])));
+      const fontesMedidas = [];
+      const frases = [];
+      const pedidas = new Set(p.propriedades?.length ? p.propriedades : p.propriedade ? [p.propriedade] : []);
+      for (const id of ['estadoPadrao', 'pontoFusaoK', 'pontoEbulicaoK', 'densidadeKgm3', 'solubilidade', 'pka']) {
+        const ms = medidas.map((mm) => mm.get(id) ?? null);
+        if (ms.filter(Boolean).length < 2) continue;
+        const prop = ms.find(Boolean).prop;
+        linhas.push([capitalizar(id === 'estadoPadrao' ? t('propriedades.medidas.estadoA25') : prop.rotulo), ...ms.map((m) => (m ? m.f.curto : '—'))]);
+        for (const m of ms) if (m) fontesMedidas.push(...m.fontes);
+        // a propriedade pedida ("compare a densidade do etanol e da água"): diz qual é maior, só entre valores da mesma unidade
+        const num = ms.map((m, i) => (m && typeof m.valor === 'number' ? { m, i } : null)).filter(Boolean);
+        if (pedidas.has(id) && num.length >= 2 && new Set(num.map((x) => x.m.campo)).size === 1) {
+          const top = num.reduce((x, y) => (y.m.valor > x.m.valor ? y : x));
+          if (num.filter((x) => x.m.valor === top.m.valor).length === 1) frases.push(t('respostas.comparar.maior', { prop: capitalizar(prop.rotulo), nome: this.nomeComposto(compostos[top.i]), valor: top.m.f.curto }));
+        }
+      }
+      const fonteTabela = [...dado(...compostos.map((c) => c.fontes?.[0])), ...fontesMedidas];
       return montar({
         intent: 'COMPARAR', titulo: t('respostas.comparar.titulo', { nomes: listar(compostos.map((c) => this.nomeComposto(c))) }),
-        blocos: [B.tabela(null, ['', ...compostos.map((c) => this.nomeComposto(c))], linhas, dado(...compostos.map((c) => c.fontes?.[0]))[0] ?? fonteApp())],
+        blocos: [B.tabela(null, ['', ...compostos.map((c) => this.nomeComposto(c))], linhas, fontesMedidas.length ? fonteTabela : dado(...compostos.map((c) => c.fontes?.[0]))[0] ?? fonteApp()),
+          ...frases.map((f) => B.texto(f, fontesMedidas.length ? fontesMedidas : fonteApp()))],
         acoes: compostos.map((c) => rota(this.rotaComposto(c.cid), t('respostas.comparar.fichaDe', { nome: this.nomeComposto(c) }))), sugestoes: []
       });
     }

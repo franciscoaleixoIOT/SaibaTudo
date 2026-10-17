@@ -202,6 +202,10 @@ textarea.auto-altura { resize: none; overflow-y: hidden; line-height: 1.4; overf
 .kv dt, .kv dd { margin: 0; padding: 7px 4px; border-bottom: 1px solid var(--outline-v); font-size: .875rem; overflow-wrap: anywhere; }
 .kv dt { color: var(--txt2); }
 .kv dd { font-variant-numeric: tabular-nums; }
+.kv-medidas dd .bloco-fonte { margin-top: 2px; }
+.aviso-valor { display: block; margin-top: 4px; padding: 6px 8px; border-radius: 8px; font-size: .75rem; background: var(--sec-c); color: var(--on-sec-c); }
+.aviso-valor svg { vertical-align: -2px; }
+.nota-valor { display: block; margin-top: 2px; }
 @media (max-width: 480px) { .kv { grid-template-columns: 1fr; } .kv dt { border-bottom: 0; padding-bottom: 0; font-size: .75rem; } }
 .tabela-rolagem { overflow-x: auto; margin-top: 6px; }
 .tabela-dados { width: 100%; border-collapse: collapse; font-size: .8125rem; }

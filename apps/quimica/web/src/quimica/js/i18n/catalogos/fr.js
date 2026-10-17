@@ -336,7 +336,8 @@ export default {
         'Éléments, composés, constantes et règles : fichiers JSON versionnés, avec SHA-256 vérifié et manifeste signé.',
         'Masse molaire, équilibrage, stœchiométrie, concentration, pH, gaz parfait et unités : code déterministe testé, sur votre appareil.',
         'Structure 2D : dessinée à partir du SMILES du jeu de données. Pictogrammes SGH : dessins simplifiés réalisés pour cette application.',
-        'Extraits d’explication : cités avec leur source et leur licence ; les traductions automatiques sont signalées comme telles.'
+        'Extraits d’explication : cités avec leur source et leur licence ; les traductions automatiques sont signalées comme telles.',
+        'Propriétés physiques des composés (fusion, ébullition, densité, solubilité dans l’eau, pKa) : de Wikidata, chaque valeur avec sa déclaration et la référence qu’elle cite ; l’état physique à 25 °C est déduit des points de fusion et d’ébullition.'
       ],
       bibliotecas: 'Bibliothèques open source',
       rodape: 'SaibaTudo est indépendant et open source (MIT). ', privacidade: 'Politique de confidentialité',
@@ -391,7 +392,20 @@ export default {
       densidadeKgm3: 'densité', estadoPadrao: 'état physique (conditions standard)', estadosOxidacao: 'nombres d’oxydation', descoberta: 'découverte',
       massaMolar: 'masse molaire', massaExata: 'masse exacte (monoisotopique)', formula: 'formule', cas: 'numéro CAS', cid: 'CID PubChem', smiles: 'SMILES', inchiKey: 'InChIKey',
       nomeIupac: 'nom IUPAC', xlogp: 'XLogP (lipophilie calculée)', doadoresH: 'donneurs de liaison hydrogène', aceptoresH: 'accepteurs de liaison hydrogène',
-      ligacoesRotaveis: 'liaisons rotatives', carga: 'charge électrique', tpsa: 'surface polaire (TPSA)'
+      ligacoesRotaveis: 'liaisons rotatives', carga: 'charge électrique', tpsa: 'surface polaire (TPSA)', solubilidade: 'solubilité dans l’eau', pka: 'pKa'
+    },
+    medidas: {
+      titulo: 'Propriétés physiques', intro: 'Valeurs mesurées, chacune avec sa source et les conditions de la mesure.',
+      unidadeG100g: 'g/100 g d’eau', unidadeGL: 'g/L (dans l’eau)', pkaVarios: '{lista}',
+      aTemperatura: 'à {k} K ({c} °C)', aPressao: 'à {pa} Pa ({atm} atm)', fase: 'phase : {fase}', referencia: 'référence : {x}',
+      semReferencia: 'sans référence dans Wikidata',
+      semReferenciaCorroborado: (p) => `sans référence dans Wikidata (${p.n} déclarations concordent)`,
+      derivado: 'déduit des points de fusion et d’ébullition du jeu de données, à 25 °C et 1 atm', derivadoNome: 'SaibaTudo Química (valeur déduite)',
+      fontePacote: 'jeu de données', revisar: 'valeur à vérifier',
+      avisoRevisar: 'Valeur à vérifier : celle de PubChem est peut-être obsolète (elle diffère des tables actuelles) et Wikidata n’a pas cette propriété.',
+      notaPauling: 'Échelle de Pauling, avec les valeurs révisées d’Allred (1961), comme dans PubChem ; les livres qui utilisent les valeurs originales de Pauling diffèrent pour quelques éléments.',
+      notaPka: 'Plus petit pKa enregistré (première dissociation) ; pour les bases, Wikidata enregistre en général le pKa de l’acide conjugué, et les acides forts n’ont pas de pKa.',
+      estadoA25: 'état physique à 25 °C et 1 atm'
     },
     categorias: {
       metal_alcalino: 'métal alcalin', metal_alcalino_terroso: 'métal alcalino-terreux', metal_transicao: 'métal de transition', metal_pos_transicao: 'métal pauvre',
@@ -517,7 +531,8 @@ export default {
       digaQualPropriedade: 'Indiquez la propriété et l’élément ou le composé. Par exemple : « densité de l’or ».',
       de: '{prop} ({nome})',
       outroTipo: (p) => `${p.prop} (cette propriété concerne les ${p.alvo === 'composto' ? 'composés' : 'éléments'} ; ${p.outros} ${p.n > 1 ? 'sont' : 'est'} d’un autre type)`,
-      naoTem: 'Le jeu de données ne contient pas : {lista}.', fichaDe: 'Fiche : {nome}', propriedadesDe: 'Propriétés : {nomes}'
+      naoTem: 'Le jeu de données ne contient pas : {lista}.', fichaDe: 'Fiche : {nome}', propriedadesDe: 'Propriétés : {nomes}',
+      oferece: 'Pour {nome}, le jeu de données contient : {lista}.', solubilidadeDeQual: 'Indiquez le composé dont vous voulez la solubilité dans l’eau. Par exemple : « solubilité de l’urée ».'
     },
     massaMolar: {
       tituloElemento: 'Masse molaire : {nome} ({simbolo})', deAtomos: 'Masse molaire : {nome} (atomes)',
@@ -581,7 +596,7 @@ export default {
     comparar: {
       titulo: 'Comparaison : {nomes}', propriedade: 'Propriété', fichaDe: 'Fiche : {nome}',
       linhas: { formula: 'Formule', massaMolar: 'Masse molaire', cas: 'Numéro CAS', nomeIupac: 'Nom IUPAC', xlogp: 'XLogP', sinal: 'Mention d’avertissement (SGH)', pictogramas: 'Pictogrammes (SGH)' },
-      tituloGeral: 'Comparer', explicacao: 'Comparez des éléments de même nature : deux éléments (« comparer le sodium et le chlore ») ou deux composés (« différence entre l’éthanol et l’acide acétique »).'
+      maior: '{prop} : plus élevé pour {nome} ({valor}).', tituloGeral: 'Comparer', explicacao: 'Comparez des éléments de même nature : deux éléments (« comparer le sodium et le chlore ») ou deux composés (« différence entre l’éthanol et l’acide acétique »).'
     },
     tabela: {
       abrir: 'Ouvrir le tableau périodique', naoTemProp: 'Le jeu de données ne contient aucune valeur de « {prop} » pour les éléments chargés.',

@@ -8,7 +8,13 @@ import { idiomaAtual, t } from './i18n/index.js';
 import { lexico } from './nlu/lex/index.js';
 import { listar } from './texto.js';
 
-/** @typedef {{id: string, rotulo: string, alvo: 'elemento'|'composto', campo: string, tipo?: string, unidade?: string, sinonimos: string[]}} Propriedade */
+/**
+ * @typedef {{id: string, rotulo: string, alvo: 'elemento'|'composto', escopos: ('elemento'|'composto')[], campo: string, campos?: string[], tipo?: string,
+ *   unidade?: string, medida?: boolean, sinonimos: string[]}} Propriedade
+ * `alvo` é o escopo principal (compatibilidade); `escopos` diz em que registros a propriedade existe (DATA_CONTRACT §3.1: fusão, ebulição, densidade e
+ * estado físico valem para elemento E composto). `medida` = propriedade física medida do composto, lida de `propriedades` com origem por valor
+ * (`fontesPorPropriedade[campo]`); `campos` = campos possíveis no registro do composto, em ordem de preferência (solubilidade e pKa têm dois).
+ */
 
 /** Lista padrão (rótulo pt-BR de referência; os outros idiomas vêm do catálogo). Os sinônimos ficam no léxico por idioma. */
 export const PROPRIEDADES_PADRAO = [
@@ -24,10 +30,10 @@ export const PROPRIEDADES_PADRAO = [
   { id: 'raioAtomicoPm', rotulo: 'raio atômico (van der Waals)', alvo: 'elemento', campo: 'raioAtomicoPm', tipo: 'numero', unidade: 'pm' },
   { id: 'afinidadeEletronicaKJmol', rotulo: 'afinidade eletrônica', alvo: 'elemento', campo: 'afinidadeEletronicaKJmol', tipo: 'numero', unidade: 'kJ/mol' },
   { id: 'energiaIonizacaoKJmol', rotulo: 'energia de ionização', alvo: 'elemento', campo: 'energiaIonizacaoKJmol', tipo: 'numero', unidade: 'kJ/mol' },
-  { id: 'pontoFusaoK', rotulo: 'ponto de fusão', alvo: 'elemento', campo: 'pontoFusaoK', tipo: 'temperatura' },
-  { id: 'pontoEbulicaoK', rotulo: 'ponto de ebulição', alvo: 'elemento', campo: 'pontoEbulicaoK', tipo: 'temperatura' },
-  { id: 'densidadeKgm3', rotulo: 'densidade', alvo: 'elemento', campo: 'densidadeKgm3', tipo: 'densidade' },
-  { id: 'estadoPadrao', rotulo: 'estado físico (condições padrão)', alvo: 'elemento', campo: 'estadoPadrao', tipo: 'estado' },
+  { id: 'pontoFusaoK', rotulo: 'ponto de fusão', alvo: 'elemento', escopos: ['elemento', 'composto'], campo: 'pontoFusaoK', tipo: 'temperatura', medida: true },
+  { id: 'pontoEbulicaoK', rotulo: 'ponto de ebulição', alvo: 'elemento', escopos: ['elemento', 'composto'], campo: 'pontoEbulicaoK', tipo: 'temperatura', medida: true },
+  { id: 'densidadeKgm3', rotulo: 'densidade', alvo: 'elemento', escopos: ['elemento', 'composto'], campo: 'densidadeKgm3', tipo: 'densidade', medida: true },
+  { id: 'estadoPadrao', rotulo: 'estado físico (condições padrão)', alvo: 'elemento', escopos: ['elemento', 'composto'], campo: 'estadoPadrao', tipo: 'estado', medida: true },
   { id: 'estadosOxidacao', rotulo: 'estados de oxidação', alvo: 'elemento', campo: 'estadosOxidacao', tipo: 'lista' },
   { id: 'descoberta', rotulo: 'descoberta', alvo: 'elemento', campo: 'descoberta', tipo: 'descoberta' },
 
@@ -44,8 +50,21 @@ export const PROPRIEDADES_PADRAO = [
   { id: 'aceptoresH', rotulo: 'aceptores de ligação de hidrogênio', alvo: 'composto', campo: 'aceptoresH', tipo: 'inteiro' },
   { id: 'ligacoesRotaveis', rotulo: 'ligações rotáveis', alvo: 'composto', campo: 'ligacoesRotaveis', tipo: 'inteiro' },
   { id: 'carga', rotulo: 'carga elétrica', alvo: 'composto', campo: 'carga', tipo: 'inteiro' },
-  { id: 'tpsa', rotulo: 'área de superfície polar (TPSA)', alvo: 'composto', campo: 'tpsa', tipo: 'numero', unidade: 'Å²' }
+  { id: 'tpsa', rotulo: 'área de superfície polar (TPSA)', alvo: 'composto', campo: 'tpsa', tipo: 'numero', unidade: 'Å²' },
+  // medidas do composto (Wikidata, DATA_CONTRACT §3.1): sem valor no pacote = sem valor na resposta
+  { id: 'solubilidade', rotulo: 'solubilidade em água', alvo: 'composto', campo: 'solubilidadeAguaG100g', campos: ['solubilidadeAguaG100g', 'solubilidadeAguaGL'], tipo: 'solubilidade', medida: true },
+  { id: 'pka', rotulo: 'pKa', alvo: 'composto', campo: 'pka', campos: ['pkaValores', 'pka'], tipo: 'pka', medida: true }
 ];
+
+/** Ids das propriedades físicas medidas dos compostos, na ordem da ficha. */
+export const MEDIDAS_COMPOSTO = ['estadoPadrao', 'pontoFusaoK', 'pontoEbulicaoK', 'densidadeKgm3', 'solubilidade', 'pka'];
+
+/** Escopos da propriedade ('elemento' | 'composto'): `escopos` → `[alvo]`. */
+export const escoposDe = (prop) => (Array.isArray(prop?.escopos) && prop.escopos.length ? prop.escopos : prop?.alvo ? [prop.alvo] : []);
+/** A propriedade existe neste escopo? */
+export const temEscopo = (prop, alvo) => escoposDe(prop).includes(alvo);
+/** Escopo de um registro do pacote: composto tem `cid` e não tem `simbolo`. */
+export const escopoDoRegistro = (r) => (r && r.cid != null && r.simbolo == null ? 'composto' : 'elemento');
 
 /** Compostos têm os campos calculados dentro de `propriedades`. */
 const CAMPOS_EM_PROPRIEDADES = new Set(['xlogp', 'doadoresH', 'aceptoresH', 'ligacoesRotaveis', 'carga', 'tpsa']);
@@ -93,25 +112,31 @@ export function tabelaDePropriedades(regras, idioma = idiomaAtual()) {
   const lex = lexico(idioma);
   const doPacote = regras?.propriedades;
   const lista = Array.isArray(doPacote) ? doPacote : doPacote && typeof doPacote === 'object' ? Object.entries(doPacote).map(([id, v]) => ({ id, ...v })) : [];
-  const mapa = new Map(PROPRIEDADES_PADRAO.map((p) => [p.id, { ...p, rotuloPt: p.rotulo, rotulo: rotuloPropriedade(p, idioma), sinonimos: [...(lex.propriedades[p.id] ?? [])] }]));
+  const mapa = new Map(PROPRIEDADES_PADRAO.map((p) => [p.id, { ...p, escopos: escoposDe(p), rotuloPt: p.rotulo, rotulo: rotuloPropriedade(p, idioma), sinonimos: [...(lex.propriedades[p.id] ?? [])] }]));
   const somar = (base, sin) => { base.sinonimos = [...new Set([...(base.sinonimos ?? []), ...(Array.isArray(sin) ? sin : [])])]; };
   const sinonimosDoPacote = (p) => [...(idioma === 'pt-BR' && Array.isArray(p.sinonimos) ? p.sinonimos : []), ...(Array.isArray(p.sinonimosPorIdioma?.[idioma]) ? p.sinonimosPorIdioma[idioma] : [])];
   for (const p of lista) {
     if (!p?.id) continue;
-    const alvo = p.alvo ?? p.escopo;
+    const alvo = p.alvo ?? p.escopo ?? (Array.isArray(p.escopos) ? p.escopos[0] : undefined);
     let base = mapa.get(p.id);
     if (!base && p.origem) {
       const caminho = String(p.origem).split('.').slice(1); // ['pontoFusaoK'] | ['descoberta', 'ano'] | ['propriedades', 'xlogp']
       const campo = caminho[0] === 'propriedades' ? caminho[1] : caminho[0];
-      base = [...mapa.values()].find((x) => (!alvo || x.alvo === alvo) && (x.campo === campo || (caminho[0] === 'propriedades' && x.id === campo)));
+      base = [...mapa.values()].find((x) => (!alvo || temEscopo(x, alvo)) && (x.campo === campo || (caminho[0] === 'propriedades' && x.id === campo)));
     }
     if (base) {
       somar(base, sinonimosDoPacote(p));
+      // escopos novos do pacote (`escopos`, ou o prefixo de `origens`: "compostos.propriedades.pontoFusaoK" → composto); o pacote só acrescenta
+      const PREFIXO = { elementos: 'elemento', compostos: 'composto' };
+      const doPacote = [...(Array.isArray(p.escopos) ? p.escopos : []), ...(Array.isArray(p.origens) ? p.origens : []).map((o) => PREFIXO[String(o).split('.')[0]])]
+        .filter((x) => x === 'elemento' || x === 'composto');
+      base.escopos = [...new Set([...escoposDe(base), ...doPacote])];
       if (typeof p.rotulos?.[idioma] === 'string' && p.rotulos[idioma]) base.rotulo = p.rotulos[idioma];
       continue;
     }
     if (p.campo) {
       const nova = { alvo: alvo ?? 'elemento', tipo: 'texto', ...p, sinonimos: sinonimosDoPacote(p) };
+      nova.escopos = escoposDe(nova);
       nova.rotulo = p.rotulos?.[idioma] ?? (idioma === 'pt-BR' ? p.rotulo ?? p.nome : null) ?? p.rotulo ?? p.nome ?? p.id;
       mapa.set(p.id, nova);
     }
@@ -119,11 +144,29 @@ export function tabelaDePropriedades(regras, idioma = idiomaAtual()) {
   return [...mapa.values()];
 }
 
+/**
+ * Valor da propriedade no registro, com o campo de onde veio: `{valor, campo}` ou null. Composto: os calculados e as medidas ficam em
+ * `registro.propriedades` (DATA_CONTRACT §3 e §3.1); elemento: no próprio registro. Solubilidade e pKa têm dois campos possíveis (`campos`).
+ */
+export function lerValor(prop, registro) {
+  if (!registro || !prop) return null;
+  const composto = escopoDoRegistro(registro) === 'composto';
+  if (composto && !temEscopo(prop, 'composto')) return null;
+  if (composto && (CAMPOS_EM_PROPRIEDADES.has(prop.id) || prop.medida)) {
+    for (const campo of prop.campos ?? [prop.campo]) {
+      const v = registro.propriedades?.[campo];
+      if (v !== undefined && v !== null && !(Array.isArray(v) && !v.length)) return { valor: v, campo };
+    }
+    return null;
+  }
+  const v = !composto && CAMPOS_EM_PROPRIEDADES.has(prop.id) && registro.propriedades ? registro.propriedades[prop.id] : registro[prop.campo];
+  return v === undefined || v === null ? null : { valor: v, campo: prop.campo };
+}
+
 /** Valor bruto da propriedade no registro (elemento ou composto); undefined se ausente. */
 export function valorBruto(prop, registro) {
   if (!registro) return undefined;
-  const v = CAMPOS_EM_PROPRIEDADES.has(prop.id) && prop.alvo === 'composto' ? registro.propriedades?.[prop.id] : registro[prop.campo];
-  return v === null ? undefined : v;
+  return lerValor(prop, registro)?.valor;
 }
 
 function emCelsius(K, ctx) {
@@ -141,11 +184,24 @@ function paraGcm3(kgm3, ctx) {
 
 /**
  * Texto legível do valor, com unidades (K também em °C, kg/m³ também em g/cm³), no formato numérico do idioma ativo.
+ * `campo` (de `lerValor`) escolhe a unidade quando a propriedade tem mais de um campo (solubilidade em g/100 g de água ou em g/L).
  * @returns {{texto: string, curto: string, numeros: number[]}|null}
  */
-export function formatarValor(prop, valor, ctx) {
+export function formatarValor(prop, valor, ctx, campo = null) {
   if (valor === undefined || valor === null || valor === '') return null;
   switch (prop.tipo) {
+    case 'solubilidade': {
+      if (typeof valor !== 'number') return null;
+      const porLitro = (campo ?? prop.campo) === 'solubilidadeAguaGL';
+      const tx = `${fmt(valor, { sig: 6 })} ${porLitro ? t('propriedades.medidas.unidadeGL') : t('propriedades.medidas.unidadeG100g')}`;
+      return { texto: tx, curto: `${fmt(valor, { sig: 6 })} ${porLitro ? 'g/L' : 'g/100 g'}`, numeros: [valor] };
+    }
+    case 'pka': {
+      const l = (Array.isArray(valor) ? valor : [valor]).filter((x) => typeof x === 'number' && Number.isFinite(x));
+      if (!l.length) return null;
+      const tx = l.length > 1 ? t('propriedades.medidas.pkaVarios', { lista: listar(l.map((x) => fmt(x, { sig: 4 }))) }) : fmt(l[0], { sig: 4 });
+      return { texto: tx, curto: l.map((x) => fmt(x, { sig: 4 })).join('; '), numeros: l };
+    }
     case 'temperatura': {
       const c = emCelsius(valor, ctx);
       const k = `${fmt(valor, { sig: 7 })} K`;
@@ -187,3 +243,86 @@ export const classeRotulo = (x) => { const v = t(`propriedades.classes.${x}`); r
 
 /** Nome legível de uma unidade (seletor do conversor): catálogo do idioma → nome da tabela (pacote/padrão). */
 export const nomeUnidade = (simbolo, nomeDaTabela) => { const v = t(`propriedades.unidades.${simbolo}`); return v === `propriedades.unidades.${simbolo}` ? nomeDaTabela ?? simbolo : v; };
+
+// ------------------------------------------------------------------------------------------------ origem por valor (DATA_CONTRACT §3.1)
+
+/** Condições da medida ("a 298,15 K (25 °C)", "a 101.325 Pa (1 atm)", "fase: líquido"), no idioma ativo; [] se não houver. */
+export function condicoesDaMedida(f, ctx) {
+  const c = f?.condicoes;
+  if (!c || typeof c !== 'object') return [];
+  const out = [];
+  if (typeof c.temperaturaK === 'number') {
+    const cel = emCelsius(c.temperaturaK, ctx);
+    out.push(t('propriedades.medidas.aTemperatura', { k: fmt(c.temperaturaK, { sig: 6 }), c: cel == null ? '' : fmt(cel, { sig: 5 }) }));
+  }
+  if (typeof c.pressaoPa === 'number') {
+    let atm = null;
+    try { atm = deBase(ctx.unidades, 'atm', 'pressao', c.pressaoPa); } catch { atm = null; }
+    out.push(t('propriedades.medidas.aPressao', { pa: fmt(c.pressaoPa, { sig: 7 }), atm: atm == null ? '' : fmt(atm, { sig: 4 }) }));
+  }
+  if (c.fase) out.push(t('propriedades.medidas.fase', { fase: estadoRotulo(c.fase) }));
+  return out;
+}
+
+/**
+ * Fonte de UM valor (`fontesPorPropriedade[campo]`) no formato das fontes da interface: `{nome, url, licenca, detalhe, condicoes, semReferencia, revisar}`.
+ * `detalhe` junta referência citada, "sem referência no Wikidata", método de derivação e aviso de revisão, já no idioma ativo.
+ * O nome do pacote vale como está (nome próprio: "Wikidata", "PubChem…"); o do valor derivado pelo app vem do catálogo.
+ */
+export function fonteDoValor(f, ctx) {
+  if (!f || typeof f !== 'object') return null;
+  const derivado = !f.url && !!f.metodo;
+  const detalhes = [];
+  const condicoes = condicoesDaMedida(f, ctx);
+  if (typeof f.referencia === 'string' && f.referencia) detalhes.push(t('propriedades.medidas.referencia', { x: f.referencia }));
+  if (f.semReferencia) detalhes.push(Number.isInteger(f.corroboradoPor) && f.corroboradoPor > 1 ? t('propriedades.medidas.semReferenciaCorroborado', { n: f.corroboradoPor }) : t('propriedades.medidas.semReferencia'));
+  if (derivado) detalhes.push(t('propriedades.medidas.derivado'));
+  if (f.revisar || f.aviso) detalhes.push(t('propriedades.medidas.revisar'));
+  return {
+    nome: derivado ? t('propriedades.medidas.derivadoNome') : String(f.nome ?? t('propriedades.medidas.fontePacote')),
+    url: typeof f.url === 'string' && /^https:\/\//.test(f.url) ? f.url : undefined,
+    licenca: f.licenca,
+    detalhe: detalhes.join('; ') || undefined,
+    condicoes, semReferencia: !!f.semReferencia, revisar: !!(f.revisar || f.aviso)
+  };
+}
+
+/** Fontes de um valor do registro: lista (pkaValores traz uma por valor, alinhada), sem repetir a mesma declaração. */
+export function fontesDoCampo(registro, campo, ctx) {
+  const bruto = registro?.fontesPorPropriedade?.[campo] ?? (campo === 'pkaValores' ? registro?.fontesPorPropriedade?.pka : null);
+  const lista = (Array.isArray(bruto) ? bruto : [bruto]).map((f) => fonteDoValor(f, ctx)).filter(Boolean);
+  const vistos = new Set();
+  return lista.filter((f) => { const k = `${f.nome}|${f.url ?? ''}|${f.detalhe ?? ''}|${f.condicoes.join()}`; if (vistos.has(k)) return false; vistos.add(k); return true; });
+}
+
+/**
+ * Propriedades físicas medidas de um composto, na ordem de MEDIDAS_COMPOSTO: `[{prop, campo, valor, f, fontes}]` (só as que existem no registro).
+ * `props` = tabela efetiva (`tabelaDePropriedades`), para os rótulos do idioma e os escopos do pacote.
+ */
+export function medidasDoComposto(c, props, ctx) {
+  const porId = new Map((props ?? []).map((p) => [p.id, p]));
+  const out = [];
+  for (const id of MEDIDAS_COMPOSTO) {
+    const prop = porId.get(id);
+    if (!prop) continue;
+    const lido = lerValor(prop, c);
+    if (!lido) continue;
+    const f = formatarValor(prop, lido.valor, ctx, lido.campo);
+    if (f) out.push({ prop, campo: lido.campo, valor: lido.valor, f, fontes: fontesDoCampo(c, lido.campo, ctx) });
+  }
+  return out;
+}
+
+/** Aviso de revisão de um valor do elemento (`fontesPorPropriedade[campo].aviso`/`revisar`), no idioma ativo; null se não houver. */
+export const avisoDoValor = (registro, campo) => {
+  const f = registro?.fontesPorPropriedade?.[campo];
+  return f && (f.revisar || f.aviso) ? t('propriedades.medidas.avisoRevisar') : null;
+};
+
+/** Nota da escala da eletronegatividade (Pauling, valores revisados de Allred), quando o pacote a declara; null se não houver. */
+export function notaEletronegatividade(regras, elemento = null) {
+  const f = elemento?.fontesPorPropriedade?.eletronegatividade;
+  const r = regras?.propriedades && !Array.isArray(regras.propriedades) ? regras.propriedades.eletronegatividade : null;
+  const escala = f?.escala ?? r?.escala ?? null;
+  return escala && /pauling/i.test(String(escala)) ? t('propriedades.medidas.notaPauling') : null;
+}

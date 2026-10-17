@@ -52,6 +52,7 @@ export function fonteEl(fonte) {
     if (i) partes.push('; ');
     partes.push(f.url ? linkExterno(f.url, f.nome) : f.nome);
     if (f.licenca) partes.push(` — ${f.licenca}`);
+    if (f.detalhe) partes.push(` (${f.detalhe})`);
   });
   return h('p', { class: 'bloco-fonte' }, t('ui.componentes.fonte'), partes);
 }

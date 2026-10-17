@@ -4,7 +4,7 @@ import { h, icon } from '../dom.js';
 import { fmt } from '../formato.js';
 import { idiomaAtual, t } from '../i18n/index.js';
 import { minusNoMeio, nomeCompostoExibicao, nomeElementoExibicao } from '../nomes.js';
-import { formatarValor, tabelaDePropriedades, valorBruto, categoriaRotulo, estadoRotulo } from '../propriedades.js';
+import { avisoDoValor, formatarValor, notaEletronegatividade, tabelaDePropriedades, valorBruto, categoriaRotulo, estadoRotulo } from '../propriedades.js';
 import { capitalizar } from '../texto.js';
 import { fonteEl, formulaEl, kvEl, linkRota } from './componentes.js';
 
@@ -24,7 +24,13 @@ export function viewElemento({ store, params }) {
   for (const p of props) {
     if (p.id === 'simbolo') continue;
     const f = formatarValor(p, valorBruto(p, e), store.ctx);
-    if (f) itens.push({ rotulo: capitalizar(p.rotulo), valor: f.texto });
+    if (!f) continue;
+    // aviso de revisão do valor (fontesPorPropriedade[campo].aviso/revisar) e a nota da escala de Pauling, junto do valor
+    const aviso = avisoDoValor(e, p.campo);
+    const nota = p.id === 'eletronegatividade' ? notaEletronegatividade(store.regras, e) : null;
+    itens.push({ rotulo: capitalizar(p.rotulo), valor: aviso || nota ? h('span', null, f.texto,
+      aviso ? h('span', { class: 'aviso-valor', role: 'note', 'data-aviso': p.id }, ' ', icon('info', 14), ` ${aviso}`) : null,
+      nota ? h('span', { class: 'mini mudo nota-valor', 'data-nota': p.id }, nota) : null) : f.texto });
   }
   if (e.massaAtomicaIncerteza != null) itens.push({ rotulo: t('ui.elemento.incerteza'), valor: fmt(e.massaAtomicaIncerteza, { sig: 3 }) });
 

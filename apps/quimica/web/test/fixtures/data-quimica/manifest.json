@@ -20,16 +20,16 @@
    "sha256": "5fc55351cbb3c95a9fd84fa398d16f1033c11c462cd7726a1d975e3dc9fb0f1e"
   },
   "fontes.json": {
-   "bytes": 6357,
-   "sha256": "bd60dfa824cd51ad1bba0ef5fceb6b2ad4879394d21f67a0d343e6596c4084f0"
+   "bytes": 7638,
+   "sha256": "d4df74a235bc7992673c14e426c674374c92ee0315652614e8ab4742d8f95fdc"
   },
   "ghs_frases.json": {
    "bytes": 20607,
    "sha256": "5209ce6563469b650973555efea15ed0f517df4b5101b390afac744c0ce8c549"
   },
   "regras.json": {
-   "bytes": 41348,
-   "sha256": "37821cd9c7d60d6394cddfed90578586f72fb257412cfaa6252d75bcc2e73926"
+   "bytes": 53766,
+   "sha256": "311e94a58b8e7848e4bb66a305444e2244cbf4ced1af72dc176244e68b7962b1"
   },
   "textos/chebi/16236.json": {
    "bytes": 682,
@@ -154,6 +154,14 @@
    "acessadoEm": "2026-10-10"
   },
   {
+   "id": "wikipedia-en-dados",
+   "nome": "Wikipedia (en) — páginas de dados de referência",
+   "url": "https://en.wikipedia.org/",
+   "licenca": "CC BY-SA 4.0",
+   "uso": "dados",
+   "acessadoEm": "2026-10-10"
+  },
+  {
    "id": "icsc-oit",
    "nome": "ICSC — Fichas Internacionais de Segurança Química (OIT/OMS)",
    "url": "https://chemicalsafety.ilo.org/dyn/icsc/showcard.home",
@@ -201,7 +209,8 @@
     "wikipedia-es",
     "wikipedia-de",
     "wikipedia-fr",
-    "wikibooks-pt"
+    "wikibooks-pt",
+    "wikipedia-en-dados"
    ]
   },
   {

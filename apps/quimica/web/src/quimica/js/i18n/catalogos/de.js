@@ -335,7 +335,8 @@ export default {
         'Elemente, Verbindungen, Konstanten und Regeln: versionierte JSON-Dateien, mit geprüftem SHA-256 und signiertem Manifest.',
         'Molare Masse, Gleichungen ausgleichen, Stöchiometrie, Konzentration, pH, ideales Gas und Einheiten: getesteter, deterministischer Code auf Ihrem Gerät.',
         '2D-Struktur: aus dem SMILES-Code im Paket gezeichnet. GHS-Piktogramme: vereinfachte, für diese App erstellte Zeichnungen.',
-        'Auszüge aus Erläuterungen: mit Quelle und Lizenz zitiert; automatische Übersetzungen sind als solche gekennzeichnet.'
+        'Auszüge aus Erläuterungen: mit Quelle und Lizenz zitiert; automatische Übersetzungen sind als solche gekennzeichnet.',
+        'Physikalische Eigenschaften der Verbindungen (Schmelzen, Sieden, Dichte, Löslichkeit in Wasser, pKs): aus Wikidata, jeder Wert mit seiner Aussage und dem darin zitierten Beleg; der Aggregatzustand bei 25 °C wird aus Schmelz- und Siedepunkt abgeleitet.'
       ],
       bibliotecas: 'Open-Source-Bibliotheken',
       rodape: 'SaibaTudo ist unabhängig und Open Source (MIT). ', privacidade: 'Datenschutzerklärung',
@@ -390,7 +391,20 @@ export default {
       densidadeKgm3: 'Dichte', estadoPadrao: 'Aggregatzustand (Standardbedingungen)', estadosOxidacao: 'Oxidationszahlen', descoberta: 'Entdeckung',
       massaMolar: 'molare Masse', massaExata: 'exakte Masse (monoisotopisch)', formula: 'Formel', cas: 'CAS-Nummer', cid: 'PubChem-CID', smiles: 'SMILES', inchiKey: 'InChIKey',
       nomeIupac: 'IUPAC-Name', xlogp: 'XLogP (berechnete Lipophilie)', doadoresH: 'Wasserstoffbrücken-Donatoren', aceptoresH: 'Wasserstoffbrücken-Akzeptoren',
-      ligacoesRotaveis: 'drehbare Bindungen', carga: 'elektrische Ladung', tpsa: 'polare Oberfläche (TPSA)'
+      ligacoesRotaveis: 'drehbare Bindungen', carga: 'elektrische Ladung', tpsa: 'polare Oberfläche (TPSA)', solubilidade: 'Löslichkeit in Wasser', pka: 'pKs-Wert'
+    },
+    medidas: {
+      titulo: 'Physikalische Eigenschaften', intro: 'Gemessene Werte, jeweils mit Quelle und Messbedingungen.',
+      unidadeG100g: 'g/100 g Wasser', unidadeGL: 'g/L (in Wasser)', pkaVarios: '{lista}',
+      aTemperatura: 'bei {k} K ({c} °C)', aPressao: 'bei {pa} Pa ({atm} atm)', fase: 'Phase: {fase}', referencia: 'Beleg: {x}',
+      semReferencia: 'ohne Beleg in Wikidata',
+      semReferenciaCorroborado: (p) => `ohne Beleg in Wikidata (${p.n} Aussagen stimmen überein)`,
+      derivado: 'abgeleitet aus Schmelz- und Siedepunkt des Pakets, bei 25 °C und 1 atm', derivadoNome: 'SaibaTudo Química (abgeleiteter Wert)',
+      fontePacote: 'Datenpaket', revisar: 'Wert wird geprüft',
+      avisoRevisar: 'Wert wird geprüft: Der PubChem-Wert ist möglicherweise veraltet (er weicht von aktuellen Tabellen ab), und Wikidata hat diese Eigenschaft nicht.',
+      notaPauling: 'Pauling-Skala mit den revidierten Werten von Allred (1961), wie bei PubChem; Bücher mit den ursprünglichen Pauling-Werten weichen bei einigen Elementen ab.',
+      notaPka: 'Kleinster erfasster pKs-Wert (erste Dissoziation); für Basen erfasst Wikidata meist den pKs-Wert der konjugierten Säure, und starke Säuren haben keinen.',
+      estadoA25: 'Aggregatzustand bei 25 °C und 1 atm'
     },
     categorias: {
       metal_alcalino: 'Alkalimetall', metal_alcalino_terroso: 'Erdalkalimetall', metal_transicao: 'Übergangsmetall', metal_pos_transicao: 'Post-Übergangsmetall',
@@ -516,7 +530,8 @@ export default {
       digaQualPropriedade: 'Sagen Sie mir, welche Eigenschaft und welches Element oder welche Verbindung gemeint ist. Zum Beispiel: „Dichte von Gold“.',
       de: '{prop} von {nome}',
       outroTipo: (p) => `${p.prop} (diese Eigenschaft gilt für ${p.alvo === 'composto' ? 'Verbindungen' : 'Elemente'}; ${p.outros} ${p.n > 1 ? 'sind' : 'ist'} von anderer Art)`,
-      naoTem: 'Das Datenpaket enthält nicht: {lista}.', fichaDe: 'Steckbrief von {nome}', propriedadesDe: 'Eigenschaften von {nomes}'
+      naoTem: 'Das Datenpaket enthält nicht: {lista}.', fichaDe: 'Steckbrief von {nome}', propriedadesDe: 'Eigenschaften von {nomes}',
+      oferece: 'Für {nome} enthält das Paket: {lista}.', solubilidadeDeQual: 'Sagen Sie, von welcher Verbindung Sie die Löslichkeit in Wasser wissen möchten. Zum Beispiel: „Löslichkeit von Harnstoff“.'
     },
     massaMolar: {
       tituloElemento: 'Molare Masse: {nome} ({simbolo})', deAtomos: 'Molare Masse von {nome} (Atome)',
@@ -580,7 +595,7 @@ export default {
     comparar: {
       titulo: 'Vergleich: {nomes}', propriedade: 'Eigenschaft', fichaDe: 'Steckbrief von {nome}',
       linhas: { formula: 'Formel', massaMolar: 'Molare Masse', cas: 'CAS-Nummer', nomeIupac: 'IUPAC-Name', xlogp: 'XLogP', sinal: 'Signalwort (GHS)', pictogramas: 'Piktogramme (GHS)' },
-      tituloGeral: 'Vergleichen', explicacao: 'Vergleichen Sie Gleichartiges: zwei Elemente („Natrium und Chlor vergleichen“) oder zwei Verbindungen („Unterschied zwischen Ethanol und Essigsäure“).'
+      maior: '{prop}: höher bei {nome} ({valor}).', tituloGeral: 'Vergleichen', explicacao: 'Vergleichen Sie Gleichartiges: zwei Elemente („Natrium und Chlor vergleichen“) oder zwei Verbindungen („Unterschied zwischen Ethanol und Essigsäure“).'
     },
     tabela: {
       abrir: 'Periodensystem öffnen', naoTemProp: 'Das Paket enthält für die geladenen Elemente keine Daten (Eigenschaft: {prop}).',

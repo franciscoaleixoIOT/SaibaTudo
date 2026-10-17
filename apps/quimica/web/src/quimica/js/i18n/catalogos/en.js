@@ -334,7 +334,8 @@ export default {
         'Elements, compounds, constants and rules: versioned JSON files, with SHA-256 checked and a signed manifest.',
         'Molar mass, balancing, stoichiometry, concentration, pH, ideal gas and units: tested deterministic code, on your device.',
         '2D structure: drawn from the SMILES in the package. GHS pictograms: simplified drawings made for this app.',
-        'Explanation excerpts: quoted with source and licence; automatic translations are flagged as such.'
+        'Explanation excerpts: quoted with source and licence; automatic translations are flagged as such.',
+        'Physical properties of compounds (melting, boiling, density, solubility in water, pKa): from Wikidata, each value with its statement and the reference it cites; the physical state at 25 °C is derived from the melting and boiling points.'
       ],
       bibliotecas: 'Open-source libraries',
       rodape: 'SaibaTudo is independent and open source (MIT). ', privacidade: 'Privacy policy',
@@ -389,7 +390,20 @@ export default {
       densidadeKgm3: 'density', estadoPadrao: 'physical state (standard conditions)', estadosOxidacao: 'oxidation states', descoberta: 'discovery',
       massaMolar: 'molar mass', massaExata: 'exact mass (monoisotopic)', formula: 'formula', cas: 'CAS number', cid: 'PubChem CID', smiles: 'SMILES', inchiKey: 'InChIKey',
       nomeIupac: 'IUPAC name', xlogp: 'XLogP (computed lipophilicity)', doadoresH: 'hydrogen bond donors', aceptoresH: 'hydrogen bond acceptors',
-      ligacoesRotaveis: 'rotatable bonds', carga: 'electric charge', tpsa: 'polar surface area (TPSA)'
+      ligacoesRotaveis: 'rotatable bonds', carga: 'electric charge', tpsa: 'polar surface area (TPSA)', solubilidade: 'solubility in water', pka: 'pKa'
+    },
+    medidas: {
+      titulo: 'Physical properties', intro: 'Measured values, each with its source and the measurement conditions.',
+      unidadeG100g: 'g/100 g of water', unidadeGL: 'g/L (in water)', pkaVarios: '{lista}',
+      aTemperatura: 'at {k} K ({c} °C)', aPressao: 'at {pa} Pa ({atm} atm)', fase: 'phase: {fase}', referencia: 'reference: {x}',
+      semReferencia: 'no reference in Wikidata',
+      semReferenciaCorroborado: (p) => `no reference in Wikidata (${p.n} statements agree)`,
+      derivado: 'derived from the melting and boiling points in the package, at 25 °C and 1 atm', derivadoNome: 'SaibaTudo Química (derived value)',
+      fontePacote: 'data package', revisar: 'value under review',
+      avisoRevisar: 'Value under review: the PubChem value may be outdated (it differs from current tables) and Wikidata does not have this property.',
+      notaPauling: 'Pauling scale, with the revised values of Allred (1961), as in PubChem; books that use Pauling’s original values differ for some elements.',
+      notaPka: 'Lowest recorded pKa (first dissociation); for bases, Wikidata usually records the pKa of the conjugate acid, and strong acids have no pKa.',
+      estadoA25: 'physical state at 25 °C and 1 atm'
     },
     categorias: {
       metal_alcalino: 'alkali metal', metal_alcalino_terroso: 'alkaline earth metal', metal_transicao: 'transition metal', metal_pos_transicao: 'post-transition metal',
@@ -515,7 +529,8 @@ export default {
       digaQualPropriedade: 'Tell me which property and which element or compound. For example: "density of gold".',
       de: '{prop} of {nome}',
       outroTipo: (p) => `${p.prop} (this property belongs to ${p.alvo === 'composto' ? 'compounds' : 'elements'}; ${p.outros} ${p.n > 1 ? 'are' : 'is'} of another type)`,
-      naoTem: 'The data package does not have: {lista}.', fichaDe: 'Sheet of {nome}', propriedadesDe: 'Properties of {nomes}'
+      naoTem: 'The data package does not have: {lista}.', fichaDe: 'Sheet of {nome}', propriedadesDe: 'Properties of {nomes}',
+      oferece: 'For {nome}, the package has: {lista}.', solubilidadeDeQual: 'Tell me which compound you want the water solubility of. For example: "solubility of urea".'
     },
     massaMolar: {
       tituloElemento: 'Molar mass: {nome} ({simbolo})', deAtomos: 'Molar mass of {nome} (atoms)',
@@ -579,7 +594,7 @@ export default {
     comparar: {
       titulo: 'Comparison: {nomes}', propriedade: 'Property', fichaDe: 'Sheet of {nome}',
       linhas: { formula: 'Formula', massaMolar: 'Molar mass', cas: 'CAS number', nomeIupac: 'IUPAC name', xlogp: 'XLogP', sinal: 'Signal word (GHS)', pictogramas: 'Pictograms (GHS)' },
-      tituloGeral: 'Compare', explicacao: 'Compare items of the same kind: two elements ("compare sodium and chlorine") or two compounds ("difference between ethanol and acetic acid").'
+      maior: '{prop}: higher for {nome} ({valor}).', tituloGeral: 'Compare', explicacao: 'Compare items of the same kind: two elements ("compare sodium and chlorine") or two compounds ("difference between ethanol and acetic acid").'
     },
     tabela: {
       abrir: 'Open the periodic table', naoTemProp: 'The package has no {prop} for the loaded elements.',

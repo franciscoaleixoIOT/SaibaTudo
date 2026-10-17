@@ -42,8 +42,8 @@ export function distancia(a, b, max = 2) {
   return p1[n];
 }
 
-/** Primeira letra maiúscula. */
-export const capitalizar = (s) => (s ? s[0].toUpperCase() + s.slice(1) : s);
+/** Primeira letra maiúscula (símbolos como "pKa" e "pH", minúscula seguida de maiúscula, ficam como estão). */
+export const capitalizar = (s) => (s ? (/^[a-z][A-Z]/.test(s) ? s : s[0].toUpperCase() + s.slice(1)) : s);
 
 let CONJUNCAO = ' e ';
 /** Conjunção da lista ("a, b e c"): definida por i18n/index.js a cada troca de idioma (" e ", " and ", " y ", " und ", " et "). */

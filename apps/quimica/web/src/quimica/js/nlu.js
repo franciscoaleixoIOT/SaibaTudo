@@ -294,7 +294,7 @@ export function parse(pergunta, dic, contexto = null, lex = dic?.lex ?? lexico()
 
   // 8) propriedades e perfis
   if (p.propriedade && tem) {
-    const alvos = new Set(props.map((x) => x.alvo));
+    const alvos = new Set(props.flatMap((x) => (Array.isArray(x.escopos) && x.escopos.length ? x.escopos : [x.alvo])));
     // propriedade de composto com um elemento citado: prefere o alvo certo
     return fim('PROPRIEDADE', { alvoPropriedade: alvos.has('composto') && p.compostos.length ? 'composto' : p.elementos.length ? 'elemento' : 'composto' });
   }

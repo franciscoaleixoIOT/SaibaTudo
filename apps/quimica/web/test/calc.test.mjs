@@ -495,6 +495,7 @@ test('pH: aviso de saturação para base pouco solúvel quando regras.solubilida
   const abaixo = calcularPH({ tipo: 'base-forte', C: 0.005, n: 2, formula: 'Ca(OH)2' }, c);
   assert.ok(!abaixo.notas.some((n) => /satur/i.test(n)));
   // sem a tabela no pacote: nenhum aviso inventado
-  const semTabela = calcularPH({ tipo: 'base-forte', C: 0.1, n: 2, formula: 'Ca(OH)2' }, await ctxDe());
+  const { solubilidadeBases: _fora, ...regrasSemTabela } = store.regras; // o fixture já traz a tabela: tira-a de propósito
+  const semTabela = calcularPH({ tipo: 'base-forte', C: 0.1, n: 2, formula: 'Ca(OH)2' }, criarContexto({ elementos: store.elementos, constantes: store.constantes, regras: regrasSemTabela }));
   assert.ok(!semTabela.notas.some((n) => /satur/i.test(n)));
 });

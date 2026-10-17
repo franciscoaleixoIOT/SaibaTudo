@@ -335,7 +335,8 @@ export default {
         'Elementos, compostos, constantes e regras: arquivos JSON versionados, com SHA-256 conferido e manifesto assinado.',
         'Massa molar, balanceamento, estequiometria, concentração, pH, gás ideal e unidades: código determinístico testado, no seu aparelho.',
         'Estrutura 2D: desenhada a partir do SMILES do pacote. Pictogramas do GHS: desenhos simplificados deste aplicativo.',
-        'Trechos de explicação: citados com fonte e licença; traduções automáticas são avisadas como tais.'
+        'Trechos de explicação: citados com fonte e licença; traduções automáticas são avisadas como tais.',
+        'Propriedades físicas dos compostos (fusão, ebulição, densidade, solubilidade em água, pKa): do Wikidata, cada valor com a declaração e a referência que ela cita; o estado físico a 25 °C é derivado do ponto de fusão e do de ebulição.'
       ],
       bibliotecas: 'Bibliotecas de código aberto',
       rodape: 'O SaibaTudo é independente e de código aberto (MIT). ', privacidade: 'Política de privacidade',
@@ -390,7 +391,20 @@ export default {
       densidadeKgm3: 'densidade', estadoPadrao: 'estado físico (condições padrão)', estadosOxidacao: 'estados de oxidação', descoberta: 'descoberta',
       massaMolar: 'massa molar', massaExata: 'massa exata (monoisotópica)', formula: 'fórmula', cas: 'número CAS', cid: 'CID no PubChem', smiles: 'SMILES', inchiKey: 'InChIKey',
       nomeIupac: 'nome IUPAC', xlogp: 'XLogP (lipofilicidade calculada)', doadoresH: 'doadores de ligação de hidrogênio', aceptoresH: 'aceptores de ligação de hidrogênio',
-      ligacoesRotaveis: 'ligações rotáveis', carga: 'carga elétrica', tpsa: 'área de superfície polar (TPSA)'
+      ligacoesRotaveis: 'ligações rotáveis', carga: 'carga elétrica', tpsa: 'área de superfície polar (TPSA)', solubilidade: 'solubilidade em água', pka: 'pKa'
+    },
+    medidas: {
+      titulo: 'Propriedades físicas', intro: 'Valores medidos, cada um com a sua fonte e as condições da medida.',
+      unidadeG100g: 'g/100 g de água', unidadeGL: 'g/L (em água)', pkaVarios: '{lista}',
+      aTemperatura: 'a {k} K ({c} °C)', aPressao: 'a {pa} Pa ({atm} atm)', fase: 'fase: {fase}', referencia: 'referência: {x}',
+      semReferencia: 'sem referência no Wikidata',
+      semReferenciaCorroborado: (p) => `sem referência no Wikidata (${p.n} declarações concordam)`,
+      derivado: 'derivado do ponto de fusão e do ponto de ebulição do pacote, a 25 °C e 1 atm', derivadoNome: 'SaibaTudo Química (valor derivado)',
+      fontePacote: 'pacote de dados', revisar: 'valor a revisar',
+      avisoRevisar: 'Valor a revisar: o do PubChem pode estar desatualizado (difere das tabelas atuais) e o Wikidata não tem esta propriedade.',
+      notaPauling: 'Escala de Pauling, com os valores revisados de Allred (1961), como no PubChem; livros que usam os valores originais de Pauling diferem em alguns elementos.',
+      notaPka: 'Menor pKa registrado (primeira dissociação); para bases, o Wikidata costuma registrar o pKa do ácido conjugado, e ácidos fortes ficam sem pKa.',
+      estadoA25: 'estado físico a 25 °C e 1 atm'
     },
     categorias: {
       metal_alcalino: 'metal alcalino', metal_alcalino_terroso: 'metal alcalino-terroso', metal_transicao: 'metal de transição', metal_pos_transicao: 'metal pós-transição',
@@ -516,7 +530,8 @@ export default {
       digaQualPropriedade: 'Diga qual propriedade e de qual elemento ou composto. Por exemplo: "densidade do ouro".',
       de: '{prop} de {nome}',
       outroTipo: (p) => `${p.prop} (essa propriedade é de ${p.alvo === 'composto' ? 'compostos' : 'elementos'}; ${p.outros} ${p.n > 1 ? 'são' : 'é'} de outro tipo)`,
-      naoTem: 'O pacote de dados não tem: {lista}.', fichaDe: 'Ficha de {nome}', propriedadesDe: 'Propriedades de {nomes}'
+      naoTem: 'O pacote de dados não tem: {lista}.', fichaDe: 'Ficha de {nome}', propriedadesDe: 'Propriedades de {nomes}',
+      oferece: 'Para {nome}, o pacote traz: {lista}.', solubilidadeDeQual: 'Diga de qual composto você quer a solubilidade em água. Por exemplo: "solubilidade da ureia".'
     },
     massaMolar: {
       tituloElemento: 'Massa molar: {nome} ({simbolo})', deAtomos: 'Massa molar de {nome} (átomos)',
@@ -580,7 +595,7 @@ export default {
     comparar: {
       titulo: 'Comparação: {nomes}', propriedade: 'Propriedade', fichaDe: 'Ficha de {nome}',
       linhas: { formula: 'Fórmula', massaMolar: 'Massa molar', cas: 'Número CAS', nomeIupac: 'Nome IUPAC', xlogp: 'XLogP', sinal: 'Palavra de sinal (GHS)', pictogramas: 'Pictogramas (GHS)' },
-      tituloGeral: 'Comparar', explicacao: 'Compare itens do mesmo tipo: dois elementos ("compare sódio e cloro") ou dois compostos ("diferença entre etanol e ácido acético").'
+      maior: '{prop}: maior em {nome} ({valor}).', tituloGeral: 'Comparar', explicacao: 'Compare itens do mesmo tipo: dois elementos ("compare sódio e cloro") ou dois compostos ("diferença entre etanol e ácido acético").'
     },
     tabela: {
       abrir: 'Abrir a tabela periódica', naoTemProp: 'O pacote não tem {prop} para os elementos carregados.',

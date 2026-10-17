@@ -8,7 +8,7 @@ import { idiomaAtual, nomeDoIdioma, t } from '../i18n/index.js';
 import { moleculaEl } from '../molecula.js';
 import { minusNoMeio, nomeComposto, nomeCompostoExibicao } from '../nomes.js';
 import { fonteGhs, descreverGhs, urlSegura } from '../perigos.js';
-import { classeRotulo, formatarValor, tabelaDePropriedades, valorBruto } from '../propriedades.js';
+import { classeRotulo, formatarValor, medidasDoComposto, tabelaDePropriedades, valorBruto } from '../propriedades.js';
 import { capitalizar, listar } from '../texto.js';
 import { fonteEl, formulaEl, ghsEl, kvEl, linkExterno, linkRota } from './componentes.js';
 
@@ -122,7 +122,10 @@ export async function viewComposto({ store, params }) {
   const idioma = idiomaAtual();
   const info = nomeComposto(c);
   const nome = info.nome || t('ui.compostos.cid', { cid: c.cid });
-  const props = tabelaDePropriedades(store.regras).filter((p) => p.alvo === 'composto' && !['formula', 'smiles', 'cid', 'nomeIupac'].includes(p.id));
+  const tabela = tabelaDePropriedades(store.regras);
+  const props = tabela.filter((p) => p.alvo === 'composto' && !p.medida && !['formula', 'smiles', 'cid', 'nomeIupac'].includes(p.id));
+  // propriedades físicas medidas (Wikidata, DATA_CONTRACT §3.1): cada valor com a sua fonte, a referência citada e as condições da medida
+  const medidas = medidasDoComposto(c, tabela, store.ctx);
   const itens = [];
   if (info.rotulado) itens.push({ rotulo: t('ui.nomes.nomeEmIdioma', { idioma: nomeDoIdioma(info.idioma) }), valor: info.nome });
   if (idioma === 'pt-BR' && c.nomePopular && c.nomePopular !== c.nome) itens.push({ rotulo: t('ui.compostos.nomePopular'), valor: c.nomePopular });
@@ -156,6 +159,15 @@ export async function viewComposto({ store, params }) {
       c.formula ? h('p', null, formulaEl(c.formula, { grande: true })) : null,
       c.classes?.length ? h('div', { class: 'tags' }, c.classes.map((x) => h('span', { class: 'tag tag-neutro' }, classeRotulo(x)))) : null)),
     h('section', { class: 'secao' }, h('h2', null, t('ui.compostos.dados')), kvEl(itens), fonteEl(c.fontes ?? [{ nome: t('ui.compostos.fontePubchem', { cid: c.cid }), url: `https://pubchem.ncbi.nlm.nih.gov/compound/${c.cid}` }])),
+    medidas.length ? h('section', { class: 'secao', id: 'propriedades-fisicas' }, h('h2', null, t('propriedades.medidas.titulo')),
+      h('p', { class: 'pequeno mudo' }, t('propriedades.medidas.intro')),
+      h('dl', { class: 'kv kv-medidas' }, medidas.flatMap((m) => {
+        const condicoes = [...new Set(m.fontes.flatMap((f) => f.condicoes))];
+        return [h('dt', null, capitalizar(m.prop.id === 'estadoPadrao' ? t('propriedades.medidas.estadoA25') : m.prop.rotulo)),
+          h('dd', { 'data-prop': m.prop.id }, m.f.texto,
+            condicoes.length ? h('span', { class: 'mini mudo' }, ` — ${condicoes.join('; ')}`) : null,
+            fonteEl(m.fontes))];
+      }))) : null,
     c.smiles ? h('section', { class: 'secao' }, h('h2', null, t('ui.compostos.estrutura')), moleculaEl(c.smiles, nome),
       h('p', { class: 'bloco-fonte' }, t('ui.compostos.desenhada'))) : null,
     h('section', { class: 'secao', id: 'seguranca' }, h('h2', null, t('ui.compostos.seguranca')),

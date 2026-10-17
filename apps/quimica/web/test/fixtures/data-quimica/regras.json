@@ -1,6 +1,6 @@
 {
  "versao": 1,
- "descricao": "Regras e tabelas de apoio: prefixos SI, unidades e fatores, série de reatividade, solubilidade, ácidos e bases fortes, nomenclatura básica e propriedades suportadas. Autoria própria; fatos conforme BIPM/IUPAC.",
+ "descricao": "Regras e tabelas de apoio: prefixos SI, unidades e fatores, série de reatividade (com E°), solubilidade, solubilidade das bases pouco solúveis, pKw(T), ácidos e bases fortes, nomenclatura básica e propriedades suportadas. Autoria própria; fatos conforme BIPM/IUPAC e valores de referência citados (Wikipédia CC BY-SA 4.0, com a referência primária).",
  "prefixosSI": [
   {
    "nome": "quetta",
@@ -271,9 +271,9 @@
  "serieReatividadeMetais": {
   "ordem": [
    "Li",
+   "Cs",
    "Rb",
    "K",
-   "Cs",
    "Ba",
    "Sr",
    "Ca",
@@ -291,12 +291,145 @@
    "Pb",
    "H",
    "Cu",
-   "Ag",
    "Hg",
+   "Ag",
    "Pt",
    "Au"
   ],
-  "nota": "do mais reativo (cede elétrons com mais facilidade) ao menos reativo; o hidrogênio (H) é a referência. Um metal desloca o cátion de outro que está depois dele."
+  "nota": "do mais reativo (cede elétrons com mais facilidade) ao menos reativo; o hidrogênio (H) é a referência. Um metal desloca o cátion de outro que está depois dele. Ordem pelo potencial-padrão de redução E° (25 °C, solução aquosa 1 mol/L): é uma ordem termodinâmica, por isso o lítio vem primeiro, embora potássio, rubídio e césio reajam mais depressa com a água.",
+  "criterio": "E° (V, 25 °C) crescente",
+  "potenciais": [
+   {
+    "simbolo": "Li",
+    "par": "Li⁺/Li",
+    "E0V": -3.0401
+   },
+   {
+    "simbolo": "Cs",
+    "par": "Cs⁺/Cs",
+    "E0V": -3.026
+   },
+   {
+    "simbolo": "Rb",
+    "par": "Rb⁺/Rb",
+    "E0V": -2.98
+   },
+   {
+    "simbolo": "K",
+    "par": "K⁺/K",
+    "E0V": -2.931
+   },
+   {
+    "simbolo": "Ba",
+    "par": "Ba²⁺/Ba",
+    "E0V": -2.912
+   },
+   {
+    "simbolo": "Sr",
+    "par": "Sr²⁺/Sr",
+    "E0V": -2.899
+   },
+   {
+    "simbolo": "Ca",
+    "par": "Ca²⁺/Ca",
+    "E0V": -2.868
+   },
+   {
+    "simbolo": "Na",
+    "par": "Na⁺/Na",
+    "E0V": -2.71
+   },
+   {
+    "simbolo": "Mg",
+    "par": "Mg²⁺/Mg",
+    "E0V": -2.372
+   },
+   {
+    "simbolo": "Al",
+    "par": "Al³⁺/Al",
+    "E0V": -1.662
+   },
+   {
+    "simbolo": "Mn",
+    "par": "Mn²⁺/Mn",
+    "E0V": -1.185
+   },
+   {
+    "simbolo": "Zn",
+    "par": "Zn²⁺/Zn",
+    "E0V": -0.7618
+   },
+   {
+    "simbolo": "Cr",
+    "par": "Cr³⁺/Cr",
+    "E0V": -0.74
+   },
+   {
+    "simbolo": "Fe",
+    "par": "Fe²⁺/Fe",
+    "E0V": -0.44
+   },
+   {
+    "simbolo": "Cd",
+    "par": "Cd²⁺/Cd",
+    "E0V": -0.4
+   },
+   {
+    "simbolo": "Co",
+    "par": "Co²⁺/Co",
+    "E0V": -0.28
+   },
+   {
+    "simbolo": "Ni",
+    "par": "Ni²⁺/Ni",
+    "E0V": -0.257
+   },
+   {
+    "simbolo": "Sn",
+    "par": "Sn²⁺/Sn",
+    "E0V": -0.13
+   },
+   {
+    "simbolo": "Pb",
+    "par": "Pb²⁺/Pb",
+    "E0V": -0.126
+   },
+   {
+    "simbolo": "H",
+    "par": "2H⁺/H₂",
+    "E0V": 0
+   },
+   {
+    "simbolo": "Cu",
+    "par": "Cu²⁺/Cu",
+    "E0V": 0.337
+   },
+   {
+    "simbolo": "Hg",
+    "par": "Hg₂²⁺/2Hg",
+    "E0V": 0.7973
+   },
+   {
+    "simbolo": "Ag",
+    "par": "Ag⁺/Ag",
+    "E0V": 0.7996
+   },
+   {
+    "simbolo": "Pt",
+    "par": "Pt²⁺/Pt",
+    "E0V": 1.188
+   },
+   {
+    "simbolo": "Au",
+    "par": "Au³⁺/Au",
+    "E0V": 1.52
+   }
+  ],
+  "fonte": {
+   "nome": "Wikipedia (en), \"Standard electrode potential (data page)\" (revisão 1377006472); cita Vanýsek, \"Electrochemical Series\", CRC Handbook of Chemistry and Physics",
+   "url": "https://en.wikipedia.org/w/index.php?title=Standard_electrode_potential_(data_page)&oldid=1377006472",
+   "licenca": "CC BY-SA 4.0"
+  }
  },
  "solubilidade": {
   "regras": [
@@ -339,11 +472,12 @@
      "Ag+",
      "Pb2+",
      "Hg2 2+"
-    ]
+    ],
+    "nota": "A regra não vale para os fluoretos (F⁻), que seguem o padrão inverso: AgF é solúvel, enquanto CaF₂, MgF₂, SrF₂, BaF₂ e PbF₂ são pouco solúveis."
    },
    {
     "id": "sulfatos",
-    "regra": "Os sulfatos (SO₄²⁻) são solúveis, exceto os de Ba²⁺, Sr²⁺ e Pb²⁺ (insolúveis); os de Ca²⁺ e Ag⁺ são pouco solúveis.",
+    "regra": "Os sulfatos (SO₄²⁻) são solúveis, exceto os de Ba²⁺, Sr²⁺ e Pb²⁺ (insolúveis); os de Ca²⁺, Ag⁺ e Hg₂²⁺ são pouco solúveis.",
     "solubilidade": "soluvel",
     "ions": [
      "SO4 2-"
@@ -353,12 +487,13 @@
      "Sr2+",
      "Pb2+",
      "Ca2+",
-     "Ag+"
+     "Ag+",
+     "Hg2 2+"
     ]
    },
    {
     "id": "hidroxidos",
-    "regra": "Os hidróxidos (OH⁻) são insolúveis, exceto os de metais alcalinos e de amônio; os de Ca²⁺, Sr²⁺ e Ba²⁺ são moderadamente solúveis.",
+    "regra": "Os hidróxidos (OH⁻) são insolúveis, exceto os de metais alcalinos e de amônio; entre os alcalinoterrosos, Ba(OH)₂ é solúvel, Sr(OH)₂ é moderadamente solúvel e Ca(OH)₂ é pouco solúvel (Mg(OH)₂ é praticamente insolúvel).",
     "solubilidade": "insoluvel",
     "ions": [
      "OH-"
@@ -435,6 +570,108 @@
   ],
   "nota": "Regras gerais de ensino, com exceções; solubilidade real depende de temperatura e concentração. Em caso de dúvida, consulte dados medidos."
  },
+ "solubilidadeBases": [
+  {
+   "formula": "Ca(OH)2",
+   "kps": 0.00000502,
+   "solubilidadeMolL": 0.02335,
+   "temperaturaC": 20,
+   "solubilidadeGL": 1.73,
+   "kpsTemperaturaC": 25,
+   "nota": "1,73 g/L a 20 °C; solubilidade retrógrada (diminui com a temperatura: 0,66 g/L a 100 °C). O Kps (25 °C) subestima a solubilidade medida (atividade ≠ concentração).",
+   "fonte": {
+    "nome": "Wikipedia (en), \"Calcium hydroxide\" (revisão 1379974348); cita CRC Handbook of Chemistry and Physics",
+    "url": "https://en.wikipedia.org/w/index.php?title=Calcium_hydroxide&oldid=1379974348",
+    "licenca": "CC BY-SA 4.0"
+   }
+  },
+  {
+   "formula": "Mg(OH)2",
+   "kps": 5.61e-12,
+   "solubilidadeMolL": 0.0001097,
+   "temperaturaC": 25,
+   "solubilidadeGL": 0.0064,
+   "kpsTemperaturaC": 25,
+   "nota": "0,00064 g/100 mL a 25 °C (praticamente insolúvel).",
+   "fonte": {
+    "nome": "Wikipedia (en), \"Magnesium hydroxide\" (revisão 1380140030); cita CRC Handbook of Chemistry and Physics",
+    "url": "https://en.wikipedia.org/w/index.php?title=Magnesium_hydroxide&oldid=1380140030",
+    "licenca": "CC BY-SA 4.0"
+   }
+  },
+  {
+   "formula": "Sr(OH)2",
+   "solubilidadeMolL": 0.1455,
+   "temperaturaC": 40,
+   "solubilidadeGL": 17.7,
+   "nota": "1,77 g/100 mL a 40 °C (0,41 g/100 mL a 0 °C; 21,83 g/100 mL a 100 °C); a fonte não traz 25 °C. Como a solubilidade cresce com a temperatura, acima deste valor a solução também está saturada a 25 °C (o aviso nunca é falso; pode faltar entre o valor de 25 °C e este).",
+   "fonte": {
+    "nome": "Wikipedia (en), \"Solubility table\" (revisão 1351761616); cita Patnaik, Handbook of Inorganic Chemicals (2003)",
+    "url": "https://en.wikipedia.org/w/index.php?title=Solubility_table&oldid=1351761616",
+    "licenca": "CC BY-SA 4.0"
+   }
+  },
+  {
+   "formula": "Ba(OH)2",
+   "solubilidadeMolL": 0.3052,
+   "temperaturaC": 25,
+   "solubilidadeGL": 52.3,
+   "nota": "4,68 g de BaO por 100 mL de água a 25 °C (a fonte expressa em BaO), isto é, ≈ 0,305 mol/L de Ba(OH)₂: solúvel.",
+   "fonte": {
+    "nome": "Wikipedia (en), \"Barium hydroxide\" (revisão 1380015778); cita CRC Handbook of Chemistry and Physics",
+    "url": "https://en.wikipedia.org/w/index.php?title=Barium_hydroxide&oldid=1380015778",
+    "licenca": "CC BY-SA 4.0"
+   }
+  }
+ ],
+ "agua": {
+  "pKw": 14,
+  "temperaturaC": 25,
+  "pKw25CPreciso": 13.997,
+  "nota": "pKw = 14,00 vale só a 25 °C (água pura, força iônica zero); o valor medido é 13,997. A outras temperaturas use a tabela pKwPorTemperatura (ex.: 14,95 a 0 °C, neutralidade perto de pH 7,5; 13,26 a 50 °C, perto de pH 6,6).",
+  "pKwPorTemperatura": [
+   {
+    "temperaturaC": 0,
+    "pKw": 14.95,
+    "referencia": "Bandura & Lvov 2006"
+   },
+   {
+    "temperaturaC": 10,
+    "pKw": 14.535,
+    "referencia": "CRC 70ª ed."
+   },
+   {
+    "temperaturaC": 20,
+    "pKw": 14.167,
+    "referencia": "CRC 70ª ed."
+   },
+   {
+    "temperaturaC": 25,
+    "pKw": 13.997,
+    "referencia": "CRC 70ª ed."
+   },
+   {
+    "temperaturaC": 30,
+    "pKw": 13.83,
+    "referencia": "CRC 70ª ed."
+   },
+   {
+    "temperaturaC": 40,
+    "pKw": 13.535,
+    "referencia": "CRC 70ª ed."
+   },
+   {
+    "temperaturaC": 50,
+    "pKw": 13.262,
+    "referencia": "CRC 70ª ed."
+   }
+  ],
+  "fonte": {
+   "nome": "Wikipedia (en), \"Self-ionization of water\" (revisão 1340047012); cita Bandura & Lvov (2006), J. Phys. Chem. Ref. Data 35, 15–30, e o CRC Handbook of Chemistry and Physics, 70ª ed. (1990)",
+   "url": "https://en.wikipedia.org/w/index.php?title=Self-ionization_of_water&oldid=1340047012",
+   "licenca": "CC BY-SA 4.0"
+  }
+ },
  "acidosFortes": [
   {
    "formula": "HCl",
@@ -494,7 +731,8 @@
   },
   {
    "formula": "Sr(OH)2",
-   "nome": "Hidróxido de estrôncio"
+   "nome": "Hidróxido de estrôncio",
+   "nota": "moderadamente solúvel"
   },
   {
    "formula": "Ba(OH)2",
@@ -681,8 +919,8 @@
    },
    {
     "funcao": "ácido carboxílico",
-    "sufixo": "-óico",
-    "nota": "ácido …óico"
+    "sufixo": "-oico",
+    "nota": "ácido …oico (sem acento desde o Acordo Ortográfico de 1990)"
    },
    {
     "funcao": "amina",
@@ -700,7 +938,12 @@
   "ions": [
    {
     "formula": "H⁺",
-    "nome": "hidrogênio (próton); em água, hidrônio H₃O⁺",
+    "nome": "hidrogênio (hidron; próton); em água, oxônio H₃O⁺",
+    "carga": 1
+   },
+   {
+    "formula": "H₃O⁺",
+    "nome": "oxônio (hidrônio, nome tradicional)",
     "carga": 1
    },
    {
@@ -791,6 +1034,11 @@
    {
     "formula": "Hg²⁺",
     "nome": "mercúrio(II)",
+    "carga": 2
+   },
+   {
+    "formula": "Hg₂²⁺",
+    "nome": "mercúrio(I) (dímero; mercuroso)",
     "carga": 2
    },
    {
@@ -1231,7 +1479,9 @@
     "fr": [
      "électronégativité"
     ]
-   }
+   },
+   "nota": "Escala de Pauling, com os valores revisados (Allred, 1961) como no PubChem; livros que usam os valores originais de Pauling diferem em alguns elementos (ex.: W 1,7 × 2,36; Pb 1,8 × 2,33).",
+   "escala": "Pauling"
   },
   "raioAtomicoPm": {
    "nome": "Raio atômico (van der Waals)",
@@ -1305,7 +1555,8 @@
     "fr": [
      "affinité électronique"
     ]
-   }
+   },
+   "nota": "Do PubChem (o Wikidata não tem a propriedade). Alguns valores diferem das tabelas atuais e vêm com aviso em elementos[].fontesPorPropriedade."
   },
   "energiaIonizacaoKJmol": {
    "nome": "Energia de ionização",
@@ -1345,7 +1596,8 @@
      "énergie d'ionisation",
      "potentiel d'ionisation"
     ]
-   }
+   },
+   "nota": "Primeira energia de ionização do átomo neutro em fase gasosa (valor do NIST ASD via Wikidata quando disponível; senão PubChem). Origem de cada valor em elementos[].fontesPorPropriedade."
   },
   "pontoFusaoK": {
    "nome": "Ponto de fusão",
@@ -1384,7 +1636,15 @@
      "point de fusion",
      "température de fusion"
     ]
-   }
+   },
+   "origens": [
+    "elementos.pontoFusaoK",
+    "compostos.propriedades.pontoFusaoK"
+   ],
+   "escopos": [
+    "elemento",
+    "composto"
+   ]
   },
   "pontoEbulicaoK": {
    "nome": "Ponto de ebulição",
@@ -1423,7 +1683,15 @@
      "point d'ébullition",
      "température d'ébullition"
     ]
-   }
+   },
+   "origens": [
+    "elementos.pontoEbulicaoK",
+    "compostos.propriedades.pontoEbulicaoK"
+   ],
+   "escopos": [
+    "elemento",
+    "composto"
+   ]
   },
   "densidadeKgm3": {
    "nome": "Densidade",
@@ -1461,7 +1729,15 @@
      "densité",
      "masse volumique"
     ]
-   }
+   },
+   "origens": [
+    "elementos.densidadeKgm3",
+    "compostos.propriedades.densidadeKgm3"
+   ],
+   "escopos": [
+    "elemento",
+    "composto"
+   ]
   },
   "estadoPadrao": {
    "nome": "Estado físico padrão",
@@ -1501,7 +1777,16 @@
      "état physique",
      "état standard"
     ]
-   }
+   },
+   "origens": [
+    "elementos.estadoPadrao",
+    "compostos.propriedades.estadoPadrao"
+   ],
+   "escopos": [
+    "elemento",
+    "composto"
+   ],
+   "nota": "Nos compostos, derivado a 298,15 K e 1 atm do ponto de fusão e de ebulição do pacote."
   },
   "estadosOxidacao": {
    "nome": "Estados de oxidação",
@@ -2220,6 +2505,105 @@
      "mention d'avertissement"
     ]
    }
+  },
+  "solubilidade": {
+   "nome": "Solubilidade em água",
+   "unidade": "g/100 g de água",
+   "origem": "compostos.propriedades.solubilidadeAguaG100g",
+   "escopo": "composto",
+   "sinonimos": [
+    "solubilidade",
+    "solubilidade em água",
+    "coeficiente de solubilidade"
+   ],
+   "rotulos": {
+    "pt-BR": "Solubilidade em água",
+    "en": "Solubility in water",
+    "es": "Solubilidad en agua",
+    "de": "Löslichkeit in Wasser",
+    "fr": "Solubilité dans l'eau"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "solubilidade",
+     "solubilidade em água",
+     "coeficiente de solubilidade"
+    ],
+    "en": [
+     "solubility",
+     "water solubility",
+     "solubility in water"
+    ],
+    "es": [
+     "solubilidad",
+     "solubilidad en agua"
+    ],
+    "de": [
+     "löslichkeit",
+     "wasserlöslichkeit"
+    ],
+    "fr": [
+     "solubilité",
+     "solubilité dans l'eau"
+    ]
+   },
+   "origens": [
+    "compostos.propriedades.solubilidadeAguaG100g",
+    "compostos.propriedades.solubilidadeAguaGL"
+   ],
+   "unidades": {
+    "compostos.propriedades.solubilidadeAguaG100g": "g/100 g de água",
+    "compostos.propriedades.solubilidadeAguaGL": "g/L"
+   },
+   "nota": "Solubilidade em água (solvente declarado no Wikidata), na temperatura de fontesPorPropriedade.condicoes."
+  },
+  "pka": {
+   "nome": "pKa",
+   "unidade": "",
+   "origem": "compostos.propriedades.pka",
+   "escopo": "composto",
+   "sinonimos": [
+    "pka",
+    "constante de acidez",
+    "constante de dissociação ácida"
+   ],
+   "rotulos": {
+    "pt-BR": "pKa",
+    "en": "pKa",
+    "es": "pKa",
+    "de": "pKs-Wert",
+    "fr": "pKa"
+   },
+   "sinonimosPorIdioma": {
+    "pt-BR": [
+     "pka",
+     "constante de acidez",
+     "constante de dissociação ácida"
+    ],
+    "en": [
+     "pka",
+     "acid dissociation constant"
+    ],
+    "es": [
+     "pka",
+     "constante de acidez"
+    ],
+    "de": [
+     "pka",
+     "pks",
+     "pks-wert",
+     "säurekonstante"
+    ],
+    "fr": [
+     "pka",
+     "constante d'acidité"
+    ]
+   },
+   "origens": [
+    "compostos.propriedades.pka",
+    "compostos.propriedades.pkaValores"
+   ],
+   "nota": "Menor pKa registrado (primeira dissociação); `pkaValores` traz todos quando há mais de um. Para bases, o Wikidata costuma registrar o pKa do ácido conjugado. Ácidos fortes ficam sem pKa."
   }
  },
  "propriedadesRevisao": {
@@ -2246,6 +2630,42 @@
    "nome": "IUPAC — Green Book, Quantities, Units and Symbols in Physical Chemistry (símbolos e unidades; fatos)",
    "url": "https://iupac.org/what-we-do/books/greenbook/",
    "licenca": "fatos (símbolos e unidades), citados; texto não copiado",
+   "acessadoEm": "2026-10-10"
+  },
+  {
+   "nome": "Wikipedia (en), \"Standard electrode potential (data page)\" (potenciais-padrão da série de reatividade; cita Vanýsek, CRC Handbook)",
+   "url": "https://en.wikipedia.org/w/index.php?title=Standard_electrode_potential_(data_page)&oldid=1377006472",
+   "licenca": "CC BY-SA 4.0",
+   "acessadoEm": "2026-10-10"
+  },
+  {
+   "nome": "Wikipedia (en), \"Calcium hydroxide\" (revisão 1379974348); cita CRC Handbook of Chemistry and Physics — solubilidade de Ca(OH)2",
+   "url": "https://en.wikipedia.org/w/index.php?title=Calcium_hydroxide&oldid=1379974348",
+   "licenca": "CC BY-SA 4.0",
+   "acessadoEm": "2026-10-10"
+  },
+  {
+   "nome": "Wikipedia (en), \"Magnesium hydroxide\" (revisão 1380140030); cita CRC Handbook of Chemistry and Physics — solubilidade de Mg(OH)2",
+   "url": "https://en.wikipedia.org/w/index.php?title=Magnesium_hydroxide&oldid=1380140030",
+   "licenca": "CC BY-SA 4.0",
+   "acessadoEm": "2026-10-10"
+  },
+  {
+   "nome": "Wikipedia (en), \"Solubility table\" (revisão 1351761616); cita Patnaik, Handbook of Inorganic Chemicals (2003) — solubilidade de Sr(OH)2",
+   "url": "https://en.wikipedia.org/w/index.php?title=Solubility_table&oldid=1351761616",
+   "licenca": "CC BY-SA 4.0",
+   "acessadoEm": "2026-10-10"
+  },
+  {
+   "nome": "Wikipedia (en), \"Barium hydroxide\" (revisão 1380015778); cita CRC Handbook of Chemistry and Physics — solubilidade de Ba(OH)2",
+   "url": "https://en.wikipedia.org/w/index.php?title=Barium_hydroxide&oldid=1380015778",
+   "licenca": "CC BY-SA 4.0",
+   "acessadoEm": "2026-10-10"
+  },
+  {
+   "nome": "Wikipedia (en), \"Self-ionization of water\" (revisão 1340047012); cita Bandura & Lvov (2006), J. Phys. Chem. Ref. Data 35, 15–30, e o CRC Handbook of Chemistry and Physics, 70ª ed. (1990) — pKw(T)",
+   "url": "https://en.wikipedia.org/w/index.php?title=Self-ionization_of_water&oldid=1340047012",
+   "licenca": "CC BY-SA 4.0",
    "acessadoEm": "2026-10-10"
   }
  ],

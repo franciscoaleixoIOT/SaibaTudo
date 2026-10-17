@@ -121,6 +121,9 @@ const CENARIOS = {
     await clicar('button.el[data-simbolo="Fe"]');
     await esperar("document.querySelector('.ficha-cab')");
     await foto(`${p}-elemento-ferro`);
+    // eletronegatividade: com a nota da escala de Pauling quando o pacote a declara; o aviso de revisão fica dentro do valor
+    await abrir('/quimica/elemento/O', "document.querySelector('.ficha-cab')");
+    if (await avaliar("[...document.querySelectorAll('[data-aviso], [data-nota]')].some((x) => !x.closest('dd'))")) throw new Error('aviso/nota fora do valor');
   },
   async compostos(p) {
     // lista completa paginada (40 por página). Com o pacote real (>40 compostos): controles visíveis, "próxima" muda a página e a URL e
@@ -144,6 +147,11 @@ const CENARIOS = {
     await abrir('/quimica/composto/2244', "document.querySelector('canvas.molecula')");
     await esperar("(() => { const c = document.querySelector('canvas.molecula'); if (!c) return false; const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; for (let i = 3; i < d.length; i += 4) if (d[i] > 0) return true; return false; })()", 20000);
     await foto(`${p}-composto-aspirina`);
+    // propriedades físicas medidas (pacote com compostos[].propriedades do Wikidata): cada valor com a sua fonte; pacote sem elas = seção ausente
+    await abrir('/quimica/composto/176', "document.querySelector('#titulo-pagina')");
+    const medidas = await avaliar("(() => { const s = document.querySelector('#propriedades-fisicas'); if (!s) return 'ausente'; const dds = [...s.querySelectorAll('dd')]; return dds.length && dds.every((d) => d.querySelector('.bloco-fonte')) ? 'ok' : 'sem-fonte'; })()");
+    if (medidas === 'sem-fonte') throw new Error('propriedades físicas do composto sem a fonte por valor');
+    await foto(`${p}-composto-acetico`);
     await abrir('/quimica/composto/1118', "document.querySelector('.picto img')");
     await dormir(300);
     await foto(`${p}-composto-sulfurico`);
