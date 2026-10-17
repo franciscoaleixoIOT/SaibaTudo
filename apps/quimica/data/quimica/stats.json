@@ -1,5 +1,5 @@
 {
-  "geradoEm": "2026-10-12T17:16:53Z",
+  "geradoEm": "2026-10-17T03:42:10Z",
   "modo": "completo",
   "idiomas": [
     "pt-BR",
@@ -79,6 +79,198 @@
         117,
         118
       ],
+      "ionizacaoWikidata": "ok",
+      "ionizacaoDoWikidata": 88,
+      "ionizacaoTrocada": [
+        {
+          "simbolo": "Al",
+          "pubchem": 577.6,
+          "wikidata": 577.5
+        },
+        {
+          "simbolo": "Sc",
+          "pubchem": 633.0,
+          "wikidata": 633.1
+        },
+        {
+          "simbolo": "Fe",
+          "pubchem": 762.4,
+          "wikidata": 762.5
+        },
+        {
+          "simbolo": "Cu",
+          "pubchem": 745.4,
+          "wikidata": 745.5
+        },
+        {
+          "simbolo": "As",
+          "pubchem": 947.0,
+          "wikidata": 944.4
+        },
+        {
+          "simbolo": "Se",
+          "pubchem": 940.9,
+          "wikidata": 941.0
+        },
+        {
+          "simbolo": "Y",
+          "pubchem": 599.8,
+          "wikidata": 599.9
+        },
+        {
+          "simbolo": "Tc",
+          "pubchem": 702.4,
+          "wikidata": 686.9
+        },
+        {
+          "simbolo": "Sb",
+          "pubchem": 833.6,
+          "wikidata": 830.6
+        },
+        {
+          "simbolo": "Pm",
+          "pubchem": 535.5,
+          "wikidata": 538.6
+        },
+        {
+          "simbolo": "Sm",
+          "pubchem": 544.6,
+          "wikidata": 544.5
+        },
+        {
+          "simbolo": "Ta",
+          "pubchem": 761.3,
+          "wikidata": 728.4
+        },
+        {
+          "simbolo": "W",
+          "pubchem": 770.0,
+          "wikidata": 758.8
+        },
+        {
+          "simbolo": "Re",
+          "pubchem": 760.3,
+          "wikidata": 755.8
+        },
+        {
+          "simbolo": "Os",
+          "pubchem": 839.4,
+          "wikidata": 814.2
+        },
+        {
+          "simbolo": "Ir",
+          "pubchem": 878.0,
+          "wikidata": 865.2
+        },
+        {
+          "simbolo": "Pt",
+          "pubchem": 868.4,
+          "wikidata": 864.4
+        },
+        {
+          "simbolo": "Au",
+          "pubchem": 890.2,
+          "wikidata": 890.1
+        },
+        {
+          "simbolo": "Tl",
+          "pubchem": 589.3,
+          "wikidata": 589.4
+        },
+        {
+          "simbolo": "Bi",
+          "pubchem": 703.3,
+          "wikidata": 702.9
+        },
+        {
+          "simbolo": "Po",
+          "pubchem": 812.1,
+          "wikidata": 812.2
+        },
+        {
+          "simbolo": "At",
+          "pubchem": 916.6,
+          "wikidata": 899.0
+        },
+        {
+          "simbolo": "Rn",
+          "pubchem": 1036.7,
+          "wikidata": 1037.1
+        },
+        {
+          "simbolo": "Fr",
+          "pubchem": 376.3,
+          "wikidata": 393.0
+        },
+        {
+          "simbolo": "Th",
+          "pubchem": 586.6,
+          "wikidata": 608.5
+        },
+        {
+          "simbolo": "Np",
+          "pubchem": 604.6,
+          "wikidata": 604.5
+        },
+        {
+          "simbolo": "Pu",
+          "pubchem": 584.7,
+          "wikidata": 581.4
+        },
+        {
+          "simbolo": "Am",
+          "pubchem": 578.2,
+          "wikidata": 576.4
+        },
+        {
+          "simbolo": "Cm",
+          "pubchem": 580.8,
+          "wikidata": 578.2
+        },
+        {
+          "simbolo": "Bk",
+          "pubchem": 601.1,
+          "wikidata": 598.0
+        },
+        {
+          "simbolo": "Cf",
+          "pubchem": 607.9,
+          "wikidata": 606.1
+        },
+        {
+          "simbolo": "Es",
+          "pubchem": 619.4,
+          "wikidata": 614.5
+        },
+        {
+          "simbolo": "No",
+          "pubchem": 641.6,
+          "wikidata": 639.3
+        },
+        {
+          "simbolo": "Lr",
+          "pubchem": null,
+          "wikidata": 478.6
+        }
+      ],
+      "ionizacaoConflitoMantidoPubchem": [],
+      "afinidadeComAviso": [
+        "Al",
+        "B",
+        "Ce",
+        "F",
+        "Fe",
+        "Fr",
+        "Ga",
+        "Ge",
+        "La",
+        "Nb",
+        "Pb",
+        "Rb",
+        "Sb",
+        "Sn",
+        "Tl"
+      ],
       "rotulosWikidata": "ok",
       "nomesSemRotulo": {
         "es": 0,
@@ -130,7 +322,7 @@
     },
     "selecaoCompostos": {
       "status": "ok",
-      "segundos": 0.1,
+      "segundos": 0.2,
       "listaFixaEntradas": 490,
       "listaFixaResolvidas": 481,
       "listaFixaDescartadas": [
@@ -180,13 +372,13 @@
           "motivo": "fórmula não confere (esperada P4O10; PubChem: 6326975=O5P2)"
         }
       ],
-      "wikidataItens": 2893,
+      "wikidataItens": 2898,
       "wikidataAdicionados": 1519,
       "lotesWikidataFalhos": []
     },
     "compostos": {
       "status": "ok",
-      "segundos": 1.8,
+      "segundos": 1.7,
       "compostos": 1990,
       "descartados": [],
       "duplicados": [
@@ -271,14 +463,14 @@
         "pt-BR": 1983,
         "en": 1982,
         "es": 1743,
-        "de": 1953,
+        "de": 1954,
         "fr": 1900
       },
       "comArtigoPorIdioma": {
         "pt-BR": 1931,
         "en": 1951,
         "es": 1722,
-        "de": 1908,
+        "de": 1909,
         "fr": 1853
       },
       "sinonimosDePubChem": "não coletados (política de campos calculados do PubChem)",
@@ -380,9 +572,66 @@
         }
       ]
     },
-    "wikipedia": {
+    "propriedadesFisicas": {
       "status": "ok",
       "segundos": 0.1,
+      "itensConsultados": 1963,
+      "itensComDeclaracao": 1035,
+      "falhas": [],
+      "descartadas": {
+        "pKa de ácido forte": 5,
+        "sem referência": 640,
+        "densidade de outra fase": 23,
+        "densidade incoerente com o estado": 8,
+        "unidade de solubilidade não convertida": 26,
+        "pressão diferente de 1 atm": 24,
+        "qualificador P1480=Q5727902": 3,
+        "qualificador P1480=Q47035128": 2,
+        "solvente": 13,
+        "fora da faixa física plausível": 2,
+        "método de determinação": 9,
+        "critério": 17,
+        "qualificador P5102=Q106410": 1,
+        "qualificador P518=Q121781745": 1,
+        "qualificador P1480=Q10585806": 1,
+        "unidade desconhecida": 1
+      },
+      "fusaoAcimaDaEbulicao": 0,
+      "divergentes": 38,
+      "divergentesPorCampo": {
+        "pontoEbulicaoK": 7,
+        "solubilidadeAguaG100g": 3,
+        "pontoFusaoK": 26,
+        "densidadeKgm3": 1,
+        "solubilidadeAguaGL": 1
+      },
+      "corroboradasSemReferencia": 7,
+      "compostosComPropriedade": {
+        "pontoFusaoK": 791,
+        "pontoEbulicaoK": 525,
+        "densidadeKgm3": 277,
+        "solubilidadeAguaGL": 24,
+        "solubilidadeAguaG100g": 192,
+        "pka": 93,
+        "pkaValores": 5,
+        "estadoPadrao": 720
+      },
+      "compostosComAlguma": 872,
+      "comReferencia": {
+        "pontoFusaoK": 789,
+        "pontoEbulicaoK": 523,
+        "densidadeKgm3": 274,
+        "solubilidadeAguaGL": 24,
+        "solubilidadeAguaG100g": 192,
+        "pka": 93,
+        "pkaValores": 0,
+        "estadoPadrao": 0
+      },
+      "compostosComAlternativas": 405
+    },
+    "wikipedia": {
+      "status": "ok",
+      "segundos": 0.2,
       "elementos": 118,
       "compostos": 150,
       "conceitos": 320,
@@ -472,7 +721,7 @@
         "índice de fluidez"
       ],
       "descartados": [],
-      "trechosCurtos": 142,
+      "trechosCurtos": 143,
       "artigos": 588
     },
     "sitelinksConceitos": {
@@ -486,11 +735,11 @@
       "elementos": 118,
       "compostos": 150,
       "conceitos": 301,
-      "trechos": 1073,
+      "trechos": 1075,
       "artigos": 569,
       "semArtigoNoIdioma": 14,
       "descartados": [],
-      "trechosCurtos": 80
+      "trechosCurtos": 79
     },
     "wikipedia-es": {
       "status": "ok",
@@ -509,7 +758,7 @@
           "titulo": "Modelo atómico"
         }
       ],
-      "trechosCurtos": 127
+      "trechosCurtos": 128
     },
     "wikipedia-de": {
       "status": "ok",
@@ -518,7 +767,7 @@
       "elementos": 118,
       "compostos": 150,
       "conceitos": 283,
-      "trechos": 766,
+      "trechos": 767,
       "artigos": 551,
       "semArtigoNoIdioma": 32,
       "descartados": [],
@@ -539,7 +788,7 @@
     },
     "wikilivros": {
       "status": "ok",
-      "segundos": 0.1,
+      "segundos": 0.0,
       "livros": {
         "Introdução à Química": 72,
         "Química Orgânica": 11,
@@ -586,41 +835,51 @@
     },
     "goldBook": {
       "status": "bloqueado",
-      "segundos": 0.7,
+      "segundos": 0.6,
       "motivo": "HTTP 403 em https://goldbook.iupac.org/"
     }
   },
   "contagens": {
     "textosPorFonte": {
       "wikipedia-pt": 925,
-      "wikipedia-en": 1073,
+      "wikipedia-en": 1075,
       "wikipedia-es": 981,
-      "wikipedia-de": 766,
+      "wikipedia-de": 767,
       "wikipedia-fr": 804,
       "wikibooks-pt": 258,
-      "chebi": 1305,
+      "chebi": 1304,
       "gutenberg-14474": 235,
       "gold-book": 0
     },
     "elementos": 118,
     "compostos": 1971,
     "constantes": 59,
-    "textos": 6347,
+    "textos": 6349,
     "textosPorIdioma": {
       "pt-BR": 1183,
-      "en": 2613,
+      "en": 2614,
       "es": 981,
-      "de": 766,
+      "de": 767,
       "fr": 804
     },
     "lotesDeTextos": 36,
     "compostosComGhsHarmonizado": 485,
     "compostosComCas": 1954,
+    "compostosComPropriedadeMedida": {
+      "pontoFusaoK": 791,
+      "pontoEbulicaoK": 525,
+      "densidadeKgm3": 277,
+      "solubilidadeAguaGL": 24,
+      "solubilidadeAguaG100g": 192,
+      "pka": 93,
+      "pkaValores": 5,
+      "estadoPadrao": 720
+    },
     "compostosComNomePorIdioma": {
       "pt-BR": 1964,
       "en": 1963,
       "es": 1724,
-      "de": 1934,
+      "de": 1935,
       "fr": 1881
     },
     "elementosComNomePorIdioma": {
@@ -636,14 +895,30 @@
     "ICSC fora dos dados (sem licença de reuso; versão PT © ACT): cada composto com CAS leva só icscBuscaUrl (link de busca da OIT).",
     "PubChem: só campos calculados pelo NLM e identificadores; sinônimos de depositantes não são lidos.",
     "GHS: só a classificação harmonizada da UE (Regulamento 1272/2008, Anexo VI); notificada (ECHA C&L) e NITE-CMC ficam fora.",
+    "Propriedades físicas dos compostos (fusão, ebulição, densidade, solubilidade em água, pKa): só declarações MEDIDAS do Wikidata (CC0) com referência, condições e origem por valor (fontesPorPropriedade); nada calculado pelo PubChem; estadoPadrao derivado localmente.",
+    "Elementos: energia de ionização do Wikidata (P2260, 1ª ionização, referência NIST ASD) quando houver; afinidade eletrônica do PubChem (o Wikidata não tem a propriedade), com aviso nos valores que a conferência de 11/10/2026 achou desatualizados.",
+    "GHS do Wikidata (P4952) avaliado e NÃO usado: ~70 itens do pacote, quase todos de fichas de fornecedor (classificação notificada).",
     "Frases H/EUH em português: Anexo III do CLP consolidado (EUR-Lex/Cellar); combinadas ausentes viram junção dos textos oficiais.",
     "CAS: só do Wikidata (identificador, CC0), validado pelo dígito verificador; elementos não levam CAS (CAS do átomo != substância).",
     "Textos: Wikipédia pt e Wikilivros pt (CC BY-SA 4.0), ChEBI (CC BY 4.0), Faraday (domínio público). Gold Book: bloqueado por Cloudflare.",
     "Idiomas (I18N §4): nomes de elementos/compostos por idioma só do Wikidata (CC0); textos em en/es/de/fr só da Wikipédia daquele idioma (CC BY-SA 4.0), escolhidos pelo item do Wikidata (sitelinks) — nunca tradução automática; frases H por idioma do Anexo III do CLP.",
     "Textos em lotes (textos/<fonte>/lote-NNN.json + textos/index.json) em vez de um arquivo por trecho (cota de upload da Vercel).",
-    "APIs oficiais (PUG REST, WDQS, /w/api.php) são acessadas apesar do Disallow genérico do robots.txt, conforme robots.EXCECOES."
+    "APIs oficiais (PUG REST, WDQS, /w/api.php) são acessadas apesar do Disallow genérico do robots.txt, conforme robots.EXCECOES.",
+    "Tradução automática só dos textos em inglês sem versão em português (ChEBI, Faraday): pipeline/traducoes/<fonte>.jsonl, aplicada pelo hash do textoOriginal (texto mudou = tradução ignorada); textoOriginal preservado, traducao: automatica, modelo e data registrados."
   ],
   "avisos": [],
+  "traducoes": {
+    "chebi": {
+      "aplicadas": 1296,
+      "hashDivergente": 0,
+      "semTraducao": 8
+    },
+    "gutenberg-14474": {
+      "aplicadas": 235,
+      "hashDivergente": 0,
+      "semTraducao": 0
+    }
+  },
   "fontes": [
     "pubchem",
     "codata",
@@ -657,11 +932,12 @@
     "wikipedia-fr",
     "wikibooks-pt",
     "gutenberg-14474",
+    "wikipedia-en-dados",
     "icsc-oit"
   ],
   "http": {
     "requisicoes": 2,
-    "doCache": 455,
+    "doCache": 476,
     "revalidadas304": 0,
     "tentativasExtras": 0,
     "erros": 0,
@@ -670,7 +946,7 @@
       "goldbook.iupac.org": 2
     }
   },
-  "duracaoSegundos": 3.7,
-  "versao": "20261012T171653Z-3b8afa4f320b",
+  "duracaoSegundos": 3.9,
+  "versao": "20261017T034210Z-2a180a93a84a",
   "erros": []
 }

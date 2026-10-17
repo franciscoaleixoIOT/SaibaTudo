@@ -1,219 +1,219 @@
 {
-  "version": "20261012T171653Z-3b8afa4f320b",
-  "generatedAt": "2026-10-12T17:16:53Z",
+  "version": "20261017T034210Z-2a180a93a84a",
+  "generatedAt": "2026-10-17T03:42:10Z",
   "schemaVersion": 1,
   "files": {
     "compostos/index.json": {
-      "bytes": 817189,
-      "sha256": "24fe479acec3e629fafb8637494e7a15b509de22938e44ae796fbe341af91ce8"
+      "bytes": 818012,
+      "sha256": "cf0344b9e6365070d90f35595e490bd505e5d51886259fa09f719c3ba5847442"
     },
     "compostos/lote-001.json": {
-      "bytes": 357770,
-      "sha256": "65c4ecb0ed951c8298c5a12ad4bdae6950367a90cb0c69bef3d6c2a2b7329d41"
+      "bytes": 473572,
+      "sha256": "13721be5035e19b250bc215694224c3020c1f3375c6dd4aef075de3137afae96"
     },
     "compostos/lote-002.json": {
-      "bytes": 362609,
-      "sha256": "efec51bddb6cc40a622bb8d81eeaae21c072abd8211fa5f6de72d2b06b171ce9"
+      "bytes": 536539,
+      "sha256": "9cca0b250915042340bf2a0979abbed886fec6b209f53a89b0c8b6cdf74018f0"
     },
     "compostos/lote-003.json": {
-      "bytes": 367468,
-      "sha256": "89600fc215b28649ff2d40ae9529a45faa80633d3b03924ad071e5f6b28d5383"
+      "bytes": 446511,
+      "sha256": "b3806fd698e5b2119a4ddc1b7774d2ece8ab05038929081f6dd294930f355a07"
     },
     "compostos/lote-004.json": {
-      "bytes": 336928,
-      "sha256": "0120601356b35ff99b19f7d65b34e2d07bcf9df8bb174cd655dd675a5d4119ff"
+      "bytes": 433281,
+      "sha256": "6f8fcd86b424c646fff90795fdf55d9b2187e1adb2781140e556deff9d11eed9"
     },
     "compostos/lote-005.json": {
-      "bytes": 327199,
-      "sha256": "9c3322eb3a5cc8fa287e9f52e3692c8164e093e6fbf5bf759fe089b24adee213"
+      "bytes": 408469,
+      "sha256": "ecf3fd8216cb014746f1fe249e60f62597660179cc19d1157ba363247ab2dc31"
     },
     "compostos/lote-006.json": {
-      "bytes": 311708,
-      "sha256": "e29aac91822991f8e99b2138f08e1afb579abe0f4df21c01caf58cda11cab0e2"
+      "bytes": 379713,
+      "sha256": "2e93f162b0d6b772628c663d0c275ad072695ca2af4feb6c15d678e3d9b34b69"
     },
     "compostos/lote-007.json": {
-      "bytes": 316875,
-      "sha256": "c88bbd3a59dfd13c7eff3e95cfbe69db0952f860078106cdd3f8341312a2312b"
+      "bytes": 380886,
+      "sha256": "956b12a9c1a3164aa5edef85839771c61eb5c64353279621c88cac08dd76fa5a"
     },
     "compostos/lote-008.json": {
-      "bytes": 301501,
-      "sha256": "01a849faf7d1f34727e87f1bcf17c1c6904d3fab424974f7ca2bcff12fdbd34f"
+      "bytes": 358977,
+      "sha256": "cc5fb0a672b6614cd5c22a818f510f5a94f1d5041e7840df3d00f1bd2f8f6e8e"
     },
     "compostos/lote-009.json": {
-      "bytes": 294446,
-      "sha256": "750bbcec37f9f83fe5e528e0480b953f6c2ff48da97b2777b1840b60122c7f1f"
+      "bytes": 367065,
+      "sha256": "7ab3ea65f5c41db6489aaed5a72b21492175ca28f34bdeea11d108b2396b6b59"
     },
     "compostos/lote-010.json": {
-      "bytes": 243192,
-      "sha256": "a8fa550bd3981b5908d44739164c0b3ddca0c7091f2b3878add51ee65cc04e1b"
+      "bytes": 291218,
+      "sha256": "729432da4177640d5e22cae08927be2c374ab96fe8eaf0a63bde1bd1c2a08a33"
     },
     "constantes.json": {
       "bytes": 20394,
-      "sha256": "d60400a4673142bdaaa8f0971be24f344c40bb6094640961535cce524a1b10a6"
+      "sha256": "67b88a0c52de6054aeb360e7715e4d432ed6bb9eb823c01ac2cdd66c15d67a8a"
     },
     "elementos.json": {
-      "bytes": 94066,
-      "sha256": "4b9e7324e1b0c675e76b4da58e0f1fcc77eb9935dadc55ff7a3899d474b520c6"
+      "bytes": 179670,
+      "sha256": "b99942e28eed742a75a5f31501234c502f4d7dd96f87a373f45f6c22c1dde404"
     },
     "fontes.json": {
-      "bytes": 5710,
-      "sha256": "6c189da7531a925fe48abe9b83bbfa4fcbd343b82f41c284744a1c5043a615bb"
+      "bytes": 6943,
+      "sha256": "26a32a75511328d076e24ab01ee7925e31e43320d1837f93f7aab3d799d38646"
     },
     "ghs_frases.json": {
       "bytes": 61416,
-      "sha256": "37ad77b105bc2361e130e46dc6e326b06db95b5310c2e013658ecfe549eb3658"
+      "sha256": "32fe092cd704e9b5ad24af40a1e49fc9a44826a9205cc4874492ddbde84b2116"
     },
     "regras.json": {
-      "bytes": 29216,
-      "sha256": "472dc90bf2943742a24717eab401e6b9d93a9fdcb9429bbe2d8f86fcaff68321"
+      "bytes": 39535,
+      "sha256": "a3b23b8c10f2bc6ee5c4a2ca4ce47a7bcc063d85a2fb2b27bcf14a82f352861c"
     },
     "textos/chebi/lote-001.json": {
-      "bytes": 129432,
-      "sha256": "3c727626df26519308a5b9f86db4f722fbc2e1c2c880c78ddae7fcb5a98257bb"
+      "bytes": 207306,
+      "sha256": "24817c79b87eb6e1b42511e2eb31dbcb0fe52c79949f4d5bcf66bfadff832e09"
     },
     "textos/chebi/lote-002.json": {
-      "bytes": 125520,
-      "sha256": "89324ca5f864ced308cf6c643417435e5901b5542115aeb8f611d721ebf9339e"
+      "bytes": 198299,
+      "sha256": "575020b6d7c34c0d2b1482f2b262fb3e9e44039b8d99ad5a8636f0d4529a11d5"
     },
     "textos/chebi/lote-003.json": {
-      "bytes": 130582,
-      "sha256": "743c7024932745de739a23b6993ab200d73a916b9ce2926c4c14eb168159412c"
+      "bytes": 209840,
+      "sha256": "edac316bb2148b11876b55f0eabb60203d1d240c95ca22d3d12f1ae28f5ec30e"
     },
     "textos/chebi/lote-004.json": {
-      "bytes": 131405,
-      "sha256": "976010b6a74c70e8cb0898b30e767e7dcf988e640f31609daed0b60fd20b00d7"
+      "bytes": 210714,
+      "sha256": "a7218dba8d8bf3f2431d5de65981e81a85bc5249e6786d2c38a3973910722465"
     },
     "textos/chebi/lote-005.json": {
-      "bytes": 132968,
-      "sha256": "bf215888c309fc36199470031b8c7de195db107524ca16a3233b85db079e75c0"
+      "bytes": 213482,
+      "sha256": "093233a36a7d2d9cc9f5044c072ca6862de27348ad2e6923e926a259677f38a4"
     },
     "textos/chebi/lote-006.json": {
-      "bytes": 138857,
-      "sha256": "8cfc7e6664856be0dd6f0505cc065ca7f079c5b0c6d59c86dcd77ba82900f877"
+      "bytes": 225128,
+      "sha256": "eca85a464f2fd8ff4e0f346b8a43018baa3b4d464a9daa3c30ed12e5b54d4ca0"
     },
     "textos/chebi/lote-007.json": {
-      "bytes": 71025,
-      "sha256": "0a1eacd312225e8cf22a88164f5d1caf19ebea648cf9a9a41fd56d52d790cb39"
+      "bytes": 113970,
+      "sha256": "fb584f579daa121214349c8374296a83482321de1118df24b80736fc0415f723"
     },
     "textos/gutenberg-14474/lote-001.json": {
-      "bytes": 330241,
-      "sha256": "bd37ecd7430ee2d8f575ad89ea45ebcdf1b35e0449fe928eecab570c0c7f916a"
+      "bytes": 588811,
+      "sha256": "26e5b7a8b3b29bf47f1576458d9e1d4da0482072e3e05f078e469849255cbcdc"
     },
     "textos/gutenberg-14474/lote-002.json": {
-      "bytes": 55697,
-      "sha256": "2e3702913901b687220629ada6354c49d09343f9e73fe9614516463f0c56cbc8"
+      "bytes": 100388,
+      "sha256": "0039769a5182f7a3dea17397a4c3163a1e00102a3f0bfa68e65cca773c78a642"
     },
     "textos/index.json": {
-      "bytes": 872744,
-      "sha256": "cdd3245901054929414230baaaf722411d7065edf5b959f56923ceea30dbd444"
+      "bytes": 872861,
+      "sha256": "e2c2898bad3a702748549a72607104a8997781ec389e93c86255fbb5dcb20d76"
     },
     "textos/wikibooks-pt/lote-001.json": {
       "bytes": 516829,
-      "sha256": "4d8b72929a778d063b535fea8b67041589cd62a4fba76a8bbdf068d7190adee3"
+      "sha256": "1d84c785097a613e65bae7d57097502441c4c48aaefab992d71136c293fe3cd3"
     },
     "textos/wikibooks-pt/lote-002.json": {
       "bytes": 174233,
-      "sha256": "425c346df74485974a5616a630af0b2162a3c7adf1778f2a2cdd86e8609be2c3"
+      "sha256": "35fbececa4d7b1d18b55d15b35feabc0cdb2d6575dd844148874839713ccdeea"
     },
     "textos/wikipedia-de/lote-001.json": {
       "bytes": 295015,
-      "sha256": "dee811d32b855e8a5f6afa2830f52cbcb8f2dbfdaf00fcf8dbf97b6b69945273"
+      "sha256": "531bae67be8a106e8cef027c4294b222caaa5c9d16a52314cf9b04d51c588163"
     },
     "textos/wikipedia-de/lote-002.json": {
-      "bytes": 297072,
-      "sha256": "16e20026bdd2d1610c2c2cbe5443b2755b1d6f794ec5d10f82886b90e8a4872b"
+      "bytes": 297487,
+      "sha256": "dc39d5bd502bab93d4e2a690f48dead3e144e3ed43d741fc270f86818f942c52"
     },
     "textos/wikipedia-de/lote-003.json": {
-      "bytes": 289394,
-      "sha256": "014ad90a98304add03bbd538d65f195e2ed3fdd875ed41a6393b16d009509525"
+      "bytes": 289004,
+      "sha256": "846508d57e31cef55cd59d9b8c4407b151e9424c05debf882b09e2b2863eb49b"
     },
     "textos/wikipedia-de/lote-004.json": {
-      "bytes": 245305,
-      "sha256": "4a794819109e8267e3dbe03379afa23f08335521a51813ff1c365a36b75951a8"
+      "bytes": 246571,
+      "sha256": "003df2262655fe9e86cf770fc08658f38f8ffc7a9953c98b1898a240c1855642"
     },
     "textos/wikipedia-en/lote-001.json": {
       "bytes": 307518,
-      "sha256": "a26cd3e649d725f2fefb8342870b5f43377c0b7e972af673dd7c77e9497cfbe1"
+      "sha256": "2340e074fd15c2dd3c821a84247d1a91e33a461bbdcf080ad569ec3f7f9b4f4e"
     },
     "textos/wikipedia-en/lote-002.json": {
-      "bytes": 303621,
-      "sha256": "f58d9a490d4008719749e7ae3bba964f29b14d9fb0b23fcd97be733aaf5001f7"
+      "bytes": 303948,
+      "sha256": "0c5fcd2643034ed1162c70badeb2c65023265f54751c5b84a97d892f5d3c2e6c"
     },
     "textos/wikipedia-en/lote-003.json": {
-      "bytes": 302870,
-      "sha256": "6d35386d491a15196b1468fca1719705a16b2d57f509444c83fb955e4305f400"
+      "bytes": 302486,
+      "sha256": "814e78ea7bec87f89fc42b9b58191255b6149e323666de5089323176fec4b194"
     },
     "textos/wikipedia-en/lote-004.json": {
-      "bytes": 309946,
-      "sha256": "3cb1c81cb925a8f83c1970fc35ac098f0570d9126dbac298381b807fea500b21"
+      "bytes": 310713,
+      "sha256": "abc6258e3b4152db2b53852b2b1be8665cb325a604ad2636907163927df93da4"
     },
     "textos/wikipedia-en/lote-005.json": {
-      "bytes": 305985,
-      "sha256": "7cf930787f6af40de499a8302e9519dd75dda50fe4b09da70b105c39accc7fc6"
+      "bytes": 305714,
+      "sha256": "bfae8bc355b686be0e27246418aff805856f4127d4b14d4b08da32d6326221ea"
     },
     "textos/wikipedia-en/lote-006.json": {
-      "bytes": 111155,
-      "sha256": "0d3547f663d9a2f1e6e1fea8546aa174ff4b97ae77c95117405d5a52330d8284"
+      "bytes": 114193,
+      "sha256": "695431d2a073099b17399eb7b8c8102070f6bbc26fe32fe7c952fa2556cde5ce"
     },
     "textos/wikipedia-es/lote-001.json": {
       "bytes": 296432,
-      "sha256": "a4f74bd5c8bde559d05f8d7d2fe3e7794bf692be60272137b0d88f1d17dfde96"
+      "sha256": "f34e5183d9513f337d0d9d0478ce9b20c17c30b198568fa286c15ecacbf6d9ca"
     },
     "textos/wikipedia-es/lote-002.json": {
-      "bytes": 316555,
-      "sha256": "4b0ae04edbc306b1a4af157fcbcc7f260978667b07a8978edbfdf55a0d319ea0"
+      "bytes": 316329,
+      "sha256": "df5ad18cfd560bc4e014290483ece00fc459e12893a29981a91b583f9a267ea8"
     },
     "textos/wikipedia-es/lote-003.json": {
-      "bytes": 306513,
-      "sha256": "b32912f241eb039638c0ba2c3844561e58f301a5a91c00a9f8858e1c8eef3394"
+      "bytes": 306709,
+      "sha256": "11f21592fb1242faed07d4c4d07de329b67f5eedc87b393a24a5e587d467621e"
     },
     "textos/wikipedia-es/lote-004.json": {
-      "bytes": 303923,
-      "sha256": "78057051412c0063e5e2e248ce3dfbf099cf02eb16dac53041959a777a198ae8"
+      "bytes": 303368,
+      "sha256": "8b0691e378a2a6c4c8c8c5a0c4227ab8e8a7745ce7df9cc5a143a9a0e341836f"
     },
     "textos/wikipedia-es/lote-005.json": {
-      "bytes": 281344,
-      "sha256": "010a585e47a57118dda88704a26e9fecc25aa0a25741f3bb7c3c1f6e7e133bb0"
+      "bytes": 281142,
+      "sha256": "ec23ef3f583f7a95d416c9f76c397534262db5a99c672bbc8161117eae8c4506"
     },
     "textos/wikipedia-fr/lote-001.json": {
       "bytes": 294918,
-      "sha256": "b4f98c5b97f70105ba8b3ae715600aeb69fdb28398513ed968a657932f914059"
+      "sha256": "94df728431cceeacc17cc774a366512ac12ecb1a52c8f000dc5e634fe0069165"
     },
     "textos/wikipedia-fr/lote-002.json": {
-      "bytes": 300446,
-      "sha256": "649019b680ca37ff2bd8f3afd50ef4436a0a5c2c1918eec745c2089acbb72fec"
+      "bytes": 300854,
+      "sha256": "7749ba04e5fe40a85d9a3e31b171fd6d04db5c1dd72c5097882b4553b9cab950"
     },
     "textos/wikipedia-fr/lote-003.json": {
-      "bytes": 296569,
-      "sha256": "ef23192f859dd7fae0de8474e97c0cc13976d704a35fce8b4f23213791097181"
+      "bytes": 295825,
+      "sha256": "6d2db235f3ec64f29bbb61b8b665f7023491032deed964871d7dd8067ca54a4d"
     },
     "textos/wikipedia-fr/lote-004.json": {
-      "bytes": 297795,
-      "sha256": "1f5c5c42fd66744a4d8e9451c0b46f6e09432ec3134bb4e0ccd4a8d31aceddf5"
+      "bytes": 298576,
+      "sha256": "f74845c8accecbc18f0f37089967d135df54a1b316b71f1cd3d5aa4120d9467f"
     },
     "textos/wikipedia-fr/lote-005.json": {
       "bytes": 5045,
-      "sha256": "119c2f0d6e734a283e1c2b04b226e4f58a3ae47f95d7131a2715775803cbf75c"
+      "sha256": "27cdd5d43a55a01aa598176cd3b9f5984a031a364d6fb3f6341bbc1ce8d830d0"
     },
     "textos/wikipedia-pt/lote-001.json": {
       "bytes": 449164,
-      "sha256": "ce06f74de5767efd74e66854194a2afb9cf79e451e8088f83050de24d204a863"
+      "sha256": "c0c3cbae3fdcf132de5ded1603f6139d1792f41a2f0b123b639cd2d488e638f2"
     },
     "textos/wikipedia-pt/lote-002.json": {
-      "bytes": 477245,
-      "sha256": "370c96ce9a8e2cf1929fbc983b6b182bee347ea22b1031a54d7909fb5e38a336"
+      "bytes": 477030,
+      "sha256": "2d76bfad4228b4ef892473c4d078570dc39864ab6b0adf82917ad9348be98516"
     },
     "textos/wikipedia-pt/lote-003.json": {
-      "bytes": 453821,
-      "sha256": "b73f0ee56aba8c55eec2934616d84d2710818b622a92a1dd4334052bcc8cbbfc"
+      "bytes": 454153,
+      "sha256": "5e87d5e70388e3cfd479304d6844eed20d4ee693d2a5c497b992208831db0a0e"
     },
     "textos/wikipedia-pt/lote-004.json": {
-      "bytes": 467825,
-      "sha256": "1d259c9d4caebbf59d1b4cc6a0695d95885031a6f3b62c41da3f9e6cfba3dd89"
+      "bytes": 468515,
+      "sha256": "21cca15d1e40a5ebc35d07727fb098f31f202aa7be6dce8e118176748ce480de"
     },
     "textos/wikipedia-pt/lote-005.json": {
-      "bytes": 293111,
-      "sha256": "c0a30dc270e7b29e0c50a07db340888b8140082bc4c46b4a836ad38e90ab1d0f"
+      "bytes": 291451,
+      "sha256": "4223f1fedb144e46f312b7802ef248187fec4d97d4a75f25a874892c8bc0e78c"
     }
   },
   "sources": [
@@ -223,7 +223,7 @@
       "url": "https://pubchem.ncbi.nlm.nih.gov/",
       "licenca": "domínio público (NCBI/NLM)",
       "uso": "dados",
-      "acessadoEm": "2026-10-12"
+      "acessadoEm": "2026-10-17"
     },
     {
       "id": "codata",
@@ -231,7 +231,7 @@
       "url": "https://physics.nist.gov/cuu/Constants/",
       "licenca": "domínio público (NIST); valores de constantes são fatos físicos",
       "uso": "dados",
-      "acessadoEm": "2026-10-12"
+      "acessadoEm": "2026-10-17"
     },
     {
       "id": "wikidata",
@@ -239,7 +239,7 @@
       "url": "https://www.wikidata.org/",
       "licenca": "CC0",
       "uso": "dados",
-      "acessadoEm": "2026-10-12"
+      "acessadoEm": "2026-10-17"
     },
     {
       "id": "clp-eurlex",
@@ -247,7 +247,7 @@
       "url": "https://eur-lex.europa.eu/legal-content/PT/TXT/?uri=CELEX:32008R1272",
       "licenca": "reutilização livre da legislação (EUR-Lex)",
       "uso": "dados",
-      "acessadoEm": "2026-10-12"
+      "acessadoEm": "2026-10-17"
     },
     {
       "id": "chebi",
@@ -255,7 +255,7 @@
       "url": "https://www.ebi.ac.uk/chebi/",
       "licenca": "CC BY 4.0",
       "uso": "textos",
-      "acessadoEm": "2026-10-12"
+      "acessadoEm": "2026-10-17"
     },
     {
       "id": "wikipedia-pt",
@@ -263,7 +263,7 @@
       "url": "https://pt.wikipedia.org/",
       "licenca": "CC BY-SA 4.0",
       "uso": "textos",
-      "acessadoEm": "2026-10-12"
+      "acessadoEm": "2026-10-17"
     },
     {
       "id": "wikipedia-en",
@@ -271,7 +271,7 @@
       "url": "https://en.wikipedia.org/",
       "licenca": "CC BY-SA 4.0",
       "uso": "textos",
-      "acessadoEm": "2026-10-12"
+      "acessadoEm": "2026-10-17"
     },
     {
       "id": "wikipedia-es",
@@ -279,7 +279,7 @@
       "url": "https://es.wikipedia.org/",
       "licenca": "CC BY-SA 4.0",
       "uso": "textos",
-      "acessadoEm": "2026-10-12"
+      "acessadoEm": "2026-10-17"
     },
     {
       "id": "wikipedia-de",
@@ -287,7 +287,7 @@
       "url": "https://de.wikipedia.org/",
       "licenca": "CC BY-SA 4.0",
       "uso": "textos",
-      "acessadoEm": "2026-10-12"
+      "acessadoEm": "2026-10-17"
     },
     {
       "id": "wikipedia-fr",
@@ -295,7 +295,7 @@
       "url": "https://fr.wikipedia.org/",
       "licenca": "CC BY-SA 4.0",
       "uso": "textos",
-      "acessadoEm": "2026-10-12"
+      "acessadoEm": "2026-10-17"
     },
     {
       "id": "wikibooks-pt",
@@ -303,7 +303,7 @@
       "url": "https://pt.wikibooks.org/",
       "licenca": "CC BY-SA 4.0",
       "uso": "textos",
-      "acessadoEm": "2026-10-12"
+      "acessadoEm": "2026-10-17"
     },
     {
       "id": "gutenberg-14474",
@@ -311,7 +311,15 @@
       "url": "https://www.gutenberg.org/ebooks/14474",
       "licenca": "domínio público",
       "uso": "textos",
-      "acessadoEm": "2026-10-12"
+      "acessadoEm": "2026-10-17"
+    },
+    {
+      "id": "wikipedia-en-dados",
+      "nome": "Wikipedia (en) — páginas de dados de referência",
+      "url": "https://en.wikipedia.org/",
+      "licenca": "CC BY-SA 4.0",
+      "uso": "dados",
+      "acessadoEm": "2026-10-17"
     },
     {
       "id": "icsc-oit",
@@ -319,7 +327,7 @@
       "url": "https://chemicalsafety.ilo.org/dyn/icsc/showcard.home",
       "licenca": "sem licença de reuso declarada; © OIT/OMS e, na versão em português, © ACT",
       "uso": "link",
-      "acessadoEm": "2026-10-12"
+      "acessadoEm": "2026-10-17"
     }
   ],
   "licencas": [
@@ -361,7 +369,8 @@
         "wikipedia-es",
         "wikipedia-de",
         "wikipedia-fr",
-        "wikibooks-pt"
+        "wikibooks-pt",
+        "wikipedia-en-dados"
       ]
     },
     {
@@ -388,33 +397,43 @@
     "elementos": 118,
     "compostos": 1971,
     "constantes": 59,
-    "textos": 6347,
+    "textos": 6349,
     "textosPorFonte": {
       "wikipedia-pt": 925,
-      "wikipedia-en": 1073,
+      "wikipedia-en": 1075,
       "wikipedia-es": 981,
-      "wikipedia-de": 766,
+      "wikipedia-de": 767,
       "wikipedia-fr": 804,
       "wikibooks-pt": 258,
-      "chebi": 1305,
+      "chebi": 1304,
       "gutenberg-14474": 235,
       "gold-book": 0
     },
     "textosPorIdioma": {
       "pt-BR": 1183,
-      "en": 2613,
+      "en": 2614,
       "es": 981,
-      "de": 766,
+      "de": 767,
       "fr": 804
     },
     "lotesDeTextos": 36,
     "compostosComGhsHarmonizado": 485,
     "compostosComCas": 1954,
+    "compostosComPropriedadeMedida": {
+      "pontoFusaoK": 791,
+      "pontoEbulicaoK": 525,
+      "densidadeKgm3": 277,
+      "solubilidadeAguaGL": 24,
+      "solubilidadeAguaG100g": 192,
+      "pka": 93,
+      "pkaValores": 5,
+      "estadoPadrao": 720
+    },
     "compostosComNomePorIdioma": {
       "pt-BR": 1964,
       "en": 1963,
       "es": 1724,
-      "de": 1934,
+      "de": 1935,
       "fr": 1881
     },
     "elementosComNomePorIdioma": {
@@ -430,13 +449,13 @@
     "pollIntervalMinutes": 10080,
     "baseUrl": "https://saibatudo.net/quimica/data/",
     "nlu": {
-      "endpoint": "https://saibatudo.net/api/quimica/nlu"
+      "endpoint": "https://saibatudo.net/quimica/api/nlu"
     },
     "ask": {
       "enabled": false
     },
     "melhoria": {
-      "enabled": false
+      "enabled": true
     }
   }
 }
