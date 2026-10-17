@@ -3,6 +3,8 @@ package net.saibatudo.quimica.domain.calc
 import androidx.annotation.StringRes
 import net.saibatudo.quimica.R
 import net.saibatudo.quimica.data.model.Constante
+import net.saibatudo.quimica.data.model.SolubilidadeBase
+import net.saibatudo.quimica.domain.Texto
 import net.saibatudo.quimica.domain.Textos
 import kotlin.math.abs
 import kotlin.math.log10
@@ -10,6 +12,9 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 
 enum class TipoForte(@param:StringRes val rotulo: Int) { ACIDO(R.string.forte_acido), BASE(R.string.forte_base) }
+
+/** Solubilidade de uma base M(OH)ₙ ([n] = OH⁻ por fórmula) em mol/L, do pacote ou calculada do Kps ([deKps]). */
+data class SaturacaoBase(val formula: String, val s: Double, val n: Int, val kps: Double?, val temperaturaC: Double?, val fonte: String?, val deKps: Boolean)
 
 /** Concentração (molaridade), diluição e pH de ácidos e bases fortes. Tudo calculado localmente, com passos. */
 object Solucoes {
@@ -137,7 +142,8 @@ object Solucoes {
         passos += t(R.string.calc_ph_grau_passo, t.sig(grau * 100, 3))
         val notas = mutableListOf(
             if (pKwDoPacote) t(R.string.calc_ph_nota_pkw_pacote, t.fixo(pKw, 2)) else t(R.string.calc_ph_nota_kw_padrao),
-            t(R.string.calc_ph_nota_k_informada, nomeK)
+            t(R.string.calc_ph_nota_k_informada, nomeK),
+            nota25C(t, pKw)
         )
         return ResultadoCalculo(
             titulo = t(if (tipo == TipoForte.ACIDO) R.string.calc_ph_titulo_acido_fraco else R.string.calc_ph_titulo_base_fraca),
@@ -146,8 +152,30 @@ object Solucoes {
         )
     }
 
+    /** Nota de toda resposta de pH: pKw e o pH neutro valem a 25 °C (igual a `nota25C` do site). */
+    private fun nota25C(t: Textos, pKw: Double): String = t(R.string.calc_ph_nota_25c, t.fixo(pKw, 2), t.fixo(pKw / 2, 2))
+
+    /**
+     * Solubilidade da base [formula] na tabela do pacote (`regras.solubilidadeBases`), comparando a contagem de átomos (Ca(OH)2 = CaH2O2).
+     * Sem solubilidade em mol/L, é calculada do Kps: M(OH)ₙ ⇌ M + n OH⁻, Kps = s·(n·s)ⁿ, logo s = (Kps / nⁿ)^(1/(n+1)). Nenhum valor no código.
+     */
+    fun solubilidadeDe(formula: String?, tabela: List<SolubilidadeBase>): SaturacaoBase? {
+        if (formula.isNullOrBlank() || tabela.isEmpty()) return null
+        val alvo = FormulaQuimica.tentar(formula)?.contagem ?: return null
+        for (b in tabela) {
+            val f = FormulaQuimica.tentar(b.formula) ?: continue
+            if (f.contagem != alvo) continue
+            val n = f.contagem["H"]?.takeIf { it > 0 } ?: continue
+            val s = b.solubilidadeMolL ?: b.kps?.let { (it / n.toDouble().pow(n)).pow(1.0 / (n + 1)) } ?: continue
+            if (!s.isFinite() || s <= 0) continue
+            return SaturacaoBase(b.formula, s, n, b.kps, b.temperaturaC, b.fonte, deKps = b.solubilidadeMolL == null)
+        }
+        return null
+    }
+
     /** pKw usado nos cálculos: da constante Kw/pKw do pacote, se existir; senão 14 a 25 °C (indicado nas notas). */
-    fun pKwDoPacote(constantes: List<Constante>): Pair<Double, Boolean> {
+    fun pKwDoPacote(constantes: List<Constante>, pKwAgua: Double? = null): Pair<Double, Boolean> {
+        pKwAgua?.takeIf { it.isFinite() && it > 0 }?.let { return it to true }   // regras.agua.pKw (25 °C), como no site
         constantes.firstOrNull { it.id.equals("pKw", true) }?.let { return it.valor to true }
         constantes.firstOrNull { it.id.equals("Kw", true) && it.valor > 0 }?.let { return -log10(it.valor) to true }
         return 14.0 to false
@@ -157,7 +185,14 @@ object Solucoes {
      * pH de ácido ou base forte, totalmente dissociado: [H⁺] (ou [OH⁻]) = n·C, com a correção da autoionização da água
      * (equação do segundo grau), que só importa em soluções muito diluídas.
      */
-    fun phForte(t: Textos, tipo: TipoForte, conc: Qtd, ionizaveis: Int, unidades: Unidades, pKw: Double = 14.0, pKwDoPacote: Boolean = false): ResultadoCalculo {
+    /**
+     * [saturacao]: solubilidade da base, se o pacote a trouxer ([solubilidadeDe]); acima dela a solução satura e a resposta avisa o pH máximo
+     * (pKw + log₁₀(n·s)), como `calcularPH` do site.
+     */
+    fun phForte(
+        t: Textos, tipo: TipoForte, conc: Qtd, ionizaveis: Int, unidades: Unidades, pKw: Double = 14.0, pKwDoPacote: Boolean = false,
+        saturacao: SaturacaoBase? = null
+    ): ResultadoCalculo {
         positivo(conc.valor, t(R.string.sol_a_concentracao))
         if (ionizaveis < 1 || ionizaveis > 4) throw CalculoInvalido(R.string.erro_ph_ionizaveis)
         val molL = unidades.porSimbolo("mol/L", "concentracao") ?: throw CalculoInvalido(R.string.erro_falta_unidade_mol_l)
@@ -183,6 +218,18 @@ object Solucoes {
         else t(R.string.calc_ph_nota_kw_padrao)
         if (abs(ion - total) / total > 0.01) notas += t(R.string.calc_ph_nota_diluida)
         notas += t(R.string.calc_ph_nota_vale_fortes)
+        notas += nota25C(t, pKw)
+        if (tipo == TipoForte.BASE && saturacao != null && c > saturacao.s * (1 + 1e-9)) {
+            val phMax = pKw + log10(saturacao.n * saturacao.s)
+            notas.add(0, t(
+                R.string.calc_ph_saturada, Texto.formulaUnicode(saturacao.formula),
+                saturacao.temperaturaC?.let { t(R.string.calc_ph_saturada_temp, t.num(it, 1)) } ?: "",
+                t.sig(saturacao.s, 3),
+                if (saturacao.deKps) t(R.string.calc_ph_saturada_kps) else "",
+                saturacao.fonte?.let { t(R.string.calc_ph_saturada_fonte, it) } ?: "",
+                t.fixo(phMax, 2)
+            ))
+        }
         val classe = t(when {
             ph < 7 - 0.005 -> R.string.calc_ph_solucao_acida
             ph > 7 + 0.005 -> R.string.calc_ph_solucao_basica

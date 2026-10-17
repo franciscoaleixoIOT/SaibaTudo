@@ -72,6 +72,8 @@ class Dicionario private constructor(
 
     private val nomesElemento: List<Pair<String, String>>
     private val nomesComposto: List<Pair<String, Long>>
+    /** Nomes de composto usados na aproximação por erro de digitação: os de [nomesComposto] que não vêm só dos sinônimos dos lotes. */
+    private val nomesCompostoAproximaveis: List<Pair<String, Long>>
     private val formulaParaCid = HashMap<String, Long>()
     private val casParaCid = HashMap<String, Long>()
     private val sinonimosPropriedade: List<Triple<String, String, String>>
@@ -105,16 +107,24 @@ class Dicionario private constructor(
         )
         val funcionais = Lexico.PALAVRAS_FUNCIONAIS_TODAS
         val co = LinkedHashMap<String, Long>()
-        for (pega in passes) {
+        // passes só de sinônimos dos lotes (PubChem/Wikidata): valem para casar o nome exato, mas não para a aproximação por erro de digitação
+        // ("equilíbrio" ≈ "Equilibrin", sinônimo da amitriptilina); o site aproxima só pelos nomes do índice
+        val passesDeSinonimos = setOf(1, 3, 5, 6)
+        val aproximaveis = HashSet<String>()
+        for ((ip, pega) in passes.withIndex()) {
             for (e in entradas) {
                 for (n in pega(e)) {
                     val k = Texto.nlu(n ?: continue)
                     // um termo que é, ele mesmo, nome de ELEMENTO (ex.: "oxigênio" = O2) fica para o matcher de elementos; "gás oxigênio", "O2" seguem casando
-                    if (k.length >= 3 && !k.all { it.isDigit() } && k !in funcionais && !co.containsKey(k) && !el.containsKey(k)) co[k] = e.cid
+                    if (k.length >= 3 && !k.all { it.isDigit() } && k !in funcionais && !el.containsKey(k)) {
+                        if (!co.containsKey(k)) co[k] = e.cid
+                        if (ip !in passesDeSinonimos && co[k] == e.cid) aproximaveis += k
+                    }
                 }
             }
         }
         nomesComposto = co.map { (k, c) -> k to c }.sortedByDescending { it.first.length }
+        nomesCompostoAproximaveis = nomesComposto.filter { it.first in aproximaveis }
 
         for (e in entradas) {
             e.formula?.let { f -> formulaParaCid.putIfAbsent(chaveFormula(f), e.cid) }
@@ -300,7 +310,7 @@ class Dicionario private constructor(
                         melhor = Triple(d, Achado(Achado.Tipo.ELEMENTO, "aproximado", (i - 1).toDouble() / maxOf(palavras.size, 1), simbolo = simbolo, nome = nomeDoElemento(simbolo)), 0.0)
                     }
                 }
-                for ((chave, cid) in nomesComposto) {
+                for ((chave, cid) in nomesCompostoAproximaveis) {
                     if (kotlin.math.abs(chave.length - frase.length) > lim || chave.count { it == ' ' } + 1 != tam) continue
                     val d = Texto.distancia(frase, chave, lim)
                     if (d <= lim && (melhor == null || d < melhor.first)) {
@@ -324,8 +334,8 @@ class Dicionario private constructor(
             val d = Texto.distancia(palavra, chave, lim)
             if (d <= lim) achados += d to nomeDoElemento(simbolo)
         }
-        for ((chave, cid) in nomesComposto) {
-            if (chave == palavra) return emptyList()
+        if (nomesComposto.any { it.first == palavra }) return emptyList()
+        for ((chave, cid) in nomesCompostoAproximaveis) {
             if (chave.contains(' ') || kotlin.math.abs(chave.length - palavra.length) > lim) continue
             val d = Texto.distancia(palavra, chave, lim)
             if (d <= lim) achados += d to (nomesPorCid[cid] ?: chave)

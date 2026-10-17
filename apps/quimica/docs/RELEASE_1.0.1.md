@@ -141,3 +141,46 @@ Confirmar no console junto com o texto da política (`PRIVACIDADE.md`, onda 2).
 3. **Teclas ↑/↓ de teclado físico no campo** (o site tem; aqui só há as setas na tela, como no app de Eleições).
 4. **Chips da home que mudam a cada resposta** e **contexto da conversa mais amplo** (`PENDENCIAS.md` §8.4) continuam abertos.
 5. Revisão das traduções novas por falante nativo; teste em aparelho real.
+
+## Paridade com as correções de química do site (17/10/2026, frente H)
+O Android passou a seguir as correções que o site recebeu em 16–17/10 (`web/src/quimica/js/calc/*`, commit 70ee75a). Os textos novos
+são os dos catálogos do site, nos cinco idiomas.
+1. **Expoente nas unidades, nunca subscrito.** O pacote escreve "m3", "dm3", "cm3", "ft3". O app mostra "m³", "dm³", "cm³", "ft³" e
+   também "s⁻¹", "mol/m³" (`Unidades.simboloExibicao`, a mesma regra do `unidadeTex` do site). A grafia do pacote continua aceita como
+   apelido, e os apelidos do padrão ("cc" etc.) são somados.
+2. **mmHg e Torr separados:**
+   - mmHg = 133,322387415 Pa;
+   - Torr = 101325/760 Pa;
+   - "torr" passa a ser Torr. Um apelido igual ao de outra unidade da grandeza é descartado, então o "torr" do fixture antigo não casa mais com mmHg.
+   - "Torr" entrou em `UNIDADES_DE_GAS` (`LocalNlu`). O nome é `unidade_nome_torr`.
+3. **Estequiometria com rendimento a partir de PRODUTO.** `Estequiometria.calcular(..., rendimentoPercentual)`: com o produto informado e
+   rendimento < 100 %, ξ = n ÷ coeficiente ÷ rendimento. A quantidade informada não muda, e os reagentes necessários são os teóricos ÷
+   rendimento. Os passos novos são `calc_est_produto_com_rendimento` e `calc_est_necessarios`. Rendimento fora de 0–100 % gera um erro
+   (`erro_est_rendimento`). Golden do site: 10 g de NH₃ a 80 % → N₂ 10,2805 g e H₂ 2,21948 g. A calculadora passa o rendimento ao cálculo.
+4. **Notas CNTP × IUPAC** (`GasIdeal.notasCntp`):
+   - "CNTP (0 °C, 1 atm): 22,4 L/mol…" e "IUPAC (0 °C, 1 bar)… 22,7 L/mol", as duas calculadas por RT/P com o R do pacote;
+   - aparecem nas respostas de volume nas CNTP e de gás ideal com "volume molar"/CNTP;
+   - sem R no pacote, a nota não aparece.
+5. **pH:**
+   - toda resposta traz a nota "pKw = 14,00 e pH neutro = 7,00 valem a 25 °C…";
+   - `regras.agua.pKw` do pacote tem precedência, como no site.
+6. **Saturação de bases pouco solúveis.** O app lê `regras.solubilidadeBases` (lista ou mapa) e funciona sem ela (sem a tabela, não há aviso).
+   - Quando a solubilidade em mol/L não vem, ela é calculada do Kps: s = (Kps/nⁿ)^(1/(n+1)).
+   - Acima da solubilidade, o aviso traz o pH máximo, pKw + log₁₀(n·s).
+   - Ca(OH)₂ com Kps 5,02e-6 dá s ≈ 0,0108 mol/L e pH máximo ≈ 12,33.
+7. **Pacote da frente J:**
+   - `serieReatividadeMetais.ordem` é lido (antes a chave lida era `reatividade` e a lista ficava vazia);
+   - as regras de solubilidade saem uma por linha, com a `nota`. Nenhuma tela do Android mostra essas duas listas hoje.
+   - Em pt-BR, um trecho com `traducao: "automatica"` e `textoPt` (ChEBI, Faraday) conta como português: corpo `textoPt`, título
+     `tituloPt` e o aviso de tradução automática. Antes, o teste procurava "automática" com acento e não casava.
+8. **Dicionário e unidades** (pendências desta versão):
+   - "10 años"/"anos"/"years" não é mais 10 Å. A palavra da unidade é lida inteira, com acentos, e uma letra solta não casa por
+     normalização ("a" ≠ Å). Com isso, "2 atmósferas" segue lida pelo léxico.
+   - "dm3"/"cm3"/"m3" com o expoente em dígito são volume. "3,5 dm3" deixou de virar "3,5 dm".
+   - A aproximação por erro de digitação ignora os nomes que vêm só dos sinônimos dos lotes (o site aproxima só pelos nomes do índice).
+     "O que significa constante de equilíbrio" passou a ser CONCEITO, e não Equilibrin (CID 2160). O sinônimo exato continua casando.
+   - Continua aberta a ordem do `formulaParaCid` (isômeros).
+
+Testes: `CorrecoesQuimicaSiteTest` (12). `./gradlew.bat :app:testDebugUnitTest :app:lintRelease` deu **192 testes, 0 falhas**, com o
+pacote real presente. O lint de release fechou sem erro e com os mesmos 19 avisos de versão de dependência. Os testes que usam
+`local/pacote-j/regras.json` (fora do Git) são pulados se o arquivo não existir.

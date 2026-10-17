@@ -152,6 +152,8 @@ data class Trecho(
     val textoOriginal: String? = null,
     val textoPt: String? = null,
     val traducao: String? = null,
+    /** Título em português, quando o texto foi traduzido (`tituloPt`). */
+    val tituloPt: String? = null,
     val palavrasChave: List<String> = emptyList(),
     /** Idioma do TEXTO como vem no trecho (`pt`, `en`, `es`…); ausente nos pacotes antigos (= português). */
     val idiomaTexto: String? = null,
@@ -160,6 +162,12 @@ data class Trecho(
 ) {
     /** Idioma do trecho no código do projeto (`pt-BR`, `en`…), para casar com o idioma ativo; sem o campo vale português. */
     val idioma: String get() = net.saibatudo.quimica.domain.Idiomas.normalizar(idiomaTexto) ?: net.saibatudo.quimica.domain.Idiomas.PADRAO
+
+    /** Tradução automática para o português (`traducao: "automatica"` ou "automática", com `textoPt`), ainda não revisada por pessoa. */
+    val traducaoAutomatica: Boolean get() {
+        val tr = net.saibatudo.quimica.domain.Texto.normalizar(traducao)
+        return textoPt != null && tr.contains("automatic") && !tr.contains("sem tradu")
+    }
 }
 
 /** Um trecho listado em `textos/index.json` (sem o texto: só o que serve para escolher o lote). */
@@ -214,7 +222,24 @@ data class Regras(
     /** Frases H (código → texto em português), se o pacote trouxer. */
     val frasesH: Map<String, String> = emptyMap(),
     /** Frases H por idioma (`ghs_frases.json`: código → idioma → texto oficial do Anexo III do CLP). */
-    val frasesHPorIdioma: Map<String, Map<String, String>> = emptyMap()
+    val frasesHPorIdioma: Map<String, Map<String, String>> = emptyMap(),
+    /** Bases pouco solúveis (`regras.solubilidadeBases`, opcional): sem a tabela no pacote, nenhum aviso de saturação é dado. */
+    val solubilidadeBases: List<SolubilidadeBase> = emptyList(),
+    /** pKw da água a 25 °C (`regras.agua.pKw`), se vier; tem precedência sobre Kw/pKw das constantes, como no site. */
+    val pKwAgua: Double? = null
+)
+
+/**
+ * Solubilidade de uma base pouco solúvel M(OH)ₙ, como o pacote a traz (`{formula, kps?, solubilidadeMolL?, temperaturaC?, fonte}`): a
+ * solubilidade em mol/L, se vier, vale; senão é calculada do Kps em [net.saibatudo.quimica.domain.calc.Solucoes.solubilidadeDe].
+ */
+data class SolubilidadeBase(
+    val formula: String,
+    val kps: Double? = null,
+    val solubilidadeMolL: Double? = null,
+    val temperaturaC: Double? = null,
+    /** Nome da fonte (texto ou `fonte.nome`). */
+    val fonte: String? = null
 )
 
 /** Entrada do índice de compostos (cid → lote) com os dados necessários para a busca. */

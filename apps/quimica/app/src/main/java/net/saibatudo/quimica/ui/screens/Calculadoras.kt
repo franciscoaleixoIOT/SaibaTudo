@@ -271,7 +271,7 @@ private fun EstequiometriaCalc(pacote: Pacote, un: Unidades, inicial: String) {
                     QuantidadeConhecida(i, v, emMols = (unidadesQtd[i] ?: "g") == "mol")
                 }
                 if (conhecidas.isNotEmpty()) {
-                    val r = tentar { Estequiometria.calcular(t, eq, conhecidas, pacote.porSimbolo).let { it.comoResultado(t, numero(t, rendimento)) } }
+                    val r = tentar { Estequiometria.calcular(t, eq, conhecidas, pacote.porSimbolo, numero(t, rendimento)).comoResultado(t) }
                     ResultadoCalcView(r)
                 } else {
                     Text(t(R.string.ui_calc_est_aguardando), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -393,7 +393,7 @@ private fun PhCalc(pacote: Pacote, un: Unidades) {
         }
         val c = numero(t, conc)
         val kv = numero(t, k)
-        val pKw = Solucoes.pKwDoPacote(pacote.constantes)
+        val pKw = Solucoes.pKwDoPacote(pacote.constantes, pacote.regras.pKwAgua)
         val resultado = if (c == null) null else tentar {
             val q = Qtd(c, concs.firstOrNull { it.simbolo == uConc } ?: concs.first())
             val tipo = if (acido) TipoForte.ACIDO else TipoForte.BASE

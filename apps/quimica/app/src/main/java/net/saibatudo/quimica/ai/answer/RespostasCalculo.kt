@@ -176,7 +176,7 @@ private suspend fun AnswerBuilder.conversaoMolar(q: ParsedQuery): Resposta {
         val res = GasIdeal.resolver(
             t, CampoQtd(1.0, un.porSimbolo("atm", "pressao")!!), CampoQtd(null, un.porSimbolo("L", "volume")!!),
             CampoQtd(mols, molUn), CampoQtd(0.0, un.porSimbolo("°C", "temperatura")!!), r, un
-        )
+        ).let { it.copy(notas = it.notas + GasIdeal.notasCntp(t, r, un)) }
         return Resposta(
             Intent.ESTEQUIOMETRIA, t(R.string.resp_est_volume_cntp_titulo),
             listOf(Bloco.Paragrafo(t(R.string.resp_est_cntp_adotadas))) + resultadoComoBlocos(res), fontes = fonteDe(r.fontes), acoes = acoes
@@ -296,7 +296,7 @@ internal suspend fun AnswerBuilder.ph(q: ParsedQuery): Resposta {
     val formula = q.formula ?: c?.formula
     val conc = q.quantidades.mapNotNull { qt -> unidadeDe(qt.unidade)?.takeIf { it.grandeza == "concentracao" }?.let { Qtd(qt.valor, it) } }.firstOrNull()
         ?: throw CalculoInvalido(R.string.erro_ph_informe_conc)
-    val pKw = Solucoes.pKwDoPacote(pacote.constantes)
+    val pKw = Solucoes.pKwDoPacote(pacote.constantes, pacote.regras.pKwAgua)
     val acoes = listOf(acaoCalculadora(TipoCalculadora.PH))
     val nome = c?.let { nomeDe(it) } ?: formula?.let { FormulaQuimica.tentar(it)?.exibicao() ?: it }
 
@@ -324,7 +324,8 @@ internal suspend fun AnswerBuilder.ph(q: ParsedQuery): Resposta {
         formula != null -> throw CalculoInvalido(R.string.erro_ph_precisa_constante, Texto.formulaUnicode(formula))
         else -> throw CalculoInvalido(R.string.erro_ph_diga_qual)
     }
-    val r = Solucoes.phForte(t, tipo, conc, ionizaveis, un, pKw.first, pKw.second)
+    val saturacao = if (tipo == TipoForte.BASE) Solucoes.solubilidadeDe(formula, pacote.regras.solubilidadeBases) else null
+    val r = Solucoes.phForte(t, tipo, conc, ionizaveis, un, pKw.first, pKw.second, saturacao)
     val titulo = if (nome != null) t(R.string.resp_ph_titulo_nome, nome, t.sig(conc.valor, 4), conc.unidade.simbolo) else r.titulo
     return Resposta(
         Intent.PH, titulo, resultadoComoBlocos(r),
@@ -345,7 +346,8 @@ internal suspend fun AnswerBuilder.gasIdeal(q: ParsedQuery): Resposta {
             throw CalculoInvalido(R.string.erro_gas_duas_vezes, t.grandeza(u.grandeza))
         }
     }
-    if (Regex("""\b(?:volume molar|cntp|ntp|condicoes (?:normais|padrao))\b""").containsMatchIn(n) && porGrandeza.size < 3) {
+    val usaCntp = Regex("""\b(?:volume molar|cntp|ntp|condicoes (?:normais|padrao))\b""").containsMatchIn(n) && porGrandeza.size < 3
+    if (usaCntp) {
         // CNTP adotadas: 1 mol, 0 °C e 1 atm (convenção declarada; os números vêm das unidades e de R)
         porGrandeza.putIfAbsent("quantidade", Qtd(1.0, un.porSimbolo("mol", "quantidade")!!))
         porGrandeza.putIfAbsent("temperatura", Qtd(0.0, un.porSimbolo("°C", "temperatura")!!))
@@ -362,6 +364,7 @@ internal suspend fun AnswerBuilder.gasIdeal(q: ParsedQuery): Resposta {
         return CampoQtd(null, alvo)
     }
     val res = GasIdeal.resolver(t, campo(VariavelGas.P, "atm"), campo(VariavelGas.V, "L"), campo(VariavelGas.N, "mol"), campo(VariavelGas.T, "K"), r, un)
+        .let { if (usaCntp) it.copy(notas = it.notas + GasIdeal.notasCntp(t, r, un)) else it }
     return Resposta(
         Intent.GAS_IDEAL, res.titulo, resultadoComoBlocos(res), fontes = fonteDe(r.fontes.ifEmpty { listOf(Fonte(t(R.string.fonte_constantes_pacote))) }),
         acoes = listOf(acaoCalculadora(TipoCalculadora.GAS_IDEAL))

@@ -19,7 +19,7 @@ data class CampoQtd(val valor: Double?, val unidade: UnidadeDef)
 /**
  * Conversão de unidades: base = valor × fator + offset (unidade-base da grandeza). As unidades e os prefixos vêm de
  * `regras.json` do pacote; o que o pacote não trouxer é completado com [PADRAO] e [PREFIXOS_PADRAO]: definições exatas do
- * SI e unidades legais/convencionais (atm, caloria termoquímica, mmHg convencional), isto é, convenções, não medições.
+ * SI e unidades legais/convencionais (atm, caloria termoquímica, mmHg convencional = 133,322387415 Pa, Torr = 101325/760 Pa), isto é, convenções, não medições.
  */
 class Unidades(lista: List<UnidadeDef>, val prefixos: List<PrefixoSi> = PREFIXOS_PADRAO) {
     val todas: List<UnidadeDef> = lista
@@ -40,9 +40,13 @@ class Unidades(lista: List<UnidadeDef>, val prefixos: List<PrefixoSi> = PREFIXOS
         pool.firstOrNull { it.simbolo == t }?.let { return it }
         pool.firstOrNull { u -> u.apelidos.any { it == t } }?.let { return it }
         val n = Texto.normalizar(t)
-        pool.firstOrNull { Texto.normalizar(it.simbolo) == n }?.let { return it }
-        pool.firstOrNull { Texto.normalizar(it.nome) == n }?.let { return it }
-        pool.firstOrNull { u -> u.apelidos.any { Texto.normalizar(it) == n } }?.let { return it }
+        // uma letra só não casa por normalização com outra grafia ("a" não é Å: "10 años", "de 10 a 20"); "k", "c" e "f" são apelidos exatos
+        val umaLetra = n.length == 1
+        pool.firstOrNull { Texto.normalizar(it.simbolo) == n && (!umaLetra || it.simbolo.equals(t, ignoreCase = true)) }?.let { return it }
+        if (!umaLetra) {
+            pool.firstOrNull { Texto.normalizar(it.nome) == n }?.let { return it }
+            pool.firstOrNull { u -> u.apelidos.any { Texto.normalizar(it) == n } }?.let { return it }
+        }
         for (p in prefixos.sortedByDescending { it.simbolo.length }) {
             val prefixo = if (t.startsWith(p.simbolo)) p.simbolo else if (p.simbolo == "µ" && t.startsWith("u")) "u" else continue
             val resto = t.substring(prefixo.length)
@@ -73,11 +77,40 @@ class Unidades(lista: List<UnidadeDef>, val prefixos: List<PrefixoSi> = PREFIXOS
     fun base(grandeza: String): UnidadeDef? = daGrandeza(grandeza).firstOrNull { it.fator == 1.0 && it.offset == 0.0 }
 
     companion object {
+        /**
+         * Unidades do pacote completadas com [PADRAO]. O símbolo do pacote escrito com o expoente em dígitos ("m3", "dm3", "s-1") passa a
+         * ser exibido com o expoente sobrescrito ("m³", "dm³", "s⁻¹"; nunca subscrito, como numa fórmula) e a grafia original vira apelido;
+         * os apelidos do [PADRAO] de mesmo símbolo são somados. Um apelido escrito igual ao símbolo ou a um apelido de OUTRA unidade da grandeza
+         * sai ("torr" não é mmHg quando existe a unidade Torr: 1 mmHg = 133,322387415 Pa e 1 Torr = 101325/760 Pa).
+         */
         fun de(regras: Regras): Unidades {
-            val conhecidas = regras.unidades.map { it.simbolo to it.grandeza }.toSet()
+            val padrao = PADRAO.associateBy { it.simbolo to it.grandeza }
+            val doPacote = regras.unidades.map { u ->
+                val exib = simboloExibicao(u.simbolo)
+                val extra = padrao[exib to u.grandeza]
+                u.copy(
+                    simbolo = exib, nome = u.nome ?: extra?.nome,
+                    apelidos = (u.apelidos + (if (exib != u.simbolo) listOf(u.simbolo) else emptyList()) + extra?.apelidos.orEmpty()).distinct()
+                )
+            }
+            val conhecidas = doPacote.map { it.simbolo to it.grandeza }.toSet()
             val prefixos = regras.prefixos.ifEmpty { PREFIXOS_PADRAO }
-            return Unidades(regras.unidades + PADRAO.filter { (it.simbolo to it.grandeza) !in conhecidas }, prefixos)
+            val todas = doPacote + PADRAO.filter { (it.simbolo to it.grandeza) !in conhecidas }
+            return Unidades(todas.map { u ->
+                val outros = todas.filter { it !== u && it.grandeza == u.grandeza }.flatMap { it.apelidos + it.simbolo }.toSet()
+                u.copy(apelidos = u.apelidos.filter { it !in outros })
+            }, prefixos)
         }
+
+        private val SOBRESCRITO = mapOf('0' to '⁰', '1' to '¹', '2' to '²', '3' to '³', '4' to '⁴', '5' to '⁵', '6' to '⁶', '7' to '⁷', '8' to '⁸', '9' to '⁹', '-' to '⁻')
+        private val RX_EXPOENTE = Regex("""([^\d\s.,^{}\-])(-?\d+)""")
+
+        /**
+         * Símbolo de unidade para exibir: o número depois do símbolo é EXPOENTE (m3 → m³, s-1 → s⁻¹, mol/m3 → mol/m³), como o
+         * `unidadeTex` do site (web/src/quimica/js/calc/unidades.js). Só para unidades: fórmulas químicas usam [Texto.formulaUnicode].
+         */
+        fun simboloExibicao(simbolo: String): String =
+            RX_EXPOENTE.replace(simbolo) { m -> m.groupValues[1] + m.groupValues[2].map { SOBRESCRITO[it] ?: it }.joinToString("") }
 
         private fun u(g: String, s: String, n: String, f: Double, o: Double = 0.0, pref: Boolean = false, vararg ap: String) =
             UnidadeDef(g, s, n, f, o, ap.toList(), pref)
@@ -98,13 +131,14 @@ class Unidades(lista: List<UnidadeDef>, val prefixos: List<PrefixoSi> = PREFIXOS
             u("pressao", "kPa", "quilopascal", 1000.0, 0.0, false, "kpa"),
             u("pressao", "bar", "bar", 100000.0, 0.0, true),
             u("pressao", "atm", "atmosfera padrão", 101325.0, 0.0, false, "atmosfera", "atmosferas"),
-            u("pressao", "mmHg", "milímetro de mercúrio", 101325.0 / 760.0, 0.0, false, "torr", "Torr"),
+            u("pressao", "mmHg", "milímetro de mercúrio", 133.322387415, 0.0, false),
+            u("pressao", "Torr", "torr", 101325.0 / 760.0, 0.0, false, "torr", "torrs"),
             u("pressao", "psi", "libra-força por polegada quadrada", 6894.757293168),
             u("volume", "m³", "metro cúbico", 1.0, 0.0, false, "m3", "metro cubico", "metros cubicos"),
             u("volume", "L", "litro", 0.001, 0.0, true, "l", "litro", "litros"),
             u("volume", "mL", "mililitro", 1e-6, 0.0, false, "ml", "mililitro", "mililitros"),
             u("volume", "cm³", "centímetro cúbico", 1e-6, 0.0, false, "cm3", "cc"),
-            u("volume", "dm³", "decímetro cúbico", 1e-3, 0.0, false, "dm3"),
+            u("volume", "dm³", "decímetro cúbico", 1e-3, 0.0, false, "dm3", "decimetro cubico", "decimetros cubicos"),
             u("massa", "kg", "quilograma", 1.0, 0.0, false, "quilo", "quilos", "quilograma", "quilogramas"),
             u("massa", "g", "grama", 0.001, 0.0, true, "grama", "gramas"),
             u("massa", "mg", "miligrama", 1e-6, 0.0, false, "miligrama", "miligramas"),

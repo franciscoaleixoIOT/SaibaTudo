@@ -149,11 +149,15 @@ internal suspend fun AnswerBuilder.buscarConceito(q: ParsedQuery): Resposta {
     // o ParsedQuery guarda o assunto como o site (com o artigo que sobrou do gatilho); a busca usa o tema limpo
     val tema = LocalNlu.temaDoConceito(q.conceito.orEmpty(), dic.lexico)
     val palavras = LocalNlu.termosDeBusca(tema, dic.lexico).filter { it.length >= 3 }
-    fun corpoDe(tr: Trecho) = if (tr.idioma == Idiomas.PADRAO) tr.textoPt ?: tr.textoOriginal.orEmpty() else tr.textoOriginal ?: tr.textoPt.orEmpty()
+    // em pt-BR, um trecho de outro idioma com tradução automática para o português (ChEBI, Faraday) vale como português, com o aviso
+    fun emPortugues(tr: Trecho) = idioma == Idiomas.PADRAO && tr.idioma != Idiomas.PADRAO && tr.traducaoAutomatica
+    fun idiomaDe(tr: Trecho) = if (emPortugues(tr)) Idiomas.PADRAO else tr.idioma
+    fun tituloDe(tr: Trecho) = if (emPortugues(tr) || (idioma == Idiomas.PADRAO && tr.idioma == Idiomas.PADRAO)) tr.tituloPt ?: tr.titulo else tr.titulo
+    fun corpoDe(tr: Trecho) = if (idiomaDe(tr) == Idiomas.PADRAO) tr.textoPt ?: tr.textoOriginal.orEmpty() else tr.textoOriginal ?: tr.textoPt.orEmpty()
     fun pontos(tr: Trecho): Int {
         var s = 0
         val chaves = tr.palavrasChave.map { Texto.nlu(it) }
-        val titulo = Texto.nlu(tr.titulo.orEmpty() + " " + tr.secao.orEmpty())
+        val titulo = Texto.nlu(tituloDe(tr).orEmpty() + " " + tr.secao.orEmpty())
         val corpo = Texto.nlu(corpoDe(tr))
         if (tema.isNotBlank()) {
             if (chaves.any { it == tema }) s += 10
@@ -164,7 +168,7 @@ internal suspend fun AnswerBuilder.buscarConceito(q: ParsedQuery): Resposta {
             if (titulo.split(' ').contains(p)) s += 2
             if (corpo.split(' ').contains(p)) s += 1
         }
-        return if (tr.idioma == idioma) s else s - 1
+        return if (idiomaDe(tr) == idioma) s else s - 1
     }
     fun melhorDe(trechos: List<Trecho>) = trechos.map { it to pontos(it) }.filter { it.second >= 3 }.maxByOrNull { it.second }?.first
     val melhor = melhorDe(pacote.trechos(idioma, palavras))
@@ -180,14 +184,14 @@ internal suspend fun AnswerBuilder.buscarConceito(q: ParsedQuery): Resposta {
     val texto = corpoDe(melhor)
     val blocos = mutableListOf<Bloco>(Bloco.Paragrafo(texto))
     // trecho em pt-BR cujo original é inglês e ainda sem tradução conta como inglês
-    val idiomaDoTexto = if (melhor.idioma == Idiomas.PADRAO && melhor.textoPt == null && melhor.traducao?.contains("pendente", true) == true) "en" else melhor.idioma
+    val idiomaDoTexto = if (melhor.idioma == Idiomas.PADRAO && melhor.textoPt == null && melhor.traducao?.contains("pendente", true) == true) "en" else idiomaDe(melhor)
     if (idiomaDoTexto != idioma) blocos += Bloco.Aviso(t(R.string.resp_trecho_em, t.nomeDoIdioma(idiomaDoTexto)))
-    else if (idioma == Idiomas.PADRAO && melhor.traducao?.contains("automática", true) == true) blocos += Bloco.Aviso(t(R.string.resp_traducao_automatica))
+    else if (idioma == Idiomas.PADRAO && melhor.traducaoAutomatica) blocos += Bloco.Aviso(t(R.string.resp_traducao_automatica))
     val fonte = Fonte(
         nome = buildString { append(melhor.fonte); melhor.secao?.let { append(", ").append(it) } },
         url = melhor.url, licenca = melhor.licenca
     )
-    return Resposta(Intent.CONCEITO, melhor.titulo ?: tema.replaceFirstChar { it.uppercase() }, blocos, fontes = listOf(fonte))
+    return Resposta(Intent.CONCEITO, tituloDe(melhor) ?: tema.replaceFirstChar { it.uppercase() }, blocos, fontes = listOf(fonte))
 }
 
 // ---- não entendi + sugestões ---------------------------------------------------------------------------------------------------------

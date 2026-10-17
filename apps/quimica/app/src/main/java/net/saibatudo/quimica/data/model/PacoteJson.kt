@@ -362,11 +362,49 @@ object PacoteJson {
             propriedades = props,
             unidades = unidades,
             prefixos = prefixos,
-            serieReatividade = o.get("reatividade").arr()?.mapNotNull { if (it.isJsonPrimitive) it.asString else null }.orEmpty(),
-            solubilidade = achatar(o.get("solubilidade")),
+            serieReatividade = serieReatividade(o.get("serieReatividadeMetais") ?: o.get("reatividade")),
+            solubilidade = regrasDeSolubilidade(o.get("solubilidade")),
             nomenclatura = achatar(o.get("nomenclatura")),
-            frasesH = frasesH
+            frasesH = frasesH,
+            solubilidadeBases = solubilidadeBases(o.get("solubilidadeBases")),
+            pKwAgua = (o.get("agua").obj()?.numero("pKw") ?: o.numero("pKw"))?.takeIf { it.isFinite() && it > 0 }
         )
+    }
+
+    /** Série de reatividade: lista de símbolos ou `{ordem: [...], criterio, potenciais, fonte}` (`regras.serieReatividadeMetais`). */
+    private fun serieReatividade(e: JsonElement?): List<String> =
+        (e.arr() ?: e.obj()?.get("ordem").arr())?.mapNotNull { if (it.isJsonPrimitive) it.asString else null }.orEmpty()
+
+    /** Regras de solubilidade: `{regras: [{regra, nota?}]}` vira uma linha por regra (com a nota, quando houver); outro formato é achatado. */
+    private fun regrasDeSolubilidade(e: JsonElement?): List<String> {
+        val lista = e.obj()?.get("regras").arr() ?: e.arr()
+        val linhas = lista?.mapNotNull { it.obj() }?.mapNotNull { r ->
+            val regra = r.texto("regra", "texto") ?: return@mapNotNull null
+            r.texto("nota")?.let { "$regra $it" } ?: regra
+        }.orEmpty()
+        return linhas.ifEmpty { achatar(e) }
+    }
+
+    /** `regras.solubilidadeBases`: lista de `{formula, kps?, solubilidadeMolL?, temperaturaC?, fonte}` ou mapa fórmula → objeto (igual ao site). */
+    internal fun solubilidadeBases(e: JsonElement?): List<SolubilidadeBase> {
+        val itens: List<Pair<String?, JsonObject>> = when {
+            e.arr() != null -> e.arr()!!.mapNotNull { it.obj() }.map { null to it }
+            e.obj() != null -> e.obj()!!.entrySet().mapNotNull { (f, v) -> v.obj()?.let { f to it } }
+            else -> emptyList()
+        }
+        return itens.mapNotNull { (chave, o) ->
+            val formula = o.texto("formula") ?: chave ?: return@mapNotNull null
+            val fonteEl = o.get("fonte")
+            val fonte = when {
+                fonteEl == null || fonteEl is JsonNull -> null
+                fonteEl.isJsonPrimitive -> fonteEl.asString.trim().ifEmpty { null }
+                else -> fonteEl.obj()?.texto("nome")
+            }
+            SolubilidadeBase(
+                formula, o.numero("kps", "Kps")?.takeIf { it > 0 }, o.numero("solubilidadeMolL", "solubilidade")?.takeIf { it > 0 },
+                o.numero("temperaturaC"), fonte
+            )
+        }
     }
 
     /**
@@ -492,7 +530,7 @@ object PacoteJson {
             fonte = o.texto("fonte") ?: "fonte desconhecida",
             licenca = o.texto("licenca") ?: "licença não informada",
             url = o.texto("url"), capitulo = o.texto("capitulo"), secao = o.texto("secao"), titulo = o.texto("titulo"),
-            textoOriginal = o.texto("textoOriginal"), textoPt = o.texto("textoPt"), traducao = o.texto("traducao"),
+            textoOriginal = o.texto("textoOriginal"), textoPt = o.texto("textoPt"), traducao = o.texto("traducao"), tituloPt = o.texto("tituloPt"),
             palavrasChave = o.textos("palavrasChave"),
             idiomaTexto = o.texto("idioma"),
             caminho = caminho

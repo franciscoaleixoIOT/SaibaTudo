@@ -19,6 +19,7 @@ object UnidadeNomes {
         "bar" to R.string.unidade_nome_bar,
         "atm" to R.string.unidade_nome_atm,
         "mmHg" to R.string.unidade_nome_mmhg,
+        "Torr" to R.string.unidade_nome_torr,
         "psi" to R.string.unidade_nome_psi,
         "m³" to R.string.unidade_nome_m3,
         "L" to R.string.unidade_nome_l,

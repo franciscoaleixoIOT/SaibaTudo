@@ -14,6 +14,28 @@ enum class VariavelGas(val simbolo: String, @param:StringRes val nome: Int, val 
 /** Gás ideal: resolve a variável que falta em PV = nRT, com R vindo das constantes do pacote (CODATA). */
 object GasIdeal {
 
+    /** Volume molar de gás ideal (L/mol) a 0 °C e 1 [pressao] ("atm" ou "bar"), por RT/P com o R do pacote; null sem R ou sem as unidades. */
+    fun volumeMolar(r: Constante?, un: Unidades, pressao: String): Double? {
+        val rv = r?.valor?.takeIf { it > 0 } ?: return null
+        val c = un.porSimbolo("°C", "temperatura") ?: return null
+        val p = un.porSimbolo(pressao, "pressao") ?: return null
+        val tK = un.paraBase(0.0, c)
+        val pPa = un.paraBase(1.0, p)
+        if (tK <= 0 || pPa <= 0) return null
+        return rv * tK / pPa * 1000.0
+    }
+
+    /**
+     * Nota das condições nas respostas que usam o volume molar: a CNTP adotada (0 °C, 1 atm: 22,4 L/mol) e, ao lado, a condição padrão
+     * atual da IUPAC (0 °C, 1 bar: 22,7 L/mol), as duas de RT/P (igual a `notasCntp` do site). Sem R no pacote, nenhuma nota.
+     */
+    fun notasCntp(t: Textos, r: Constante?, un: Unidades): List<String> {
+        val vm = volumeMolar(r, un, "atm") ?: return emptyList()
+        val cntp = t(R.string.calc_nota_cntp, t.sig(vm, 3))
+        val iupac = volumeMolar(r, un, "bar") ?: return listOf(cntp)
+        return listOf("$cntp ${t(R.string.calc_nota_iupac, t.sig(iupac, 3))}")
+    }
+
     fun resolver(
         tx: Textos, p: CampoQtd, v: CampoQtd, n: CampoQtd, t: CampoQtd,
         r: Constante?, unidades: Unidades

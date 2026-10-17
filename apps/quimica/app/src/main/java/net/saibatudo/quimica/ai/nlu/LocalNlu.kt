@@ -246,7 +246,7 @@ object LocalNlu {
     }
 
     private val RX_PV_NRT = Regex("""pv\s*=\s*nrt""", RegexOption.IGNORE_CASE)
-    private val UNIDADES_DE_GAS = setOf("atm", "Pa", "kPa", "mmHg", "bar", "K", "°C")
+    private val UNIDADES_DE_GAS = setOf("atm", "Pa", "kPa", "mmHg", "Torr", "bar", "K", "°C")
 
     /** Número do primeiro grupo de captura que casou (as pistas `grupo`/`periodo` de alguns idiomas têm alternativas com grupos diferentes). */
     private fun grupoDe(m: MatchResult?): Int? = m?.groupValues?.drop(1)?.firstOrNull { it.isNotEmpty() }?.toIntOrNull()

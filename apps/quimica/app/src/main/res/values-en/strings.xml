@@ -93,6 +93,7 @@
     <string name="erro_est_especie_inexistente">Species not in the equation.</string>
     <string name="erro_est_quantidade_positiva">The amounts must be positive numbers.</string>
     <string name="erro_est_so_reagentes">Give only reactants (to find the limiting one) or a single species.</string>
+    <string name="erro_est_rendimento">The yield must be between 0 and 100 %.</string>
     <string name="calc_est_massas_molares">Molar masses: %1$s.</string>
     <string name="calc_est_mol_informado">%1$s: %2$s mol (given).</string>
     <string name="calc_est_mol_de_massa">%1$s: n = m / M = %2$s g ÷ %3$s g/mol = %4$s mol.</string>
@@ -101,6 +102,10 @@
     <string name="calc_est_uma_especie">With only one known species: ξ = n ÷ coefficient = %1$s ÷ %2$d = %3$s mol.</string>
     <string name="calc_est_cada_especie">Each species: n = coefficient × ξ; mass = n × M.</string>
     <string name="calc_est_sobra">Remaining %1$s: %2$s mol (%3$s g).</string>
+    <string name="calc_est_produto_com_rendimento">The desired amount of %1$s is what is obtained at %2$s %% yield: divide by the yield to find the extent the reaction must reach (ξ = n ÷ coefficient ÷ yield); the given product amount does not change.</string>
+    <string name="calc_est_necessarios">Reagents needed (n = coefficient × ξ): %1$s.</string>
+    <string name="calc_nota_cntp">STP (0 °C, 1 atm): %1$s L/mol, the molar volume used here.</string>
+    <string name="calc_nota_iupac">Under the current IUPAC standard condition (0 °C, 1 bar), the molar volume is %1$s L/mol.</string>
     <string name="erro_gas_sem_r">The data package does not include the gas constant (R).</string>
     <string name="erro_um_campo_vazio_gas" tools:ignore="PluralsCandidate">Leave exactly one field blank: that is the one to be calculated (currently %1$d are blank).</string>
     <string name="erro_gas_positiva">%1$s must be positive (in %2$s).</string>
@@ -165,6 +170,11 @@
     <string name="calc_ph_nota_k_informada">The %1$s constant was supplied by you; this app does not have it in its data.</string>
     <string name="calc_ph_nota_diluida">Very dilute solution: the autoionization of water was included (the simple calculation would give a different value).</string>
     <string name="calc_ph_nota_vale_fortes">Applies to strong acids and bases. Weak acids and bases need the equilibrium constant (Ka or Kb).</string>
+    <string name="calc_ph_nota_25c">pKw = %1$s and neutral pH = %2$s hold at 25 °C; at other temperatures both change (pure water stays neutral).</string>
+    <string name="calc_ph_saturada">Warning: %1$s is only slightly soluble in water%2$s: at most about %3$s mol/L dissolves%4$s%5$s. The given concentration exceeds this: the solution is saturated (solid remains) and the actual pH does not go above about %6$s.</string>
+    <string name="calc_ph_saturada_temp">" (at %1$s °C)"</string>
+    <string name="calc_ph_saturada_kps">" (calculated from Ksp)"</string>
+    <string name="calc_ph_saturada_fonte">", according to %1$s"</string>
 
     <!-- 20_respostas -->
     <string name="resp_voce_quis_dizer">Did you mean: %1$s</string>
@@ -765,6 +775,7 @@
     <string name="unidade_nome_bar">bar</string>
     <string name="unidade_nome_atm">atmosphere</string>
     <string name="unidade_nome_mmhg">millimetre of mercury</string>
+    <string name="unidade_nome_torr">torr</string>
     <string name="unidade_nome_psi">pound-force per square inch</string>
     <string name="unidade_nome_m3">cubic metre</string>
     <string name="unidade_nome_l">litre</string>

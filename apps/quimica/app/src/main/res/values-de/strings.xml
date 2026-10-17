@@ -93,6 +93,7 @@
     <string name="erro_est_especie_inexistente">Dieser Stoff kommt in der Gleichung nicht vor.</string>
     <string name="erro_est_quantidade_positiva">Die Mengen müssen positive Zahlen sein.</string>
     <string name="erro_est_so_reagentes">Geben Sie nur Edukte an (um das limitierende Reagenz zu finden) oder einen einzigen Stoff.</string>
+    <string name="erro_est_rendimento">Die Ausbeute muss zwischen 0 und 100 % liegen.</string>
     <string name="calc_est_massas_molares">Molare Massen: %1$s.</string>
     <string name="calc_est_mol_informado">%1$s: %2$s mol (angegeben).</string>
     <string name="calc_est_mol_de_massa">%1$s: n = m / M = %2$s g ÷ %3$s g/mol = %4$s mol.</string>
@@ -101,6 +102,10 @@
     <string name="calc_est_uma_especie">Mit nur einem bekannten Stoff: ξ = n ÷ Koeffizient = %1$s ÷ %2$d = %3$s mol.</string>
     <string name="calc_est_cada_especie">Für jeden Stoff: n = Koeffizient × ξ; Masse = n × M.</string>
     <string name="calc_est_sobra">Verbleibend von %1$s: %2$s mol (%3$s g).</string>
+    <string name="calc_est_produto_com_rendimento">Die gewünschte Menge %1$s ist die bei %2$s %% Ausbeute erhaltene: Teilen Sie durch die Ausbeute, um den nötigen Reaktionsumsatz zu erhalten (ξ = n ÷ Koeffizient ÷ Ausbeute); die angegebene Produktmenge ändert sich nicht.</string>
+    <string name="calc_est_necessarios">Benötigte Reaktanten (n = Koeffizient × ξ): %1$s.</string>
+    <string name="calc_nota_cntp">Normbedingungen (0 °C, 1 atm): %1$s L/mol, das hier verwendete molare Volumen.</string>
+    <string name="calc_nota_iupac">Unter der aktuellen IUPAC-Standardbedingung (0 °C, 1 bar) beträgt das molare Volumen %1$s L/mol.</string>
     <string name="erro_gas_sem_r">Das Datenpaket enthält die Gaskonstante (R) nicht.</string>
     <string name="erro_um_campo_vazio_gas" tools:ignore="PluralsCandidate">Lassen Sie genau ein Feld leer: Dieses wird berechnet (es fehlen %1$d).</string>
     <string name="erro_gas_positiva">%1$s muss positiv sein (in %2$s).</string>
@@ -165,6 +170,11 @@
     <string name="calc_ph_nota_k_informada">Die Konstante %1$s wurde von Ihnen angegeben; die App hat sie nicht in den Daten.</string>
     <string name="calc_ph_nota_diluida">Sehr verdünnte Lösung: Die Autoprotolyse des Wassers wurde berücksichtigt (die einfache Rechnung würde einen anderen Wert ergeben).</string>
     <string name="calc_ph_nota_vale_fortes">Gilt für starke Säuren und Basen. Schwache Säuren und Basen erfordern die Gleichgewichtskonstante (Ka oder Kb).</string>
+    <string name="calc_ph_nota_25c">pKw = %1$s und neutraler pH = %2$s gelten bei 25 °C; bei anderen Temperaturen ändern sich beide (reines Wasser bleibt neutral).</string>
+    <string name="calc_ph_saturada">Achtung: %1$s ist in Wasser schwer löslich%2$s: Es lösen sich höchstens etwa %3$s mol/L%4$s%5$s. Die angegebene Konzentration liegt darüber: Die Lösung ist gesättigt (Feststoff bleibt zurück), und der tatsächliche pH-Wert steigt nicht über etwa %6$s.</string>
+    <string name="calc_ph_saturada_temp">" (bei %1$s °C)"</string>
+    <string name="calc_ph_saturada_kps">" (aus dem Löslichkeitsprodukt berechnet)"</string>
+    <string name="calc_ph_saturada_fonte">", laut %1$s"</string>
 
     <!-- 20_respostas -->
     <string name="resp_voce_quis_dizer">Meinten Sie: %1$s</string>
@@ -765,6 +775,7 @@
     <string name="unidade_nome_bar">Bar</string>
     <string name="unidade_nome_atm">Standardatmosphäre</string>
     <string name="unidade_nome_mmhg">Millimeter Quecksilbersäule</string>
+    <string name="unidade_nome_torr">Torr</string>
     <string name="unidade_nome_psi">Pfund-Kraft pro Quadratzoll</string>
     <string name="unidade_nome_m3">Kubikmeter</string>
     <string name="unidade_nome_l">Liter</string>

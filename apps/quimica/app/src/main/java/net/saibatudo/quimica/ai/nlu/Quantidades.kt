@@ -14,7 +14,8 @@ data class QuantidadeLida(val valor: Double, val unidade: String?, val texto: St
  */
 object Quantidades {
 
-    private val RX_SO_SIMBOLO = Regex("""^[A-Za-zµμ°º/³²⁻¹·.-]+$""")
+    /** Símbolo de unidade, com o expoente em dígito no fim ("dm3", "cm3", "m-3" = dm³, cm³, m⁻³). */
+    private val RX_SO_SIMBOLO = Regex("""^[A-Za-zµμ°º/³²⁻¹·.-]+(?:-?[1-3])?$""")
 
     /** Interpreta uma unidade escrita (símbolo ou nome por extenso no idioma do léxico): devolve o símbolo ou null. */
     fun lerUnidade(texto: String?, un: Unidades?, lex: Lexico = Lexico.de(Idiomas.PADRAO)): String? {
@@ -88,7 +89,9 @@ object Quantidades {
     /** Quantidade + unidade (símbolo, °C, % ou nome por extenso com até duas palavras: "mol por litro", "degrees celsius"). */
     private fun rxQuant(lex: Lexico): Regex = cacheQuant.getOrPut(lex.idioma) {
         val l = lex.letrasUnidade
-        Regex("""(?<![A-Za-z(\[)\]^_\-.,\d])$NUM\s*(°\s*[CF]|º\s*[CF]|%|[A-Za-zµμ°º][A-Za-zµμ°º/³²⁻¹·.-]*(?:\s+${lex.quantidadeComplemento}\s+[$l]+)?(?:\s+[$l]+)?)?""")
+        // o símbolo aceita o expoente em dígito ("3,5 dm3") e a palavra vai inteira, com acentos: "10 años" não vira "10 a" (Å) e
+        // "2 atmósferas" é lida pelo léxico do idioma
+        Regex("""(?<![A-Za-z(\[)\]^_\-.,\d])$NUM\s*(°\s*[CF]|º\s*[CF]|%|[A-Za-zµμ°º][\p{L}µμ°º/³²⁻¹·.-]*(?:-?[1-3](?![\d.,]?\d))?(?:\s+${lex.quantidadeComplemento}\s+[$l]+)?(?:\s+[$l]+)?)?""")
     }
 
     /** Quantidades com unidade encontradas no texto, na ordem; [unidade] nula quando não reconhecida. */

@@ -25,9 +25,11 @@ data class ResultadoEstequiometria(
     val limitante: String?,
     val extensao: Double,
     val linhas: List<LinhaEstequiometria>,
-    val passos: List<String>
+    val passos: List<String>,
+    /** Rendimento real (%) informado, abaixo de 100; null = teórico. As [linhas] são sempre as teóricas (n = coeficiente × ξ). */
+    val rendimento: Double? = null
 ) {
-    fun comoResultado(t: Textos, rendimentoPercentual: Double? = null): ResultadoCalculo {
+    fun comoResultado(t: Textos, rendimentoPercentual: Double? = rendimento): ResultadoCalculo {
         val l = linhas.map {
             val verbo = t(if (it.reagente) R.string.calc_est_consumido else R.string.calc_est_formado)
             val valor = "${t.sig(it.mols, 5)} mol = ${t.sig(it.massa, 5)} g"
@@ -50,9 +52,18 @@ data class ResultadoEstequiometria(
  */
 object Estequiometria {
 
-    fun calcular(t: Textos, eq: EquacaoBalanceada, conhecidas: List<QuantidadeConhecida>, elementos: Map<String, Elemento>): ResultadoEstequiometria {
+    /**
+     * [rendimentoPercentual] (0 < r ≤ 100, opcional) é o rendimento real. Partindo de REAGENTES, os produtos obtidos são os teóricos × rendimento.
+     * Partindo de um PRODUTO desejado com rendimento < 100 %, a quantidade informada é a obtida: a reação precisa avançar mais
+     * (ξ = n ÷ coeficiente ÷ rendimento) e os reagentes necessários são os teóricos ÷ rendimento (igual a `calcularEstequiometria` do site).
+     */
+    fun calcular(
+        t: Textos, eq: EquacaoBalanceada, conhecidas: List<QuantidadeConhecida>, elementos: Map<String, Elemento>, rendimentoPercentual: Double? = null
+    ): ResultadoEstequiometria {
         val especies = eq.equacao.todas
         val nr = eq.equacao.reagentes.size
+        val rend = rendimentoPercentual ?: 100.0
+        if (!rend.isFinite() || rend <= 0.0 || rend > 100.0) throw CalculoInvalido(R.string.erro_est_rendimento)
         if (conhecidas.isEmpty()) throw CalculoInvalido(R.string.erro_est_sem_quantidade)
         if (conhecidas.map { it.indice }.distinct().size != conhecidas.size) throw CalculoInvalido(R.string.erro_est_especie_repetida)
         for (q in conhecidas) {
@@ -84,8 +95,15 @@ object Estequiometria {
             passos += t(R.string.calc_est_limitante, Texto.formulaUnicode(limitante), t.sig(extensao, 5))
         } else if (molsConhecidos.size == 1) {
             val (i, n) = molsConhecidos.entries.first()
-            extensao = n / eq.coeficientes[i]
-            passos += t(R.string.calc_est_uma_especie, t.sig(n, 5), eq.coeficientes[i], t.sig(extensao, 5))
+            if (i >= nr && rend < 100.0) {
+                // produto desejado com rendimento: a quantidade informada é a real; a extensão teórica é maior
+                extensao = n / eq.coeficientes[i] / (rend / 100.0)
+                passos += t(R.string.calc_est_produto_com_rendimento, Texto.formulaUnicode(especies[i].rotulo), t.sig(rend, 4)) +
+                    " ξ = ${t.sig(n, 5)} ÷ (${eq.coeficientes[i]} × ${t.sig(rend / 100.0, 4)}) = ${t.sig(extensao, 5)} mol."
+            } else {
+                extensao = n / eq.coeficientes[i]
+                passos += t(R.string.calc_est_uma_especie, t.sig(n, 5), eq.coeficientes[i], t.sig(extensao, 5))
+            }
         } else {
             throw CalculoInvalido(R.string.erro_est_so_reagentes)
         }
@@ -96,9 +114,15 @@ object Estequiometria {
             LinhaEstequiometria(especies[i].rotulo, eq.coeficientes[i], i < nr, massas[i], mols, mols * massas[i], sobra?.let { if (kotlin.math.abs(it) < 1e-12) 0.0 else it })
         }
         passos += t(R.string.calc_est_cada_especie)
+        val necessarios = linhas.filterIndexed { i, l -> l.reagente && !molsConhecidos.containsKey(i) }
+        if (necessarios.isNotEmpty()) {
+            passos += t(R.string.calc_est_necessarios, necessarios.joinToString("; ") {
+                "n(${Texto.formulaUnicode(it.especie)}) = ${it.coeficiente} × ${t.sig(extensao, 5)} = ${t.sig(it.mols, 5)} mol (${t.sig(it.massa, 5)} g)"
+            })
+        }
         linhas.filter { it.sobraMols != null && it.sobraMols > 0.0 }.forEach {
             passos += t(R.string.calc_est_sobra, Texto.formulaUnicode(it.especie), t.sig(it.sobraMols!!, 5), t.sig(it.sobraMols * it.massaMolar, 5))
         }
-        return ResultadoEstequiometria(eq, limitante, extensao, linhas, passos)
+        return ResultadoEstequiometria(eq, limitante, extensao, linhas, passos, rend.takeIf { it < 100.0 })
     }
 }

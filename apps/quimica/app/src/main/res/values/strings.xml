@@ -99,6 +99,7 @@
     <string name="erro_est_especie_inexistente">Espécie inexistente na equação.</string>
     <string name="erro_est_quantidade_positiva">As quantidades devem ser números positivos.</string>
     <string name="erro_est_so_reagentes">Informe somente reagentes (para achar o limitante) ou uma única espécie.</string>
+    <string name="erro_est_rendimento">O rendimento deve estar entre 0 e 100 %.</string>
     <string name="calc_est_massas_molares">Massas molares: %1$s.</string>
     <string name="calc_est_mol_informado">%1$s: %2$s mol (informado).</string>
     <string name="calc_est_mol_de_massa">%1$s: n = m / MM = %2$s g ÷ %3$s g/mol = %4$s mol.</string>
@@ -107,6 +108,10 @@
     <string name="calc_est_uma_especie">Com uma só espécie conhecida: ξ = n ÷ coeficiente = %1$s ÷ %2$d = %3$s mol.</string>
     <string name="calc_est_cada_especie">Cada espécie: n = coeficiente × ξ; massa = n × MM.</string>
     <string name="calc_est_sobra">Sobra de %1$s: %2$s mol (%3$s g).</string>
+    <string name="calc_est_produto_com_rendimento">A quantidade desejada de %1$s é a obtida com rendimento de %2$s %%: divida pelo rendimento para achar a extensão que a reação precisa alcançar (ξ = n ÷ coeficiente ÷ rendimento); o produto informado não muda.</string>
+    <string name="calc_est_necessarios">Reagentes necessários (n = coeficiente × ξ): %1$s.</string>
+    <string name="calc_nota_cntp">CNTP (0 °C, 1 atm): %1$s L/mol, o volume molar usado aqui.</string>
+    <string name="calc_nota_iupac">Na condição padrão atual da IUPAC (0 °C, 1 bar), o volume molar é %1$s L/mol.</string>
     <string name="erro_gas_sem_r">O pacote de dados não traz a constante dos gases (R).</string>
     <string name="erro_um_campo_vazio_gas" tools:ignore="PluralsCandidate">Deixe exatamente um campo vazio: é o que será calculado (faltam %1$d).</string>
     <string name="erro_gas_positiva">%1$s deve ser positiva (em %2$s).</string>
@@ -171,6 +176,11 @@
     <string name="calc_ph_nota_k_informada">A constante %1$s foi informada por você; este app não a tem nos dados.</string>
     <string name="calc_ph_nota_diluida">Solução muito diluída: foi incluída a autoionização da água (a conta simples daria outro valor).</string>
     <string name="calc_ph_nota_vale_fortes">Vale para ácidos e bases fortes. Ácidos e bases fracas exigem a constante de equilíbrio (Ka ou Kb).</string>
+    <string name="calc_ph_nota_25c">pKw = %1$s e pH neutro = %2$s valem a 25 °C; em outras temperaturas os dois mudam (a água pura continua neutra).</string>
+    <string name="calc_ph_saturada">Atenção: %1$s é pouco solúvel em água%2$s: dissolve no máximo cerca de %3$s mol/L%4$s%5$s. A concentração informada passa disso: a solução fica saturada (sobra sólido) e o pH real não passa de cerca de %6$s.</string>
+    <string name="calc_ph_saturada_temp">" (a %1$s °C)"</string>
+    <string name="calc_ph_saturada_kps">" (calculado do Kps)"</string>
+    <string name="calc_ph_saturada_fonte">", segundo %1$s"</string>
 
     <!-- 20_respostas -->
     <string name="resp_voce_quis_dizer">Você quis dizer: %1$s</string>
@@ -771,6 +781,7 @@
     <string name="unidade_nome_bar">bar</string>
     <string name="unidade_nome_atm">atmosfera padrão</string>
     <string name="unidade_nome_mmhg">milímetro de mercúrio</string>
+    <string name="unidade_nome_torr">torr</string>
     <string name="unidade_nome_psi">libra-força por polegada quadrada</string>
     <string name="unidade_nome_m3">metro cúbico</string>
     <string name="unidade_nome_l">litro</string>
