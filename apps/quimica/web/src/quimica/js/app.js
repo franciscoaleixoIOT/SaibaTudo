@@ -6,6 +6,7 @@ import { Engine } from './engine.js';
 import { h, icon, anunciar } from './dom.js';
 import { aplicarIdiomaAoDocumento, caminhoPrivacidade, definirIdioma, detectarIdioma, idiomaAtual, t } from './i18n/index.js';
 import { aoMudarInstalacao, ehIos, iniciarInstalacao, instalar, jaInstalado, podeInstalarAgora } from './install.js';
+import { iniciarMelhoria } from './melhoria.js';
 import { NuvemNlu } from './nuvem.js';
 import { aplicarAparencia, carregar, installId, salvarIdioma } from './prefs.js';
 import { roteador, toast } from './ui/componentes.js';
@@ -199,6 +200,8 @@ export async function iniciarApp() {
   document.addEventListener('click', interceptarLinks);
   window.addEventListener('popstate', () => renderizar());
   await renderizar();
+  // "Ajudar a melhorar o app" (opt-in próprio): tenta enviar a fila guardada na abertura e quando a rede volta (só com a chave ligada)
+  iniciarMelhoria();
   // verificação de atualização em segundo plano (dois arquivos pequenos), sem travar a interface
   setTimeout(async () => {
     const r = await S.store.verificarAtualizacao().catch(() => null);

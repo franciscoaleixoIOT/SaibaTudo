@@ -1,5 +1,6 @@
 // GET /api/health — verificação de saúde (sem segredos e sem chamar o Modal nem o Hugging Face: não gera custo).
-//   Saída: { ok:true, version, model, nlu:"on"|"off", ask:"on"|"off", shared:"on"|"off", data:{version, generatedAt, packageAgeDays}|null, time }
+//   Saída: { ok:true, version, model, nlu:"on"|"off", ask:"on"|"off", melhoria:"on"|"off", shared:"on"|"off", data:{version, generatedAt, packageAgeDays}|null, time }
+// "melhoria":"on" = captura opt-in das perguntas não entendidas ligada (MELHORIA_ENABLED=1 E Redis; _lib/melhoria-handler.js).
 // "nlu":"off" / "ask":"off" indicam o kill switch ativo (os clientes usam só o NLU local e as respostas montadas dos dados).
 // `data` descreve o PACOTE DE DADOS publicado: lido de data/quimica/manifest.json quando o arquivo vai junto da função (vercel.json
 // `includeFiles`) ou, senão, buscado no próprio site (/quimica/data/manifest.json) em até 2 s. `null` se nenhum dos dois funcionar
@@ -8,6 +9,7 @@
 import { readFile } from 'node:fs/promises';
 import { askAtivo, nluAtivo, readConfig } from './_lib/config.js';
 import { lerConfigCompartilhado } from './_lib/compartilhado.js';
+import { melhoriaAtiva } from './_lib/melhoria-handler.js';
 import { json, origemPermitida, toNodeHandler } from './_lib/http.js';
 
 const TIMEOUT_DADOS_MS = 2000;
@@ -67,6 +69,7 @@ export async function handleHealth(request, env = process.env, deps = {}) {
     model: cfg.modelVersion,
     nlu: nluAtivo(cfg) ? 'on' : 'off',
     ask: askAtivo(cfg) ? 'on' : 'off',
+    melhoria: melhoriaAtiva(cfg, env) ? 'on' : 'off',
     shared: lerConfigCompartilhado(env).ativo ? 'on' : 'off', // contadores globais de limite entre instâncias (Redis opcional)
     data,
     time: new Date().toISOString(),

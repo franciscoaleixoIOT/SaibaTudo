@@ -85,6 +85,39 @@ class Yaml(unittest.TestCase):
                     grupo = d["concurrency"]["group"] if isinstance(d["concurrency"], dict) else d["concurrency"]
                     self.assertTrue(str(grupo).startswith("quimica-"), grupo)
 
+    def test_data_refresh_compara_pacotes_antes_de_publicar(self):
+        # PENDENCIAS 8.3: divergência de números entre o pacote novo e o publicado bloqueia a publicação (tools/comparar_pacotes.py)
+        d = _carregar(GITHUB / "workflows" / "quimica-data-refresh.yml")
+        passos = d["jobs"]["atualizar"]["steps"]
+        ids = [p.get("id") for p in passos]
+        for obrigatorio in ("build", "comparar", "publicar"):
+            self.assertIn(obrigatorio, ids)
+        i_build, i_comp, i_pub = ids.index("build"), ids.index("comparar"), ids.index("publicar")
+        self.assertLess(i_build, i_comp)
+        self.assertLess(i_comp, i_pub)
+        comp = passos[i_comp]
+        self.assertIn("tools/comparar_pacotes.py", comp["run"])
+        self.assertIn("--anterior-reserva", comp["run"])
+        self.assertIn("inputs.rapido != true", str(comp["if"]), "o modo rápido nunca publica nem é comparado")
+        self.assertTrue(comp.get("continue-on-error"), "a issue é aberta no passo seguinte; o passo de bloqueio derruba a execução")
+        # a entrada `permitir` passa por env (nunca ${{ }} direto num script de shell) e os relatórios ficam fora de apps/quimica
+        self.assertIn("PERMITIR", comp["env"])
+        self.assertIn("$RUNNER_TEMP/comparacao.txt", comp["run"])
+        texto = chr(10).join(p.get("run", "") for p in passos)
+        self.assertNotIn("inputs.permitir", texto)
+        gatilho = d.get("on", d.get(True))
+        self.assertIn("permitir", gatilho["workflow_dispatch"]["inputs"])
+        # entre a comparação e a publicação há um passo que falha quando a comparação falhou
+        bloqueio = [p for p in passos[i_comp + 1:i_pub] if "exit 1" in p.get("run", "") and "comparar" in str(p.get("if", ""))]
+        self.assertTrue(bloqueio, "falta o passo que bloqueia a publicação")
+        # issue com etiqueta própria (a de frescor `alerta-dados-quimica` é fechada pelo outro workflow) e permissão para abri-la
+        self.assertEqual(d["permissions"].get("issues"), "write")
+        self.assertIn("divergencia-dados-quimica", texto)
+        self.assertNotIn("alerta-dados-quimica", texto)
+        # o pacote versionado é guardado ANTES do build (que troca data/quimica no lugar) para servir de reserva da comparação
+        guarda = [i for i, p in enumerate(passos) if "pacote-versionado" in p.get("run", "") and "cp -r" in p.get("run", "")]
+        self.assertTrue(guarda and guarda[0] < i_build)
+
     def test_android_ci_sem_segredos_e_com_verificador(self):
         p = GITHUB / "workflows" / "quimica-android-ci.yml"
         texto = p.read_text(encoding="utf-8")

@@ -111,6 +111,22 @@ export default {
       falhou: 'Die KI in der Cloud konnte die Frage gerade nicht interpretieren. Formulieren Sie sie neu und nennen Sie das Element, die Verbindung oder die Eigenschaft.',
       quisDizer: 'Diese Verbindung habe ich in den Daten nicht gefunden. Meinten Sie:'
     },
+    melhoria: {
+      titulo: 'Helfen, die App zu verbessern',
+      explicacao: 'Die App hat diese Frage nicht verstanden. Wenn Sie möchten, senden Sie sie uns, damit wir dem Interpreter beibringen können, sie zu verstehen. Gesendet werden nur der Text der Frage und ein zufälliger Code dieser Installation, ohne Ihren Namen und ohne etwas, das Sie identifiziert. Fragen mit E-Mail-Adresse, Telefonnummer, Ausweisnummer, Webadresse oder einer gefährlichen Anfrage werden nicht gesendet, aber kein Filter ist perfekt: Schreiben Sie bitte keine persönlichen Daten. Ein Mensch prüft die gespeicherten Fragen, die nach spätestens 4 Monaten gelöscht werden. Um sie immer zu senden, schalten Sie „Helfen, die App zu verbessern“ in den Einstellungen ein; dort können Sie es auch ausschalten und die Warteschlange leeren.',
+      botao: 'Diese Frage senden',
+      enviando: 'Wird gesendet…',
+      enviada: 'Danke! Die Frage wurde gesendet.',
+      naFila: 'Diese Frage ist in der Warteschlange von „Helfen, die App zu verbessern“ und wird mit den nächsten gesendet. Zum Ausschalten gehen Sie zu den Einstellungen.',
+      guardada: 'Die Frage bleibt auf diesem Gerät gespeichert und wird mit den nächsten gesendet.',
+      indisponivel: 'Das Senden ist gerade nicht verfügbar. Die Frage bleibt auf diesem Gerät gespeichert und wird später gesendet.',
+      falhou: 'Senden gerade nicht möglich (kein Netz oder zu viele Sendungen hintereinander). Die Frage bleibt auf diesem Gerät gespeichert und wird später gesendet.',
+      chave: 'Helfen, die App zu verbessern',
+      chaveAjuda: 'Standardmäßig aus. Wenn eingeschaltet, kommen die Fragen, die die App nicht verstanden hat, in eine Warteschlange auf diesem Gerät und werden gebündelt an unseren Server gesendet, nur mit dem Text der Frage und einem zufälligen Code dieser Installation, damit ein Mensch sie prüft und der App beibringt, sie zu verstehen. Fragen mit persönlichen Daten (E-Mail, Telefon, Ausweisnummer, Website) oder einer gefährlichen Anfrage kommen nicht in die Warteschlange, aber kein Filter ist perfekt: Vermeiden Sie persönliche Daten. Beim Ausschalten wird gelöscht, was noch nicht gesendet wurde.',
+      fila: (p) => (Number(p.n) === 0 ? 'Keine Frage in der Warteschlange.' : Number(p.n) === 1 ? 'Eine Frage in der Warteschlange wartet auf das Senden.' : `${p.n} Fragen in der Warteschlange warten auf das Senden.`),
+      apagarFila: 'Warteschlange leeren',
+      filaApagada: 'Warteschlange geleert.'
+    },
     resposta: {
       rotuloRecusa: 'Anfrage aus Sicherheitsgründen abgelehnt',
       rotuloResolvida: 'Antwort auf Ihrem Gerät aus den Daten erstellt',

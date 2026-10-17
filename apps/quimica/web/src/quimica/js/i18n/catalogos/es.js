@@ -110,6 +110,22 @@ export default {
       falhou: 'La IA en la nube no pudo interpretar la pregunta ahora. Intenta reformularla citando el elemento, el compuesto o la propiedad.',
       quisDizer: 'No encontré ese compuesto en los datos. ¿Quisiste decir:'
     },
+    melhoria: {
+      titulo: 'Ayudar a mejorar la aplicación',
+      explicacao: 'La aplicación no entendió esta pregunta. Si quieres, envíala para ayudarnos a enseñar al intérprete. Solo se envían el texto de la pregunta y un código aleatorio de esta instalación, sin tu nombre ni nada que te identifique. Las preguntas con correo electrónico, teléfono, número de documento, dirección web o una petición peligrosa no se envían, pero ningún filtro es perfecto: no escribas datos personales. Una persona revisa las preguntas guardadas, que se borran en un plazo máximo de 4 meses. Para enviarlas siempre, activa "Ayudar a mejorar la aplicación" en Configuración; allí también puedes desactivarlo y vaciar la cola.',
+      botao: 'Enviar esta pregunta',
+      enviando: 'Enviando…',
+      enviada: '¡Gracias! La pregunta se envió.',
+      naFila: 'Esta pregunta entró en la cola de "Ayudar a mejorar la aplicación" y se enviará con las próximas. Para desactivarlo, ve a Configuración.',
+      guardada: 'La pregunta quedó guardada en este dispositivo y se enviará con las próximas.',
+      indisponivel: 'El envío no está disponible ahora. La pregunta queda guardada en este dispositivo y se enviará más tarde.',
+      falhou: 'No se pudo enviar ahora (sin red o demasiados envíos seguidos). La pregunta queda guardada en este dispositivo y se enviará más tarde.',
+      chave: 'Ayudar a mejorar la aplicación',
+      chaveAjuda: 'Desactivado por defecto. Si lo activas, las preguntas que la aplicación no entendió entran en una cola en este dispositivo y se envían por lotes a nuestro servidor, solo con el texto de la pregunta y un código aleatorio de esta instalación, para que una persona las revise y enseñe a la aplicación a entenderlas. Las preguntas con datos personales (correo, teléfono, documento, sitio web) o una petición peligrosa no entran en la cola, pero ningún filtro es perfecto: evita escribir datos personales. Al desactivarlo se borra lo que aún no se ha enviado.',
+      fila: (p) => (Number(p.n) === 0 ? 'Ninguna pregunta en la cola.' : Number(p.n) === 1 ? 'Una pregunta en la cola, esperando el envío.' : `${p.n} preguntas en la cola, esperando el envío.`),
+      apagarFila: 'Vaciar la cola',
+      filaApagada: 'Cola vaciada.'
+    },
     resposta: {
       rotuloRecusa: 'Petición rechazada por motivos de seguridad',
       rotuloResolvida: 'Respuesta construida en tu dispositivo, a partir de los datos',

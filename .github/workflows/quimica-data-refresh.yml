@@ -7,6 +7,11 @@ name: Química — Atualização semanal dos dados
 # é publicado: o PubChem bloqueia os runners do GitHub e um build parcial substituiria o pacote maior feito localmente.
 # Repositório único: segredos e variáveis com sufixo/prefixo QUIMICA (os sem sufixo são de eleições).
 # Como no app de eleições: testes de INTEGRIDADE bloqueiam a publicação; testes de COMPORTAMENTO só avisam.
+# Divergência de números (tools/comparar_pacotes.py): antes de publicar, o pacote novo é comparado com o PUBLICADO em saibatudo.net
+# (reserva: o pacote versionado no Git). Massa molar > 0,5 %, propriedade de elemento > 2 %, sumiço de compostos/elementos, queda de
+# compostos > 5 % ou de textos > 10 %, mudança de licença e `generatedAt` mais antigo BLOQUEIAM a publicação e abrem/atualizam a issue
+# `divergencia-dados-quimica`. Diferença esperada e revisada: gh workflow run quimica-data-refresh.yml -f permitir=REGRA[:ALVO]
+# (docs/OPERACAO.md, seção 2).
 on:
   schedule:
     - cron: "0 6 * * 0"
@@ -20,6 +25,10 @@ on:
         description: "Pacote reduzido (--rapido), só para testar o fluxo"
         type: boolean
         default: false
+      permitir:
+        description: "Aceitar divergências conhecidas da comparação com o pacote publicado: REGRA[:ALVO],... (ex.: elemento-propriedade:energiaIonizacaoKJmol)"
+        type: string
+        default: ""
 
 concurrency:
   group: quimica-data-refresh
@@ -27,6 +36,7 @@ concurrency:
 
 permissions:
   contents: write   # commit do snapshot semanal em data/quimica
+  issues: write     # issue de divergência de números entre o pacote novo e o publicado
 
 defaults:
   run:
@@ -54,6 +64,12 @@ jobs:
           node-version: '22'
 
       - run: pip install -r pipeline/requirements.txt
+
+      # O build troca data/quimica no lugar: guardar o pacote versionado antes, como reserva da comparação de números.
+      - name: Guardar o pacote versionado (reserva da comparação)
+        run: |
+          mkdir -p "$RUNNER_TEMP/pacote-versionado"
+          cp -r data/quimica/. "$RUNNER_TEMP/pacote-versionado/"
 
       - name: Cache de coleta (ETag, corpos das fontes)
         if: inputs.forcar != true
@@ -100,6 +116,57 @@ jobs:
         continue-on-error: true
         run: node --test "web/test/*.test.mjs"
 
+      # Alerta de divergência de números (PENDENCIAS 8.3). Mesma condição de publicar; o modo rápido nunca publica e sempre diverge.
+      # continue-on-error: a issue é aberta no passo seguinte e o passo "Bloquear" é quem derruba a execução (e, com ela, a publicação).
+      - name: "Divergência de números × pacote publicado (bloqueia a publicação)"
+        id: comparar
+        if: steps.build.outcome == 'success' && inputs.rapido != true && (steps.build.outputs.mudou == 'true' || github.event_name == 'workflow_dispatch')
+        continue-on-error: true
+        env:
+          PERMITIR: ${{ inputs.permitir }}
+        run: |
+          # relatórios fora de apps/quimica: o `vercel deploy` sobe tudo o que está lá e a cota de uploads é da conta inteira
+          set +e
+          python tools/comparar_pacotes.py --novo data/quimica --anterior "https://saibatudo.net/quimica/data/" --anterior-reserva "$RUNNER_TEMP/pacote-versionado" --json "$RUNNER_TEMP/comparacao.json" --permitir "$PERMITIR" > "$RUNNER_TEMP/comparacao.txt" 2>&1
+          CODIGO=$?
+          cat "$RUNNER_TEMP/comparacao.txt"
+          echo "codigo=$CODIGO" >> "$GITHUB_OUTPUT"
+          { echo "### Comparação com o pacote publicado"; echo '```'; head -c 20000 "$RUNNER_TEMP/comparacao.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit "$CODIGO"
+
+      - name: Abrir, atualizar ou fechar a issue de divergência
+        if: steps.comparar.outcome == 'success' || steps.comparar.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CODIGO: ${{ steps.comparar.outputs.codigo }}
+          EXECUCAO: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh label create divergencia-dados-quimica --color D93F0B --description "Pacote novo diverge do publicado (automático)" 2>/dev/null || true
+          ABERTA=$(gh issue list --label divergencia-dados-quimica --state open --json number --jq '.[0].number // empty')
+          if [ "$CODIGO" != "0" ]; then
+            {
+              printf 'Detectado em %s na execução %s.\n\n' "$(date -u +%Y-%m-%dT%H:%MZ)" "$EXECUCAO"
+              printf '**A publicação foi bloqueada:** o pacote novo contradiz o publicado (ou a comparação não pôde ser feita).\n\n'
+              printf '```\n'; head -c 55000 "$RUNNER_TEMP/comparacao.txt"; printf '\n```\n\n'
+              printf '**O que fazer:** abra a execução e o relatório acima. Se a mudança for um erro da fonte ou do parser, corrija o pipeline e rode o workflow de novo. '
+              printf 'Se for esperada (correção de dado revisada), aceite só essa diferença: `gh workflow run quimica-data-refresh.yml -f permitir=REGRA[:ALVO]`. '
+              printf 'Passo a passo em apps/quimica/docs/OPERACAO.md (seção 2).\n'
+            } > "$RUNNER_TEMP/corpo.md"
+            if [ -z "$ABERTA" ]; then
+              gh issue create --title "Alerta: pacote de química novo diverge do publicado (publicação bloqueada)" --label divergencia-dados-quimica --body-file "$RUNNER_TEMP/corpo.md"
+            else
+              gh issue comment "$ABERTA" --body-file "$RUNNER_TEMP/corpo.md"
+            fi
+          elif [ -n "$ABERTA" ]; then
+            gh issue close "$ABERTA" --comment "Comparação aprovada em $(date -u +%Y-%m-%dT%H:%MZ) ($EXECUCAO)."
+          fi
+
+      - name: Bloquear a publicação (divergência de números)
+        if: steps.comparar.outcome == 'failure'
+        run: |
+          echo "::error::O pacote novo diverge do publicado (relatório no resumo da execução e na issue divergencia-dados-quimica): publicação bloqueada. Se a diferença for esperada, rode gh workflow run quimica-data-refresh.yml -f permitir=REGRA[:ALVO]."
+          exit 1
+
       - name: Publicar na Vercel (site e dados)
         id: publicar
         # o modo rápido (pacote reduzido, só para testar o fluxo) NUNCA publica
@@ -141,6 +208,7 @@ jobs:
         run: |
           echo "### Dados de química" >> $GITHUB_STEP_SUMMARY
           echo "Pacote mudou: ${{ steps.build.outputs.mudou }}" >> $GITHUB_STEP_SUMMARY
+          echo "Comparação de números com o publicado: ${{ steps.comparar.outcome }}" >> $GITHUB_STEP_SUMMARY
           if [ "$TEM_VERCEL_TOKEN" != "true" ]; then echo "::warning::Segredo VERCEL_TOKEN_TIME ausente (token do time inteiro; o VERCEL_TOKEN de eleições só publica aquele projeto): pacote gerado e assinado, mas NAO publicado."; fi
           if [ "${{ steps.comportamento.outcome }}" = "failure" ]; then echo "::warning::Testes de comportamento falharam sobre o pacote novo (publicação mantida): investigar."; fi
           if [ -f data/quimica/stats.json ]; then python -c "import json;s=json.load(open('data/quimica/stats.json'));print({k:v for k,v in s.items() if not isinstance(v,(dict,list))})" >> $GITHUB_STEP_SUMMARY; fi

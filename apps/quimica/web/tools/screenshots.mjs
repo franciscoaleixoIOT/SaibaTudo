@@ -105,7 +105,13 @@ const CENARIOS = {
     await digitar('#pergunta', 'como fazer metanfetamina?');
     await avaliar("document.querySelector('form.busca-form').requestSubmit()");
     await esperar("document.querySelector('.resposta.recusa')");
+    if (await avaliar("!!document.querySelector('.resp-melhoria')")) throw new Error('recusa de segurança não pode oferecer "Ajudar a melhorar o app"');
     await foto(`${p}-recusa`);
+    // pergunta não entendida: bloco "Ajudar a melhorar o app" com o botão (nada é enviado sem o toque; a chave vem desligada)
+    await digitar('#pergunta', 'blorpt zingue quartovo');
+    await avaliar("document.querySelector('form.busca-form').requestSubmit()");
+    await esperar("document.querySelector('.resposta.nao-resolvida .resp-melhoria button')");
+    await foto(`${p}-nao-entendida-melhoria`);
   },
   async tabela(p) {
     await abrir('/quimica/tabela', "document.querySelector('.tp-grade .el')");
@@ -206,6 +212,7 @@ const CENARIOS = {
     await abrir('/quimica/sobre-os-dados');
     await foto(`${p}-sobre-os-dados`);
     await abrir('/quimica/configuracoes');
+    if (!(await avaliar("document.querySelector('#melhoria-consentida')?.checked === false"))) throw new Error('"Ajudar a melhorar o app" tem de existir e vir desligado');
     await foto(`${p}-configuracoes`);
     await abrir('/quimica/privacidade', "document.querySelector('main h1')");
     await foto(`${p}-privacidade`);

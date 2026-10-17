@@ -121,6 +121,8 @@ textarea.auto-altura { resize: none; overflow-y: hidden; line-height: 1.4; overf
 .resp-rodape { margin-top: 10px; }
 .resp-nuvem { margin-top: 12px; display: grid; gap: 6px; justify-items: start; }
 .resp-nuvem .mini { margin: 0; }
+.resp-melhoria { margin-top: 12px; display: grid; gap: 6px; justify-items: start; padding-top: 10px; border-top: 1px solid var(--borda, rgba(127, 127, 127, .25)); }
+.resp-melhoria .mini, .resp-melhoria p { margin: 0; }
 .chave { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; cursor: pointer; }
 .chave input { margin-top: 3px; flex: none; }
 .chave .ajuda-campo { display: block; margin-top: 2px; }

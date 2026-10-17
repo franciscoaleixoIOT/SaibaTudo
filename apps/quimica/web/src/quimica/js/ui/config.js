@@ -1,7 +1,9 @@
-// Configurações: idioma, aparência, instalação do app, IA na nuvem (opt-in: chave do modo automático) e apagar os dados deste aparelho.
+// Configurações: idioma, aparência, instalação do app, IA na nuvem (opt-in: chave do modo automático), "Ajudar a melhorar o app" (opt-in próprio:
+// chave + fila + "Apagar fila"; js/melhoria.js) e apagar os dados deste aparelho (inclui a fila e o consentimento).
 import { h, icon } from '../dom.js';
 import { IDIOMAS, NOMES_IDIOMAS, caminhoPrivacidade, idiomaAtual, t } from '../i18n/index.js';
 import { instalar, instrucoes, jaInstalado, podeInstalarAgora } from '../install.js';
+import { filaMelhoria } from '../melhoria.js';
 import { FONTES, TEMAS, apagar, aplicarAparencia, carregar, salvar } from '../prefs.js';
 import { botaoAtualizacao } from './sobre.js';
 import { kvEl, toast } from './componentes.js';
@@ -19,7 +21,21 @@ export function seletorIdioma({ id = 'sel-idioma', classe = 'campo', aoMudar, ar
 
 export function viewConfig({ store, mudarIdioma }) {
   let prefs = carregar();
-  const mudar = (campo, valor) => { prefs = { ...prefs, [campo]: valor }; salvar(prefs); aplicarAparencia(prefs); toast(t('ui.config.salva')); };
+  // relê as preferências antes de gravar: a fila do "Ajudar a melhorar o app" pode ter mudado em segundo plano (envio de um lote)
+  const mudar = (campo, valor) => { prefs = { ...carregar(), [campo]: valor }; salvar(prefs); aplicarAparencia(prefs); toast(t('ui.config.salva')); };
+
+  const fila = filaMelhoria();
+  const contagemFila = h('p', { class: 'pequeno mudo', role: 'status', 'aria-live': 'polite', id: 'melhoria-fila' });
+  const atualizarFila = () => { const n = fila.pendentes().length; contagemFila.textContent = t('ui.melhoria.fila', { n }); botaoFila.disabled = n === 0; };
+  const botaoFila = h('button', { class: 'btn btn-contorno peq', type: 'button', id: 'melhoria-apagar-fila', onClick: () => { fila.limpar(); atualizarFila(); toast(t('ui.melhoria.filaApagada')); } },
+    icon('trash', 16), t('ui.melhoria.apagarFila'));
+  const aoMudarMelhoria = (ligada) => {
+    mudar('melhoriaConsentida', ligada);
+    if (!ligada) fila.limpar(); // desligou: o que ainda não foi enviado é apagado
+    else fila.enviarSePreciso().catch(() => {}).finally(atualizarFila);
+    atualizarFila();
+  };
+  atualizarFila();
 
   const blocoInstalar = h('div');
   const atualizarInstalar = () => {
@@ -54,6 +70,10 @@ export function viewConfig({ store, mudarIdioma }) {
     h('p', { class: 'aviso-caixa discreto' }, icon('info', 16), t('ui.config.iaAviso')),
     h('label', { class: 'chave' }, h('input', { type: 'checkbox', id: 'nuvem-automatica', checked: prefs.nuvemAutomatica === true, onChange: (e) => mudar('nuvemAutomatica', e.target.checked === true) }),
       h('span', null, h('strong', null, t('ui.config.nuvemAutomatica')), h('span', { class: 'ajuda-campo' }, t('ui.config.nuvemAutomaticaAjuda')))),
+    h('div', { class: 'grupo', id: 'melhoria' }, t('ui.melhoria.titulo')),
+    h('label', { class: 'chave' }, h('input', { type: 'checkbox', id: 'melhoria-consentida', checked: prefs.melhoriaConsentida === true, onChange: (e) => aoMudarMelhoria(e.target.checked === true) }),
+      h('span', null, h('strong', null, t('ui.melhoria.chave')), h('span', { class: 'ajuda-campo' }, t('ui.melhoria.chaveAjuda')))),
+    contagemFila, botaoFila,
     h('div', { class: 'grupo' }, t('ui.config.dados')),
     kvEl([{ rotulo: t('ui.config.versaoPacote'), valor: String(store.versao) }, { rotulo: t('ui.config.assinatura'), valor: t(`ui.config.assinaturaValor.${store.sig.estado}`) }]),
     botaoAtualizacao(store),

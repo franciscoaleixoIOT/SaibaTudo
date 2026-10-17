@@ -112,6 +112,22 @@ export default {
       falhou: 'L’IA dans le cloud n’a pas pu interpréter la question pour le moment. Essayez de la reformuler en citant l’élément, le composé ou la propriété.',
       quisDizer: 'Je n’ai pas trouvé ce composé dans les données. Vouliez-vous dire :'
     },
+    melhoria: {
+      titulo: 'Aider à améliorer l’application',
+      explicacao: 'L’application n’a pas compris cette question. Si vous le souhaitez, envoyez-la pour nous aider à entraîner l’interpréteur. Seuls le texte de la question et un identifiant aléatoire propre à cette installation sont envoyés, sans votre nom ni rien qui vous identifie. Les questions contenant une adresse e-mail, un numéro de téléphone, un numéro de document, une adresse de site ou une demande dangereuse ne sont pas envoyées, mais aucun filtre n’est parfait : n’écrivez pas de données personnelles. Une personne relit les questions conservées, qui sont effacées dans un délai de 4 mois au plus. Pour les envoyer toujours, activez « Aider à améliorer l’application » dans les Paramètres ; vous pouvez aussi le désactiver et vider la file d’attente.',
+      botao: 'Envoyer cette question',
+      enviando: 'Envoi en cours…',
+      enviada: 'Merci ! La question a été envoyée.',
+      naFila: 'Cette question a rejoint la file d’attente « Aider à améliorer l’application » et sera envoyée avec les suivantes. Pour désactiver, allez dans les Paramètres.',
+      guardada: 'La question est conservée sur cet appareil et sera envoyée avec les suivantes.',
+      indisponivel: 'L’envoi n’est pas disponible pour le moment. La question reste sur cet appareil et sera envoyée plus tard.',
+      falhou: 'Envoi impossible pour le moment (pas de réseau ou trop d’envois d’affilée). La question reste sur cet appareil et sera envoyée plus tard.',
+      chave: 'Aider à améliorer l’application',
+      chaveAjuda: 'Désactivé par défaut. Une fois activé, les questions que l’application n’a pas comprises entrent dans une file d’attente sur cet appareil et sont envoyées par lots à notre serveur, avec seulement le texte de la question et un identifiant aléatoire propre à cette installation, afin qu’une personne les relise et apprenne à l’application à les comprendre. Les questions contenant des données personnelles (e-mail, téléphone, numéro de document, site web) ou une demande dangereuse n’entrent pas dans la file, mais aucun filtre n’est parfait : évitez d’écrire des données personnelles. La désactivation efface ce qui n’a pas encore été envoyé.',
+      fila: (p) => (Number(p.n) === 0 ? 'Aucune question dans la file d’attente.' : Number(p.n) === 1 ? 'Une question dans la file d’attente, en attente d’envoi.' : `${p.n} questions dans la file d’attente, en attente d’envoi.`),
+      apagarFila: 'Vider la file d’attente',
+      filaApagada: 'File d’attente vidée.'
+    },
     resposta: {
       rotuloRecusa: 'Demande refusée pour des raisons de sécurité',
       rotuloResolvida: 'Réponse construite sur votre appareil, à partir des données',

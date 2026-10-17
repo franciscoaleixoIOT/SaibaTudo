@@ -6,9 +6,10 @@ pergunta** (só status, latência, cache, `client` e o motivo do erro).
 
 | Rota | Arquivo | O que faz | Estado padrão |
 | :-- | :-- | :-- | :-- |
-| `GET /quimica/api/health` | `health.js` | saúde, versão do modelo, `nlu`/`ask`/`shared` ligados ou não, idade do pacote de dados | sempre ligada |
+| `GET /quimica/api/health` | `health.js` | saúde, versão do modelo, `nlu`/`ask`/`melhoria`/`shared` ligados ou não, idade do pacote de dados | sempre ligada |
 | `POST /quimica/api/nlu` | `nlu.js` + `_lib/nlu-handler.js` | interpreta a pergunta na nuvem (intenção + entidades ancoradas na pergunta); chamada pelo site desde 14/10/2026 (`web/.../js/nuvem.js`, opt-in) | ligada desde 14/10 (sem `MODAL_ENDPOINT` → `503 disabled`) |
 | `POST /quimica/api/ask` | `ask.js` + `_lib/ask-handler.js` | explicação gerada, ancorada nos trechos licenciados, com verificador de fidelidade | **desligada**: `503 disabled` |
+| `POST /quimica/api/melhoria` | `melhoria.js` + `_lib/melhoria-handler.js` (+ `_lib/dadopessoal.js`) | "Ajudar a melhorar o app": guarda, com consentimento próprio, as perguntas que o app **não entendeu** (filtradas) para melhorar o interpretador; chamada pelo site desde 16/10/2026 (`web/.../js/melhoria.js`) | **desligada**: sem `MELHORIA_ENABLED=1` **e** o Redis → `503 disabled` |
 
 ## Rewrite necessário (aplicar no `vercel.json`, fora da área de quem escreveu a API)
 O site chama `/quimica/api/*`; as funções vivem em `/api/*`. Acrescentar ao `vercel.json` deste projeto:
@@ -41,6 +42,42 @@ aceita artigo/preposição à frente). Achou: `"resolucao": { "composto": { "cid
 você quis dizer Y?" com os nomes de exibição do próprio dicionário, em vez de inventar. `null` quando não há composto ou o índice não veio junto.
 A resolução vai junto no cache e nunca derruba a resposta (erro interno vira `null`). A API continua sem fornecer fatos: só CID e nome de busca.
 
+### `POST /api/melhoria` ("Ajudar a melhorar o app", desde 16/10/2026)
+Captura **opcional**, com consentimento **próprio** (separado do da IA na nuvem), das perguntas que o app não entendeu. Diferente do `/api/nlu`,
+aqui o texto é **guardado** para uma pessoa revisar. Porte de `apps/eleicoes2026/api/melhoria.js` (lá: hash por dia e filtro de opinião política; aqui: lista
+por mês, filtro de pedido perigoso e de dado pessoal ampliado).
+
+Entrada (corpo até 8 KB):
+```json
+{ "v": 1, "client": "web" | "android", "iid": "<uuid v4/v7>", "idioma": "pt-BR" | "en" | "es" | "de" | "fr",
+  "itens": [ { "q": "3 a 300 caracteres", "intentLocal": "<intenção do NLU local>" | "DESCONHECIDA", "t": "AAAA-MM-DD (opcional)" } ] }
+```
+1 a 10 itens. `intentLocal` ausente vale `DESCONHECIDA`; fora do vocabulário (`_lib/vocab.js`) é guardada como `DESCONHECIDA`; fora do formato `[A-Z_]` = `400`.
+`t` com hora ou data impossível = `400`; ausente = o dia de hoje (Brasília).
+
+Saída: `200 { "ok": true, "aceitos": n, "descartados": m }` · `400 { "error": "bad_request", "field": "v"|"client"|"iid"|"idioma"|"itens"|"body" }` ·
+`403 origin` · `405` · `413`/`415` · `429 rate_limited` (com `Retry-After`) · `503 disabled` (desligado: `MELHORIA_ENABLED` diferente de `1` ou sem Redis) ·
+`503 unavailable` (o Redis falhou: **nada** foi guardado; o cliente mantém a fila).
+
+No servidor, **antes de guardar**, cada item é **descartado** (nunca mascarado), contando em `descartados`, quando:
+- tem menos de 3 ou mais de 300 caracteres depois da limpeza (controles, espaços repetidos, delimitadores do ChatML: `cleanText`);
+- é **pedido perigoso** (`_lib/seguranca.js` → `avaliarPedido`: regras próprias + léxico de **todos** os idiomas, sempre) ou veio com `intentLocal: "RECUSA_PERIGO"`;
+- tem **dado pessoal** (`_lib/dadopessoal.js`): e-mail (também "arroba ... ponto com" e nomes de provedor), CPF, CNPJ, telefone (Brasil, com ou sem DDD, e internacional
+  com `+`), URL/`www.`/domínio com TLD conhecido, `@usuário`, ou sequência de 9 ou mais dígitos (com espaços, pontos, hífens). Número CAS (`7732-18-5`) e decimal
+  (`6.02214076`) não contam. Hidratos com ponto (`CuSO4.5H2O`) não são domínio. Intervalos de temperatura `2000-3000 K` caem no padrão de telefone: a pergunta não é
+  guardada (falso positivo aceito, privacidade primeiro). Espelho no site: `web/src/quimica/js/melhoria.js` (o teste do site confere os dois com os mesmos casos);
+- é repetido no mesmo envio (sem diferença de caixa).
+
+Guardado: `RPUSH quimica:melhoria:<AAAA-MM>` (mês de Brasília) de `{"q","intentLocal","idioma","client","t"}` — **sem iid, sem IP, sem hora** —, depois
+`LTRIM` (no máximo `MELHORIA_MAX_POR_MES` = 5.000; ficam as mais recentes) e `EXPIREAT` 90 dias depois do fim do mês (retenção máxima ~4 meses). O texto **nunca**
+vai para o log (só `evt`, `status`, `ms`, `client`, `idioma`, `err`, `aceitos`, `descartados`). Limites: `MELHORIA_PER_HOUR` por IP e `MELHORIA_PER_DAY` por
+instalação (memória da instância + contador no Redis `st:quimica:melhoria:{ip|iid}:<balde>`, que expira com a janela). Não há leitor automático: a colheita
+para revisão humana ainda não existe aqui (molde: `apps/eleicoes2026/backend/retrain/colher_sinais.mjs` e `docs/OPERACAO.md` §7 de lá).
+
+**Para ligar:** política de privacidade 1.2 publicada (`web/src/quimica/privacidade/*`, já com a linha "Ajudar a melhorar o app") → `UPSTASH_REDIS_REST_URL` e
+`UPSTASH_REDIS_REST_TOKEN` na Vercel → `MELHORIA_ENABLED=1` → deploy → `GET /quimica/api/health` com `"melhoria":"on"`. O site mostra a opção sempre (desligada por
+padrão); com o servidor desligado a fila fica no aparelho e a resposta é "não disponível agora", sem erro.
+
 ### `POST /api/ask`
 Entrada `{ "q", "context"?, "trechos"?: [{ "id", "texto" }], "v": 1, "client", "iid" }`: contexto até 4.000 caracteres; até 6 trechos (`id` no formato de
 `data/quimica/textos`, `texto` até 1.200 caracteres, 6.000 no total); corpo até 24 KB.
@@ -71,7 +108,9 @@ Erros comuns: `400` corpo inválido · `403` origem não permitida · `405` mét
 | `RATE_IP_PER_MIN` · `RATE_IID_PER_DAY` | limites por IP e por instalação (`iid`) | 20 · 60 |
 | `CACHE_TTL_SECONDS` · `CACHE_MAX_ENTRIES` | cache em memória por instância | 3600 · 500 |
 | `ALLOWED_ORIGINS` | origens CORS, separadas por vírgula; `*` casa só um trecho de hostname | `https://saibatudo.net,https://www.saibatudo.net` |
-| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` (ou `KV_REST_API_*`) | contadores **globais** de limite e de orçamento entre instâncias (opcional; falha aberto) | vazio = só local |
+| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` (ou `KV_REST_API_*`) | contadores **globais** de limite e de orçamento entre instâncias (opcional; falha aberto) e o armazenamento do `/api/melhoria` (obrigatório para ele) | vazio = só local |
+| `MELHORIA_ENABLED` | **só `1` liga** o `/api/melhoria` (e é preciso o Redis acima) | desligado |
+| `MELHORIA_PER_HOUR` · `MELHORIA_PER_DAY` · `MELHORIA_MAX_POR_MES` | envios por IP/hora · envios por instalação/dia · perguntas guardadas por mês (as mais antigas saem) | 6 · 20 · 5000 |
 | `VERCEL_GIT_COMMIT_SHA` | preenchida pela Vercel; vira `version` no health | `dev` |
 
 No Git Bash grave sempre com `printf '%s' "$VALOR" | vercel env add NOME production [--sensitive]` (sem quebra de linha no fim). `vercel env ls production` lista só os nomes.
@@ -83,7 +122,8 @@ No Git Bash grave sempre com `printf '%s' "$VALOR" | vercel env add NOME product
 | Explicação por IA | `vercel env rm ASK_ENABLED production -y` + deploy | `503 disabled`; o app mantém a resposta montada dos dados |
 | Só o Hugging Face | remover `HF_ASK_SPACE_URL` (a reserva no Modal passa a ser o principal, com o orçamento dela) | explicação via Modal |
 | Só a reserva do Modal | remover `MODAL_ASK_ENDPOINT` | falha do Space vira `502` |
-| Limites compartilhados | remover `UPSTASH_REDIS_REST_*` | volta a valer só o limite por instância |
+| Limites compartilhados | remover `UPSTASH_REDIS_REST_*` | volta a valer só o limite por instância (e o `/api/melhoria` desliga: `503 disabled`) |
+| "Ajudar a melhorar o app" | `vercel env rm MELHORIA_ENABLED production -y` + deploy | `503 disabled`; a fila fica no aparelho, sem erro |
 | Gastar menos | `DAILY_BUDGET`, `HF_ASK_DAILY_BUDGET`, `MODAL_ASK_DAILY_BUDGET` menores (0 = esgotado) | `503 budget` |
 Reverter a versão do modelo: `docs/MODELO.md` §9.
 
@@ -92,6 +132,7 @@ Reverter a versão do modelo: `docs/MODELO.md` §9.
 segurança e ancoragem em **todos os idiomas** (`seguranca_idiomas`, `ground_idiomas`, `lexico`: cópias do léxico em dia),
 fidelidade, golden compartilhado (`contracts/nlu_golden_cases.json`: o "modelo perfeito" não perde entidade, sem tolerância; os casos sem a entidade que a intenção exige — o golden
 não traz `composto` quando o composto não está no pacote — devem virar `DESCONHECIDA`), handlers (503 desligado, CORS, validação, limites por IP/instalação/Redis, cache,
+`melhoria` (desligado/ligado, filtros de pedido perigoso em 5 idiomas e de dado pessoal com falsos positivos da química, lista do mês com LTRIM/EXPIREAT, privacidade do que é guardado e do log),
 orçamento, coalescência, falhas do Modal, caminho Hugging Face → Modal → falha, verificador), health e adaptador Node. Não há modo mock: nada responde "como se fosse o modelo".
 
 ## Idiomas: como a API usa o léxico compartilhado

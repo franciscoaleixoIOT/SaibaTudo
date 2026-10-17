@@ -111,6 +111,22 @@ export default {
       falhou: 'A IA na nuvem não conseguiu interpretar agora. Tente reformular citando o elemento, o composto ou a propriedade.',
       quisDizer: 'Não encontrei esse composto nos dados. Você quis dizer:'
     },
+    melhoria: {
+      titulo: 'Ajudar a melhorar o app',
+      explicacao: 'O app não entendeu esta pergunta. Se quiser, envie-a para nos ajudar a ensinar o interpretador. Vão só o texto da pergunta e um código aleatório desta instalação, sem seu nome e sem nada que identifique você. Perguntas com e-mail, telefone, CPF, endereço de site ou pedido perigoso não são enviadas, mas nenhum filtro é perfeito: não escreva dados pessoais. Uma pessoa revisa as perguntas guardadas, que são apagadas em até 4 meses. Para enviar sempre, ligue "Ajudar a melhorar o app" em Configurações; lá também dá para desligar e apagar a fila.',
+      botao: 'Enviar esta pergunta',
+      enviando: 'Enviando…',
+      enviada: 'Obrigado! A pergunta foi enviada.',
+      naFila: 'Esta pergunta entrou na fila do "Ajudar a melhorar o app" e será enviada com as próximas. Para desligar, vá a Configurações.',
+      guardada: 'A pergunta ficou guardada neste aparelho e será enviada com as próximas.',
+      indisponivel: 'O envio não está disponível agora. A pergunta fica guardada neste aparelho e será enviada depois.',
+      falhou: 'Não deu para enviar agora (sem rede ou muitos envios seguidos). A pergunta fica guardada neste aparelho e será enviada depois.',
+      chave: 'Ajudar a melhorar o app',
+      chaveAjuda: 'Desligado por padrão. Ligado, as perguntas que o app não entendeu entram numa fila neste aparelho e são enviadas em lotes ao nosso servidor, só com o texto da pergunta e um código aleatório desta instalação, para uma pessoa revisar e ensinar o app a entendê-las. Perguntas com dado pessoal (e-mail, telefone, CPF, site) ou pedido perigoso não entram na fila, mas nenhum filtro é perfeito: evite escrever dados pessoais. Desligar apaga o que ainda não foi enviado.',
+      fila: (p) => (Number(p.n) === 0 ? 'Nenhuma pergunta na fila.' : Number(p.n) === 1 ? 'Uma pergunta na fila, aguardando envio.' : `${p.n} perguntas na fila, aguardando envio.`),
+      apagarFila: 'Apagar fila',
+      filaApagada: 'Fila apagada.'
+    },
     resposta: {
       rotuloRecusa: 'Pedido recusado por segurança',
       rotuloResolvida: 'Resposta montada no seu aparelho, a partir dos dados',

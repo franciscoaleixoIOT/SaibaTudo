@@ -63,6 +63,12 @@ export function readConfig(env = process.env) {
     cacheTtlMs: inteiro(env.CACHE_TTL_SECONDS, 3600, 1, 86_400) * 1000,
     cacheMax: inteiro(env.CACHE_MAX_ENTRIES, 500, 10, 5000),
 
+    // --- "Ajudar a melhorar o app" (/api/melhoria, _lib/melhoria-handler.js): DESLIGADO por padrão; só liga com MELHORIA_ENABLED=1 E o Redis
+    melhoriaEnabled: (env.MELHORIA_ENABLED ?? '').trim() === '1',
+    melhoriaPerHour: inteiro(env.MELHORIA_PER_HOUR, 6, 1, 1000),
+    melhoriaPerDay: inteiro(env.MELHORIA_PER_DAY, 20, 1, 10_000),
+    melhoriaMaxPorMes: inteiro(env.MELHORIA_MAX_POR_MES, 5000, 100, 100_000),
+
     // --- CORS
     allowedOrigins: parseOrigins(env.ALLOWED_ORIGINS),
 

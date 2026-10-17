@@ -1,9 +1,12 @@
 // Início: caixa de pergunta (motor local), resposta com fonte em cada bloco, sugestões e atalhos para as telas. Textos pelo catálogo do idioma.
 // IA na nuvem (opt-in, 14/10/2026): botão "Perguntar à IA na nuvem" em toda resposta que não veio da nuvem (padrão docs/PADRAO_ASSISTENTE.md §IA na
 // nuvem); o toque é o consentimento para enviar SÓ aquela pergunta; a resposta nova continua montada dos dados locais.
+// "Ajudar a melhorar o app" (16/10/2026, js/melhoria.js): na resposta NÃO entendida (nunca na recusa de segurança), junto do bloco da nuvem, a
+// explicação e o botão "Enviar esta pergunta" (consentimento daquela pergunta); com a chave ligada em Configurações, a pergunta já entra na fila.
 import { dataDoPacote, sugestoesPadrao } from '../answers.js';
 import { h, icon, anunciar, trocar } from '../dom.js';
 import { t } from '../i18n/index.js';
+import { filaMelhoria, respostaCandidata, textoEnfileiravel } from '../melhoria.js';
 import { chaveFalhaNuvem, ofereceNuvem, pedirANuvem } from '../nuvem.js';
 import { carregar, registrarPergunta } from '../prefs.js';
 import { ajustarAltura, blocoEl, campoAutoAltura, cartaoEl, chip, linkExterno, linkRota, toast } from './componentes.js';
@@ -43,7 +46,35 @@ function nuvemEl(r, pedirNuvem) {
   return slot;
 }
 
-export function respostaEl(r, perguntar, { pergunta = null, dataDados = null, fechar = null, pedirNuvem = null } = {}) {
+/** Resultado do envio (melhoria.js) → chave do catálogo ui.melhoria.*. Nenhum caso é mostrado como erro: a pergunta fica guardada. */
+export const chaveResultadoMelhoria = (res) => ({ enviado: 'enviada', indisponivel: 'indisponivel', falhou: 'falhou', offline: 'falhou' })[res] ?? 'guardada';
+
+/**
+ * Bloco "Ajudar a melhorar o app" numa resposta não entendida. `naFila` = a chave está ligada e a pergunta já entrou na fila (só um aviso);
+ * senão, explicação + botão "Enviar esta pergunta". null quando a resposta não é candidata ou o texto não pode ser enviado (dado pessoal, perigo).
+ */
+export function melhoriaEl(r, pergunta, { naFila = false, fila = filaMelhoria() } = {}) {
+  const q = pergunta ?? r?.pergunta ?? null;
+  if (!respostaCandidata(r) || !textoEnfileiravel(q)) return null;
+  const slot = h('div', { class: 'resp-melhoria' });
+  if (naFila) {
+    slot.replaceChildren(h('p', { class: 'mini mudo' }, icon('info', 14), ' ', t('ui.melhoria.naFila')));
+    return slot;
+  }
+  const botao = h('button', { type: 'button', class: 'btn btn-contorno peq', onClick: async () => {
+    botao.disabled = true;
+    botao.textContent = t('ui.melhoria.enviando');
+    fila.enfileirar(q, r.intent, { explicito: true });
+    let res = 'falhou';
+    try { res = await fila.enviarSePreciso({ forcar: true }); } catch { res = 'falhou'; }
+    slot.replaceChildren(h('p', { class: 'mini', role: 'status' }, icon(res === 'enviado' ? 'verified' : 'info', 14), ' ', t(`ui.melhoria.${chaveResultadoMelhoria(res)}`)));
+    anunciar(t(`ui.melhoria.${chaveResultadoMelhoria(res)}`));
+  } }, icon('send', 16), t('ui.melhoria.botao'));
+  slot.replaceChildren(h('strong', null, t('ui.melhoria.titulo')), h('p', { class: 'mini mudo' }, t('ui.melhoria.explicacao')), botao);
+  return slot;
+}
+
+export function respostaEl(r, perguntar, { pergunta = null, dataDados = null, fechar = null, pedirNuvem = null, melhoria = null } = {}) {
   const classe = r.intent === 'RECUSA_PERIGO' ? 'recusa' : r.resolvida ? '' : 'nao-resolvida';
   const rotulo = r.intent === 'RECUSA_PERIGO' ? t('ui.resposta.rotuloRecusa') : r.resolvida ? t('ui.resposta.rotuloResolvida') : t('ui.resposta.rotuloNaoResolvida');
   const titulo = h('h2', { class: 'resp-titulo', tabindex: '-1', id: 'resp-titulo' }, r.titulo);
@@ -57,6 +88,7 @@ export function respostaEl(r, perguntar, { pergunta = null, dataDados = null, fe
     r.blocos.map(blocoEl),
     r.acoes?.length ? h('div', { class: 'resp-acoes' }, r.acoes.map(acaoEl)) : null,
     nuvemEl(r, pedirNuvem),
+    melhoria ? melhoriaEl(r, pergunta, melhoria) : null,
     r.sugestoes?.length ? h('div', { class: 'resp-sugestoes' }, h('div', { class: 'rot' }, t('ui.resposta.tambem')),
       h('div', { class: 'chips' }, r.sugestoes.map((s) => chip({ rotulo: s, icone: false, classe: 'sug', onClick: () => perguntar(s) })))) : null,
     r.fontes?.length ? h('details', { class: 'resp-fontes' }, h('summary', null, t('ui.resposta.fontes', { n: r.fontes.length })),
@@ -145,7 +177,12 @@ export function viewInicio({ engine, query }) {
     regiao.replaceChildren(h('div', { class: 'carregando', role: 'status' }, h('span', { class: 'spinner mini', 'aria-hidden': 'true' }), h('span', { class: 'mudo' }, t('ui.inicio.pensando'))));
     try {
       const r = await engine.responder(q);
-      ultima = { pergunta: q, resposta: r };
+      // "Ajudar a melhorar o app" ligado: a pergunta não entendida entra na fila (filtrada) e vai em lote quando houver o bastante
+      const fila = filaMelhoria();
+      const candidata = respostaCandidata(r);
+      if (candidata && fila.enfileirar(q, r.intent)) fila.enviarSePreciso().catch(() => {});
+      const naFila = candidata && fila.habilitada() === true;
+      ultima = { pergunta: q, resposta: r, naFila };
       mostrar(r, true);
     } finally { ocupado = false; atualizarEstado(); }
   }
@@ -162,7 +199,7 @@ export function viewInicio({ engine, query }) {
     try {
       const res = await pedirANuvem({ engine, atual: r, pergunta });
       if (res.ok) {
-        ultima = { pergunta, resposta: res.resposta };
+        ultima = { pergunta, resposta: res.resposta, naFila: false };
         mostrar(res.resposta, true);
         return;
       }
@@ -173,7 +210,7 @@ export function viewInicio({ engine, query }) {
     } finally { ocupado = false; atualizarEstado(); }
   }
   function mostrar(r, foco) {
-    regiao.replaceChildren(respostaEl(r, perguntar, { pergunta: ultima?.pergunta, dataDados: dataDados(), pedirNuvem, fechar: () => { ultima = null; engine.limparContexto?.(); regiao.replaceChildren(); campo.focus(); } }));
+    regiao.replaceChildren(respostaEl(r, perguntar, { pergunta: ultima?.pergunta, dataDados: dataDados(), pedirNuvem, melhoria: { naFila: ultima?.naFila === true }, fechar: () => { ultima = null; engine.limparContexto?.(); regiao.replaceChildren(); campo.focus(); } }));
     if (foco) {
       document.getElementById('resp-titulo')?.focus({ preventScroll: false });
       anunciar(r.resolvida ? t('ui.inicio.respostaAnuncio', { titulo: r.titulo }) : r.titulo);

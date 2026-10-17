@@ -110,6 +110,22 @@ export default {
       falhou: 'The cloud AI could not interpret the question right now. Try rephrasing it by naming the element, the compound or the property.',
       quisDizer: 'I could not find that compound in the data. Did you mean:'
     },
+    melhoria: {
+      titulo: 'Help improve the app',
+      explicacao: 'The app did not understand this question. If you like, send it to help us teach the interpreter. Only the text of the question and a random code for this installation are sent, without your name or anything that identifies you. Questions with an email address, phone number, ID number, website address or a dangerous request are not sent, but no filter is perfect: please do not type personal data. A person reviews the stored questions, which are deleted within 4 months. To always send them, turn on "Help improve the app" in Settings; you can also turn it off and clear the queue there.',
+      botao: 'Send this question',
+      enviando: 'Sending…',
+      enviada: 'Thank you! The question was sent.',
+      naFila: 'This question joined the "Help improve the app" queue and will be sent with the next ones. To turn this off, go to Settings.',
+      guardada: 'The question was kept on this device and will be sent with the next ones.',
+      indisponivel: 'Sending is not available right now. The question stays on this device and will be sent later.',
+      falhou: 'Could not send right now (no network or too many sends in a row). The question stays on this device and will be sent later.',
+      chave: 'Help improve the app',
+      chaveAjuda: 'Off by default. When on, the questions the app did not understand go into a queue on this device and are sent in batches to our server, with only the text of the question and a random code for this installation, so that a person can review them and teach the app to understand them. Questions with personal data (email, phone, ID number, website) or a dangerous request never join the queue, but no filter is perfect: avoid typing personal data. Turning it off deletes whatever has not been sent yet.',
+      fila: (p) => (Number(p.n) === 0 ? 'No questions in the queue.' : Number(p.n) === 1 ? 'One question in the queue, waiting to be sent.' : `${p.n} questions in the queue, waiting to be sent.`),
+      apagarFila: 'Clear queue',
+      filaApagada: 'Queue cleared.'
+    },
     resposta: {
       rotuloRecusa: 'Request refused for safety reasons',
       rotuloResolvida: 'Answer built on your device, from the data',
