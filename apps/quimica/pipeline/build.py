@@ -138,7 +138,9 @@ def aplicar_traducoes(regs, fonte, pasta):
             r["traducaoData"] = t["data"]
         r["idiomaOriginal"] = t.get("idiomaOrigem") or r.get("idioma") or "en"
         titulo = (t.get("titulo") or "").strip()
-        if titulo and titulo != r.get("titulo"):
+        # `tituloPt` só quando o título original está no idioma de origem (Gutenberg). No ChEBI o `titulo` já é o nome em português
+        # (Wikidata) e a linha de tradução pode trazer o título de OUTRO composto com a mesma definição (cache por hash): nunca usar.
+        if titulo and titulo != r.get("titulo") and not str(r.get("id", "")).startswith("chebi-"):
             r["tituloPt"] = titulo  # `titulo`/`secao` ficam no original: alimentam a `chave` do índice de textos
         # atribuição: a tradução é uma adaptação do original (ChEBI CC BY 4.0 exige indicar mudanças); a licença não muda
         r["fontes"] = [dict(f, nome=f"{f.get('nome', '')} — {NOTA_ADAPTACAO}", adaptacao=NOTA_ADAPTACAO) for f in (r.get("fontes") or [])]

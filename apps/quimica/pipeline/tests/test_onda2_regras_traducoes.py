@@ -195,6 +195,18 @@ class TraducoesTest(unittest.TestCase):
         self.assertEqual(build.aplicar_traducoes(regs, "chebi", None)["aplicadas"], 0)
         self.assertEqual(regs[0]["traducao"], "pendente")
 
+    def test_chebi_nunca_recebe_tituloPt_mesmo_quando_a_linha_traz_outro_titulo(self):
+        # cache por hash: definições iguais compartilham a linha, e o título da linha pode ser de OUTRO composto (visto em 17/10: "Asparagina" × "N-óxido de trimetilamina")
+        regs = [{"id": "chebi-58048", "titulo": "Asparagina", "textoOriginal": "An amino acid.", "textoPt": None, "traducao": "pendente", "idioma": "en"}]
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "chebi.jsonl").write_text(json.dumps({"id": "chebi-58048", "hash": _h("An amino acid."), "titulo": "N-óxido de trimetilamina",
+                                                              "texto": "Um aminoácido.", "idiomaOrigem": "en", "modelo": "qwen3.8-max", "data": "2026-10-16",
+                                                              "traducao": "automatica"}), encoding="utf-8")
+            build.aplicar_traducoes(regs, "chebi", tmp)
+        self.assertEqual(regs[0]["textoPt"], "Um aminoácido.")
+        self.assertNotIn("tituloPt", regs[0])
+        self.assertEqual(regs[0]["titulo"], "Asparagina")
+
     def test_chebi_mantem_titulo_igual_sem_tituloPt(self):
         regs = [{"id": "chebi-1", "titulo": "Metoclopramida", "textoOriginal": "A member of the benzamides.", "textoPt": None,
                  "traducao": "pendente", "idioma": "en"}]

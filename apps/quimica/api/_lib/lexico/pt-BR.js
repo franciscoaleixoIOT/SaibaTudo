@@ -194,8 +194,8 @@ export default {
    "bar"
   ],
   [
-   "^torr$",
-   "mmHg"
+   "^torrs?$",
+   "Torr"
   ],
   [
    "^horas?$",
