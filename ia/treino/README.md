@@ -166,3 +166,22 @@ Eleições: só depois de 27/10.
   gerar (`repontuar_eval.py --app quimica --eval <out>/eval_quimica_q4.json --out <out>/eval_quimica_q4_repontuado.json`), empacotar de novo
   (`--forcar-pasta`) e promover sem `--force`; (C) v3.6 com mais CONCEITO pt (teto maior para CONCEITO ou `--revisao 1.0`) e revisão de eleições, ~4 h.
   Em qualquer caso: corrigir o desacordo do golden (pendência) e, no v3.6, reforçar CONCEITO pt, "Wie rechnet man Kc in Kp um?" e `apenasDeferidas`.
+
+## v3.6 (treino iniciado em 18/10/2026, 15h54): reforço de CONCEITO pt e de eleições sobre o LoRA v3.5
+Decisão do mantenedor em 18/10 (depois do gate do v3.5 acima): em vez de promover o v3.5 à força ou de mexer no golden, treinar um v3.6 que
+recupere CONCEITO pt e `apenasDeferidas` de eleições. **Receita:** continuação CURTA do LoRA **v3.5** (`--lora_init ia/treino/out/nlu-v35-cont/final`,
+lr 1e-4, 1 época, lote 2 × 8, `max_length 288`) sobre uma **mistura de reforço** montada por `ia/treino/misturar_reforco.py` (novo; testes em
+`test_misturar_reforco.py`), só com pares que já existem nos corpora:
+- **foco:** TODOS os CONCEITO da química: 2.683 do corpus v35 + 1.792 que o v35 tinha deixado de fora (teto 760) e vêm do v34
+  com o rótulo de lá — pt 2.668, en 447, es 469, de 455, fr 436;
+- **eleições:** 5.999 pares estratificados por intenção, com TODOS os 396 que trazem `apenasDeferidas` (ELEGIBILIDADE 634);
+- **retenção da química:** 10.009 pares estratificados por (intenção, idioma) das outras 24 intenções (inclusive as 4 novas), para o modelo não
+  passar a ver CONCEITO em "o que é a amônia?";
+- **filtro de teste:** golden e casos dos dois apps + todos os `holdout_*.json` (v35, v34 e `holdout_eleicoes`), com o `FiltroDeTeste` do corpus
+  (exato ou Jaccard ≥ 0,8): 123 pares excluídos (foco/quase 22, retencao/quase 101).
+Total **20.360 pares** (7.123 química pt, 7.238 química en/es/de/fr,
+5.999 eleições; CONCEITO 4.453 = 22 %), 1.273 passos, ~4,4 s/passo (~1 h 35). Roteiro: `ia/treino/out/nlu-v36-cont/pipeline.sh`
+(mistura → treino → `exportar_gguf.py --q8` → `gate.sh` = o do v3.5: golden 984, holdout 2.538, 17 extras, eleições, Q8). Critério para promover:
+os gates do app (`empacotar_versao.py` → `passed`), CONCEITO pt de volta ao nível do v3.4 nos 776 casos em comum, `apenasDeferidas` ≥ 90 % no holdout de
+eleições, sem perder os 208 casos novos. O desacordo dos 3 casos IUPAC do golden (`composto: null`) continua em aberto: se o v3.6 copiar o nome, como
+o contrato manda, o `passed` formal volta a reprovar por esses 3 casos — a decisão sobre o golden é do mantenedor.
