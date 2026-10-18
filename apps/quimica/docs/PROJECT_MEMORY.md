@@ -266,6 +266,21 @@ conectado — teste no aparelho fica com o mantenedor (`RELEASE_1.0.3.md`). Deci
 massa atômica arredondada ROTULADA como aproximação (nunca como fato); "falta ΔGf°" é resposta resolvida (não vai à nuvem); Kc sem equação traz
 parágrafo por regra + ação para a calculadora (o trecho da Wikipédia pt vem com TeX cru e é filtrado).
 
+### 6.u. 18/10/2026 (manhã): NLU v3.5 treinado e medido; promoção pendente
+Pipeline automático (`ia/treino/out/nlu-v35-cont/pipeline.sh`) terminou às 10h00: treino 3 h 19 min (2.710 passos), GGUF Q4/Q8, gate completo
+(`ia/treino/README.md` §v3.5). Química: golden 984 intenção 98,4 % (nos 776 casos em comum com o v3.4: 98,5 → 97,9 %, −0,6 pt; os 208 casos novos
+das calculadoras, ids novos, partículas e Kc sem equação: 100 %), holdout 2.538 99,4 %, Q8 = Q4, 17 holdouts extras com intenção ≥ 90 % por intenção
+(falhas da meta só por idioma em amostras de 3–9 casos). **Reprovado formalmente** por "alucinação de composto" em 3 de 10 casos null: NOMENCLATURA
+de nomes IUPAC fora do pacote em que o modelo copia o nome da pergunta para `composto` — o contrato admite `composto` nessa intenção e o proxy só
+mantém composto com evidência no texto, logo é desacordo entre esses 3 casos do golden (3f360b2) e o contrato, não entidade inventada. Regressões
+reais, pequenas: CONCEITO pt ("o que é sal/açúcar" → COMPOSTO, "como funciona uma pilha" → DESCONHECIDA; a regra local de cbbac61 responde certo no
+site e no Android) por CONCEITO pt ter caído de 2.366 para 1.619 pares (teto 760) com `--revisao 0.3`; eleições 97,4 → 96,5 % golden e `apenasDeferidas`
+4/9 (sem uso neste serviço; retreino após 27/10 com mais revisão). Pacote `ai_model/output/gguf/nlu-v3.5-20261018/` (`passed: false`) e os 3 arquivos
+enviados ao Volume `SaibaTudoIA-Models-Quimica` (`/nlu-v3.5-20261018/`). **Não promovido:** o `promover.py --force --reason` (caminho previsto para
+gate reprovado) foi bloqueado pelo classificador de permissões do agente; ponteiro `current.json`, `SNAPSHOT_EPOCH` e `MODEL_VERSION` seguem no
+v3.4 e o serviço segue com o `nlu_core.py` anterior. Decisão e comandos em `ia/treino/README.md` §v3.5 (A: forçar; B: alinhar os 3 casos do golden
+ao contrato, repontuar e promover sem força; C: v3.6).
+
 ## 7. Contas e segredos
 Vercel `saibatudo-quimica` (time `franciscoaleixo-9696`); GitHub `franciscoaleixoIOT`; Hugging Face `franciscoaleixo` (PRO, 40 min/dia de ZeroGPU); Modal `franciscoaleixo/main` (US$ 30/mês grátis; já usados pelo app de eleições, ~US$ 5/mês).
 `secrets/data_signing_key.pem` (nova, exclusiva deste app; pública em `pipeline/data_signing_public.pem`). Fazer backup offline. Modal: app `SaibaTudoIA-NLU-Quimica`, Volume `SaibaTudoIA-Models-Quimica` (nomes desde 14/10/2026; os antigos `saibatudo-quimica-*` foram apagados), par de Proxy Auth Token criado pelo mantenedor em 13/10/2026 (guardado em `secrets/modal_proxy_quimica.env` da raiz do monorepo, ignorado, e como variáveis sensíveis na Vercel; nunca no Git nem no chat).

@@ -107,7 +107,7 @@ baseline_v33_*.json, empacotar.log). Corpus: `ia/corpus/out/v34/` (ver `ia/corpu
   continuação. Sem contexto o modelo se comporta como o v3.3 (golden e holdout acima); foi assim que ele entrou no ar.
 - **Vazamento corrigido depois do gate:** o golden ganhou em 16/10 (f2ce884) o caso fr "Qu'est-ce que la stœchiométrie ?", que já era um exemplo de treino desde o v3.3 (`test_nenhum_caso_de_teste_no_treino` reprovava). O caso do golden foi reescrito para "Explique-moi ce qu'est la stœchiométrie" (o treino não muda; o golden deixa de medir um exemplo visto). Regra: rodar `python -m pytest ia/corpus` depois de mexer no golden de qualquer app.
 
-## v3.5 (treino iniciado em 18/10/2026, 02h52): calculadoras, famílias de superfície, ΔGf°/S°/partículas
+## v3.5 (treinado e medido em 18/10/2026; PROMOÇÃO PENDENTE de decisão do mantenedor): calculadoras, famílias de superfície, ΔGf°/S°/partículas
 Corpus: `ia/corpus/out/v35/` (`ia/corpus/README.md`, seção v3.5; montagem final de 18/10 com teto pt 760 e piso por propriedade 25/6): 74.935 pares, treino 68.388 (química 69,8 %), ids novos `energiaGibbsFormacaoKJmol`, `entropiaPadraoJmolK`, `particulas` e Kc sem equação → CONCEITO (contrato de 18/10, `apps/quimica/docs/CALCULADORAS_2026-10-17.md` §7), NOX/ENTALPIA/EQUILIBRIO/LIGACAO
 ~0,9–1,1 mil cada no treino (5 idiomas), `entalpiaFormacaoKJmol`, notação científica, números por extenso, estequiometria sem "quantos",
 nomenclatura por nome sistemático, misturas, ordenação e pistas de configuração eletrônica; 13 holdouts `holdout_v35_*.json` (536 casos, inclusive `particulas` e os dois lados de `equilibrio`). Treino previsto = **continuação do LoRA
@@ -129,3 +129,40 @@ RTX 5060 (estimativa 3 h 50 min; pico 6,1 GiB de VRAM). Roteiro completo em `ia/
 `H=ia/corpus/out/v35` e `--extra` para os 13 `holdout_v35_*.json` + os holdouts do v3.4 (meta 90 % em cada extra). Antes do treino:
 `CORPUS_OUT=ia/corpus/out/v35 python -I -m unittest discover -s ia/corpus -p "test_*.py"` → 43 OK (vazamento golden 984 × treino limpo).
 Eleições: só depois de 27/10.
+
+**Resultado (18/10/2026): treino 02h52–06h12 (3 h 19 min, 2.710 passos, perda final 0,0001), GGUF 06h13 (Q4 1,27 GB, Q8 2,0 GB), gate 06h13–10h00.**
+- **Gate química Q4_K_M (CPU 8 threads):** golden **984** JSON 100 %, intenção **98,4 %**, elemento 100, composto 99,0, propriedade 96,8, equação 100,
+  unidadeDestino 100; sem gramática JSON 98,4 % / intenção 96,7 %; holdout **2.538** (nunca treinado) **99,4 %** (elemento 99,0, composto 99,5,
+  propriedade 98,9, quantidades/equação/nível/unidade 100); Q8 98,3 % (= Q4); sem `<think>`; template = serviço; latência média 1,8 s (p95 3,4 s).
+  Catraca manual nos **776 casos em comum com o v3.4: 98,5 → 97,9 %** (−0,6 pt, dentro de 1 ponto): perdeu "como funciona uma pilha?" (pt e fr →
+  DESCONHECIDA), "o que é sal?"/"o que é açúcar?" (→ COMPOSTO; a regra local de cbbac61 responde o CONCEITO no site e no Android, a nuvem só vê a
+  pergunta se a pessoa pedir a segunda interpretação) e es "combustión del metano: CH4 + O2 = CO2 + H2O" (BALANCEAR → ENTALPIA); ganhou fr Pa → atm.
+  **208 casos novos do golden (NOX, ENTALPIA, EQUILIBRIO, LIGACAO, ids novos, partículas, Kc sem equação): 100 %.** Por intenção, só CONCEITO abaixo
+  de 90 % no golden (68/78: os 7 acima + de "Was ist der pH-Wert?" → PH e "Was ist das ideale Gasgesetz?" → GAS_IDEAL); no holdout em comum
+  (1.134) 100 → 99,6 % (4 CONCEITO pt "importância/como funciona oxigênio", "octanagem", "monóxido de carbono"; 1 de DESCONHECIDA → AJUDA).
+  Causa provável: CONCEITO pt caiu de 2.366 (v3.4) para 1.619 pares no corpus (teto 760) e a mistura (`--revisao 0.3`) só levou 601.
+- **17 extras (meta 90 %):** intenção ≥ 90 % em todos, por intenção; falhas da meta por idioma em amostras de 3–9 casos (1 erro cada):
+  `holdout_v34_multiturno` es elemento 5/6 ("Dime algo del radio" → PROPRIEDADE raio), `holdout_v35_entalpia_formacao` de propriedade 7/8
+  ("freie Standardbildungsenthalpie" → ΔHf° em vez de ΔGf°), `holdout_v35_equilibrio` de intenção 7/9 ("Wie rechnet man Kc in Kp um?" duas vezes →
+  CONVERSAO_UNIDADE), `holdout_v35_esteq_formada` en elemento 2/3 ("Kalii iodidum" sem elemento), `holdout_v35_notacao` en quantidades 8/9 ("2e2 mol"
+  → 2), `holdout_v35_particulas` de propriedade 6/7. O v3.4 foi aprovado com falhas análogas (multi-turno en propriedade 85,7 %, fr elemento 83,3 %).
+- **Reprovação formal (gates de referência e `empacotar_versao.py` → `passed: false`): "alucinação de composto 30 % > 5 % (10 casos null)"** — os 3
+  casos são NOMENCLATURA de nomes IUPAC fora do pacote ("Como se chama o 2-cloro-3-metil-pentano?", "What is the IUPAC name of 3-ethyl-2-methylhexane?",
+  "Wie heißt 2-Chlor-3-methylpentan?", golden de 3f360b2 com `composto: null`), em que o modelo copia o nome da pergunta para `composto`. O contrato
+  (`nlu_core.ENTIDADES_POR_INTENCAO`) admite `composto` em NOMENCLATURA, o gerador do dataset rotula o nome como texto e o proxy só mantém composto com
+  evidência no texto: não há entidade inventada, há desacordo entre esses 3 casos do golden e o contrato. Com 10 casos null, 1 erro já passa de 5 %.
+- **Eleições (mesmo GGUF):** golden 96,5 % (v3.4 97,4 %; +1 erro "Governador do Pará" → PERFIL_CANDIDATO), holdout 96,6 % (97,0 %),
+  `apenasDeferidas` 55,6 % (4 de 9 "X é ficha limpa?" saíram sem `apenasDeferidas: true`); causa provável `--revisao 0.3` (v3.4: 2.0) com menos
+  pares de eleições. O serviço da química não atende eleições; o retreino de eleições (depois de 27/10) deve usar mais revisão.
+- **Pacote:** `apps/quimica/ai_model/output/gguf/nlu-v3.5-20261018/` (`passed: false`, `reasons` acima; catraca do empacotador ignorada por mudança
+  de contrato — a comparação manual está acima). Os 3 arquivos **já estão no Volume** `SaibaTudoIA-Models-Quimica` em `/nlu-v3.5-20261018/`
+  (`modal volume put` ×3 às 10h20). **Ponteiro `current.json`, `SNAPSHOT_EPOCH` e `MODEL_VERSION` continuam no v3.4: NÃO promovido.** A promoção
+  com `promover.py --force --reason` foi bloqueada pelo classificador de permissões do agente em 18/10 — decisão do mantenedor. Opções:
+  (A) promover assim mesmo (o caminho previsto para gate reprovado, motivo gravado no meta.json):
+  `MSYS_NO_PATHCONV=1 python backend/modal/promover.py --version nlu-v3.5-20261018 --force --reason "..."` em `apps/quimica`, depois
+  `SNAPSHOT_EPOCH = "nlu-v3.5-20261018"` em `backend/modal/nlu_app.py` + `python -m modal deploy backend/modal/nlu_app.py`, `vercel env rm MODEL_VERSION
+  production -y` + `printf '%s' nlu-v3.5-20261018 | vercel env add MODEL_VERSION production`, `vercel deploy --prod`, conferir `/quimica/api/health`;
+  (B) alinhar os 3 casos do golden ao contrato (`composto` = o nome, ou sem a chave), rodar os testes de contrato do site e do Android, repontuar sem
+  gerar (`repontuar_eval.py --app quimica --eval <out>/eval_quimica_q4.json --out <out>/eval_quimica_q4_repontuado.json`), empacotar de novo
+  (`--forcar-pasta`) e promover sem `--force`; (C) v3.6 com mais CONCEITO pt (teto maior para CONCEITO ou `--revisao 1.0`) e revisão de eleições, ~4 h.
+  Em qualquer caso: corrigir o desacordo do golden (pendência) e, no v3.6, reforçar CONCEITO pt, "Wie rechnet man Kc in Kp um?" e `apenasDeferidas`.

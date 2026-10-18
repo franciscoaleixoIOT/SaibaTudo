@@ -235,12 +235,13 @@ PubChem voltam com `cid=`), +11 compostos e 2 apelidos; 7 lacunas das regras do 
   `dataset/gerar_nlu.py`): 75.041 pares (treino 68.589; química 69,9 %), holdouts `holdout_v35_*` 472 casos, 36 testes verdes, vazamento
   golden × treino limpo. **Não treinado.** Decisões a confirmar antes do treino: tetos de 850 (pt) e 180 (estrangeiros) por intenção para
   caber abaixo de 70 % (cortam PROPRIEDADE, CONCEITO, SEGURANCA…); família `configuracao` extra; comando em `ia/treino/README.md` (~4 h).
-- [ ] **Treinar e passar no gate o NLU v3.5** — **treino iniciado em 18/10/2026 às 02h52** (`ia/treino/out/nlu-v35-cont/pipeline.sh`:
-  mistura 43.360 pares → continuação do LoRA v3.4, `max_length 288`, 2.710 passos, ~3 h 50 → `exportar_gguf.py --q8` → `gate.sh` com os 13 holdouts
-  do v3.5 + os do v3.4). Cortes do corpus confirmados em 18/10: teto pt 760 por intenção (era 850) com **piso de 25 exemplos por id de propriedade**
-  (6 por idioma estrangeiro; `--piso-propriedade-*` em `montar_corpus.py`) — só pelo hash, `ligacoesRotaveis`/`doadoresH`/`carga` ficavam com 5–10;
-  química 69,8 % do treino (`ia/corpus/README.md`). Depois do gate: `empacotar_versao.py`, `modal volume put` ×3, `promover.py`, `SNAPSHOT_EPOCH` +
-  `modal deploy` do `nlu_app.py` (o serviço ainda roda o `nlu_core.py` ANTERIOR, sem as 4 intenções nem os 3 ids novos), `MODEL_VERSION` na Vercel.
+- [ ] **NLU v3.5: treinado e medido em 18/10/2026 (02h52–10h00), promoção PENDENTE** (`ia/treino/README.md` §v3.5): golden 984 98,4 %
+  (776 em comum com o v3.4: 98,5 → 97,9 %; 208 casos novos 100 %), holdout 2.538 99,4 %, 17 extras ≥ 90 % por intenção; `passed: false` só por
+  3 casos NOMENCLATURA de nome IUPAC (golden `composto: null` × modelo copia o nome; o contrato admite). Pacote `nlu-v3.5-20261018` e os 3 arquivos
+  já no Volume; ponteiro, `SNAPSHOT_EPOCH` e `MODEL_VERSION` no v3.4. **Decisão do mantenedor:** (A) `promover.py --force --reason` + `SNAPSHOT_EPOCH`
+  + `modal deploy` + `MODEL_VERSION` + `vercel deploy --prod`; (B) alinhar os 3 casos do golden ao contrato, repontuar, empacotar e promover sem força;
+  (C) v3.6 (mais CONCEITO pt e revisão de eleições). Pendências do modelo para o v3.6: CONCEITO pt ("o que é sal/açúcar", "como funciona uma
+  pilha" — a regra local cobre no site e no Android), de "Wie rechnet man Kc in Kp um?", eleições `apenasDeferidas` (4/9) com `--revisao` maior.
 - [x] **Calculadoras novas** (17/10, noite, ordem do mantenedor: entalpia, configuração eletrônica, NOX, Kc/Kp, tipo de ligação) —
   contrato, fontes e decisões em `docs/CALCULADORAS_2026-10-17.md`; intenções NOX/ENTALPIA/EQUILIBRIO/LIGACAO em todos os espelhos;
   site (calc/, nlu.js, answers.js, tela Calculadoras, catálogos 5 idiomas; 217 testes, E2E Chrome), golden 873 → 929; Android portado em paridade (domain/calc/{Entalpia,Eletronica,Nox,Equilibrio,Ligacao}.kt, RespostasCalculadoras.kt, LocalNlu 2b/5b, 5 cartões em Calculadoras.kt, 196 strings × 5 idiomas; 242 testes, golden 929, lint sem aviso novo; tela ainda não testada no aparelho).

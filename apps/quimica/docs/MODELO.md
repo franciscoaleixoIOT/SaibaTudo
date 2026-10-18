@@ -210,3 +210,11 @@ vazamento golden 984 × treino limpo) e a mistura de continuação (43.360 pares
 LoRA v3.4 (`ia/treino/README.md` §v3.5; roteiro `ia/treino/out/nlu-v35-cont/pipeline.sh`). Gate previsto: golden 984 (o v3.4 erra os casos das
 intenções e ids novos — comparar por intenção), holdout da química, 13 holdouts do v3.5 e os do v3.4 (meta 90 % cada), eleições sem regressão. O
 serviço no Modal continua com o `nlu_core.py` anterior até a promoção.
+
+**v3.5 treinado e medido (18/10/2026, 10h) — promoção PENDENTE:** gate em `ia/treino/README.md` §v3.5: golden 984 intenção 98,4 % (776 casos em
+comum com o v3.4: 98,5 → 97,9 %; 208 casos novos 100 %), holdout 2.538 99,4 %, Q8 = Q4, 17 extras com intenção ≥ 90 %; eleições 96,5 % / 96,6 %.
+`passed: false` só por "alucinação de composto" em 3 de 10 casos null — NOMENCLATURA de nomes IUPAC fora do pacote em que o modelo copia o nome da
+pergunta para `composto` (o contrato admite; desacordo entre o golden e o contrato, não entidade inventada). Pacote
+`ai_model/output/gguf/nlu-v3.5-20261018/` e os 3 arquivos já no Volume (`/nlu-v3.5-20261018/`); **ponteiro, `SNAPSHOT_EPOCH` e `MODEL_VERSION`
+continuam no v3.4**. A promoção com `promover.py --force --reason` ficou para o mantenedor (opções A/B/C no README do treino). O serviço continua
+com o `nlu_core.py` anterior até a promoção.
