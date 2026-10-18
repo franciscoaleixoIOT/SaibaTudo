@@ -1,5 +1,5 @@
 {
-  "geradoEm": "2026-10-17T20:06:29Z",
+  "geradoEm": "2026-10-18T05:19:23Z",
   "modo": "completo",
   "idiomas": [
     "pt-BR",
@@ -288,7 +288,7 @@
     },
     "clp": {
       "status": "ok",
-      "segundos": 0.5,
+      "segundos": 0.6,
       "celex": "02008R1272-20260701",
       "url": "https://eur-lex.europa.eu/legal-content/PT/TXT/?uri=CELEX:02008R1272-20260701",
       "idiomas": [
@@ -323,7 +323,7 @@
     },
     "selecaoCompostos": {
       "status": "ok",
-      "segundos": 0.1,
+      "segundos": 0.2,
       "listaFixaEntradas": 501,
       "listaFixaResolvidas": 501,
       "listaFixaDescartadas": [],
@@ -333,7 +333,7 @@
     },
     "compostos": {
       "status": "ok",
-      "segundos": 1.3,
+      "segundos": 2.0,
       "compostos": 1990,
       "descartados": [],
       "duplicados": [
@@ -654,7 +654,7 @@
     },
     "termoquimicaWikipedia": {
       "status": "ok",
-      "segundos": 0.1,
+      "segundos": 0.2,
       "compostos": 1971,
       "comTituloEn": 1933,
       "paginasLidas": 1933,
@@ -946,7 +946,7 @@
     },
     "wikipedia": {
       "status": "ok",
-      "segundos": 0.1,
+      "segundos": 0.2,
       "elementos": 118,
       "compostos": 150,
       "conceitos": 320,
@@ -1103,7 +1103,7 @@
     },
     "wikilivros": {
       "status": "ok",
-      "segundos": 0.0,
+      "segundos": 0.1,
       "livros": {
         "Introdução à Química": 72,
         "Química Orgânica": 11,
@@ -1150,7 +1150,7 @@
     },
     "goldBook": {
       "status": "bloqueado",
-      "segundos": 0.7,
+      "segundos": 0.6,
       "motivo": "HTTP 403 em https://goldbook.iupac.org/"
     }
   },
@@ -1264,7 +1264,7 @@
       "goldbook.iupac.org": 2
     }
   },
-  "duracaoSegundos": 3.6,
-  "versao": "20261017T200629Z-4bdcfd55c55a",
+  "duracaoSegundos": 5.0,
+  "versao": "20261018T051923Z-d8252787a75d",
   "erros": []
 }
