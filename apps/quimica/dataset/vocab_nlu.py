@@ -23,6 +23,9 @@ PROP_ELEMENTO = {
     "densidadeKgm3": [("a", "densidade"), ("a", "massa específica")],
     "estadoPadrao": [("o", "estado físico"), ("o", "estado padrão")],
     "estadosOxidacao": [("os", "estados de oxidação"), ("os", "números de oxidação")],
+    # 18/10/2026 (docs/CALCULADORAS_2026-10-17.md §7): prótons, nêutrons e elétrons do átomo ou do íon
+    "particulas": [("o", "número de prótons"), ("o", "número de nêutrons"), ("o", "número de elétrons"), ("o", "número de massa"),
+                   ("as", "partículas subatômicas")],
 }
 PROP_COMPOSTO = {
     "massaMolar": [("a", "massa molar"), ("o", "peso molecular"), ("a", "massa molecular")],
@@ -43,6 +46,10 @@ PROP_COMPOSTO = {
     "densidadeKgm3": [("a", "densidade")],
     # 17/10/2026 (docs/CALCULADORAS_2026-10-17.md §1): ΔHf° do composto; "entalpia da REAÇÃO/combustão" é a intenção ENTALPIA, não esta propriedade
     "entalpiaFormacaoKJmol": [("a", "entalpia de formação"), ("a", "entalpia padrão de formação"), ("o", "calor de formação")],
+    # 18/10/2026 (§7): ΔGf° e S° a 298,15 K (pacote: chembox da Wikipédia em inglês)
+    "energiaGibbsFormacaoKJmol": [("a", "energia livre de Gibbs de formação"), ("a", "energia livre padrão de formação"),
+                                  ("a", "energia de Gibbs de formação"), ("a", "entalpia livre de formação")],
+    "entropiaPadraoJmolK": [("a", "entropia padrão"), ("a", "entropia molar padrão"), ("a", "entropia absoluta")],
 }
 
 # unidade canônica -> formas escritas

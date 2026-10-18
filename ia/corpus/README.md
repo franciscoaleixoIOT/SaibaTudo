@@ -95,7 +95,7 @@ ficar abaixo de 70 % do treino); testes contra ele: `CORPUS_OUT=ia/corpus/out/v3
 - Para remontar o corpus do v3.4 depois do v3.5: acrescente `--escala-v35 0` (o padrão agora liga o v3.5). Os testes contra `out/v34` deixaram
   de passar em `test_quimica_cinco_idiomas...`, que desde o v3.5 exige exemplos das 4 intenções novas.
 
-## v3.5 (17/10/2026): calculadoras (NOX, ENTALPIA, EQUILIBRIO, LIGACAO), `entalpiaFormacaoKJmol` e famílias de superfície
+## v3.5 (17–18/10/2026): calculadoras (NOX, ENTALPIA, EQUILIBRIO, LIGACAO), termoquímica (`entalpiaFormacaoKJmol`, `energiaGibbsFormacaoKJmol`, `entropiaPadraoJmolK`), `particulas` e famílias de superfície
 Contrato: `apps/quimica/docs/CALCULADORAS_2026-10-17.md` (§1 intenções, §5 famílias). Gerador `quimica_v35.py` (`--escala-v35`, 0 desliga),
 chamado por `montar_corpus.carregar_v35`, e moldes pt-BR das 4 intenções em `apps/quimica/dataset/gerar_nlu.py` (`T["NOX"]`... e
 `COTA_CALCULADORAS` 700/800/700/650, gerados **depois** das variantes de linguagem e com sorteio próprio: todas as outras famílias do dataset
@@ -103,28 +103,31 @@ geram exatamente os mesmos pares de antes). Só padrões escritos por nós, nenh
 ácidos do pacote: `gerar_nlu.ions_do_pacote`), equações (as de `dataset/equacoes.py`, com os coeficientes de `calculo.balancear`) e elementos vêm do
 pacote e dos módulos do dataset.
 
-Corpus do v3.5 (a química fica em 69,8 % do treino):
+Corpus do v3.5 (montagem final de 18/10/2026; a química fica em 69,8 % do treino):
 ```bash
-python -I ia/corpus/montar_corpus.py --out ia/corpus/out/v35 --escala-v34 0.69 --escala-v35 1.0 --teto-intencao-quimica-pt 850 --teto-intencao-quimica-estrangeiros 180
+python -I ia/corpus/montar_corpus.py --out ia/corpus/out/v35 --escala-v34 0.69 --escala-v35 1.0 --teto-intencao-quimica-pt 760 --teto-intencao-quimica-estrangeiros 180 --piso-propriedade-pt 25 --piso-propriedade-estrangeiros 6
 CORPUS_OUT=ia/corpus/out/v35 python -I -m unittest discover -s ia/corpus -p "test_*.py"
 python -I ia/corpus/quimica_v35.py --familia extenso --idioma de --n 20      # amostra de uma família
 ```
-Os tetos abrem espaço para ~7,6 mil exemplos novos sem passar de 70 %: o pt base vai a 850 por intenção (PROPRIEDADE, CONCEITO, SEGURANCA,
-ESTEQUIOMETRIA, COMPARAR, MASSA_MOLAR, CONCENTRACAO e NOMENCLATURA são cortadas) e o gerador multilíngue base a 180 por intenção e idioma.
-O corte é estável (hash da pergunta), não tira nenhuma recusa (`RECUSA_PERIGO` é isenta) e não toca nos populares, no v3.4 nem no v3.5.
+Os tetos abrem espaço para os exemplos novos sem passar de 70 %: o pt base vai a 760 por intenção (PROPRIEDADE, CONCEITO, SEGURANCA,
+ESTEQUIOMETRIA, COMPARAR, MASSA_MOLAR, CONCENTRACAO e NOMENCLATURA são cortadas; em 17/10 era 850, baixado em 18/10 para absorver as famílias
+`particulas`, ΔGf°/S° e Kc sem equação) e o gerador multilíngue base a 180 por intenção e idioma. **Piso por propriedade (18/10):** em
+PROPRIEDADE e COMPARAR o corte garante pelo menos 25 exemplos (pt) / 6 (por idioma estrangeiro) de cada id de propriedade antes de completar
+o teto por hash (`--piso-propriedade-pt/-estrangeiros`, `limitar_por_intencao`): só pelo hash, PROPRIEDADE pt 3896 → 760 deixava
+`ligacoesRotaveis` com 5, `doadoresH` 7, `carga` 10, `bloco` 14; com o piso os ids mais raros ficam com 22–28 em pt e 21–27 somando os quatro
+idiomas estrangeiros. O corte é estável (hash da pergunta), não tira nenhuma recusa (`RECUSA_PERIGO` é isenta) e não toca nos populares, no
+v3.4 nem no v3.5.
 
-Números (75.041 pares; treino 68.589, val 2.697, holdout 3.755; química 47.927 de treino = 69,9 %; 4.756 do gerador v3.5): NOX 1.018 no
-treino (pt 728, en 74, es 70, de 74, fr 72), ENTALPIA 1.107, EQUILIBRIO 987, LIGACAO 938; `entalpiaFormacaoKJmol` 275 (PROPRIEDADE 167, COMPARAR 108). Famílias de superfície no
-treino (pt / en, es, de, fr): notação 177 / 70–77, extenso 180 / 70–80, estequiometria sem "quantos" 178 / 67–72, nomenclatura por nome
-sistemático 171 / 58–64, mistura 172 / 63–73, ordenação 179 / 73–81, pistas de configuração eletrônica 80 / 40–47.
+Números (montagem de 18/10: 74.935 pares; treino 68.388, val 2.694, holdout 3.853; química 47.726 de treino = 69,8 %; 5.317 do gerador v3.5): NOX 1.017 no treino (pt 727, en 74, es 70, de 74, fr 72), ENTALPIA 1.107, EQUILIBRIO 945 (+ os CONCEITO de Kc sem equação), LIGACAO 941; PROPRIEDADE/COMPARAR com `entalpiaFormacaoKJmol` 233, `energiaGibbsFormacaoKJmol` 171, `entropiaPadraoJmolK` 182, `particulas` 356. Famílias do v3.5 no treino (pt / en–fr): nox 101 / 70–74, entalpia 95 / 70–74, equilibrio 113 / 65–71, ligacao 91 / 56–61, entalpia_formacao 144 / 76–83, configuracao 79 / 40–47, particulas 115 / 58–63, notacao 177 / 70–77, extenso 180 / 70–80, esteq_formada 178 / 67–72, nomenclatura_nome 171 / 58–64, mistura 172 / 63–73, ordenacao 179 / 73–81. Holdouts `holdout_v35_*`: 13 arquivos, 536 casos.
 
 | Família | Intenção e rótulo |
 | :-- | :-- |
 | `nox` | NOX: "NOX do S no H2SO4" → elemento (um elemento DA fórmula) + composto; "NOX de cada elemento no KMnO4" → só composto (o golden mede `elemento: null`); 15 % orgânicos ("nox do carbono em C3H8"); íons "MnO4-", "Cr2O7 2-", "NH4+" copiados como composto |
 | `entalpia` | ENTALPIA: combustão de <combustível do pacote> (composto), de <equação balanceada> (equacao), calor da queima de <quantidade> de <composto> (composto + quantidades), "lei de Hess" sem entidade |
-| `equilibrio` | EQUILIBRIO (equacao obrigatória): seta `⇌`, `<=>`, `<->`, `→`, `=` ou `->` (o serviço normaliza para `⇌`/`→` e o rótulo copia a pergunta normalizada); 25 % com o estado físico de cada espécie pelo `estadoPadrao` do pacote ("CaCO3(s) ⇌ CaO(s) + CO2(g)"); Kp a <T> (quantidade K/°C); `[X] = v mol/L` e `p(X) = v atm` na ordem do texto, também antes da equação ("com [N2O4] = ..., qual o Kc de ...?") |
+| `equilibrio` | EQUILIBRIO (equacao obrigatória): **desde 18/10, ~25 % sem equação viram CONCEITO** ("como calcular o Kc", "o que é Kp", "qual o Kp a 500 K", "calcule o Kc da reação"; a temperatura fica só no texto); no resto, seta `⇌`, `<=>`, `<->`, `→`, `=` ou `->` (o serviço normaliza para `⇌`/`→` e o rótulo copia a pergunta normalizada); 25 % com o estado físico de cada espécie pelo `estadoPadrao` do pacote ("CaCO3(s) ⇌ CaO(s) + CO2(g)"); Kp a <T> (quantidade K/°C); `[X] = v mol/L` e `p(X) = v atm` na ordem do texto, também antes da equação ("com [N2O4] = ..., qual o Kc de ...?") |
 | `ligacao` | LIGACAO: par de elementos → elemento = o PRIMEIRO; composto → composto; "ligação no ferro metálico" → elemento |
-| `entalpia_formacao` | PROPRIEDADE/COMPARAR com `entalpiaFormacaoKJmol` (formas do léxico: "entalpia (padrão) de formação", "calor de formação"); COMPARAR com o primeiro composto; + CONCEITO de contraste ("o que é entalpia?", "o que é NOX?") |
+| `entalpia_formacao` | PROPRIEDADE/COMPARAR com a termoquímica padrão: `entalpiaFormacaoKJmol` (formas do léxico: "entalpia (padrão) de formação", "calor de formação"; qualquer composto, como em 17/10) e, desde 18/10, `energiaGibbsFormacaoKJmol` ("energia livre de Gibbs de formação", "ΔG de formação", "Gibbs de formação"; en "standard Gibbs free energy of formation", es "energía libre de Gibbs de formación", de "freie Standardbildungsenthalpie"/"Gibbs-Energie der Bildung", fr "enthalpie libre standard de formation") e `entropiaPadraoJmolK` ("entropia padrão", "entropia molar padrão", "entropia absoluta", "S°"; en "standard molar entropy", es "entropía molar estándar", de "(molare) Standardentropie", fr "entropie molaire standard"), estas duas **só com compostos que têm o valor no pacote** (~80 com ΔGf°, ~240 com S° por idioma); sorteio 45/25/30; COMPARAR com o primeiro composto ("mais negativo" só nas energias); + CONCEITO de contraste ("o que é entalpia?", "o que é entropia?", "o que é energia livre de Gibbs?") |
+| `particulas` | (18/10) PROPRIEDADE + `particulas`, `elemento` = símbolo: "quantos prótons tem o ferro", "número de nêutrons do carbono", "quantos prótons, nêutrons e elétrons tem o Fe2+?", "número de massa do sódio", "partículas do átomo de Mg"; íons monoatômicos (cargas dos `estadosOxidacao` do pacote: + nos metais, − nos não metais) escritos "Fe2+", "Fe²⁺", "Fe+2", "Fe^2+", "Cl-", "íon Na+", "cátion Ca2+", "ânion O2-"; número de massa na pergunta ("Fe-56", "56Fe", "¹⁴C", "carbono-14", "isótopo C-14"; tabela `ISOTOPOS` de nuclídeos conhecidos ou a massa atômica arredondada). **O rótulo não leva carga nem número de massa** (o cliente lê do texto): `{"intent":"PROPRIEDADE","elemento":"Fe","propriedade":"particulas"}`. ~15 % de contraste: elétrons de valência → `configuracaoEletronica`, número atômico → `numeroAtomico`. Holdout por espécie (`Fe+2`, `C14`, elemento neutro) |
 | `configuracao` | PROPRIEDADE + `configuracaoEletronica` pelas pistas novas ("elétrons de valência", "camada de valência", "diagrama de Linus Pauling", "distribuição eletrônica"; CALCULADORAS §1: não é intenção nova). Família a mais do que o §5 pede, porque o golden de 17/10 traz esses casos |
 | `notacao` | quantidades "2,5 × 10³ g", "3x10^-2 mol", "1,5·10⁻³ mol/L", "4 x 10^(-5) M", "1.5e-3" (ESTEQUIOMETRIA, CONCENTRACAO, PH, CONVERSAO_UNIDADE, GAS_IDEAL) |
 | `extenso` | "meio mol" 0,5; "um quarto de mol" 0,25; "um mol e meio" 1,5; "dois mols" 2; "1/2", "½"; "meio litro", "dois quilos"; en "half a mole", es "medio mol", de "ein halbes Mol"/"einem halben Mol", fr "une demi-mole". "um mol" fica de fora (é MASSA_MOLAR) |
@@ -145,8 +148,17 @@ sistemático 171 / 58–64, mistura 172 / 63–73, ordenação 179 / 73–81, pi
   copiáveis hoje; para aceitá-los, acrescentar `^⁺⁻⁰-⁹` à classe da gramática e ao filtro do proxy.
 - **Pacote.** `entalpiaFormacaoKJmol` ainda não está nos compostos do pacote (coleta P3078 do Wikidata, CALCULADORAS §3): COMPARAR com ela não
   é ancorado em valores (como ebulição/pKa de compostos no v3.4). Equilíbrio usa equações do dataset sem estado físico (s/l/g).
+- **O que mudou em 18/10/2026** (contrato: `nlu_core.PROPRIEDADES` ganha, no fim, `energiaGibbsFormacaoKJmol`, `entropiaPadraoJmolK` e
+  `particulas`; Kc/Kp sem equação passa a CONCEITO): cotas `entalpia_formacao` (110, 60) → (160, 90), `equilibrio` (100, 70) → (130, 80) e a
+  família nova `particulas` (130, 70). Gerado com escala 1.0 (antes da validação do montador): `entalpia_formacao` pt 160 (ΔHf° 71, ΔGf° 30,
+  S° 47, CONCEITO 12), en/es/de/fr 90 cada; `particulas` pt 130 (104 `particulas`, 17 configuração, 9 número atômico), en/es/de/fr 70 cada
+  (60–65 `particulas`); `equilibrio` pt 130 (33 CONCEITO), en 80 (22), es 80 (16), de 80 (14), fr 80 (19) — 23 % no total. Testes direto no
+  gerador em `test_montar_corpus.GeradorV35Novas` (não dependem do corpus montado). Os moldes antigos "Quantos prótons tem {el}?"/"Quantos
+  elétrons tem {el}?" (`apps/quimica/dataset/gerar_nlu.py` T e `quimica_idiomas/{en,es,de,fr}.py`) rotulavam `numeroAtomico`; em 18/10
+  passaram a `particulas`, o mesmo rótulo do golden (no montador vale o primeiro rótulo visto, `conflitos_de_rotulo`, e formas parecidas
+  com rótulos diferentes ensinariam os dois).
 - **Testes fora do treino** continuam valendo (golden 5 idiomas, segurança, eleições). Holdouts do v3.5 (~8 % por hash da entidade, nunca treinam;
-  conferidos no teste `test_v35_calculadoras_e_familias`): `holdout_v35_{nox,entalpia,equilibrio,ligacao,entalpia_formacao,notacao,extenso,
+  conferidos no teste `test_v35_calculadoras_e_familias`): `holdout_v35_{nox,entalpia,equilibrio,ligacao,entalpia_formacao,particulas,notacao,extenso,
   esteq_formada,nomenclatura_nome,mistura,ordenacao,configuracao}.json` (30 / 37 / 27 / 44 / 30 / 51 / 47 / 47 / 39 / 57 / 37 / 26 = 472). O holdout base da
   química (`holdout_quimica.json`) também ganha as 4 intenções pela divisão por entidade do `gerar_nlu` (`val.jsonl`: NOX 36, ENTALPIA 48,
   EQUILIBRIO 39, LIGACAO 16).
@@ -161,7 +173,7 @@ sistemático 171 / 58–64, mistura 172 / 63–73, ordenação 179 / 73–81, pi
 
 ## Arquivos
 - `montar_corpus.py`: monta o corpus.
-- `quimica_v35.py`: geradores do v3.5 (12 famílias, 5 idiomas) e a evidência `evidencia_v35`; `quimica_v34.py`: geradores do v3.4.
+- `quimica_v35.py`: geradores do v3.5 (13 famílias desde 18/10, 5 idiomas) e a evidência `evidencia_v35`; `quimica_v34.py`: geradores do v3.4.
 - `quimica_populares.py`: gerador focado dos compostos do dia a dia nos cinco idiomas (ver a tabela de fontes); `test_quimica_populares.py`
   confere composto copiado da pergunta, quantidades na ordem, rótulo válido pelo contrato, nomes populares presentes, filtro de sinônimos,
   substâncias elementares fora do pool e o grupo por nome de elemento (símbolo válido, sem `composto`).

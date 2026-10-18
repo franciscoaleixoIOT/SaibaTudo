@@ -13,10 +13,18 @@ Famílias (cada registro leva `familia`; ~8 % de cada uma vai para o holdout por
     entalpia         ENTALPIA: ΔH da combustão de <composto> (combustíveis do pacote), de <equação balanceada>, calor da queima de <quantidade>
                      de <composto>, "pela lei de Hess" (sem entidade)
     equilibrio       EQUILIBRIO: expressão de Kc/Kp de <equação com ⇌, <=>, <->, → ou =>; Kp a <temperatura>; Kc com [X] = v mol/L (as
-                     quantidades na ordem do texto)
+                     quantidades na ordem do texto). 18/10: ~25 % SEM equação -> CONCEITO ("como calcular o Kc", "o que é Kp", "qual o Kp a
+                     500 K", "calcule o Kc da reação"): sem equação não há o que calcular (CALCULADORAS §1)
     ligacao          LIGACAO: tipo de ligação do <composto>; ligação entre <el1> e <el2> (elemento = o PRIMEIRO); "polar ou apolar"
-    entalpia_formacao PROPRIEDADE/COMPARAR com `entalpiaFormacaoKJmol` ("entalpia de formação da água", "qual tem maior calor de formação, X
-                     ou Y" -> o primeiro); + CONCEITO de contraste ("o que é entalpia?", "o que é número de oxidação?")
+    entalpia_formacao PROPRIEDADE/COMPARAR com a termoquímica padrão do pacote: `entalpiaFormacaoKJmol` ("entalpia de formação da água", "qual
+                     tem maior calor de formação, X ou Y" -> o primeiro) e, desde 18/10, `energiaGibbsFormacaoKJmol` ("energia livre de Gibbs de
+                     formação", "ΔG de formação") e `entropiaPadraoJmolK` ("entropia padrão", "entropia molar padrão", "entropia absoluta"), estas
+                     duas só com compostos que TÊM o valor no pacote; + CONCEITO de contraste ("o que é entalpia?", "o que é entropia?", "o que é
+                     energia livre de Gibbs?")
+    particulas       (18/10) PROPRIEDADE `particulas` com elemento = símbolo: "quantos prótons tem o ferro", "quantos elétrons tem o íon Cl-",
+                     "número de massa do sódio", íons ("Fe2+", "Fe²⁺", "Fe+2", "cátion Ca2+", "ânion O2-") e número de massa na pergunta ("Fe-56",
+                     "56Fe", "carbono-14"); carga e número de massa NÃO vão no rótulo (o cliente lê do texto); ~15 % de contraste (elétrons de
+                     valência -> configuracaoEletronica, número atômico -> numeroAtomico)
     configuracao     PROPRIEDADE configuracaoEletronica pelas pistas novas ("elétrons de valência", "camada de valência", "diagrama de Linus
                      Pauling", "distribuição eletrônica"): CALCULADORAS §1 (configuração eletrônica não ganha intenção)
   superfície das intenções existentes
@@ -381,32 +389,150 @@ HF_FORMAS = {  # entalpiaFormacaoKJmol: (artigo, forma); as formas casam com con
     "de": [("die", "Bildungsenthalpie"), ("die", "Standardbildungsenthalpie"), ("die", "Bildungswärme")],
     "fr": [("l'", "enthalpie de formation"), ("l'", "enthalpie standard de formation"), ("la", "chaleur de formation")],
 }
-HF = {
-    "pt-BR": {"prop": ["{P} {c_de}", "Qual {p_art} {c_de}?", "Me diga {p_art} {c_de}", "{c}: {p}", "Quanto vale {p_art} {c_de}?", "Qual é {p_art} {c_de} em kJ/mol?"],
-              "comp": ["Qual tem maior {p}, {a} ou {b}?", "Compare {p_art} {a_de} e {b_de}", "{a} ou {b}: qual tem {p} mais negativo?",
-                       "Entre {a} e {b}, qual tem menor {p}?"]},
-    "en": {"prop": ["{P} {c_de}", "What is {p_art} {c_de}?", "Tell me {p_art} {c_de}", "{c}: {p}", "{p_art} {c_de} in kJ/mol"],
-           "comp": ["Which has the higher {p}, {a} or {b}?", "Compare {p_art} {a_de} and {b_de}", "{a} or {b}: which has the more negative {p}?"]},
-    "es": {"prop": ["{P} {c_de}", "¿Cuál es {p_art} {c_de}?", "Dime {p_art} {c_de}", "{c}: {p}"],
-           "comp": ["¿Cuál tiene mayor {p}, {a} o {b}?", "Compara {p_art} {a_de} y {b_de}"]},
-    "de": {"prop": ["{P} {c_de}", "Wie groß ist {p_art} {c_de}?", "Nenne {p_art} {c_de}", "{c}: {p}"],
-           "comp": ["Welches hat die höhere {p}, {a} oder {b}?", "Vergleiche {p_art} {a_de} und {b_de}"]},
-    "fr": {"prop": ["{P} {c_de}", "Quelle est {p_art} {c_de} ?", "Donne-moi {p_art} {c_de}", "{c} : {p}"],
-           "comp": ["Lequel a la plus grande {p}, {a} ou {b} ?", "Compare {p_art} {a_de} et {b_de}"]},
+# Termoquímica padrão do pacote (18/10/2026): ΔHf°, ΔGf° e S° (DATA_CONTRACT §3.1). id -> idioma -> [(artigo, forma)]
+TERMO_FORMAS = {
+    "entalpiaFormacaoKJmol": HF_FORMAS,
+    "energiaGibbsFormacaoKJmol": {
+        "pt-BR": [("a", "energia livre de Gibbs de formação"), ("a", "energia livre de Gibbs padrão de formação"), ("o", "ΔG de formação"),
+                  ("a", "energia de Gibbs de formação"), ("o", "Gibbs de formação"), ("a", "energia livre padrão de formação"), ("o", "ΔG° de formação")],
+        "en": [("the", "standard Gibbs free energy of formation"), ("the", "Gibbs free energy of formation"), ("the", "Gibbs energy of formation"),
+               ("the", "ΔG of formation"), ("the", "standard free energy of formation")],
+        "es": [("la", "energía libre de Gibbs de formación"), ("la", "energía libre de Gibbs estándar de formación"), ("el", "ΔG de formación"),
+               ("la", "energía de Gibbs de formación"), ("la", "energía libre estándar de formación")],
+        "de": [("die", "freie Standardbildungsenthalpie"), ("die", "Gibbs-Energie der Bildung"), ("die", "freie Bildungsenthalpie"),
+               ("die", "Gibbs-Bildungsenergie"), ("die", "freie Standardbildungsenergie")],
+        "fr": [("l'", "enthalpie libre standard de formation"), ("l'", "enthalpie libre de formation"), ("l'", "énergie de Gibbs de formation"),
+               ("l'", "énergie libre de Gibbs de formation")]},
+    "entropiaPadraoJmolK": {
+        "pt-BR": [("a", "entropia padrão"), ("a", "entropia molar padrão"), ("a", "entropia absoluta"), ("a", "entropia padrão molar"), ("o", "S°")],
+        "en": [("the", "standard molar entropy"), ("the", "standard entropy"), ("the", "absolute entropy"), ("the", "molar entropy")],
+        "es": [("la", "entropía molar estándar"), ("la", "entropía estándar"), ("la", "entropía absoluta")],
+        "de": [("die", "Standardentropie"), ("die", "molare Standardentropie"), ("die", "absolute Entropie")],
+        "fr": [("l'", "entropie molaire standard"), ("l'", "entropie standard"), ("l'", "entropie absolue")]},
 }
+TERMO_PESOS = {"entalpiaFormacaoKJmol": 45, "energiaGibbsFormacaoKJmol": 25, "entropiaPadraoJmolK": 30}
+TERMO_UNIDADE = {"entalpiaFormacaoKJmol": ["kJ/mol"], "energiaGibbsFormacaoKJmol": ["kJ/mol"],
+                 "entropiaPadraoJmolK": ["J/(mol·K)", "J/(mol·K)", "J/mol·K", "J/(K·mol)", "J mol⁻¹ K⁻¹"]}
+# {u} unidade da propriedade; {neg} "mais negativo(a)" concordando com a forma ("comp_neg" só nas energias: S° padrão é sempre positiva)
+HF = {
+    "pt-BR": {"prop": ["{P} {c_de}", "Qual {p_art} {c_de}?", "Me diga {p_art} {c_de}", "{c}: {p}", "Quanto vale {p_art} {c_de}?", "Qual é {p_art} {c_de} em {u}?"],
+              "comp": ["Qual tem maior {p}, {a} ou {b}?", "Compare {p_art} {a_de} e {b_de}", "Entre {a} e {b}, qual tem menor {p}?"],
+              "comp_neg": ["{a} ou {b}: qual tem {p_art} {neg}?"]},
+    "en": {"prop": ["{P} {c_de}", "What is {p_art} {c_de}?", "Tell me {p_art} {c_de}", "{c}: {p}", "{p_art} {c_de} in {u}"],
+           "comp": ["Which has the higher {p}, {a} or {b}?", "Compare {p_art} {a_de} and {b_de}"],
+           "comp_neg": ["{a} or {b}: which has the more negative {p}?"]},
+    "es": {"prop": ["{P} {c_de}", "¿Cuál es {p_art} {c_de}?", "Dime {p_art} {c_de}", "{c}: {p}", "{P} {c_de} en {u}"],
+           "comp": ["¿Cuál tiene mayor {p}, {a} o {b}?", "Compara {p_art} {a_de} y {b_de}"],
+           "comp_neg": ["{a} o {b}: ¿cuál tiene {p_art} {neg}?"]},
+    "de": {"prop": ["{P} {c_de}", "Wie groß ist {p_art} {c_de}?", "Nenne {p_art} {c_de}", "{c}: {p}", "{P} {c_de} in {u}"],
+           "comp": ["Welches hat die höhere {p}, {a} oder {b}?", "Vergleiche {p_art} {a_de} und {b_de}"],
+           "comp_neg": ["{a} oder {b}: welches hat die negativere {p}?"]},
+    "fr": {"prop": ["{P} {c_de}", "Quelle est {p_art} {c_de} ?", "Donne-moi {p_art} {c_de}", "{c} : {p}", "{P} {c_de} en {u}"],
+           "comp": ["Lequel a la plus grande {p}, {a} ou {b} ?", "Compare {p_art} {a_de} et {b_de}"],
+           "comp_neg": ["{a} ou {b} : lequel a {p_art} {neg} ?"]},
+}
+NEG = {"pt-BR": {"o": "mais negativo", "a": "mais negativa"}, "es": {"el": "más negativo", "la": "más negativa"},
+       "fr": {"le": "le plus négatif", "la": "la plus négative", "l'": "la plus négative"}}
 CONTRASTE = {  # definições -> CONCEITO (não é cálculo: a pergunta não traz composto, equação nem par de elementos)
     "pt-BR": ["O que é entalpia?", "O que é número de oxidação?", "O que é NOX?", "O que é ligação iônica?", "O que é ligação covalente?", "O que é constante de equilíbrio?",
               "O que diz a lei de Hess?", "O que é entalpia de formação?", "Explique o que é ligação metálica", "O que significa reação exotérmica?",
-              "Para que serve o Kc?", "O que é equilíbrio químico?", "Explique a diferença entre ligação polar e apolar", "O que é estado de oxidação?"],
+              "Para que serve o Kc?", "O que é equilíbrio químico?", "Explique a diferença entre ligação polar e apolar", "O que é estado de oxidação?",
+              "O que é entropia?", "O que é energia livre de Gibbs?", "O que significa ΔG negativo?", "O que é entropia padrão?", "Explique a energia de Gibbs",
+              "Qual a diferença entre entalpia e entropia?", "O que mede a entropia?", "O que é uma reação espontânea?"],
     "en": ["What is enthalpy?", "What is an oxidation number?", "What is an ionic bond?", "What is a covalent bond?", "What is an equilibrium constant?",
-           "What does Hess's law say?", "What is enthalpy of formation?", "Explain metallic bonding", "What does exothermic mean?", "What is chemical equilibrium?"],
+           "What does Hess's law say?", "What is enthalpy of formation?", "Explain metallic bonding", "What does exothermic mean?", "What is chemical equilibrium?",
+           "What is entropy?", "What is Gibbs free energy?", "What does a negative ΔG mean?", "What is standard entropy?", "Explain Gibbs energy",
+           "What is the difference between enthalpy and entropy?"],
     "es": ["¿Qué es la entalpía?", "¿Qué es el número de oxidación?", "¿Qué es un enlace iónico?", "¿Qué es un enlace covalente?", "¿Qué es la constante de equilibrio?",
-           "¿Qué dice la ley de Hess?", "Explica el enlace metálico", "¿Qué es el equilibrio químico?"],
+           "¿Qué dice la ley de Hess?", "Explica el enlace metálico", "¿Qué es el equilibrio químico?", "¿Qué es la entropía?", "¿Qué es la energía libre de Gibbs?",
+           "¿Qué significa un ΔG negativo?", "Explica la entropía estándar"],
     "de": ["Was ist Enthalpie?", "Was ist eine Oxidationszahl?", "Was ist eine Ionenbindung?", "Was ist eine kovalente Bindung?", "Was ist die Gleichgewichtskonstante?",
-           "Was besagt der Satz von Hess?", "Erkläre die Metallbindung", "Was ist ein chemisches Gleichgewicht?"],
+           "Was besagt der Satz von Hess?", "Erkläre die Metallbindung", "Was ist ein chemisches Gleichgewicht?", "Was ist Entropie?", "Was ist die Gibbs-Energie?",
+           "Was ist die freie Enthalpie?", "Was bedeutet ein negatives ΔG?"],
     "fr": ["Qu'est-ce que l'enthalpie ?", "Qu'est-ce qu'un nombre d'oxydation ?", "Qu'est-ce qu'une liaison ionique ?", "Qu'est-ce qu'une liaison covalente ?",
-           "Qu'est-ce que la constante d'équilibre ?", "Que dit la loi de Hess ?", "Explique la liaison métallique", "Qu'est-ce que l'équilibre chimique ?"],
+           "Qu'est-ce que la constante d'équilibre ?", "Que dit la loi de Hess ?", "Explique la liaison métallique", "Qu'est-ce que l'équilibre chimique ?",
+           "Qu'est-ce que l'entropie ?", "Qu'est-ce que l'enthalpie libre ?", "Qu'est-ce que l'énergie de Gibbs ?", "Que signifie un ΔG négatif ?"],
 }
+
+# EQUILIBRIO sem equação (18/10/2026) -> CONCEITO: sem a reação não há Kc/Kp a montar; {T} temperatura em dígitos (não vai no rótulo)
+EQM_CONCEITO = {
+    "pt-BR": ["Como calcular o Kc?", "O que é Kc?", "O que é Kp?", "Qual o Kp a {T}?", "fórmula da constante de equilíbrio", "Calcule o Kc da reação",
+              "Como se calcula o Kp?", "Qual a diferença entre Kc e Kp?", "Como converter Kc em Kp?", "fórmula de Kp em função de Kc", "O que significa um Kc muito grande?",
+              "Como montar a expressão do Kc?", "Kc depende da temperatura?", "Calcule o Kc", "Qual o valor do Kc a {T}?", "Como achar a constante de equilíbrio de uma reação?",
+              "o que é constante de equilíbrio em termos de pressão", "Qual a fórmula do Kc?", "Como calcular o Kp a {T}?", "Por que sólidos não entram no Kc?"],
+    "en": ["How do I calculate Kc?", "What is Kc?", "What is Kp?", "What is Kp at {T}?", "formula for the equilibrium constant", "Calculate the Kc of the reaction",
+           "How is Kp calculated?", "What is the difference between Kc and Kp?", "How do I convert Kc to Kp?", "Kp in terms of Kc formula", "What does a large Kc mean?",
+           "How do I write the Kc expression?", "Does Kc depend on temperature?", "Calculate Kc", "Why are solids left out of Kc?"],
+    "es": ["¿Cómo se calcula el Kc?", "¿Qué es Kc?", "¿Qué es Kp?", "¿Cuál es el Kp a {T}?", "fórmula de la constante de equilibrio", "Calcula el Kc de la reacción",
+           "¿Cómo se calcula el Kp?", "¿Qué diferencia hay entre Kc y Kp?", "¿Cómo convertir Kc en Kp?", "¿Qué significa un Kc muy grande?", "¿El Kc depende de la temperatura?",
+           "Calcula el Kc"],
+    "de": ["Wie berechnet man Kc?", "Was ist Kc?", "Was ist Kp?", "Wie groß ist Kp bei {T}?", "Formel der Gleichgewichtskonstante", "Berechne das Kc der Reaktion",
+           "Wie berechnet man Kp?", "Was ist der Unterschied zwischen Kc und Kp?", "Wie rechnet man Kc in Kp um?", "Was bedeutet ein großes Kc?",
+           "Hängt Kc von der Temperatur ab?", "Berechne Kc"],
+    "fr": ["Comment calculer le Kc ?", "Qu'est-ce que le Kc ?", "Qu'est-ce que le Kp ?", "Quel est le Kp à {T} ?", "formule de la constante d'équilibre",
+           "Calcule le Kc de la réaction", "Comment calcule-t-on le Kp ?", "Quelle est la différence entre Kc et Kp ?", "Comment convertir Kc en Kp ?",
+           "Que signifie un Kc très grand ?", "Le Kc dépend-il de la température ?", "Calcule le Kc"],
+}
+EQM_CONCEITO_FRACAO = 0.30  # sorteio; ~25 % depois de tirar as repetidas
+
+# PARTICULAS (18/10/2026): prótons = Z, elétrons = Z − carga, nêutrons = A − Z; o rótulo leva só elemento + propriedade (carga e A ficam no texto,
+# lidos pelo cliente). {x} a espécie (sujeito/objeto, com artigo onde a língua pede), {x_de} com a preposição ("do ferro", "of the Fe2+ ion", "von Fe2+").
+PART = {
+    "pt-BR": {"todos": ["Quantos prótons, nêutrons e elétrons tem {x}?", "prótons, nêutrons e elétrons {x_de}", "partículas {x_de}", "Quais as partículas subatômicas {x_de}?",
+                        "número de prótons, nêutrons e elétrons {x_de}", "Calcule prótons, nêutrons e elétrons {x_de}", "Quantas partículas de cada tipo tem {x}?",
+                        "Determine o número de prótons, elétrons e nêutrons {x_de}"],
+              "p": ["Quantos prótons tem {x}?", "número de prótons {x_de}", "Quantos prótons há no núcleo {x_de}?", "prótons {x_de}", "Qual o número de prótons {x_de}?"],
+              "n": ["Quantos nêutrons tem {x}?", "número de nêutrons {x_de}", "Calcule o número de nêutrons {x_de}", "nêutrons {x_de}", "Quantos nêutrons possui {x}?"],
+              "e": ["Quantos elétrons tem {x}?", "número de elétrons {x_de}", "Quantos elétrons possui {x}?", "elétrons {x_de}", "Qual o número de elétrons {x_de}?"],
+              "A": ["número de massa {x_de}", "Qual o número de massa {x_de}?", "Qual é o número de massa (A) {x_de}?"]},
+    "en": {"todos": ["How many protons, neutrons and electrons does {x} have?", "protons, neutrons and electrons {x_de}", "subatomic particles {x_de}",
+                     "number of protons, neutrons and electrons {x_de}", "Find the protons, neutrons and electrons {x_de}"],
+           "p": ["How many protons does {x} have?", "number of protons {x_de}", "How many protons are in the nucleus {x_de}?", "protons {x_de}"],
+           "n": ["How many neutrons does {x} have?", "number of neutrons {x_de}", "neutrons {x_de}", "Calculate the number of neutrons {x_de}"],
+           "e": ["How many electrons does {x} have?", "number of electrons {x_de}", "electrons {x_de}", "How many electrons has {x} got?"],
+           "A": ["mass number {x_de}", "What is the mass number {x_de}?"]},
+    "es": {"todos": ["¿Cuántos protones, neutrones y electrones tiene {x}?", "protones, neutrones y electrones {x_de}", "partículas subatómicas {x_de}",
+                     "número de protones, neutrones y electrones {x_de}", "Calcula los protones, neutrones y electrones {x_de}"],
+           "p": ["¿Cuántos protones tiene {x}?", "número de protones {x_de}", "protones {x_de}"],
+           "n": ["¿Cuántos neutrones tiene {x}?", "número de neutrones {x_de}", "neutrones {x_de}"],
+           "e": ["¿Cuántos electrones tiene {x}?", "número de electrones {x_de}", "electrones {x_de}"],
+           "A": ["número de masa {x_de}", "¿Cuál es el número de masa {x_de}?"]},
+    "de": {"todos": ["Wie viele Protonen, Neutronen und Elektronen hat {x}?", "Protonen, Neutronen und Elektronen {x_de}", "Elementarteilchen {x_de}",
+                     "Anzahl der Protonen, Neutronen und Elektronen {x_de}", "Bestimme Protonen, Neutronen und Elektronen {x_de}"],
+           "p": ["Wie viele Protonen hat {x}?", "Anzahl der Protonen {x_de}", "Protonen {x_de}"],
+           "n": ["Wie viele Neutronen hat {x}?", "Anzahl der Neutronen {x_de}", "Neutronenzahl {x_de}"],
+           "e": ["Wie viele Elektronen hat {x}?", "Anzahl der Elektronen {x_de}", "Elektronenzahl {x_de}"],
+           "A": ["Massenzahl {x_de}", "Wie groß ist die Massenzahl {x_de}?", "Welche Massenzahl hat {x}?"]},
+    "fr": {"todos": ["Combien de protons, de neutrons et d'électrons a {x} ?", "protons, neutrons et électrons {x_de}", "particules subatomiques {x_de}",
+                     "nombre de protons, de neutrons et d'électrons {x_de}", "Calcule les protons, neutrons et électrons {x_de}"],
+           "p": ["Combien de protons a {x} ?", "nombre de protons {x_de}", "protons {x_de}"],
+           "n": ["Combien de neutrons a {x} ?", "nombre de neutrons {x_de}", "neutrons {x_de}"],
+           "e": ["Combien d'électrons a {x} ?", "nombre d'électrons {x_de}", "Combien d'électrons possède {x} ?", "électrons {x_de}"],
+           "A": ["nombre de masse {x_de}", "Quel est le nombre de masse {x_de} ?"]},
+}
+# Contrastes da família (~15 %): elétrons de VALÊNCIA -> configuracaoEletronica; número atômico -> numeroAtomico ({el}, {el_de}; {p_art}/{P} do léxico)
+PART_CONTRASTE = {
+    "pt-BR": {"cfg": ["número de elétrons de valência {el_de}", "Quantos elétrons de valência tem {el}?", "elétrons na última camada {el_de}"],
+              "z": ["Qual {p_art} {el_de}?", "{P} {el_de}"]},
+    "en": {"cfg": ["number of valence electrons in {el}", "How many electrons are in the outer shell of {el}?"], "z": ["What is {p_art} {el_de}?", "{P} {el_de}"]},
+    "es": {"cfg": ["número de electrones de valencia {el_de}", "¿Cuántos electrones hay en la última capa {el_de}?"], "z": ["¿Cuál es {p_art} {el_de}?", "{P} {el_de}"]},
+    "de": {"cfg": ["Anzahl der Valenzelektronen {el_de}", "Wie viele Elektronen hat {el} auf der äußersten Schale?"], "z": ["Wie lautet {p_art} {el_de}?", "{P} {el_de}"]},
+    "fr": {"cfg": ["nombre d'électrons de valence {el_de}", "Combien d'électrons sur la couche externe {el_de} ?"], "z": ["Quel est {p_art} {el_de} ?", "{P} {el_de}"]},
+}
+# palavras da espécie: (íon, cátion, ânion, isótopo, átomo de); de: nominativo e "von"-forma
+PART_PALAVRAS = {
+    "pt-BR": {"ion": "íon", "cat": "cátion", "an": "ânion", "iso": "isótopo", "atomo": "átomo de"},
+    "en": {"ion": "ion", "cat": "cation", "an": "anion", "iso": "isotope", "atomo": "atom"},
+    "es": {"ion": "ion", "cat": "catión", "an": "anión", "iso": "isótopo", "atomo": "átomo de"},
+    "de": {"ion": "Ion", "cat": "Kation", "an": "Anion", "iso": "Isotop", "atomo": "Atom"},
+    "fr": {"ion": "ion", "cat": "cation", "an": "anion", "iso": "isotope", "atomo": "atome de"},
+}
+# números de massa de isótopos conhecidos (fatos de tabela de nuclídeos); fora daqui vale a massa atômica do pacote arredondada
+ISOTOPOS = {"H": [1, 2, 3], "He": [3, 4], "Li": [6, 7], "B": [10, 11], "C": [12, 13, 14], "N": [14, 15], "O": [16, 17, 18], "F": [19], "Ne": [20, 22],
+            "Na": [23], "Mg": [24, 25, 26], "Al": [27], "Si": [28, 29, 30], "P": [31, 32], "S": [32, 34], "Cl": [35, 37], "Ar": [40], "K": [39, 40, 41],
+            "Ca": [40, 44], "Fe": [54, 56, 57, 58], "Co": [59, 60], "Ni": [58, 60], "Cu": [63, 65], "Zn": [64, 66], "Br": [79, 81], "Sr": [88, 90],
+            "Ag": [107, 109], "I": [127, 131], "Cs": [133, 137], "Au": [197], "Hg": [200, 202], "Pb": [206, 207, 208], "Rn": [222], "Ra": [226],
+            "Th": [232], "U": [234, 235, 238], "Pu": [239], "Am": [241], "Tc": [99]}
 
 # Quantidades (notação e extenso): {qm} massa, {qn} mols, {qv} volume, {qc} concentração, {q} conversão + {u} destino, {T}/{P} em dígitos. de: {qn_dat}/{qv_dat}.
 QT = {
@@ -565,8 +691,8 @@ PROP_ORD_EL = ["eletronegatividade", "raioAtomicoPm", "energiaIonizacaoKJmol", "
 PROP_ORD_CO = ["pontoEbulicaoK", "pontoFusaoK", "massaMolar", "densidadeKgm3"]
 
 COTAS = {  # (pt-BR, outros idiomas) com escala 1.0
-    "nox": (110, 80), "entalpia": (110, 80), "equilibrio": (100, 70), "ligacao": (100, 70), "entalpia_formacao": (110, 60),
-    "configuracao": (90, 50), "notacao": (200, 85), "extenso": (200, 85), "esteq_formada": (200, 80), "nomenclatura_nome": (190, 70), "mistura": (200, 80), "ordenacao": (200, 85),
+    "nox": (110, 80), "entalpia": (110, 80), "equilibrio": (130, 80), "ligacao": (100, 70), "entalpia_formacao": (160, 90),
+    "configuracao": (90, 50), "particulas": (130, 70), "notacao": (200, 85), "extenso": (200, 85), "esteq_formada": (200, 80), "nomenclatura_nome": (190, 70), "mistura": (200, 80), "ordenacao": (200, 85),
 }
 FAMILIAS = list(COTAS)
 
@@ -599,6 +725,12 @@ class Gerador:
             if f and not pac.comp_pendente(c):
                 self.formula_idx.setdefault(f, c)
         self.nomes_sist = self._nomes_sistematicos()
+        # ΔGf° e S°: só compostos que TÊM o valor no pacote (ΔHf° segue o sorteio geral do v3.5 de 17/10)
+        self.p_termo = {pid: [x for x in todos if ((x[0].get("propriedades") or {}).get(pid)) is not None]
+                        for pid in ("energiaGibbsFormacaoKJmol", "entropiaPadraoJmolK")}
+        # partículas: elementos com nome no idioma, Z e massa atômica no pacote
+        self.el_part = [(e, n) for e, n in self.E.elementos if e.get("z") and e["z"] <= 100 and e.get("massaAtomica")]
+        self.pesos_part = [12 if e["simbolo"] in v34.ELEMENTOS_MUITO_COMUNS or e["simbolo"] in ISOTOPOS else 4 if e["z"] <= 56 else 1 for e, _ in self.el_part]
 
     # -- utilidades ------------------------------------------------------------------------------------
     def _el_nome(self, e):
@@ -625,8 +757,8 @@ class Gerador:
         return txt, reag, prod, coefs
 
     def _p(self, pid, de_el=True):
-        if pid == "entalpiaFormacaoKJmol":
-            art, forma = self.rng.choice(HF_FORMAS[self.idioma])
+        if pid in TERMO_FORMAS:
+            art, forma = self.rng.choice(TERMO_FORMAS[pid][self.idioma])
             return (f"{art}{forma}" if art.endswith("'") else f"{art} {forma}"), forma, art
         tabela = self.L.prop_el if de_el else self.L.prop_co
         art, forma = self.rng.choice(tabela[pid])
@@ -746,6 +878,10 @@ class Gerador:
 
     def equilibrio(self):
         rng, L, T = self.rng, self.L, EQM[self.idioma]
+        if rng.random() < EQM_CONCEITO_FRACAO:  # sem equação: CONCEITO (a temperatura, se houver, fica só no texto)
+            tpl = rng.choice(EQM_CONCEITO[self.idioma])
+            base = _render(tpl, {"T": L.quant(rng.choice(["K", "K", "°C"]))[0]} if "{T}" in tpl else {})
+            return self._fim(base, {"intent": "CONCEITO"}, "conceito|" + fold(base), p_prefixo=0.2, p_sufixo=0.1)
         txt, reag, prod, coefs = self._eq(self.eq_eqm, ["⇌", "<=>", "<->", "→", "=", "->"], [45, 20, 8, 15, 7, 5], coef=0.85)
         especies = reag + prod
         if rng.random() < 0.25:
@@ -863,23 +999,31 @@ class Gerador:
         if r < 0.14:
             q = rng.choice(CONTRASTE[self.idioma])
             return self._fim(q, {"intent": "CONCEITO"}, "contraste|" + fold(q), p_prefixo=0.25, p_sufixo=0.1)
-        junto, forma, art = self._p("entalpiaFormacaoKJmol")
+        pid = rng.choices(list(TERMO_PESOS), weights=list(TERMO_PESOS.values()))[0]
+        pool = self.p_termo.get(pid)  # None (ΔHf°): sorteio geral; ΔGf° e S°: só quem tem o valor no pacote
+        if pool is not None and len(pool) < 2:
+            return None
+        junto, forma, art = self._p(pid)
+        T = HF[self.idioma]
+        u = rng.choice(TERMO_UNIDADE[pid])
         if r < 0.70:
-            c, texto, tipo = self._sup_co(None)
-            tpl = rng.choice(HF[self.idioma]["prop"])
-            valores = {"c": texto, "c_de": L.x(texto, tipo, "de"), "p": forma, "p_art": junto, "P": forma[:1].upper() + forma[1:]}
-            alvo = {"intent": "PROPRIEDADE", "composto": texto, "propriedade": "entalpiaFormacaoKJmol"}
+            c, texto, tipo = self._sup_co(pool)
+            tpl = rng.choice(T["prop"])
+            valores = {"c": texto, "c_de": L.x(texto, tipo, "de"), "p": forma, "p_art": junto, "P": forma[:1].upper() + forma[1:], "u": u}
+            alvo = {"intent": "PROPRIEDADE", "composto": texto, "propriedade": pid}
             return self._fim(_render(tpl, valores), alvo, "prop|" + str(c["cid"]), [texto])
-        c1, t1, ty1 = self._sup_co(None)
+        c1, t1, ty1 = self._sup_co(pool)
         for _ in range(30):
-            c2, t2, ty2 = self._sup_co(None)
+            c2, t2, ty2 = self._sup_co(pool)
             if c2["cid"] != c1["cid"] and fold(t2) != fold(t1):
                 break
         else:
             return None
-        tpl = rng.choice(HF[self.idioma]["comp"])
-        valores = {"a": t1, "b": t2, "a_de": L.x(t1, ty1, "de"), "b_de": L.x(t2, ty2, "de"), "p": forma, "p_art": junto}
-        alvo = {"intent": "COMPARAR", "composto": t1, "propriedade": "entalpiaFormacaoKJmol"}
+        moldes = T["comp"] + (T["comp_neg"] if pid != "entropiaPadraoJmolK" else [])
+        tpl = rng.choice(moldes)
+        neg = NEG.get(self.idioma, {}).get(art, "")
+        valores = {"a": t1, "b": t2, "a_de": L.x(t1, ty1, "de"), "b_de": L.x(t2, ty2, "de"), "p": forma, "p_art": junto, "neg": neg}
+        alvo = {"intent": "COMPARAR", "composto": t1, "propriedade": pid}
         return self._fim(_render(tpl, valores), alvo, "comp|" + "|".join(sorted([str(c1["cid"]), str(c2["cid"])])), [t1])
 
     def configuracao(self):
@@ -888,6 +1032,119 @@ class Gerador:
         valores = {"el": self.L.x(s, t), "el_de": self.L.x(s, t, "de")}
         alvo = {"intent": "PROPRIEDADE", "elemento": e["simbolo"], "propriedade": "configuracaoEletronica"}
         return self._fim(_render(tpl, valores), alvo, "cfg|" + e["simbolo"])
+
+    # -- partículas (18/10/2026) -------------------------------------------------------------------------
+    def _artigo_sim(self, tok, prep=""):
+        """espécie escrita com símbolo ("Fe2+", "C-14") com o artigo/preposição do idioma: "do Fe2+", "of Fe2+", "del Fe2+", "von Fe2+", "du Fe2+"."""
+        rng, i = self.rng, self.idioma
+        if i == "pt-BR":
+            return f"do {tok}" if prep else rng.choice([f"o {tok}", tok])
+        if i == "es":
+            return f"del {tok}" if prep else rng.choice([f"el {tok}", tok])
+        if i == "fr":
+            return rng.choice([f"du {tok}", f"de {tok}"]) if prep else rng.choice([f"le {tok}", tok])
+        if i == "en":
+            return f"of {tok}" if prep else tok
+        return f"von {tok}" if prep else tok
+
+    def _com_palavra(self, w, tok):
+        """(x, x_de) com a palavra da espécie: "o íon Fe2+"/"do íon Fe2+", "the Fe2+ ion", "das Fe2+-Ion"/"des Fe2+-Ions", "l'ion Fe2+"."""
+        rng, i = self.rng, self.idioma
+        if i == "pt-BR":
+            return f"o {w} {tok}", f"do {w} {tok}"
+        if i == "es":
+            return f"el {w} {tok}", f"del {w} {tok}"
+        if i == "fr":
+            art = "l'" if w[:1] in "aeiouéi" else "le "
+            return f"{art}{w} {tok}", (f"de l'{w} {tok}" if art == "l'" else f"du {w} {tok}")
+        if i == "en":
+            x = rng.choice([f"the {tok} {w}", f"the {w} {tok}"])
+            return x, "of " + x
+        if rng.random() < 0.5 and not tok.endswith("-"):  # "das Fe2+-Ion"; "I--Anion" não
+            return f"das {tok}-{w}", rng.choice([f"des {tok}-{w}s", f"vom {tok}-{w}"])
+        return f"das {w} {tok}", f"vom {w} {tok}"
+
+    def _especie(self):
+        """(elemento, x, x_de, tipo, chave, token): átomo neutro (45 %), íon monoatômico (33 %; cargas dos estados de oxidação do pacote, + nos
+        metais e − nos não metais) ou isótopo com o número de massa no texto (22 %; ISOTOPOS ou a massa atômica arredondada)."""
+        rng, L, W = self.rng, self.L, PART_PALAVRAS[self.idioma]
+        e, nome = rng.choices(self.el_part, weights=self.pesos_part)[0]
+        sim = e["simbolo"]
+        r = rng.random()
+        if r < 0.33:
+            metal = self.gn.eh_metal(e)
+            cargas = [q for q in (e.get("estadosOxidacao") or []) if isinstance(q, int) and q and abs(q) <= 3 and (q > 0 if metal else q < 0 or sim == "H")]
+            if cargas:
+                q = rng.choice(cargas)
+                n, s = abs(q), ("+" if q > 0 else "-")
+                d = str(n) if n > 1 else ""
+                formas = [f"{sim}{d}{s}"] * 4 + [f"{sim}{(d + s).translate(SUP)}"] * 2 + ([f"{sim}{s}{n}"] if n > 1 else []) + [f"{sim}^{d}{s}"]
+                tok = rng.choice(formas)
+                if rng.random() < 0.55:
+                    w = W[rng.choice(["ion", "cat"] if q > 0 else ["ion", "an"])]
+                    x, x_de = self._com_palavra(w, tok)
+                else:
+                    x, x_de = self._artigo_sim(tok), self._artigo_sim(tok, "de")
+                return e, x, x_de, "ion", f"ion|{sim}{q:+d}", tok
+        if r >= 0.78 or (r < 0.33 and rng.random() < 0.3):
+            A = rng.choice(ISOTOPOS.get(sim) or [int(round(e["massaAtomica"]))])
+            if rng.random() < 0.5:
+                sep = rng.choice(["-", " "]) if self.idioma == "fr" else "-"
+                nm = nome if self.idioma == "de" else (nome.lower() if rng.random() < 0.85 else nome)
+                tok = f"{nm}{sep}{A}"
+                if rng.random() < 0.3:
+                    x, x_de = self._com_palavra(W["iso"], tok) if self.idioma != "de" else (f"das Isotop {tok}", f"des Isotops {tok}")
+                else:
+                    x, x_de = L.x(nm, "elemento") + f"{sep}{A}", L.x(nm, "elemento", "de") + f"{sep}{A}"
+            else:
+                tok = rng.choice([f"{sim}-{A}", f"{sim}-{A}", f"{A}{sim}", f"{str(A).translate(SUP)}{sim}"])
+                if rng.random() < 0.3:
+                    x, x_de = self._com_palavra(W["iso"], tok) if self.idioma != "de" else (f"das Isotop {tok}", f"des Isotops {tok}")
+                else:
+                    x, x_de = self._artigo_sim(tok), self._artigo_sim(tok, "de")
+            return e, x, x_de, "iso", f"iso|{sim}{A}", tok
+        s, t = self._sup_el(e)
+        if rng.random() < 0.2:  # "do átomo de ferro", "of an iron atom"
+            i, a = self.idioma, W["atomo"]
+            if i == "pt-BR":
+                x, x_de = f"um {a} {s}", rng.choice([f"do {a} {s}", f"de um {a} {s}"])
+            elif i == "es":
+                x, x_de = f"un {a} {s}", f"del {a} {s}"
+            elif i == "fr":
+                x, x_de = f"un {a} {s}", f"de l'{a} {s}"
+            elif i == "en":
+                x = rng.choice([f"an {a} of {s}", f"a {s} {a}"]) if t == "simbolo" else f"an {a} of {s.lower()}"
+                x_de = "of " + x
+            else:
+                x, x_de = f"ein {s}-{a}", f"eines {s}-{a}s"
+        else:
+            x, x_de = L.x(s, t), L.x(s, t, "de")
+        return e, x, x_de, "neutro", f"el|{sim}", s
+
+    PART_PESOS = {"neutro": {"todos": 25, "p": 25, "n": 20, "e": 15, "A": 15}, "ion": {"todos": 35, "e": 40, "p": 15, "n": 10},
+                  "iso": {"n": 40, "todos": 30, "p": 10, "e": 10, "A": 10}}
+
+    def particulas(self):
+        rng, L = self.rng, self.L
+        r = rng.random()
+        if r < 0.15:  # contraste: não é contagem de partículas
+            C = PART_CONTRASTE[self.idioma]
+            if r < 0.08:
+                e, s, t = self.E.el(com="configuracaoEletronica")
+                tpl, pid, chave = rng.choice(C["cfg"]), "configuracaoEletronica", "cfg|" + e["simbolo"]
+                junto = forma = ""
+            else:
+                e, s, t = self.E.el()
+                junto, forma, _art = self._p("numeroAtomico", True)
+                tpl, pid, chave = rng.choice(C["z"]), "numeroAtomico", "z|" + e["simbolo"]
+            valores = {"el": L.x(s, t), "el_de": L.x(s, t, "de"), "p_art": junto, "P": forma[:1].upper() + forma[1:]}
+            return self._fim(_render(tpl, valores), {"intent": "PROPRIEDADE", "elemento": e["simbolo"], "propriedade": pid}, chave, [s])
+        e, x, x_de, tipo, chave, tok = self._especie()
+        pesos = self.PART_PESOS[tipo]
+        grupo = rng.choices(list(pesos), weights=list(pesos.values()))[0]
+        tpl = rng.choice(PART[self.idioma][grupo])
+        alvo = {"intent": "PROPRIEDADE", "elemento": e["simbolo"], "propriedade": "particulas"}
+        return self._fim(_render(tpl, {"x": x, "x_de": x_de}), alvo, chave, [tok])
 
     def _quantidades(self, modo):
         """Moldes de QT com as quantidades no modo pedido (ao menos uma no modo; as demais podem vir em dígitos)."""

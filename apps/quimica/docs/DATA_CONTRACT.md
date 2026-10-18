@@ -90,8 +90,8 @@ Nome em PT: do Wikidata (rótulo `pt`/`pt-br`) quando existir; senão o nome IUP
 | `pkaValores` | — | P1117 | lista crescente, só quando há mais de um valor distinto (agrupados a < 0,5); `fontesPorPropriedade.pkaValores` é lista alinhada |
 | `estadoPadrao` | `solido`/`liquido`/`gas` | derivado | a 298,15 K e 1 atm, de `pontoFusaoK`/`pontoEbulicaoK`; ausente a ±2 K de 298,15 K |
 | `entalpiaFormacaoKJmol` | kJ/mol (2 casas) | chembox `DeltaHf` da Wikipédia em inglês (primário, CC BY-SA 4.0); Wikidata P3078 (CC0) só onde o artigo não tem o campo | entalpia padrão de formação a 298,15 K (17/10/2026, `CALCULADORAS_2026-10-17.md` §3). Estado padrão: `condicoes.fase` (`solido`/`liquido`/`gas`) quando a fonte marca; valor de fase diferente do `estadoPadrao` fica fora. Wikidata: só referência forte (P248/P854). Id no NLU/`regras.propriedades`: `entalpiaFormacaoKJmol` |
-| `energiaGibbsFormacaoKJmol` | kJ/mol (2 casas) | chembox `DeltaGf` | ΔG de formação padrão a 298,15 K, mesmas regras de fase (ainda sem id no NLU) |
-| `entropiaPadraoJmolK` | J/(mol·K) (2 casas) | chembox `Entropy` | entropia molar padrão a 298,15 K, mesmas regras de fase (ainda sem id no NLU) |
+| `energiaGibbsFormacaoKJmol` | kJ/mol (2 casas) | chembox `DeltaGf` | ΔG de formação padrão a 298,15 K, mesmas regras de fase. Id no NLU/`regras.propriedades`: `energiaGibbsFormacaoKJmol` (18/10/2026, `CALCULADORAS_2026-10-17.md` §7) |
+| `entropiaPadraoJmolK` | J/(mol·K) (2 casas) | chembox `Entropy` | entropia molar padrão a 298,15 K, mesmas regras de fase. Id no NLU/`regras.propriedades`: `entropiaPadraoJmolK` (18/10/2026, §7) |
 
 - **Termoquímica padrão (17/10/2026).** `entalpiaFormacaoKJmol`, `energiaGibbsFormacaoKJmol` e `entropiaPadraoJmolK` vêm do `chembox` do artigo do
   composto na Wikipédia em inglês (CC BY-SA 4.0; `pipeline/coleta_termo_wikipedia.py`): o artigo é o sitelink `enwiki` do item do Wikidata do composto,
@@ -125,6 +125,14 @@ Nome em PT: do Wikidata (rótulo `pt`/`pt-br`) quando existir; senão o nome IUP
   `escopos: ["elemento", "composto"]` (`origem`/`escopo` antigos ficam iguais); novos `solubilidade` (as duas origens, com `unidades` por origem) e `pka`,
   os mesmos ids do vocabulário do modelo (`nlu_core.PROPRIEDADES`, `api/_lib/vocab.js`). Os clientes antigos ignoram os campos novos (o Android lê só os
   números de `propriedades`; listas e objetos são ignorados).
+  **18/10/2026:** `energiaGibbsFormacaoKJmol` (kJ/mol) e `entropiaPadraoJmolK` (J/(mol·K)) entram ao lado de `entalpiaFormacaoKJmol`, com
+  `origem` `compostos.propriedades.<id>`, `casasDecimais: 2` (também em `entalpiaFormacaoKJmol`) e `nota`/`notaPorIdioma` citando o chembox da
+  Wikipédia em inglês (CC BY-SA 4.0; o Wikidata dá só o artigo, pelo QID, não o valor). E `particulas` (escopo `elemento`), a primeira
+  propriedade **calculada por regra**: `origem: null`, `calculado: true` e `calculo: {entradas: ["elementos.z", "elementos.massaAtomica"],
+  protons: "z", eletrons: "z - carga", neutrons: "numeroMassa - z", carga, numeroMassa, aproximacao}` — carga e número de massa vêm da pergunta
+  (não do rótulo do NLU); sem número de massa, a massa atômica arredondada, rotulada como aproximação (depende do isótopo). Os sinônimos não
+  trazem "elétrons" solto ("elétrons de valência" é `configuracaoEletronica`). Clientes que não conhecem o id ignoram a entrada (sem `origem`
+  nem `campo`, nada é casado). Fonte: `pipeline/regras.py` (`CALCULO_PARTICULAS`, `NOTA_*_PT`, `NOTAS_PROPRIEDADES_I18N`).
 - Regras de aceitação e escolha (referência obrigatória, qualificadores excluídos, divergências): `pipeline/coleta_propriedades.py` e `FONTES_E_LICENCAS.md` §8.
   As declarações aceitas e **não escolhidas** ficam fora do pacote, em `<cache>/propriedades_wikidata_alternativas.json`.
 - `nomes` (opcional): `pt-BR` = `nome` **só quando é um nome em português de verdade** (ausente se `nomePtPendente`); `en`/`es`/`de`/`fr` = rótulo do item do
@@ -283,6 +291,18 @@ que **não** podem ser recusados (ex.: "como neutralizar ácido derramado").
 `EQUILIBRIO` (expressão e valor de Kc/Kp), `LIGACAO` (tipo de ligação), `RECUSA_PERIGO`, `SOBRE_DADOS`, `FONTES`, `AJUDA`, `DESCONHECIDA`.
 As quatro de calculadora entraram em 17/10/2026 (`CALCULADORAS_2026-10-17.md` §1); "entalpia de FORMAÇÃO de X" continua `PROPRIEDADE` +
 `entalpiaFormacaoKJmol`, e configuração eletrônica continua `PROPRIEDADE` + `configuracaoEletronica`.
+**18/10/2026 (`CALCULADORAS_2026-10-17.md` §7):** propriedades `energiaGibbsFormacaoKJmol` (ΔGf°), `entropiaPadraoJmolK` (S°) e `particulas`
+(prótons, nêutrons e elétrons de um átomo ou íon; `PROPRIEDADE` com `elemento`); "ΔGf/ΔG°f/ΔG de formação do X" → `PROPRIEDADE`
+`energiaGibbsFormacaoKJmol` (como "ΔHf"); **Kc/Kp sem equação na pergunta → `CONCEITO`** (saída do modelo `{"intent": "CONCEITO"}`; o assunto
+`conceito: "constante de equilibrio"` é do cliente); com equação continua `EQUILIBRIO`. "Elétrons de valência"/"distribuição eletrônica"
+continuam `configuracaoEletronica` e "número atômico" continua `numeroAtomico`.
+**Campos só do cliente** (o modelo não os emite nem os recebe em `contexto`; `api/_lib/contexto.js` `CAMPOS_SO_DO_CLIENTE`): `unidadesDestino`,
+`concentracoes`, `conceito`, `cargaFormula` (NOX: carga escrita separada da fórmula, "Cr2O7 2-" → −2; desde 18/10/2026 também a carga do íon
+de UM símbolo de elemento: "Fe2+", "Fe²⁺", "Fe+2", "Fe 2+", "Cl-", "íon ferro 2+", "íon ferro(III)" → +2/−1/+3) e `numeroMassa` (inteiro:
+"Fe-56", "⁵⁶Fe", "ferro-56", "carbono 14?"; "56Fe" sem sobrescrito só com pista de partícula; plausível se Z ≤ A ≤ 3Z + 10). Os clientes os
+extraem da pergunta pelas regras locais e os mesclam na interpretação da nuvem quando ela fala do mesmo elemento (`nuvem.js`
+`mesclarCamposDoCliente`, `CloudNlu.kt` `NluValidator.validar`). Um íon sem pista de partícula ("o que é Fe2+") é `ELEMENTO` com `cargaFormula`.
+Fórmula de mais de um elemento ("NO3-", "SO4 2-") não é íon de elemento; com equação na pergunta (semirreação) nada disso se aplica.
 Entidades: `elemento` (símbolo), `composto` (cid ou nome canônico), `propriedade` (id de `regras.propriedades`), `quantidades: [{valor, unidade}]`, `equacao` (texto),
 `nivel` (`fundamental|medio|superior`), `unidadeDestino` (e, só nos clientes, `unidadesDestino`: todos os destinos de "para atm, kPa e torr", desde 17/10/2026).
 **Chaves por intenção (14/10/2026):** cada intenção admite só algumas entidades, e algumas são obrigatórias — tabela `ENTIDADES_POR_INTENCAO` em

@@ -162,7 +162,7 @@ export async function viewComposto({ store, params }) {
     medidas.length ? h('section', { class: 'secao', id: 'propriedades-fisicas' }, h('h2', null, t('propriedades.medidas.titulo')),
       h('p', { class: 'pequeno mudo' }, t('propriedades.medidas.intro')),
       h('dl', { class: 'kv kv-medidas' }, medidas.flatMap((m) => {
-        const condicoes = [...new Set(m.fontes.flatMap((f) => f.condicoes))];
+        const condicoes = m.condicoes ?? [...new Set(m.fontes.flatMap((f) => f.condicoes))];
         return [h('dt', null, capitalizar(m.prop.id === 'estadoPadrao' ? t('propriedades.medidas.estadoA25') : m.prop.rotulo)),
           h('dd', { 'data-prop': m.prop.id }, m.f.texto,
             condicoes.length ? h('span', { class: 'mini mudo' }, ` — ${condicoes.join('; ')}`) : null,

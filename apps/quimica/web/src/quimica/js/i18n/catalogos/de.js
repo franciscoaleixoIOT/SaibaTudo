@@ -241,34 +241,34 @@ export default {
         ph: { titulo: 'pH', descricao: 'Starke und schwache Säuren und Basen (mit Ka oder Kb) und Umrechnungen.' },
         'gas-ideal': { titulo: 'Ideales Gas', descricao: 'PV = nRT mit der Konstante R aus dem Paket (CODATA).' },
         unidades: { titulo: 'Einheitenumrechnung', descricao: 'Druck, Volumen, Masse, Temperatur, Energie und mehr.' },
-        entalpia: { titulo: 'Enthalpie (Bildung und Hess)', descricao: 'Reaktions-ΔH aus den Bildungsenthalpien des Datenpakets oder nach dem Satz von Hess mit bis zu 4 Gleichungen.' },
-        'configuracao-eletronica': { titulo: 'Elektronenkonfiguration', descricao: 'Besetzungsreihenfolge (Madelung), Schalen und Valenzelektronen; auch für Ionen.' },
-        nox: { titulo: 'Oxidationszahl', descricao: 'Oxidationszahl jedes Elements nach den Regeln, mit Ionen und Mittelwerten.' },
+        entalpia: { titulo: 'Enthalpie (Bildung und Hess)', descricao: 'ΔH der Reaktion aus den Bildungsenthalpien des Datenpakets oder nach dem Satz von Hess, mit bis zu 4 Gleichungen.' },
+        'configuracao-eletronica': { titulo: 'Elektronenkonfiguration', descricao: 'Madelung-Regel (Diagonalregel), Schalen und Valenzelektronen; auch für Ionen.' },
+        nox: { titulo: 'Oxidationszahl', descricao: 'Oxidationszahl jedes Elements nach den Regeln, auch für Ionen und als Mittelwert.' },
         equilibrio: { titulo: 'Gleichgewicht (Kc und Kp)', descricao: 'Kc-Ausdruck, Δn, Kp = Kc·(RT)^Δn und der Wert von Kc aus den Konzentrationen.' },
-        ligacao: { titulo: 'Bindungsart', descricao: 'Ionisch, polar kovalent, unpolar kovalent oder metallisch, nach der Elektronegativität.' }
+        ligacao: { titulo: 'Bindungsart', descricao: 'Ionenbindung, polare Atombindung, unpolare Atombindung oder Metallbindung, nach der Elektronegativität.' }
       },
       entalpia: {
-        modo: 'Berechnung', formacao: 'Aus Bildungsenthalpien', hess: 'Satz von Hess', equacao: 'Reaktionsgleichung', placeholder: 'z. B. CH4 + 2 O2 -> CO2 + 2 H2O',
-        ajuda: 'Ohne Koeffizienten gleicht die App die Gleichung aus. Die ΔHf°-Werte stammen aus dem Datenpaket; Elemente im Standardzustand (O2, N2, Fe…) haben 0.',
-        alvo: 'Zielgleichung', placeholderAlvo: 'z. B. C + 2 H2 -> CH4', equacaoN: 'Gleichung {n}', dH: 'ΔH von Gleichung {n} (kJ)',
+        modo: 'Berechnung', formacao: 'Aus Bildungsenthalpien', hess: 'Satz von Hess', equacao: 'Reaktionsgleichung', placeholder: 'z. B.: CH4 + 2 O2 -> CO2 + 2 H2O',
+        ajuda: 'Ohne Koeffizienten gleicht die App die Gleichung aus. Die ΔHf°-Werte stammen aus dem Datenpaket; Elemente im Standardzustand (O2, N2, Fe…) gelten als 0.',
+        alvo: 'Zielgleichung', placeholderAlvo: 'z. B.: C + 2 H2 -> CH4', equacaoN: 'Gleichung {n}', dH: 'ΔH der Gleichung {n} (kJ)',
         ajudaHess: 'Geben Sie die ausgeglichenen Gleichungen wie in der Aufgabe ein, jede mit ihrem ΔH. Brüche sind möglich (1/2 O2). Lassen Sie nicht benötigte Felder leer.', calcular: 'ΔH berechnen'
       },
       eletronica: {
-        elemento: 'Element (Symbol oder Name)', placeholder: 'z. B. Fe, Eisen, Cl', carga: 'Ladung des Ions', ajudaCarga: '0 für das neutrale Atom; 2 für Fe²⁺, -1 für Cl⁻.',
-        calcular: 'Verteilen', naoEncontrei: 'Dieses Element ist nicht im Datenpaket.'
+        elemento: 'Element (Symbol oder Name)', placeholder: 'z. B.: Fe, Eisen, Cl', carga: 'Ladung des Ions', ajudaCarga: '0 für das neutrale Atom; 2 für Fe²⁺, -1 für Cl⁻.',
+        calcular: 'Berechnen', naoEncontrei: 'Dieses Element ist nicht im Datenpaket.'
       },
       nox: {
-        formula: 'Formel (bei Ionen mit Ladung)', placeholder: 'z. B. H2SO4, MnO4-, Cr2O7 2-', ajuda: 'Ladung am Ende: MnO4-, SO4^2-, NH4+ oder "Cr2O7 2-". Hydrate werden nicht unterstützt.',
-        elemento: 'Hervorgehobenes Element (optional)', placeholderElemento: 'z. B. S', calcular: 'Oxidationszahlen berechnen'
+        formula: 'Formel (bei Ionen mit Ladung)', placeholder: 'z. B.: H2SO4, MnO4-, Cr2O7 2-', ajuda: 'Ladung am Ende: MnO4-, SO4^2-, NH4+ oder „Cr2O7 2-“. Hydrate werden nicht unterstützt.',
+        elemento: 'Element zum Hervorheben (optional)', placeholderElemento: 'z. B.: S', calcular: 'Berechnen'
       },
       equilibrio: {
-        equacao: 'Gleichung', placeholder: 'z. B. N2 + 3 H2 ⇌ 2 NH3', ajuda: 'Akzeptiert ⇌, <=>, -> oder =. Zustände (s), (l), (g), (aq) sind möglich: reine Feststoffe und Flüssigkeiten fallen aus dem Ausdruck heraus.',
-        concentracoes: 'Gleichgewichtskonzentrationen (optional)', placeholderConc: 'z. B. [N2] = 0,5; [H2] = 1,5; [NH3] = 0,2', ajudaConc: 'Eine pro Teilchenart, in mol/L, durch Semikolon getrennt.',
+        equacao: 'Gleichung', placeholder: 'z. B.: N2 + 3 H2 ⇌ 2 NH3', ajuda: 'Akzeptiert ⇌, <=>, -> oder =. Die Zustände (s), (l), (g) und (aq) werden berücksichtigt; reine Feststoffe und Flüssigkeiten gehen nicht in den Ausdruck ein.',
+        concentracoes: 'Gleichgewichtskonzentrationen (optional)', placeholderConc: 'z. B.: [N2] = 0,5; [H2] = 1,5; [NH3] = 0,2', ajudaConc: 'Eine pro Stoff, in mol/L, durch Semikolon getrennt.',
         temperatura: 'Temperatur (optional, für Kp)', calcular: 'Berechnen'
       },
       ligacao: {
-        modo: 'Eingabe', porFormula: 'Formel', porElementos: 'Zwei Elemente', formula: 'Formel', placeholder: 'z. B. NaCl, HCl, Cl2, NaOH',
-        a: 'Element 1', b: 'Element 2', placeholderA: 'z. B. H', placeholderB: 'z. B. Cl', calcular: 'Einordnen'
+        modo: 'Eingabe', porFormula: 'Formel', porElementos: 'Zwei Elemente', formula: 'Formel', placeholder: 'z. B.: NaCl, HCl, Cl2, NaOH',
+        a: 'Element 1', b: 'Element 2', placeholderA: 'z. B.: H', placeholderB: 'z. B.: Cl', calcular: 'Einordnen'
       },
       massaMolar: {
         formula: 'Chemische Formel', placeholder: 'z. B.: Ca(OH)2, CuSO4·5H2O, Fe2(SO4)3', ajuda: 'Klammern, Hydrate mit „·“ (oder „.“), Ladungen am Ende: Fe3+, SO4^2-.',
@@ -420,7 +420,8 @@ export default {
       massaMolar: 'molare Masse', massaExata: 'exakte Masse (monoisotopisch)', formula: 'Formel', cas: 'CAS-Nummer', cid: 'PubChem-CID', smiles: 'SMILES', inchiKey: 'InChIKey',
       nomeIupac: 'IUPAC-Name', xlogp: 'XLogP (berechnete Lipophilie)', doadoresH: 'Wasserstoffbrücken-Donatoren', aceptoresH: 'Wasserstoffbrücken-Akzeptoren',
       ligacoesRotaveis: 'drehbare Bindungen', carga: 'elektrische Ladung', tpsa: 'polare Oberfläche (TPSA)', solubilidade: 'Löslichkeit in Wasser', pka: 'pKs-Wert',
-      entalpiaFormacaoKJmol: 'Standardbildungsenthalpie'
+      entalpiaFormacaoKJmol: 'Standardbildungsenthalpie',
+      energiaGibbsFormacaoKJmol: 'freie Standardbildungsenthalpie', entropiaPadraoJmolK: 'molare Standardentropie', particulas: 'Protonen, Neutronen und Elektronen'
     },
     medidas: {
       titulo: 'Physikalische Eigenschaften', intro: 'Gemessene Werte, jeweils mit Quelle und Messbedingungen.',
@@ -433,7 +434,8 @@ export default {
       avisoRevisar: 'Wert wird geprüft: Der PubChem-Wert ist möglicherweise veraltet (er weicht von aktuellen Tabellen ab), und Wikidata hat diese Eigenschaft nicht.',
       notaPauling: 'Pauling-Skala mit den revidierten Werten von Allred (1961), wie bei PubChem; Bücher mit den ursprünglichen Pauling-Werten weichen bei einigen Elementen ab.',
       notaPka: 'Kleinster erfasster pKs-Wert (erste Dissoziation); für Basen erfasst Wikidata meist den pKs-Wert der konjugierten Säure, und starke Säuren haben keinen.',
-      estadoA25: 'Aggregatzustand bei 25 °C und 1 atm'
+      estadoA25: 'Aggregatzustand bei 25 °C und 1 atm',
+      padrao298: 'Standardzustand bei 298,15 K (25 °C)', faseEstadoPadrao: 'Phase: {fase} (Aggregatzustand der Verbindung bei 25 °C)', campoChembox: 'Feld {campo} der Chembox'
     },
     categorias: {
       metal_alcalino: 'Alkalimetall', metal_alcalino_terroso: 'Erdalkalimetall', metal_transicao: 'Übergangsmetall', metal_pos_transicao: 'Post-Übergangsmetall',
@@ -480,10 +482,11 @@ export default {
       boyle: 'Lokale Berechnung der App mit der Einheitentabelle aus dem Datenpaket',
       wikipedia: 'Wikipedia auf {idioma}',
       trechoEm: 'Text auf {idioma} (noch nicht übersetzt).',
-      regrasNox: 'Regeln für Oxidationszahlen aus Chemielehrbüchern (Konvention), von der App angewendet',
+      regrasNox: 'Lehrbuchregeln für Oxidationszahlen (Konvention), von der App angewendet',
       regraLigacao: 'Lehrbuchregel der Elektronegativitätsdifferenz (Pauling-Skala; Grenzen 0,4 und 1,7 nach Konvention)',
       acaoDasMassas: 'Massenwirkungsgesetz (Regel), lokale Berechnung der App',
-      distribuicao: 'Von der App aus der Konfiguration des Datenpakets berechnete Verteilung (Madelung-Regel, Energieniveauschema)',
+      particulas: 'Zählregel: Protonen = Z, Elektronen = Z − Ladung, Neutronen = A − Z (Massenzahl minus Ordnungszahl)',
+      distribuicao: 'Von der App aus der Konfiguration im Datenpaket berechnete Elektronenverteilung (Madelung-Regel, Diagonalregel)',
       substanciaSimples: 'Konvention: ΔHf° = 0 für ein Element im Standardzustand',
       entalpiaCalculo: 'Lokale Berechnung der App (Satz von Hess) mit den ΔHf°-Werten des Datenpakets'
     },
@@ -566,7 +569,7 @@ export default {
       digaQualPropriedade: 'Sagen Sie mir, welche Eigenschaft und welches Element oder welche Verbindung gemeint ist. Zum Beispiel: „Dichte von Gold“.',
       de: '{prop} von {nome}',
       outroTipo: (p) => `${p.prop} (diese Eigenschaft gilt für ${p.alvo === 'composto' ? 'Verbindungen' : 'Elemente'}; ${p.outros} ${p.n > 1 ? 'sind' : 'ist'} von anderer Art)`,
-      naoTem: 'Das Datenpaket enthält nicht: {lista}.', fichaDe: 'Steckbrief von {nome}', propriedadesDe: 'Eigenschaften von {nomes}',
+      faltaTermo: '{simbolo} von {nome} fehlt im Datenpaket; die App schätzt diesen Wert nicht.', naoTem: 'Das Datenpaket enthält nicht: {lista}.', fichaDe: 'Steckbrief von {nome}', propriedadesDe: 'Eigenschaften von {nomes}',
       oferece: 'Für {nome} enthält das Paket: {lista}.', solubilidadeDeQual: 'Sagen Sie, von welcher Verbindung Sie die Löslichkeit in Wasser wissen möchten. Zum Beispiel: „Löslichkeit von Harnstoff“.'
     },
     massaMolar: {
@@ -631,7 +634,7 @@ export default {
     comparar: {
       titulo: 'Vergleich: {nomes}', propriedade: 'Eigenschaft', fichaDe: 'Steckbrief von {nome}',
       linhas: { formula: 'Formel', massaMolar: 'Molare Masse', cas: 'CAS-Nummer', nomeIupac: 'IUPAC-Name', xlogp: 'XLogP', sinal: 'Signalwort (GHS)', pictogramas: 'Piktogramme (GHS)' },
-      maior: '{prop}: höher bei {nome} ({valor}).',
+      maior: '{prop}: höher bei {nome} ({valor}).', maisNegativo: '{prop}: am negativsten bei {nome} ({valor}).',
       ordemCrescente: '{prop}, aufsteigend: {lista}.', ordemDecrescente: '{prop}, absteigend: {lista}.', semDadoOrdem: 'Ohne diesen Wert im Datenpaket: {nomes}.', tituloGeral: 'Vergleichen', explicacao: 'Vergleichen Sie Gleichartiges: zwei Elemente („Natrium und Chlor vergleichen“) oder zwei Verbindungen („Unterschied zwischen Ethanol und Essigsäure“).'
     },
     tabela: {
@@ -654,6 +657,39 @@ export default {
       orientacao: 'Allgemeine Sicherheitshinweise', naoIdentifiquei: 'Ich habe den Stoff nicht erkannt. Nennen Sie seinen Namen oder seine Formel, um die GHS-Gefahren zu sehen, oder befolgen Sie die allgemeinen Hinweise unten.',
       comoLer: 'So lesen Sie Piktogramme und H-Sätze', titulo: 'Sicherheit: {alvo}', tituloGeral: 'Chemische Sicherheit', eConector: ' und '
     },
+    particulas: {
+      titulo: '{especie}: {protons}, {neutrons} und {eletrons}',
+      tituloAprox: '{especie}: {protons}, {eletrons} und etwa {neutrons}',
+      contProtons: (p) => (Number(p.n) === 1 ? '1 Proton' : `${p.n} Protonen`),
+      contNeutrons: (p) => (Number(p.n) === 1 ? '1 Neutron' : `${p.n} Neutronen`),
+      contEletrons: (p) => (Number(p.n) === 1 ? '1 Elektron' : `${p.n} Elektronen`),
+      especie: 'Teilchen',
+      protons: 'Protonen (Z)',
+      eletrons: 'Elektronen',
+      neutrons: 'Neutronen',
+      numeroMassa: 'Massenzahl (A)',
+      atomoNeutro: 'neutrales Atom ({nome})',
+      cation: '{ion}-Kation ({nome})',
+      anion: '{ion}-Anion ({nome})',
+      isotopo: 'Isotop {iso}',
+      eletronsNeutro: 'neutrales Atom: gleich Z',
+      neutronsAprox: 'etwa {n}',
+      numeroMassaAprox: 'etwa {a}',
+      aproxMassa: 'aus der Atommasse genähert, {m}',
+      avisoAprox: 'Massenzahl aus der Atommasse genähert ({m} → {a}); die Neutronenzahl hängt vom Isotop ab. Für ein bestimmtes Isotop fragen Sie zum Beispiel: „Neutronen in {simbolo}-{a}“.',
+      semMassa: 'Das Datenpaket enthält keine Atommasse für {nome}: ohne Massenzahl werden die Neutronen nicht berechnet.',
+      cargaInvalida: 'Eine Ladung von {carga} würde mehr Elektronen entfernen, als {nome} hat ({z}): dieses Ion gibt es nicht.',
+      linhaIon: '{ion}-Ion ({tipo}): {eletrons} ({conta}).',
+      linhaIsotopo: 'Isotop {iso}: {protons} und {neutrons} ({conta}).',
+      tipoCation: 'Kation',
+      tipoAnion: 'Anion'
+    },
+    constanteEquilibrio: {
+      titulo: 'Gleichgewichtskonstante (Kc und Kp)',
+      explicacao: 'Die Gleichgewichtskonstante Kc ist der Quotient aus den Gleichgewichtskonzentrationen (mol/L) der Produkte und denen der Edukte, jeweils mit ihrem Koeffizienten in der ausgeglichenen Gleichung potenziert: Für aA + bB ⇌ cC + dD gilt Kc = [C]^c·[D]^d / ([A]^a·[B]^b). Nur Gase und Teilchen in wässriger Lösung gehen ein; reine Feststoffe und Flüssigkeiten bleiben außen vor. Kp ist derselbe Ausdruck mit den Partialdrücken der Gase, und beide hängen über Kp = Kc·(RT)^Δn zusammen, wobei Δn die Änderung der Stoffmenge an Gas (Produkte − Edukte) und T die Temperatur in Kelvin ist. Der Wert von K hängt nur von der Temperatur ab.',
+      equacao: 'Geben Sie mir die Gleichung (z. B. N2 + 3 H2 ⇌ 2 NH3), und ich stelle den Ausdruck auf.',
+      temperatura: 'Die Temperatur aus der Frage ({t} K) ist im Rechner schon eingetragen.'
+    },
     conceito: {
       semTexto: 'Dazu habe ich noch keinen Text',
       naoEncontrei: 'Unter den lizenzierten Auszügen im Datenpaket habe ich keine Erklärung zu „{termo}“ gefunden. Daten zu Elementen und Verbindungen sowie die Rechner stehen weiterhin zur Verfügung.',
@@ -661,77 +697,77 @@ export default {
     },
     equacaoErros: {
       semSeta: 'Ich habe den Reaktionspfeil nicht gefunden. Schreiben Sie Edukte -> Produkte, zum Beispiel: N2 + 3 H2 ⇌ 2 NH3.', duasSetas: 'Die Gleichung hat mehr als einen Pfeil. Geben Sie jeweils nur eine Reaktion ein.',
-      lado: 'Eine Seite der Gleichung (Edukte oder Produkte) fehlt.', eletron: 'Halbreaktionen (mit Elektronen) werden hier nicht verwendet: Nutzen Sie die vollständige Gleichung.',
+      lado: 'Eine Seite der Gleichung (Edukte oder Produkte) fehlt.', eletron: 'Halbreaktionen (mit Elektronen) werden bei dieser Berechnung nicht verwendet: Nutzen Sie die vollständige Gleichung.',
       formula: 'Die Gleichung enthält eine ungültige Formel.', balancear: 'Ich konnte die Gleichung nicht ausgleichen.', expressao: 'Ich konnte den Ausdruck nicht aufstellen.'
     },
     nox: {
       titulo: 'Oxidationszahlen in {formula}', tituloElemento: 'Oxidationszahl von {el} in {formula}: {nox}', deQual: 'Oxidationszahlen welcher Verbindung?',
-      digite: 'Nennen Sie die Formel (bei Ionen mit Ladung). Beispiele: "Oxidationszahl von Schwefel in H2SO4", "Oxidationsstufe von Mn in MnO4-", "Oxidationszahl von Chrom in Cr2O7 2-".',
+      digite: 'Nennen Sie die Formel (bei Ionen mit Ladung). Beispiele: „Oxidationszahl von Schwefel in H2SO4“, „Oxidationsstufe von Mn in MnO4-“, „Oxidationszahl von Chrom in Cr2O7 2-“.',
       naoConsegui: 'Ich konnte die Oxidationszahlen nicht bestimmen', hidrato: 'Hydrate werden hier nicht berechnet: Geben Sie die Formel ohne Kristallwasser ein.',
-      indeterminado: 'Nach den Regeln nicht bestimmbar: Für {lista} legt keine Regel die Oxidationszahl fest. Nutzen Sie die Strukturformel (Bindung für Bindung).',
-      inconsistente: 'Die Regeln ergeben die Summe {soma}, verschieden von der Ladung {carga}: Prüfen Sie Formel und Ladung.',
-      semDados: 'Das Datenpaket enthält keine Elektronegativität für: {lista}.', medio: 'mittlere Oxidationszahl',
+      indeterminado: 'Nach den Regeln nicht bestimmbar: Für {lista} legt keine Regel die Oxidationszahl fest. Nutzen Sie zur Zuordnung die Strukturformel (Bindung für Bindung).',
+      inconsistente: 'Die Regeln ergeben die Summe {soma}, die von der Ladung {carga} abweicht: Prüfen Sie Formel und Ladung.',
+      semDados: 'Das Datenpaket enthält keine Elektronegativitätswerte für: {lista}.', medio: 'mittlere Oxidationszahl',
       regras: {
-        substanciaSimples: 'Element: 0', ionMonoatomico: 'Ion aus einem Element: Ladung ÷ Atome', fluor: 'Fluor: immer −1', grupo1: 'Gruppe 1: +1', grupo2: 'Gruppe 2: +2',
+        substanciaSimples: 'Element: 0', ionMonoatomico: 'Ion aus nur einem Element: Ladung ÷ Atomzahl', fluor: 'Fluor: immer −1', grupo1: 'Gruppe 1: +1', grupo2: 'Gruppe 2: +2',
         aluminio: 'Aluminium: +3', hidrogenio: 'Wasserstoff: +1', hidretoMetalico: 'Metallhydrid: H −1', oxigenio: 'Sauerstoff: −2', peroxido: 'Peroxid: O −1',
         superoxido: 'Hyperoxid: O −1/2', halogenio: 'elektronegativstes Halogen der Verbindung: −1', eletronegatividade: 'das elektronegativste Element erhält den üblichen negativen Wert seiner Gruppe',
         balanco: 'aus der Bilanz (Summe der Oxidationszahlen = Ladung)'
       },
       passoRegras: 'Wenden Sie die Regeln der Reihe nach an (Element, Ion, F, Gruppen 1 und 2, Al, H, O, Halogene); das übrige Element folgt aus der Bilanz.',
-      passoSoma: 'Die Summe der Oxidationszahlen mal der Atomzahl ist gleich der Ladung ({carga}):',
-      avisoMedio: 'Ein Bruch ist eine mittlere Oxidationszahl: Die Atome dieses Elements können unterschiedliche Oxidationszahlen haben (siehe Strukturformel).',
+      passoSoma: 'Die Summe aus Oxidationszahl mal Atomzahl ist gleich der Ladung ({carga}):',
+      avisoMedio: 'Eine gebrochene Zahl ist eine mittlere Oxidationszahl: Die Atome dieses Elements können unterschiedliche Oxidationszahlen haben (siehe Strukturformel).',
       elementoAusente: '{el} kommt in {formula} nicht vor.', abrir: 'Rechner für Oxidationszahlen öffnen'
     },
     ligacao: {
-      titulo: 'Bindungsart: {alvo}', deQual: 'Bindung zwischen was?', digite: 'Nennen Sie die Formel oder zwei Elemente. Beispiele: "Bindungsart in NaCl", "welche Bindung besteht zwischen H und Cl".',
+      titulo: 'Bindungsart: {alvo}', deQual: 'Welche Bindung soll ich einordnen?', digite: 'Nennen Sie die Formel oder zwei Elemente. Beispiele: „Bindungsart in NaCl“, „welche Bindung besteht zwischen H und Cl“.',
       naoConsegui: 'Ich konnte die Bindung nicht einordnen', semCategoria: 'Das Datenpaket enthält keine Kategorie (Metall oder Nichtmetall) für: {lista}.',
-      semEletronegatividade: 'Das Datenpaket enthält keine Elektronegativität für: {lista}.', semElemento: 'Dieses Element ist nicht im Datenpaket: {lista}.',
+      semEletronegatividade: 'Das Datenpaket enthält keine Elektronegativitätswerte für: {lista}.', semElemento: 'Folgende Elemente sind nicht im Datenpaket: {lista}.',
       semEntrada: 'Nennen Sie die Formel oder zwei Elemente.',
-      tipos: { metalica: 'metallisch', ionica: 'ionisch', covalentePolar: 'polar kovalent', covalenteApolar: 'unpolar kovalent', nenhuma: 'bildet unter üblichen Bedingungen keine Bindung (Edelgas)' },
+      tipos: { metalica: 'Metallbindung', ionica: 'Ionenbindung', covalentePolar: 'polare Atombindung', covalenteApolar: 'unpolare Atombindung', nenhuma: 'bildet unter üblichen Bedingungen keine Bindung (Edelgas)' },
       delta: 'ΔEN = {d} ({a}: {ea}; {b}: {eb})', metalMetal: 'Metall mit Metall',
-      convencao: 'Lehrbuchregel: Metall mit Metall → metallisch; Metall mit Nichtmetall und ΔEN ≥ 1,7 → ionisch; 0,4 ≤ ΔEN < 1,7 → polar kovalent; ΔEN < 0,4 → unpolar kovalent. Die Grenzen 0,4 und 1,7 sind eine Konvention (Pauling-Skala); Halbmetalle zählen als Nichtmetalle.',
-      estimado: 'Bei drei oder mehr Elementen wurden die Paare aus der Formel geschätzt (jedes Metall und jedes Nichtmetall mit dem elektronegativsten Nichtmetall); die echte Struktur kann andere Bindungen haben.',
+      convencao: 'Lehrbuchregel: Metall mit Metall → Metallbindung; Metall mit Nichtmetall und ΔEN ≥ 1,7 → Ionenbindung; 0,4 ≤ ΔEN < 1,7 → polare Atombindung; ΔEN < 0,4 → unpolare Atombindung. Die Grenzen 0,4 und 1,7 sind eine Konvention (Pauling-Skala); Halbmetalle zählen als Nichtmetalle.',
+      estimado: 'Bei drei oder mehr Elementen wurden die Paare aus der Formel geschätzt (jedes Metall und jedes Nichtmetall mit dem elektronegativsten Nichtmetall); die tatsächliche Struktur kann andere Bindungen haben.',
       polaridadeMolecula: 'Die Polarität des Moleküls hängt auch von seiner Geometrie ab: Polare Bindungen können sich aufheben (wie bei CO₂, das unpolar ist).',
       abrir: 'Rechner für die Bindungsart öffnen'
     },
     equilibrio: {
       titulo: 'Gleichgewicht: {equacao}', deQual: 'Gleichgewicht welcher Reaktion?',
-      digite: 'Schreiben Sie die Gleichung mit ⇌ (oder <=>, ->). Beispiele: "Gleichgewichtskonstante Kc für N2 + 3 H2 ⇌ 2 NH3", "Kc von N2 + 3 H2 ⇌ 2 NH3 mit [N2] = 0,5 mol/L, [H2] = 1,5 mol/L und [NH3] = 0,2 mol/L".',
+      digite: 'Schreiben Sie die Gleichung mit ⇌ (oder <=>, ->). Beispiele: „Gleichgewichtskonstante Kc für N2 + 3 H2 ⇌ 2 NH3“, „Kc von N2 + 3 H2 ⇌ 2 NH3 mit [N2] = 0,5 mol/L, [H2] = 1,5 mol/L und [NH3] = 0,2 mol/L“.',
       naoConsegui: 'Ich konnte den Gleichgewichtsausdruck nicht aufstellen', balanceada: 'Die Gleichung wurde zuerst ausgeglichen: {equacao}.',
-      semSolidoLiquido: 'Reine Feststoffe und Flüssigkeiten fallen aus dem Ausdruck heraus: {lista}.', gasPorHipotese: 'Ohne angegebenen Aggregatzustand und ohne Daten im Paket habe ich als Gase behandelt: {lista}.',
-      faseDoPacote: 'Aggregatzustand aus dem Datenpaket (Standardbedingungen): {lista}.', faseNaTemperatura: 'Aggregatzustand bei {t} K nach Schmelz- und Siedepunkt aus dem Datenpaket: {lista}.', deltaN: 'Δn (Gase): Produkte − Edukte',
+      semSolidoLiquido: 'Reine Feststoffe und Flüssigkeiten gehen nicht in den Ausdruck ein: {lista}.', gasPorHipotese: 'Ohne angegebenen Aggregatzustand und ohne Angaben im Datenpaket habe ich diese Stoffe als Gase behandelt: {lista}.',
+      faseDoPacote: 'Aggregatzustand aus dem Datenpaket (Standardbedingungen): {lista}.', faseNaTemperatura: 'Aggregatzustand bei {t} K anhand von Schmelz- und Siedepunkt aus dem Datenpaket: {lista}.', deltaN: 'Δn (Gase): Produkte − Edukte',
       kc: 'Kc', kp: 'Kp', fatorRT: '(RT)^Δn', temperatura: 'Temperatur', unidadeKc: 'Konzentrationen in mol/L',
       faltam: 'Es fehlen die Gleichgewichtskonzentrationen von: {lista}. Ohne sie gibt es nur den Kc-Ausdruck.', invalida: 'Die Konzentrationen müssen größer als null sein.',
       passoKc: 'Setzen Sie die Gleichgewichtskonzentrationen (mol/L) in den Ausdruck ein:', passoKp: 'Kp = Kc·(RT)^Δn, mit R = {R} L·atm/(mol·K) und T in Kelvin:',
-      semT: 'Für den Wert von Kp nennen Sie die Temperatur (zum Beispiel "bei 500 K").', semR: 'Die Konstante R ist nicht im Datenpaket (constantes.json).',
+      semT: 'Für den Wert von Kp nennen Sie die Temperatur (zum Beispiel „bei 500 K“).', semR: 'Die Konstante R ist nicht im Datenpaket (constantes.json).',
       abrir: 'Rechner für Kc und Kp öffnen'
     },
     entalpia: {
       tituloReacao: 'Reaktionsenthalpie: {equacao}', tituloCombustao: 'Verbrennungsenthalpie: {nome}', tituloHess: 'Reaktionsenthalpie (Satz von Hess)', tituloHessResultado: 'Satz von Hess',
-      tituloAmostra: 'Wärme der Probe', naoConsegui: 'Ich konnte die Enthalpie nicht berechnen',
-      digite: 'Nennen Sie die Reaktion oder die Verbindung. Beispiele: "ΔH der Verbrennung von Methan", "Enthalpieänderung von 2 H2 + O2 -> 2 H2O". Für den Satz von Hess (mehrere Gleichungen mit ΔH) nutzen Sie den Rechner.',
+      tituloAmostra: 'Wärmemenge der Probe', naoConsegui: 'Ich konnte die Enthalpie nicht berechnen',
+      digite: 'Nennen Sie die Reaktion oder die Verbindung. Beispiele: „ΔH der Verbrennung von Methan“, „Enthalpieänderung von 2 H2 + O2 -> 2 H2O“. Für den Satz von Hess (mehrere Gleichungen mit ΔH) nutzen Sie den Rechner.',
       hess: 'Der Satz von Hess addiert bekannte Gleichungen (mit einem Faktor multipliziert oder umgekehrt), bis sich die gesuchte Reaktion ergibt; ΔH addiert sich genauso. Im Rechner geben Sie die Zielgleichung und bis zu 4 Gleichungen mit ΔH ein, und die App findet die Kombination.',
       falta: 'Das Datenpaket enthält keine Standardbildungsenthalpie (ΔHf°) für: {lista}. Ohne diesen Wert wird ΔH nicht berechnet (kein Wert wird erfunden).',
       expressao: 'ΔH° = Σ n·ΔHf°(Produkte) − Σ n·ΔHf°(Edukte):', passoSoma: 'Mit den Werten aus dem Datenpaket (kJ/mol):',
       valores: 'Verwendete Standardbildungsenthalpien (298,15 K)', dHfDe: 'ΔHf° von {formula}', semValor: 'kein Wert im Datenpaket',
-      simples: '0 (Element im Standardzustand, per Definition)', resultado: 'ΔH° der Reaktion', porMol: 'Verbrennungs-ΔH° pro Mol {nome}',
-      amostra: 'Wärme für {valor} {unidade} {nome}', passoAmostra: 'Stoffmenge der Probe: n = {mol} mol; die Wärme ist der Reaktionsumsatz mal ΔH:',
+      simples: '0 (Element im Standardzustand, per Definition)', resultado: 'ΔH° der Reaktion', porMol: 'ΔH° der Verbrennung pro mol {nome}',
+      amostra: 'Wärmemenge für {valor} {unidade} {nome}', passoAmostra: 'Stoffmenge der Probe: n = {mol} mol; die Wärmemenge ist der Formelumsatz mal ΔH:',
       semMol: 'Ich konnte die angegebene Menge nicht in Mol umrechnen.',
       exotermica: 'ΔH < 0: exotherme Reaktion (gibt Wärme ab).', endotermica: 'ΔH > 0: endotherme Reaktion (nimmt Wärme auf).',
       combustaoCompleta: 'Vollständige Verbrennung, Produkte im Standardzustand (CO₂, H₂O, N₂, SO₂).', balanceada: 'Die Gleichung wurde zuerst ausgeglichen: {equacao}.',
       naoQueima: 'Die vollständige Verbrennung gilt hier nur für Verbindungen aus C, H, O, N und S.',
-      hessAlvo: 'Zielgleichung: {msg}', hessEquacao: 'Gleichung {n}: {msg}', naoBalanceada: 'Gleichung {n} ist so, wie sie geschrieben ist, nicht ausgeglichen.',
-      semDH: 'Das ΔH von Gleichung {n} fehlt.', semCombinacao: 'Keine Kombination der angegebenen Gleichungen ergibt die Zielreaktion.',
+      hessAlvo: 'Zielgleichung: {msg}', hessEquacao: 'Gleichung {n}: {msg}', naoBalanceada: 'Gleichung {n} ist in der eingegebenen Form nicht ausgeglichen.',
+      semDH: 'Das ΔH der Gleichung {n} fehlt.', semCombinacao: 'Keine Kombination der angegebenen Gleichungen ergibt die Zielreaktion.',
       hessPasso: 'Gleichung {n} × {fator}: ΔH = {dH} kJ', hessInvertida: 'Gleichung {n} umgekehrt, × {fator}: ΔH = {dH} kJ', hessSoma: 'Addieren Sie die ΔH der kombinierten Gleichungen:',
       hessResultado: 'ΔH der Zielreaktion', abrir: 'Enthalpierechner öffnen', abrirHess: 'Rechner öffnen (Hess)'
     },
     eletronica: {
       titulo: 'Elektronenkonfiguration von {nome}', tituloIon: 'Elektronenkonfiguration des Ions {simbolo} ({carga})', deQual: 'Elektronenkonfiguration welches Elements?',
-      digite: 'Nennen Sie das Element (Symbol oder Name), zum Beispiel "Elektronenkonfiguration von Eisen".',
-      pacote: 'Konfiguration im Datenpaket', completa: 'Vollständige Schreibweise (Besetzungsreihenfolge)', camadasOrdem: 'Nach Schalen geordnet',
+      digite: 'Nennen Sie das Element (Symbol oder Name), zum Beispiel „Elektronenkonfiguration von Eisen“.',
+      pacote: 'Konfiguration im Datenpaket', completa: 'Vollständige Schreibweise (Besetzungsreihenfolge, Diagonalregel)', camadasOrdem: 'Nach Schalen geordnet',
       porCamada: 'Elektronen pro Schale', camadaValencia: 'Valenzschale', camadaValenciaValor: '{camada} (n = {n}), {e} Elektron(en)',
       eletronsValencia: 'Valenzelektronen', valenciaTransicao: '{e} (Konvention für Übergangsmetalle: ns + (n−1)d)', valenciaF: '{e} (Konvention: ns + (n−1)d + (n−2)f)',
-      maisEnergetico: 'Energiereichstes Unterniveau', bloco: 'Block',
+      maisEnergetico: 'Energiereichste Unterschale', bloco: 'Block',
       totalDiferente: 'Die Konfiguration im Datenpaket ergibt {total} Elektronen, die Ordnungszahl ist aber {z}: Die Verteilung wurde nicht berechnet (der Wert wird nicht von Hand korrigiert).',
       semConfiguracao: 'Das Datenpaket enthält keine Elektronenkonfiguration für {nome}.', cargaInvalida: 'Ungültige Ladung für {nome}.',
       ignorados: 'Hinweis aus dem Datenpaket: {lista}.', abrir: 'Rechner für die Elektronenkonfiguration öffnen'

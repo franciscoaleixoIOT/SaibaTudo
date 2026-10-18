@@ -24,6 +24,8 @@ object ContratoNlu {
         "categoria" -> r.categoria
         "estado" -> r.estado
         "formula" -> r.formula
+        "cargaFormula" -> r.cargaFormula
+        "numeroMassa" -> r.numeroMassa
         else -> null
     }
 
@@ -31,7 +33,7 @@ object ContratoNlu {
     fun idiomaDoCaso(c: JsonObject): String =
         net.saibatudo.quimica.domain.Idiomas.normalizar(c.get("idioma")?.takeIf { !it.isJsonNull }?.asString) ?: net.saibatudo.quimica.domain.Idiomas.PADRAO
 
-    val CHAVES = listOf("intent", "elemento", "composto", "propriedade", "equacao", "unidadeDestino", "grupo", "periodo", "bloco", "categoria", "estado", "formula")
+    val CHAVES = listOf("intent", "elemento", "composto", "propriedade", "equacao", "unidadeDestino", "grupo", "periodo", "bloco", "categoria", "estado", "formula", "cargaFormula", "numeroMassa")
 
     /** Falhas de UM caso (lista de textos; vazia = passou). [d] é o dicionário do idioma do caso (o léxico vem dele). */
     fun falhasDoCaso(c: JsonObject, d: Dicionario): List<String> {

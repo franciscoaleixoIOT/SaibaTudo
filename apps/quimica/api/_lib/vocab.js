@@ -136,6 +136,10 @@ export const PROPRIEDADES = Object.freeze([
   'pka',
   'solubilidade',
   'entalpiaFormacaoKJmol',
+  // 18/10/2026 (docs/CALCULADORAS_2026-10-17.md §7): ΔGf° e S° do pacote (DATA_CONTRACT §3.1) e prótons/nêutrons/elétrons de um átomo ou íon
+  'energiaGibbsFormacaoKJmol',
+  'entropiaPadraoJmolK',
+  'particulas',
 ]);
 export const PROPRIEDADE_SET = new Set(PROPRIEDADES);
 
@@ -151,7 +155,7 @@ export const FORMAS_PROPRIEDADE = Object.freeze({
   massaAtomica: ['massa atomica', 'peso atomico', 'massa do atomo'],
   massaMolar: ['massa molar', 'massa molecular', 'peso molecular', 'massa formula', 'massa da molecula', 'massa do mol'],
   massaExata: ['massa exata', 'massa monoisotopica'],
-  numeroAtomico: ['numero atomico', 'z do', 'numero de protons'],
+  numeroAtomico: ['numero atomico', 'z do'],
   grupo: ['grupo', 'familia'],
   periodo: ['periodo'],
   bloco: ['bloco'],
@@ -179,6 +183,12 @@ export const FORMAS_PROPRIEDADE = Object.freeze({
   pka: ['pka', 'constante de acidez', 'ka do', 'ka da'],
   solubilidade: ['solubilidade', 'soluvel', 'solubiliza', 'dissolve', 'dissolvem', 'dissolver'],
   entalpiaFormacaoKJmol: ['entalpia de formacao', 'entalpia padrao de formacao', 'calor de formacao'],
+  energiaGibbsFormacaoKJmol: ['energia livre de gibbs de formacao', 'energia de gibbs de formacao', 'energia livre de formacao', 'gibbs de formacao',
+    'entalpia livre de formacao', 'variacao de energia livre de formacao', 'energia livre padrao de formacao'],
+  entropiaPadraoJmolK: ['entropia padrao', 'entropia molar padrao', 'entropia absoluta', 'entropia molar', 'entropia padrao molar', 'entropia do',
+    'entropia da', 'entropia de'],
+  // "número de prótons" é a pergunta de partículas (desde 18/10/2026; antes era evidência de numeroAtomico)
+  particulas: ['protons', 'neutrons', 'eletrons', 'numero de protons', 'numero de neutrons', 'numero de eletrons', 'numero de massa', 'particulas subatomicas'],
 });
 
 /** [paridade] Unidades canônicas aceitas em `quantidades` e `unidadeDestino`. */

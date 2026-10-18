@@ -80,7 +80,10 @@ export default {
   "hess": "\\b(?:loi de hess|hess)\\b",
   "kcKp": "\\b(?:kp|pressions partielles)\\b",
   "concentracaoColchete": "=|:|est|vaut|egal a|egale a|de",
-  "ligacaoPolaridade": "\\b(?:ioniques?|covalentes?|polaires?|apolaires?|metalliques?)\\b"
+  "ligacaoPolaridade": "\\b(?:ioniques?|covalentes?|polaires?|apolaires?|metalliques?)\\b",
+  "deFormacao": "\\bde formation\\b",
+  "constanteEquilibrio": "\\b(?:kc|kp|constantes? d equilibre|expression (?:de|du|de la) (?:kc|kp|constante))\\b",
+  "ionRomano": "\\b(?:ions?|cations?) (?:de |du )?([a-z]+) (i{1,3}|iv|vi{0,2}|v)\\b"
  },
  "nivel": {
   "fundamental": "\\b(?:primaire|ecole primaire|college|enfant|enfants|simple|tres simple|facile a comprendre|pour debutants|pour les nuls)\\b",
@@ -635,6 +638,40 @@ export default {
    "enthalpie standard de formation",
    "enthalpie de formation",
    "chaleur de formation"
+  ],
+  "energiaGibbsFormacaoKJmol": [
+   "enthalpie libre standard de formation",
+   "enthalpie libre de formation",
+   "energie libre de gibbs de formation",
+   "energie de gibbs de formation",
+   "energie libre standard de formation",
+   "energie libre de formation",
+   "delta g de formation"
+  ],
+  "entropiaPadraoJmolK": [
+   "entropie molaire standard",
+   "entropie standard molaire",
+   "entropie standard",
+   "entropie absolue",
+   "entropie molaire",
+   "entropie du",
+   "entropie de la",
+   "entropie de l",
+   "entropie des",
+   "entropie de"
+  ],
+  "particulas": [
+   "particules subatomiques",
+   "nombre de protons",
+   "nombre de neutrons",
+   "nombre d electrons",
+   "nombre de masse",
+   "protons",
+   "proton",
+   "neutrons",
+   "neutron",
+   "electrons",
+   "electron"
   ]
  },
  "rotulosPropriedadeNormalizados": true,

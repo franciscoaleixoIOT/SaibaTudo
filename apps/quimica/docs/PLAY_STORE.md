@@ -13,7 +13,7 @@ Android. Esta ficha, as declarações e o Data safety descrevem o app **com** a 
 
 | Item | Arquivo |
 | :-- | :-- |
-| App Bundle assinado (chave de upload) | `app/build/outputs/bundle/release/app-release.aab` (7,6 MB, `1.0.0` / versionCode 1, gerado em 14/10; refazer com `JAVA_HOME="/c/Program Files/Android/Android Studio/jbr" ./gradlew.bat bundleRelease` se o código mudar). O APK de release (R8) tem 5,4 MB e as duas bibliotecas nativas do AndroidX estão alinhadas a 16 KB (conferido nos cabeçalhos ELF). `docs/RELEASE_1.0.0.md` registra os testes dessa versão |
+| App Bundle assinado (chave de upload) | `app/build/outputs/bundle/release/app-release.aab` (8,3 MB, `1.0.3` / versionCode 4, gerado em 18/10/2026 — `docs/RELEASE_1.0.3.md`; as 1.0.0–1.0.2 nunca foram enviadas; refazer com `JAVA_HOME="/c/Program Files/Android/Android Studio/jbr" ./gradlew.bat bundleRelease` se o código mudar). O APK de release (R8) tem 6,1 MB e as duas bibliotecas nativas do AndroidX estão alinhadas a 16 KB (conferido nos cabeçalhos ELF). `docs/RELEASE_1.0.0.md` registra os testes dessa versão |
 | Chave de upload | `secrets/upload-keystore.p12` + `keystore.properties` (ambos ignorados pelo Git). **Faça backup agora** (cofre de senhas + cópia offline). Ative o **Play App Signing** (padrão): se a chave de upload for perdida, o Google permite redefini-la |
 | Ícone 512×512 (quadrado, sem cantos — a Play aplica a máscara) | `store/play/icon-512.png` (cópia de `brand/png/play-icon-512.png`, gerado por `web/tools/gerar_icones.mjs` a partir de `brand/quimica-icon.svg`) |
 | Gráfico de recursos 1024×500 | `store/play/feature-graphic-1024x500.png` (pt-BR) e `…-en.png`, `…-es.png`, `…-de.png`, `…-fr.png` (um por localização). Gerados por `store/play/fonte/grafico.mjs` (Chrome headless + Poppins de `brand/fonts`) |
@@ -465,3 +465,11 @@ script não os envia; dá para acrescentar `edits.listings` e `edits.images` da 
 
 ## Atualização 1.0.2 (17/10/2026)
 Enviar o AAB da **1.0.2 (versionCode 3)** — `app/build/outputs/bundle/release/app-release.aab` — no lugar da 1.0.1, que não foi enviada. Notas da versão (5 idiomas, ≤500 caracteres): `store/play/release-notes-1.0.2.json`. A política de privacidade subiu para 1.3 (interpretação da pergunta anterior pode ir à nuvem em perguntas de continuação); a seção "Segurança dos dados" não muda (continua: dados enviados só com consentimento, sem identificador pessoal). Detalhes: `RELEASE_1.0.2.md`.
+
+## Atualização 1.0.3 (18/10/2026)
+Enviar o AAB da **1.0.3 (versionCode 4)** — `app/build/outputs/bundle/release/app-release.aab` (8,3 MB, assinado, `jarsigner -verify` ok) — no lugar
+da 1.0.2, que não foi enviada. Notas da versão (5 idiomas, 412–478 caracteres): `store/play/release-notes-1.0.3.json`. O que entra:
+cinco calculadoras (entalpia/Hess, configuração eletrônica, NOX, Kc/Kp, tipo de ligação), termoquímica padrão na ficha do composto, prótons/nêutrons/
+elétrons de íons e isótopos, Kc sem equação com ação para a calculadora (`docs/RELEASE_1.0.3.md`). Política de privacidade e "Segurança dos dados" não
+mudam (nenhum dado novo sai do aparelho: carga e número de massa são lidos localmente e não vão à nuvem). **Antes de enviar: testar num aparelho
+real** (nenhum estava conectado em 18/10 de madrugada).

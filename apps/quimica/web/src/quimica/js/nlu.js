@@ -209,6 +209,13 @@ export function extrairEquacao(texto) {
 // `cargaFormula` (carga escrita separada da fórmula: "Cr2O7 2-"). O símbolo Δ/∆ de "ΔH" não é palavra de nenhum idioma (a normalização o apaga).
 const RX_DELTA_H = /[Δ∆]\s*H(?![a-z])/;
 const RX_DELTA_HF = /[Δ∆]\s*H\s*°?\s*f(?![a-z])/;
+// 18/10/2026 (§7): "ΔGf", "ΔG°f", "ΔGf°" e "ΔG de formação" (a palavra "formação" vem do léxico: `pistas.deFormacao`)
+const RX_DELTA_G = /[Δ∆]\s*G\s*°?(?![a-z])/;
+const RX_DELTA_GF = /[Δ∆]\s*G\s*°?\s*f(?![a-z])/;
+/** Assunto de CONCEITO de "Kc/Kp" sem equação na pergunta (a resposta oferece a calculadora de equilíbrio). */
+export const CONCEITO_CONSTANTE_EQUILIBRIO = 'constante de equilibrio';
+/** Propriedades termoquímicas de formação de um composto (a pergunta de uma delas não é ENTALPIA de reação). */
+const PROPRIEDADES_TERMO = new Set(['entalpiaFormacaoKJmol', 'energiaGibbsFormacaoKJmol', 'entropiaPadraoJmolK']);
 const RX_SETA_DUPLA = /<=>|<->|⇌|⇄|↔/;
 
 const rxColcheteCache = new WeakMap();
@@ -261,7 +268,7 @@ function elementoDoNox(n, original, dic, lex) {
 }
 
 /** Carga escrita separada logo depois da fórmula ("Cr2O7 2-", "SO4 2-", "NH4 +"): número ou null. */
-function cargaDepoisDa(formula, original) {
+export function cargaDepoisDa(formula, original) {
   if (!formula) return null;
   const i = original.indexOf(formula);
   if (i < 0) return null;
@@ -271,13 +278,87 @@ function cargaDepoisDa(formula, original) {
   return sinal * Number(m[1] || m[4] || 1);
 }
 
+// ---------------------------------------------------------------------------------------------------- íons e número de massa (18/10/2026)
+// Contrato: docs/CALCULADORAS_2026-10-17.md §7. Campos só do cliente: `cargaFormula` (carga de UM símbolo de elemento: "Fe2+", "Fe²⁺", "Fe+2",
+// "Fe 2+", "Cl-", "íon ferro 2+", "íon ferro(II)") e `numeroMassa` ("Fe-56", "⁵⁶Fe", "ferro-56", "carbono 14?"). O modelo da nuvem não os emite:
+// nuvem.js os mescla a partir de `lerIonsEIsotopo`. Espelho de `LocalNlu.lerIonsEIsotopo` (Android).
+const SOBRESCRITOS = { '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9', '⁺': '+', '⁻': '-', '−': '-' };
+const RX_SOBRESCRITO = /[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻−]/g;
+/** Símbolo com carga e/ou número de massa à frente: "Fe2+", "Fe+2", "Fe^{2+}", "56Fe", "56Fe3+" (o texto já sem sobrescritos). */
+const RX_TOKEN_ION = /^(\d{1,3})?([A-Z][a-z]?)(?:\^?\{?(\d?[+-]|[+-]\d)\}?)?$/;
+const RX_SIMBOLO_MASSA = /^([A-Z][a-z]?)-(\d{1,3})$/;
+const RX_NOME_MASSA = /^(\p{L}+)-(\d{1,3})$/u;
+const RX_CARGA_SOLTA = /^(?:\d[+-]|[+-]\d)$/;
+const ROMANOS = { i: 1, ii: 2, iii: 3, iv: 4, v: 5, vi: 6, vii: 7 };
+
+/** Carga escrita ("2+", "+2", "-", "3-") → inteiro com sinal. */
+function cargaDe(s) {
+  const m = /^(\d?)([+-])(\d?)$/.exec(s);
+  if (!m) return null;
+  return (m[2] === '-' ? -1 : 1) * Number(m[1] || m[3] || 1);
+}
+
+/** Número de massa plausível para o elemento (Z ≤ A ≤ 3Z + 10): corta coeficientes ("2Na") e temperaturas ("100K"). */
+function massaPlausivel(dic, simbolo, a) {
+  const z = dic.porSimbolo?.get(simbolo)?.z;
+  return Number.isInteger(z) && a >= z && a <= 3 * z + 10;
+}
+
+/**
+ * Íons de UM elemento e número de massa citados na pergunta: `{ ions: [{simbolo, carga}], isotopo: {simbolo, numeroMassa}|null, simbolos }`
+ * (`simbolos` = os elementos citados assim, na ordem). Fórmula de mais de um elemento ("NO3-", "SO4 2-") não conta. `comPista`: a pergunta
+ * fala de partículas — só então "56Fe" sem sobrescrito vale (sem a pista, "100K" e "100W" são temperatura e potência).
+ */
+export function lerIonsEIsotopo(original, dic, lex = dic?.lex ?? lexico(), comPista = false) {
+  const texto = String(original ?? '');
+  const ions = [];
+  let isotopo = null;
+  const simbolos = [];
+  const elementoValido = (s) => !!s && !!dic?.porSimbolo?.has(s);
+  const porNome = (w) => dic?.nomesElementoMap?.get(normalizar(w)) ?? null;
+  const addIon = (simbolo, carga) => { if (carga != null && carga !== 0) { ions.push({ simbolo, carga }); if (!simbolos.includes(simbolo)) simbolos.push(simbolo); } };
+  const addIsotopo = (simbolo, a) => {
+    if (!isotopo && massaPlausivel(dic, simbolo, a)) { isotopo = { simbolo, numeroMassa: a }; if (!simbolos.includes(simbolo)) simbolos.push(simbolo); }
+  };
+  const brutos = texto.split(/\s+/).filter(Boolean);
+  const toks = brutos.map((b) => b.replace(RX_SOBRESCRITO, (c) => SOBRESCRITOS[c]).replace(/^[^\p{L}\d+-]+|[^\p{L}\d+}-]+$/gu, '').replace(/^(.*[+-]\}?)-\p{L}+$/u, '$1'));
+  for (let i = 0; i < toks.length; i++) {
+    const t = toks[i];
+    const prox = toks[i + 1] ?? '';
+    let m = RX_TOKEN_ION.exec(t);
+    if (m && (m[1] || m[3]) && elementoValido(m[2])) {
+      if (m[3]) addIon(m[2], cargaDe(m[3]));
+      // "56Fe" sem sobrescrito só com pista de partículas; "⁵⁶Fe" sempre
+      if (m[1] && (comPista || /^[⁰¹²³⁴⁵⁶⁷⁸⁹]/.test(brutos[i].replace(/^[^\p{L}\d⁰¹²³⁴⁵⁶⁷⁸⁹]+/u, '')))) addIsotopo(m[2], Number(m[1]));
+      continue;
+    }
+    if ((m = RX_SIMBOLO_MASSA.exec(t)) && elementoValido(m[1])) { addIsotopo(m[1], Number(m[2])); continue; }
+    if (/^[A-Z][a-z]?$/.test(t) && elementoValido(t) && RX_CARGA_SOLTA.test(prox)) { addIon(t, cargaDe(prox)); i++; continue; }
+    if ((m = RX_NOME_MASSA.exec(t))) { const s = porNome(m[1]); if (s) addIsotopo(s, Number(m[2])); continue; }
+    const s = /^\p{L}{3,}$/u.test(t) ? porNome(t) : null;
+    if (s && RX_CARGA_SOLTA.test(prox)) { addIon(s, cargaDe(prox)); i++; continue; }
+    // "carbono 14?" / "carbon 14": o número no fim da frase (ou antes de pontuação), sem unidade depois
+    if (s && /^\d{1,3}$/.test(prox) && (i + 2 === toks.length || /[?!.,;:)]$/.test(brutos[i + 1]))) { addIsotopo(s, Number(prox)); i++; }
+  }
+  // "íon ferro(II)", "iron(III) ion": nome do elemento + algarismo romano junto da palavra íon/cátion (`pistas.ionRomano` do léxico)
+  if (lex?.pistas?.ionRomano) {
+    const mr = lex.pistas.ionRomano.exec(normalizar(texto));
+    if (mr) {
+      const grupos = mr.slice(1).filter((x) => x != null);
+      const s = grupos.length >= 2 ? porNome(grupos[0]) : null;
+      if (s && ROMANOS[grupos[1]] && !ions.some((x) => x.simbolo === s)) addIon(s, ROMANOS[grupos[1]]);
+    }
+  }
+  return { ions, isotopo, simbolos };
+}
+
 // ---------------------------------------------------------------------------------------------------- parse
 function parseVazio(original) {
   return {
     intent: 'DESCONHECIDA', textoOriginal: original, elemento: null, elementos: [], composto: null, compostoNome: null, compostos: [], formulas: [], formula: null,
     propriedade: null, propriedades: [], quantidades: [], equacao: null, nivel: null, unidadeDestino: null, unidadesDestino: [], conceito: null,
     grupo: null, periodo: null, bloco: null, categoria: null, estado: null, extremo: null, tendencia: false, ordem: null, mistura: false, constantes: {}, seguranca: null,
-    concentracoes: [], cargaFormula: null
+    concentracoes: [], cargaFormula: null, numeroMassa: null
   };
 }
 
@@ -298,7 +379,7 @@ function lerConstantes(original, lex) {
 }
 
 /** Remove o gatilho de conceito e artigos: "o que é um mol" → "mol". */
-function limparConceito(n, lex) {
+export function limparConceito(n, lex) {
   let s = n.replace(lex.intencoes.conceitoCue, '');
   for (const rx of lex.pistas.limparConceito) s = s.replace(rx, '');
   return s.trim();
@@ -385,6 +466,26 @@ export function parse(pergunta, dic, contexto = null, lex = dic?.lex ?? lexico()
   p.formula = p.formulas[0] ?? compostos.find((c) => c.via === 'formula')?.texto ?? null;
   p.propriedades = props.map((x) => x.id);
   p.propriedade = p.propriedades[0] ?? null;
+  // íon de UM elemento ("Fe2+", "Cl-", "íon ferro 2+") e número de massa ("Fe-56", "carbono-14"): o elemento, `cargaFormula` e `numeroMassa`;
+  // o token sai das fórmulas e dos compostos por fórmula ("O2-" é o óxido, não o O2). Com equação na pergunta, nada muda (semirreações).
+  if (!equacao) {
+    const ext = lerIonsEIsotopo(original, dic, lex, props.some((x) => x.id === 'particulas'));
+    if (ext.simbolos.length) {
+      const doIon = (txt) => ext.simbolos.includes(String(txt ?? '').replace(/[\d+\-^{}⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻−]/g, ''));
+      compostos = compostos.filter((c) => !(c.via === 'formula' && doIon(c.texto)));
+      p.compostos = compostos.map((c) => c.cid);
+      p.composto = p.compostos[0] ?? null;
+      p.compostoNome = compostos[0]?.nome ?? null;
+      p.formulas = p.formulas.filter((f) => !doIon(f));
+      p.formula = p.formulas[0] ?? compostos.find((c) => c.via === 'formula')?.texto ?? null;
+      // o elemento do íon/isótopo é o assunto da pergunta: vem primeiro
+      p.elementos = [...new Set([...ext.simbolos, ...p.elementos])];
+      p.elemento = p.elementos[0];
+      const ion = ext.ions.find((x) => x.simbolo === p.elemento);
+      p.cargaFormula = ion ? ion.carga : null;
+      p.numeroMassa = ext.isotopo && ext.isotopo.simbolo === p.elemento ? ext.isotopo.numeroMassa : null;
+    }
+  }
   const nEnt = p.elementos.length + p.compostos.length + p.formulas.length;
   const tem = nEnt > 0;
 
@@ -404,17 +505,25 @@ export function parse(pergunta, dic, contexto = null, lex = dic?.lex ?? lexico()
     const eqE = concentracoes.length ? extrairEquacao(semConcentracoes(original, concentracoes)) ?? equacao : equacao;
     // com seta dupla na pergunta (⇌, <=>, <->, ⇄), a equação fica com ⇌ (a mesma forma que a normalização do serviço usa)
     if (eqE) return fim('EQUILIBRIO', { equacao: RX_SETA_DUPLA.test(original) ? eqE.replace(' -> ', ' ⇌ ') : eqE, concentracoes });
+    // Kc/Kp SEM equação ("qual o Kp a 500 K", "como calcular o Kc", "o que é Kc", "fórmula do Kp"): o conceito (18/10/2026, §7)
+    if (P.constanteEquilibrio.test(n)) return fim('CONCEITO', { conceito: CONCEITO_CONSTANTE_EQUILIBRIO, propriedade: null, propriedades: [] });
   }
   const temComposto = p.compostos.length > 0 || p.formulas.length > 0;
-  // "ΔHf do metano": a propriedade (entalpia padrão de formação), como "entalpia de formação do metano"
-  if (RX_DELTA_HF.test(original) && temComposto && !equacao && !p.propriedade) {
+  // "ΔHf do metano", "ΔH de formação do metano": a propriedade (entalpia padrão de formação), como "entalpia de formação do metano";
+  // "ΔGf da água", "ΔG°f", "ΔG de formação": energia livre de Gibbs padrão de formação (18/10/2026)
+  const deltaFormacao = (rxF, rx) => (rxF.test(original) || (rx.test(original) && P.deFormacao.test(n))) && temComposto && !equacao && !p.propriedade;
+  if (deltaFormacao(RX_DELTA_GF, RX_DELTA_G)) {
+    return fim('PROPRIEDADE', { propriedade: 'energiaGibbsFormacaoKJmol', propriedades: ['energiaGibbsFormacaoKJmol'], alvoPropriedade: 'composto' });
+  }
+  if (deltaFormacao(RX_DELTA_HF, RX_DELTA_H) && !P.entalpiaCombustao.test(n) && !P.hess.test(n)) {
     return fim('PROPRIEDADE', { propriedade: 'entalpiaFormacaoKJmol', propriedades: ['entalpiaFormacaoKJmol'], alvoPropriedade: 'composto' });
   }
   if (I.entalpia.test(n) || RX_DELTA_H.test(original)) {
     const combustao = P.entalpiaCombustao.test(n);
     const hess = P.hess.test(n);
-    // "entalpia de formação da água" é PROPRIEDADE (entalpiaFormacaoKJmol); "o que é entalpia?" é CONCEITO
-    const soFormacao = P.entalpiaFormacao.test(n) && temComposto && !combustao && !hess && !equacao;
+    // "entalpia de formação da água" é PROPRIEDADE (entalpiaFormacaoKJmol); "o que é entalpia?" é CONCEITO; "entalpia livre de formação" (ΔGf) e
+    // "enthalpie libre standard de formation" também são PROPRIEDADE (a propriedade termoquímica citada)
+    const soFormacao = (P.entalpiaFormacao.test(n) || PROPRIEDADES_TERMO.has(p.propriedade)) && temComposto && !combustao && !hess && !equacao;
     const definicao = !equacao && !temComposto && (P.prefixoDefinicao.test(n) || I.conceitoCue.test(n));
     if (!soFormacao && !definicao && (equacao || temComposto || combustao || hess)) return fim('ENTALPIA', { equacao });
   }
@@ -463,7 +572,9 @@ export function parse(pergunta, dic, contexto = null, lex = dic?.lex ?? lexico()
     return fim('GAS_IDEAL');
   }
   if (I.concentracao.test(n) && (temQuant || P.concentracaoForte.test(n)) && !P.prefixoExplicacaoPalavra.test(n)) return fim('CONCENTRACAO');
-  if (I.estequiometria.test(n) && (temQuant || tem) && !P.prefixoDefinicao.test(n)) return fim('ESTEQUIOMETRIA', { equacao });
+  // "quantas partículas subatômicas tem o oxigênio" é PROPRIEDADE particulas; "quantas partículas há em 2 mol de Fe" (com quantidade) continua cálculo
+  const soParticulas = p.propriedade === 'particulas' && !temQuant;
+  if (I.estequiometria.test(n) && (temQuant || tem) && !P.prefixoDefinicao.test(n) && !soParticulas) return fim('ESTEQUIOMETRIA', { equacao });
   if (I.massaMolar.test(n) && !P.prefixoDefinicao.test(n)) return fim('MASSA_MOLAR');
   // estequiometria sem "quantos": uma quantidade de massa, mols ou volume + substância citada + verbo de reação ("formada a partir de 2 g de
   // hidrogênio", "reage com 10 g de Cu2S") ou pedido de massa/mols/volume ("massa de meio mol de NaCl")

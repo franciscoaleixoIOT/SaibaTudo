@@ -82,7 +82,10 @@
   "hess": "\\b(?:satz von hess|hess\\w*)\\b",
   "kcKp": "\\b(?:kp|partialdruck\\w*)\\b",
   "concentracaoColchete": "=|:|ist|betragt|gleich|von",
-  "ligacaoPolaridade": "\\b(?:ionisch\\w*|kovalent\\w*|polar\\w*|unpolar\\w*|metallisch\\w*)\\b"
+  "ligacaoPolaridade": "\\b(?:ionisch\\w*|kovalent\\w*|polar\\w*|unpolar\\w*|metallisch\\w*)\\b",
+  "deFormacao": "\\b(?:der bildung|bildung\\w*)\\b",
+  "constanteEquilibrio": "\\b(?:kc|kp|gleichgewichtskonstante\\w*)\\b",
+  "ionRomano": "\\b([a-z]+) (i{1,3}|iv|vi{0,2}|v) ?-?(?:ions?|ionen|kations?|kationen)\\b|\\b(?:ions?|kations?) (?:des |von )?([a-z]+) (i{1,3}|iv|vi{0,2}|v)\\b"
  },
  "nivel": {
   "fundamental": "\\b(?:grundschule|kinder|kind|einfach|ganz einfach|leicht verstandlich|fur anfanger|fur laien)\\b",
@@ -639,6 +642,42 @@
    "standardbildungsenthalpie",
    "bildungsenthalpie",
    "bildungswarme"
+  ],
+  "energiaGibbsFormacaoKJmol": [
+   "freie standardbildungsenthalpie",
+   "freie bildungsenthalpie",
+   "gibbs-energie der bildung",
+   "gibbs energie der bildung",
+   "freie standardbildungsenergie",
+   "freie bildungsenergie",
+   "gibbs-bildungsenergie",
+   "freie enthalpie der bildung"
+  ],
+  "entropiaPadraoJmolK": [
+   "molare standardentropie",
+   "standardentropie",
+   "absolute entropie",
+   "molare entropie",
+   "entropie von",
+   "entropie des",
+   "entropie der"
+  ],
+  "particulas": [
+   "subatomare teilchen",
+   "anzahl der protonen",
+   "anzahl der neutronen",
+   "anzahl der elektronen",
+   "protonenzahl",
+   "neutronenzahl",
+   "elektronenzahl",
+   "massenzahl",
+   "nukleonenzahl",
+   "protonen",
+   "proton",
+   "neutronen",
+   "neutron",
+   "elektronen",
+   "elektron"
   ]
  },
  "rotulosPropriedadeNormalizados": true,

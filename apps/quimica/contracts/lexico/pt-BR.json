@@ -79,7 +79,10 @@
     "hess": "\\b(?:lei de hess|hess)\\b",
     "kcKp": "\\b(?:kp|pressoes parciais)\\b",
     "concentracaoColchete": "=|:|e|eh|vale|igual a|de",
-    "ligacaoPolaridade": "\\b(?:ionic[oa]s?|covalentes?|polar(?:es)?|apolar(?:es)?|metalic[oa]s?)\\b"
+    "ligacaoPolaridade": "\\b(?:ionic[oa]s?|covalentes?|polar(?:es)?|apolar(?:es)?|metalic[oa]s?)\\b",
+    "deFormacao": "\\b(?:de formacao|padrao de formacao)\\b",
+    "constanteEquilibrio": "\\b(?:kc|kp|constantes? de equilibrio|expressao (?:do|de|da) (?:kc|kp|constante))\\b",
+    "ionRomano": "\\b(?:ions?|cations?) (?:de |do |da )?([a-z]+) (i{1,3}|iv|vi{0,2}|v)\\b"
   },
   "nivel": {
     "fundamental": "\\b(?:ensino fundamental|fundamental|crianca|simples|bem simples|facil de entender|para leigos)\\b",
@@ -466,7 +469,9 @@
       "camada de valencia",
       "subniveis",
       "subnivel mais energetico",
-      "distribuicao em subniveis"
+      "distribuicao em subniveis",
+      "eletrons na ultima camada",
+      "ultima camada"
     ],
     "eletronegatividade": [
       "eletronegatividade"
@@ -621,6 +626,47 @@
       "entalpia padrao de formacao",
       "entalpia de formacao",
       "calor de formacao"
+    ],
+    "energiaGibbsFormacaoKJmol": [
+      "energia livre de gibbs de formacao",
+      "energia livre de gibbs padrao de formacao",
+      "energia de gibbs de formacao",
+      "energia livre padrao de formacao",
+      "energia livre de formacao",
+      "variacao de energia livre de formacao",
+      "entalpia livre de formacao",
+      "gibbs de formacao",
+      "delta g de formacao",
+      "delta gf"
+    ],
+    "entropiaPadraoJmolK": [
+      "entropia molar padrao",
+      "entropia padrao molar",
+      "entropia padrao",
+      "entropia absoluta",
+      "entropia molar",
+      "entropia do",
+      "entropia da",
+      "entropia dos",
+      "entropia das",
+      "entropia de"
+    ],
+    "particulas": [
+      "particulas subatomicas",
+      "particulas do atomo",
+      "numero de protons",
+      "numero de neutrons",
+      "numero de eletrons",
+      "numero de massa",
+      "quantidade de protons",
+      "quantidade de neutrons",
+      "quantidade de eletrons",
+      "protons",
+      "proton",
+      "neutrons",
+      "neutron",
+      "eletrons",
+      "eletron"
     ]
   },
   "rotulosPropriedadeNormalizados": true,

@@ -229,7 +229,7 @@ class PropriedadesMedidasTest {
         assertFalse(r.entendida)
         val txt = r.texto()
         assertTrue(txt, txt.contains("não traz densidade para Etanol"))
-        assertTrue(txt, txt.contains("Para Etanol, o pacote traz: estado físico a 25 °C e 1 atm (líquido), ponto de fusão (159,05 K), ponto de ebulição (351,44 K) e pKa (16)."))
+        assertTrue(txt, txt.contains("Para Etanol, o pacote traz: estado físico a 25 °C e 1 atm (líquido), ponto de fusão (159,05 K), ponto de ebulição (351,44 K), pKa (16) e entalpia padrão de formação (-277,60 kJ/mol)."))
         assertFalse("nenhum número inventado", txt.contains("789"))
         val es = responder(real("es")!!, "densidad del etanol")
         assertTrue(es.texto(Tx.de("es")), es.texto(Tx.de("es")).contains("el paquete trae"))

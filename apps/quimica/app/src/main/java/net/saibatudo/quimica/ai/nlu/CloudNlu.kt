@@ -66,7 +66,7 @@ object NluValidator {
         if (intent == Intent.DESCONHECIDA) return InterpretacaoNuvem(null, sugestoes, compostoTexto)
 
         // ---- entidades, uma a uma ----
-        val elemento = nlu.str("elemento")?.let { validarElemento(it, d, original, n, base) ?: it.takeIf { s -> herdado?.elemento == s } }
+        val elementoNuvem = nlu.str("elemento")?.let { validarElemento(it, d, original, n, base) ?: it.takeIf { s -> herdado?.elemento == s } }
         var cid: Long? = null
         var formula: String? = null
         // composto herdado: o mesmo texto que o app mandou no contexto (a nuvem o copia de lá, não da pergunta)
@@ -85,6 +85,12 @@ object NluValidator {
         val nivel = nlu.str("nivel")?.lowercase()?.takeIf { it in NIVEIS }
         val equacao = nlu.str("equacao")?.take(200)?.let { validarEquacao(it, ascii + (herdado?.equacao?.let { e -> " " + Texto.paraAscii(e) } ?: "")) }
         val quantidades = validarQuantidades(nlu.get("quantidades"), d, original, herdado?.quantidades.orEmpty())
+
+        // a nuvem copiou o íon de um elemento como composto ("Fe2+", "Fe-56"): é o elemento da interpretação local, com a carga (18/10/2026)
+        val formulaDeIon = formula != null && cid == null && base.elemento != null && (base.cargaFormula != null || base.numeroMassa != null) &&
+            formula.replace(Regex("""[\d+\-^{}⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻−]"""), "") == base.elemento
+        if (formulaDeIon) formula = null
+        val elemento = elementoNuvem ?: base.elemento.takeIf { formulaDeIon }
 
         // ---- junta com a interpretação local (os campos que a nuvem não manda) ----
         val elementos = (listOfNotNull(elemento) + base.elementos).distinct()
@@ -112,6 +118,13 @@ object NluValidator {
             }
             Intent.SEGURANCA -> q.copy(mistura = base.mistura || d.lexico.pista("mistura").containsMatchIn(n))
             else -> q
+        }
+        // campos SÓ DO CLIENTE (docs/CALCULADORAS_2026-10-17.md §1 e §7): o modelo não emite `cargaFormula` nem `numeroMassa`; vêm da interpretação
+        // LOCAL da mesma pergunta e valem para o mesmo elemento (no NOX, a carga escrita depois da fórmula). Espelho de `mesclarCamposDoCliente` (site).
+        q = when {
+            intent == Intent.NOX -> q.copy(cargaFormula = LocalNlu.cargaDepoisDa(q.formula ?: compostoTexto, original))
+            q.elemento != null && q.elemento == base.elemento -> q.copy(cargaFormula = base.cargaFormula, numeroMassa = base.numeroMassa)
+            else -> q.copy(cargaFormula = null, numeroMassa = null)
         }
         if (!temAsEntidadesExigidas(q)) return InterpretacaoNuvem(null, sugestoes, compostoTexto)
         return InterpretacaoNuvem(q, sugestoes, compostoTexto)

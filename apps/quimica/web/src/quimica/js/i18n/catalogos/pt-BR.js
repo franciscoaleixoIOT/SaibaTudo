@@ -420,7 +420,8 @@ export default {
       massaMolar: 'massa molar', massaExata: 'massa exata (monoisotópica)', formula: 'fórmula', cas: 'número CAS', cid: 'CID no PubChem', smiles: 'SMILES', inchiKey: 'InChIKey',
       nomeIupac: 'nome IUPAC', xlogp: 'XLogP (lipofilicidade calculada)', doadoresH: 'doadores de ligação de hidrogênio', aceptoresH: 'aceptores de ligação de hidrogênio',
       ligacoesRotaveis: 'ligações rotáveis', carga: 'carga elétrica', tpsa: 'área de superfície polar (TPSA)', solubilidade: 'solubilidade em água', pka: 'pKa',
-      entalpiaFormacaoKJmol: 'entalpia padrão de formação'
+      entalpiaFormacaoKJmol: 'entalpia padrão de formação',
+      energiaGibbsFormacaoKJmol: 'energia livre de Gibbs padrão de formação', entropiaPadraoJmolK: 'entropia molar padrão', particulas: 'prótons, nêutrons e elétrons'
     },
     medidas: {
       titulo: 'Propriedades físicas', intro: 'Valores medidos, cada um com a sua fonte e as condições da medida.',
@@ -433,7 +434,8 @@ export default {
       avisoRevisar: 'Valor a revisar: o do PubChem pode estar desatualizado (difere das tabelas atuais) e o Wikidata não tem esta propriedade.',
       notaPauling: 'Escala de Pauling, com os valores revisados de Allred (1961), como no PubChem; livros que usam os valores originais de Pauling diferem em alguns elementos.',
       notaPka: 'Menor pKa registrado (primeira dissociação); para bases, o Wikidata costuma registrar o pKa do ácido conjugado, e ácidos fortes ficam sem pKa.',
-      estadoA25: 'estado físico a 25 °C e 1 atm'
+      estadoA25: 'estado físico a 25 °C e 1 atm',
+      padrao298: 'estado padrão a 298,15 K (25 °C)', faseEstadoPadrao: 'fase: {fase} (estado físico do composto a 25 °C)', campoChembox: 'campo {campo} do chembox'
     },
     categorias: {
       metal_alcalino: 'metal alcalino', metal_alcalino_terroso: 'metal alcalino-terroso', metal_transicao: 'metal de transição', metal_pos_transicao: 'metal pós-transição',
@@ -483,6 +485,7 @@ export default {
       regrasNox: 'Regras de NOX dos livros didáticos (convenção), aplicadas pelo aplicativo',
       regraLigacao: 'Regra didática da diferença de eletronegatividade (escala de Pauling; limites 0,4 e 1,7 por convenção)',
       acaoDasMassas: 'Lei da ação das massas (regra), cálculo local do aplicativo',
+      particulas: 'Contagem por regra: prótons = Z, elétrons = Z − carga, nêutrons = A − Z (número de massa menos número atômico)',
       distribuicao: 'Distribuição calculada pelo aplicativo a partir da configuração do pacote (regra de Madelung, diagrama de Linus Pauling)',
       substanciaSimples: 'Convenção: ΔHf° = 0 para substância simples no estado padrão',
       entalpiaCalculo: 'Cálculo local do aplicativo (lei de Hess), com os ΔHf° do pacote de dados'
@@ -566,7 +569,7 @@ export default {
       digaQualPropriedade: 'Diga qual propriedade e de qual elemento ou composto. Por exemplo: "densidade do ouro".',
       de: '{prop} de {nome}',
       outroTipo: (p) => `${p.prop} (essa propriedade é de ${p.alvo === 'composto' ? 'compostos' : 'elementos'}; ${p.outros} ${p.n > 1 ? 'são' : 'é'} de outro tipo)`,
-      naoTem: 'O pacote de dados não tem: {lista}.', fichaDe: 'Ficha de {nome}', propriedadesDe: 'Propriedades de {nomes}',
+      faltaTermo: 'Falta {simbolo} de {nome} no pacote de dados; o aplicativo não estima esse valor.', naoTem: 'O pacote de dados não tem: {lista}.', fichaDe: 'Ficha de {nome}', propriedadesDe: 'Propriedades de {nomes}',
       oferece: 'Para {nome}, o pacote traz: {lista}.', solubilidadeDeQual: 'Diga de qual composto você quer a solubilidade em água. Por exemplo: "solubilidade da ureia".'
     },
     massaMolar: {
@@ -631,7 +634,7 @@ export default {
     comparar: {
       titulo: 'Comparação: {nomes}', propriedade: 'Propriedade', fichaDe: 'Ficha de {nome}',
       linhas: { formula: 'Fórmula', massaMolar: 'Massa molar', cas: 'Número CAS', nomeIupac: 'Nome IUPAC', xlogp: 'XLogP', sinal: 'Palavra de sinal (GHS)', pictogramas: 'Pictogramas (GHS)' },
-      maior: '{prop}: maior em {nome} ({valor}).',
+      maior: '{prop}: maior em {nome} ({valor}).', maisNegativo: '{prop}: mais negativo em {nome} ({valor}).',
       ordemCrescente: '{prop}, em ordem crescente: {lista}.', ordemDecrescente: '{prop}, em ordem decrescente: {lista}.', semDadoOrdem: 'Sem esse dado no pacote: {nomes}.', tituloGeral: 'Comparar', explicacao: 'Compare itens do mesmo tipo: dois elementos ("compare sódio e cloro") ou dois compostos ("diferença entre etanol e ácido acético").'
     },
     tabela: {
@@ -653,6 +656,39 @@ export default {
       elementoSemGhs: 'O pacote traz a classificação de perigo (GHS) apenas de compostos, não do elemento {nome}. Os perigos dependem da forma química (por exemplo, o vapor do metal ou um sal): consulte a ficha de segurança do produto.',
       orientacao: 'Orientação geral de segurança', naoIdentifiquei: 'Não identifiquei a substância. Diga o nome ou a fórmula para ver os perigos do GHS, ou siga a orientação geral abaixo.',
       comoLer: 'Como ler pictogramas e frases H', titulo: 'Segurança: {alvo}', tituloGeral: 'Segurança química', eConector: ' e '
+    },
+    particulas: {
+      titulo: '{especie}: {protons}, {neutrons} e {eletrons}',
+      tituloAprox: '{especie}: {protons}, {eletrons} e cerca de {neutrons}',
+      contProtons: (p) => (Number(p.n) === 1 ? '1 próton' : `${p.n} prótons`),
+      contNeutrons: (p) => (Number(p.n) === 1 ? '1 nêutron' : `${p.n} nêutrons`),
+      contEletrons: (p) => (Number(p.n) === 1 ? '1 elétron' : `${p.n} elétrons`),
+      especie: 'Espécie',
+      protons: 'Prótons (Z)',
+      eletrons: 'Elétrons',
+      neutrons: 'Nêutrons',
+      numeroMassa: 'Número de massa (A)',
+      atomoNeutro: 'átomo neutro de {nome}',
+      cation: 'cátion {ion} ({nome})',
+      anion: 'ânion {ion} ({nome})',
+      isotopo: 'isótopo {iso}',
+      eletronsNeutro: 'átomo neutro: igual a Z',
+      neutronsAprox: 'cerca de {n}',
+      numeroMassaAprox: 'cerca de {a}',
+      aproxMassa: 'aproximado pela massa atômica, {m}',
+      avisoAprox: 'Número de massa aproximado pela massa atômica ({m} → {a}); o número de nêutrons depende do isótopo. Para um isótopo, pergunte, por exemplo: "nêutrons do {simbolo}-{a}".',
+      semMassa: 'O pacote de dados não tem a massa atômica de {nome}: sem o número de massa, os nêutrons não são calculados.',
+      cargaInvalida: 'A carga {carga} tiraria mais elétrons do que {nome} tem ({z}): esse íon não existe.',
+      linhaIon: 'Íon {ion} ({tipo}): {eletrons} ({conta}).',
+      linhaIsotopo: 'Isótopo {iso}: {protons} e {neutrons} ({conta}).',
+      tipoCation: 'cátion',
+      tipoAnion: 'ânion'
+    },
+    constanteEquilibrio: {
+      titulo: 'Constante de equilíbrio (Kc e Kp)',
+      explicacao: 'A constante de equilíbrio Kc é o quociente das concentrações no equilíbrio (mol/L) dos produtos pelas dos reagentes, cada uma elevada ao seu coeficiente na equação balanceada: para aA + bB ⇌ cC + dD, Kc = [C]^c·[D]^d / ([A]^a·[B]^b). Só entram gases e espécies em solução aquosa; sólidos e líquidos puros ficam fora. Kp é a mesma expressão com as pressões parciais dos gases, e as duas se relacionam por Kp = Kc·(RT)^Δn, em que Δn é a variação do número de mols de gás (produtos − reagentes) e T, a temperatura em kelvin. O valor de K depende só da temperatura.',
+      equacao: 'Me dê a equação (ex.: N2 + 3 H2 ⇌ 2 NH3) e eu monto a expressão.',
+      temperatura: 'A temperatura da pergunta ({t} K) já vai preenchida na calculadora.'
     },
     conceito: {
       semTexto: 'Ainda não tenho um texto sobre isso',

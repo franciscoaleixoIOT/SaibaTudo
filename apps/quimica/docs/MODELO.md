@@ -203,3 +203,10 @@ já mediu o multi-turno com esse formato: 99,3 %); publicar exige `modal deploy`
 nome sistemático, mistura, ordenação). O serviço no Modal **continua com o `nlu_core.py` anterior** de propósito: o v3.4 não foi treinado nas
 intenções novas e a gramática nova só deve ir ao ar junto com o v3.5 aprovado no gate (golden 929 agora inclui 56 casos das intenções novas —
 o v3.4 vai errar esses; comparar por intenção). Treino: `ia/treino/README.md` §v3.5 (continuação do LoRA v3.4, `max_length 288`, ~4 h).
+
+**Treino do v3.5 iniciado (18/10/2026, 02h52):** depois do contrato de 18/10 (`CALCULADORAS_2026-10-17.md` §7: ids `energiaGibbsFormacaoKJmol`,
+`entropiaPadraoJmolK`, `particulas`; Kc sem equação → CONCEITO), o corpus foi remontado (teto pt 760 + piso por propriedade; 74.935 pares; 43 testes,
+vazamento golden 984 × treino limpo) e a mistura de continuação (43.360 pares, 21 rótulos mudados pelos moldes de prótons) começou a treinar sobre o
+LoRA v3.4 (`ia/treino/README.md` §v3.5; roteiro `ia/treino/out/nlu-v35-cont/pipeline.sh`). Gate previsto: golden 984 (o v3.4 erra os casos das
+intenções e ids novos — comparar por intenção), holdout da química, 13 holdouts do v3.5 e os do v3.4 (meta 90 % cada), eleições sem regressão. O
+serviço no Modal continua com o `nlu_core.py` anterior até a promoção.

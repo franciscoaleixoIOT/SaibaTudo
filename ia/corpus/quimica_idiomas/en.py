@@ -118,7 +118,7 @@ T["PROPRIEDADE_EL"] = [(t, {}) for t in [
     ("At what temperature does {el} melt?", {"propriedade": "pontoFusaoK"}), ("At what temperature does {el} boil?", {"propriedade": "pontoEbulicaoK"}),
     ("Is {el} a metal?", {"propriedade": "categoria"}), ("What type of element is {el}?", {"propriedade": "categoria"}),
     ("Which group is {el} in?", {"propriedade": "grupo"}), ("Which period is {el} in?", {"propriedade": "periodo"}),
-    ("How many protons does {el} have?", {"propriedade": "numeroAtomico"}), ("How many electrons does a neutral atom of {el_s} have?", {"propriedade": "numeroAtomico"}),
+    ("How many protons does {el} have?", {"propriedade": "particulas"}), ("How many electrons does a neutral atom of {el_s} have?", {"propriedade": "particulas"}),
     ("Is {el} denser than water?", {"propriedade": "densidadeKgm3"}), ("What are the oxidation states {el_de}?", {"propriedade": "estadosOxidacao"}),
     ("How heavy is an atom {el_de}?", {"propriedade": "massaAtomica"}),
 ]

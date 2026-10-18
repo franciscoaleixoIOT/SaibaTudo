@@ -276,7 +276,9 @@ class RegrasEFontesTest(unittest.TestCase):
         self.assertIn("NaOH", [b["formula"] for b in r["basesFortes"]])
         for pid, p in r["propriedades"].items():
             base = {"nome", "unidade", "origem", "escopo", "sinonimos", "rotulos", "sinonimosPorIdioma"}
-            self.assertTrue(base <= set(p) <= base | {"origens", "escopos", "unidades", "nota", "notaPorIdioma", "escala"}, pid)
+            self.assertTrue(base <= set(p) <= base | {"origens", "escopos", "unidades", "nota", "notaPorIdioma", "escala", "casasDecimais",
+                                                       "calculado", "calculo"}, pid)
+            self.assertEqual(p["origem"] is None, bool(p.get("calculado")), pid)  # só a propriedade calculada por regra não tem origem
             self.assertEqual("nota" in p, "notaPorIdioma" in p, pid)  # `nota` (pt-BR) e `notaPorIdioma` andam juntas
             if "origens" in p:
                 self.assertIn(p["origem"], p["origens"], pid)
@@ -292,6 +294,39 @@ class RegrasEFontesTest(unittest.TestCase):
         self.assertEqual(set(so_en["rotulos"]), {"pt-BR", "en"})
         self.assertIn("massaMolar", r["propriedades"])
         self.assertTrue(any("Green Book" in f["nome"] for f in r["fontes"]))
+
+    def test_termoquimica_e_particulas_18_10(self):
+        """ΔGf° e S° com id no NLU (mesmo molde de ΔHf°: unidade, 2 casas, nota nos 5 idiomas citando o chembox) e `particulas` calculada por regra."""
+        r = R.montar("2026-10-18")["propriedades"]
+        ids = list(r)
+        self.assertEqual(ids[ids.index("entalpiaFormacaoKJmol"):][:4], ["entalpiaFormacaoKJmol", "energiaGibbsFormacaoKJmol", "entropiaPadraoJmolK", "particulas"])
+        for pid, un in (("entalpiaFormacaoKJmol", "kJ/mol"), ("energiaGibbsFormacaoKJmol", "kJ/mol"), ("entropiaPadraoJmolK", "J/(mol·K)")):
+            p = r[pid]
+            self.assertEqual((p["unidade"], p["escopo"], p["origem"], p["casasDecimais"]), (un, "composto", f"compostos.propriedades.{pid}", 2), pid)
+            self.assertEqual(set(p["notaPorIdioma"]), {"pt-BR", "en", "es", "de", "fr"}, pid)
+            for idioma, nota in p["notaPorIdioma"].items():
+                self.assertIn("chembox", nota.lower(), (pid, idioma))
+                self.assertIn("Wikidata", nota, (pid, idioma))
+        for pid in ("energiaGibbsFormacaoKJmol", "entropiaPadraoJmolK"):
+            for nota in r[pid]["notaPorIdioma"].values():
+                self.assertIn("CC BY-SA 4.0", nota, pid)
+                self.assertIn("2", nota, pid)
+        self.assertIn("energia livre de gibbs de formação", r["energiaGibbsFormacaoKJmol"]["sinonimos"])
+        self.assertIn("standard molar entropy", r["entropiaPadraoJmolK"]["sinonimosPorIdioma"]["en"])
+        p = r["particulas"]
+        self.assertTrue(p["calculado"])
+        self.assertIsNone(p["origem"])  # os clientes ignoram id sem `origem`/`campo` que não conhecem (propriedades.js, Propriedades.kt)
+        self.assertEqual(p["escopo"], "elemento")
+        c = p["calculo"]
+        self.assertEqual((c["protons"], c["eletrons"], c["neutrons"]), ("z", "z - carga", "numeroMassa - z"))
+        self.assertEqual(c["entradas"], ["elementos.z", "elementos.massaAtomica"])
+        self.assertIn("aproxima", c["numeroMassa"])
+        self.assertIn("isótopo", p["nota"])
+        self.assertIn("isotope", p["notaPorIdioma"]["en"])
+        self.assertEqual(p["rotulos"]["de"], "Protonen, Neutronen und Elektronen")
+        # sinônimos sem "elétrons" solto: "elétrons de valência" é configuracaoEletronica
+        for idioma, lst in p["sinonimosPorIdioma"].items():
+            self.assertFalse({"elétrons", "electrons", "electrones", "elektronen", "électrons"} & set(lst), idioma)
 
     def test_fontes_e_licencas(self):
         todas = F.gerar(None, "2026-10-10")

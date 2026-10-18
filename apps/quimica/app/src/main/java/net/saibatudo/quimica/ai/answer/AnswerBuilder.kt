@@ -257,6 +257,8 @@ class AnswerBuilder(
         val linhas = Propriedades.fichaElemento(t, e, dic.propriedades, un, nivel)
         val blocos = mutableListOf<Bloco>(Bloco.Paragrafo(t(R.string.resp_elemento_intro, nomeDe(e), e.simbolo, e.z)))
         linhas.forEach { blocos += Bloco.Campo(it.rotulo, it.valor) }
+        // "o que é Fe2+", "o que é C-14": a ficha do elemento + os elétrons do íon / os nêutrons do isótopo (campos só do cliente, §7)
+        if (q.elemento == e.simbolo) blocos += linhasIonIsotopo(e, q.cargaFormula, q.numeroMassa)
         return Resposta(
             Intent.ELEMENTO, "${nomeDe(e)} (${e.simbolo})", blocos, fontes = e.fontes.ifEmpty { fontesDoPacote() },
             acoes = listOf(acaoFichaElemento(e), acaoTabela()),
@@ -348,7 +350,8 @@ class AnswerBuilder(
         for (id in ids) {
             val def = dic.propriedade(id) ?: continue
             for (alvo in def.escoposEfetivos) {
-                if (alvo == "elemento") for (e in elementos) {
+                // partículas (prótons, nêutrons, elétrons) dependem da carga e do número de massa da pergunta: blocos próprios, abaixo
+                if (alvo == "elemento" && def.id != "particulas") for (e in elementos) {
                     val nome = "${nomeDe(e)} (${e.simbolo})"
                     val rotulo = if (umaEntidade) Texto.capitalizar(def.rotulo) else t(R.string.resp_prop_de, Texto.capitalizar(def.rotulo), nome)
                     val v = Propriedades.formatar(t, def, Propriedades.bruto(def, e), un, nivel)
@@ -390,8 +393,25 @@ class AnswerBuilder(
         blocos += campos
         if (campos.isNotEmpty() && ids.any { it == "estadosOxidacao" || it == "configuracaoEletronica" }) blocos += Bloco.Paragrafo(t(R.string.resp_valor_do_pacote))
         avisos.forEach { blocos += Bloco.Aviso(it) }
+        // partículas do átomo ou do íon (18/10/2026, §7): a carga e o número de massa da pergunta valem para o elemento citado nela
+        var particulasOk = false
+        var especieParticulas: String? = null
+        if ("particulas" in ids) {
+            for (e in elementos.take(3)) {
+                val daPergunta = e.simbolo == q.elemento
+                val p = blocosParticulas(e, if (daPergunta) q.cargaFormula else null, if (daPergunta) q.numeroMassa else null)
+                if (!umaEntidade) blocos += Bloco.Paragrafo("${nomeDe(e)} (${p.especie})")
+                blocos += p.blocos
+                if (p.ok) { particulasOk = true; fontes += e.fontes }
+                if (especieParticulas == null) especieParticulas = "${nomeDe(e)} (${p.especie})"
+            }
+        }
         if (ausentes.isNotEmpty()) {
-            blocos += if (campos.isEmpty() && ausentes.size == 1) Bloco.Paragrafo(t(R.string.resp_prop_sem_valor, t.minusNoMeio(ausentes[0].first.rotulo), ausentes[0].second))
+            val d0 = ausentes[0].first
+            blocos += if (campos.isEmpty() && !particulasOk && ausentes.size == 1 && d0.id in Propriedades.TERMO) {
+                // termoquímica sem valor: diz qual falta (ΔGf° da água), sem estimar
+                Bloco.Paragrafo(t(R.string.resp_prop_falta_termo, t.minusNoMeio(Propriedades.rotuloMedida(d0, t)), Propriedades.TERMO[d0.id], ausentes[0].second))
+            } else if (campos.isEmpty() && !particulasOk && ausentes.size == 1) Bloco.Paragrafo(t(R.string.resp_prop_sem_valor, t.minusNoMeio(ausentes[0].first.rotulo), ausentes[0].second))
             else Bloco.Aviso(t(R.string.resp_prop_nao_tem, ausentes.joinToString("; ") { (d, n) -> t(R.string.resp_prop_de, t.minusNoMeio(d.rotulo), n) }))
         }
         // o que o pacote traz dos compostos sem a medida pedida ("o pacote não traz a densidade do etanol, mas traz…")
@@ -414,13 +434,14 @@ class AnswerBuilder(
         }
         if (campos.isEmpty() && fontes.isEmpty()) fontes += (elementos.flatMap { it.fontes } + compostos.flatMap { it.fontes })
         val titulo = when {
+            ids == listOf("particulas") && umaEntidade && especieParticulas != null -> t(R.string.resp_part_titulo, especieParticulas)
             umaEntidade -> "${nomeTitulo.first()}: ${if (compostos.isNotEmpty() && def0.medida) Propriedades.rotuloMedida(def0, t) else def0.rotulo}"
             else -> t(R.string.resp_prop_propriedades_de, Propriedades.listar(t, nomeTitulo))
         }
         return Resposta(
             Intent.PROPRIEDADE, titulo, blocos,
             fontes = fontes.distinctBy { "${it.nome}|${it.url}|${it.detalhe}" }.ifEmpty { fontesDoPacote() },
-            acoes = acoesFinais, entendida = campos.isNotEmpty()
+            acoes = acoesFinais, entendida = campos.isNotEmpty() || particulasOk
         )
     }
 
@@ -532,7 +553,15 @@ class AnswerBuilder(
                 val num = ms.withIndex().mapNotNull { (i, m) -> (m?.valor as? Number)?.toDouble()?.let { Triple(i, m, it) } }
                 if (id in pedidas && num.size >= 2 && num.map { it.second.campo }.distinct().size == 1) {
                     val topo = num.maxBy { it.third }
-                    if (num.count { it.third == topo.third } == 1) frases += t(R.string.resp_comparar_maior, Texto.capitalizar(def.rotulo), nomeDe(compostos[topo.first]), topo.second.formatado.curto)
+                    val base = num.minBy { it.third }
+                    val unicos = num.count { it.third == topo.third } == 1 && num.count { it.third == base.third } == 1
+                    if (id in Propriedades.TERMO && unicos) {
+                        // ΔHf°/ΔGf°/S° (18/10/2026): o maior e o menor; valor negativo = "mais negativo" (mais estável em relação aos elementos)
+                        frases += t(
+                            if (base.third < 0) R.string.resp_comparar_maior_mais_negativo else R.string.resp_comparar_maior_menor,
+                            Texto.capitalizar(def.rotulo), nomeDe(compostos[topo.first]), topo.second.formatado.curto, nomeDe(compostos[base.first]), base.second.formatado.curto
+                        )
+                    } else if (num.count { it.third == topo.third } == 1) frases += t(R.string.resp_comparar_maior, Texto.capitalizar(def.rotulo), nomeDe(compostos[topo.first]), topo.second.formatado.curto)
                 }
                 // ordem pedida ("ordem crescente de densidade: água, etanol e glicerina"): lista ordenada antes da tabela
                 if (q.ordem != null && id in pedidas && num.size >= 2 && num.map { it.second.campo }.distinct().size == 1) {
@@ -632,7 +661,9 @@ class AnswerBuilder(
 
     // ---- tabela periódica, conceito, não entendi ---------------------------------------------------------------------------------------
 
-    private suspend fun conceito(q: ParsedQuery): Resposta = buscarConceito(q)
+    /** "constante de equilibrio" (Kc/Kp sem equação, 18/10/2026): conceito + pedido da equação + calculadora de Kc e Kp (RespostasParticulas.kt). */
+    private suspend fun conceito(q: ParsedQuery): Resposta =
+        if (q.conceito == LocalNlu.CONCEITO_CONSTANTE_EQUILIBRIO) conceitoConstanteEquilibrio(q) else buscarConceito(q)
 
     private suspend fun naoEntendi(q: ParsedQuery): Resposta = respostaNaoEntendi(q)
 

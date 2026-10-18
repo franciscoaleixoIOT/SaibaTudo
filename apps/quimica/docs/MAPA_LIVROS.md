@@ -146,9 +146,10 @@ feita em 11/10 (PENDENCIAS §10); para exercícios completos seria preciso resol
 - **Calculadoras novas por rendimento** — **feitas em 17/10 (noite), na ordem decidida pelo mantenedor:** entalpia (formação + combustão +
   lei de Hess na tela Calculadoras; ΔHf° do pacote), configuração eletrônica (resposta de PROPRIEDADE enriquecida: notação completa, camadas,
   valência; sem intenção nova), NOX por regra, Kc/Kp (expressão, Δn, Kp = Kc(RT)^Δn, valor com concentrações), tipo de ligação por ΔEN de
-  Pauling. Contrato, fontes e decisões em `docs/CALCULADORAS_2026-10-17.md`. Lacunas que o mapa ainda mostra nesses temas: Kc sem equação na
-  pergunta (hoje DESCONHECIDA/COMPOSTO; candidata a CONCEITO com ação "abrir calculadora"), contagem de prótons/nêutrons/elétrons de um íon
-  ("quantos prótons, nêutrons e elétrons tem o Fe2+?" cai em COMPOSTO), Kps e solubilidade de sais (SOLUBILIDADE 0 %).
+  Pauling. Contrato, fontes e decisões em `docs/CALCULADORAS_2026-10-17.md`. Lacunas que o mapa mostrava nesses temas, **fechadas em 18/10 (madrugada)**: Kc sem
+  equação → CONCEITO "constante de equilíbrio" com ação "Abrir a calculadora de Kc e Kp"; prótons/nêutrons/elétrons de átomo, íon e isótopo →
+  propriedade `particulas` (carga e número de massa lidos da pergunta); ΔGf° e S° com id no NLU e na ficha. Continua em aberto: Kps e
+  solubilidade de sais (SOLUBILIDADE 0 %).
 - **Classes de compostos** no léxico e no CONCEITO (éster, alceno, amida…), já pendente, sobe de prioridade.
 - **Livros abertos (CC BY)** da pendência §(UNILA/USP) continuam sendo a fonte certa de TEXTO para os conceitos que os livros fechados
   mostraram faltar.

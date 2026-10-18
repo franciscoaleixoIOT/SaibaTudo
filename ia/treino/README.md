@@ -107,10 +107,10 @@ baseline_v33_*.json, empacotar.log). Corpus: `ia/corpus/out/v34/` (ver `ia/corpu
   continuação. Sem contexto o modelo se comporta como o v3.3 (golden e holdout acima); foi assim que ele entrou no ar.
 - **Vazamento corrigido depois do gate:** o golden ganhou em 16/10 (f2ce884) o caso fr "Qu'est-ce que la stœchiométrie ?", que já era um exemplo de treino desde o v3.3 (`test_nenhum_caso_de_teste_no_treino` reprovava). O caso do golden foi reescrito para "Explique-moi ce qu'est la stœchiométrie" (o treino não muda; o golden deixa de medir um exemplo visto). Regra: rodar `python -m pytest ia/corpus` depois de mexer no golden de qualquer app.
 
-## v3.5 (previsto; corpus montado em 17/10/2026, NÃO treinado): calculadoras e famílias de superfície
-Corpus: `ia/corpus/out/v35/` (`ia/corpus/README.md`, seção v3.5): 75.041 pares, treino 68.589 (química 69,9 %), NOX/ENTALPIA/EQUILIBRIO/LIGACAO
+## v3.5 (treino iniciado em 18/10/2026, 02h52): calculadoras, famílias de superfície, ΔGf°/S°/partículas
+Corpus: `ia/corpus/out/v35/` (`ia/corpus/README.md`, seção v3.5; montagem final de 18/10 com teto pt 760 e piso por propriedade 25/6): 74.935 pares, treino 68.388 (química 69,8 %), ids novos `energiaGibbsFormacaoKJmol`, `entropiaPadraoJmolK`, `particulas` e Kc sem equação → CONCEITO (contrato de 18/10, `apps/quimica/docs/CALCULADORAS_2026-10-17.md` §7), NOX/ENTALPIA/EQUILIBRIO/LIGACAO
 ~0,9–1,1 mil cada no treino (5 idiomas), `entalpiaFormacaoKJmol`, notação científica, números por extenso, estequiometria sem "quantos",
-nomenclatura por nome sistemático, misturas, ordenação e pistas de configuração eletrônica; 12 holdouts `holdout_v35_*.json` (472 casos). Treino previsto = **continuação do LoRA
+nomenclatura por nome sistemático, misturas, ordenação e pistas de configuração eletrônica; 13 holdouts `holdout_v35_*.json` (536 casos, inclusive `particulas` e os dois lados de `equilibrio`). Treino previsto = **continuação do LoRA
 v3.4**, a mesma receita do v3.4 (lr 1e-4, 1 época, lote 2 × 8), com `max_length` 288 (o maior par do corpus tem 258 tokens; com 256 o fim do
 JSON seria cortado):
 
@@ -122,11 +122,10 @@ O=ia/treino/out/nlu-v35-cont
 "$PY" -I -u ia/treino/treinar_nlu.py --dataset $O/train_cont.json --lora_init ia/treino/out/nlu-v34-cont/final \
   --lr 1e-4 --epochs 1 --batch_size 2 --grad_accum 8 --max_length 288 --out $O
 ```
-Tamanho medido da mistura (17/10): 27.766 "novos" (13.039 pt, ~3,7 mil por idioma estrangeiro) + 14.653 de revisão (10.539 das eleições) =
-42.419 pares, ~4 h 15 min na RTX 5060 (o v3.4 fez 16.065 em 1 h 38 min). Os "novos" são bem mais que os ~7,6 mil das famílias do v3.5 porque o
-pacote local mudou desde o v3.4 (20261017T042452Z → 20261017T200629Z) e os geradores base (dataset pt, multilíngue, populares) sorteiam outros
-nomes: são perguntas dos mesmos moldes, revisão de fato. Com `--revisao 0.4` a mistura vai a 47.304 (14.053 das eleições). Gate depois do
-treino: o mesmo `gate.sh` do v3.4 com `H=ia/corpus/out/v35` e `--extra $H/holdout_v35_<família>.json` para as 12 famílias (meta 90 %), mais os
-holdouts do v3.4. O golden da química vai ganhar casos das calculadoras (CALCULADORAS §4, pelo site): rodar
-`CORPUS_OUT=ia/corpus/out/v35 python -I -m unittest discover -s ia/corpus -p "test_*.py"` de novo antes de treinar (teste de vazamento).
+Mistura real (18/10, `ia/treino/out/nlu-v35-cont/train_cont.resumo.json`): 28.304 "novos" + 15.056 de revisão = 43.360 pares
+(21 rótulos mudados: os moldes "quantos prótons/elétrons tem X" passaram de `numeroAtomico` a `particulas`), 2.710 passos, ~5 s/passo na
+RTX 5060 (estimativa 3 h 50 min; pico 6,1 GiB de VRAM). Roteiro completo em `ia/treino/out/nlu-v35-cont/pipeline.sh` (mistura → treino →
+`exportar_gguf.py --q8` → `gate.sh`, com `tools/benchmark_ia/acordado.ps1` impedindo a suspensão). Gate: `gate.sh` da pasta = o do v3.4 com
+`H=ia/corpus/out/v35` e `--extra` para os 13 `holdout_v35_*.json` + os holdouts do v3.4 (meta 90 % em cada extra). Antes do treino:
+`CORPUS_OUT=ia/corpus/out/v35 python -I -m unittest discover -s ia/corpus -p "test_*.py"` → 43 OK (vazamento golden 984 × treino limpo).
 Eleições: só depois de 27/10.

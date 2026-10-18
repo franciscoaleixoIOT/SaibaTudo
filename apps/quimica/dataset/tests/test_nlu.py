@@ -58,6 +58,35 @@ class TestNluGerado(unittest.TestCase):
             self.assertIn(p, core.PROPRIEDADES, p)
         self.assertIn("entalpiaFormacaoKJmol", gerar_nlu.V.PROP_COMPOSTO)
 
+    def test_contrato_18_10_particulas_termo_kc(self):
+        """18/10/2026 (CALCULADORAS §7): ids no fim de PROPRIEDADES; partículas só com `elemento` (carga e número de massa NÃO vão ao alvo);
+        ΔGf°/S° com composto; Kc/Kp sem equação = CONCEITO sem entidades; "quantos prótons tem X" não é mais numeroAtomico."""
+        core = gerar_nlu.core
+        if core is None:
+            self.skipTest("backend/modal/nlu_core.py indisponível")
+        self.assertEqual(core.PROPRIEDADES[-3:], ["energiaGibbsFormacaoKJmol", "entropiaPadraoJmolK", "particulas"])
+        self.assertIn("particulas", gerar_nlu.V.PROP_ELEMENTO)
+        self.assertTrue({"energiaGibbsFormacaoKJmol", "entropiaPadraoJmolK"} <= set(gerar_nlu.V.PROP_COMPOSTO))
+        vistos = Counter()
+        for q, alvo, _ in self.amostras:
+            p = alvo.get("propriedade")
+            if p == "particulas":
+                vistos[p] += 1
+                self.assertIn("elemento", alvo, q)
+                self.assertNotIn("composto", alvo, q)
+            if p in ("energiaGibbsFormacaoKJmol", "entropiaPadraoJmolK"):
+                vistos[p] += 1
+                self.assertIn("composto", alvo, q)
+            self.assertFalse({"cargaFormula", "numeroMassa", "conceito"} & set(alvo), (q, alvo))
+            if re.search(r"\b(?:Kc|Kp)\b", q) and not re.search(r"⇌|->|→|<=>|<->|\s=\s", q):
+                vistos["kc"] += 1
+                self.assertEqual(alvo["intent"], "CONCEITO", q)
+                self.assertFalse(set(alvo) - {"intent", "nivel"}, (q, alvo))
+            if re.match(r"(?i)quant[oa]s (?:prótons|elétrons) tem", q):
+                self.assertNotEqual(p, "numeroAtomico", q)
+        for k in ("particulas", "energiaGibbsFormacaoKJmol", "entropiaPadraoJmolK", "kc"):
+            self.assertGreater(vistos[k], 10, k)
+
     def test_calculadoras_entidades_do_pacote(self):
         """NOX: o elemento está na fórmula do composto/íon; íons derivados do pacote; EQUILIBRIO sempre com a equação; concentrações na ordem."""
         ions = {b for b, _ in gerar_nlu.ions_do_pacote(self.pac)}

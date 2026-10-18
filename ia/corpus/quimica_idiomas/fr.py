@@ -184,7 +184,7 @@ T["PROPRIEDADE_EL"] = [(t, {}) for t in [
     ("Est-ce que {el} est un métal ou un non-métal ?", {"propriedade": "categoria"}),
     ("Dans quel groupe se trouve {el} ?", {"propriedade": "grupo"}), ("À quelle famille appartient {el} ?", {"propriedade": "grupo"}),
     ("Dans quelle période se trouve {el} ?", {"propriedade": "periodo"}),
-    ("Combien de protons {el} a-t-il ?", {"propriedade": "numeroAtomico"}), ("Combien de protons possède {el} ?", {"propriedade": "numeroAtomico"}),
+    ("Combien de protons {el} a-t-il ?", {"propriedade": "particulas"}), ("Combien de protons possède {el} ?", {"propriedade": "particulas"}),
     ("Si on prend {el}, combien d'électrons a un atome neutre ?", {"propriedade": "numeroAtomico"}),
     ("Combien d'électrons a un atome neutre dans le cas {el_de} ?", {"propriedade": "numeroAtomico"}),
     ("Est-ce que {el} est plus dense que l'eau ?", {"propriedade": "densidadeKgm3"}),

@@ -135,6 +135,9 @@ PROPRIEDADES = [
     "eletronegatividade", "raioAtomicoPm", "afinidadeEletronicaKJmol", "energiaIonizacaoKJmol", "pontoFusaoK", "pontoEbulicaoK",
     "densidadeKgm3", "estadoPadrao", "estadosOxidacao", "descoberta", "formula", "smiles", "cas", "xlogp", "tpsa", "doadoresH",
     "aceptoresH", "ligacoesRotaveis", "carga", "pka", "solubilidade", "entalpiaFormacaoKJmol",
+    # 18/10/2026 (docs/CALCULADORAS_2026-10-17.md §7): ΔGf° e S° do pacote; prótons/nêutrons/elétrons de um átomo ou íon (a carga e o
+    # número de massa da pergunta são campos SÓ do cliente — cargaFormula, numeroMassa —, o modelo não os emite)
+    "energiaGibbsFormacaoKJmol", "entropiaPadraoJmolK", "particulas",
 ]
 # Vazio desde a unificação (10/10/2026, 21h30): cliente, modelo, golden e `regras.propriedades` usam os MESMOS ids — os nomes dos campos do
 # contrato, com unidade (`pontoFusaoK`, `densidadeKgm3`, ...). Espelha PROPRIEDADE_CLIENTE do vocab.js (test_nlu_core.py confere).

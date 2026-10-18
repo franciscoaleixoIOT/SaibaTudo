@@ -79,7 +79,10 @@
     "hess": "\\b(?:ley de hess|hess)\\b",
     "kcKp": "\\b(?:kp|presiones parciales)\\b",
     "concentracaoColchete": "=|:|es|vale|igual a|de",
-    "ligacaoPolaridade": "\\b(?:ionic[oa]s?|covalentes?|polar(?:es)?|apolar(?:es)?|metalic[oa]s?)\\b"
+    "ligacaoPolaridade": "\\b(?:ionic[oa]s?|covalentes?|polar(?:es)?|apolar(?:es)?|metalic[oa]s?)\\b",
+    "deFormacao": "\\bde formacion\\b",
+    "constanteEquilibrio": "\\b(?:kc|kp|constantes? de equilibrio|expresion (?:de|del|de la) (?:kc|kp|constante))\\b",
+    "ionRomano": "\\b(?:ion(?:es)?|cation(?:es)?) (?:de |del )?([a-z]+) (i{1,3}|iv|vi{0,2}|v)\\b"
   },
   "nivel": {
     "fundamental": "\\b(?:primaria|escuela primaria|secundaria basica|nino|ninos|simple|muy simple|facil de entender|para principiantes)\\b",
@@ -617,6 +620,38 @@
       "entalpia estandar de formacion",
       "entalpia de formacion",
       "calor de formacion"
+    ],
+    "energiaGibbsFormacaoKJmol": [
+      "energia libre de gibbs estandar de formacion",
+      "energia libre de gibbs de formacion",
+      "energia de gibbs de formacion",
+      "energia libre estandar de formacion",
+      "energia libre de formacion",
+      "delta g de formacion"
+    ],
+    "entropiaPadraoJmolK": [
+      "entropia molar estandar",
+      "entropia estandar molar",
+      "entropia estandar",
+      "entropia absoluta",
+      "entropia molar",
+      "entropia del",
+      "entropia de la",
+      "entropia de"
+    ],
+    "particulas": [
+      "particulas subatomicas",
+      "numero de protones",
+      "numero de neutrones",
+      "numero de electrones",
+      "numero de masa",
+      "numero masico",
+      "protones",
+      "proton",
+      "neutrones",
+      "neutron",
+      "electrones",
+      "electron"
     ]
   },
   "rotulosPropriedadeNormalizados": true,

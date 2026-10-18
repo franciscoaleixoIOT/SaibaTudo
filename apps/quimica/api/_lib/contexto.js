@@ -39,6 +39,13 @@ export const ENTIDADES_POR_INTENCAO = Object.freeze({
   DESCONHECIDA: [],
 });
 
+/**
+ * Campos SÓ DO CLIENTE (docs/DATA_CONTRACT.md §9; CALCULADORAS_2026-10-17.md §1 e §7): os clientes os extraem da pergunta pelas regras locais e
+ * os mesclam na interpretação da nuvem (web/src/quimica/js/nuvem.js `mesclarCamposDoCliente`, Android `NluValidator.validar`). O modelo nunca
+ * os emite nem os recebe: num `contexto` eles são chave fora do contrato (400), como qualquer outra.
+ */
+export const CAMPOS_SO_DO_CLIENTE = Object.freeze(['cargaFormula', 'numeroMassa', 'concentracoes', 'unidadesDestino', 'conceito']);
+
 /** Tamanho máximo da forma canônica (igual a nlu_core.MAX_CONTEXTO_CHARS; test_nlu_core.py confere). */
 export const MAX_CONTEXTO = 400;
 /** Ordem das chaves = nlu_core.KEYS (e ORDEM_CAMPOS de normalize.js). */

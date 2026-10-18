@@ -397,7 +397,9 @@ function calcEquilibrio({ ctx, store, query, mostrar }) {
   const Q = (k) => C(`equilibrio.${k}`);
   const eq = campo({ rotulo: Q('equacao'), valor: query.get('eq') ?? '', placeholder: Q('placeholder'), ajuda: Q('ajuda') });
   const conc = campo({ rotulo: Q('concentracoes'), placeholder: Q('placeholderConc'), ajuda: Q('ajudaConc') });
-  const temp = valorUnidade({ rotulo: Q('temperatura'), unidades: unidadesDe(ctx, 'temperatura', ['K', '°C']), padrao: 'K' });
+  // ?t=500&ut=K: temperatura vinda da resposta do assistente ("qual o Kp a 500 K", CONCEITO constante de equilíbrio)
+  const unidadesT = unidadesDe(ctx, 'temperatura', ['K', '°C']);
+  const temp = valorUnidade({ rotulo: Q('temperatura'), unidades: unidadesT, padrao: unidadesT.includes(query.get('ut')) ? query.get('ut') : 'K', valor: query.get('t') ?? '' });
   const executar = async () => {
     const concentracoes = lerConcentracoes(conc.valor(), ctx.unidades, lexico()).map(({ especie, valor }) => ({ especie, valor }));
     const temperatura = temp.vazio() ? null : temp.dado();

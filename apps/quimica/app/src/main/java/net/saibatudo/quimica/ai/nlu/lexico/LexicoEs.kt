@@ -106,7 +106,10 @@ internal object LexicoEs {
         "hess" to "\\b(?:ley de hess|hess)\\b",
         "kcKp" to "\\b(?:kp|presiones parciales)\\b",
         "concentracaoColchete" to "=|:|es|vale|igual a|de",
-        "ligacaoPolaridade" to "\\b(?:ionic[oa]s?|covalentes?|polar(?:es)?|apolar(?:es)?|metalic[oa]s?)\\b"
+        "ligacaoPolaridade" to "\\b(?:ionic[oa]s?|covalentes?|polar(?:es)?|apolar(?:es)?|metalic[oa]s?)\\b",
+        "deFormacao" to "\\bde formacion\\b",
+        "constanteEquilibrio" to "\\b(?:kc|kp|constantes? de equilibrio|expresion (?:de|del|de la) (?:kc|kp|constante))\\b",
+        "ionRomano" to "\\b(?:ion(?:es)?|cation(?:es)?) (?:de |del )?([a-z]+) (i{1,3}|iv|vi{0,2}|v)\\b"
     )
 
     private fun n_nivel(): Map<String, Any?> = linkedMapOf<String, Any?>(
@@ -842,6 +845,41 @@ internal object LexicoEs {
         "calor de formacion"
     )
 
+    private fun n_propriedades_energiaGibbsFormacaoKJmol(): List<Any?> = listOf<Any?>(
+        "energia libre de gibbs estandar de formacion",
+        "energia libre de gibbs de formacion",
+        "energia de gibbs de formacion",
+        "energia libre estandar de formacion",
+        "energia libre de formacion",
+        "delta g de formacion"
+    )
+
+    private fun n_propriedades_entropiaPadraoJmolK(): List<Any?> = listOf<Any?>(
+        "entropia molar estandar",
+        "entropia estandar molar",
+        "entropia estandar",
+        "entropia absoluta",
+        "entropia molar",
+        "entropia del",
+        "entropia de la",
+        "entropia de"
+    )
+
+    private fun n_propriedades_particulas(): List<Any?> = listOf<Any?>(
+        "particulas subatomicas",
+        "numero de protones",
+        "numero de neutrones",
+        "numero de electrones",
+        "numero de masa",
+        "numero masico",
+        "protones",
+        "proton",
+        "neutrones",
+        "neutron",
+        "electrones",
+        "electron"
+    )
+
     private fun n_propriedades(): Map<String, Any?> = linkedMapOf<String, Any?>(
         "numeroAtomico" to n_propriedades_numeroAtomico(),
         "massaAtomica" to n_propriedades_massaAtomica(),
@@ -877,7 +915,10 @@ internal object LexicoEs {
         "tpsa" to n_propriedades_tpsa(),
         "solubilidade" to n_propriedades_solubilidade(),
         "pka" to n_propriedades_pka(),
-        "entalpiaFormacaoKJmol" to n_propriedades_entalpiaFormacaoKJmol()
+        "entalpiaFormacaoKJmol" to n_propriedades_entalpiaFormacaoKJmol(),
+        "energiaGibbsFormacaoKJmol" to n_propriedades_energiaGibbsFormacaoKJmol(),
+        "entropiaPadraoJmolK" to n_propriedades_entropiaPadraoJmolK(),
+        "particulas" to n_propriedades_particulas()
     )
 
     private fun n_stopwordsBusca(): List<Any?> = listOf<Any?>(

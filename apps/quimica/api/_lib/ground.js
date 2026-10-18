@@ -69,11 +69,14 @@ function contemFrase(texto, frase, { fim = false } = {}) {
 const SIMBOLOS_AMBIGUOS = new Set(['As', 'No', 'Os', 'Se', 'Na', 'In', 'Be', 'La', 'Ho', 'Pa', 'Ne', 'Re', 'He', 'Er', 'Ar', 'Cu', 'Si', 'Ir', 'Ta', 'Po', 'Fr', 'Mo', 'Ni']);
 const RX_CUE_SIMBOLO = /(?:^|\s)(?:elemento|simbolo(?: quimico)?)\s+(?:(?:do|de|e)\s+)?$/;
 
-/** Evidência do SÍMBOLO: token isolado com a caixa exata (Fe, Na+, Fe3+), ou em minúsculas logo depois de "elemento"/"símbolo". */
+/**
+ * Evidência do SÍMBOLO: token isolado com a caixa exata (Fe, Na+, Fe3+ e, desde 18/10/2026, o número de massa "Fe-56"), ou em minúsculas logo
+ * depois de "elemento"/"símbolo".
+ */
 function simboloNoTexto(simbolo, raw) {
   const s = simplificar(raw);
   const toks = [...s.matchAll(/[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ0-9]*(?:[+-]\d*)?/g)].map((m) => ({ t: m[0], i: m.index }));
-  const rx = new RegExp('^' + simbolo + '(?:\\d?[+-]\\d?)?$');
+  const rx = new RegExp('^' + simbolo + '(?:\\d?[+-]\\d?|-\\d{1,3})?$');
   for (let n = 0; n < toks.length; n++) {
     const { t, i } = toks[n];
     if (rx.test(t)) {

@@ -235,16 +235,35 @@ PubChem voltam com `cid=`), +11 compostos e 2 apelidos; 7 lacunas das regras do 
   `dataset/gerar_nlu.py`): 75.041 pares (treino 68.589; química 69,9 %), holdouts `holdout_v35_*` 472 casos, 36 testes verdes, vazamento
   golden × treino limpo. **Não treinado.** Decisões a confirmar antes do treino: tetos de 850 (pt) e 180 (estrangeiros) por intenção para
   caber abaixo de 70 % (cortam PROPRIEDADE, CONCEITO, SEGURANCA…); família `configuracao` extra; comando em `ia/treino/README.md` (~4 h).
-- [ ] **Treinar e passar no gate o NLU v3.5** (continuação do LoRA v3.4; `max_length 288`), depois `modal deploy` do `nlu_app.py` — o
-  serviço Modal ainda roda o `nlu_core.py` ANTERIOR (sem as 4 intenções): só vale redeployar junto com o modelo treinado nelas.
+- [ ] **Treinar e passar no gate o NLU v3.5** — **treino iniciado em 18/10/2026 às 02h52** (`ia/treino/out/nlu-v35-cont/pipeline.sh`:
+  mistura 43.360 pares → continuação do LoRA v3.4, `max_length 288`, 2.710 passos, ~3 h 50 → `exportar_gguf.py --q8` → `gate.sh` com os 13 holdouts
+  do v3.5 + os do v3.4). Cortes do corpus confirmados em 18/10: teto pt 760 por intenção (era 850) com **piso de 25 exemplos por id de propriedade**
+  (6 por idioma estrangeiro; `--piso-propriedade-*` em `montar_corpus.py`) — só pelo hash, `ligacoesRotaveis`/`doadoresH`/`carga` ficavam com 5–10;
+  química 69,8 % do treino (`ia/corpus/README.md`). Depois do gate: `empacotar_versao.py`, `modal volume put` ×3, `promover.py`, `SNAPSHOT_EPOCH` +
+  `modal deploy` do `nlu_app.py` (o serviço ainda roda o `nlu_core.py` ANTERIOR, sem as 4 intenções nem os 3 ids novos), `MODEL_VERSION` na Vercel.
 - [x] **Calculadoras novas** (17/10, noite, ordem do mantenedor: entalpia, configuração eletrônica, NOX, Kc/Kp, tipo de ligação) —
   contrato, fontes e decisões em `docs/CALCULADORAS_2026-10-17.md`; intenções NOX/ENTALPIA/EQUILIBRIO/LIGACAO em todos os espelhos;
   site (calc/, nlu.js, answers.js, tela Calculadoras, catálogos 5 idiomas; 217 testes, E2E Chrome), golden 873 → 929; Android portado em paridade (domain/calc/{Entalpia,Eletronica,Nox,Equilibrio,Ligacao}.kt, RespostasCalculadoras.kt, LocalNlu 2b/5b, 5 cartões em Calculadoras.kt, 196 strings × 5 idiomas; 242 testes, golden 929, lint sem aviso novo; tela ainda não testada no aparelho).
   Reavaliação do mapa (`MAPA_LIVROS.md` §3): 61 perguntas derivadas passaram a ENTALPIA/LIGACAO/NOX; EQUILIBRIO segue 1/45 porque a
   pergunta derivada perde a equação (exigida pelo contrato).
-- [ ] Lacunas que o mapa ainda mostra nos temas novos: Kc/constante de equilíbrio sem equação (→ CONCEITO com ação "abrir calculadora"),
-  prótons/nêutrons/elétrons de íon ("Fe2+" cai em COMPOSTO), Kps/solubilidade de sais; `energiaGibbsFormacaoKJmol` e `entropiaPadraoJmolK`
-  ainda sem id no NLU nem na ficha do composto (só no pacote); `MEDIDAS_COMPOSTO` da ficha do site sem a entalpia de formação.
+- [x] Lacunas que o mapa mostrava nos temas novos — resolvidas em 18/10 (abaixo), exceto Kps/solubilidade de sais: Kc sem equação (→ CONCEITO com
+  ação), prótons/nêutrons/elétrons de íon ("Fe2+" caía em COMPOSTO), `energiaGibbsFormacaoKJmol`/`entropiaPadraoJmolK` sem id nem ficha,
+  `MEDIDAS_COMPOSTO` sem a entalpia de formação.
+  - [x] **18/10/2026, camada "contrato do NLU"** (`CALCULADORAS_2026-10-17.md` §7): ids `energiaGibbsFormacaoKJmol`, `entropiaPadraoJmolK` e
+    `particulas` no fim do vocabulário (nlu_core, api/vocab, propriedades.js, Propriedades.kt, dataset); íon de um elemento → `elemento` +
+    `cargaFormula` e número de massa → `numeroMassa` (campos só do cliente, mesclados na interpretação da nuvem); ΔGf/ΔG°f/ΔG de formação;
+    Kc/Kp sem equação → CONCEITO "constante de equilibrio"; léxico 5 idiomas, golden 929 → 984, site e Android em paridade, dataset regerado.
+  - [x] **Camada de respostas (18/10, madrugada; site e Android em paridade):** `particulas` (prótons = Z; elétrons = Z − carga; nêutrons =
+    A − Z com A da pergunta — "C-14", "⁵⁶Fe" — ou, na falta, a massa atômica arredondada ROTULADA como aproximação, "depende do isótopo"); íon
+    nomeado (cátion Fe²⁺/ânion Cl⁻) com a conta; ELEMENTO com `cargaFormula`/`numeroMassa` ganha a linha do íon/isótopo; ΔGf°/S° na ficha
+    (`MEDIDAS_COMPOSTO` += ΔHf°, ΔGf°, S°, com fonte por valor, "estado padrão a 298,15 K" e fase do `estadoPadrao` quando a fonte não marca) e
+    em PROPRIEDADE/COMPARAR ("mais negativo"); sem valor → "falta ΔGf° de X; o app não estima"; CONCEITO "constante de equilibrio" com parágrafo
+    por regra (Kc, Kp = Kc(RT)^Δn), pedido da equação e ação "Abrir a calculadora de Kc e Kp" (`/quimica/calculadoras/equilibrio?t=500&ut=K`
+    pré-preenche a temperatura); fonte repetida no mesmo bloco removida (bug da ligação, só no site). Site 229 testes (226 + 3 pulados antigos);
+    Android 255 testes, lint 0 erros; `web/tools/screenshots.mjs` com cenários de partículas e ΔGf°. Textos en/es/de/fr novos sem revisão nativa.
+    **Fica:** "compare o ΔGf do metano e do CO2" cai em PROPRIEDADE (a regra do Δ vem antes de COMPARAR; o site responde maior/mais negativo
+    mesmo assim; com as formas por extenso já é COMPARAR); Kps/solubilidade de sais; texto da Wikipédia pt sobre constante de equilíbrio chega
+    com TeX cru (`{\displaystyle…}`) e é filtrado — vale limpar no pipeline.
 - [ ] **Classes de compostos** (éster, alceno, amida, álcoois…) no léxico/CONCEITO — item de 6.b, sobe de prioridade (citadas 20+ vezes).
 - [ ] OCR dos 3 livros só imagem (Levine, Martha Reis FQ, McQuarrie) se o mapa precisar de físico-química de nível superior em pt.
 - [ ] Conferência de respostas × gabaritos ficou inconclusiva por desenho (pergunta derivada é 1 passo; alternativa tem valores
@@ -255,4 +274,4 @@ PubChem voltam com `cid=`), +11 compostos e 2 apelidos; 7 lacunas das regras do 
 2. Origem da chave `apikey-sabetudo.txt`.
 3. Permissão da OpenStax (opcional; em 17/10 a termoquímica foi resolvida sem ela, pelo chembox da Wikipédia en — o CLAUDE.md da química passou a dizer "OpenStax e LibreTexts só como link").
 4. ~~Tokens do Modal~~ (par de Proxy Auth criado pelo mantenedor em 13/10, em `secrets/modal_proxy_quimica.env` da raiz e na Vercel); conta do Hugging Face para o explicador; **teto de gasto no Modal** (ainda não definido).
-5. ~~Chave de upload~~ (criada em 14/10, fazer backup) e conta da Play para o Android (criar o app, subir o AAB, teste interno → fechado).
+5. ~~Chave de upload~~ (criada em 14/10, fazer backup) e conta da Play para o Android (criar o app, subir o AAB, teste interno → fechado). **AAB 1.0.3 (versionCode 4) gerado em 18/10** (`docs/RELEASE_1.0.3.md`, notas em `store/play/release-notes-1.0.3.json`); testar num aparelho antes de enviar (nenhum conectado em 18/10 de madrugada).

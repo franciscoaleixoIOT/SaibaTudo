@@ -88,8 +88,8 @@ T["PROPRIEDADE_EL"] = [(t, {}) for t in [
     ("Qual o nox {el_de}?", {"propriedade": "estadosOxidacao"}), ("A que temperatura {el} derrete?", {"propriedade": "pontoFusaoK"}),
     ("A que temperatura {el} ferve?", {"propriedade": "pontoEbulicaoK"}), ("{el} é um metal?", {"propriedade": "categoria"}),
     ("Que tipo de elemento é {el}?", {"propriedade": "categoria"}), ("Em que grupo está {el}?", {"propriedade": "grupo"}),
-    ("Em que período está {el}?", {"propriedade": "periodo"}), ("Quantos prótons tem {el}?", {"propriedade": "numeroAtomico"}),
-    ("Quantos elétrons tem {el}?", {"propriedade": "numeroAtomico"}), ("{el} é mais denso que a água?", {"propriedade": "densidadeKgm3"}),
+    ("Em que período está {el}?", {"propriedade": "periodo"}), ("Quantos prótons tem {el}?", {"propriedade": "particulas"}),
+    ("Quantos elétrons tem {el}?", {"propriedade": "particulas"}), ("{el} é mais denso que a água?", {"propriedade": "densidadeKgm3"}),
 ]
 T["PROPRIEDADE_CO"] = [(t, {}) for t in [
     "Qual é {prop_art} {co_de}?", "{Prop} {co_de}", "{Prop} {co_de}?", "Me diga {prop_art} {co_de}", "Quero saber {prop_art} {co_de}", "Pode me dizer {prop_art} {co_de}?",
@@ -251,6 +251,70 @@ T["LIGACAO"] = [(t, {}) for t in [
     "{Co} é iônico ou covalente?", "Que tipo de ligação química existe {co_em}?", "As ligações {co_em} são covalentes polares?", "Classifique a ligação {co_de}",
     "Qual a polaridade da ligação {co_em}?", "Que ligação une os átomos {co_em}?",
 ]]
+# 18/10/2026 (docs/CALCULADORAS_2026-10-17.md §7): partículas de um átomo/íon, ΔGf° e S°, Kc/Kp sem equação. Placeholders novos (só estes
+# moldes): {elion} = símbolo de um elemento com a carga usual do grupo ("Fe2+", "Fe²⁺", "Fe+2", "Cl-", "Cl⁻"); {eliso} = elemento com número de
+# massa ("Fe-56", "⁵⁶Fe", "ferro-56"; A = massa atômica arredondada do pacote). O modelo só rotula `elemento` + `propriedade`: a carga e o
+# número de massa são campos só do cliente (cargaFormula, numeroMassa). Kc/Kp sem equação é CONCEITO sem entidades (números no texto não viram
+# quantidades: CONCEITO não as admite).
+T["PARTICULAS"] = [(t, {"propriedade": "particulas"}) for t in [
+    "Quantos prótons, nêutrons e elétrons tem {el}?", "Quantos nêutrons tem {el}?", "Quantos elétrons tem um átomo {el_de}?",
+    "Quantos prótons há no núcleo {el_de}?", "Número de prótons {el_de}", "Número de elétrons {el_de}", "Número de nêutrons {el_de}",
+    "Qual o número de massa {el_de}?", "Partículas subatômicas {el_de}", "Quantas partículas subatômicas tem um átomo {el_de}?",
+    "Quantos elétrons tem o íon {elion}?", "Quantos prótons e elétrons tem o {elion}?", "Quantos elétrons há no {elion}?",
+    "Prótons, nêutrons e elétrons do íon {elion}", "Número de elétrons do {elion}", "Quantas partículas subatômicas tem o íon {elion}?",
+    "Quantos nêutrons tem o {eliso}?", "Quantos prótons e nêutrons tem o {eliso}?", "Número de nêutrons do isótopo {eliso}",
+    "Prótons, nêutrons e elétrons do {eliso}",
+]]
+T["ION_ELEMENTO"] = [(t, {}) for t in [
+    "O que é o íon {elion}?", "Fale sobre o íon {elion}", "Informações sobre o {elion}", "{elion}", "Me fale do íon {elion}",
+]]
+T["TERMO"] = [(t, {"propriedade": "energiaGibbsFormacaoKJmol"}) for t in [
+    "ΔGf {co_de}", "Qual o ΔGf° {co_de}?", "ΔG°f {co_de}", "Qual o ΔG de formação {co_de}?", "Energia livre de Gibbs de formação {co_de}",
+    "Qual a energia livre padrão de formação {co_de}?", "Entalpia livre de formação {co_de}", "Qual a energia de Gibbs de formação {co_de}?",
+]] + [(t, {"propriedade": "entropiaPadraoJmolK"}) for t in [
+    "Qual a entropia padrão {co_de}?", "Entropia molar padrão {co_de}", "Qual a entropia {co_de}?", "Entropia absoluta {co_de}",
+    "Quanto vale a entropia padrão {co_de}?", "Qual o valor da entropia molar {co_de}?",
+]]
+T["TERMO_COMPARAR"] = [(t, {"propriedade": "entropiaPadraoJmolK"}) for t in [
+    "Qual tem maior entropia padrão: {co_s} ou {co2_s}?", "Quem tem menor entropia molar, {co_s} ou {co2_s}?", "Compare a entropia padrão {co_de} e {co2_de}",
+]] + [(t, {"propriedade": "energiaGibbsFormacaoKJmol"}) for t in [
+    "Qual tem menor energia livre de formação, {co_s} ou {co2_s}?", "Compare o ΔGf {co_de} e {co2_de}",
+    "Qual tem maior energia livre de Gibbs de formação: {co_s} ou {co2_s}?",
+]]
+T["KC_CONCEITO"] = [(t, {}) for t in [
+    "Como se calcula o Kc?", "O que é a constante Kc?", "O que significa Kp?", "Qual a diferença entre Kc e Kp?", "Como calcular o Kp de uma reação?",
+    "Qual a fórmula do Kc?", "Como achar a constante de equilíbrio?", "O que é Kp em química?", "Calcule o Kp", "Explique a constante de equilíbrio Kc",
+    "Qual o Kc a 298 K?", "Qual o valor de Kp a 1000 K?", "Como calcular Kc e Kp?", "Me ensina a calcular o Kc", "Kc e Kp: o que são?",
+    "Qual a expressão do Kp?", "Calcular a constante de equilíbrio", "Como se acha o Kp?", "Para que serve o Kc?", "Qual a unidade do Kc?",
+]]
+COTA_18_10 = {"PARTICULAS": ("PROPRIEDADE", 450), "ION_ELEMENTO": ("ELEMENTO", 120), "TERMO": ("PROPRIEDADE", 300),
+              "TERMO_COMPARAR": ("COMPARAR", 150), "KC_CONCEITO": ("CONCEITO", 40)}
+_SOBRESCRITO = str.maketrans("0123456789+-", "⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻")
+
+
+def carga_usual(e):
+    """Carga do íon mais comum pelo grupo (1 → +1, 2 → +2, 13 → +3, 15 → -3, 16 → -2, 17 → -1; metal de transição: +2/+3); None sem regra."""
+    g = e.get("grupo")
+    if e.get("categoria") == "gas_nobre" or e.get("simbolo") == "H":
+        return None
+    return {1: (1,), 2: (2,), 13: (3,), 15: (-3,), 16: (-2,), 17: (-1,)}.get(g) or ((2, 3) if e.get("categoria") == "metal_transicao" else None)
+
+
+def superficie_carga(simbolo, carga, rng):
+    """Fe2+ / Fe²⁺ / Fe+2 / Fe 2+ (carga ±1: Na+ / Na⁺)."""
+    sinal = "+" if carga > 0 else "-"
+    n = abs(carga)
+    corpo = sinal if n == 1 else f"{n}{sinal}"
+    forma = rng.choices(["junto", "sobrescrito", "invertido", "espaco"], weights=[55, 20, 15, 10])[0]
+    if forma == "sobrescrito":
+        return simbolo + corpo.translate(_SOBRESCRITO)
+    if forma == "invertido" and n > 1:
+        return f"{simbolo}{sinal}{n}"
+    if forma == "espaco" and n > 1:
+        return f"{simbolo} {corpo}"
+    return simbolo + corpo
+
+
 T["_HARD_NEG_INTENT"] = {
     "Quais os perigos da nitroglicerina?": "SEGURANCA", "Qual a massa molar do TNT?": "MASSA_MOLAR", "Primeiros socorros em intoxicação por cianeto": "SEGURANCA",
     "O que é o gás mostarda?": "CONCEITO",
@@ -275,7 +339,7 @@ FRACAO_VARIANTES_POR_MIL = 100  # 10 % dos exemplos ganham uma variante de lingu
 CODIGOS_H = sorted(ghs_pt.FRASES_H)
 NUMERICAS = {"massaAtomica", "numeroAtomico", "eletronegatividade", "raioAtomicoPm", "afinidadeEletronicaKJmol", "energiaIonizacaoKJmol", "pontoFusaoK",
              "pontoEbulicaoK", "densidadeKgm3", "massaMolar", "massaExata", "xlogp", "tpsa", "doadoresH", "aceptoresH", "ligacoesRotaveis",
-             "entalpiaFormacaoKJmol"}
+             "entalpiaFormacaoKJmol", "energiaGibbsFormacaoKJmol", "entropiaPadraoJmolK"}
 
 
 # ---------------------------------------------------------------------------------------------------------
@@ -519,7 +583,7 @@ class Gerador:
         if "propriedade" in estaticos:
             lab["propriedade"] = estaticos["propriedade"]
         for n in nomes:
-            if n in valores or n in ("elf", "elf_de"):  # elf: depois do composto (o elemento sai da fórmula dele)
+            if n in valores or n in ("elf", "elf_de", "elion", "eliso"):  # elf: depois do composto; elion/eliso: depois do laço
                 continue
             if n.startswith(("el", "El")):
                 if e1 is None:
@@ -687,6 +751,18 @@ class Gerador:
             valores["elf"] = b
             valores["elf_de"] = f"{self._art(g, 'de')} {b}" if b != sim else f"do {b}"
             lab["elemento"] = sim
+        if {"elion", "eliso"} & uso:  # 18/10/2026: íon de um elemento ou isótopo (o rótulo é só o elemento)
+            if "elion" in uso:
+                pool = [x for x in self.elementos if carga_usual(x) and x["z"] <= 56]
+                e1 = rng.choice(pool)
+                valores["elion"] = superficie_carga(e1["simbolo"], rng.choice(carga_usual(e1)), rng)
+            else:
+                e1 = rng.choice([x for x in self.elementos if x.get("massaAtomica") and x["z"] <= 92])
+                a = int(round(e1["massaAtomica"]))
+                b, _ = self._bare_el(e1)
+                valores["eliso"] = rng.choices([f"{e1['simbolo']}-{a}", str(a).translate(_SOBRESCRITO) + e1["simbolo"], f"{b}-{a}"], weights=[45, 20, 35])[0]
+            lab["elemento"] = e1["simbolo"]
+            permitir_acento = False
         # rótulos
         if intent == "COMPARAR":
             lab.pop("composto", None) if e1 is not None and c1 is None else None
@@ -943,6 +1019,24 @@ def gerar(pac, seed, scale):
             if guardar(q, alvo, chave):
                 feitos += 1
         g.calculadoras[intent] = feitos
+    # 18/10/2026 (CALCULADORAS §7): partículas/íons, ΔGf°/S° e Kc sem equação, também depois e com sorteio próprio (seed + 36)
+    g18 = Gerador(pac, random.Random(seed + 36))
+    g.contrato_18_10 = {}
+    for familia, (intent, cota) in COTA_18_10.items():
+        meta = int(cota * scale)
+        feitos = tent = 0
+        while feitos < meta and tent < meta * 60:
+            tent += 1
+            t, est = g18.rng.choice(T[familia])
+            r = g18.amostra(intent, t, dict(est))
+            if r is None:
+                continue
+            q, alvo, chave = r
+            if core is not None and not core.combinacao_valida(alvo):
+                continue
+            if guardar(q, alvo, chave):
+                feitos += 1
+        g.contrato_18_10[familia] = feitos
     return list(amostras.values()), g
 
 
@@ -1050,7 +1144,7 @@ def main(argv=None):
         "por_intencao_train": dict(sorted(por_i_train.items())), "por_intencao_val": dict(sorted(por_i_val.items())),
         "elementos_no_pool": len(g.elementos), "compostos_no_pool": len(g.compostos), "formulas_livres": len(g.formulas_livres),
         "templates": sum(len(v) for k, v in T.items() if isinstance(v, list)) + len(V.MODELOS_CONCEITO), "sft_gerado": bool(sft),
-        "variantes_de_linguagem": getattr(g, "variantes", {}), "calculadoras": getattr(g, "calculadoras", {}),
+        "variantes_de_linguagem": getattr(g, "variantes", {}), "calculadoras": getattr(g, "calculadoras", {}), "contrato_18_10": getattr(g, "contrato_18_10", {}),
         **descartes,
     }
     (out / "stats.json").write_text(json.dumps(stats, ensure_ascii=False, indent=1), encoding="utf-8", newline="\n")

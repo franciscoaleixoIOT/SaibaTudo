@@ -3,7 +3,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createNluHandler, createNluState } from '../_lib/nlu-handler.js';
-import { contextoCanonico, formatarNumero, MAX_CONTEXTO, validarContexto } from '../_lib/contexto.js';
+import { CAMPOS_SO_DO_CLIENTE, CHAVES_CONTEXTO, contextoCanonico, formatarNumero, MAX_CONTEXTO, validarContexto } from '../_lib/contexto.js';
 import { normalizeModelOutput } from '../_lib/normalize.js';
 import { ENV_BASE, bodyNlu, capturarLog, mkRequest, relogio, respostaModal } from './_helpers.mjs';
 
@@ -56,6 +56,17 @@ test('contexto inválido: objeto plano, intenção e chaves do contrato, vocabul
   for (const r of ruins) assert.equal(validarContexto(r).ok, false, JSON.stringify(r));
   // o último passa de 400 caracteres só na forma canônica
   assert.ok(contextoCanonico(ruins.at(-1)).length > MAX_CONTEXTO);
+});
+
+test('campos só do cliente (cargaFormula, numeroMassa, conceito...) não entram no contexto; as propriedades de 18/10/2026 sim', () => {
+  for (const k of CAMPOS_SO_DO_CLIENTE) assert.ok(!CHAVES_CONTEXTO.includes(k), k);
+  assert.equal(validarContexto({ intent: 'PROPRIEDADE', elemento: 'Fe', propriedade: 'particulas', cargaFormula: 2 }).ok, false);
+  assert.equal(validarContexto({ intent: 'PROPRIEDADE', elemento: 'C', propriedade: 'particulas', numeroMassa: 14 }).ok, false);
+  assert.equal(validarContexto({ intent: 'CONCEITO', conceito: 'constante de equilibrio' }).ok, false);
+  for (const propriedade of ['particulas', 'energiaGibbsFormacaoKJmol', 'entropiaPadraoJmolK']) {
+    const alvo = propriedade === 'particulas' ? { elemento: 'Fe' } : { composto: 'água' };
+    assert.equal(validarContexto({ intent: 'PROPRIEDADE', ...alvo, propriedade }).ok, true, propriedade);
+  }
 });
 
 test('contexto válido: vai ao Modal (saneado), muda a chave do cache e a resposta traz contexto:true', async () => {

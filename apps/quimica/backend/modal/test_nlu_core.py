@@ -181,7 +181,14 @@ class TestGramatica(unittest.TestCase):
                 {"intent": "LIGACAO"}, {"intent": "LIGACAO", "composto": "NaCl"}, {"intent": "LIGACAO", "elemento": "H"},
                 {"intent": "LIGACAO", "elemento": "C", "composto": "CO2"},
                 {"intent": "PROPRIEDADE", "composto": "água", "propriedade": "entalpiaFormacaoKJmol"},
-                {"intent": "COMPARAR", "composto": "metano", "propriedade": "entalpiaFormacaoKJmol"}]
+                {"intent": "COMPARAR", "composto": "metano", "propriedade": "entalpiaFormacaoKJmol"},
+                # 18/10/2026 (CALCULADORAS §7): ΔGf°, S° e partículas; Kc sem equação = CONCEITO sem entidades
+                {"intent": "PROPRIEDADE", "composto": "água", "propriedade": "energiaGibbsFormacaoKJmol"},
+                {"intent": "PROPRIEDADE", "composto": "metano", "propriedade": "entropiaPadraoJmolK"},
+                {"intent": "COMPARAR", "composto": "água", "propriedade": "entropiaPadraoJmolK"},
+                {"intent": "PROPRIEDADE", "elemento": "Fe", "propriedade": "particulas"},
+                {"intent": "COMPARAR", "elemento": "Na", "propriedade": "particulas"},
+                {"intent": "CONCEITO"}]
         for r in bons:
             self.assertTrue(core.combinacao_valida(r), r)
             self.assertIsNotNone(self.rx.match(core.format_output(r)), r)
@@ -213,6 +220,10 @@ class TestGramatica(unittest.TestCase):
             '{"intent":"MASSA_MOLAR"}',  # separadores fora do padrão
             '{"composto": "H2O", "intent": "MASSA_MOLAR"}',  # ordem fixa: intent primeiro
             '{"intent": "ELEMENTO", "composto": "H2O", "elemento": "O"}',  # ordem fixa: elemento antes de composto
+            # 18/10/2026: carga do íon e número de massa são campos SÓ do cliente; o modelo não os emite
+            '{"intent": "PROPRIEDADE", "elemento": "Fe", "propriedade": "particulas", "cargaFormula": 2}',
+            '{"intent": "PROPRIEDADE", "elemento": "C", "propriedade": "particulas", "numeroMassa": 14}',
+            '{"intent": "CONCEITO", "conceito": "constante de equilibrio"}',
         ]
         for r in ruins:
             self.assertIsNone(self.rx.match(r), r)

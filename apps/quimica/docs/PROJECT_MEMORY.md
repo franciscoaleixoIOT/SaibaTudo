@@ -248,6 +248,24 @@ dataset do app regerado (22.257/1.091); não treinado — comando e riscos em `i
 redeployado** (o modelo v3.4 não conhece as intenções novas; a gramática nova só vai com o v3.5). Mapa reavaliado: 61 perguntas derivadas
 mudaram para as intenções novas; EQUILIBRIO 1/45 por desenho (sem equação). Home: `NUMEROS_QUIMICA.compostosComGhsHarmonizado` 481 → 482.
 
+## 6.t Fechamento das pendências §13, corpus/treino v3.5 e Android 1.0.3 (18/10/2026, madrugada)
+Mantenedor: "Pode seguir com os três" (treinar o v3.5 confirmando os cortes do corpus; testar a tela Calculadoras no aparelho e gerar o 1.0.3;
+pendências menores da §13). **Ordem escolhida:** primeiro o contrato das pendências (ids `energiaGibbsFormacaoKJmol`, `entropiaPadraoJmolK`,
+`particulas`, campos só do cliente `cargaFormula`/`numeroMassa`, Kc sem equação → CONCEITO — `CALCULADORAS_2026-10-17.md` §7), porque o modelo
+precisa aprender os ids antes de treinar; depois corpus → treino; respostas (site/Android) e Android 1.0.3 enquanto a GPU treina. Cinco subagentes:
+contrato (opus), corpus+`regras.py` (opus), revisão nativa en/es/de/fr (sonnet; 166 textos ajustados, `revisao: pendente` mantido de propósito),
+respostas do site (opus), respostas do Android + 1.0.3 (opus). **Cortes do corpus confirmados com ajuste:** o teto 850 por intenção cortava
+PROPRIEDADE pt 3.155 → 850 só pelo hash e deixava `ligacoesRotaveis` com 5, `doadoresH` 7, `carga` 10; `montar_corpus.py` ganhou piso por id de
+propriedade (`--piso-propriedade-pt 25 --piso-propriedade-estrangeiros 6`) e o teto pt baixou para 760 para a química ficar em 69,8 % com as
+famílias novas (`particulas`, ΔGf°/S°, Kc sem equação; 13 holdouts v3.5, 536 casos). Os moldes antigos "quantos prótons/elétrons tem X"
+(dataset pt e `quimica_idiomas`) rotulavam `numeroAtomico` e passaram a `particulas` (21 rótulos mudados na mistura). **Treino iniciado às
+02h52** (`ia/treino/out/nlu-v35-cont/pipeline.sh`: mistura 43.360 → treino 2.710 passos → GGUF Q4/Q8 → gate); resultado na §6.u. **Pacote**
+`20261018T051923Z` (rebuild offline: `regras.propriedades` com as duas termoquímicas e `particulas` calculada por regra; commit `0a3bd94`).
+**Android 1.0.3 (versionCode 4):** AAB 8,3 MB / APK 6,1 MB assinados, `verificar_release.py` OK, 255 testes, lint 0 erros; nenhum aparelho
+conectado — teste no aparelho fica com o mantenedor (`RELEASE_1.0.3.md`). Decisões de resposta: nêutrons sem número de massa na pergunta usam a
+massa atômica arredondada ROTULADA como aproximação (nunca como fato); "falta ΔGf°" é resposta resolvida (não vai à nuvem); Kc sem equação traz
+parágrafo por regra + ação para a calculadora (o trecho da Wikipédia pt vem com TeX cru e é filtrado).
+
 ## 7. Contas e segredos
 Vercel `saibatudo-quimica` (time `franciscoaleixo-9696`); GitHub `franciscoaleixoIOT`; Hugging Face `franciscoaleixo` (PRO, 40 min/dia de ZeroGPU); Modal `franciscoaleixo/main` (US$ 30/mês grátis; já usados pelo app de eleições, ~US$ 5/mês).
 `secrets/data_signing_key.pem` (nova, exclusiva deste app; pública em `pipeline/data_signing_public.pem`). Fazer backup offline. Modal: app `SaibaTudoIA-NLU-Quimica`, Volume `SaibaTudoIA-Models-Quimica` (nomes desde 14/10/2026; os antigos `saibatudo-quimica-*` foram apagados), par de Proxy Auth Token criado pelo mantenedor em 13/10/2026 (guardado em `secrets/modal_proxy_quimica.env` da raiz do monorepo, ignorado, e como variáveis sensíveis na Vercel; nunca no Git nem no chat).

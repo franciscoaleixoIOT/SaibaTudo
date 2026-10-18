@@ -113,11 +113,58 @@ propriedade nova nos 5 idiomas; notação científica e sobrescritos nas quantid
 "é mistura ou substância pura" / "mistura homogênea ou heterogênea" (CONCEITO); ordenação de listas ("ordem crescente de raio atômico de Na,
 K e Rb" → COMPARAR com o primeiro elemento e a propriedade). Nada em `apps/eleicoes2026/` muda antes de 27/10.
 
-## 6. Estado em 17/10/2026 (noite)
-- **Feito:** contrato em todos os espelhos; pacote com termoquímica (§3); site (regras, 5 calculadoras, respostas, tela Calculadoras, catálogos
-  nos 5 idiomas com `revisao: pendente`, golden 873 → 929, 217 testes + E2E); Android em paridade (`domain/calc/*.kt`,
-  `RespostasCalculadoras.kt`, `LocalNlu` passos 2b/5b, 5 cartões, 196 strings × 5 idiomas, 242 testes, golden 929); corpus v3.5 com as
-  intenções novas (`ia/corpus/quimica_v35.py`) e moldes pt no dataset.
-- **Pendente:** treinar e aprovar o NLU v3.5 e só então `modal deploy` (o serviço ainda roda o `nlu_core.py` sem as intenções novas, de
-  propósito: o v3.4 não as conhece); testar a tela Calculadoras no aparelho; revisão nativa dos textos en/es/de/fr; `energiaGibbsFormacaoKJmol`
-  e `entropiaPadraoJmolK` ainda só no pacote (sem id no NLU nem na ficha); Kc sem equação na pergunta (ver `MAPA_LIVROS.md` §6).
+## 6. Estado em 18/10/2026 (madrugada)
+- **Feito em 17/10 (noite):** contrato em todos os espelhos; pacote com termoquímica (§3); site (regras, 5 calculadoras, respostas, tela
+  Calculadoras, catálogos nos 5 idiomas, golden 873 → 929); Android em paridade; corpus v3.5 montado.
+- **Feito em 18/10 (madrugada):** §7 inteira — contrato (ids `energiaGibbsFormacaoKJmol`, `entropiaPadraoJmolK`, `particulas`; `cargaFormula`/
+  `numeroMassa` só do cliente; Kc sem equação → CONCEITO; golden 929 → 984) e respostas (ficha com ΔHf°/ΔGf°/S°, partículas de íons e isótopos,
+  conceito de Kc com ação para a calculadora) em site e Android; revisão de terminologia en/es/de/fr dos textos de 17/10 por agente (166 textos
+  ajustados; `revisao: pendente` mantido porque não foi falante nativo); corpus v3.5 remontado (teto pt 760 + piso por propriedade; 74.935 pares,
+  química 69,8 %); **treino do v3.5 iniciado às 02h52** (`ia/treino/README.md` §v3.5); Android **1.0.3 (versionCode 4)** gerado e verificado
+  (`docs/RELEASE_1.0.3.md`). Testes: web 229 (226 + 3 pulados), API 253, modal 133, dataset 87, pipeline 243, tools 112, Android 255 + lint 0 erros,
+  corpus 43, raiz 8, portal 10.
+- **Pendente:** gate do v3.5 e só então `empacotar_versao.py` → `modal volume put` → `promover.py` → `SNAPSHOT_EPOCH` + `modal deploy` →
+  `MODEL_VERSION` na Vercel (o serviço ainda roda o `nlu_core.py` sem as intenções e ids novos, de propósito); testar a tela Calculadoras, a ficha
+  e as respostas novas no aparelho e enviar o AAB 1.0.3; revisão por falante nativo dos textos en/es/de/fr; "compare o ΔGf de X e Y" → COMPARAR
+  (hoje PROPRIEDADE com resposta de comparação); Kps/solubilidade; TeX cru nos trechos da Wikipédia pt (pipeline).
+
+## 7. 18/10/2026: propriedades ΔGf°/S°/partículas e Kc sem equação
+
+Decisões do mantenedor (18/10/2026), camada "contrato do NLU" (as respostas e a interface vêm numa camada à parte):
+
+- **Três ids novos de propriedade**, no FIM do vocabulário, nesta ordem: `energiaGibbsFormacaoKJmol` (ΔGf° a 298,15 K, kJ/mol),
+  `entropiaPadraoJmolK` (S° a 298,15 K, J/(mol·K)) — os dois já estavam no pacote (`DATA_CONTRACT.md` §3.1) — e `particulas` (prótons,
+  nêutrons e elétrons de um átomo ou íon; `PROPRIEDADE` com `elemento`, alvo `elemento`, campo `z`, tipo `particulas`). Espelhos:
+  `nlu_core.PROPRIEDADES`, `api/_lib/vocab.js` (`PROPRIEDADES`, `FORMAS_PROPRIEDADE`: "número de prótons" saiu de `numeroAtomico`),
+  `propriedades.js`, `Propriedades.kt`, `dataset/vocab_nlu.py`, catálogos (`propriedades.rotulos`) e `strings.xml` (`prop_energia_gibbs_formacao`,
+  `prop_entropia_padrao`, `prop_particulas`) nos 5 idiomas.
+- **Formas** (`contracts/lexico/<idioma>.json`, `propriedades`): ΔGf° ("energia livre de Gibbs de formação", "entalpia livre de formação",
+  "standard Gibbs free energy of formation", "freie Standardbildungsenthalpie", "enthalpie libre standard de formation"…), S° ("entropia
+  padrão/molar/absoluta", "entropia do/da/de X"; "o que é entropia" segue `CONCEITO` pelo gatilho de definição), partículas ("prótons",
+  "nêutrons", "elétrons", "número de massa", "partículas subatômicas", "Protonenzahl", "Massenzahl"…). Precedência pela forma mais longa:
+  "elétrons de valência", "camada de valência", "distribuição eletrônica" (e agora "elétrons na última camada") continuam
+  `configuracaoEletronica`; "número atômico" continua `numeroAtomico`. "Quantas partículas há em 2 mol de Fe" (com quantidade) continua
+  `ESTEQUIOMETRIA`.
+- **Δ na pergunta** (a normalização apaga Δ/∆; as regras olham o texto original): "ΔGf", "ΔG°f", "ΔGf°" e "ΔG de formação" (pista
+  `deFormacao` do léxico) → `PROPRIEDADE energiaGibbsFormacaoKJmol`; "ΔH de formação" passou a `entalpiaFormacaoKJmol` como "ΔHf" (antes
+  era `ENTALPIA`). "Entalpia livre de formação" / "enthalpie libre…" com composto não é `ENTALPIA`.
+- **Íon e número de massa: campos só do cliente.** `cargaFormula` (já usado pelo NOX) passa a guardar também a carga do íon de UM símbolo
+  de elemento ("Fe2+", "Fe²⁺", "Fe+2", "Fe 2+", "Fe^{3+}", "Cl-", "Cl⁻", "S2-", "íon ferro 2+", "íon ferro(III)"/"iron(III) ion" pela pista
+  `ionRomano`); `numeroMassa` (novo) guarda o número de massa ("Fe-56", "C-14", "⁵⁶Fe", "ferro-56", "carbono-14", "carbono 14?"; "56Fe" sem
+  sobrescrito só com pista de partícula; aceito se Z ≤ A ≤ 3Z + 10). O token do íon sai de `formulas`/`compostos` ("O2-" é óxido, não O2) e
+  o elemento dele vem primeiro em `elementos`. Fórmula de mais de um elemento ("NO3-", "SO4 2-", "OH-") não conta; com equação na pergunta
+  (semirreação) nada muda. Sem pista de partícula, o íon é `ELEMENTO` com `cargaFormula` ("o que é Fe2+"). Funções: `lerIonsEIsotopo`
+  (`nlu.js`) ↔ `LocalNlu.lerIonsEIsotopo`. O modelo **não** emite esses campos: saída para "quantos elétrons tem o Fe2+" =
+  `{"intent": "PROPRIEDADE", "elemento": "Fe", "propriedade": "particulas"}`; os clientes os tiram da pergunta e os mesclam quando a nuvem
+  fala do mesmo elemento (`nuvem.js` `mesclarCamposDoCliente`, `CloudNlu.kt`; no NOX, a carga depois da fórmula; a nuvem que copiar
+  "Fe2+" como composto vira o elemento). No `contexto` da API eles são chave fora do contrato (`api/_lib/contexto.js` `CAMPOS_SO_DO_CLIENTE`).
+  A ancoragem do proxy aceita o símbolo em "Fe-56" (`ground.js`).
+- **Kc/Kp sem equação → `CONCEITO`** (pista `constanteEquilibrio`): "qual o Kp a 500 K", "como calcular o Kc", "calcule o Kc da reação",
+  "o que é Kc", "fórmula do Kp", "constante de equilíbrio". Saída do modelo `{"intent": "CONCEITO"}`; `conceito: "constante de equilibrio"`
+  (`CONCEITO_CONSTANTE_EQUILIBRIO`) é do cliente. Com equação continua `EQUILIBRIO`.
+- **Golden** 929 → 984 (+55: partículas/íons/número de massa, precedência, ΔGf°/S° com COMPARAR, Kc sem equação; pt, en, es, de, fr). Chaves
+  novas conferidas pelos clientes: `cargaFormula`, `numeroMassa` (o site também confere `conceito`).
+- **Dataset** (`dataset/gerar_nlu.py`): "quantos prótons/elétrons tem X" agora rotula `particulas`; famílias novas `COTA_18_10` (PARTICULAS
+  450, ION_ELEMENTO 120, TERMO 300, TERMO_COMPARAR 150, KC_CONCEITO 40; sorteio próprio, seed + 36), placeholders `{elion}`/`{eliso}`.
+- **Fica para a camada de respostas:** resposta de `particulas` (Z, A − Z, Z − carga), ΔGf°/S° na ficha e nas respostas com fonte por valor,
+  CONCEITO de Kc/Kp com a ação "abrir calculadora", ELEMENTO com `cargaFormula`; corpus v3.5 e treino; `modal deploy` só depois do gate.

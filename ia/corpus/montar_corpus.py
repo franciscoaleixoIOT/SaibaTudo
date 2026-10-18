@@ -438,9 +438,21 @@ def carregar_v34(bq, gv, stats, idiomas, escala, completas_por_idioma) -> tuple:
     return treino, holdouts
 
 
-def limitar_por_intencao(regs, teto: int, stats, rotulo: str, isentas=ISENTAS_DO_TETO):
+COM_PROPRIEDADE = frozenset({"PROPRIEDADE", "COMPARAR"})  # intenções cujo corte respeita um piso por id de propriedade
+
+
+def _propriedade_de(r):
+    try:
+        return json.loads(r["saida"]).get("propriedade")
+    except (ValueError, TypeError, KeyError):
+        return None
+
+
+def limitar_por_intencao(regs, teto: int, stats, rotulo: str, isentas=ISENTAS_DO_TETO, piso_propriedade: int = 0):
     """Teto de exemplos por intenção (escolha estável por hash da pergunta), para um app/idioma não enviesar o modelo. As `isentas` (recusas)
-    nunca são cortadas."""
+    nunca são cortadas. Em PROPRIEDADE e COMPARAR, `piso_propriedade` > 0 garante pelo menos esse número de exemplos de cada id de propriedade
+    (ou todos os que houver) antes de completar o teto por hash: sem isso o teto de 850 do v3.5 deixava `ligacoesRotaveis`, `doadoresH`,
+    `carga`, `bloco` com 5–14 exemplos em pt (18/10/2026). O piso pode passar do teto se houver muitas propriedades."""
     if not teto:
         return regs
     por = defaultdict(list)
@@ -449,8 +461,21 @@ def limitar_por_intencao(regs, teto: int, stats, rotulo: str, isentas=ISENTAS_DO
     saida = []
     for it, lst in por.items():
         if len(lst) > teto and it not in isentas:
-            lst = sorted(lst, key=lambda r: balde(r["entrada"], 10 ** 9))[:teto]
-            stats["limite_por_intencao"].setdefault(rotulo, {})[it] = {"antes": len(por[it]), "depois": teto}
+            ordem = sorted(lst, key=lambda r: balde(r["entrada"], 10 ** 9))
+            if piso_propriedade and it in COM_PROPRIEDADE:
+                grupos = defaultdict(list)
+                for r in ordem:
+                    grupos[_propriedade_de(r)].append(r)
+                base = [r for g in grupos.values() for r in g[:piso_propriedade]]
+                ids_base = {id(r) for r in base}
+                resto = [r for r in ordem if id(r) not in ids_base]
+                lst = base + resto[:max(0, teto - len(base))]
+                no_piso = sum(1 for g in grupos.values() if len(g) > piso_propriedade)
+                stats["limite_por_intencao"].setdefault(rotulo, {})[it] = {"antes": len(por[it]), "depois": len(lst), "piso_propriedade": piso_propriedade,
+                                                                           "propriedades": len(grupos), "propriedades_acima_do_piso": no_piso}
+            else:
+                lst = ordem[:teto]
+                stats["limite_por_intencao"].setdefault(rotulo, {})[it] = {"antes": len(por[it]), "depois": teto}
         saida += lst
     return saida
 
@@ -483,10 +508,11 @@ def montar(args) -> dict:
     q_tr, q_hold = carregar_quimica(bq, ml, stats, idiomas, args.escala)
     pt = [r for r in q_tr if r["idioma"] == "pt-BR"]
     resto = [r for r in q_tr if r["idioma"] != "pt-BR"]
-    pt = limitar_por_intencao(pt, args.teto_intencao_quimica_pt, stats, "quimica/pt-BR")
+    pt = limitar_por_intencao(pt, args.teto_intencao_quimica_pt, stats, "quimica/pt-BR", piso_propriedade=getattr(args, "piso_propriedade_pt", 0))
     teto_est = getattr(args, "teto_intencao_quimica_estrangeiros", 0)
     if teto_est:  # por idioma, só no gerador multilíngue base (os populares e os v3.4/v3.5 ficam inteiros)
-        resto = [r for i in idiomas for r in limitar_por_intencao([x for x in resto if x["idioma"] == i], teto_est, stats, f"quimica/{i}")]
+        resto = [r for i in idiomas for r in limitar_por_intencao([x for x in resto if x["idioma"] == i], teto_est, stats, f"quimica/{i}",
+                                                                   piso_propriedade=getattr(args, "piso_propriedade_estrangeiros", 0))]
     p_tr, p_hold = carregar_populares(bq, populares(), stats, idiomas, args.escala_populares)  # fora do teto: correção do gate do v3
     q_hold += p_hold
     completas = defaultdict(list)  # perguntas completas (sem contexto) do treino da química, para o multi-turno "contexto ignorado"
@@ -600,6 +626,7 @@ def montar(args) -> dict:
     cont["config"] = {"teto_intencao_quimica_pt": args.teto_intencao_quimica_pt, "val_pct_quimica": args.val_pct_quimica, "idiomas_estrangeiros": args.idiomas,
                       "escala_estrangeiros": args.escala, "escala_populares": args.escala_populares, "escala_v34": getattr(args, "escala_v34", 1.0), "escala_v35": getattr(args, "escala_v35", 1.0),
                       "teto_intencao_quimica_estrangeiros": getattr(args, "teto_intencao_quimica_estrangeiros", 0), "linha_idioma_quimica": bool(args.linha_idioma_quimica),
+                      "piso_propriedade_pt": getattr(args, "piso_propriedade_pt", 0), "piso_propriedade_estrangeiros": getattr(args, "piso_propriedade_estrangeiros", 0),
                       "seed": SEED, "jaccard_quase_igual": JACCARD_QUASE_IGUAL}
     cont["prompts"] = prompts
     cont["filtros"] = {k: (dict(sorted(v.items())) if isinstance(v, Counter) else v) for k, v in stats.items()}
@@ -646,6 +673,10 @@ def main(argv=None):
     ap.add_argument("--escala-v35", type=float, default=1.0, help="escala dos geradores do v3.5 (calculadoras e famílias de superfície; 0 desliga = corpus do v3.4)")
     ap.add_argument("--teto-intencao-quimica-estrangeiros", type=int, default=0,
                     help="teto por intenção e idioma no gerador multilíngue base da química (0 = sem teto; recusas isentas)")
+    ap.add_argument("--piso-propriedade-pt", type=int, default=0,
+                    help="dentro do teto pt de PROPRIEDADE/COMPARAR, mínimo de exemplos por id de propriedade (0 = só o hash)")
+    ap.add_argument("--piso-propriedade-estrangeiros", type=int, default=0,
+                    help="idem por idioma estrangeiro no gerador multilíngue base")
     ap.add_argument("--out", help="pasta de saída (padrão ia/corpus/out)")
     ap.add_argument("--linha-idioma-quimica", action="store_true", help="acrescenta ao prompt da química a linha de idioma PROPOSTA (não está em produção)")
     a = ap.parse_args(argv)

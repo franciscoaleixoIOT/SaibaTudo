@@ -153,4 +153,130 @@ class CalculadorasRespostasTest {
         a = r("what type of bond is in NaCl?", en)
         assertTrue(a.texto(Tx.de("en")), a.texto(Tx.de("en")).contains("ionic"))
     }
+
+    // ---- 18/10/2026 (docs/CALCULADORAS_2026-10-17.md §7, camada de respostas): ΔGf°/S°, partículas, íon/isótopo, Kc sem equação ----------------
+
+    private val embutido by lazy { TestData.Embutido?.pacote }
+    private fun bReal(idioma: String = "pt-BR"): AnswerBuilder {
+        assumeTrue("pacote embutido (assets) ausente", embutido != null)
+        return AnswerBuilder(embutido!!, dicionario(embutido!!, idioma), Nivel.MEDIO)
+    }
+    private fun campos(a: Resposta) = a.blocos.filterIsInstance<Bloco.Campo>().associate { it.rotulo to it.valor }
+
+    @Test fun termoquimicaDgfESComFonteDoValorEFaltaSemEstimar() {
+        val b = bReal()
+        var a = r("ΔGf do NaOH", b)
+        validar(a, "ΔGf NaOH")
+        assertEquals("-379,70 kJ/mol", campos(a)["Energia livre de Gibbs padrão de formação"])
+        assertTrue(a.fontes.toString(), a.fontes.any { it.licenca == "CC BY-SA 4.0" && it.url?.contains("oldid=") == true && it.nome.startsWith("Wikipedia (en)") })
+        a = r("entropia padrão do CO2", b)
+        validar(a, "S° CO2")
+        assertEquals("214,00 J/(mol·K)", campos(a)["Entropia molar padrão"])
+        // a água não tem ΔGf° no pacote: diz qual falta, sem estimar (e o que o pacote traz dela)
+        a = r("energia livre de Gibbs de formação da água", b)
+        assertFalse(a.entendida)
+        assertTrue(a.texto(), a.texto().contains("não traz a energia livre de Gibbs padrão de formação (ΔGf°) de Água") && a.texto().contains("Não vou estimar"))
+        assertTrue(a.texto(), campos(a).isEmpty())
+        val en = bReal("en")
+        a = r("standard Gibbs free energy of formation of NaOH", en)
+        assertEquals("-379.70 kJ/mol", campos(a)["Standard Gibbs free energy of formation"])
+    }
+
+    @Test fun compararTermoquimicaMaiorMenorEMaisNegativo() {
+        val b = bReal()
+        var a = r("compare a energia livre de Gibbs de formação do NaOH e do KOH", b)
+        validar(a, "comparar ΔGf")
+        assertEquals(Intent.COMPARAR, a.intent)
+        assertTrue(a.texto(), a.texto().contains("maior em Hidróxido de sódio (-379,70 kJ/mol); menor (mais negativo) em Hidróxido de potássio (-380,20 kJ/mol)"))
+        assertTrue(a.fontes.any { it.nome == "Wikipedia (en): Sodium hydroxide" } && a.fontes.any { it.nome == "Wikipedia (en): Potassium hydroxide" })
+        a = r("compare a entropia padrão do NaOH e do KOH", b)
+        assertTrue(a.texto(), a.texto().contains("Entropia molar padrão: maior em Hidróxido de potássio (79,32 J/(mol·K)); menor em Hidróxido de sódio (64,40 J/(mol·K))"))
+    }
+
+    @Test fun fichaDoCompostoTrazAsTresMedidasTermoquimicasNaOrdem() {
+        assertEquals(
+            listOf("estadoPadrao", "pontoFusaoK", "pontoEbulicaoK", "densidadeKgm3", "solubilidade", "pka", "entalpiaFormacaoKJmol", "energiaGibbsFormacaoKJmol", "entropiaPadraoJmolK"),
+            net.saibatudo.quimica.domain.Propriedades.MEDIDAS_COMPOSTO
+        )
+        val b = bReal()
+        val a = r("hidróxido de sódio", b)
+        assertEquals(Intent.COMPOSTO, a.intent)
+        val rotulos = a.blocos.filterIsInstance<Bloco.Campo>().map { it.rotulo }
+        val i = listOf("Entalpia padrão de formação", "Energia livre de Gibbs padrão de formação", "Entropia molar padrão").map { rotulos.indexOf(it) }
+        assertTrue(rotulos.toString(), i.all { it >= 0 } && i == i.sorted() && rotulos.indexOf("Ponto de ebulição") < i[0])
+        assertEquals("64,40 J/(mol·K)", campos(a)["Entropia molar padrão"])
+        assertTrue(a.fontes.any { it.nome == "Wikipedia (en): Sodium hydroxide" && it.licenca == "CC BY-SA 4.0" })
+        // na ficha do elemento as partículas não entram (dependem da pergunta), nem no nível superior
+        val sup = AnswerBuilder(embutido!!, dicionario(embutido!!), Nivel.SUPERIOR)
+        assertFalse(r("ferro", sup).blocos.filterIsInstance<Bloco.Campo>().any { it.rotulo.startsWith("Prótons") })
+    }
+
+    @Test fun particulasIonIsotopoEAproximacaoRotulada() {
+        val b = bReal()
+        var a = r("quantos elétrons tem o Fe2+", b)
+        validar(a, "Fe2+")
+        assertEquals("Ferro (Fe²⁺): prótons, nêutrons e elétrons", a.titulo)
+        var c = campos(a)
+        assertEquals("26 (número atômico Z)", c["Prótons"])
+        assertEquals("24 (Z − carga: 26 − 2 = 24)", c["Elétrons"])
+        assertTrue(a.texto(), a.texto().contains("Fe²⁺ é um cátion (carga 2+)"))
+        // sem número de massa: aproximação ROTULADA, nunca como fato
+        assertTrue(c["Nêutrons"]!!, c["Nêutrons"]!!.startsWith("≈ 30") && c["Nêutrons"]!!.contains("aproximado"))
+        assertTrue(a.texto(), a.texto().contains("Número de massa aproximado pela massa atômica, 55,85 → 56; depende do isótopo"))
+        assertTrue(a.fontes.any { it.nome.startsWith("PubChem") })
+        a = r("quantos elétrons tem o Cl-", b)
+        assertEquals("18 (Z − carga: 17 + 1 = 18)", campos(a)["Elétrons"])
+        assertTrue(a.texto(), a.texto().contains("Cl⁻ é um ânion (carga 1−)"))
+        // isótopo: número de massa da pergunta, exato
+        a = r("quantos nêutrons tem o C-14", b)
+        validar(a, "C-14")
+        c = campos(a)
+        assertEquals("8 (A − Z: 14 − 6 = 8)", c["Nêutrons"])
+        assertEquals("14 (da pergunta: isótopo ¹⁴C)", c["Número de massa (A)"])
+        assertFalse(a.texto(), a.texto().contains("≈") || a.texto().contains("aproximado"))
+        a = r("prótons, nêutrons e elétrons do ⁵⁶Fe", b)
+        assertEquals("30 (A − Z: 56 − 26 = 30)", campos(a)["Nêutrons"])
+        a = r("how many neutrons in Fe-56", bReal("en"))
+        assertEquals("30 (A − Z: 56 − 26 = 30)", campos(a)["Neutrons"])
+        assertEquals("Iron (⁵⁶Fe): protons, neutrons and electrons", a.titulo)
+    }
+
+    @Test fun elementoComCargaOuIsotopoGanhaALinhaDoIon() {
+        val b = bReal()
+        var a = r("o que é Fe2+", b)
+        assertEquals(Intent.ELEMENTO, a.intent)
+        assertEquals("24 elétrons (26 − 2 = 24)", campos(a)["Cátion Fe²⁺"])
+        assertTrue(campos(a).containsKey("Massa atômica"))
+        a = r("o que é C-14", b)
+        assertEquals("8 nêutrons (14 − 6 = 8)", campos(a)["Isótopo ¹⁴C"])
+        a = r("o que é ferro", b)
+        assertFalse(campos(a).keys.any { it.startsWith("Cátion") || it.startsWith("Isótopo") })
+    }
+
+    @Test fun kcSemEquacaoEhConceitoComPedidoDaEquacaoEAcaoDaCalculadora() {
+        for ((idioma, q, pedido) in listOf(
+            Triple("pt-BR", "como calcular o Kc", "Me dê a equação"), Triple("pt-BR", "o que é Kp", "Me dê a equação"),
+            Triple("en", "how to calculate Kc", "Give me the equation"), Triple("de", "Wie berechnet man Kc?", "Gib mir die Gleichung")
+        )) {
+            val a = r(q, bReal(idioma))
+            val txt = a.texto(Tx.de(idioma))
+            assertEquals(q, Intent.CONCEITO, a.intent)
+            assertTrue(txt, a.entendida && txt.contains(pedido) && txt.contains("Kp = Kc·(RT)^Δn"))
+            assertFalse("$q: trecho ilegível (LaTeX) ou de outro idioma: $txt", txt.contains("displaystyle"))
+            assertTrue(q, a.acoes.any { it is Acao.AbrirCalculadora && it.tipo == TipoCalculadora.EQUILIBRIO })
+            assertTrue(q, a.fontes.isNotEmpty())
+        }
+        // no fixture também (sem trecho sobre o tema: o parágrafo por regra)
+        val a = r("como calcular o Kc")
+        assertEquals(Intent.CONCEITO, a.intent)
+        assertTrue(a.texto(), a.texto().contains("Só entram espécies gasosas e em solução aquosa"))
+        assertTrue(a.fontes.any { "ação das massas" in it.nome })
+    }
+
+    @Test fun ligacaoNaoRepeteAFonteDoPubChem() {
+        val a = r("tipo de ligação do NaCl", bReal())
+        validar(a, "NaCl")
+        assertEquals(a.fontes.toString(), 1, a.fontes.count { it.nome.startsWith("PubChem") })
+        assertEquals(a.fontes.size, a.fontes.distinctBy { "${it.nome}|${it.url}" }.size)
+    }
 }

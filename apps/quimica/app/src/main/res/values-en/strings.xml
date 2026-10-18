@@ -524,6 +524,9 @@
     <string name="prop_solubilidade">solubility in water</string>
     <string name="prop_pka">pKa</string>
     <string name="prop_entalpia_formacao">standard enthalpy of formation</string>
+    <string name="prop_energia_gibbs_formacao">standard Gibbs free energy of formation</string>
+    <string name="prop_entropia_padrao">standard molar entropy</string>
+    <string name="prop_particulas">protons, neutrons and electrons</string>
     <string name="prop_medida_titulo">Physical properties</string>
     <string name="prop_medida_intro">Measured values, each with its source and the measurement conditions.</string>
     <string name="prop_medida_unidade_g100g">g/100 g of water</string>
@@ -951,10 +954,10 @@
     <string name="resp_nox_nao_consegui">I could not work out the oxidation numbers</string>
     <string name="resp_nox_hidrato">Hydrates are not handled here: type the formula without the water of crystallization.</string>
     <string name="resp_nox_indeterminado">Not determined by the rules: no rule fixes the oxidation number of %1$s. Use the structural formula (bond by bond) to assign it.</string>
-    <string name="resp_nox_inconsistente">The rules give a sum of %1$s, different from the charge %2$s: check the formula and the charge.</string>
+    <string name="resp_nox_inconsistente">The rules give a sum of %1$s, which differs from the charge (%2$s): check the formula and the charge.</string>
     <string name="resp_nox_sem_dados">The data package has no electronegativity for: %1$s.</string>
     <string name="resp_nox_medio">average oxidation number</string>
-    <string name="resp_nox_regras_substancia_simples">element: 0</string>
+    <string name="resp_nox_regras_substancia_simples">free element: 0</string>
     <string name="resp_nox_regras_ion_monoatomico">single-element ion: charge ÷ atoms</string>
     <string name="resp_nox_regras_fluor">fluorine: always −1</string>
     <string name="resp_nox_regras_grupo1">group 1: +1</string>
@@ -966,15 +969,15 @@
     <string name="resp_nox_regras_peroxido">peroxide: O −1</string>
     <string name="resp_nox_regras_superoxido" tools:ignore="TypographyFractions">superoxide: O −1/2</string>
     <string name="resp_nox_regras_halogenio">most electronegative halogen in the compound: −1</string>
-    <string name="resp_nox_regras_eletronegatividade">the most electronegative gets the usual negative value of its group</string>
-    <string name="resp_nox_regras_balanco">from the balance (sum of oxidation numbers = charge)</string>
-    <string name="resp_nox_passo_regras">Apply the rules in order (element, ion, F, groups 1 and 2, Al, H, O, halogens); the remaining element comes from the balance.</string>
-    <string name="resp_nox_passo_soma">The sum of oxidation numbers times the number of atoms equals the charge (%1$s):</string>
+    <string name="resp_nox_regras_eletronegatividade">the most electronegative element gets the usual negative value for its group</string>
+    <string name="resp_nox_regras_balanco">from the charge balance (sum of oxidation numbers = charge)</string>
+    <string name="resp_nox_passo_regras">Apply the rules in order (free element, ion, F, groups 1 and 2, Al, H, O, halogens); the remaining element is found from the charge balance.</string>
+    <string name="resp_nox_passo_soma">The sum of (oxidation number × number of atoms) equals the charge (%1$s):</string>
     <string name="resp_nox_aviso_medio">A fractional value is an average oxidation number: atoms of that element may have different oxidation numbers (see the structural formula).</string>
     <string name="resp_nox_elemento_ausente">%1$s is not in %2$s.</string>
     <string name="resp_nox_abrir">Open the oxidation number calculator</string>
     <string name="resp_lig_titulo">Bond type: %1$s</string>
-    <string name="resp_lig_de_qual">Bond between what?</string>
+    <string name="resp_lig_de_qual">Which bond do you mean?</string>
     <string name="resp_lig_digite">Give the formula or two elements. Examples: \"bond type in NaCl\", \"what bond is there between H and Cl\".</string>
     <string name="resp_lig_nao_consegui">I could not classify the bond</string>
     <string name="resp_lig_sem_categoria">The data package has no category (metal or nonmetal) for: %1$s.</string>
@@ -985,7 +988,7 @@
     <string name="resp_lig_tipos_ionica">ionic</string>
     <string name="resp_lig_tipos_covalente_polar">polar covalent</string>
     <string name="resp_lig_tipos_covalente_apolar">nonpolar covalent</string>
-    <string name="resp_lig_tipos_nenhuma">forms no bond under ordinary conditions (noble gas)</string>
+    <string name="resp_lig_tipos_nenhuma">forms no bonds under ordinary conditions (noble gas)</string>
     <string name="resp_lig_delta">ΔEN = %1$s (%2$s: %3$s; %4$s: %5$s)</string>
     <string name="resp_lig_metal_metal">metal with metal</string>
     <string name="resp_lig_convencao">Textbook rule: metal with metal → metallic; metal with nonmetal and ΔEN ≥ 1.7 → ionic; 0.4 ≤ ΔEN &lt; 1.7 → polar covalent; ΔEN &lt; 0.4 → nonpolar covalent. The 0.4 and 1.7 cut-offs are a convention (Pauling scale); metalloids count as nonmetals.</string>
@@ -998,7 +1001,7 @@
     <string name="resp_eqm_nao_consegui">I could not build the equilibrium expression</string>
     <string name="resp_eqm_balanceada">The equation was balanced first: %1$s.</string>
     <string name="resp_eqm_sem_solido_liquido">Pure solids and liquids are left out of the expression: %1$s.</string>
-    <string name="resp_eqm_gas_por_hipotese">With no physical state written and no data in the package, I treated these as gases: %1$s.</string>
+    <string name="resp_eqm_gas_por_hipotese">With no physical state given or found in the data package, I assumed these are gases: %1$s.</string>
     <string name="resp_eqm_fase_do_pacote">Physical state taken from the data package (standard conditions): %1$s.</string>
     <string name="resp_eqm_fase_na_temperatura">Physical state at %1$s K from the melting and boiling points in the data package: %2$s.</string>
     <string name="resp_eqm_delta_n">Δn (gases): products − reactants</string>
@@ -1009,7 +1012,7 @@
     <string name="resp_eqm_unidade_kc">concentrations in mol/L</string>
     <string name="resp_eqm_faltam">Missing equilibrium concentrations for: %1$s. Without them, only the Kc expression is given.</string>
     <string name="resp_eqm_invalida">Concentrations must be greater than zero.</string>
-    <string name="resp_eqm_passo_kc">Put the equilibrium concentrations (mol/L) into the expression:</string>
+    <string name="resp_eqm_passo_kc">Substitute the equilibrium concentrations (mol/L) into the expression:</string>
     <string name="resp_eqm_passo_kp">Kp = Kc·(RT)^Δn, with R = %1$s L·atm/(mol·K) and T in kelvin:</string>
     <string name="resp_eqm_sem_t">For the value of Kp, give the temperature (for example, \"at 500 K\").</string>
     <string name="resp_eqm_sem_r">The constant R is not in the data package (constantes.json).</string>
@@ -1021,7 +1024,7 @@
     <string name="resp_ent_titulo_amostra">Heat for the sample</string>
     <string name="resp_ent_nao_consegui">I could not calculate the enthalpy</string>
     <string name="resp_ent_digite">Give the reaction or the compound. Examples: \"ΔH of combustion of methane\", \"enthalpy change of 2 H2 + O2 -&gt; 2 H2O\". For Hess’s law (several equations with ΔH), use the calculator.</string>
-    <string name="resp_ent_hess">Hess’s law adds known equations (multiplied by a factor or reversed) until they give the wanted reaction, and ΔH adds up the same way. In the calculator you type the target equation and up to 4 equations with ΔH, and the app finds the combination.</string>
+    <string name="resp_ent_hess">Hess’s law adds known equations (multiplied by a factor or reversed) until they give the desired reaction, and the ΔH values add up the same way. In the calculator you enter the target equation and up to 4 equations with their ΔH, and the app finds the combination.</string>
     <string name="resp_ent_falta">The data package has no standard enthalpy of formation (ΔHf°) for: %1$s. Without it, ΔH is not calculated (no value is made up).</string>
     <string name="resp_ent_expressao">ΔH° = Σ n·ΔHf°(products) − Σ n·ΔHf°(reactants):</string>
     <string name="resp_ent_passo_soma">With the values from the data package (kJ/mol):</string>
@@ -1055,7 +1058,7 @@
     <string name="resp_ele_de_qual">Electron configuration of which element?</string>
     <string name="resp_ele_digite">Give the element (symbol or name), for example \"electron configuration of iron\".</string>
     <string name="resp_ele_pacote">Configuration in the data package</string>
-    <string name="resp_ele_completa">Full notation (filling order, aufbau)</string>
+    <string name="resp_ele_completa">Full notation (aufbau filling order)</string>
     <string name="resp_ele_camadas_ordem">In shell order</string>
     <string name="resp_ele_por_camada">Electrons per shell</string>
     <string name="resp_ele_camada_valencia">Valence shell</string>
@@ -1065,7 +1068,7 @@
     <string name="resp_ele_valencia_f">%1$s (convention: ns + (n−1)d + (n−2)f)</string>
     <string name="resp_ele_mais_energetico">Highest-energy subshell</string>
     <string name="resp_ele_bloco">Block</string>
-    <string name="resp_ele_total_diferente">The data package configuration adds up to %1$s electrons, but the atomic number is %2$s: the distribution was not calculated (the data is not corrected by hand).</string>
+    <string name="resp_ele_total_diferente">The configuration in the data package adds up to %1$s electrons, but the atomic number is %2$s: the distribution was not calculated (the data is not corrected by hand).</string>
     <string name="resp_ele_sem_configuracao">The data package has no electron configuration for %1$s.</string>
     <string name="resp_ele_carga_invalida">Invalid charge for %1$s.</string>
     <string name="resp_ele_ignorados">Note from the data package: %1$s.</string>
@@ -1081,31 +1084,31 @@
     <string name="ui_calc_ent_formacao">From enthalpies of formation</string>
     <string name="ui_calc_ent_hess">Hess’s law</string>
     <string name="ui_calc_ent_equacao">Reaction equation</string>
-    <string name="ui_calc_ent_placeholder">E.g. CH4 + 2 O2 -&gt; CO2 + 2 H2O</string>
-    <string name="ui_calc_ent_ajuda">Without coefficients the app balances it. ΔHf° values come from the data package; elements in their standard state (O2, N2, Fe…) are 0.</string>
+    <string name="ui_calc_ent_placeholder">E.g.: CH4 + 2 O2 -&gt; CO2 + 2 H2O</string>
+    <string name="ui_calc_ent_ajuda">Without coefficients, the app balances the equation. ΔHf° values come from the data package; elements in their standard state (O2, N2, Fe…) are taken as 0.</string>
     <string name="ui_calc_ent_alvo">Target equation</string>
-    <string name="ui_calc_ent_placeholder_alvo">E.g. C + 2 H2 -&gt; CH4</string>
+    <string name="ui_calc_ent_placeholder_alvo">E.g.: C + 2 H2 -&gt; CH4</string>
     <string name="ui_calc_ent_equacao_n">Equation %1$s</string>
     <string name="ui_calc_ent_d_h">ΔH of equation %1$s (kJ)</string>
-    <string name="ui_calc_ent_ajuda_hess" tools:ignore="TypographyFractions">Type the balanced equations as given in the problem, each with its ΔH. Fractions work (1/2 O2). Leave unused ones blank.</string>
+    <string name="ui_calc_ent_ajuda_hess" tools:ignore="TypographyFractions">Type the balanced equations as they appear in the problem, each with its ΔH. Fractions are accepted (1/2 O2). Leave unused equations blank.</string>
     <string name="ui_calc_ent_calcular">Calculate ΔH</string>
     <string name="ui_calc_ele_elemento">Element (symbol or name)</string>
-    <string name="ui_calc_ele_placeholder">E.g. Fe, iron, Cl</string>
+    <string name="ui_calc_ele_placeholder">E.g.: Fe, iron, Cl</string>
     <string name="ui_calc_ele_carga">Ion charge</string>
     <string name="ui_calc_ele_ajuda_carga">0 for the neutral atom; 2 for Fe²⁺, -1 for Cl⁻.</string>
-    <string name="ui_calc_ele_calcular">Fill the shells</string>
+    <string name="ui_calc_ele_calcular">Calculate</string>
     <string name="ui_calc_ele_nao_encontrei">This element is not in the data package.</string>
     <string name="ui_calc_nox_formula">Formula (with the charge, for an ion)</string>
-    <string name="ui_calc_nox_placeholder">E.g. H2SO4, MnO4-, Cr2O7 2-</string>
+    <string name="ui_calc_nox_placeholder">E.g.: H2SO4, MnO4-, Cr2O7 2-</string>
     <string name="ui_calc_nox_ajuda">Charge at the end: MnO4-, SO4^2-, NH4+ or \"Cr2O7 2-\". Hydrates are not accepted.</string>
     <string name="ui_calc_nox_elemento">Element to highlight (optional)</string>
-    <string name="ui_calc_nox_placeholder_elemento">E.g. S</string>
-    <string name="ui_calc_nox_calcular">Calculate oxidation numbers</string>
+    <string name="ui_calc_nox_placeholder_elemento">E.g.: S</string>
+    <string name="ui_calc_nox_calcular">Calculate</string>
     <string name="ui_calc_eqm_equacao">Equation</string>
-    <string name="ui_calc_eqm_placeholder">E.g. N2 + 3 H2 ⇌ 2 NH3</string>
-    <string name="ui_calc_eqm_ajuda">Accepts ⇌, &lt;=&gt;, -&gt; or =. States (s), (l), (g), (aq) work: pure solids and liquids are left out of the expression.</string>
+    <string name="ui_calc_eqm_placeholder">E.g.: N2 + 3 H2 ⇌ 2 NH3</string>
+    <string name="ui_calc_eqm_ajuda">Accepts ⇌, &lt;=&gt;, -&gt; or =. The states (s), (l), (g) and (aq) are recognized; pure solids and liquids are left out of the expression.</string>
     <string name="ui_calc_eqm_concentracoes">Equilibrium concentrations (optional)</string>
-    <string name="ui_calc_eqm_placeholder_conc">E.g. [N2] = 0.5; [H2] = 1.5; [NH3] = 0.2</string>
+    <string name="ui_calc_eqm_placeholder_conc">E.g.: [N2] = 0.5; [H2] = 1.5; [NH3] = 0.2</string>
     <string name="ui_calc_eqm_ajuda_conc">One per species, in mol/L, separated by semicolons.</string>
     <string name="ui_calc_eqm_temperatura">Temperature (optional, for Kp)</string>
     <string name="ui_calc_eqm_calcular">Calculate</string>
@@ -1113,16 +1116,16 @@
     <string name="ui_calc_lig_por_formula">Formula</string>
     <string name="ui_calc_lig_por_elementos">Two elements</string>
     <string name="ui_calc_lig_formula">Formula</string>
-    <string name="ui_calc_lig_placeholder">E.g. NaCl, HCl, Cl2, NaOH</string>
+    <string name="ui_calc_lig_placeholder">E.g.: NaCl, HCl, Cl2, NaOH</string>
     <string name="ui_calc_lig_a">Element 1</string>
     <string name="ui_calc_lig_b">Element 2</string>
-    <string name="ui_calc_lig_placeholder_a">E.g. H</string>
-    <string name="ui_calc_lig_placeholder_b">E.g. Cl</string>
+    <string name="ui_calc_lig_placeholder_a">E.g.: H</string>
+    <string name="ui_calc_lig_placeholder_b">E.g.: Cl</string>
     <string name="ui_calc_lig_calcular">Classify</string>
     <string name="fonte_regras_nox">Oxidation-number rules from chemistry textbooks (convention), applied by the app</string>
     <string name="fonte_regra_ligacao">Textbook electronegativity-difference rule (Pauling scale; 0.4 and 1.7 cut-offs by convention)</string>
     <string name="fonte_acao_das_massas">Law of mass action (rule), local calculation by the app</string>
-    <string name="fonte_distribuicao">Distribution calculated by the app from the data package configuration (Madelung rule, aufbau diagram)</string>
+    <string name="fonte_distribuicao">Electron distribution calculated by the app from the configuration in the data package (Madelung rule, aufbau diagram)</string>
     <string name="fonte_substancia_simples">Convention: ΔHf° = 0 for an element in its standard state</string>
     <string name="fonte_entalpia_calculo">Local calculation by the app (Hess’s law), with ΔHf° values from the data package</string>
     <string name="fonte_constante_r">Local calculation with the R constant from the package (CODATA)</string>
@@ -1130,14 +1133,49 @@
     <string name="sug_ligacao_hcl">Bond type in HCl</string>
     <string name="sug_kc_amonia">Equilibrium constant expression for N2 + 3 H2 ⇌ 2 NH3</string>
     <string name="sug_entalpia_hess">Reaction enthalpy by Hess’s law</string>
-    <string name="calculadora_entalpia">Enthalpy (formation and Hess)</string>
+    <string name="calculadora_entalpia">Enthalpy (formation, Hess’s law)</string>
     <string name="calculadora_eletronica">Electron configuration</string>
     <string name="calculadora_nox">Oxidation number</string>
     <string name="calculadora_equilibrio">Equilibrium (Kc and Kp)</string>
     <string name="calculadora_ligacao">Bond type</string>
-    <string name="ui_calc_desc_entalpia">Reaction ΔH from the data package enthalpies of formation, or by Hess’s law with up to 4 equations.</string>
-    <string name="ui_calc_desc_eletronica">Aufbau (Madelung) order, shells and valence electrons; ions too.</string>
-    <string name="ui_calc_desc_nox">Oxidation number of each element by the rules, with ions and average values.</string>
-    <string name="ui_calc_desc_equilibrio">Kc expression, Δn, Kp = Kc·(RT)^Δn and the value of Kc from concentrations.</string>
-    <string name="ui_calc_desc_ligacao">Ionic, polar covalent, nonpolar covalent or metallic, from electronegativity.</string>
+    <string name="ui_calc_desc_entalpia">Reaction ΔH from the data package’s enthalpies of formation or by Hess’s law, with up to 4 equations.</string>
+    <string name="ui_calc_desc_eletronica">Aufbau diagram (Madelung rule), shells and valence electrons; ions too.</string>
+    <string name="ui_calc_desc_nox">Oxidation number of each element by the rules, including ions and average values.</string>
+    <string name="ui_calc_desc_equilibrio">Kc expression, Δn, Kp = Kc·(RT)^Δn and the value of Kc from the concentrations.</string>
+    <string name="ui_calc_desc_ligacao">Ionic, polar covalent, nonpolar covalent or metallic, based on electronegativity.</string>
+    <!-- 18/10/2026 (docs/CALCULADORAS_2026-10-17.md §7): ΔGf°/S° nas respostas, partículas do átomo/íon, Kc/Kp sem equação -->
+    <string name="resp_prop_falta_termo">The data package does not have the %1$s (%2$s) of %3$s. I will not estimate this value.</string>
+    <string name="resp_comparar_maior_menor">%1$s: highest for %2$s (%3$s); lowest for %4$s (%5$s).</string>
+    <string name="resp_comparar_maior_mais_negativo">%1$s: highest for %2$s (%3$s); lowest (most negative) for %4$s (%5$s).</string>
+    <string name="resp_part_titulo">%1$s: protons, neutrons and electrons</string>
+    <string name="resp_part_protons">Protons</string>
+    <string name="resp_part_eletrons">Electrons</string>
+    <string name="resp_part_neutrons">Neutrons</string>
+    <string name="resp_part_numero_massa">Mass number (A)</string>
+    <string name="resp_part_protons_valor">%1$d (atomic number Z)</string>
+    <string name="resp_part_eletrons_neutro">%1$d (neutral atom: equal to Z)</string>
+    <string name="resp_part_eletrons_ion">%1$d (Z − charge: %2$s)</string>
+    <string name="resp_part_neutrons_exato">%1$d (A − Z: %2$s)</string>
+    <string name="resp_part_neutrons_aprox">≈ %1$d (A − Z: %2$s, with approximate A)</string>
+    <string name="resp_part_a_da_pergunta">%1$d (from the question: isotope %2$s)</string>
+    <string name="resp_part_a_aprox">≈ %1$d (approximated from the atomic mass)</string>
+    <string name="resp_part_aviso_aprox">Mass number approximated from the atomic mass, %1$s → %2$d; it depends on the isotope. For a specific isotope, ask for example \"neutrons in %3$s-%2$d\".</string>
+    <string name="resp_part_sem_massa">The data package does not have the atomic mass of %1$s: I will not estimate the neutrons. Give the mass number of the isotope (for example, C-14).</string>
+    <string name="resp_part_cation">%1$s is a cation (charge %2$s): the %3$s atom lost electrons, so it has fewer electrons than protons.</string>
+    <string name="resp_part_anion">%1$s is an anion (charge %2$s): the %3$s atom gained electrons, so it has more electrons than protons.</string>
+    <string name="resp_part_carga_invalida">The charge of %1$s is not possible: %2$s does not have that many electrons to lose.</string>
+    <string name="resp_elemento_cation">Cation %1$s</string>
+    <string name="resp_elemento_anion">Anion %1$s</string>
+    <string name="resp_elemento_isotopo">Isotope %1$s</string>
+    <string name="resp_kc_conceito_titulo">Equilibrium constant (Kc and Kp)</string>
+    <string name="resp_kc_conceito_texto">The equilibrium constant Kc is the product of the concentrations (mol/L) of the products divided by the product of the concentrations of the reactants, each raised to its coefficient in the balanced equation, with the values at equilibrium. Only gaseous and aqueous species are included: pure solids and liquids are left out. Kp is the same expression with the partial pressures of the gases, and the two are related by Kp = Kc·(RT)^Δn, where Δn is the sum of the coefficients of the gaseous products minus that of the gaseous reactants.</string>
+    <string name="resp_kc_conceito_pedir">Give me the equation (e.g. N2 + 3 H2 ⇌ 2 NH3) and I will write the expression.</string>
+    <plurals name="resp_elemento_ion_eletrons">
+        <item quantity="one">%1$d electron (%2$s)</item>
+        <item quantity="other">%1$d electrons (%2$s)</item>
+    </plurals>
+    <plurals name="resp_elemento_isotopo_neutrons">
+        <item quantity="one">%1$d neutron (%2$s)</item>
+        <item quantity="other">%1$d neutrons (%2$s)</item>
+    </plurals>
 </resources>

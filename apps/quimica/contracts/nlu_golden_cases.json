@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "descricao": "Casos de referência do NLU (site e Android). Chaves ausentes não são verificadas; chave com null exige ausência. Chaves: idioma (BCP 47; ausente = pt-BR; o dicionário e o léxico do caso são os desse idioma), intent, elemento (símbolo), composto (CID), propriedade, equacao, unidadeDestino, grupo, periodo, bloco, categoria, estado, formula. Nunca entram no treino.",
+  "descricao": "Casos de referência do NLU (site e Android). Chaves ausentes não são verificadas; chave com null exige ausência. Chaves: idioma (BCP 47; ausente = pt-BR; o dicionário e o léxico do caso são os desse idioma), intent, elemento (símbolo), composto (CID), propriedade, equacao, unidadeDestino, grupo, periodo, bloco, categoria, estado, formula, conceito (o site confere), cargaFormula e numeroMassa (campos só do cliente: carga do íon e número de massa, 18/10/2026). Nunca entram no treino.",
   "cases": [
     {
       "q": "Fale sobre o oxigênio",
@@ -5371,6 +5371,362 @@
       "intent": "PROPRIEDADE",
       "composto": 222,
       "propriedade": "entalpiaFormacaoKJmol"
+    },
+    {
+      "q": "quantos prótons tem o ferro?",
+      "intent": "PROPRIEDADE",
+      "elemento": "Fe",
+      "propriedade": "particulas",
+      "cargaFormula": null
+    },
+    {
+      "q": "quantos prótons, nêutrons e elétrons tem o Fe2+?",
+      "intent": "PROPRIEDADE",
+      "elemento": "Fe",
+      "propriedade": "particulas",
+      "formula": null,
+      "cargaFormula": 2
+    },
+    {
+      "q": "quantos elétrons tem o íon Cl-",
+      "intent": "PROPRIEDADE",
+      "elemento": "Cl",
+      "propriedade": "particulas",
+      "formula": null,
+      "cargaFormula": -1
+    },
+    {
+      "q": "número de nêutrons do carbono-14",
+      "intent": "PROPRIEDADE",
+      "elemento": "C",
+      "propriedade": "particulas",
+      "numeroMassa": 14
+    },
+    {
+      "q": "número de massa do Fe-56",
+      "intent": "PROPRIEDADE",
+      "elemento": "Fe",
+      "propriedade": "particulas",
+      "formula": null,
+      "numeroMassa": 56
+    },
+    {
+      "q": "quantos elétrons tem o S2-?",
+      "intent": "PROPRIEDADE",
+      "elemento": "S",
+      "propriedade": "particulas",
+      "cargaFormula": -2
+    },
+    {
+      "q": "partículas subatômicas do sódio",
+      "intent": "PROPRIEDADE",
+      "elemento": "Na",
+      "propriedade": "particulas"
+    },
+    {
+      "q": "quantos nêutrons tem o ⁵⁶Fe?",
+      "intent": "PROPRIEDADE",
+      "elemento": "Fe",
+      "propriedade": "particulas",
+      "numeroMassa": 56
+    },
+    {
+      "q": "quantos elétrons tem o íon ferro 2+?",
+      "intent": "PROPRIEDADE",
+      "elemento": "Fe",
+      "propriedade": "particulas",
+      "cargaFormula": 2
+    },
+    {
+      "q": "quantos elétrons tem o cátion Na+?",
+      "intent": "PROPRIEDADE",
+      "elemento": "Na",
+      "propriedade": "particulas",
+      "cargaFormula": 1
+    },
+    {
+      "q": "o que é Fe2+?",
+      "intent": "ELEMENTO",
+      "elemento": "Fe",
+      "composto": null,
+      "cargaFormula": 2
+    },
+    {
+      "q": "cátion Ca2+",
+      "intent": "ELEMENTO",
+      "elemento": "Ca",
+      "cargaFormula": 2
+    },
+    {
+      "q": "qual tem mais prótons, sódio ou cloro?",
+      "intent": "COMPARAR",
+      "elemento": "Na",
+      "propriedade": "particulas"
+    },
+    {
+      "q": "elétrons de valência do Na",
+      "intent": "PROPRIEDADE",
+      "elemento": "Na",
+      "propriedade": "configuracaoEletronica"
+    },
+    {
+      "q": "número atômico do Fe",
+      "intent": "PROPRIEDADE",
+      "elemento": "Fe",
+      "propriedade": "numeroAtomico"
+    },
+    {
+      "q": "distribuição eletrônica do Fe2+",
+      "intent": "PROPRIEDADE",
+      "elemento": "Fe",
+      "propriedade": "configuracaoEletronica",
+      "cargaFormula": 2
+    },
+    {
+      "q": "explique o que é entropia",
+      "intent": "CONCEITO"
+    },
+    {
+      "q": "energia livre de Gibbs de formação da água",
+      "intent": "PROPRIEDADE",
+      "composto": 962,
+      "propriedade": "energiaGibbsFormacaoKJmol"
+    },
+    {
+      "q": "ΔGf do metano",
+      "intent": "PROPRIEDADE",
+      "composto": 297,
+      "propriedade": "energiaGibbsFormacaoKJmol"
+    },
+    {
+      "q": "ΔG°f do CO2",
+      "intent": "PROPRIEDADE",
+      "composto": 280,
+      "propriedade": "energiaGibbsFormacaoKJmol"
+    },
+    {
+      "q": "qual o ΔG de formação da amônia?",
+      "intent": "PROPRIEDADE",
+      "composto": 222,
+      "propriedade": "energiaGibbsFormacaoKJmol"
+    },
+    {
+      "q": "entropia padrão da água",
+      "intent": "PROPRIEDADE",
+      "composto": 962,
+      "propriedade": "entropiaPadraoJmolK"
+    },
+    {
+      "q": "entropia molar padrão do metano",
+      "intent": "PROPRIEDADE",
+      "composto": 297,
+      "propriedade": "entropiaPadraoJmolK"
+    },
+    {
+      "q": "qual a entropia do etanol?",
+      "intent": "PROPRIEDADE",
+      "composto": 702,
+      "propriedade": "entropiaPadraoJmolK"
+    },
+    {
+      "q": "qual tem maior entropia padrão, água ou etanol?",
+      "intent": "COMPARAR",
+      "composto": 962,
+      "propriedade": "entropiaPadraoJmolK"
+    },
+    {
+      "q": "qual tem menor energia livre de formação, CO2 ou metano?",
+      "intent": "COMPARAR",
+      "composto": 280,
+      "propriedade": "energiaGibbsFormacaoKJmol"
+    },
+    {
+      "q": "ΔH de formação do metano",
+      "intent": "PROPRIEDADE",
+      "composto": 297,
+      "propriedade": "entalpiaFormacaoKJmol"
+    },
+    {
+      "q": "qual o Kp a 500 K?",
+      "intent": "CONCEITO",
+      "conceito": "constante de equilibrio"
+    },
+    {
+      "q": "como calcular o Kc?",
+      "intent": "CONCEITO",
+      "conceito": "constante de equilibrio"
+    },
+    {
+      "q": "calcule o Kc da reação",
+      "intent": "CONCEITO",
+      "conceito": "constante de equilibrio"
+    },
+    {
+      "q": "o que é Kc?",
+      "intent": "CONCEITO",
+      "conceito": "constante de equilibrio"
+    },
+    {
+      "q": "fórmula do Kp",
+      "intent": "CONCEITO",
+      "propriedade": null,
+      "conceito": "constante de equilibrio"
+    },
+    {
+      "q": "expressão do Kc",
+      "intent": "CONCEITO",
+      "conceito": "constante de equilibrio"
+    },
+    {
+      "q": "how many protons does iron have?",
+      "idioma": "en",
+      "intent": "PROPRIEDADE",
+      "elemento": "Fe",
+      "propriedade": "particulas"
+    },
+    {
+      "q": "how many electrons does Fe2+ have?",
+      "idioma": "en",
+      "intent": "PROPRIEDADE",
+      "elemento": "Fe",
+      "propriedade": "particulas",
+      "cargaFormula": 2
+    },
+    {
+      "q": "number of neutrons in carbon-14",
+      "idioma": "en",
+      "intent": "PROPRIEDADE",
+      "elemento": "C",
+      "propriedade": "particulas",
+      "numeroMassa": 14
+    },
+    {
+      "q": "valence electrons of sodium",
+      "idioma": "en",
+      "intent": "PROPRIEDADE",
+      "elemento": "Na",
+      "propriedade": "configuracaoEletronica"
+    },
+    {
+      "q": "atomic number of Fe",
+      "idioma": "en",
+      "intent": "PROPRIEDADE",
+      "elemento": "Fe",
+      "propriedade": "numeroAtomico"
+    },
+    {
+      "q": "standard Gibbs free energy of formation of water",
+      "idioma": "en",
+      "intent": "PROPRIEDADE",
+      "composto": 962,
+      "propriedade": "energiaGibbsFormacaoKJmol"
+    },
+    {
+      "q": "standard molar entropy of methane",
+      "idioma": "en",
+      "intent": "PROPRIEDADE",
+      "composto": 297,
+      "propriedade": "entropiaPadraoJmolK"
+    },
+    {
+      "q": "which has the higher standard molar entropy, water or ethanol?",
+      "idioma": "en",
+      "intent": "COMPARAR",
+      "composto": 962,
+      "propriedade": "entropiaPadraoJmolK"
+    },
+    {
+      "q": "how to calculate Kp?",
+      "idioma": "en",
+      "intent": "CONCEITO",
+      "conceito": "constante de equilibrio"
+    },
+    {
+      "q": "explain entropy",
+      "idioma": "en",
+      "intent": "CONCEITO"
+    },
+    {
+      "q": "¿cuántos protones tiene el hierro?",
+      "idioma": "es",
+      "intent": "PROPRIEDADE",
+      "elemento": "Fe",
+      "propriedade": "particulas"
+    },
+    {
+      "q": "entropía molar estándar del agua",
+      "idioma": "es",
+      "intent": "PROPRIEDADE",
+      "composto": 962,
+      "propriedade": "entropiaPadraoJmolK"
+    },
+    {
+      "q": "energía libre de Gibbs de formación del metano",
+      "idioma": "es",
+      "intent": "PROPRIEDADE",
+      "composto": 297,
+      "propriedade": "energiaGibbsFormacaoKJmol"
+    },
+    {
+      "q": "¿cómo calcular el Kc?",
+      "idioma": "es",
+      "intent": "CONCEITO",
+      "conceito": "constante de equilibrio"
+    },
+    {
+      "q": "Wie viele Elektronen hat das Fe2+-Ion?",
+      "idioma": "de",
+      "intent": "PROPRIEDADE",
+      "elemento": "Fe",
+      "propriedade": "particulas",
+      "cargaFormula": 2
+    },
+    {
+      "q": "Standardentropie von Wasser",
+      "idioma": "de",
+      "intent": "PROPRIEDADE",
+      "composto": 962,
+      "propriedade": "entropiaPadraoJmolK"
+    },
+    {
+      "q": "freie Standardbildungsenthalpie von Methan",
+      "idioma": "de",
+      "intent": "PROPRIEDADE",
+      "composto": 297,
+      "propriedade": "energiaGibbsFormacaoKJmol"
+    },
+    {
+      "q": "Wie berechnet man Kc?",
+      "idioma": "de",
+      "intent": "CONCEITO",
+      "conceito": "constante de equilibrio"
+    },
+    {
+      "q": "combien de protons a le fer ?",
+      "idioma": "fr",
+      "intent": "PROPRIEDADE",
+      "elemento": "Fe",
+      "propriedade": "particulas"
+    },
+    {
+      "q": "entropie molaire standard de l'eau",
+      "idioma": "fr",
+      "intent": "PROPRIEDADE",
+      "composto": 962,
+      "propriedade": "entropiaPadraoJmolK"
+    },
+    {
+      "q": "enthalpie libre standard de formation du méthane",
+      "idioma": "fr",
+      "intent": "PROPRIEDADE",
+      "composto": 297,
+      "propriedade": "energiaGibbsFormacaoKJmol"
+    },
+    {
+      "q": "qu'est-ce que Kc ?",
+      "idioma": "fr",
+      "intent": "CONCEITO",
+      "conceito": "constante de equilibrio"
     }
   ]
 }

@@ -86,11 +86,23 @@ object Propriedades {
         Padrao("solubilidade", R.string.prop_solubilidade, "composto", "solubilidadeAguaG100g", "solubilidade", medida = true, campos = listOf("solubilidadeAguaG100g", "solubilidadeAguaGL")),
         Padrao("pka", R.string.prop_pka, "composto", "pka", "pka", medida = true, campos = listOf("pkaValores", "pka")),
         // 17/10/2026 (docs/CALCULADORAS_2026-10-17.md §3): ΔHf° a 298,15 K, Wikidata P3078 (CC0), em `propriedades.entalpiaFormacaoKJmol`
-        Padrao("entalpiaFormacaoKJmol", R.string.prop_entalpia_formacao, "composto", "entalpiaFormacaoKJmol", "numero", "kJ/mol", medida = true)
+        Padrao("entalpiaFormacaoKJmol", R.string.prop_entalpia_formacao, "composto", "entalpiaFormacaoKJmol", "numero", "kJ/mol", medida = true),
+        // 18/10/2026 (docs/CALCULADORAS_2026-10-17.md §7): ΔGf° (kJ/mol) e S° (J/(mol·K)) a 298,15 K, chembox da Wikipédia em inglês (CC BY-SA 4.0)
+        Padrao("energiaGibbsFormacaoKJmol", R.string.prop_energia_gibbs_formacao, "composto", "energiaGibbsFormacaoKJmol", "numero", "kJ/mol", medida = true),
+        Padrao("entropiaPadraoJmolK", R.string.prop_entropia_padrao, "composto", "entropiaPadraoJmolK", "numero", "J/(mol·K)", medida = true),
+        // prótons, nêutrons e elétrons do átomo ou do íon (de `z`, da carga `cargaFormula` e do número de massa `numeroMassa` da pergunta)
+        Padrao("particulas", R.string.prop_particulas, "elemento", "z", "particulas")
     )
 
     /** Ids das propriedades físicas medidas dos compostos, na ordem da ficha (igual a `MEDIDAS_COMPOSTO` do site). */
-    val MEDIDAS_COMPOSTO = listOf("estadoPadrao", "pontoFusaoK", "pontoEbulicaoK", "densidadeKgm3", "solubilidade", "pka")
+    val MEDIDAS_COMPOSTO = listOf(
+        "estadoPadrao", "pontoFusaoK", "pontoEbulicaoK", "densidadeKgm3", "solubilidade", "pka",
+        // 18/10/2026 (docs/CALCULADORAS_2026-10-17.md §7): termoquímica padrão, depois das medidas físicas, nesta ordem
+        "entalpiaFormacaoKJmol", "energiaGibbsFormacaoKJmol", "entropiaPadraoJmolK"
+    )
+
+    /** Termoquímica padrão a 298,15 K (chembox da Wikipédia en, CC BY-SA 4.0): valor com 2 casas e o símbolo usual (ΔHf°, ΔGf°, S°). */
+    val TERMO: Map<String, String> = linkedMapOf("entalpiaFormacaoKJmol" to "ΔHf°", "energiaGibbsFormacaoKJmol" to "ΔGf°", "entropiaPadraoJmolK" to "S°")
 
     /**
      * Lista efetiva no idioma de [t] (espelha `tabelaDePropriedades` do site): a padrão (rótulos de strings.xml no idioma), com os sinônimos do
@@ -253,7 +265,7 @@ object Propriedades {
             "massaAtomica" -> (valor as? Number)?.toDouble()?.let { ValorFormatado("${num(it, 9)} u (g/mol)", "${num(it, 9)} u") }
             "massaMolar" -> (valor as? Number)?.toDouble()?.let { ValorFormatado("${num(it, 9)} g/mol", "${num(it, 9)} g/mol") }
             "numero" -> (valor as? Number)?.toDouble()?.let {
-                val t = num(it) + (def.unidade?.let { u -> " $u" } ?: "")
+                val t = (if (def.id in TERMO) t.fixo(it, 2) else num(it)) + (def.unidade?.let { u -> " $u" } ?: "")
                 ValorFormatado(t, t)
             }
             "inteiro" -> (valor as? Number)?.let { ValorFormatado(it.toLong().toString(), it.toLong().toString()) }
@@ -375,7 +387,8 @@ object Propriedades {
         }
         return ids.mapNotNull { id ->
             val d = defs.firstOrNull { it.id == id } ?: return@mapNotNull null
-            if (id == "simbolo") return@mapNotNull null
+            // "particulas" depende da pergunta (carga, número de massa): resposta própria, fora da ficha
+            if (id == "simbolo" || id == "particulas") return@mapNotNull null
             val v = formatar(t, d, bruto(d, e), un, nivel) ?: return@mapNotNull null
             LinhaFicha(
                 Texto.capitalizar(d.rotulo), v.texto, aviso = avisoDoValor(e, d.campo, t),

@@ -17,10 +17,10 @@ import { calorDaAmostra, combinarHess, ehSubstanciaSimplesPadrao, equacaoDeCombu
 import { respostaRecusa } from './seguranca.js';
 import { fmt, fmtTex } from './formato.js';
 import { fmtData, idiomaAtual, nomeDoIdioma, t, tl } from './i18n/index.js';
-import { ligarQuantidades, termosDeBusca } from './nlu.js';
+import { CONCEITO_CONSTANTE_EQUILIBRIO, ligarQuantidades, termosDeBusca } from './nlu.js';
 import { exibirNome, minusNoMeio, nomeComposto as infoNomeComposto, nomeElemento as infoNomeElemento } from './nomes.js';
 import { fonteGhs, descreverGhs, urlSegura } from './perigos.js';
-import { avisoDoValor, categoriaPlural, categoriaRotulo, classeRotulo, escoposDe, estadoChave, estadoRotulo, fontesDoCampo, formatarValor, lerValor, medidasDoComposto, notaEletronegatividade, temEscopo, valorBruto } from './propriedades.js';
+import { avisoDoValor, categoriaPlural, categoriaRotulo, classeRotulo, escoposDe, estadoChave, estadoRotulo, fontesDoCampo, formatarValor, lerValor, MEDIDAS_COMPOSTO, MEDIDAS_TERMO, medidaDoComposto, medidasDoComposto, notaEletronegatividade, simboloDaPropriedade, TERMO_ENERGIA, temEscopo, valorBruto } from './propriedades.js';
 import { capitalizar, listar, normalizar } from './texto.js';
 
 /** Fonte "este aplicativo" no idioma ativo (função: o idioma pode mudar em tempo de execução). */
@@ -65,8 +65,12 @@ function textoDoBloco(b) {
 }
 
 /** Monta a resposta final: texto plano, fontes agregadas (únicas), ações e sugestões. */
+const chaveFonte = (f) => `${f?.nome ?? ''}|${f?.url ?? ''}|${f?.licenca ?? ''}|${f?.detalhe ?? ''}`;
+/** A mesma fonte uma vez só na lista de um bloco (dois elementos com a fonte do PubChem não a repetem). */
+const fontesUnicas = (fs) => { const vistas = new Set(); return fs.filter((f) => { if (!f) return false; const k = chaveFonte(f); if (vistas.has(k)) return false; vistas.add(k); return true; }); };
+
 function montar({ intent, titulo, blocos, acoes = [], sugestoes = [], resolvida = true, extra = {} }) {
-  const todos = blocos.map((b) => ({ ...b, fonte: b.fonte ?? fonteApp() }));
+  const todos = blocos.map((b) => { const f = b.fonte ?? fonteApp(); return { ...b, fonte: Array.isArray(f) ? fontesUnicas(f) : f }; });
   const vistas = new Set();
   const fontes = [];
   for (const b of todos) {
@@ -256,11 +260,15 @@ export class AnswerBuilder {
     const itens = [...(this.idioma === 'en' ? [] : [{ rotulo: t('respostas.elemento.nomeEmIngles'), valor: e.nomes?.en ?? e.nomeEn ?? '—' }]), ...this.itensDoElemento(e)].filter((i) => i.valor !== '—');
     const s = [sug('fusaoDe', { nome: nomeMeio }), sug('configuracaoDe', { nome: nomeMeio })].filter((_, i) => (i === 0 ? e.pontoFusaoK != null : !!e.configuracaoEletronica));
     if (e.massaAtomica != null) s.push(sug('massaMolarDe', { nome: nomeMeio }));
+    // "o que é Fe2+": a ficha do elemento + a linha do íon (e do isótopo, "carbono-14"), campos só do cliente (CALCULADORAS §7)
+    const carga = Number.isInteger(p.cargaFormula) && p.cargaFormula !== 0 ? p.cargaFormula : 0;
+    const acoes = [rota(this.rotaElemento(e.simbolo), t('respostas.elemento.ficha', { nome })), rota('/quimica/tabela', t('respostas.elemento.verTabela'))];
+    if (carga && e.configuracaoEletronica) acoes.push(rota(this.rotaEletronica(e.simbolo, carga), t('respostas.eletronica.abrir')));
     return montar({
       intent: 'ELEMENTO', titulo: t('respostas.elemento.titulo', { nome, simbolo: e.simbolo, z: e.z }),
-      blocos: [B.kv(null, itens, fonte)],
-      acoes: [rota(this.rotaElemento(e.simbolo), t('respostas.elemento.ficha', { nome })), rota('/quimica/tabela', t('respostas.elemento.verTabela'))],
-      sugestoes: s
+      blocos: [...this.linhasIonIsotopo(e, carga, p.numeroMassa ?? null), B.kv(null, itens, fonte)],
+      acoes, sugestoes: s,
+      extra: carga ? { ion: { simbolo: e.simbolo, carga } } : {}
     });
   }
 
@@ -327,7 +335,7 @@ export class AnswerBuilder {
   // ------------------------------------------------------------------------------------------------ propriedades
   /** Item {rotulo, valor} de uma medida do composto: valor com unidades, condições da medida e "sem referência" quando for o caso. */
   itemMedida(m, rotulo = null) {
-    const extras = [...new Set(m.fontes.flatMap((f) => f.condicoes))];
+    const extras = [...(m.condicoes ?? new Set(m.fontes.flatMap((f) => f.condicoes)))];
     if (m.fontes.some((f) => f.semReferencia)) extras.push(t('propriedades.medidas.semReferencia'));
     const r = rotulo ?? capitalizar(m.prop.id === 'estadoPadrao' ? t('propriedades.medidas.estadoA25') : m.prop.rotulo);
     return { rotulo: r, valor: `${m.f.texto}${extras.length ? ` — ${extras.join('; ')}` : ''}` };
@@ -349,8 +357,14 @@ export class AnswerBuilder {
         sugestoes: [sug('fusaoFerro'), sug('massaMolarAgua')]
       });
     }
+    // prótons, nêutrons e elétrons (CALCULADORAS §7): resposta própria, por regra, com a carga e o número de massa da pergunta
+    if (ids.includes('particulas') && elementos.length) {
+      if (ids.length === 1) return this.respostaParticulas(elementos, p);
+    }
     const linhas = [];
     const ausentes = [];
+    const faltaTermo = [];
+    const termoPorId = new Map(); // id → [{nome, m}] (vários compostos com ΔHf°/ΔGf°/S°: qual é o maior e o mais negativo)
     const fontes = [];
     const blocosMedidas = [];
     const avisos = [];
@@ -358,7 +372,7 @@ export class AnswerBuilder {
     const nomeDe = (reg, alvo) => (alvo === 'composto' ? this.nomeComposto(reg) : this.nomeElemento(reg));
     for (const id of ids) {
       const prop = this.dic.propPorId.get(id);
-      if (!prop) continue;
+      if (!prop || (id === 'particulas' && elementos.length)) continue;
       const escopos = escoposDe(prop);
       let algum = false;
       for (const alvo of escopos) {
@@ -368,14 +382,17 @@ export class AnswerBuilder {
           const nome = nomeDe(reg, alvo);
           const rotulo = t('respostas.propriedade.de', { prop: capitalizar(prop.id === 'estadoPadrao' && alvo === 'composto' ? t('propriedades.medidas.estadoA25') : prop.rotulo), nome });
           if (alvo === 'composto' && prop.medida) {
-            // medida do composto (Wikidata): cada valor com a sua fonte e as condições da medida
-            const lido = lerValor(prop, reg);
-            const f = lido && formatarValor(prop, lido.valor, this.ctx, lido.campo);
-            if (f) {
-              const m = { prop, campo: lido.campo, valor: lido.valor, f, fontes: fontesDoCampo(reg, lido.campo, this.ctx) };
+            // medida do composto (Wikidata; termoquímica do chembox da Wikipédia en): cada valor com a sua fonte e as condições da medida
+            const m = medidaDoComposto(prop, reg, this.ctx);
+            if (m) {
               blocosMedidas.push(B.kv(null, [this.itemMedida(m, rotulo)], m.fontes.length ? m.fontes : dado(reg.fontes?.[0])[0] ?? fonteApp()));
-              linhas.push({ rotulo, valor: f.texto, medida: true });
+              linhas.push({ rotulo, valor: m.f.texto, medida: true });
+              if (MEDIDAS_TERMO.includes(prop.id) && typeof m.valor === 'number') (termoPorId.get(prop.id) ?? termoPorId.set(prop.id, []).get(prop.id)).push({ nome, m });
               if (prop.id === 'pka') avisos.push(t('propriedades.medidas.notaPka'));
+            } else if (MEDIDAS_TERMO.includes(prop.id)) {
+              // sem o valor no pacote: diz o que falta e não estima (DATA_CONTRACT §3.1)
+              faltaTermo.push({ rotulo, texto: t('respostas.propriedade.faltaTermo', { simbolo: simboloDaPropriedade(prop), nome: minus(nome) }) });
+              semMedida.set(reg.cid, reg);
             } else { ausentes.push(t('respostas.propriedade.de', { prop: prop.rotulo, nome })); semMedida.set(reg.cid, reg); }
             continue;
           }
@@ -403,7 +420,17 @@ export class AnswerBuilder {
     const simples = linhas.filter((l) => !l.medida).map(({ rotulo, valor }) => ({ rotulo, valor }));
     if (simples.length) blocos.push(B.kv(null, simples, fontes.filter(Boolean).length ? fontes.filter(Boolean) : fonteApp()));
     blocos.push(...blocosMedidas);
+    for (const [id, lista] of termoPorId) {
+      if (lista.length < 2) continue;
+      const pr = this.dic.propPorId.get(id);
+      const fs = lista.flatMap((x) => x.m.fontes);
+      const top = lista.reduce((x, y) => (y.m.valor > x.m.valor ? y : x));
+      const low = lista.reduce((x, y) => (y.m.valor < x.m.valor ? y : x));
+      if (lista.filter((x) => x.m.valor === top.m.valor).length === 1) blocos.push(B.texto(t('respostas.comparar.maior', { prop: capitalizar(pr.rotulo), nome: top.nome, valor: top.m.f.curto }), fs));
+      if (TERMO_ENERGIA.includes(id) && low.m.valor < 0 && lista.filter((x) => x.m.valor === low.m.valor).length === 1) blocos.push(B.texto(t('respostas.comparar.maisNegativo', { prop: capitalizar(pr.rotulo), nome: low.nome, valor: low.m.f.curto }), fs));
+    }
     for (const a of [...new Set(avisos)]) blocos.push(B.aviso(a));
+    for (const f of faltaTermo) blocos.push(B.aviso(f.texto));
     if (ausentes.length) blocos.push(B.aviso(t('respostas.propriedade.naoTem', { lista: ausentes.join('; ') })));
     // o que o pacote traz dos compostos sem a medida pedida
     for (const c of semMedida.values()) {
@@ -412,13 +439,18 @@ export class AnswerBuilder {
     }
     // configuração eletrônica (§2.2 de docs/CALCULADORAS_2026-10-17.md): além do valor do pacote, a distribuição calculada
     if (ids.includes('configuracaoEletronica')) for (const e of elementos.slice(0, 3)) blocos.push(...this.blocosEletronica(e));
+    // partículas pedidas junto com outras propriedades ("número atômico e nêutrons do ferro")
+    if (ids.includes('particulas')) for (const e of elementos.slice(0, 3)) blocos.push(...this.blocosParticulas(e, this.cargaDaPergunta(p, e), this.massaDaPergunta(p, e), true).blocos);
     const primeiro = elementos[0] ?? compostos[0];
     const acoes = elementos[0] && ids.some((i) => temEscopo(this.dic.propPorId.get(i), 'elemento'))
       ? [rota(this.rotaElemento(elementos[0].simbolo), t('respostas.propriedade.fichaDe', { nome: this.nomeElemento(elementos[0]) }))]
       : compostos[0] ? [rota(this.rotaComposto(compostos[0].cid), t('respostas.propriedade.fichaDe', { nome: this.nomeComposto(compostos[0]) }))] : [];
     if (ids.includes('configuracaoEletronica') && elementos[0]?.configuracaoEletronica) acoes.push(rota(`/quimica/calculadoras/configuracao-eletronica?el=${encodeURIComponent(elementos[0].simbolo)}`, t('respostas.eletronica.abrir')));
+    // a falta de um dado do pacote não é falha de interpretação: a resposta continua resolvida (o contexto vale para "e do metano?")
+    const soFalta = !linhas.length && faltaTermo.length > 0 && !ids.includes('particulas');
     return montar({
-      intent: 'PROPRIEDADE', titulo: linhas.length === 1 ? linhas[0].rotulo : t('respostas.propriedade.propriedadesDe', { nomes: listar([...elementos.map((e) => this.nomeElemento(e)), ...compostos.map((c) => this.nomeComposto(c))]) }),
+      intent: 'PROPRIEDADE',
+      titulo: linhas.length === 1 ? linhas[0].rotulo : soFalta && faltaTermo.length === 1 ? faltaTermo[0].rotulo : t('respostas.propriedade.propriedadesDe', { nomes: listar([...elementos.map((e) => this.nomeElemento(e)), ...compostos.map((c) => this.nomeComposto(c))]) }),
       blocos, acoes,
       sugestoes: primeiro ? [elementos[0] ? sug('densidadeDe', { nome: minus(this.nomeElemento(elementos[0])) }) : sug('massaMolarDe', { nome: minus(this.nomeComposto(compostos[0])) })] : [],
       extra: { alvoPropriedade: elementos.length ? 'elemento' : 'composto' }
@@ -869,8 +901,14 @@ export class AnswerBuilder {
       const frases = [];
       const frasesOrdem = [];
       const pedidas = new Set(p.propriedades?.length ? p.propriedades : p.propriedade ? [p.propriedade] : []);
-      for (const id of ['estadoPadrao', 'pontoFusaoK', 'pontoEbulicaoK', 'densidadeKgm3', 'solubilidade', 'pka']) {
+      const faltas = [];
+      for (const id of MEDIDAS_COMPOSTO) {
         const ms = medidas.map((mm) => mm.get(id) ?? null);
+        // termoquímica pedida e ausente num dos compostos: diz qual falta (nenhum valor estimado)
+        if (pedidas.has(id) && MEDIDAS_TERMO.includes(id)) {
+          const pr = this.dic.propPorId.get(id);
+          ms.forEach((m, i) => { if (!m) faltas.push(t('respostas.propriedade.faltaTermo', { simbolo: simboloDaPropriedade(pr), nome: minus(this.nomeComposto(compostos[i])) })); });
+        }
         if (ms.filter(Boolean).length < 2) continue;
         const prop = ms.find(Boolean).prop;
         linhas.push([capitalizar(id === 'estadoPadrao' ? t('propriedades.medidas.estadoA25') : prop.rotulo), ...ms.map((m) => (m ? m.f.curto : '—'))]);
@@ -880,6 +918,9 @@ export class AnswerBuilder {
         if (pedidas.has(id) && num.length >= 2 && new Set(num.map((x) => x.m.campo)).size === 1) {
           const top = num.reduce((x, y) => (y.m.valor > x.m.valor ? y : x));
           if (num.filter((x) => x.m.valor === top.m.valor).length === 1) frases.push(t('respostas.comparar.maior', { prop: capitalizar(prop.rotulo), nome: this.nomeComposto(compostos[top.i]), valor: top.m.f.curto }));
+          // ΔHf°/ΔGf°: o "mais negativo" (o mais estável em relação aos elementos), quando há valor negativo
+          const low = num.reduce((x, y) => (y.m.valor < x.m.valor ? y : x));
+          if (TERMO_ENERGIA.includes(id) && low.m.valor < 0 && num.filter((x) => x.m.valor === low.m.valor).length === 1) frases.push(t('respostas.comparar.maisNegativo', { prop: capitalizar(prop.rotulo), nome: this.nomeComposto(compostos[low.i]), valor: low.m.f.curto }));
         }
         // ordem pedida ("ordem crescente de densidade: água, etanol e glicerina"): lista ordenada antes da tabela
         if (p.ordem && pedidas.has(id) && num.length >= 2 && new Set(num.map((x) => x.m.campo)).size === 1) {
@@ -893,7 +934,7 @@ export class AnswerBuilder {
         intent: 'COMPARAR', titulo: t('respostas.comparar.titulo', { nomes: listar(compostos.map((c) => this.nomeComposto(c))) }),
         blocos: [...frasesOrdem.map((f) => B.texto(f, fontesMedidas.length ? fontesMedidas : fonteApp())),
           B.tabela(null, ['', ...compostos.map((c) => this.nomeComposto(c))], linhas, fontesMedidas.length ? fonteTabela : dado(...compostos.map((c) => c.fontes?.[0]))[0] ?? fonteApp()),
-          ...frases.map((f) => B.texto(f, fontesMedidas.length ? fontesMedidas : fonteApp()))],
+          ...frases.map((f) => B.texto(f, fontesMedidas.length ? fontesMedidas : fonteApp())), ...faltas.map((f) => B.aviso(f))],
         acoes: compostos.map((c) => rota(this.rotaComposto(c.cid), t('respostas.comparar.fichaDe', { nome: this.nomeComposto(c) }))), sugestoes: []
       });
     }
@@ -950,7 +991,7 @@ export class AnswerBuilder {
       const top = com.slice(0, 5);
       return montar({
         intent: 'TABELA_PERIODICA', titulo: t('respostas.tabela.extremo', { dir, prop: pr.rotulo, nome: nomeTit(top[0].e), simbolo: top[0].e.simbolo }),
-        blocos: [B.tabela(t('respostas.tabela.entreOs', { n: com.length }), [t('respostas.tabela.elemento'), t('respostas.tabela.simbolo'), capitalizar(pr.rotulo)], top.map((x) => [nomeTit(x.e), x.e.simbolo, formatarValor(pr, x.v, this.ctx).curto]), fonte)],
+        blocos: [B.tabela(t('respostas.tabela.entreOs', { n: com.length }), [t('respostas.tabela.elemento'), t('respostas.tabela.simbolo'), capitalizar(pr.rotulo)], top.map((x) => [nomeTit(x.e), x.e.simbolo, formatarValor(pr, x.v, this.ctx)?.curto ?? '—']), fonte)],
         acoes: acao, sugestoes: [sug('grupo17')]
       });
     }
@@ -1000,8 +1041,8 @@ export class AnswerBuilder {
     const gr = melhor(porGrupo, p.grupo);
     const nomeTit = (e) => this.nomeElementoTitulo(e);
     const blocos = [];
-    if (per != null) blocos.push(B.tabela(t('respostas.tabela.periodoLegenda', { p: per }), [t('respostas.tabela.elemento'), t('respostas.tabela.colGrupo'), capitalizar(pr.rotulo)], porPeriodo.get(per).sort((a, b) => a.z - b.z).map((e) => [`${nomeTit(e)} (${e.simbolo})`, String(e.grupo ?? '—'), formatarValor(pr, valorBruto(pr, e), this.ctx).curto]), fonte));
-    if (gr != null) blocos.push(B.tabela(t('respostas.tabela.grupoLegenda', { g: gr }), [t('respostas.tabela.elemento'), t('respostas.tabela.colPeriodo'), capitalizar(pr.rotulo)], porGrupo.get(gr).sort((a, b) => a.periodo - b.periodo).map((e) => [`${nomeTit(e)} (${e.simbolo})`, String(e.periodo), formatarValor(pr, valorBruto(pr, e), this.ctx).curto]), fonte));
+    if (per != null) blocos.push(B.tabela(t('respostas.tabela.periodoLegenda', { p: per }), [t('respostas.tabela.elemento'), t('respostas.tabela.colGrupo'), capitalizar(pr.rotulo)], porPeriodo.get(per).sort((a, b) => a.z - b.z).map((e) => [`${nomeTit(e)} (${e.simbolo})`, String(e.grupo ?? '—'), formatarValor(pr, valorBruto(pr, e), this.ctx)?.curto ?? '—']), fonte));
+    if (gr != null) blocos.push(B.tabela(t('respostas.tabela.grupoLegenda', { g: gr }), [t('respostas.tabela.elemento'), t('respostas.tabela.colPeriodo'), capitalizar(pr.rotulo)], porGrupo.get(gr).sort((a, b) => a.periodo - b.periodo).map((e) => [`${nomeTit(e)} (${e.simbolo})`, String(e.periodo), formatarValor(pr, valorBruto(pr, e), this.ctx)?.curto ?? '—']), fonte));
     if (!blocos.length) blocos.push(B.aviso(t('respostas.tabela.naoTemSuficiente', { prop: pr.rotulo })));
     return montar({
       intent: 'TABELA_PERIODICA', titulo: t('respostas.tabela.tendencia', { prop: pr.rotulo }),
@@ -1410,6 +1451,7 @@ export class AnswerBuilder {
 
   // ------------------------------------------------------------------------------------------------ conceitos (trechos licenciados)
   async conceito(p) {
+    if (p.conceito === CONCEITO_CONSTANTE_EQUILIBRIO && !p.soTextos) return this.respostaConstanteEquilibrio(p);
     const termos = termosDeBusca(p.conceito || p.textoOriginal, this.dic.lex);
     const chave = normalizar(p.conceito || '');
     const idioma = this.idioma;
@@ -1462,12 +1504,132 @@ export class AnswerBuilder {
       acoes: [], sugestoes: [sug('molsAgua'), sug('phHcl')]
     });
   }
+  // ------------------------------------------------------------------------------------------------ partículas, íons e Kc sem equação (18/10/2026)
+  // docs/CALCULADORAS_2026-10-17.md §7: prótons = Z; elétrons = Z − carga; nêutrons = A − Z, com A da pergunta (exato) ou, sem ele, a massa
+  // atômica arredondada, sempre ROTULADA como aproximação. Carga e número de massa são campos só do cliente (`cargaFormula`, `numeroMassa`).
+  rotaEletronica(simbolo, carga = 0) { return `/quimica/calculadoras/configuracao-eletronica?el=${encodeURIComponent(simbolo)}${carga ? `&q=${carga}` : ''}`; }
+  /** Carga da pergunta, só para o elemento a que ela se refere (`p.elemento`). */
+  cargaDaPergunta(p, e) { return e.simbolo === p.elemento && Number.isInteger(p.cargaFormula) ? p.cargaFormula : 0; }
+  /** Número de massa da pergunta, só para o elemento a que ele se refere. */
+  massaDaPergunta(p, e) { return e.simbolo === p.elemento && Number.isInteger(p.numeroMassa) ? p.numeroMassa : null; }
+
+  /** Contagem das partículas: {z, q, eletrons, a, neutrons, exato, massa}. `a`/`neutrons` null sem número de massa e sem massa atômica. */
+  dadosParticulas(e, carga = 0, numeroMassa = null) {
+    const z = e.z;
+    const q = Number.isInteger(carga) ? carga : 0;
+    const exato = Number.isInteger(numeroMassa) && numeroMassa >= z;
+    const massa = typeof e.massaAtomica === 'number' && Number.isFinite(e.massaAtomica) ? e.massaAtomica : null;
+    const a = exato ? numeroMassa : massa != null ? Math.round(massa) : null;
+    return { z, q, eletrons: z - q, a, neutrons: a != null ? a - z : null, exato, massa };
+  }
+
+  /** Blocos de partículas de um elemento: {ok, titulo, blocos, dados}. `comTitulo` põe o título no bloco (resposta com vários elementos). */
+  blocosParticulas(e, carga = 0, numeroMassa = null, comTitulo = false) {
+    const d = this.dadosParticulas(e, carga, numeroMassa);
+    const nome = minus(this.nomeElemento(e));
+    const fontes = [...dado(e.fontes?.[0]), this.fonteRegra('particulas')];
+    const especie = notacaoEspecie(e.simbolo, d.q, d.exato ? d.a : null);
+    const dados = { simbolo: e.simbolo, protons: d.z, eletrons: d.eletrons, neutrons: d.neutrons, numeroMassa: d.a, carga: d.q, aproximado: !d.exato };
+    if (d.eletrons < 0) {
+      const titulo = t('respostas.particulas.especie') + `: ${especie}`;
+      return { ok: false, titulo, dados, blocos: [B.aviso(t('respostas.particulas.cargaInvalida', { carga: textoCarga(d.q), nome, z: String(d.z) }), fontes)] };
+    }
+    const P = (k, n) => t(`respostas.particulas.${k}`, { n });
+    const descricao = d.q > 0 ? t('respostas.particulas.cation', { ion: especie, nome })
+      : d.q < 0 ? t('respostas.particulas.anion', { ion: especie, nome })
+        : d.exato ? `${t('respostas.particulas.isotopo', { iso: especie })} (${nome})` : t('respostas.particulas.atomoNeutro', { nome });
+    const itens = [
+      { rotulo: t('respostas.particulas.especie'), valor: descricao },
+      { rotulo: t('respostas.particulas.protons'), valor: String(d.z), destaque: true },
+      { rotulo: t('respostas.particulas.eletrons'), valor: String(d.eletrons), destaque: true, extra: d.q ? contaEletrons(d) : t('respostas.particulas.eletronsNeutro') }
+    ];
+    const blocosAviso = [];
+    if (d.a != null) {
+      // sem o número de massa na pergunta: A ≈ massa atômica arredondada, rotulado como aproximação (o número de nêutrons depende do isótopo)
+      itens.push({ rotulo: t('respostas.particulas.numeroMassa'), valor: d.exato ? String(d.a) : t('respostas.particulas.numeroMassaAprox', { a: String(d.a) }), ...(d.exato ? {} : { extra: t('respostas.particulas.aproxMassa', { m: fmt(d.massa, { sig: 6 }) }) }) });
+      itens.push({ rotulo: t('respostas.particulas.neutrons'), valor: d.exato ? String(d.neutrons) : t('respostas.particulas.neutronsAprox', { n: String(d.neutrons) }), destaque: d.exato, extra: `A − Z ${d.exato ? '=' : '≈'} ${d.a} − ${d.z}` });
+      if (!d.exato) blocosAviso.push(B.aviso(t('respostas.particulas.avisoAprox', { m: fmt(d.massa, { sig: 6 }), a: String(d.a), simbolo: e.simbolo }), fontes));
+    } else blocosAviso.push(B.aviso(t('respostas.particulas.semMassa', { nome }), fontes));
+    const contagens = { especie, protons: P('contProtons', d.z), eletrons: P('contEletrons', d.eletrons), neutrons: d.neutrons != null ? P('contNeutrons', d.neutrons) : '' };
+    const titulo = d.a == null ? `${especie}: ${listar([contagens.protons, contagens.eletrons])}` : t(d.exato ? 'respostas.particulas.titulo' : 'respostas.particulas.tituloAprox', contagens);
+    return { ok: true, titulo, dados, blocos: [B.resultado(comTitulo ? titulo : null, itens, fontes), ...blocosAviso] };
+  }
+
+  /** PROPRIEDADE `particulas`: um bloco por elemento (até 3); carga e número de massa só no elemento da pergunta. */
+  respostaParticulas(elementos, p) {
+    const lista = elementos.slice(0, 3);
+    const partes = lista.map((e) => this.blocosParticulas(e, this.cargaDaPergunta(p, e), this.massaDaPergunta(p, e), lista.length > 1));
+    const e0 = lista[0];
+    const q0 = this.cargaDaPergunta(p, e0);
+    const acoes = [rota(this.rotaElemento(e0.simbolo), t('respostas.propriedade.fichaDe', { nome: this.nomeElemento(e0) }))];
+    if (e0.configuracaoEletronica) acoes.push(rota(this.rotaEletronica(e0.simbolo, q0), t('respostas.eletronica.abrir')));
+    return montar({
+      intent: 'PROPRIEDADE', resolvida: partes.every((x) => x.ok),
+      titulo: partes.length === 1 ? partes[0].titulo : t('respostas.propriedade.propriedadesDe', { nomes: listar(lista.map((e) => this.nomeElemento(e))) }),
+      blocos: partes.flatMap((x) => x.blocos), acoes,
+      sugestoes: [sug('configuracaoDe', { nome: minus(this.nomeElemento(e0)) })],
+      extra: { alvoPropriedade: 'elemento', particulas: partes.map((x) => x.dados) }
+    });
+  }
+
+  /** Linhas do íon e do isótopo para a ficha do elemento ("o que é Fe2+": "Íon Fe²⁺ (cátion): 24 elétrons (26 − 2)."). */
+  linhasIonIsotopo(e, carga = 0, numeroMassa = null) {
+    const out = [];
+    const fontes = [...dado(e.fontes?.[0]), this.fonteRegra('particulas')];
+    if (Number.isInteger(carga) && carga !== 0) {
+      const d = this.dadosParticulas(e, carga, null);
+      if (d.eletrons < 0) out.push(B.aviso(t('respostas.particulas.cargaInvalida', { carga: textoCarga(carga), nome: minus(this.nomeElemento(e)), z: String(d.z) }), fontes));
+      else out.push(B.texto(t('respostas.particulas.linhaIon', { ion: notacaoEspecie(e.simbolo, carga, null), tipo: t(carga > 0 ? 'respostas.particulas.tipoCation' : 'respostas.particulas.tipoAnion'), eletrons: t('respostas.particulas.contEletrons', { n: d.eletrons }), conta: contaEletrons(d) }), fontes));
+    }
+    if (Number.isInteger(numeroMassa) && numeroMassa >= e.z) {
+      out.push(B.texto(t('respostas.particulas.linhaIsotopo', { iso: notacaoEspecie(e.simbolo, 0, numeroMassa), protons: t('respostas.particulas.contProtons', { n: e.z }), neutrons: t('respostas.particulas.contNeutrons', { n: numeroMassa - e.z }), conta: `A − Z = ${numeroMassa} − ${e.z}` }), fontes));
+    }
+    return out;
+  }
+
+  /**
+   * CONCEITO "constante de equilibrio" (Kc/Kp sem equação na pergunta): a explicação por regra, o pedido da equação e a ação que abre o cartão
+   * Kc/Kp da tela Calculadoras (com a temperatura da pergunta já preenchida); o trecho licenciado do pacote sobre o tema, se houver, vem depois.
+   */
+  async respostaConstanteEquilibrio(p) {
+    const regra = this.fonteRegra('acaoDasMassas');
+    const temp = (p.quantidades ?? []).find((q) => q && typeof q.valor === 'number' && Number.isFinite(q.valor) && q.unidade && acharUnidade(this.ctx.unidades, q.unidade).some((u) => u.grupo === 'temperatura')) ?? null;
+    const T = temp ? temperaturaEmK(temp, this.ctx) : null;
+    const blocos = [
+      B.texto(t('respostas.constanteEquilibrio.explicacao'), regra),
+      B.equacao('K_c = \\dfrac{[\\mathrm{C}]^{c}\\,[\\mathrm{D}]^{d}}{[\\mathrm{A}]^{a}\\,[\\mathrm{B}]^{b}}', 'Kc = [C]^c·[D]^d / ([A]^a·[B]^b)', regra),
+      B.equacao('K_p = K_c\\,(RT)^{\\Delta n}', 'Kp = Kc·(RT)^Δn', regra),
+      B.texto(t('respostas.constanteEquilibrio.equacao'))
+    ];
+    if (T != null) blocos.push(B.texto(t('respostas.constanteEquilibrio.temperatura', { t: fmt(T, { sig: 6 }) })));
+    // o texto do pacote sobre o tema (Wikipédia etc.) continua valendo, depois da regra
+    try {
+      const doPacote = await this.conceito({ ...p, soTextos: true });
+      // trecho com a fórmula do artigo em TeX cru ("{\displaystyle …}", extração da Wikipédia) não ajuda ao lado da expressão já montada
+      if (doPacote.resolvida) blocos.push(...doPacote.blocos.filter((b) => b.tipo === 'citacao' && !/\\displaystyle/.test(b.texto)).slice(0, 1));
+    } catch { /* sem texto: só a regra */ }
+    const qs = temp ? `?t=${encodeURIComponent(String(temp.valor))}&ut=${encodeURIComponent(temp.unidade)}` : '';
+    return montar({
+      intent: 'CONCEITO', titulo: t('respostas.constanteEquilibrio.titulo'), blocos,
+      acoes: [rota(`/quimica/calculadoras/equilibrio${qs}`, t('respostas.equilibrio.abrir'))],
+      sugestoes: [sug('kcAmonia')],
+      extra: { conceito: CONCEITO_CONSTANTE_EQUILIBRIO, temperaturaK: T }
+    });
+  }
 }
 
 const formatarFormulaTexto = (f) => (tentarFormula(f) ? formulaUnicode(f) : f);
 
 /** Carga como texto: "+1", "−2", "0". */
 const textoCarga = (q) => (q === 0 ? '0' : `${q > 0 ? '+' : '−'}${Math.abs(q)}`);
+const SOBRESCRITO = { 0: '⁰', 1: '¹', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶', 7: '⁷', 8: '⁸', 9: '⁹', '+': '⁺', '-': '⁻' };
+const sobrescrito = (s) => [...String(s)].map((c) => SOBRESCRITO[c] ?? c).join('');
+/** Carga em sobrescrito: 2 → "²⁺", −1 → "⁻", 0 → "". */
+export const cargaSobrescrita = (q) => (!q ? '' : sobrescrito(`${Math.abs(q) === 1 ? '' : Math.abs(q)}${q > 0 ? '+' : '-'}`));
+/** Notação da espécie: número de massa à esquerda em sobrescrito e carga à direita ("⁵⁶Fe", "Fe²⁺", "Cl⁻"). */
+export const notacaoEspecie = (simbolo, carga = 0, numeroMassa = null) => `${numeroMassa ? sobrescrito(numeroMassa) : ''}${simbolo}${cargaSobrescrita(carga)}`;
+/** Conta dos elétrons de um íon: "26 − 2 = 24" (cátion), "17 + 1 = 18" (ânion). */
+const contaEletrons = (d) => `${d.z} ${d.q > 0 ? '−' : '+'} ${Math.abs(d.q)} = ${d.eletrons}`;
 /** NOX (Frac) em TeX: "+6", "-2", "-\frac{8}{3}". */
 function texNox(f) {
   if (f.zero) return '0';

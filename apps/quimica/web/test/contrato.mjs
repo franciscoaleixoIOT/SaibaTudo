@@ -1,7 +1,7 @@
 // Comparação dos casos de referência do NLU (contracts/nlu_golden_cases.json) com a interpretação do site. Usado pelos testes do NLU e das respostas.
 import { normalizar } from '../src/quimica/js/texto.js';
 
-export const CHAVES_GOLDEN = ['intent', 'elemento', 'composto', 'propriedade', 'equacao', 'unidadeDestino', 'grupo', 'periodo', 'bloco', 'categoria', 'estado', 'formula', 'nivel', 'conceito'];
+export const CHAVES_GOLDEN = ['intent', 'elemento', 'composto', 'propriedade', 'equacao', 'unidadeDestino', 'grupo', 'periodo', 'bloco', 'categoria', 'estado', 'formula', 'nivel', 'conceito', 'cargaFormula', 'numeroMassa'];
 
 /** O composto esperado (CID ou nome) existe no pacote? Devolve o CID. */
 export function cidDe(esperado, store) {

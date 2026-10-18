@@ -80,7 +80,10 @@ export default {
   "hess": "\\b(?:hess s law|hess law|hess)\\b",
   "kcKp": "\\b(?:kp|partial pressures?)\\b",
   "concentracaoColchete": "=|:|is|equals|of",
-  "ligacaoPolaridade": "\\b(?:ionic|covalent|polar|nonpolar|non polar|apolar|metallic)\\b"
+  "ligacaoPolaridade": "\\b(?:ionic|covalent|polar|nonpolar|non polar|apolar|metallic)\\b",
+  "deFormacao": "\\b(?:of formation|formation)\\b",
+  "constanteEquilibrio": "\\b(?:kc|kp|equilibrium constants?|equilibrium expression|expression for (?:kc|kp|the equilibrium constant))\\b",
+  "ionRomano": "\\b(?:ions?|cations?) (?:of )?([a-z]+) (i{1,3}|iv|vi{0,2}|v)\\b|\\b([a-z]+) (i{1,3}|iv|vi{0,2}|v) (?:ions?|cations?)\\b"
  },
  "nivel": {
   "fundamental": "\\b(?:elementary school|primary school|middle school|for kids|for children|simple|very simple|easy to understand|for beginners|layman)\\b",
@@ -465,7 +468,9 @@ export default {
    "aufbau diagram",
    "subshells",
    "highest energy subshell",
-   "electron shell distribution"
+   "electron shell distribution",
+   "outer shell electrons",
+   "outer shell"
   ],
   "eletronegatividade": [
    "electronegativity"
@@ -629,6 +634,36 @@ export default {
    "standard enthalpy of formation",
    "enthalpy of formation",
    "heat of formation"
+  ],
+  "energiaGibbsFormacaoKJmol": [
+   "standard gibbs free energy of formation",
+   "standard gibbs energy of formation",
+   "gibbs free energy of formation",
+   "gibbs energy of formation",
+   "standard free energy of formation",
+   "free energy of formation",
+   "delta g of formation",
+   "delta gf"
+  ],
+  "entropiaPadraoJmolK": [
+   "standard molar entropy",
+   "standard entropy",
+   "absolute entropy",
+   "molar entropy",
+   "entropy of"
+  ],
+  "particulas": [
+   "subatomic particles",
+   "number of protons",
+   "number of neutrons",
+   "number of electrons",
+   "mass number",
+   "protons",
+   "proton",
+   "neutrons",
+   "neutron",
+   "electrons",
+   "electron"
   ]
  },
  "rotulosPropriedadeNormalizados": true,

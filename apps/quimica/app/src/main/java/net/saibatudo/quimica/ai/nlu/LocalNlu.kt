@@ -20,7 +20,8 @@ import net.saibatudo.quimica.domain.calc.FormulaQuimica
  * Ordem (a primeira regra que casa vence):
  *  1. segurança química (RECUSA_PERIGO), antes de qualquer outra coisa;
  *  2. conversa e meta: AJUDA (saudação), SOBRE_DADOS, FONTES, AJUDA ("o que você faz");
- *  2b. EQUILIBRIO e ENTALPIA (antes da equação, senão viram BALANCEAR); "ΔHf do X" = PROPRIEDADE entalpiaFormacaoKJmol;
+ *  2b. EQUILIBRIO e ENTALPIA (antes da equação, senão viram BALANCEAR); "ΔHf do X" = PROPRIEDADE entalpiaFormacaoKJmol; "ΔGf do X" =
+ *      energiaGibbsFormacaoKJmol; Kc/Kp sem equação = CONCEITO "constante de equilibrio" (18/10/2026);
  *  3. equação química: ESTEQUIOMETRIA (com quantidades) ou BALANCEAR;
  *  4. CONVERSAO_UNIDADE (duas unidades da mesma grandeza);
  *  5. cálculos: PH, GAS_IDEAL, CONCENTRACAO, ESTEQUIOMETRIA, MASSA_MOLAR;
@@ -127,6 +128,26 @@ object LocalNlu {
             formulas = formulasTexto, formula = formulasTexto.firstOrNull() ?: compostos.firstOrNull { it.via == "formula" }?.texto,
             propriedades = props.map { it.id }, propriedade = props.firstOrNull()?.id
         )
+        // íon de UM elemento ("Fe2+", "Cl-", "íon ferro 2+") e número de massa ("Fe-56", "carbono-14"): o elemento, `cargaFormula` e `numeroMassa`;
+        // o token sai das fórmulas e dos compostos por fórmula ("O2-" é o óxido, não o O2). Com equação na pergunta, nada muda (semirreações).
+        if (equacao == null) {
+            val ext = lerIonsEIsotopo(original, d, lex, props.any { it.id == "particulas" })
+            if (ext.simbolos.isNotEmpty()) {
+                fun doIon(txt: String?) = (txt ?: "").replace(RX_CARGA_E_MASSA, "") in ext.simbolos
+                compostos = compostos.filter { !(it.via == "formula" && doIon(it.texto)) }
+                val formulasSemIon = p.formulas.filter { !doIon(it) }
+                // o elemento do íon/isótopo é o assunto da pergunta: vem primeiro
+                val elementosComIon = (ext.simbolos + p.elementos).distinct()
+                val elementoIon = elementosComIon.first()
+                p = p.copy(
+                    compostos = compostos.map { it.cid.toString() }, composto = compostos.firstOrNull()?.cid?.toString(), compostoNome = compostos.firstOrNull()?.nome,
+                    formulas = formulasSemIon, formula = formulasSemIon.firstOrNull() ?: compostos.firstOrNull { it.via == "formula" }?.texto,
+                    elementos = elementosComIon, elemento = elementoIon,
+                    cargaFormula = ext.ions.firstOrNull { it.first == elementoIon }?.second,
+                    numeroMassa = ext.isotopo?.takeIf { it.first == elementoIon }?.second
+                )
+            }
+        }
         val nEnt = p.elementos.size + p.compostos.size + p.formulas.size
         val tem = nEnt > 0
         fun fim(intent: Intent, extra: (ParsedQuery) -> ParsedQuery = { it }): ParsedQuery = extra(p.copy(intent = intent))
@@ -149,17 +170,26 @@ object LocalNlu {
             if (eqE != null) return fim(Intent.EQUILIBRIO) {
                 it.copy(equacao = if (setaDupla) eqE.replaceFirst(" -> ", " ⇌ ") else eqE, concentracoes = concentracoes.map { c -> Concentracao(c.especie, c.valor, c.unidade) })
             }
+            // Kc/Kp SEM equação ("qual o Kp a 500 K", "como calcular o Kc", "o que é Kc", "fórmula do Kp"): o conceito (18/10/2026, §7)
+            if (pista("constanteEquilibrio")) return fim(Intent.CONCEITO) { it.copy(conceito = CONCEITO_CONSTANTE_EQUILIBRIO, propriedade = null, propriedades = emptyList()) }
         }
         val temComposto = p.compostos.isNotEmpty() || p.formulas.isNotEmpty()
-        // "ΔHf do metano": a propriedade (entalpia padrão de formação), como "entalpia de formação do metano"
-        if (RX_DELTA_HF.containsMatchIn(original) && temComposto && equacao == null && p.propriedade == null) {
+        // "ΔHf do metano", "ΔH de formação do metano": a propriedade (entalpia padrão de formação), como "entalpia de formação do metano";
+        // "ΔGf da água", "ΔG°f", "ΔG de formação": energia livre de Gibbs padrão de formação (18/10/2026)
+        fun deltaFormacao(rxF: Regex, rx: Regex) =
+            (rxF.containsMatchIn(original) || (rx.containsMatchIn(original) && pista("deFormacao"))) && temComposto && equacao == null && p.propriedade == null
+        if (deltaFormacao(RX_DELTA_GF, RX_DELTA_G)) {
+            return fim(Intent.PROPRIEDADE) { it.copy(propriedade = "energiaGibbsFormacaoKJmol", propriedades = listOf("energiaGibbsFormacaoKJmol"), alvoPropriedade = "composto") }
+        }
+        if (deltaFormacao(RX_DELTA_HF, RX_DELTA_H) && !pista("entalpiaCombustao") && !pista("hess")) {
             return fim(Intent.PROPRIEDADE) { it.copy(propriedade = "entalpiaFormacaoKJmol", propriedades = listOf("entalpiaFormacaoKJmol"), alvoPropriedade = "composto") }
         }
         if (i("entalpia") || RX_DELTA_H.containsMatchIn(original)) {
             val combustao = pista("entalpiaCombustao")
             val hess = pista("hess")
-            // "entalpia de formação da água" é PROPRIEDADE (entalpiaFormacaoKJmol); "o que é entalpia?" é CONCEITO
-            val soFormacao = pista("entalpiaFormacao") && temComposto && !combustao && !hess && equacao == null
+            // "entalpia de formação da água" é PROPRIEDADE (entalpiaFormacaoKJmol); "o que é entalpia?" é CONCEITO; "entalpia livre de formação" (ΔGf)
+            // e "enthalpie libre standard de formation" também são PROPRIEDADE (a propriedade termoquímica citada)
+            val soFormacao = (pista("entalpiaFormacao") || p.propriedade in PROPRIEDADES_TERMO) && temComposto && !combustao && !hess && equacao == null
             val definicao = equacao == null && !temComposto && (pista("prefixoDefinicao") || i("conceitoCue"))
             if (!soFormacao && !definicao && (equacao != null || temComposto || combustao || hess)) return fim(Intent.ENTALPIA) { it.copy(equacao = equacao) }
         }
@@ -206,7 +236,9 @@ object LocalNlu {
             return fim(Intent.GAS_IDEAL)
         }
         if (i("concentracao") && (temQuant || pista("concentracaoForte")) && !pista("prefixoExplicacaoPalavra")) return fim(Intent.CONCENTRACAO)
-        if (i("estequiometria") && (temQuant || tem) && !pista("prefixoDefinicao")) {
+        // "quantas partículas subatômicas tem o oxigênio" é PROPRIEDADE particulas; "quantas partículas há em 2 mol de Fe" (com quantidade) continua cálculo
+        val soParticulas = p.propriedade == "particulas" && !temQuant
+        if (i("estequiometria") && (temQuant || tem) && !pista("prefixoDefinicao") && !soParticulas) {
             // com várias substâncias, a primeira é a que recebe a quantidade ("16 g de metano" em "quantos gramas de CO2 se formam de 16 g de metano")
             val ligado = compostoLigadoAQuantidade(original, quant, d, p.compostos, lex)
             return fim(Intent.ESTEQUIOMETRIA) {
@@ -353,6 +385,95 @@ object LocalNlu {
     private val RX_SETA_DUPLA = Regex("""<=>|<->|⇌|⇄|↔""")
     private val RX_BORDA_INICIO = Regex("""^[^\p{L}\d]+""")
     private val RX_BORDA_FIM = Regex("""[^\p{L}\d+-]+$""")
+    // 18/10/2026 (§7): "ΔGf", "ΔG°f", "ΔGf°" e "ΔG de formação" (a palavra "formação" vem do léxico: `pistas.deFormacao`)
+    private val RX_DELTA_G = Regex("""[Δ∆]\s*G\s*°?(?![a-z])""")
+    private val RX_DELTA_GF = Regex("""[Δ∆]\s*G\s*°?\s*f(?![a-z])""")
+    /** Assunto de CONCEITO de "Kc/Kp" sem equação na pergunta (a resposta oferece a calculadora de equilíbrio). Igual ao site. */
+    const val CONCEITO_CONSTANTE_EQUILIBRIO = "constante de equilibrio"
+    /** Propriedades termoquímicas de formação de um composto (a pergunta de uma delas não é ENTALPIA de reação). */
+    private val PROPRIEDADES_TERMO = setOf("entalpiaFormacaoKJmol", "energiaGibbsFormacaoKJmol", "entropiaPadraoJmolK")
+    private val RX_CARGA_E_MASSA = Regex("""[\d+\-^{}⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻−]""")
+
+    // ---- íons e número de massa (18/10/2026, docs/CALCULADORAS_2026-10-17.md §7) — espelho de `lerIonsEIsotopo` do site ----------------
+    private val SOBRESCRITOS = mapOf('⁰' to '0', '¹' to '1', '²' to '2', '³' to '3', '⁴' to '4', '⁵' to '5', '⁶' to '6', '⁷' to '7', '⁸' to '8', '⁹' to '9',
+        '⁺' to '+', '⁻' to '-', '−' to '-')
+    /** Símbolo com carga e/ou número de massa à frente: "Fe2+", "Fe+2", "Fe^{2+}", "56Fe", "56Fe3+" (o texto já sem sobrescritos). */
+    private val RX_TOKEN_ION = Regex("""^(\d{1,3})?([A-Z][a-z]?)(?:\^?\{?(\d?[+-]|[+-]\d)\}?)?$""")
+    private val RX_SIMBOLO_MASSA = Regex("""^([A-Z][a-z]?)-(\d{1,3})$""")
+    private val RX_NOME_MASSA = Regex("""^(\p{L}+)-(\d{1,3})$""")
+    private val RX_CARGA_SOLTA = Regex("""^(?:\d[+-]|[+-]\d)$""")
+    private val RX_TOKEN_INICIO = Regex("""^[^\p{L}\d+-]+""")
+    private val RX_TOKEN_FIM = Regex("""[^\p{L}\d+}-]+$""")
+    private val RX_SUFIXO_ION = Regex("""^(.*[+-]\}?)-\p{L}+$""")
+    private val ROMANOS = mapOf("i" to 1, "ii" to 2, "iii" to 3, "iv" to 4, "v" to 5, "vi" to 6, "vii" to 7)
+
+    /** Íons de UM elemento ([ions]: símbolo → carga, na ordem), isótopo (símbolo → número de massa) e os símbolos citados assim, na ordem. */
+    data class IonsEIsotopo(val ions: List<Pair<String, Int>>, val isotopo: Pair<String, Int>?, val simbolos: List<String>)
+
+    /** Carga escrita ("2+", "+2", "-", "3-") → inteiro com sinal. */
+    private fun cargaDe(s: String): Int? {
+        val m = Regex("""^(\d?)([+-])(\d?)$""").find(s) ?: return null
+        return (if (m.groupValues[2] == "-") -1 else 1) * (m.groupValues[1].ifEmpty { m.groupValues[3] }.ifEmpty { "1" }).toInt()
+    }
+
+    /** Número de massa plausível para o elemento (Z ≤ A ≤ 3Z + 10): corta coeficientes ("2Na") e temperaturas ("100K"). */
+    private fun massaPlausivel(d: Dicionario, simbolo: String, a: Int): Boolean {
+        val z = d.pacote.porSimbolo[simbolo]?.z ?: return false
+        return a >= z && a <= 3 * z + 10
+    }
+
+    /**
+     * Íons de UM elemento e número de massa citados na pergunta. Fórmula de mais de um elemento ("NO3-", "SO4 2-") não conta. [comPista]: a
+     * pergunta fala de partículas — só então "56Fe" sem sobrescrito vale (sem a pista, "100K" e "100W" são temperatura e potência).
+     */
+    fun lerIonsEIsotopo(original: String, d: Dicionario, lex: Lexico = d.lexico, comPista: Boolean = false): IonsEIsotopo {
+        val ions = mutableListOf<Pair<String, Int>>()
+        var isotopo: Pair<String, Int>? = null
+        val simbolos = mutableListOf<String>()
+        fun valido(s: String) = d.pacote.porSimbolo.containsKey(s)
+        fun porNome(w: String): String? = d.elementoPorNome(w)
+        fun addIon(s: String, carga: Int?) { if (carga != null && carga != 0) { ions += s to carga; if (s !in simbolos) simbolos += s } }
+        fun addIsotopo(s: String, a: Int) { if (isotopo == null && massaPlausivel(d, s, a)) { isotopo = s to a; if (s !in simbolos) simbolos += s } }
+        val brutos = original.split(Regex("""\s+""")).filter { it.isNotEmpty() }
+        val toks = brutos.map { b ->
+            val semSobrescrito = b.map { c -> SOBRESCRITOS[c] ?: c }.joinToString("")
+            RX_SUFIXO_ION.replace(RX_TOKEN_FIM.replace(RX_TOKEN_INICIO.replace(semSobrescrito, ""), ""), "$1")
+        }
+        var i = 0
+        while (i < toks.size) {
+            val t = toks[i]
+            val prox = toks.getOrElse(i + 1) { "" }
+            val m = RX_TOKEN_ION.find(t)
+            if (m != null && (m.groupValues[1].isNotEmpty() || m.groupValues[3].isNotEmpty()) && valido(m.groupValues[2])) {
+                if (m.groupValues[3].isNotEmpty()) addIon(m.groupValues[2], cargaDe(m.groupValues[3]))
+                // "56Fe" sem sobrescrito só com pista de partículas; "⁵⁶Fe" sempre
+                val comSobrescrito = brutos[i].dropWhile { !it.isLetterOrDigit() && it !in SOBRESCRITOS.keys }.firstOrNull()?.let { it in "⁰¹²³⁴⁵⁶⁷⁸⁹" } == true
+                if (m.groupValues[1].isNotEmpty() && (comPista || comSobrescrito)) addIsotopo(m.groupValues[2], m.groupValues[1].toInt())
+                i++; continue
+            }
+            val sm = RX_SIMBOLO_MASSA.find(t)
+            if (sm != null && valido(sm.groupValues[1])) { addIsotopo(sm.groupValues[1], sm.groupValues[2].toInt()); i++; continue }
+            if (Regex("""^[A-Z][a-z]?$""").matches(t) && valido(t) && RX_CARGA_SOLTA.matches(prox)) { addIon(t, cargaDe(prox)); i += 2; continue }
+            val nm = RX_NOME_MASSA.find(t)
+            if (nm != null) { porNome(nm.groupValues[1])?.let { addIsotopo(it, nm.groupValues[2].toInt()) }; i++; continue }
+            val s = if (t.length >= 3 && t.all { it.isLetter() }) porNome(t) else null
+            if (s != null && RX_CARGA_SOLTA.matches(prox)) { addIon(s, cargaDe(prox)); i += 2; continue }
+            // "carbono 14?" / "carbon 14": o número no fim da frase (ou antes de pontuação), sem unidade depois
+            if (s != null && Regex("""^\d{1,3}$""").matches(prox) && (i + 2 == toks.size || Regex("""[?!.,;:)]$""").containsMatchIn(brutos[i + 1]))) {
+                addIsotopo(s, prox.toInt()); i += 2; continue
+            }
+            i++
+        }
+        // "íon ferro(II)", "iron(III) ion": nome do elemento + algarismo romano junto da palavra íon/cátion (`pistas.ionRomano` do léxico)
+        lex.pista("ionRomano").find(Texto.nlu(original))?.let { mr ->
+            val grupos = mr.groupValues.drop(1).filter { it.isNotEmpty() }
+            val s = if (grupos.size >= 2) porNome(grupos[0]) else null
+            val r = grupos.getOrNull(1)?.let { ROMANOS[it] }
+            if (s != null && r != null && ions.none { it.first == s }) addIon(s, r)
+        }
+        return IonsEIsotopo(ions, isotopo, simbolos)
+    }
+
     private val RX_CARGA_SEPARADA = Regex("""^\s+(\d?)([+-])(?![\w.,])|^\s+([+-])(\d)(?![\w.,])""")
 
     /** O texto sem as concentrações entre colchetes (para achar a equação mesmo quando elas vêm antes dela). */
@@ -376,7 +497,7 @@ object LocalNlu {
     }
 
     /** Carga escrita separada logo depois da fórmula ("Cr2O7 2-", "SO4 2-", "NH4 +"): número ou null. */
-    private fun cargaDepoisDa(formula: String?, original: String): Int? {
+    internal fun cargaDepoisDa(formula: String?, original: String): Int? {
         if (formula == null) return null
         val i = original.indexOf(formula)
         if (i < 0) return null

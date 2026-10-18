@@ -106,7 +106,10 @@ internal object LexicoFr {
         "hess" to "\\b(?:loi de hess|hess)\\b",
         "kcKp" to "\\b(?:kp|pressions partielles)\\b",
         "concentracaoColchete" to "=|:|est|vaut|egal a|egale a|de",
-        "ligacaoPolaridade" to "\\b(?:ioniques?|covalentes?|polaires?|apolaires?|metalliques?)\\b"
+        "ligacaoPolaridade" to "\\b(?:ioniques?|covalentes?|polaires?|apolaires?|metalliques?)\\b",
+        "deFormacao" to "\\bde formation\\b",
+        "constanteEquilibrio" to "\\b(?:kc|kp|constantes? d equilibre|expression (?:de|du|de la) (?:kc|kp|constante))\\b",
+        "ionRomano" to "\\b(?:ions?|cations?) (?:de |du )?([a-z]+) (i{1,3}|iv|vi{0,2}|v)\\b"
     )
 
     private fun n_nivel(): Map<String, Any?> = linkedMapOf<String, Any?>(
@@ -859,6 +862,43 @@ internal object LexicoFr {
         "chaleur de formation"
     )
 
+    private fun n_propriedades_energiaGibbsFormacaoKJmol(): List<Any?> = listOf<Any?>(
+        "enthalpie libre standard de formation",
+        "enthalpie libre de formation",
+        "energie libre de gibbs de formation",
+        "energie de gibbs de formation",
+        "energie libre standard de formation",
+        "energie libre de formation",
+        "delta g de formation"
+    )
+
+    private fun n_propriedades_entropiaPadraoJmolK(): List<Any?> = listOf<Any?>(
+        "entropie molaire standard",
+        "entropie standard molaire",
+        "entropie standard",
+        "entropie absolue",
+        "entropie molaire",
+        "entropie du",
+        "entropie de la",
+        "entropie de l",
+        "entropie des",
+        "entropie de"
+    )
+
+    private fun n_propriedades_particulas(): List<Any?> = listOf<Any?>(
+        "particules subatomiques",
+        "nombre de protons",
+        "nombre de neutrons",
+        "nombre d electrons",
+        "nombre de masse",
+        "protons",
+        "proton",
+        "neutrons",
+        "neutron",
+        "electrons",
+        "electron"
+    )
+
     private fun n_propriedades(): Map<String, Any?> = linkedMapOf<String, Any?>(
         "numeroAtomico" to n_propriedades_numeroAtomico(),
         "massaAtomica" to n_propriedades_massaAtomica(),
@@ -894,7 +934,10 @@ internal object LexicoFr {
         "tpsa" to n_propriedades_tpsa(),
         "solubilidade" to n_propriedades_solubilidade(),
         "pka" to n_propriedades_pka(),
-        "entalpiaFormacaoKJmol" to n_propriedades_entalpiaFormacaoKJmol()
+        "entalpiaFormacaoKJmol" to n_propriedades_entalpiaFormacaoKJmol(),
+        "energiaGibbsFormacaoKJmol" to n_propriedades_energiaGibbsFormacaoKJmol(),
+        "entropiaPadraoJmolK" to n_propriedades_entropiaPadraoJmolK(),
+        "particulas" to n_propriedades_particulas()
     )
 
     private fun n_stopwordsBusca(): List<Any?> = listOf<Any?>(

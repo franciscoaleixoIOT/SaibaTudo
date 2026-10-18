@@ -530,6 +530,9 @@
     <string name="prop_solubilidade">solubilidade em água</string>
     <string name="prop_pka">pKa</string>
     <string name="prop_entalpia_formacao">entalpia padrão de formação</string>
+    <string name="prop_energia_gibbs_formacao">energia livre de Gibbs padrão de formação</string>
+    <string name="prop_entropia_padrao">entropia molar padrão</string>
+    <string name="prop_particulas">prótons, nêutrons e elétrons</string>
     <string name="prop_medida_titulo">Propriedades físicas</string>
     <string name="prop_medida_intro">Valores medidos, cada um com a sua fonte e as condições da medida.</string>
     <string name="prop_medida_unidade_g100g">g/100 g de água</string>
@@ -1146,4 +1149,39 @@
     <string name="ui_calc_desc_nox">NOX de cada elemento pelas regras, com íons e NOX médio.</string>
     <string name="ui_calc_desc_equilibrio">Expressão de Kc, Δn, Kp = Kc·(RT)^Δn e o valor de Kc pelas concentrações.</string>
     <string name="ui_calc_desc_ligacao">Iônica, covalente polar, covalente apolar ou metálica, pela eletronegatividade.</string>
+    <!-- 18/10/2026 (docs/CALCULADORAS_2026-10-17.md §7): ΔGf°/S° nas respostas, partículas do átomo/íon, Kc/Kp sem equação -->
+    <string name="resp_prop_falta_termo">O pacote de dados não traz a %1$s (%2$s) de %3$s. Não vou estimar esse valor.</string>
+    <string name="resp_comparar_maior_menor">%1$s: maior em %2$s (%3$s); menor em %4$s (%5$s).</string>
+    <string name="resp_comparar_maior_mais_negativo">%1$s: maior em %2$s (%3$s); menor (mais negativo) em %4$s (%5$s).</string>
+    <string name="resp_part_titulo">%1$s: prótons, nêutrons e elétrons</string>
+    <string name="resp_part_protons">Prótons</string>
+    <string name="resp_part_eletrons">Elétrons</string>
+    <string name="resp_part_neutrons">Nêutrons</string>
+    <string name="resp_part_numero_massa">Número de massa (A)</string>
+    <string name="resp_part_protons_valor">%1$d (número atômico Z)</string>
+    <string name="resp_part_eletrons_neutro">%1$d (átomo neutro: igual a Z)</string>
+    <string name="resp_part_eletrons_ion">%1$d (Z − carga: %2$s)</string>
+    <string name="resp_part_neutrons_exato">%1$d (A − Z: %2$s)</string>
+    <string name="resp_part_neutrons_aprox">≈ %1$d (A − Z: %2$s, com A aproximado)</string>
+    <string name="resp_part_a_da_pergunta">%1$d (da pergunta: isótopo %2$s)</string>
+    <string name="resp_part_a_aprox">≈ %1$d (aproximado pela massa atômica)</string>
+    <string name="resp_part_aviso_aprox">Número de massa aproximado pela massa atômica, %1$s → %2$d; depende do isótopo. Para um isótopo específico, pergunte por exemplo \"nêutrons do %3$s-%2$d\".</string>
+    <string name="resp_part_sem_massa">O pacote de dados não traz a massa atômica de %1$s: não vou estimar os nêutrons. Informe o número de massa do isótopo (por exemplo, C-14).</string>
+    <string name="resp_part_cation">%1$s é um cátion (carga %2$s): o átomo de %3$s perdeu elétrons, por isso tem menos elétrons do que prótons.</string>
+    <string name="resp_part_anion">%1$s é um ânion (carga %2$s): o átomo de %3$s ganhou elétrons, por isso tem mais elétrons do que prótons.</string>
+    <string name="resp_part_carga_invalida">A carga de %1$s não é possível: %2$s não tem tantos elétrons para perder.</string>
+    <string name="resp_elemento_cation">Cátion %1$s</string>
+    <string name="resp_elemento_anion">Ânion %1$s</string>
+    <string name="resp_elemento_isotopo">Isótopo %1$s</string>
+    <string name="resp_kc_conceito_titulo">Constante de equilíbrio (Kc e Kp)</string>
+    <string name="resp_kc_conceito_texto">A constante de equilíbrio Kc é o produto das concentrações (mol/L) dos produtos dividido pelo produto das concentrações dos reagentes, cada uma elevada ao seu coeficiente na equação balanceada, com os valores no equilíbrio. Só entram espécies gasosas e em solução aquosa: sólidos e líquidos puros ficam de fora. Kp é a mesma expressão com as pressões parciais dos gases, e as duas se relacionam por Kp = Kc·(RT)^Δn, em que Δn é a soma dos coeficientes dos produtos gasosos menos a dos reagentes gasosos.</string>
+    <string name="resp_kc_conceito_pedir">Me dê a equação (ex.: N2 + 3 H2 ⇌ 2 NH3) e eu monto a expressão.</string>
+    <plurals name="resp_elemento_ion_eletrons">
+        <item quantity="one">%1$d elétron (%2$s)</item>
+        <item quantity="other">%1$d elétrons (%2$s)</item>
+    </plurals>
+    <plurals name="resp_elemento_isotopo_neutrons">
+        <item quantity="one">%1$d nêutron (%2$s)</item>
+        <item quantity="other">%1$d nêutrons (%2$s)</item>
+    </plurals>
 </resources>

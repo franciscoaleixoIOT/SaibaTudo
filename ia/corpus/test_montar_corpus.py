@@ -179,7 +179,15 @@ class Corpus(unittest.TestCase):
         saidas = [json.loads(ex["output"]) for ex in self.train if ex["app"] == "quimica"]
         self.assertTrue(any(a.get("propriedade") == "entalpiaFormacaoKJmol" and a["intent"] == "PROPRIEDADE" for a in saidas))
         self.assertTrue(any(a.get("propriedade") == "entalpiaFormacaoKJmol" and a["intent"] == "COMPARAR" for a in saidas))
+        # 18/10: ΔGf°, S° e partículas (ids novos do contrato) e Kc/Kp sem equação -> CONCEITO
+        for pid in ("energiaGibbsFormacaoKJmol", "entropiaPadraoJmolK"):
+            self.assertTrue(any(a.get("propriedade") == pid and a["intent"] == "PROPRIEDADE" for a in saidas), pid)
+        self.assertGreaterEqual(sum(1 for a in saidas if a.get("propriedade") == "particulas"), 200)
         fam = self.cont["treino_v35"]["por_familia_idioma"]
+        for idioma in ["pt-BR"] + ESTRANGEIROS:
+            self.assertGreater(fam.get(f"particulas/{idioma}", 0), 0, idioma)
+        hold_eq = json.loads((OUT / "holdout_v35_equilibrio.json").read_text(encoding="utf-8"))["cases"]
+        self.assertEqual({c["intent"] for c in hold_eq}, {"EQUILIBRIO", "CONCEITO"})
         for f in ("notacao", "extenso", "esteq_formada", "nomenclatura_nome", "mistura", "ordenacao"):
             self.assertGreaterEqual(fam.get(f"{f}/pt-BR", 0), 150, f)
             for idioma in ESTRANGEIROS:
@@ -263,6 +271,102 @@ class EvidenciaV35(unittest.TestCase):
             self.assertEqual(self.bq.evidencia_basica(self.bq.nlu.validate_question(q), alvo), "quantidades", q)
 
 
+class GeradorV35Novas(unittest.TestCase):
+    """18/10/2026: termoquímica (ΔGf°, S°) em entalpia_formacao, família `particulas` e equilíbrio sem equação -> CONCEITO, direto no gerador
+    (não depende do corpus montado). Os rótulos passam pelo contrato só quando nlu_core já conhece os ids novos."""
+    TERMO_NOVAS = ("energiaGibbsFormacaoKJmol", "entropiaPadraoJmolK")
+
+    @classmethod
+    def setUpClass(cls):
+        cls.gv = MC.v35()
+        cls.ds = cls.gv._dataset()
+        cls.pac = cls.ds[1].localizar(None)
+        if cls.pac.eh_fixture:
+            raise unittest.SkipTest("pacote data/quimica ausente")
+        cls.regs = {(f, i): cls.gv.gerar_familia(cls.pac, i, f, 2026, 1.0, cls.ds)[0]
+                    for f in ("entalpia_formacao", "particulas", "equilibrio") for i in cls.gv.IDIOMAS}
+        cls.core = MC.modulos_quimica().nlu
+
+    def _contrato(self, alvo):
+        novos = {"particulas", *self.TERMO_NOVAS}
+        if alvo.get("propriedade") in novos and alvo["propriedade"] not in self.core.PROPRIEDADES:
+            return  # o contrato (nlu_core.PROPRIEDADES) ganha os ids em paralelo; o carregar_v35 descarta até lá
+        self.assertTrue(self.core.has_valid_shape(alvo) and self.core.combinacao_valida(alvo), alvo)
+
+    def test_cotas_e_familias(self):
+        self.assertEqual(self.gv.COTAS["entalpia_formacao"], (160, 90))
+        self.assertEqual(self.gv.COTAS["particulas"], (130, 70))
+        self.assertEqual(self.gv.COTAS["equilibrio"], (130, 80))
+        self.assertIn("particulas", self.gv.FAMILIAS)
+
+    def test_termoquimica_so_com_valor_no_pacote(self):
+        for idioma in self.gv.IDIOMAS:
+            g = self.gv.Gerador(self.pac, idioma, random.Random(0), self.ds)
+            regs = self.regs[("entalpia_formacao", idioma)]
+            for pid in self.TERMO_NOVAS:
+                pool = g.p_termo[pid]
+                self.assertTrue(pool and all((c.get("propriedades") or {}).get(pid) is not None for c, _s in pool), (idioma, pid))
+                sups = {self.gv.fold(t) for _c, s in pool for t, _ in s}
+                usados = [r for r in regs if r["alvo"].get("propriedade") == pid]
+                self.assertTrue(any(r["alvo"]["intent"] == "PROPRIEDADE" for r in usados), (idioma, pid))
+                for r in usados:
+                    self.assertIn(self.gv.fold(r["alvo"]["composto"]), sups, r)  # o composto citado (o primeiro, no COMPARAR) tem o valor
+            self.assertTrue(any(r["alvo"]["intent"] == "CONCEITO" for r in regs), idioma)
+            for r in regs:
+                self._contrato(r["alvo"])
+                if "composto" in r["alvo"]:
+                    self.assertIn(r["alvo"]["composto"], r["q"], r)
+        todos = [r for i in self.gv.IDIOMAS for r in self.regs[("entalpia_formacao", i)]]
+        for pid in self.TERMO_NOVAS:
+            self.assertTrue(any(r["alvo"].get("propriedade") == pid and r["alvo"]["intent"] == "COMPARAR" for r in todos), pid)
+        self.assertTrue(any(self.gv.fold(r["q"]).startswith("o que e entropia") for r in self.regs[("entalpia_formacao", "pt-BR")]))
+
+    def test_particulas_rotulo_so_elemento_e_propriedade(self):
+        ions = isotopos = 0
+        for idioma in self.gv.IDIOMAS:
+            regs = self.regs[("particulas", idioma)]
+            props = Counter(r["alvo"]["propriedade"] for r in regs)
+            self.assertGreaterEqual(props["particulas"] / len(regs), 0.75, idioma)
+            self.assertLessEqual(set(props), {"particulas", "configuracaoEletronica", "numeroAtomico"}, idioma)
+            self.assertTrue(props["configuracaoEletronica"] + props["numeroAtomico"] > 0, idioma)  # contrastes
+            for r in regs:
+                a = r["alvo"]
+                self.assertEqual(set(a), {"intent", "elemento", "propriedade"}, r)  # sem carga nem número de massa no rótulo
+                self.assertEqual(a["intent"], "PROPRIEDADE")
+                self.assertIn(a["elemento"], self.pac.el_simbolo, r)
+                self._contrato(a)
+                if a["propriedade"] == "particulas":
+                    if re.search(re.escape(a["elemento"]) + r"(?:\^?\d?[+-]\d?|[⁰-⁹]*[⁺⁻])(?![A-Za-z])", r["q"]):
+                        ions += 1
+                    if re.search(r"[-\s]\d{1,3}\b|\b\d{1,3}" + re.escape(a["elemento"]) + r"\b|[⁰-⁹]+" + re.escape(a["elemento"]), r["q"]):
+                        isotopos += 1
+        self.assertGreater(ions, 50)
+        self.assertGreater(isotopos, 30)
+        pt = " | ".join(r["q"] for r in self.regs[("particulas", "pt-BR")])
+        for forma in ("íon", "prótons", "nêutrons", "elétrons", "número de massa"):
+            self.assertIn(forma, pt.lower(), forma)
+
+    def test_equilibrio_sem_equacao_e_conceito(self):
+        todos, holdout = [], Counter()
+        for idioma in self.gv.IDIOMAS:
+            regs = self.regs[("equilibrio", idioma)]
+            todos += regs
+            conceito = [r for r in regs if r["alvo"]["intent"] == "CONCEITO"]
+            self.assertTrue(conceito, idioma)
+            for r in regs:
+                if r["alvo"]["intent"] == "CONCEITO":
+                    self.assertEqual(r["alvo"], {"intent": "CONCEITO"}, r)
+                else:
+                    self.assertEqual(r["alvo"]["intent"], "EQUILIBRIO", r)
+                    self.assertIn(r["alvo"]["equacao"], r["q"], r)
+                self._contrato(r["alvo"])
+                if r["_lado"] == "holdout":
+                    holdout[r["alvo"]["intent"]] += 1
+        frac = sum(r["alvo"]["intent"] == "CONCEITO" for r in todos) / len(todos)
+        self.assertTrue(0.18 <= frac <= 0.32, frac)
+        self.assertEqual(set(holdout), {"CONCEITO", "EQUILIBRIO"})  # holdout_v35_equilibrio com os dois lados
+
+
 class Gerador(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -298,6 +402,48 @@ class Gerador(unittest.TestCase):
             if comp and not re.search(r"[₀-₉·]", comp):
                 self.assertIn(self.ml.fold(comp), nomes | {self.ml.fold(f) for f in self.ml.GeradorIdioma(self.pac, self.ml.carregar_moldes("de"), random.Random(0), self.ds).formulas_livres}, r)
 
+
+
+class TestPisoPorPropriedade(unittest.TestCase):
+    """limitar_por_intencao com piso: cada id de propriedade mantém pelo menos `piso` exemplos (ou todos) dentro do teto."""
+
+    def _regs(self):
+        regs = []
+        for i in range(300):
+            regs.append({"intent": "PROPRIEDADE", "entrada": f"ponto de fusão do composto {i}", "saida": json.dumps({"intent": "PROPRIEDADE", "propriedade": "pontoFusaoK"})})
+        for i in range(8):
+            regs.append({"intent": "PROPRIEDADE", "entrada": f"ligações rotáveis do composto {i}", "saida": json.dumps({"intent": "PROPRIEDADE", "propriedade": "ligacoesRotaveis"})})
+        for i in range(60):
+            regs.append({"intent": "PROPRIEDADE", "entrada": f"carga do íon {i}", "saida": json.dumps({"intent": "PROPRIEDADE", "propriedade": "carga"})})
+        for i in range(50):
+            regs.append({"intent": "ELEMENTO", "entrada": f"elemento {i}", "saida": json.dumps({"intent": "ELEMENTO"})})
+        return regs
+
+    def _por_prop(self, regs):
+        c = Counter(MC._propriedade_de(r) for r in regs if r["intent"] == "PROPRIEDADE")
+        return dict(c)
+
+    def test_sem_piso_pode_zerar_propriedade_rara(self):
+        stats = {"limite_por_intencao": {}}
+        saida = MC.limitar_por_intencao(self._regs(), 100, stats, "t")
+        self.assertEqual(sum(1 for r in saida if r["intent"] == "PROPRIEDADE"), 100)
+        self.assertEqual(stats["limite_por_intencao"]["t"]["PROPRIEDADE"], {"antes": 368, "depois": 100})
+
+    def test_com_piso_mantem_cada_propriedade(self):
+        stats = {"limite_por_intencao": {}}
+        saida = MC.limitar_por_intencao(self._regs(), 100, stats, "t", piso_propriedade=30)
+        por = self._por_prop(saida)
+        self.assertEqual(por["ligacoesRotaveis"], 8)  # todos os que havia
+        self.assertEqual(por["carga"], 30)
+        self.assertEqual(por["pontoFusaoK"], 100 - 8 - 30)  # o resto completa o teto por hash
+        self.assertEqual(sum(1 for r in saida if r["intent"] == "ELEMENTO"), 50)  # intenção abaixo do teto não muda
+        lim = stats["limite_por_intencao"]["t"]["PROPRIEDADE"]
+        self.assertEqual((lim["antes"], lim["depois"], lim["piso_propriedade"], lim["propriedades"], lim["propriedades_acima_do_piso"]), (368, 100, 30, 3, 2))
+
+    def test_piso_e_estavel(self):
+        a = MC.limitar_por_intencao(self._regs(), 100, {"limite_por_intencao": {}}, "t", piso_propriedade=30)
+        b = MC.limitar_por_intencao(self._regs(), 100, {"limite_por_intencao": {}}, "t", piso_propriedade=30)
+        self.assertEqual([r["entrada"] for r in a], [r["entrada"] for r in b])
 
 if __name__ == "__main__":
     sys.exit(unittest.main())

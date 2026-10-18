@@ -6,7 +6,7 @@
 // Multi-turno (NLU v3.4+, desde 17/10/2026): numa PERGUNTA DE CONTINUAÇÃO ("e o do potássio?", "em gramas?", "desenhe") o corpo leva também
 // `contexto`, a INTERPRETAÇÃO da pergunta anterior (intenção + entidades como texto, nunca o CID), nunca o texto dela nem o histórico.
 // Regra em `ehContinuacao`; objeto em `contextoParaNuvem`; paridade com o Android em ai/nlu/CloudNlu.kt (ContextoNuvem).
-import { INTENTS, extrairEquacao, lerUnidade, parse } from './nlu.js';
+import { INTENTS, cargaDepoisDa, extrairEquacao, lerUnidade, limparConceito, parse } from './nlu.js';
 import { normalizar } from './texto.js';
 
 /** Proxy serverless da Vercel (mesma origem). É ele que guarda o segredo do Modal; o site nunca fala com o Modal. */
@@ -280,9 +280,33 @@ export function validarNluNuvem(nlu, dic, textoOriginal, resolucao = null, lex =
   const dest = sv(nlu, 'unidadeDestino');
   p.unidadeDestino = dest ? lerUnidade(dest, dic.unidades, lex) : null;
 
+  mesclarCamposDoCliente(p, dic, lex);
   const exige = EXIGE[intent];
   if (exige && !exige(p)) return null;
   return p;
+}
+
+/**
+ * Campos SÓ DO CLIENTE (docs/CALCULADORAS_2026-10-17.md §1 e §7; DATA_CONTRACT §9): o modelo não emite `cargaFormula` (carga do íon, "Fe2+"; carga
+ * escrita separada da fórmula no NOX, "Cr2O7 2-"), `numeroMassa` ("Fe-56", "carbono-14") nem `conceito`. Saem da interpretação LOCAL da mesma
+ * pergunta e valem quando a nuvem fala do mesmo elemento (ou da mesma fórmula, no NOX). Espelho de `NluValidator.validar` (Android).
+ */
+function mesclarCamposDoCliente(p, dic, lex) {
+  const base = parse(p.textoOriginal, dic, null, lex);
+  // a nuvem copiou o íon como composto ("Fe2+"): é o elemento com carga
+  const doIon = (f) => base.elemento != null && String(f ?? '').replace(/[\d+\-^{}⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻−]/g, '') === base.elemento;
+  if (p.composto == null && p.formula && (base.cargaFormula != null || base.numeroMassa != null) && doIon(p.formula)) {
+    p.formula = null;
+    p.formulas = [];
+    if (!p.elemento) { p.elemento = base.elemento; p.elementos = [base.elemento]; }
+  }
+  if (p.intent === 'NOX') {
+    p.cargaFormula = cargaDepoisDa(p.formula ?? p.compostoTexto ?? null, p.textoOriginal);
+  } else if (p.elemento && p.elemento === base.elemento) {
+    p.cargaFormula = base.cargaFormula ?? null;
+    p.numeroMassa = base.numeroMassa ?? null;
+  }
+  if (p.intent === 'CONCEITO' && !p.conceito) p.conceito = base.conceito ?? (limparConceito(normalizar(p.textoOriginal), lex ?? dic.lex) || null);
 }
 
 /** Cliente do NLU na nuvem (POST /quimica/api/nlu, mesma origem). Só é chamado com consentimento. */

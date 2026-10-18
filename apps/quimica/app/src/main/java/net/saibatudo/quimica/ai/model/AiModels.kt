@@ -90,8 +90,13 @@ data class ParsedQuery(
     val herdado: Boolean = false,
     /** EQUILIBRIO: concentrações entre colchetes, na ordem (campo só do cliente, docs/CALCULADORAS_2026-10-17.md §1). */
     val concentracoes: List<Concentracao> = emptyList(),
-    /** NOX: carga escrita separada da fórmula ("Cr2O7 2-" → -2); null quando não há (campo só do cliente). */
-    val cargaFormula: Int? = null
+    /**
+     * Campo só do cliente: NOX → carga escrita separada da fórmula ("Cr2O7 2-" → -2); desde 18/10/2026 também a carga do íon de UM elemento
+     * citado ("Fe2+", "Cl⁻", "íon ferro 2+" → +2/-1, docs/CALCULADORAS_2026-10-17.md §7). null quando não há.
+     */
+    val cargaFormula: Int? = null,
+    /** Número de massa escrito na pergunta ("Fe-56", "⁵⁶Fe", "carbono-14"), do [elemento]; campo só do cliente (18/10/2026, §7). */
+    val numeroMassa: Int? = null
 )
 
 enum class OrigemResposta(@param:StringRes val rotulo: Int) {

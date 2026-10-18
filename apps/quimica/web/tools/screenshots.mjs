@@ -97,6 +97,15 @@ const CENARIOS = {
     await avaliar("document.querySelector('form.busca-form').requestSubmit()");
     await esperar("document.querySelector('.resposta .katex')");
     await foto(`${p}-resposta-massa-molar`);
+    // partículas de um íon (prótons, elétrons = Z − carga, nêutrons aproximados e rotulados) e ΔGf° (valor do pacote ou "falta", sem estimar)
+    await digitar('#pergunta', 'quantos elétrons tem o Fe2+?');
+    await avaliar("document.querySelector('form.busca-form').requestSubmit()");
+    await esperar("(document.querySelector('.resposta')?.innerText ?? '').includes('Fe²⁺')");
+    await foto(`${p}-resposta-particulas`);
+    await digitar('#pergunta', 'ΔGf da água');
+    await avaliar("document.querySelector('form.busca-form').requestSubmit()");
+    await esperar("(document.querySelector('.resposta')?.innerText ?? '').includes('ΔGf°') || (document.querySelector('.resposta')?.innerText ?? '').includes('kJ/mol')");
+    await foto(`${p}-resposta-gibbs`);
     await digitar('#pergunta', 'Por que não misturar água sanitária com amoníaco?');
     await avaliar("document.querySelector('form.busca-form').requestSubmit()");
     await esperar("document.querySelector('.resposta .picto img')");

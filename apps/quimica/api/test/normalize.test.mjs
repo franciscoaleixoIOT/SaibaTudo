@@ -92,6 +92,17 @@ const CASOS = [
   ['LIGACAO com composto', 'tipo de ligação do NaCl', { intent: 'LIGACAO', composto: 'NaCl' }, { intent: 'LIGACAO', composto: 'NaCl' }],
   ['LIGACAO não leva propriedade', 'tipo de ligação do NaCl', { intent: 'LIGACAO', composto: 'NaCl', propriedade: 'eletronegatividade' }, { intent: 'LIGACAO', composto: 'NaCl' }],
   ['entalpia de formação é propriedade do composto', 'entalpia de formação do CO2', { intent: 'PROPRIEDADE', composto: 'CO2', propriedade: 'entalpiaFormacaoKJmol' }, { intent: 'PROPRIEDADE', composto: 'CO2', propriedade: 'entalpiaFormacaoKJmol' }],
+  // --- 18/10/2026 (CALCULADORAS §7): ΔGf°, S° e partículas; o modelo não emite cargaFormula/numeroMassa (o cliente os tira da pergunta)
+  ['partículas de um íon: o elemento ancora no "Fe2+"', 'quantos elétrons tem o Fe2+?', { intent: 'PROPRIEDADE', elemento: 'Fe', propriedade: 'particulas' }, { intent: 'PROPRIEDADE', elemento: 'Fe', propriedade: 'particulas' }],
+  ['partículas: carga e número de massa do modelo são ignorados', 'quantos nêutrons tem o carbono-14?', { intent: 'PROPRIEDADE', elemento: 'C', propriedade: 'particulas', cargaFormula: 0, numeroMassa: 14 }, { intent: 'PROPRIEDADE', elemento: 'C', propriedade: 'particulas' }],
+  ['número de massa: o símbolo ancora no "Fe-56"', 'número de massa do Fe-56', { intent: 'PROPRIEDADE', elemento: 'Fe', propriedade: 'particulas' }, { intent: 'PROPRIEDADE', elemento: 'Fe', propriedade: 'particulas' }],
+  ['número de prótons é partículas', 'número de prótons do sódio', { intent: 'PROPRIEDADE', elemento: 'Na', propriedade: 'particulas' }, { intent: 'PROPRIEDADE', elemento: 'Na', propriedade: 'particulas' }],
+  ['partículas sem evidência cai', 'qual a massa atômica do ferro?', { intent: 'PROPRIEDADE', elemento: 'Fe', propriedade: 'particulas' }, D],
+  ['ΔGf° é propriedade do composto', 'energia livre de Gibbs de formação da água', { intent: 'PROPRIEDADE', composto: 'água', propriedade: 'energiaGibbsFormacaoKJmol' }, { intent: 'PROPRIEDADE', composto: 'água', propriedade: 'energiaGibbsFormacaoKJmol' }],
+  ['S° é propriedade do composto', 'entropia padrão do metano', { intent: 'PROPRIEDADE', composto: 'metano', propriedade: 'entropiaPadraoJmolK' }, { intent: 'PROPRIEDADE', composto: 'metano', propriedade: 'entropiaPadraoJmolK' }],
+  ['COMPARAR com S°', 'qual tem maior entropia padrão, água ou etanol?', { intent: 'COMPARAR', composto: 'água', propriedade: 'entropiaPadraoJmolK' }, { intent: 'COMPARAR', composto: 'água', propriedade: 'entropiaPadraoJmolK' }],
+  ['S° em inglês', 'standard molar entropy of water', { intent: 'PROPRIEDADE', composto: 'water', propriedade: 'entropiaPadraoJmolK' }, { intent: 'PROPRIEDADE', composto: 'water', propriedade: 'entropiaPadraoJmolK' }],
+  ['Kc sem equação é CONCEITO (sem entidades)', 'como calcular o Kc?', { intent: 'CONCEITO' }, { intent: 'CONCEITO' }],
   // --- intenções sem entidades e formas inválidas
   ['recusa não leva entidades', 'como sintetizar sarin', { intent: 'RECUSA_PERIGO', composto: 'sarin' }, { intent: 'RECUSA_PERIGO' }],
   ['ajuda não leva entidades', 'o que você faz com o ferro?', { intent: 'AJUDA', elemento: 'Fe' }, { intent: 'AJUDA' }],

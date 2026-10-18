@@ -246,7 +246,37 @@ PROPRIEDADES = {
     # 17/10/2026 (docs/CALCULADORAS_2026-10-17.md §3): ΔHf° do chembox da Wikipédia en (CC BY-SA 4.0) e, onde falta, do Wikidata (P3078, CC0); base da calculadora de entalpia.
     "entalpiaFormacaoKJmol": ("Entalpia padrão de formação", "kJ/mol", "compostos.propriedades.entalpiaFormacaoKJmol", "composto",
                               ["entalpia de formação", "entalpia padrão de formação", "calor de formação"]),
+    # 18/10/2026: ΔGf° e S° do mesmo chembox (já no pacote desde 17/10; agora com id no NLU, nlu_core.PROPRIEDADES)
+    "energiaGibbsFormacaoKJmol": ("Energia livre de Gibbs padrão de formação", "kJ/mol", "compostos.propriedades.energiaGibbsFormacaoKJmol", "composto",
+                                  ["energia livre de gibbs de formação", "energia de gibbs de formação", "δg de formação", "energia livre padrão de formação"]),
+    "entropiaPadraoJmolK": ("Entropia molar padrão", "J/(mol·K)", "compostos.propriedades.entropiaPadraoJmolK", "composto",
+                            ["entropia padrão", "entropia molar padrão", "entropia absoluta"]),
+    # 18/10/2026: CALCULADA por regra a partir do elemento (sem fonte de dado própria; `origem` nula, `calculado: true`, regra em `calculo`)
+    "particulas": ("Prótons, nêutrons e elétrons", "", None, "elemento",
+                   ["prótons, nêutrons e elétrons", "número de prótons", "número de nêutrons", "número de massa", "partículas subatômicas",
+                    "quantos prótons", "quantos nêutrons"]),
 }
+
+# Termoquímica e partículas (18/10/2026). ΔGf° e S° vêm SÓ do chembox (campos `DeltaGf`/`Entropy`; coleta_termo_wikipedia.py): o artigo é o
+# sitelink `enwiki` do item do Wikidata do composto (mesmo QID), e o Wikidata não fornece esses dois valores (o P3078 com referência forte vale só para ΔHf°).
+NOTA_GIBBS_PT = ("Energia livre de Gibbs padrão de formação (ΔGf°) a 298,15 K, em kJ/mol, com 2 casas: campo DeltaGf do chembox da Wikipédia em inglês "
+                 "(CC BY-SA 4.0), no artigo ligado ao item do Wikidata do composto (mesmo QID); o Wikidata não fornece o valor. A fase da medida fica em "
+                 "fontesPorPropriedade.condicoes. Substância simples no estado padrão tem ΔGf° = 0 por definição.")
+NOTA_ENTROPIA_PT = ("Entropia molar padrão (S°) a 298,15 K, em J/(mol·K), com 2 casas: campo Entropy do chembox da Wikipédia em inglês (CC BY-SA 4.0), "
+                    "no artigo ligado ao item do Wikidata do composto (mesmo QID); o Wikidata não fornece o valor. É absoluta (terceira lei), positiva "
+                    "também para as substâncias simples; a fase da medida fica em fontesPorPropriedade.condicoes.")
+CALCULO_PARTICULAS = {
+    "entradas": ["elementos.z", "elementos.massaAtomica"],
+    "protons": "z",
+    "eletrons": "z - carga",
+    "neutrons": "numeroMassa - z",
+    "carga": "a da pergunta (íon: Fe2+, Fe²⁺, Fe+2, Cl-); sem carga, átomo neutro (0)",
+    "numeroMassa": "o da pergunta (Fe-56, 56Fe, carbono-14); sem ele, massaAtomica arredondada ao inteiro (aproximação)",
+    "aproximacao": "sem número de massa na pergunta, nêutrons e número de massa são aproximados: dependem do isótopo",
+}
+NOTA_PARTICULAS_PT = ("Calculado por regra, sem fonte de dado própria: prótons = Z; elétrons = Z − carga; nêutrons = A − Z. A carga e o número de massa A "
+                      "vêm da pergunta (Fe2+, Cl-, Fe-56, carbono-14); sem A, usa-se a massa atômica do pacote arredondada, uma aproximação, porque o "
+                      "número de nêutrons depende do isótopo.")
 
 # Campos complementares por id (16/10/2026): a mesma propriedade pode existir em elementos E compostos. `origem`/`escopo` continuam
 # como sempre (clientes antigos); `origens`/`escopos` listam todos os lugares; `unidades` dá a unidade de cada origem quando difere;
@@ -270,7 +300,11 @@ PROPRIEDADES_EXTRA = {
             "nota": "Menor pKa registrado (primeira dissociação); `pkaValores` traz todos quando há mais de um. Para bases, o Wikidata "
                     "costuma registrar o pKa do ácido conjugado. Ácidos fortes ficam sem pKa."},
     "entalpiaFormacaoKJmol": {"nota": "Entalpia padrão de formação (ΔHf°) a 298,15 K, em kJ/mol (chembox da Wikipédia em inglês; Wikidata P3078 onde o artigo não tem o campo); a fase da medida fica em "
-                                      "fontesPorPropriedade.condicoes. Substância simples no estado padrão tem ΔHf° = 0 por definição."},
+                                      "fontesPorPropriedade.condicoes. Substância simples no estado padrão tem ΔHf° = 0 por definição.",
+                              "casasDecimais": 2},
+    "energiaGibbsFormacaoKJmol": {"nota": NOTA_GIBBS_PT, "casasDecimais": 2},
+    "entropiaPadraoJmolK": {"nota": NOTA_ENTROPIA_PT, "casasDecimais": 2},
+    "particulas": {"calculado": True, "calculo": CALCULO_PARTICULAS, "nota": NOTA_PARTICULAS_PT},
 }
 
 
@@ -350,6 +384,21 @@ NOTAS_PROPRIEDADES_I18N = {
         "es": "Entalpía estándar de formación (ΔHf°) a 298,15 K, en kJ/mol (chembox de la Wikipedia en inglés; Wikidata P3078 donde el artículo no tiene el campo); la fase de la medida está en fontesPorPropriedade.condicoes. Una sustancia simple en su estado estándar tiene ΔHf° = 0 por definición.",
         "de": "Standardbildungsenthalpie (ΔHf°) bei 298,15 K in kJ/mol (Chembox der englischen Wikipedia; Wikidata P3078, wo der Artikel das Feld nicht hat); die Phase der Messung steht in fontesPorPropriedade.condicoes. Ein Element im Standardzustand hat per Definition ΔHf° = 0.",
         "fr": "Enthalpie standard de formation (ΔHf°) à 298,15 K, en kJ/mol (chembox de la Wikipédia en anglais ; Wikidata P3078 là où l'article n'a pas le champ) ; la phase de la mesure figure dans fontesPorPropriedade.condicoes. Un corps simple dans son état standard a ΔHf° = 0 par définition."},
+    "energiaGibbsFormacaoKJmol": {
+        "en": "Standard Gibbs free energy of formation (ΔGf°) at 298.15 K, in kJ/mol, with 2 decimal places: DeltaGf field of the English Wikipedia chembox (CC BY-SA 4.0), in the article linked to the compound's Wikidata item (same QID); Wikidata does not provide the value. The phase of the measurement is in fontesPorPropriedade.condicoes. An element in its standard state has ΔGf° = 0 by definition.",
+        "es": "Energía libre de Gibbs estándar de formación (ΔGf°) a 298,15 K, en kJ/mol, con 2 decimales: campo DeltaGf del chembox de la Wikipedia en inglés (CC BY-SA 4.0), en el artículo vinculado al elemento de Wikidata del compuesto (mismo QID); Wikidata no proporciona el valor. La fase de la medida está en fontesPorPropriedade.condicoes. Una sustancia simple en su estado estándar tiene ΔGf° = 0 por definición.",
+        "de": "Freie Standardbildungsenthalpie (ΔGf°) bei 298,15 K in kJ/mol mit 2 Nachkommastellen: Feld DeltaGf der Chembox der englischen Wikipedia (CC BY-SA 4.0), im Artikel, der mit dem Wikidata-Objekt der Verbindung verknüpft ist (gleiche QID); Wikidata liefert den Wert nicht. Die Phase der Messung steht in fontesPorPropriedade.condicoes. Ein Element im Standardzustand hat per Definition ΔGf° = 0.",
+        "fr": "Enthalpie libre standard de formation (ΔGf°) à 298,15 K, en kJ/mol, avec 2 décimales : champ DeltaGf du chembox de la Wikipédia en anglais (CC BY-SA 4.0), dans l'article lié à l'élément Wikidata du composé (même QID) ; Wikidata ne fournit pas la valeur. La phase de la mesure figure dans fontesPorPropriedade.condicoes. Un corps simple dans son état standard a ΔGf° = 0 par définition."},
+    "entropiaPadraoJmolK": {
+        "en": "Standard molar entropy (S°) at 298.15 K, in J/(mol·K), with 2 decimal places: Entropy field of the English Wikipedia chembox (CC BY-SA 4.0), in the article linked to the compound's Wikidata item (same QID); Wikidata does not provide the value. It is absolute (third law) and positive, also for elements; the phase of the measurement is in fontesPorPropriedade.condicoes.",
+        "es": "Entropía molar estándar (S°) a 298,15 K, en J/(mol·K), con 2 decimales: campo Entropy del chembox de la Wikipedia en inglés (CC BY-SA 4.0), en el artículo vinculado al elemento de Wikidata del compuesto (mismo QID); Wikidata no proporciona el valor. Es absoluta (tercera ley) y positiva, también para las sustancias simples; la fase de la medida está en fontesPorPropriedade.condicoes.",
+        "de": "Molare Standardentropie (S°) bei 298,15 K in J/(mol·K) mit 2 Nachkommastellen: Feld Entropy der Chembox der englischen Wikipedia (CC BY-SA 4.0), im Artikel, der mit dem Wikidata-Objekt der Verbindung verknüpft ist (gleiche QID); Wikidata liefert den Wert nicht. Sie ist absolut (dritter Hauptsatz) und positiv, auch für Elemente; die Phase der Messung steht in fontesPorPropriedade.condicoes.",
+        "fr": "Entropie molaire standard (S°) à 298,15 K, en J/(mol·K), avec 2 décimales : champ Entropy du chembox de la Wikipédia en anglais (CC BY-SA 4.0), dans l'article lié à l'élément Wikidata du composé (même QID) ; Wikidata ne fournit pas la valeur. Elle est absolue (troisième principe) et positive, aussi pour les corps simples ; la phase de la mesure figure dans fontesPorPropriedade.condicoes."},
+    "particulas": {
+        "en": "Calculated by rule, with no data source of its own: protons = Z; electrons = Z − charge; neutrons = A − Z. The charge and the mass number A come from the question (Fe2+, Cl-, Fe-56, carbon-14); without A, the package's atomic mass rounded to an integer is used, an approximation, because the number of neutrons depends on the isotope.",
+        "es": "Calculado por regla, sin fuente de datos propia: protones = Z; electrones = Z − carga; neutrones = A − Z. La carga y el número de masa A vienen de la pregunta (Fe2+, Cl-, Fe-56, carbono-14); sin A, se usa la masa atómica del paquete redondeada, una aproximación, porque el número de neutrones depende del isótopo.",
+        "de": "Per Regel berechnet, ohne eigene Datenquelle: Protonen = Z; Elektronen = Z − Ladung; Neutronen = A − Z. Ladung und Massenzahl A stammen aus der Frage (Fe2+, Cl-, Fe-56, Kohlenstoff-14); ohne A wird die gerundete Atommasse des Pakets verwendet, eine Näherung, denn die Neutronenzahl hängt vom Isotop ab.",
+        "fr": "Calculé par règle, sans source de données propre : protons = Z ; électrons = Z − charge ; neutrons = A − Z. La charge et le nombre de masse A viennent de la question (Fe2+, Cl-, Fe-56, carbone 14) ; sans A, on utilise la masse atomique du jeu de données arrondie, une approximation, car le nombre de neutrons dépend de l'isotope."},
 }
 
 
@@ -447,6 +496,21 @@ PROPRIEDADES_I18N = {
                               "es": ("Entalpía estándar de formación", ["entalpía de formación", "entalpía estándar de formación", "calor de formación"]),
                               "de": ("Standardbildungsenthalpie", ["bildungsenthalpie", "standardbildungsenthalpie", "bildungswärme"]),
                               "fr": ("Enthalpie standard de formation", ["enthalpie de formation", "enthalpie standard de formation", "chaleur de formation"])},
+    "energiaGibbsFormacaoKJmol": {
+        "en": ("Standard Gibbs free energy of formation", ["standard gibbs free energy of formation", "gibbs free energy of formation", "gibbs energy of formation", "δg of formation"]),
+        "es": ("Energía libre de Gibbs estándar de formación", ["energía libre de gibbs de formación", "energía de gibbs de formación", "δg de formación"]),
+        "de": ("Freie Standardbildungsenthalpie", ["freie standardbildungsenthalpie", "freie bildungsenthalpie", "gibbs-energie der bildung", "gibbs-bildungsenergie"]),
+        "fr": ("Enthalpie libre standard de formation", ["enthalpie libre standard de formation", "enthalpie libre de formation", "énergie de gibbs de formation"])},
+    "entropiaPadraoJmolK": {
+        "en": ("Standard molar entropy", ["standard molar entropy", "standard entropy", "absolute entropy"]),
+        "es": ("Entropía molar estándar", ["entropía molar estándar", "entropía estándar", "entropía absoluta"]),
+        "de": ("Molare Standardentropie", ["molare standardentropie", "standardentropie", "absolute entropie"]),
+        "fr": ("Entropie molaire standard", ["entropie molaire standard", "entropie standard", "entropie absolue"])},
+    "particulas": {
+        "en": ("Protons, neutrons and electrons", ["protons, neutrons and electrons", "number of protons", "number of neutrons", "mass number", "subatomic particles", "how many protons", "how many neutrons"]),
+        "es": ("Protones, neutrones y electrones", ["protones, neutrones y electrones", "número de protones", "número de neutrones", "número de masa", "partículas subatómicas", "cuántos protones", "cuántos neutrones"]),
+        "de": ("Protonen, Neutronen und Elektronen", ["protonen, neutronen und elektronen", "anzahl der protonen", "anzahl der neutronen", "neutronenzahl", "massenzahl", "wie viele protonen", "wie viele neutronen"]),
+        "fr": ("Protons, neutrons et électrons", ["protons, neutrons et électrons", "nombre de protons", "nombre de neutrons", "nombre de masse", "particules subatomiques", "combien de protons", "combien de neutrons"])},
 }
 
 

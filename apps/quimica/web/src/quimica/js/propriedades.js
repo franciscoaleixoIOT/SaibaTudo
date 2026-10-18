@@ -55,11 +55,23 @@ export const PROPRIEDADES_PADRAO = [
   { id: 'solubilidade', rotulo: 'solubilidade em água', alvo: 'composto', campo: 'solubilidadeAguaG100g', campos: ['solubilidadeAguaG100g', 'solubilidadeAguaGL'], tipo: 'solubilidade', medida: true },
   { id: 'pka', rotulo: 'pKa', alvo: 'composto', campo: 'pka', campos: ['pkaValores', 'pka'], tipo: 'pka', medida: true },
   // 17/10/2026 (docs/CALCULADORAS_2026-10-17.md §3): ΔHf° a 298,15 K, Wikidata P3078 (CC0), em `propriedades.entalpiaFormacaoKJmol`
-  { id: 'entalpiaFormacaoKJmol', rotulo: 'entalpia padrão de formação', alvo: 'composto', campo: 'entalpiaFormacaoKJmol', tipo: 'numero', unidade: 'kJ/mol', medida: true }
+  { id: 'entalpiaFormacaoKJmol', rotulo: 'entalpia padrão de formação', alvo: 'composto', campo: 'entalpiaFormacaoKJmol', tipo: 'numero', unidade: 'kJ/mol', medida: true, casasMax: 2, grandeza: 'ΔHf°' },
+  // 18/10/2026 (docs/CALCULADORAS_2026-10-17.md §7): ΔGf° (kJ/mol) e S° (J/(mol·K)) a 298,15 K, chembox da Wikipédia em inglês (CC BY-SA 4.0),
+  // em `propriedades.energiaGibbsFormacaoKJmol` / `propriedades.entropiaPadraoJmolK` (DATA_CONTRACT §3.1)
+  { id: 'energiaGibbsFormacaoKJmol', rotulo: 'energia livre de Gibbs padrão de formação', alvo: 'composto', campo: 'energiaGibbsFormacaoKJmol', tipo: 'numero', unidade: 'kJ/mol', medida: true, casasMax: 2, grandeza: 'ΔGf°' },
+  { id: 'entropiaPadraoJmolK', rotulo: 'entropia molar padrão', alvo: 'composto', campo: 'entropiaPadraoJmolK', tipo: 'numero', unidade: 'J/(mol·K)', medida: true, casasMax: 2, grandeza: 'S°' },
+  // prótons, nêutrons e elétrons do átomo ou do íon (derivados de `z`, da carga `cargaFormula` e do número de massa `numeroMassa` da pergunta)
+  { id: 'particulas', rotulo: 'prótons, nêutrons e elétrons', alvo: 'elemento', campo: 'z', tipo: 'particulas' }
 ];
 
-/** Ids das propriedades físicas medidas dos compostos, na ordem da ficha. */
-export const MEDIDAS_COMPOSTO = ['estadoPadrao', 'pontoFusaoK', 'pontoEbulicaoK', 'densidadeKgm3', 'solubilidade', 'pka'];
+/** Ids das propriedades físicas medidas dos compostos, na ordem da ficha (a termoquímica padrão por último, 18/10/2026). */
+export const MEDIDAS_COMPOSTO = ['estadoPadrao', 'pontoFusaoK', 'pontoEbulicaoK', 'densidadeKgm3', 'solubilidade', 'pka', 'entalpiaFormacaoKJmol', 'energiaGibbsFormacaoKJmol', 'entropiaPadraoJmolK'];
+/** Termoquímica padrão a 298,15 K (chembox da Wikipédia en, CC BY-SA 4.0; DATA_CONTRACT §3.1): valor sem estimativa, fase do estado padrão. */
+export const MEDIDAS_TERMO = ['entalpiaFormacaoKJmol', 'energiaGibbsFormacaoKJmol', 'entropiaPadraoJmolK'];
+/** As de energia (kJ/mol), em que "mais negativo" tem sentido na comparação. */
+export const TERMO_ENERGIA = ['entalpiaFormacaoKJmol', 'energiaGibbsFormacaoKJmol'];
+/** Símbolo da grandeza ("ΔGf°"), para os avisos de falta; o id se a propriedade não tem símbolo. */
+export const simboloDaPropriedade = (prop) => prop?.grandeza ?? PROPRIEDADES_PADRAO.find((x) => x.id === prop?.id)?.grandeza ?? prop?.id ?? '';
 
 /** Escopos da propriedade ('elemento' | 'composto'): `escopos` → `[alvo]`. */
 export const escoposDe = (prop) => (Array.isArray(prop?.escopos) && prop.escopos.length ? prop.escopos : prop?.alvo ? [prop.alvo] : []);
@@ -217,10 +229,14 @@ export function formatarValor(prop, valor, ctx, campo = null) {
     case 'massaAtomica': return { texto: `${fmt(valor, { sig: 9 })} u (g/mol)`, curto: `${fmt(valor, { sig: 9 })} u`, numeros: [valor] };
     case 'massaMolar': return { texto: `${fmt(valor, { sig: 9 })} g/mol`, curto: `${fmt(valor, { sig: 9 })} g/mol`, numeros: [valor] };
     case 'numero': {
-      const tx = `${fmt(valor, { sig: 7 })}${prop.unidade ? ` ${prop.unidade}` : ''}`;
+      // `casasMax`: no máximo N casas decimais, sem zeros à direita inventados (a termoquímica vem com até 2 casas: −74,6 e −285,83)
+      const v = typeof valor === 'number' && Number.isInteger(prop.casasMax) ? Math.round(valor * 10 ** prop.casasMax) / 10 ** prop.casasMax : valor;
+      const tx = `${fmt(v, { sig: 7 })}${prop.unidade ? ` ${prop.unidade}` : ''}`;
       return { texto: tx, curto: tx, numeros: [valor] };
     }
     case 'inteiro': return { texto: String(valor), curto: String(valor), numeros: [valor] };
+    // prótons, nêutrons e elétrons não são um valor do registro: a resposta própria os calcula (answers.js `blocosParticulas`)
+    case 'particulas': return null;
     case 'categoria': return { texto: categoriaRotulo(valor), curto: categoriaRotulo(valor), numeros: [] };
     case 'estado': return { texto: estadoRotulo(valor), curto: estadoRotulo(valor), numeros: [] };
     case 'lista': {
@@ -277,6 +293,7 @@ export function fonteDoValor(f, ctx) {
   const detalhes = [];
   const condicoes = condicoesDaMedida(f, ctx);
   if (typeof f.referencia === 'string' && f.referencia) detalhes.push(t('propriedades.medidas.referencia', { x: f.referencia }));
+  if (typeof f.campoOriginal === 'string' && f.campoOriginal && /wikipedia/i.test(String(f.nome ?? ''))) detalhes.push(t('propriedades.medidas.campoChembox', { campo: f.campoOriginal }));
   if (f.semReferencia) detalhes.push(Number.isInteger(f.corroboradoPor) && f.corroboradoPor > 1 ? t('propriedades.medidas.semReferenciaCorroborado', { n: f.corroboradoPor }) : t('propriedades.medidas.semReferencia'));
   if (derivado) detalhes.push(t('propriedades.medidas.derivado'));
   if (f.revisar || f.aviso) detalhes.push(t('propriedades.medidas.revisar'));
@@ -298,19 +315,36 @@ export function fontesDoCampo(registro, campo, ctx) {
 }
 
 /**
- * Propriedades físicas medidas de um composto, na ordem de MEDIDAS_COMPOSTO: `[{prop, campo, valor, f, fontes}]` (só as que existem no registro).
- * `props` = tabela efetiva (`tabelaDePropriedades`), para os rótulos do idioma e os escopos do pacote.
+ * Uma medida do composto: `{prop, campo, valor, f, fontes, condicoes}` ou null (sem valor no pacote). `condicoes` = as das fontes, sem repetir; na
+ * termoquímica padrão, também "estado padrão a 298,15 K" e, quando a fonte não marca a fase, a do `estadoPadrao` do composto (o pipeline só
+ * aceita valor da fase do estado padrão, DATA_CONTRACT §3.1).
+ */
+export function medidaDoComposto(prop, c, ctx) {
+  const lido = prop ? lerValor(prop, c) : null;
+  if (!lido) return null;
+  const f = formatarValor(prop, lido.valor, ctx, lido.campo);
+  if (!f) return null;
+  const fontes = fontesDoCampo(c, lido.campo, ctx);
+  const condicoes = [...new Set(fontes.flatMap((x) => x.condicoes))];
+  if (MEDIDAS_TERMO.includes(prop.id)) {
+    condicoes.unshift(t('propriedades.medidas.padrao298'));
+    const temFase = typeof c.fontesPorPropriedade?.[lido.campo]?.condicoes?.fase === 'string';
+    const est = c.propriedades?.estadoPadrao;
+    if (!temFase && est && estadoChave(est) !== 'desconhecido') condicoes.push(t('propriedades.medidas.faseEstadoPadrao', { fase: estadoRotulo(est) }));
+  }
+  return { prop, campo: lido.campo, valor: lido.valor, f, fontes, condicoes };
+}
+
+/**
+ * Propriedades físicas medidas de um composto, na ordem de MEDIDAS_COMPOSTO: `[{prop, campo, valor, f, fontes, condicoes}]` (só as que existem no
+ * registro). `props` = tabela efetiva (`tabelaDePropriedades`), para os rótulos do idioma e os escopos do pacote.
  */
 export function medidasDoComposto(c, props, ctx) {
   const porId = new Map((props ?? []).map((p) => [p.id, p]));
   const out = [];
   for (const id of MEDIDAS_COMPOSTO) {
-    const prop = porId.get(id);
-    if (!prop) continue;
-    const lido = lerValor(prop, c);
-    if (!lido) continue;
-    const f = formatarValor(prop, lido.valor, ctx, lido.campo);
-    if (f) out.push({ prop, campo: lido.campo, valor: lido.valor, f, fontes: fontesDoCampo(c, lido.campo, ctx) });
+    const m = medidaDoComposto(porId.get(id), c, ctx);
+    if (m) out.push(m);
   }
   return out;
 }
