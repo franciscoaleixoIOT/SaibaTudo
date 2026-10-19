@@ -7,10 +7,13 @@ Diferente de `misturar_continuacao.py` (tudo o que é novo no corpus + revisão 
 mistura é escolhida à mão, em quatro partes, todas de pares que já existem nos corpora (nenhum exemplo novo é escrito aqui):
   1. FOCO: TODOS os pares do app de foco cujas intenções estão em `--intencoes`, tomados do corpus-base (o que o LoRA treinou) e, se
      `--extra` for dado, também do corpus anterior (pares que o corpus-base deixou de fora, p. ex. pelo teto por intenção), com o rótulo de lá.
+     `--foco-teto-idioma N` limita cada (intenção, idioma) a N pares, para o foco não ficar quase só em pt (lição do v3.6: reforço só em pt
+     custou es no golden).
   2. APP SECUNDÁRIO: amostra estratificada por intenção (`--amostra-app APP=N`), mais TODOS os pares cuja saída contém algum texto de
-     `--sempre-com` (p. ex. `apenasDeferidas`).
+     `--sempre-com` (p. ex. `apenasDeferidas`) ou cuja intenção está em `--sempre-intencoes` (p. ex. REGRAS_URNA,AJUDA).
   3. RETENÇÃO: amostra estratificada por (intenção, idioma) das demais intenções do app de foco (`--retencao N`), para o modelo não
-     esquecer o resto nem passar a ver a intenção de foco em tudo.
+     esquecer o resto nem passar a ver a intenção de foco em tudo; com `--retencao-equilibrada`, o orçamento é dividido igualmente entre os
+     idiomas (e, dentro de cada idioma, proporcional por intenção).
   4. Nada que seja caso de teste: todo par passa pelo `FiltroDeTeste` de `montar_corpus.py` (golden e casos dos dois apps + todos os
      holdouts em `--holdouts-dir`), igual ao teste `test_nenhum_caso_de_teste_no_treino`; pares excluídos são contados no resumo.
 
@@ -77,9 +80,12 @@ def main(argv=None):
     ap.add_argument("--extra", action="append", default=[], help="train.json anterior; só entram pares das intenções de foco ausentes da base")
     ap.add_argument("--app", required=True, help="app de foco (ex.: quimica)")
     ap.add_argument("--intencoes", required=True, help="intenções de foco, separadas por vírgula (ex.: CONCEITO)")
+    ap.add_argument("--foco-teto-idioma", type=int, default=0, help="máximo de pares de foco por (intenção, idioma); 0 = sem teto")
     ap.add_argument("--amostra-app", action="append", default=[], metavar="APP=N", help="amostra estratificada por intenção de outro app")
     ap.add_argument("--sempre-com", action="append", default=[], help="texto na saída que garante o par do app secundário (ex.: apenasDeferidas)")
+    ap.add_argument("--sempre-intencoes", default="", help="intenções do app secundário que entram inteiras, separadas por vírgula")
     ap.add_argument("--retencao", type=int, default=0, help="pares de retenção do app de foco, fora das intenções de foco")
+    ap.add_argument("--retencao-equilibrada", action="store_true", help="divide a retenção igualmente entre os idiomas do app de foco")
     ap.add_argument("--holdouts-dir", action="append", default=[], help="pastas com holdout_*.json a excluir (além do golden dos apps)")
     ap.add_argument("--out", required=True)
     ap.add_argument("--seed", type=int, default=2026)
@@ -103,16 +109,38 @@ def main(argv=None):
     rng = random.Random(a.seed)
 
     parte_foco = [e for e in base if e["app"] == a.app and intencao(e) in foco] + extras
+    n_foco_bruto = len(parte_foco)
+    if a.foco_teto_idioma:
+        grupos = defaultdict(list)
+        for e in parte_foco:
+            grupos[(intencao(e), e["idioma"])].append(e)
+        parte_foco = []
+        for g, lista in sorted(grupos.items()):
+            rng.shuffle(lista)
+            parte_foco += lista[:a.foco_teto_idioma]
+    sempre_int = {s for s in a.sempre_intencoes.split(",") if s}
+
+    def garantido(e):
+        return any(t in e["output"] for t in a.sempre_com) or intencao(e) in sempre_int
+
     parte_sec = []
     for item in a.amostra_app:
         app_, _, n = item.partition("=")
         pares = [e for e in base if e["app"] == app_]
-        garantidos = [e for e in pares if any(t in e["output"] for t in a.sempre_com)]
-        resto = [e for e in pares if not any(t in e["output"] for t in a.sempre_com)]
+        garantidos = [e for e in pares if garantido(e)]
+        resto = [e for e in pares if not garantido(e)]
         amostra = estratificar(resto, intencao, max(0, int(n) - len(garantidos)), rng)
         parte_sec += garantidos + amostra
-    parte_ret = estratificar([e for e in base if e["app"] == a.app and intencao(e) not in foco],
-                             lambda e: (intencao(e), e["idioma"]), a.retencao, rng) if a.retencao else []
+    candidatos_ret = [e for e in base if e["app"] == a.app and intencao(e) not in foco]
+    if a.retencao and a.retencao_equilibrada:
+        idiomas = sorted({e["idioma"] for e in candidatos_ret})
+        parte_ret = []
+        for idi in idiomas:
+            parte_ret += estratificar([e for e in candidatos_ret if e["idioma"] == idi], intencao, a.retencao // len(idiomas), rng)
+    elif a.retencao:
+        parte_ret = estratificar(candidatos_ret, lambda e: (intencao(e), e["idioma"]), a.retencao, rng)
+    else:
+        parte_ret = []
 
     excluidos = Counter()
     vistos_mistura = set()
@@ -136,11 +164,16 @@ def main(argv=None):
     Path(a.out).write_text(json.dumps(mistura, ensure_ascii=False, indent=0), encoding="utf-8")
     resumo = {
         "total": len(mistura),
-        "foco": {"intencoes": sorted(foco), "da_base": len(parte_foco) - len(extras), "dos_extras": len(extras),
-                 "por_idioma": dict(sorted(Counter(e["idioma"] for e in parte_foco).items()))},
+        "foco": {"intencoes": sorted(foco), "da_base": n_foco_bruto - len(extras), "dos_extras": len(extras),
+                 "teto_por_intencao_idioma": a.foco_teto_idioma, "apos_teto": len(parte_foco),
+                 "por_idioma": dict(sorted(Counter(e["idioma"] for e in parte_foco).items())),
+                 "por_intencao_idioma": {f"{i}/{l}": n for (i, l), n in sorted(Counter((intencao(e), e["idioma"]) for e in parte_foco).items())}},
         "secundario": {"total": len(parte_sec), "por_intencao": dict(sorted(Counter(intencao(e) for e in parte_sec).items())),
-                       "garantidos_por_sempre_com": sum(1 for e in parte_sec if any(t in e["output"] for t in a.sempre_com))},
-        "retencao": {"total": len(parte_ret), "por_intencao": dict(sorted(Counter(intencao(e) for e in parte_ret).items()))},
+                       "garantidos_por_sempre_com": sum(1 for e in parte_sec if any(t in e["output"] for t in a.sempre_com)),
+                       "garantidos_por_intencao": sum(1 for e in parte_sec if intencao(e) in sempre_int)},
+        "retencao": {"total": len(parte_ret), "equilibrada_por_idioma": a.retencao_equilibrada,
+                     "por_idioma": dict(sorted(Counter(e["idioma"] for e in parte_ret).items())),
+                     "por_intencao": dict(sorted(Counter(intencao(e) for e in parte_ret).items()))},
         "excluidos_por_serem_teste": dict(excluidos),
         "por_app_idioma": dict(sorted(Counter(f"{e['app']}/{e['idioma']}" for e in mistura).items())),
         "por_intencao": dict(sorted(Counter(intencao(e) for e in mistura).items())),

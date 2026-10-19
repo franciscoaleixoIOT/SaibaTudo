@@ -218,3 +218,29 @@ Saídas em `ia/treino/out/nlu-v36-cont/` (`eval_quimica_q4.json/.log`, `eval_ele
   `MODEL_VERSION` + `vercel deploy --prod`; (B) manter o v3.4, alinhar os 3 casos IUPAC do golden ao contrato e tratar es num v3.7 com reforço
   multilíngue (CONCEITO/CONVERSAO en/es/de/fr + eleições REGRAS_URNA/AJUDA); (C) nada por ora. A interrupção do shell de acompanhamento pelo Claude
   Code (pouca memória, 18h53) não afetou o pipeline, que seguiu até o fim.
+
+## v3.7 (treino iniciado em 18/10/2026, 22:14h): reforço MULTILÍNGUE sobre o LoRA v3.6, com o golden alinhado — opção B do mantenedor
+Decisão do mantenedor em 18/10 à noite, depois do gate do v3.6 ("Va para b"): manter o v3.4 em produção, **alinhar os 3 casos IUPAC do golden ao
+contrato** e treinar um v3.7 com reforço multilíngue antes de promover.
+- **Golden alinhado:** os 3 casos NOMENCLATURA de nome IUPAC fora do pacote ("Como se chama o 2-cloro-3-metil-pentano?", "What is the IUPAC name
+  of 3-ethyl-2-methylhexane?", "Wie heißt 2-Chlor-3-methylpentan?") deixam de ter `composto: null` (chave ausente = não medida; a `descricao` do golden
+  registra a regra). O contrato admite o nome copiado da pergunta em `composto` (`nlu_core.ENTIDADES_POR_INTENCAO`, holdout `nomenclatura_nome`)
+  e o proxy só o mantém com evidência no texto. Nada mais mudou nos 984 casos; web 226, API 253, Modal 133 e Android (ContratoNlu, NluGoldenCases)
+  continuam verdes. Com esse golden, o v3.6 teria reprovado só por es `unidadeDestino` 9/11 (os 7 casos null restantes têm 0 alucinação).
+- **Receita:** continuação CURTA do LoRA **v3.6** (`--lora_init ia/treino/out/nlu-v36-cont/final`, lr 1e-4, 1 época, lote 2 × 8, `max_length 288`)
+  sobre uma mistura de `misturar_reforco.py` com três opções novas (testes em `test_misturar_reforco.py`, 20 no total): `--foco-teto-idioma N`
+  (teto por (intenção, idioma) no foco), `--retencao-equilibrada` (retenção dividida igualmente entre idiomas) e `--sempre-intencoes` (intenções
+  inteiras do app secundário). Lição do v3.6: o foco só em pt custou es; aqui o foco é multilíngue por construção e sem `--extra` do v34 (o teto
+  dispensa os pares cortados e evita rótulos antigos de outras intenções).
+- **Mistura (21.654 pares):** foco = BALANCEAR, COMPARAR, CONCEITO, CONVERSAO_UNIDADE, DESCONHECIDA, ELEMENTO com teto 350 por (intenção, idioma):
+  12.438 candidatos → 7.770 (pt 2.100, en 1.433, es 1.416,
+  de 1.415, fr 1.406); eleições 6.000 com todos os 396 `apenasDeferidas`
+  e inteiras REGRAS_URNA 806 e AJUDA 276 (erros do v3.6: "Como ser mesário?", "bom dia, tudo bem?");
+  retenção 7.993 equilibrada (de 1599, en 1599, es 1598, fr 1597, pt-BR 1600); 109 pares excluídos pelo
+  `FiltroDeTeste` (foco/quase 30, retencao/quase 79). Por app/idioma: química pt 3.672, en 3.011,
+  es 2.991, de 3.005, fr 2.975; eleições 6.000. ~1.350 passos, ~1 h 40 de treino,
+  gate ~4 h. Roteiro: `ia/treino/out/nlu-v37-cont/pipeline.sh` (mistura → treino → `exportar_gguf.py --q8` → `gate.sh` = o do v3.5/v3.6).
+- **Critério para promover (sem força):** `empacotar_versao.py` → `passed: true` com o golden alinhado (inclusive os gates por idioma: es
+  `unidadeDestino` ≥ 90 %), golden em comum com o v3.4 ≥ 98,5 %, CONCEITO pt 15/15, es ≥ 143/145 (nível do v3.5), holdout ≥ 99,6 %, 208 casos
+  novos ≥ 207, `apenasDeferidas` ≥ 8/9 e eleições golden ≥ 96,5 % (nível do v3.5). Então: empacotar → Volume → `promover.py` → `SNAPSHOT_EPOCH` +
+  `modal deploy` → `MODEL_VERSION` + `vercel deploy --prod` → testes ao vivo.

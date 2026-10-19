@@ -226,3 +226,10 @@ Q8 98,8 %, 13 dos 17 extras inteiros; eleições golden 94,7 % e `apenasDeferida
 **es unidadeDestino 9/11** ("25 °C a K" → PROPRIEDADE; "mmHg a atm, kPa y torr" → kPa). Pacote `ai_model/output/gguf/nlu-v3.6-20261018/` e Volume
 (`/nlu-v3.6-20261018/`); **ponteiro, `SNAPSHOT_EPOCH` e `MODEL_VERSION` continuam no v3.4**; o serviço continua com o `nlu_core.py` anterior.
 Decisão do mantenedor (A forçar o v3.6 / B v3.7 multilíngue + golden alinhado / C nada) e comandos no README do treino.
+
+**Opção B (18/10/2026, noite): golden alinhado e v3.7 em treino.** O mantenedor escolheu manter o v3.4, alinhar o golden e treinar antes de
+promover. Os 3 casos NOMENCLATURA de nome IUPAC fora do pacote perderam o `composto: null` (`contracts/nlu_golden_cases.json`, 984 casos; chave
+ausente = não medida; a `descricao` registra a regra: o contrato admite o nome copiado e o proxy só o mantém com evidência no texto). Testes web,
+API, Modal e Android do contrato continuam verdes. v3.7 = continuação do LoRA v3.6 com reforço **multilíngue** (21.654 pares: foco com teto
+350 por intenção × idioma, retenção equilibrada por idioma, eleições com REGRAS_URNA e AJUDA inteiras; `ia/treino/README.md` §v3.7). Promoção
+só com `passed: true` sem força; até lá o serviço segue no v3.4 com o `nlu_core.py` anterior.

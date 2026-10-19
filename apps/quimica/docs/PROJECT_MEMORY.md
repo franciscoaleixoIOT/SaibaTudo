@@ -297,6 +297,19 @@ eleições golden 97,4 → 96,5 → 94,7 % e `apenasDeferidas` 5/9 → 8/9. **Cu
 pelas regras locais antes de a nuvem ser chamada. Opções para o mantenedor (A forçar v3.6 com motivo; B golden alinhado + v3.7 multilíngue; C manter
 v3.4) em `ia/treino/README.md` §v3.6 e `PENDENCIAS.md` §13.
 
+### 6.w. 18/10/2026 (noite): opção B — golden alinhado ao contrato e NLU v3.7 (reforço multilíngue) em treino
+Mantenedor: "Va para b" (manter o v3.4, alinhar os 3 casos IUPAC do golden ao contrato, treinar um v3.7 multilíngue antes de promover).
+**Golden:** os 3 casos NOMENCLATURA de nome IUPAC fora do pacote deixaram de exigir ausência de `composto` (chave removida; a `descricao` do golden
+registra a regra); os 7 casos null restantes (ELEMENTO "fale sobre o oxigênio" nos 5 idiomas, "o que é Fe2+?", SEGURANCA) ficam. Com isso o v3.6
+teria reprovado só por es `unidadeDestino` 9/11. Testes que leem o golden: web 226 (3 pulados), API 253, Modal 133, Android ContratoNlu e
+NluGoldenCasesTest — verdes. **v3.7:** `misturar_reforco.py` ganhou `--foco-teto-idioma`, `--retencao-equilibrada` e `--sempre-intencoes` (+3 testes,
+20 no total). Mistura de 21.654 pares: foco CONCEITO, CONVERSAO_UNIDADE, DESCONHECIDA, ELEMENTO, BALANCEAR e COMPARAR com teto 350 por
+(intenção, idioma) → 7.770 (pt 2.100, demais ≈ 1.400 cada); eleições 6.000 com todos os `apenasDeferidas`,
+REGRAS_URNA (806) e AJUDA (276) inteiras; retenção 7.993 dividida igualmente entre os 5 idiomas; sem `--extra` do v34.
+Química pt 3.672 vs ≈ 3.000 por idioma estrangeiro. Continuação do LoRA v3.6 (lr 1e-4, 1 época), gate igual ao do v3.5/v3.6, início às
+22:14h (`ia/treino/out/nlu-v37-cont/`; previsão de fim ≈ 04h30 de 19/10). Critérios de promoção sem força em `ia/treino/README.md` §v3.7. Pacotes
+v3.5 e v3.6 ficam no Volume como histórico; ponteiro, `SNAPSHOT_EPOCH` e `MODEL_VERSION` no v3.4.
+
 ## 7. Contas e segredos
 Vercel `saibatudo-quimica` (time `franciscoaleixo-9696`); GitHub `franciscoaleixoIOT`; Hugging Face `franciscoaleixo` (PRO, 40 min/dia de ZeroGPU); Modal `franciscoaleixo/main` (US$ 30/mês grátis; já usados pelo app de eleições, ~US$ 5/mês).
 `secrets/data_signing_key.pem` (nova, exclusiva deste app; pública em `pipeline/data_signing_public.pem`). Fazer backup offline. Modal: app `SaibaTudoIA-NLU-Quimica`, Volume `SaibaTudoIA-Models-Quimica` (nomes desde 14/10/2026; os antigos `saibatudo-quimica-*` foram apagados), par de Proxy Auth Token criado pelo mantenedor em 13/10/2026 (guardado em `secrets/modal_proxy_quimica.env` da raiz do monorepo, ignorado, e como variáveis sensíveis na Vercel; nunca no Git nem no chat).

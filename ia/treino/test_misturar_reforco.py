@@ -111,5 +111,64 @@ class TestMistura(unittest.TestCase):
         self.assertEqual(out2.read_text(encoding="utf-8"), self.out.read_text(encoding="utf-8"))
 
 
+class TestMisturaMultilingue(unittest.TestCase):
+    """Opções do v3.7: teto por (intenção, idioma) no foco, retenção equilibrada por idioma e intenções garantidas no app secundário."""
+
+    def setUp(self):
+        base = []
+        for i in range(12):
+            base.append(par("quimica", "pt-BR", f"o que é o zorbitólio número {i} zz", "CONCEITO"))
+        for i in range(2):
+            base.append(par("quimica", "es", f"qué es el zorbitolio número {i} zz", "CONCEITO"))
+        for idi, n in (("pt-BR", 9), ("en", 3), ("es", 3)):
+            for i in range(n):
+                base.append(par("quimica", idi, f"masa molar del zorbitol {idi} {i} zz", "MASSA_MOLAR", composto="zorbitol"))
+                base.append(par("quimica", idi, f"dibuja el zorbitol {idi} {i} zz", "DESENHAR", composto="zorbitol"))
+        for i in range(5):
+            base.append(par("eleicoes2026", "pt-BR", f"quem é candidato em zorbópolis {i} zz", "LISTAR_CANDIDATOS", cargo="GOVERNADOR", uf="SP"))
+        for i in range(3):
+            base.append(par("eleicoes2026", "pt-BR", f"como ser mesário em zorbópolis {i} zz", "REGRAS_URNA"))
+        base.append(par("eleicoes2026", "pt-BR", "fulano zorb é ficha limpa zz", "ELEGIBILIDADE", nome="fulano zorb", apenasDeferidas=True))
+        self.tmp = tempfile.TemporaryDirectory()
+        d = Path(self.tmp.name)
+        (d / "base.json").write_text(json.dumps(base, ensure_ascii=False), encoding="utf-8")
+        self.out = d / "mix.json"
+        mr.main(["--base", str(d / "base.json"), "--app", "quimica", "--intencoes", "CONCEITO", "--foco-teto-idioma", "4",
+                 "--amostra-app", "eleicoes2026=6", "--sempre-com", "apenasDeferidas", "--sempre-intencoes", "REGRAS_URNA",
+                 "--retencao", "6", "--retencao-equilibrada", "--out", str(self.out), "--seed", "5"])
+        self.mix = json.loads(self.out.read_text(encoding="utf-8"))
+        self.resumo = json.loads(self.out.with_suffix(".resumo.json").read_text(encoding="utf-8"))
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_teto_por_intencao_idioma_no_foco(self):
+        foco = [e for e in self.mix if e["app"] == "quimica" and '"CONCEITO"' in e["output"]]
+        por = {}
+        for e in foco:
+            por[e["idioma"]] = por.get(e["idioma"], 0) + 1
+        self.assertEqual(por, {"pt-BR": 4, "es": 2})  # pt cortado em 4; es inteiro (2 < teto)
+        self.assertEqual(self.resumo["foco"]["da_base"], 14)
+        self.assertEqual(self.resumo["foco"]["apos_teto"], 6)
+        self.assertEqual(self.resumo["foco"]["por_intencao_idioma"], {"CONCEITO/es": 2, "CONCEITO/pt-BR": 4})
+
+    def test_retencao_equilibrada_por_idioma(self):
+        ret = [e for e in self.mix if e["app"] == "quimica" and '"CONCEITO"' not in e["output"]]
+        por = {}
+        for e in ret:
+            por[e["idioma"]] = por.get(e["idioma"], 0) + 1
+        self.assertEqual(por, {"pt-BR": 2, "en": 2, "es": 2})  # 6 // 3 idiomas, e não proporcional (pt teria 4)
+        self.assertEqual(self.resumo["retencao"]["por_idioma"], {"en": 2, "es": 2, "pt-BR": 2})
+        self.assertTrue(self.resumo["retencao"]["equilibrada_por_idioma"])
+
+    def test_sempre_intencoes_garante_o_app_secundario(self):
+        el = [e for e in self.mix if e["app"] == "eleicoes2026"]
+        regras = [e for e in el if '"REGRAS_URNA"' in e["output"]]
+        self.assertEqual(len(regras), 3)  # as 3 inteiras, não amostradas
+        self.assertEqual(len(el), 6)  # 1 (apenasDeferidas) + 3 (REGRAS_URNA) + 2 da amostra
+        self.assertEqual(self.resumo["secundario"]["garantidos_por_intencao"], 3)
+        self.assertEqual(self.resumo["secundario"]["garantidos_por_sempre_com"], 1)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "descricao": "Casos de referência do NLU (site e Android). Chaves ausentes não são verificadas; chave com null exige ausência. Chaves: idioma (BCP 47; ausente = pt-BR; o dicionário e o léxico do caso são os desse idioma), intent, elemento (símbolo), composto (CID), propriedade, equacao, unidadeDestino, grupo, periodo, bloco, categoria, estado, formula, conceito (o site confere), cargaFormula e numeroMassa (campos só do cliente: carga do íon e número de massa, 18/10/2026). Nunca entram no treino.",
+  "descricao": "Casos de referência do NLU (site e Android). Chaves ausentes não são verificadas; chave com null exige ausência. Chaves: idioma (BCP 47; ausente = pt-BR; o dicionário e o léxico do caso são os desse idioma), intent, elemento (símbolo), composto (CID), propriedade, equacao, unidadeDestino, grupo, periodo, bloco, categoria, estado, formula, conceito (o site confere), cargaFormula e numeroMassa (campos só do cliente: carga do íon e número de massa, 18/10/2026). NOMENCLATURA de nome IUPAC fora do pacote não fixa composto: o contrato admite o nome copiado da pergunta e o proxy só o mantém com evidência no texto (chave ausente, 18/10/2026). Nunca entram no treino.",
   "cases": [
     {
       "q": "Fale sobre o oxigênio",
@@ -4791,8 +4791,7 @@
     },
     {
       "q": "Como se chama o 2-cloro-3-metil-pentano?",
-      "intent": "NOMENCLATURA",
-      "composto": null
+      "intent": "NOMENCLATURA"
     },
     {
       "q": "How many moles are in 3.01 × 10²⁴ molecules?",
@@ -4848,8 +4847,7 @@
     {
       "q": "What is the IUPAC name of 3-ethyl-2-methylhexane?",
       "idioma": "en",
-      "intent": "NOMENCLATURA",
-      "composto": null
+      "intent": "NOMENCLATURA"
     },
     {
       "q": "¿Cuántos moles hay en 1,2 × 10²³ átomos?",
@@ -4929,8 +4927,7 @@
     {
       "q": "Wie heißt 2-Chlor-3-methylpentan?",
       "idioma": "de",
-      "intent": "NOMENCLATURA",
-      "composto": null
+      "intent": "NOMENCLATURA"
     },
     {
       "q": "Combien de moles y a-t-il dans 1,2 × 10²³ atomes ?",
