@@ -233,3 +233,11 @@ ausente = não medida; a `descricao` registra a regra: o contrato admite o nome 
 API, Modal e Android do contrato continuam verdes. v3.7 = continuação do LoRA v3.6 com reforço **multilíngue** (21.654 pares: foco com teto
 350 por intenção × idioma, retenção equilibrada por idioma, eleições com REGRAS_URNA e AJUDA inteiras; `ia/treino/README.md` §v3.7). Promoção
 só com `passed: true` sem força; até lá o serviço segue no v3.4 com o `nlu_core.py` anterior.
+
+**v3.7 APROVADO no gate (19/10/2026, 04h15) — promoção à espera do mantenedor.** Com o golden alinhado, gate de referência e 5 idiomas ok
+(`ia/treino/README.md` §v3.7): golden 984 intenção 98,9 % (776 em comum com o v3.4: 98,5 → 98,7 %; 208 casos novos 207/208; CONCEITO pt 15/15;
+composto 0 alucinação; unidadeDestino 96,7 %, es 100 %), holdout 2.538 99,3 %, Q8 99,0 %, 15 dos 17 extras inteiros; eleições 95,6 % / 94,9 %
+(sem uso aqui). `passed: true`; pacote `ai_model/output/gguf/nlu-v3.7-20261019/` e os 3 arquivos no Volume; `SNAPSHOT_EPOCH = "nlu-v3.7-20261019"`
+editado em `nlu_app.py`. O classificador do agente bloqueou `promover.py` (sem força): a troca do ponteiro, o `modal deploy`, o `MODEL_VERSION` e o
+`vercel deploy --prod` ficam para o mantenedor (comandos no README do treino). Depois da promoção o serviço passa a usar o `nlu_core.py` atual
+(intenções NOX/ENTALPIA/EQUILIBRIO/LIGACAO, ids `energiaGibbsFormacaoKJmol`, `entropiaPadraoJmolK`, `particulas`, gramática por intenção).

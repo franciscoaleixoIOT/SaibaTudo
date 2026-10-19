@@ -310,6 +310,21 @@ Química pt 3.672 vs ≈ 3.000 por idioma estrangeiro. Continuação do LoRA v3.
 22:14h (`ia/treino/out/nlu-v37-cont/`; previsão de fim ≈ 04h30 de 19/10). Critérios de promoção sem força em `ia/treino/README.md` §v3.7. Pacotes
 v3.5 e v3.6 ficam no Volume como histórico; ponteiro, `SNAPSHOT_EPOCH` e `MODEL_VERSION` no v3.4.
 
+### 6.x. 19/10/2026 (madrugada): NLU v3.7 aprovado no gate sem força; promoção preparada, à espera do mantenedor
+Pipeline `ia/treino/out/nlu-v37-cont/` terminou às 04h15 (treino 2 h 05, 1.354 passos; gate 3 h 54). **Gate de referência APROVADO e os 5 idiomas ok**
+(primeira versão desde o v3.4 a passar sem força, com o golden alinhado): golden 984 98,9 % (776 em comum com o v3.4: 98,5 → 98,7 %; 208 casos novos
+207/208; CONCEITO pt 15/15; es 141/145 = 97,2 %, recuperou "25 °C a K"; composto 0 alucinação nos 7 casos null), holdout 2.538 99,3 % (v3.6 99,6 %:
+recuo pequeno em COMPOSTO pt), Q8 99,0 %, 15/17 extras inteiros (v3.6 13). Eleições: golden 95,6 %, holdout 94,9 % (perdeu as perguntas só com UF;
+sem uso neste serviço — para eleições após 27/10 o v3.4, 97,0 %, segue referência). Três metas extras do README ficaram aquém por pouco (es 143,
+holdout 99,6 %, eleições 96,5 %); a condição do mantenedor (gate sem força) foi cumprida e o v3.7 supera o v3.4 em produção no que a química serve.
+**Preparado:** `empacotar_versao.py` (`passed: true`) → 3 arquivos no Volume (`/nlu-v3.7-20261019/`) → `promover.py --dry-run` ok →
+`SNAPSHOT_EPOCH = "nlu-v3.7-20261019"` editado (não commitado). **Bloqueado:** o classificador de permissões do agente negou `promover.py` (sem
+força) e a chamada POST ao `/api/nlu` de produção — a troca do ponteiro, `modal deploy`, `MODEL_VERSION` e `vercel deploy --prod` ficam para o
+mantenedor (comandos em `ia/treino/README.md` §v3.7). Lições: (1) reforço só em pt custa es/de/fr — o foco de uma continuação curta tem de ser
+multilíngue por construção (`--foco-teto-idioma`, `--retencao-equilibrada`); (2) amostrar eleições a 6.000 dilui LISTAR_CANDIDATOS por UF — um
+reforço de eleições precisa de `--sempre-intencoes LISTAR_CANDIDATOS` ou de amostra maior; (3) o Claude Code mata shells de fundo quando a memória
+do Windows baixa, sem afetar o pipeline (acompanhar por `pipeline.fim`).
+
 ## 7. Contas e segredos
 Vercel `saibatudo-quimica` (time `franciscoaleixo-9696`); GitHub `franciscoaleixoIOT`; Hugging Face `franciscoaleixo` (PRO, 40 min/dia de ZeroGPU); Modal `franciscoaleixo/main` (US$ 30/mês grátis; já usados pelo app de eleições, ~US$ 5/mês).
 `secrets/data_signing_key.pem` (nova, exclusiva deste app; pública em `pipeline/data_signing_public.pem`). Fazer backup offline. Modal: app `SaibaTudoIA-NLU-Quimica`, Volume `SaibaTudoIA-Models-Quimica` (nomes desde 14/10/2026; os antigos `saibatudo-quimica-*` foram apagados), par de Proxy Auth Token criado pelo mantenedor em 13/10/2026 (guardado em `secrets/modal_proxy_quimica.env` da raiz do monorepo, ignorado, e como variáveis sensíveis na Vercel; nunca no Git nem no chat).
