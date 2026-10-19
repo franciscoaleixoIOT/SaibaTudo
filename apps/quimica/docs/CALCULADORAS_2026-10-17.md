@@ -123,8 +123,9 @@ K e Rb" → COMPARAR com o primeiro elemento e a propriedade). Nada em `apps/ele
   química 69,8 %); **treino do v3.5 iniciado às 02h52** (`ia/treino/README.md` §v3.5); Android **1.0.3 (versionCode 4)** gerado e verificado
   (`docs/RELEASE_1.0.3.md`). Testes: web 229 (226 + 3 pulados), API 253, modal 133, dataset 87, pipeline 243, tools 112, Android 255 + lint 0 erros,
   corpus 43, raiz 8, portal 10.
-- **Pendente:** decisão do mantenedor sobre a promoção do v3.5 (gate medido às 10h de 18/10, `ia/treino/README.md` §v3.5: reprovado só
-  por 3 casos IUPAC de NOMENCLATURA do golden; pacote e arquivos já no Volume) e então `promover.py` → `SNAPSHOT_EPOCH` + `modal deploy` →
+- **Pendente:** decisão do mantenedor sobre a promoção do NLU (v3.5 medido às 10h e v3.6 às 21h29 de 18/10, `ia/treino/README.md` §v3.5
+  e §v3.6: o v3.6 recupera CONCEITO pt e fica acima do v3.4 no golden em comum, mas reprova pelos 3 casos IUPAC do golden e por es
+  unidadeDestino 9/11; pacotes e arquivos já no Volume) e então `promover.py` → `SNAPSHOT_EPOCH` + `modal deploy` →
   `MODEL_VERSION` na Vercel (o serviço ainda roda o `nlu_core.py` sem as intenções e ids novos, de propósito); testar a tela Calculadoras, a ficha
   e as respostas novas no aparelho e enviar o AAB 1.0.3; revisão por falante nativo dos textos en/es/de/fr; "compare o ΔGf de X e Y" → COMPARAR
   (hoje PROPRIEDADE com resposta de comparação); Kps/solubilidade; TeX cru nos trechos da Wikipédia pt (pipeline).

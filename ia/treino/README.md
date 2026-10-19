@@ -167,7 +167,7 @@ Eleições: só depois de 27/10.
   (`--forcar-pasta`) e promover sem `--force`; (C) v3.6 com mais CONCEITO pt (teto maior para CONCEITO ou `--revisao 1.0`) e revisão de eleições, ~4 h.
   Em qualquer caso: corrigir o desacordo do golden (pendência) e, no v3.6, reforçar CONCEITO pt, "Wie rechnet man Kc in Kp um?" e `apenasDeferidas`.
 
-## v3.6 (treino iniciado em 18/10/2026, 15h54): reforço de CONCEITO pt e de eleições sobre o LoRA v3.5
+## v3.6 (treinado e medido em 18/10/2026, 15h54–21h29): reforço de CONCEITO pt e de eleições sobre o LoRA v3.5; PROMOÇÃO PENDENTE
 Decisão do mantenedor em 18/10 (depois do gate do v3.5 acima): em vez de promover o v3.5 à força ou de mexer no golden, treinar um v3.6 que
 recupere CONCEITO pt e `apenasDeferidas` de eleições. **Receita:** continuação CURTA do LoRA **v3.5** (`--lora_init ia/treino/out/nlu-v35-cont/final`,
 lr 1e-4, 1 época, lote 2 × 8, `max_length 288`) sobre uma **mistura de reforço** montada por `ia/treino/misturar_reforco.py` (novo; testes em
@@ -185,3 +185,36 @@ Total **20.360 pares** (7.123 química pt, 7.238 química en/es/de/fr,
 os gates do app (`empacotar_versao.py` → `passed`), CONCEITO pt de volta ao nível do v3.4 nos 776 casos em comum, `apenasDeferidas` ≥ 90 % no holdout de
 eleições, sem perder os 208 casos novos. O desacordo dos 3 casos IUPAC do golden (`composto: null`) continua em aberto: se o v3.6 copiar o nome, como
 o contrato manda, o `passed` formal volta a reprovar por esses 3 casos — a decisão sobre o golden é do mantenedor.
+
+**Resultado (pipeline 15h54 → 21h29 de 18/10/2026; treino 1 h 34, 1.273 passos, perda média 0,0014, pico de VRAM 8,1 GB; gate 4 h).**
+Saídas em `ia/treino/out/nlu-v36-cont/` (`eval_quimica_q4.json/.log`, `eval_eleicoes_q4.json`, `eval_*_q8.json`). Comparação nos mesmos casos
+(scratch `cruzar_v36.py`; v3.4 / v3.5 / v3.6):
+- **Golden química 984 (Q4, com gramática):** JSON 100 %, intenção **98,9 %** (v3.5 98,4 %), elemento 99,5 %, composto 99,7 %, propriedade 97,7 %,
+  equação 100 %, unidadeDestino 95,1 % (58/61); sem gramática JSON 98,9 % / intenção 97,9 %; latência 1,86 s; Q8 98,8 %. Nos **776 casos em comum
+  com o v3.4: 98,5 → 97,9 → 98,7 %** (766/776, acima do v3.4); os 208 casos novos 207/208 (o erro: "quantos mols são 6,02.10^23 partículas?" →
+  CONCEITO). **CONCEITO 49 / 45 / 53 de 55 e CONCEITO pt 15 / 12 / 15 de 15: recuperado** ("o que é sal/açúcar" em pt/en/de/fr, "como funciona uma
+  pilha" pt/fr, "Was ist das ideale Gasgesetz?"). Por idioma (em comum): pt 99,4 → 97,5 → 98,8 %; en 98,3 → 98,3 → 100 %; **es 99,3 → 98,6 → 96,6 %**;
+  de 97,5 → 97,5 → 99,4 %; fr 97,9 → 97,9 → 99,0 %. Os 5 erros em es: "hierrro" → DESCONHECIDA, "texto de relleno sin sentido…" → CONCEITO,
+  "25 °C a K" → PROPRIEDADE, "combustión del metano: CH4 + O2 = CO2 + H2O" → ENTALPIA, "¿qué es el azúcar?" → COMPOSTO (os três primeiros o v3.5 acertava).
+- **Holdout química 2.538:** intenção **99,6 %** (v3.5 99,4 %), JSON 100 %, entidades ≥ 98,2 %; nos 1.134 em comum com o v3.4: 100 → 99,6 → 99,8 %;
+  CONCEITO pt 74 / 70 / 74 de 74. 1.404 casos só do v3.5/v3.6: 99,4 %.
+- **17 extras:** 13 passam inteiros; falhas só por idioma em amostras pequenas: multiturno es (elemento 5/6 e 2 "alucinações" com contexto — as mesmas
+  do v3.5), revisor de 15/17 ("Warum ist HCl eine starke Säure, aber HF…" → CONCEITO em vez de COMPARAR, nos 4 idiomas; passava no v3.5), esteq_formada
+  elemento en 1/3 (I2 formada), partículas propriedade en 3/4. `equilibrio` de, que reprovava no v3.5 (77,8 %), passou a 100 %.
+- **Eleições (sem uso neste serviço):** golden 114: 97,4 → 96,5 → **94,7 %** (novos erros: "bom dia, tudo bem?" e "Como ser mesário?" → DESCONHECIDA,
+  "O presidente da mesa receptora…" → PERFIL_CANDIDATO); holdout 435: 97,0 → 96,6 → 96,3 %; **`apenasDeferidas` 9/9 → 5/9 → 8/9 (88,9 %)**, falta
+  "joao rodrigues e ficha limpa". O gate de referência de eleições reprova nas três versões por alucinação de `cargo` em 3 casos null do golden
+  ("deputado mais votado" → DEPUTADO_DISTRITAL; v3.4/v3.5 1 de 3, v3.6 2 de 3).
+- **`passed` formal (`empacotar_versao.py`): REPROVADO** por três motivos: os mesmos 3 casos IUPAC de NOMENCLATURA do golden (`composto: null` ×
+  modelo copia o nome; geral 30 % e [pt-BR] 25 %) e **[es] unidadeDestino 81,8 % (9/11)**: "25 °C a K" (intenção errada, regressão real) e
+  "pasa 1.520 mmHg a atm, kPa y torr" → `kPa` (três unidades-alvo; o golden espera a primeira). Pacote `apps/quimica/ai_model/output/gguf/nlu-v3.6-20261018/`
+  (meta.json `passed: false`, 3 motivos) e os 3 arquivos enviados ao Volume `SaibaTudoIA-Models-Quimica` (`/nlu-v3.6-20261018/`); **ponteiro,
+  `SNAPSHOT_EPOCH` e `MODEL_VERSION` continuam no v3.4**. Não foi promovido: a condição do mantenedor era passar no gate.
+- **Leitura:** o reforço fez o que devia (CONCEITO pt e `apenasDeferidas` voltaram), o v3.6 é o melhor modelo medido para a química (golden em comum
+  98,7 % > v3.4 98,5 %; holdout 99,8 %; casos novos 99,5 %), mas custou es (−3 casos vs v3.5, −4 vs v3.4) e 2 intenções de eleições; a mistura tinha
+  pouco es/de/fr em CONCEITO (foco pt). Em produção, "25 °C a K", "o que é sal/açúcar" e os nomes IUPAC são resolvidos pelas regras locais do site e
+  do Android antes de a nuvem ser chamada. **Decisão do mantenedor (18/10, noite):** (A) `promover.py --version nlu-v3.6-20261018 --force --reason
+  "3 casos IUPAC do golden em desacordo com o contrato + es unidadeDestino 9/11 cobertos pela regra local"` → `SNAPSHOT_EPOCH` + `modal deploy` →
+  `MODEL_VERSION` + `vercel deploy --prod`; (B) manter o v3.4, alinhar os 3 casos IUPAC do golden ao contrato e tratar es num v3.7 com reforço
+  multilíngue (CONCEITO/CONVERSAO en/es/de/fr + eleições REGRAS_URNA/AJUDA); (C) nada por ora. A interrupção do shell de acompanhamento pelo Claude
+  Code (pouca memória, 18h53) não afetou o pipeline, que seguiu até o fim.

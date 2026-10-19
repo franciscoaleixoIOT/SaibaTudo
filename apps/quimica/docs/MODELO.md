@@ -218,3 +218,11 @@ pergunta para `composto` (o contrato admite; desacordo entre o golden e o contra
 `ai_model/output/gguf/nlu-v3.5-20261018/` e os 3 arquivos já no Volume (`/nlu-v3.5-20261018/`); **ponteiro, `SNAPSHOT_EPOCH` e `MODEL_VERSION`
 continuam no v3.4**. A promoção com `promover.py --force --reason` ficou para o mantenedor (opções A/B/C no README do treino). O serviço continua
 com o `nlu_core.py` anterior até a promoção.
+
+**v3.6 treinado e medido (18/10/2026, 21h29) — promoção PENDENTE:** continuação curta do LoRA v3.5 com a mistura de reforço de
+`ia/treino/misturar_reforco.py` (todo CONCEITO da química + eleições com todos os `apenasDeferidas` + retenção; `ia/treino/README.md` §v3.6).
+Golden 984 intenção 98,9 % (776 em comum com o v3.4: 98,5 → 97,9 → 98,7 %; CONCEITO pt 15/15 de volta; 208 casos novos 207/208), holdout 2.538 99,6 %,
+Q8 98,8 %, 13 dos 17 extras inteiros; eleições golden 94,7 % e `apenasDeferidas` 8/9. `passed: false` pelos mesmos 3 casos IUPAC e por
+**es unidadeDestino 9/11** ("25 °C a K" → PROPRIEDADE; "mmHg a atm, kPa y torr" → kPa). Pacote `ai_model/output/gguf/nlu-v3.6-20261018/` e Volume
+(`/nlu-v3.6-20261018/`); **ponteiro, `SNAPSHOT_EPOCH` e `MODEL_VERSION` continuam no v3.4**; o serviço continua com o `nlu_core.py` anterior.
+Decisão do mantenedor (A forçar o v3.6 / B v3.7 multilíngue + golden alinhado / C nada) e comandos no README do treino.

@@ -281,6 +281,22 @@ gate reprovado) foi bloqueado pelo classificador de permissões do agente; ponte
 v3.4 e o serviço segue com o `nlu_core.py` anterior. Decisão e comandos em `ia/treino/README.md` §v3.5 (A: forçar; B: alinhar os 3 casos do golden
 ao contrato, repontuar e promover sem força; C: v3.6).
 
+### 6.v. 18/10/2026 (tarde e noite): NLU v3.6 (reforço) treinado e medido; promoção continua pendente
+Decisão do mantenedor depois do gate do v3.5: "Treinar um v3.6 com mais CONCEITO pt e revisão de eleições. Depois pode" (promover se passar).
+Novo `ia/treino/misturar_reforco.py` (+ 8 testes, 0959c47): mistura de reforço com pares já existentes — todo CONCEITO da química (4.453, inclusive
+os que o teto 760 do v35 cortara, vindos do v34), 5.999 de eleições estratificados com todos os 396 `apenasDeferidas`, 10.009 de retenção estratificada
+por (intenção, idioma), 123 pares excluídos pelo `FiltroDeTeste` (golden e holdouts). Continuação curta do LoRA v3.5 (1 época, 1.273 passos, 1 h 34)
+e o mesmo gate do v3.5 (`ia/treino/out/nlu-v36-cont/`, 15h54–21h29; o Claude Code matou o shell de acompanhamento por pouca memória às 18h53, sem
+afetar o pipeline). Resultado (`ia/treino/README.md` §v3.6): golden 984 intenção 98,9 % (776 em comum com o v3.4: 98,5 → 97,9 → 98,7 %; **CONCEITO pt
+15/15 recuperado**; 208 casos novos 207/208), holdout 2.538 99,6 % (1.134 em comum: 100 → 99,6 → 99,8 %), Q8 98,8 %, 13 dos 17 extras inteiros;
+eleições golden 97,4 → 96,5 → 94,7 % e `apenasDeferidas` 5/9 → 8/9. **Custo:** es 99,3 → 98,6 → 96,6 % no golden ("hierrro", "texto de relleno…",
+"25 °C a K", "combustión del metano…", "¿qué es el azúcar?") — a mistura de foco era quase só pt. **`passed: false`** por três motivos: os mesmos
+3 casos IUPAC (desacordo golden × contrato) e **es unidadeDestino 9/11** ("25 °C a K" → PROPRIEDADE; "mmHg a atm, kPa y torr" → kPa). Pacote
+`ai_model/output/gguf/nlu-v3.6-20261018/` e os 3 arquivos no Volume (`/nlu-v3.6-20261018/`); **não promovido** (a condição era passar): ponteiro,
+`SNAPSHOT_EPOCH` e `MODEL_VERSION` seguem no v3.4. Em produção, os casos que o v3.6 erra ("25 °C a K", "o que é sal", nomes IUPAC) são resolvidos
+pelas regras locais antes de a nuvem ser chamada. Opções para o mantenedor (A forçar v3.6 com motivo; B golden alinhado + v3.7 multilíngue; C manter
+v3.4) em `ia/treino/README.md` §v3.6 e `PENDENCIAS.md` §13.
+
 ## 7. Contas e segredos
 Vercel `saibatudo-quimica` (time `franciscoaleixo-9696`); GitHub `franciscoaleixoIOT`; Hugging Face `franciscoaleixo` (PRO, 40 min/dia de ZeroGPU); Modal `franciscoaleixo/main` (US$ 30/mês grátis; já usados pelo app de eleições, ~US$ 5/mês).
 `secrets/data_signing_key.pem` (nova, exclusiva deste app; pública em `pipeline/data_signing_public.pem`). Fazer backup offline. Modal: app `SaibaTudoIA-NLU-Quimica`, Volume `SaibaTudoIA-Models-Quimica` (nomes desde 14/10/2026; os antigos `saibatudo-quimica-*` foram apagados), par de Proxy Auth Token criado pelo mantenedor em 13/10/2026 (guardado em `secrets/modal_proxy_quimica.env` da raiz do monorepo, ignorado, e como variáveis sensíveis na Vercel; nunca no Git nem no chat).

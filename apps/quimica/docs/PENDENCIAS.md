@@ -235,13 +235,15 @@ PubChem voltam com `cid=`), +11 compostos e 2 apelidos; 7 lacunas das regras do 
   `dataset/gerar_nlu.py`): 75.041 pares (treino 68.589; química 69,9 %), holdouts `holdout_v35_*` 472 casos, 36 testes verdes, vazamento
   golden × treino limpo. **Não treinado.** Decisões a confirmar antes do treino: tetos de 850 (pt) e 180 (estrangeiros) por intenção para
   caber abaixo de 70 % (cortam PROPRIEDADE, CONCEITO, SEGURANCA…); família `configuracao` extra; comando em `ia/treino/README.md` (~4 h).
-- [ ] **NLU v3.5: treinado e medido em 18/10/2026 (02h52–10h00), promoção PENDENTE** (`ia/treino/README.md` §v3.5): golden 984 98,4 %
-  (776 em comum com o v3.4: 98,5 → 97,9 %; 208 casos novos 100 %), holdout 2.538 99,4 %, 17 extras ≥ 90 % por intenção; `passed: false` só por
-  3 casos NOMENCLATURA de nome IUPAC (golden `composto: null` × modelo copia o nome; o contrato admite). Pacote `nlu-v3.5-20261018` e os 3 arquivos
-  já no Volume; ponteiro, `SNAPSHOT_EPOCH` e `MODEL_VERSION` no v3.4. **Decisão do mantenedor:** (A) `promover.py --force --reason` + `SNAPSHOT_EPOCH`
-  + `modal deploy` + `MODEL_VERSION` + `vercel deploy --prod`; (B) alinhar os 3 casos do golden ao contrato, repontuar, empacotar e promover sem força;
-  (C) v3.6 (mais CONCEITO pt e revisão de eleições). Pendências do modelo para o v3.6: CONCEITO pt ("o que é sal/açúcar", "como funciona uma
-  pilha" — a regra local cobre no site e no Android), de "Wie rechnet man Kc in Kp um?", eleições `apenasDeferidas` (4/9) com `--revisao` maior.
+- [ ] **NLU v3.5 e v3.6 treinados e medidos em 18/10/2026, promoção PENDENTE** (`ia/treino/README.md` §v3.5 e §v3.6). v3.6 (reforço de
+  CONCEITO pt e eleições sobre o v3.5): golden 984 98,9 % (776 em comum com o v3.4: 98,5 → 98,7 %; CONCEITO pt 15/15; 208 casos novos 207/208),
+  holdout 2.538 99,6 %, eleições `apenasDeferidas` 8/9; `passed: false` por 3 casos NOMENCLATURA de nome IUPAC (golden `composto: null` × modelo
+  copia o nome; o contrato admite) **e** por es unidadeDestino 9/11 ("25 °C a K" → PROPRIEDADE, regressão; "mmHg a atm, kPa y torr" → kPa).
+  Pacotes `nlu-v3.5-20261018` e `nlu-v3.6-20261018` com os 3 arquivos no Volume; ponteiro, `SNAPSHOT_EPOCH` e `MODEL_VERSION` no v3.4.
+  **Decisão do mantenedor:** (A) `promover.py --version nlu-v3.6-20261018 --force --reason …` + `SNAPSHOT_EPOCH` + `modal deploy` + `MODEL_VERSION`
+  + `vercel deploy --prod`; (B) alinhar os 3 casos IUPAC do golden ao contrato e treinar um v3.7 com reforço multilíngue (CONCEITO/CONVERSAO
+  en/es/de/fr, eleições REGRAS_URNA/AJUDA) antes de promover; (C) manter o v3.4. Pendências do modelo que restam: es ("hierrro", "texto de relleno",
+  "¿qué es el azúcar?"), "Warum ist HCl eine starke Säure, aber HF…" → COMPARAR, eleições "Como ser mesário?"/"bom dia, tudo bem?".
 - [x] **Calculadoras novas** (17/10, noite, ordem do mantenedor: entalpia, configuração eletrônica, NOX, Kc/Kp, tipo de ligação) —
   contrato, fontes e decisões em `docs/CALCULADORAS_2026-10-17.md`; intenções NOX/ENTALPIA/EQUILIBRIO/LIGACAO em todos os espelhos;
   site (calc/, nlu.js, answers.js, tela Calculadoras, catálogos 5 idiomas; 217 testes, E2E Chrome), golden 873 → 929; Android portado em paridade (domain/calc/{Entalpia,Eletronica,Nox,Equilibrio,Ligacao}.kt, RespostasCalculadoras.kt, LocalNlu 2b/5b, 5 cartões em Calculadoras.kt, 196 strings × 5 idiomas; 242 testes, golden 929, lint sem aviso novo; tela ainda não testada no aparelho).
