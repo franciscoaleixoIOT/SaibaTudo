@@ -249,6 +249,12 @@ retomar. Guardado em `out/explica-v1/treino-travado-20261020/` (o `adapter_model
 mudou para `apps/eleicoes2026/ai_model/.venv` (a pasta antiga `SaibaTudoEleicao2026` foi apagada; recriado com as mesmas versões via `uv`).
 `train_hybrid.py` ganhou `--save_steps` (padrão 200). Fila nova, uma carga pesada por vez (`ia/treino/out/fila-20261020.sh`, log
 `fila-20261020.log`): v3.8 primeiro, depois o explicador do zero com checkpoint a cada 25 passos, depois `pos_treino.sh`.
+**Segundo travamento, 13h16:56**, de novo ao gravar um checkpoint do explicador (o `checkpoint-25`, incompleto, em `treino-travado-20261020-13h/`).
+Nos dois casos o log do Windows tem um erro do driver da NVIDIA (`nvlddmkm`, evento 14) no MESMO segundo da gravação; o v3.8 (2B, ~7,6 GB) gravou
+cinco checkpoints sem problema. Causa provável: o explicador (4B) com o orçamento padrão de VRAM (6,92 GiB para os pesos) ocupava 7,8 dos 8 GB e o
+otimizador paginado migra estados GPU↔RAM justamente ao salvar. `train_hybrid.py` ganhou `--gpu_mem` (GiB para os pesos) e `--optim`; a fila 2
+(`fila-20261020b.sh`, 13h38) refaz o explicador com `--gpu_mem 5.5 --cpu_offload on --optim adamw_bnb_8bit --save_steps 25` e grava o `FILA_FIM` no
+mesmo `fila-20261020.log` que o v3.9 espera.
 
 ## v3.9 (fila de 20/10/2026, depois do explicador): o v3.8 com os extras corrigidos, sobre o LoRA v3.7
 **Resultado do v3.8 (treino 06h58 → 09h01, gate até 12h43): NÃO promovido.** Golden química Q4 com gramática: intenção 98,9 → **99,0 %**, elemento

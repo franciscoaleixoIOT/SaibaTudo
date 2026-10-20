@@ -34,6 +34,14 @@ class Argumentos(unittest.TestCase):
         a = th.montar_argumentos(["--target", "ask", "--version", "ask-v2-20270101", "--max_length", "768", "--epochs", "1", "--dataset", "x.json"])
         self.assertEqual((a.max_length, a.epochs, a.dataset.name), (768, 1.0, "x.json"))
 
+    def test_memoria_da_gpu_e_otimizador_pela_linha_de_comando(self):
+        a = th.montar_argumentos(["--target", "ask", "--version", "ask-v1-20261020", "--gpu_mem", "5.5", "--optim", "adamw_bnb_8bit", "--save_steps", "25"])
+        self.assertEqual((a.gpu_mem, a.optim, a.save_steps), (5.5, "adamw_bnb_8bit", 25))
+        padrao = th.montar_argumentos(["--target", "ask", "--version", "ask-v1-20261020"])
+        self.assertEqual((padrao.gpu_mem, padrao.optim, padrao.save_steps), (None, "paged_adamw_8bit", 200))
+        with self.assertRaises(SystemExit):
+            th.montar_argumentos(["--target", "ask", "--version", "ask-v1-20261020", "--optim", "sgd"])
+
     def test_versao_tem_de_combinar_com_o_alvo(self):
         for argv in (["--target", "nlu", "--version", "ask-v1-20261101"], ["--target", "ask", "--version", "v2.3-20261007"], ["--target", "nlu", "--version", "nlu-v1-2026"]):
             with self.assertRaises(SystemExit), contextlib.redirect_stderr(io.StringIO()):

@@ -65,6 +65,11 @@ def montar_argumentos(argv=None):
     p.add_argument("--lr", type=float, default=None)
     p.add_argument("--cpu_offload", default="auto", choices=["auto", "on", "off"], help="Híbrido: offload de camadas para a RAM do sistema.")
     p.add_argument("--resume", default=None)
+    p.add_argument("--gpu_mem", type=float, default=None,
+                   help="GiB de VRAM para os pesos (padrão: resolve_gpu_memory, ~88 %% da placa). 20/10/2026: com o padrão o ask ocupou 7,8 dos 8 GB e "
+                        "o driver da NVIDIA (nvlddmkm 14) travou o Windows DUAS vezes ao gravar o checkpoint; use ~5.5 com --cpu_offload on")
+    p.add_argument("--optim", default="paged_adamw_8bit", choices=["paged_adamw_8bit", "adamw_bnb_8bit", "adamw_torch"],
+                   help="otimizador; o paginado migra estados GPU<->RAM ao salvar (suspeito nos travamentos de 20/10): adamw_bnb_8bit não pagina")
     p.add_argument("--save_steps", type=int, default=200, help="checkpoint a cada N passos (menor = perde menos num travamento; cada um tem ~400 MB no ask)")
     p.add_argument("--seed", type=int, default=2026, help="semente (gravada em train_meta.json): mesmo dataset + mesma semente = mesmo treino")
     p.add_argument("--sobrescrever", action="store_true", help="permite reaproveitar a pasta de saída de um treino anterior")
@@ -161,7 +166,7 @@ def main(argv=None):
     # Memória híbrida: VRAM local + RAM (offload) — permite bases maiores se necessário
     max_memory = {}
     if device == "cuda":
-        max_memory[0] = resolve_gpu_memory(torch)
+        max_memory[0] = f"{a.gpu_mem:.2f}GiB" if a.gpu_mem else resolve_gpu_memory(torch)
     if a.cpu_offload in ("auto", "on"):
         ram = 0
         try:
@@ -197,7 +202,7 @@ def main(argv=None):
         output_dir=str(a.output_dir), num_train_epochs=a.epochs, per_device_train_batch_size=a.batch_size, gradient_accumulation_steps=a.grad_accum,
         learning_rate=a.lr, lr_scheduler_type="cosine", warmup_steps=25, weight_decay=0.01, bf16=(device == "cuda"), gradient_checkpointing=True,
         gradient_checkpointing_kwargs={"use_reentrant": False}, logging_steps=20, save_strategy="steps", save_steps=a.save_steps, save_total_limit=2,
-        report_to=[], optim="paged_adamw_8bit", max_grad_norm=0.3,
+        report_to=[], optim=a.optim, max_grad_norm=0.3,
         # 0 workers: no Windows, o spawn de subprocesso recarrega o torch e estoura o arquivo de paginação (WinError 1455).
         dataloader_num_workers=0, remove_unused_columns=False, seed=a.seed, data_seed=a.seed,
     )
@@ -212,7 +217,7 @@ def main(argv=None):
     escrever_train_meta(
         final_dir, dataset=a.dataset, base_model=a.base_model, semente=a.seed, amostras=len(train_ds), alvo=a.target, versao=a.version,
         hiperparametros={"epochs": a.epochs, "batch_size": a.batch_size, "grad_accum": a.grad_accum, "max_length": a.max_length, "lr": a.lr,
-                         "lora_r": 16, "lora_alpha": 32, "lora_dropout": 0.05},
+                         "lora_r": 16, "lora_alpha": 32, "lora_dropout": 0.05, "optim": a.optim, "gpu_mem": a.gpu_mem},
         mascara=dict(train_ds.stats), log_history=trainer.state.log_history, inicio=inicio,
         versoes={"torch": torch.__version__, "transformers": transformers.__version__, "peft": peft.__version__},
     )
