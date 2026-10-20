@@ -241,3 +241,8 @@ composto 0 alucinação; unidadeDestino 96,7 %, es 100 %), holdout 2.538 99,3 %,
 editado em `nlu_app.py`. O classificador do agente bloqueou `promover.py` (sem força): a troca do ponteiro, o `modal deploy`, o `MODEL_VERSION` e o
 `vercel deploy --prod` ficam para o mantenedor (comandos no README do treino). Depois da promoção o serviço passa a usar o `nlu_core.py` atual
 (intenções NOX/ENTALPIA/EQUILIBRIO/LIGACAO, ids `energiaGibbsFormacaoKJmol`, `entropiaPadraoJmolK`, `particulas`, gramática por intenção).
+
+**v3.7 PUBLICADO (00h25 de 20/10/2026).** O mantenedor autorizou e o agente rodou: `promover.py --version nlu-v3.7-20261019` → `SNAPSHOT_EPOCH` +
+`modal deploy` → `MODEL_VERSION` na Vercel + `vercel deploy --prod` (saibatudo-quimica-rhdn0tqw9-franciscoaleixo-9696.vercel.app). Health `"model":"nlu-v3.7-20261019"` (versão `4c73bd7`);
+`/quimica/api/nlu` ao vivo: massa molar da água → MASSA_MOLAR/CID 962 (16,7 s, frio), "¿qué es el azúcar?" → COMPOSTO/CID 5988 (3,5 s),
+"Wie heißt 2-Chlor-3-methylpentan?" → NOMENCLATURA sem CID (3,8 s). O serviço usa o `nlu_core.py` atual. Volta em um comando (`--rollback`).

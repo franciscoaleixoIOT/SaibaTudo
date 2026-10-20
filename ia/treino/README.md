@@ -219,7 +219,7 @@ Saídas em `ia/treino/out/nlu-v36-cont/` (`eval_quimica_q4.json/.log`, `eval_ele
   multilíngue (CONCEITO/CONVERSAO en/es/de/fr + eleições REGRAS_URNA/AJUDA); (C) nada por ora. A interrupção do shell de acompanhamento pelo Claude
   Code (pouca memória, 18h53) não afetou o pipeline, que seguiu até o fim.
 
-## v3.7 (treinado 18/10 22h14 → medido 19/10 04h15: gate APROVADO sem força; promoção à espera do mantenedor): reforço MULTILÍNGUE sobre o LoRA v3.6, com o golden alinhado — opção B
+## v3.7 (treinado 18/10 22h14 → medido 19/10 04h15: gate APROVADO sem força; PUBLICADO na química em 20/10 00h25): reforço MULTILÍNGUE sobre o LoRA v3.6, com o golden alinhado — opção B
 Decisão do mantenedor em 18/10 à noite, depois do gate do v3.6 ("Va para b"): manter o v3.4 em produção, **alinhar os 3 casos IUPAC do golden ao
 contrato** e treinar um v3.7 com reforço multilíngue antes de promover.
 - **Golden alinhado:** os 3 casos NOMENCLATURA de nome IUPAC fora do pacote ("Como se chama o 2-cloro-3-metil-pentano?", "What is the IUPAC name
@@ -244,6 +244,15 @@ contrato** e treinar um v3.7 com reforço multilíngue antes de promover.
   `unidadeDestino` ≥ 90 %), golden em comum com o v3.4 ≥ 98,5 %, CONCEITO pt 15/15, es ≥ 143/145 (nível do v3.5), holdout ≥ 99,6 %, 208 casos
   novos ≥ 207, `apenasDeferidas` ≥ 8/9 e eleições golden ≥ 96,5 % (nível do v3.5). Então: empacotar → Volume → `promover.py` → `SNAPSHOT_EPOCH` +
   `modal deploy` → `MODEL_VERSION` + `vercel deploy --prod` → testes ao vivo.
+
+**Promoção feita às 00h25 de 20/10/2026** (o mantenedor autorizou o agente a rodar os comandos): `promover.py --version nlu-v3.7-20261019` (ponteiro
+`current.json`, sha256 7011d2e8…1447) → `SNAPSHOT_EPOCH = "nlu-v3.7-20261019"` + `python -m modal deploy backend/modal/nlu_app.py` (4,7 s) →
+`MODEL_VERSION=nlu-v3.7-20261019` na Vercel + `vercel deploy --prod` (saibatudo-quimica-rhdn0tqw9-franciscoaleixo-9696.vercel.app; cota 39.999/40.000 antes) → health
+`{"ok":true,"version":"4c73bd7","model":"nlu-v3.7-20261019","nlu":"on","ask":"off",…}`. Testes ao vivo em `/quimica/api/nlu` (modelo `nlu-v3.7-20261019`, `cached:false`):
+  - "qual a massa molar da água?" → MASSA_MOLAR, composto "água" → CID 962 (16,7 s: contêiner frio, restaurando o snapshot)
+  - "¿qué es el azúcar?" → COMPOSTO, composto "azúcar" → CID 5988 (3,5 s)
+  - "Wie heißt 2-Chlor-3-methylpentan?" → NOMENCLATURA, composto "2-Chlor-3-methylpentan", sem CID (3,8 s) — o contrato admite o nome copiado
+Volta: `promover.py --version nlu-v3.4-20261017 --rollback --target nlu` + `SNAPSHOT_EPOCH` + `modal deploy` + `MODEL_VERSION`.
 
 **Resultado (pipeline 22h14 de 18/10 → 04h15 de 19/10; treino 2 h 05, 1.354 passos a 5,5 s/passo, perda média 0,0013; gate 3 h 54).** Saídas em
 `ia/treino/out/nlu-v37-cont/`; comparação nos mesmos casos (scratch `cruzar_v37.py`; v3.4 / v3.6 / v3.7):

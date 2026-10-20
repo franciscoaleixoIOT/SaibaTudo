@@ -46,7 +46,7 @@ POINTER = os.environ.get("NLU_POINTER", "current.json")
 # Versão promovida por último. Mude a cada promoção: com o snapshot de memória ligado, `modal deploy` sem mudança no código é
 # pulado ("no changes detected") e os contêineres novos restauram o snapshot com o modelo ANTERIOR já carregado. Uma mudança aqui
 # força um deploy novo, que descarta o snapshot e carrega o ponteiro atual (lição de 17/10/2026, promoção do v3.4).
-SNAPSHOT_EPOCH = "nlu-v3.4-20261017"
+SNAPSHOT_EPOCH = "nlu-v3.7-20261019"
 VOLUME_NAME = "SaibaTudoIA-Models-Quimica"
 MODELS_DIR = "/models"
 LLAMA_CPP_PYTHON = "llama-cpp-python==0.3.19"  # mesmo runtime do gate (convert_local.py)

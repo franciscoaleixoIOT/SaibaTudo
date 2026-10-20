@@ -235,13 +235,13 @@ PubChem voltam com `cid=`), +11 compostos e 2 apelidos; 7 lacunas das regras do 
   `dataset/gerar_nlu.py`): 75.041 pares (treino 68.589; química 69,9 %), holdouts `holdout_v35_*` 472 casos, 36 testes verdes, vazamento
   golden × treino limpo. **Não treinado.** Decisões a confirmar antes do treino: tetos de 850 (pt) e 180 (estrangeiros) por intenção para
   caber abaixo de 70 % (cortam PROPRIEDADE, CONCEITO, SEGURANCA…); família `configuracao` extra; comando em `ia/treino/README.md` (~4 h).
-- [ ] **NLU v3.7 APROVADO no gate sem força (19/10/2026, 04h15) — promoção à espera do mantenedor** (`ia/treino/README.md` §v3.7): opção B
+- [x] **NLU v3.7 PUBLICADO na química em 20/10/2026 (00h25)** — aprovado no gate sem força em 19/10 04h15 (`ia/treino/README.md` §v3.7): opção B
   cumprida (golden alinhado: 3 casos IUPAC sem `composto: null`; reforço multilíngue sobre o v3.6). Golden 984 98,9 % (776 em comum com o v3.4:
   98,5 → 98,7 %; CONCEITO pt 15/15; 208 casos novos 207/208; es 141/145; composto 0 alucinação), holdout 2.538 99,3 %, 15/17 extras inteiros, Q8
   99,0 %; `passed: true`. Aquém das metas extras por pouco: es (143), holdout (v3.6 99,6 %), eleições golden 95,6 % / holdout 94,9 % (sem uso aqui;
-  para eleições após 27/10 o v3.4 segue referência). Pacote `nlu-v3.7-20261019` com os 3 arquivos no Volume; `SNAPSHOT_EPOCH` já editado localmente.
-  O classificador do agente bloqueou `promover.py`: **comandos para o mantenedor** no README do treino (promover → `modal deploy` → `MODEL_VERSION`
-  → `vercel deploy --prod` → health com `"model":"nlu-v3.7-20261019"`). v3.5 e v3.6 ficam no Volume como histórico.
+  para eleições o v3.4 segue referência). `current.json`, `SNAPSHOT_EPOCH` e `MODEL_VERSION` = `nlu-v3.7-20261019`; health `"model":"nlu-v3.7-20261019"`,
+  3 perguntas ao vivo ok (frio 16,7 s; quente 3,5–3,8 s). v3.5 e v3.6 ficam no Volume como histórico. Volta: `promover.py --version
+  nlu-v3.4-20261017 --rollback --target nlu` + `SNAPSHOT_EPOCH` + `modal deploy` + `MODEL_VERSION`.
 - [ ] **Pendências do modelo para um v3.8** (sem urgência): es "hierrro"/"¿qué es el azúcar?"/"combustión del metano: … = …" (BALANCEAR × ENTALPIA),
   de "Edelgase"/"Was ist das ideale Gasgesetz?", holdout COMPOSTO pt ("formamida", "litargírio"), "oxigênio reage com 10 g de magnésio" → elemento O,
   eleições LISTAR_CANDIDATOS por UF ("RS??") e REGRAS_URNA ("Como ser mesário?").

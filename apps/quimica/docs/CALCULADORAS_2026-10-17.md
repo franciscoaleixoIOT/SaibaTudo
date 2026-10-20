@@ -123,9 +123,8 @@ K e Rb" → COMPARAR com o primeiro elemento e a propriedade). Nada em `apps/ele
   química 69,8 %); **treino do v3.5 iniciado às 02h52** (`ia/treino/README.md` §v3.5); Android **1.0.3 (versionCode 4)** gerado e verificado
   (`docs/RELEASE_1.0.3.md`). Testes: web 229 (226 + 3 pulados), API 253, modal 133, dataset 87, pipeline 243, tools 112, Android 255 + lint 0 erros,
   corpus 43, raiz 8, portal 10.
-- **Pendente:** promover o NLU v3.7, aprovado no gate sem força em 19/10 04h15 (`ia/treino/README.md` §v3.7; pacote e Volume prontos,
-  comandos para o mantenedor lá) — o serviço na nuvem passa então a entender as intenções e ids novos das calculadoras; depois, `promover.py` → `SNAPSHOT_EPOCH` + `modal deploy` →
-  `MODEL_VERSION` na Vercel (o serviço ainda roda o `nlu_core.py` sem as intenções e ids novos, de propósito); testar a tela Calculadoras, a ficha
+- **Feito em 20/10 (00h25):** NLU v3.7 promovido (`ia/treino/README.md` §v3.7; health `"model":"nlu-v3.7-20261019"`): o serviço na nuvem
+  passa a entender as intenções e ids novos das calculadoras. **Pendente:** testar a tela Calculadoras, a ficha
   e as respostas novas no aparelho e enviar o AAB 1.0.3; revisão por falante nativo dos textos en/es/de/fr; "compare o ΔGf de X e Y" → COMPARAR
   (hoje PROPRIEDADE com resposta de comparação); Kps/solubilidade; TeX cru nos trechos da Wikipédia pt (pipeline).
 

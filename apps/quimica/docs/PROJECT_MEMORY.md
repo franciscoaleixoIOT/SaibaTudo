@@ -325,6 +325,17 @@ multilíngue por construção (`--foco-teto-idioma`, `--retencao-equilibrada`); 
 reforço de eleições precisa de `--sempre-intencoes LISTAR_CANDIDATOS` ou de amostra maior; (3) o Claude Code mata shells de fundo quando a memória
 do Windows baixa, sem afetar o pipeline (acompanhar por `pipeline.fim`).
 
+### 6.y. 20/10/2026 (00h25): NLU v3.7 PUBLICADO na química
+Na madrugada de 20/10 o mantenedor autorizou ("pode seguir para a promoção da nlu v3.7") e o agente executou a sequência do README do treino:
+`promover.py --version nlu-v3.7-20261019` (ponteiro `current.json`, sha256 7011d2e8…1447, `promoted_at` 03:24Z) → `SNAPSHOT_EPOCH = "nlu-v3.7-20261019"`
+(já editado em 19/10) + `python -m modal deploy backend/modal/nlu_app.py` (4,7 s) → `MODEL_VERSION` na Vercel → `vercel deploy --prod` (saibatudo-quimica-rhdn0tqw9-franciscoaleixo-9696.vercel.app;
+cota de uploads 39.999/40.000) → health `{"ok":true,"version":"4c73bd7","model":"nlu-v3.7-20261019","nlu":"on","ask":"off",…}`. Ao vivo:
+  - "qual a massa molar da água?" → MASSA_MOLAR, composto "água" → CID 962 (16,7 s: contêiner frio, restaurando o snapshot)
+  - "¿qué es el azúcar?" → COMPOSTO, composto "azúcar" → CID 5988 (3,5 s)
+  - "Wie heißt 2-Chlor-3-methylpentan?" → NOMENCLATURA, composto "2-Chlor-3-methylpentan", sem CID (3,8 s) — o contrato admite o nome copiado
+O frio de 16,7 s na primeira chamada é o restauro do snapshot + inferência; o mantenedor relatou que "às vezes os 25 s demoram" e pediu tempo
+inicial maior (ver pendências). Volta em um comando (`promover.py --rollback`). Docs: README do treino §v3.7, MODELO §13, PENDENCIAS §13, CALCULADORAS §6.
+
 ## 7. Contas e segredos
 Vercel `saibatudo-quimica` (time `franciscoaleixo-9696`); GitHub `franciscoaleixoIOT`; Hugging Face `franciscoaleixo` (PRO, 40 min/dia de ZeroGPU); Modal `franciscoaleixo/main` (US$ 30/mês grátis; já usados pelo app de eleições, ~US$ 5/mês).
 `secrets/data_signing_key.pem` (nova, exclusiva deste app; pública em `pipeline/data_signing_public.pem`). Fazer backup offline. Modal: app `SaibaTudoIA-NLU-Quimica`, Volume `SaibaTudoIA-Models-Quimica` (nomes desde 14/10/2026; os antigos `saibatudo-quimica-*` foram apagados), par de Proxy Auth Token criado pelo mantenedor em 13/10/2026 (guardado em `secrets/modal_proxy_quimica.env` da raiz do monorepo, ignorado, e como variáveis sensíveis na Vercel; nunca no Git nem no chat).
