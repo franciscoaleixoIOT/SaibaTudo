@@ -346,6 +346,20 @@ casas decimais vinham de checkout anterior a 456ceca) foi rodado de novo com `-f
 Registrado em OPERACAO §5 passo 5. Em paralelo (git-ignorado em `ia/treino/out/`): treino do explicador SaibaTudo IA (QLoRA Qwen3-4B, 4.724 pares) em curso
 (ETA ~09h) com cadeia pós-treino automática (fusão → GGUF + gates → HF privado `franciscoaleixo/SaibaTudoIA-Explica`), e NLU v3.8 (extras_v38) na fila da GPU.
 
+### 6.aa. 20/10/2026 (19h–20h): Explica v1 reprovado no gate de segurança por excesso de recusa → família `seguranca_pratica` e Explica v1.1
+O explicador SaibaTudo IA (QLoRA Qwen3-4B, 4.724 pares) treinou sem travar depois da correção de VRAM (`--gpu_mem 5.5 --cpu_offload on
+--optim adamw_bnb_8bit`; dois travamentos do Windows em 20/10 às 05h21 e 13h16 tinham acontecido ao gravar checkpoint a 7,8/8 GB) e **reprovou no
+gate** (`convert_local.py --target ask`): 0 % útil a pedido perigoso e 100 % de fidelidade, mas **39 % dos 418 pedidos legítimos respondidos**
+(mínimo 95 %): recusava EPI, neutralizar, armazenar, descartar, "fórmula do TNT", "sabão caseiro", "bomba calorimétrica", "bolo de cenoura", pior em
+es/de/fr. Causa nos dados: só recusas "como fazer X perigoso" sem trechos e segurança quase só de rótulo GHS; nenhum legítimo parecido.
+Correção: **`dataset/fam_seguranca_pratica.py`** (tipo `seguranca`, 1.286 pares em `qa/seguranca.jsonl`: EPI, armazenamento, derramamento, primeiros
+socorros e descarte por classe de perigo do rótulo, fatos legítimos sobre 38 compostos de destaque, 84 pares gerais à mão; sem número, sem imperativo
+de procedimento, sem frase de recusa — `tests/test_seguranca_pratica.py`), **`backend/retrain/build_ask_extras.py`** (extras só de treino: perguntas
+em en/es/de/fr com resposta em pt-BR, recusas com trechos e em outros idiomas; `test_build_ask_extras.py`) e `ia/treino/misturar_explica.py
+--extra/--manter`. O dataset `qa/` foi regerado inteiro (o pacote mudou no refresh de 20/10: valores como 577,6 → 577,5 kJ/mol). Treino do v1.1
+(6.089 pares) na fila atrás do treino do NLU v3.9; o upload ao HF agora só acontece se o gate aprovar (o do v1 reprovado foi interrompido).
+Detalhes e critérios: `ia/treino/README.md` §Explica v1 e §Explica v1.1.
+
 ## 7. Contas e segredos
 Vercel `saibatudo-quimica` (time `franciscoaleixo-9696`); GitHub `franciscoaleixoIOT`; Hugging Face `franciscoaleixo` (PRO, 40 min/dia de ZeroGPU); Modal `franciscoaleixo/main` (US$ 30/mês grátis; já usados pelo app de eleições, ~US$ 5/mês).
 `secrets/data_signing_key.pem` (nova, exclusiva deste app; pública em `pipeline/data_signing_public.pem`). Fazer backup offline. Modal: app `SaibaTudoIA-NLU-Quimica`, Volume `SaibaTudoIA-Models-Quimica` (nomes desde 14/10/2026; os antigos `saibatudo-quimica-*` foram apagados), par de Proxy Auth Token criado pelo mantenedor em 13/10/2026 (guardado em `secrets/modal_proxy_quimica.env` da raiz do monorepo, ignorado, e como variáveis sensíveis na Vercel; nunca no Git nem no chat).

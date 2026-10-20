@@ -33,6 +33,7 @@ import fam_elementos  # noqa: E402
 import fam_nomenclatura  # noqa: E402
 import fam_recusas_desenho_seguranca as frds  # noqa: E402
 import fam_regras  # noqa: E402
+import fam_seguranca_pratica  # noqa: E402
 import fam_seguranca_rotulo  # noqa: E402
 import fam_textos  # noqa: E402
 import fam_variantes  # noqa: E402
@@ -45,7 +46,7 @@ SCRIPT_VERSION = "1.0"
 LICENCA_DATASET = "CC BY-SA 4.0"
 ARQUIVOS = {
     "elementos": ["elementos"], "compostos": ["compostos"], "calculos": ["calculos"], "nomenclatura": ["nomenclatura"], "regras": ["regras"], "desenho": ["desenho"],
-    "seguranca": ["seguranca", "seguranca_rotulo", "seguranca_texto"], "recusas": ["recusas"], "conceitos": ["conceitos", "conceitos_texto"],
+    "seguranca": ["seguranca", "seguranca_rotulo", "seguranca_texto", "seguranca_pratica"], "recusas": ["recusas"], "conceitos": ["conceitos", "conceitos_texto"],
     "comparacoes": ["comparacoes"], "escopo": ["escopo"], "variantes": ["variantes"],
 }
 
@@ -67,7 +68,8 @@ def gerar(pac, seed=2026, variantes_el=2, variantes_co=1, n_recusas=420):
     fam_seguranca_rotulo.gerar(ctx)
     fam_conceitos_texto.gerar(ctx)
     fam_escopo.gerar(ctx)
-    fam_variantes.gerar(ctx)  # por último: varia uma fração dos pares já gerados
+    fam_variantes.gerar(ctx)  # varia uma fração dos pares já gerados (as famílias abaixo não recebem variantes)
+    fam_seguranca_pratica.gerar(ctx)  # 20/10/2026: pedidos legítimos de segurança (EPI, derramamento, descarte, fatos) que o explicador deve responder
     filtrar_contra_casos_de_seguranca(ctx, REPO / "contracts" / "seguranca_cases.json")
     return ctx
 

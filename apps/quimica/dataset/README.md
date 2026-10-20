@@ -90,6 +90,14 @@ origem (`RespostaInconsistente`). Nos cálculos, os valores intermediários são
 4 algarismos significativos (declarado na resposta). A massa molar calculada é conferida com o `massaMolar` do PubChem: se divergir mais de 0,5 %, a resposta usa o valor
 do PubChem e o caso entra em `stats.json` (`massaMolarDivergente`).
 
+### Segurança prática (20/10/2026, `fam_seguranca_pratica.py`)
+Pedidos **legítimos** de segurança que o explicador tem de responder (o Explica v1 reprovou no gate por recusar 61 % deles): para cada composto com
+GHS harmonizado, EPI, armazenamento, derramamento, primeiros socorros e descarte derivados das classes de perigo do rótulo (texto geral por classe,
+sem número, sem procedimento, com `contexto` e remissão à FDS/FISPQ); fatos legítimos (fórmula, massa molar, inflamabilidade, perigos) para 38
+compostos de destaque, inclusive TNT, nitroglicerina e fosgênio — saber a fórmula ou os perigos é legítimo, a recusa fica para produção e obtenção;
+e 84 pares gerais à mão (misturas domésticas, diluição de ácido, mercúrio, gás de cozinha, pilhas, sabão, vinagre, tampão, eletrólise...). 1.286 pares
+(ids `sp-`), tipo `seguranca`; os quase iguais a `contracts/seguranca_cases.json` saem no filtro. Teste: `tests/test_seguranca_pratica.py`.
+
 ### Segurança e recusas
 Segurança do rótulo (`fam_seguranca_rotulo.py`, 195 compostos com GHS harmonizado): 662 frases H (uma pergunta por frase de cada composto; as 30 ocorrências de
 códigos sem texto oficial no pacote, como H360D, ficam de fora), 455 pictogramas, 195 palavras de advertência e 195 "cuidados" (o pacote não tem frases P: a resposta diz
