@@ -1,5 +1,5 @@
 {
-  "geradoEm": "2026-10-18T05:19:23Z",
+  "geradoEm": "2026-10-20T03:33:39Z",
   "modo": "completo",
   "idiomas": [
     "pt-BR",
@@ -17,7 +17,7 @@
   "familias": {
     "elementos": {
       "status": "ok",
-      "segundos": 0.0,
+      "segundos": 5.7,
       "pubchemLinhas": 118,
       "wikidata": "ok",
       "nomesDivergentesWikidata": [
@@ -56,9 +56,7 @@
         76,
         78,
         83,
-        84,
         86,
-        88,
         91,
         92,
         94,
@@ -281,14 +279,14 @@
     },
     "constantes": {
       "status": "ok",
-      "segundos": 0.0,
+      "segundos": 0.2,
       "constantes": 59,
       "linhasCodata": 355,
       "ausentesNoCodata": []
     },
     "clp": {
       "status": "ok",
-      "segundos": 0.6,
+      "segundos": 13.6,
       "celex": "02008R1272-20260701",
       "url": "https://eur-lex.europa.eu/legal-content/PT/TXT/?uri=CELEX:02008R1272-20260701",
       "idiomas": [
@@ -323,17 +321,17 @@
     },
     "selecaoCompostos": {
       "status": "ok",
-      "segundos": 0.2,
+      "segundos": 1101.8,
       "listaFixaEntradas": 501,
       "listaFixaResolvidas": 501,
       "listaFixaDescartadas": [],
-      "wikidataItens": 2898,
+      "wikidataItens": 2899,
       "wikidataAdicionados": 1499,
       "lotesWikidataFalhos": []
     },
     "compostos": {
       "status": "ok",
-      "segundos": 2.0,
+      "segundos": 6320.8,
       "compostos": 1990,
       "descartados": [],
       "duplicados": [
@@ -458,7 +456,7 @@
       "comCas": 1973,
       "comWikidata": 1982,
       "nomePtPendente": 7,
-      "comDefinicaoChebi": 1316,
+      "comDefinicaoChebi": 1317,
       "frasesHSemTextoPt": [
         "H350i",
         "H360D",
@@ -472,8 +470,8 @@
       ],
       "wikidataFalhas": [],
       "chebi": {
-        "solicitados": 1774,
-        "encontrados": 1773,
+        "solicitados": 1775,
+        "encontrados": 1774,
         "comDefinicao": 1368,
         "falhas": []
       },
@@ -481,14 +479,14 @@
       "comNomePorIdioma": {
         "pt-BR": 1983,
         "en": 1982,
-        "es": 1743,
+        "es": 1744,
         "de": 1953,
         "fr": 1900
       },
       "comArtigoPorIdioma": {
         "pt-BR": 1924,
         "en": 1951,
-        "es": 1722,
+        "es": 1724,
         "de": 1908,
         "fr": 1852
       },
@@ -593,9 +591,9 @@
     },
     "propriedadesFisicas": {
       "status": "ok",
-      "segundos": 0.1,
+      "segundos": 19.5,
       "itensConsultados": 1963,
-      "itensComDeclaracao": 1048,
+      "itensComDeclaracao": 1049,
       "falhas": [],
       "descartadas": {
         "pKa de ácido forte": 5,
@@ -627,7 +625,7 @@
       },
       "corroboradasSemReferencia": 8,
       "compostosComPropriedade": {
-        "pontoFusaoK": 791,
+        "pontoFusaoK": 792,
         "pontoEbulicaoK": 524,
         "densidadeKgm3": 278,
         "solubilidadeAguaGL": 25,
@@ -635,12 +633,12 @@
         "pka": 93,
         "pkaValores": 5,
         "entalpiaFormacaoKJmol": 27,
-        "estadoPadrao": 721
+        "estadoPadrao": 722
       },
       "entalpiaReferenciaFraca": 0,
-      "compostosComAlguma": 877,
+      "compostosComAlguma": 878,
       "comReferencia": {
-        "pontoFusaoK": 789,
+        "pontoFusaoK": 790,
         "pontoEbulicaoK": 522,
         "densidadeKgm3": 275,
         "solubilidadeAguaGL": 25,
@@ -654,7 +652,7 @@
     },
     "termoquimicaWikipedia": {
       "status": "ok",
-      "segundos": 0.2,
+      "segundos": 38.5,
       "compostos": 1971,
       "comTituloEn": 1933,
       "paginasLidas": 1933,
@@ -946,11 +944,11 @@
     },
     "wikipedia": {
       "status": "ok",
-      "segundos": 0.2,
+      "segundos": 123.4,
       "elementos": 118,
       "compostos": 150,
       "conceitos": 320,
-      "trechos": 925,
+      "trechos": 926,
       "trechosPorTema": {
         "acidez-basicidade-organica": 5,
         "acidos-bases": 7,
@@ -960,7 +958,7 @@
         "aromaticos": 6,
         "bioquimica": 15,
         "carbonila": 9,
-        "carbono-cadeias": 7,
+        "carbono-cadeias": 8,
         "cinetica": 9,
         "cinetica-avancada": 11,
         "coligativas": 9,
@@ -1041,24 +1039,24 @@
     },
     "sitelinksConceitos": {
       "status": "ok",
-      "segundos": 0.0
+      "segundos": 6.3
     },
     "wikipedia-en": {
       "status": "ok",
-      "segundos": 0.1,
+      "segundos": 37.6,
       "idioma": "en",
       "elementos": 118,
       "compostos": 150,
       "conceitos": 301,
-      "trechos": 1076,
+      "trechos": 1074,
       "artigos": 569,
       "semArtigoNoIdioma": 14,
       "descartados": [],
-      "trechosCurtos": 79
+      "trechosCurtos": 77
     },
     "wikipedia-es": {
       "status": "ok",
-      "segundos": 0.1,
+      "segundos": 30.4,
       "idioma": "es",
       "elementos": 118,
       "compostos": 150,
@@ -1077,7 +1075,7 @@
     },
     "wikipedia-de": {
       "status": "ok",
-      "segundos": 0.1,
+      "segundos": 45.3,
       "idioma": "de",
       "elementos": 118,
       "compostos": 150,
@@ -1090,20 +1088,20 @@
     },
     "wikipedia-fr": {
       "status": "ok",
-      "segundos": 0.1,
+      "segundos": 38.0,
       "idioma": "fr",
       "elementos": 118,
       "compostos": 150,
       "conceitos": 294,
       "trechos": 803,
       "artigos": 562,
-      "semArtigoNoIdioma": 24,
+      "semArtigoNoIdioma": 23,
       "descartados": [],
       "trechosCurtos": 146
     },
     "wikilivros": {
       "status": "ok",
-      "segundos": 0.1,
+      "segundos": 102.1,
       "livros": {
         "Introdução à Química": 72,
         "Química Orgânica": 11,
@@ -1142,7 +1140,7 @@
     },
     "faraday": {
       "status": "ok",
-      "segundos": 0.0,
+      "segundos": 0.6,
       "secoes": 8,
       "trechos": 235,
       "trechosCurtos": 15,
@@ -1156,13 +1154,13 @@
   },
   "contagens": {
     "textosPorFonte": {
-      "wikipedia-pt": 925,
-      "wikipedia-en": 1076,
+      "wikipedia-pt": 926,
+      "wikipedia-en": 1074,
       "wikipedia-es": 981,
       "wikipedia-de": 767,
       "wikipedia-fr": 803,
       "wikibooks-pt": 258,
-      "chebi": 1297,
+      "chebi": 1298,
       "gutenberg-14474": 235,
       "gold-book": 0
     },
@@ -1171,8 +1169,8 @@
     "constantes": 59,
     "textos": 6342,
     "textosPorIdioma": {
-      "pt-BR": 1183,
-      "en": 2608,
+      "pt-BR": 1184,
+      "en": 2607,
       "es": 981,
       "de": 767,
       "fr": 803
@@ -1181,7 +1179,7 @@
     "compostosComGhsHarmonizado": 482,
     "compostosComCas": 1954,
     "compostosComPropriedadeMedida": {
-      "pontoFusaoK": 791,
+      "pontoFusaoK": 792,
       "pontoEbulicaoK": 524,
       "densidadeKgm3": 278,
       "solubilidadeAguaGL": 25,
@@ -1189,14 +1187,14 @@
       "pka": 93,
       "pkaValores": 5,
       "entalpiaFormacaoKJmol": 281,
-      "estadoPadrao": 721,
+      "estadoPadrao": 722,
       "energiaGibbsFormacaoKJmol": 81,
       "entropiaPadraoJmolK": 258
     },
     "compostosComNomePorIdioma": {
       "pt-BR": 1964,
       "en": 1963,
-      "es": 1724,
+      "es": 1725,
       "de": 1934,
       "fr": 1881
     },
@@ -1227,9 +1225,9 @@
   "avisos": [],
   "traducoes": {
     "chebi": {
-      "aplicadas": 1285,
+      "aplicadas": 1288,
       "hashDivergente": 0,
-      "semTraducao": 12
+      "semTraducao": 10
     },
     "gutenberg-14474": {
       "aplicadas": 235,
@@ -1254,17 +1252,33 @@
     "icsc-oit"
   ],
   "http": {
-    "requisicoes": 2,
-    "doCache": 515,
+    "requisicoes": 3041,
+    "doCache": 0,
     "revalidadas304": 0,
     "tentativasExtras": 0,
     "erros": 0,
     "cacheVencido": 0,
     "porHost": {
+      "pubchem.ncbi.nlm.nih.gov": 2525,
+      "query.wikidata.org": 83,
+      "www.wikidata.org": 50,
+      "physics.nist.gov": 1,
+      "publications.europa.eu": 2,
+      "www.ebi.ac.uk": 30,
+      "en.wikipedia.org": 68,
+      "pt.wikipedia.org": 90,
+      "es.wikipedia.org": 29,
+      "de.wikipedia.org": 28,
+      "fr.wikipedia.org": 29,
+      "pt.wikibooks.org": 103,
+      "www.gutenberg.org": 1,
       "goldbook.iupac.org": 2
+    },
+    "throttling": {
+      "pubchem.ncbi.nlm.nih.gov": "Black"
     }
   },
-  "duracaoSegundos": 5.0,
-  "versao": "20261018T051923Z-d8252787a75d",
+  "duracaoSegundos": 7884.7,
+  "versao": "20261020T033339Z-5bb39b8e232b",
   "erros": []
 }
