@@ -151,23 +151,29 @@ O NLU compartilhado (base Qwen3.5-2B, treinado também com as perguntas de elei�
 sobre o GGUF, golden 114 **97,4 %** e holdout 435 **97,0 %** (v2.3 em produção: 93,7 % / 96,8 %); o v3.7 publicado na química fica abaixo
 em eleições (95,6 % / 94,9 %), por isso o canário usa o v3.4. Ele reprova o gate formal de eleições por um caso de `cargo` (alucinação 1/3 nos
 casos sem cargo). O GGUF já está no Volume `saibatudo-nlu-models` em `/nlu-v3.4-20261017/` (copiado da química) e o serviço aceita o
-`prompt_suffix` do ponteiro (bloco de raciocínio vazio do Qwen3.5; `nlu_core.THINK_VAZIO`). Passos que o agente não pôde executar (bloqueio
-do classificador) e ficam para o mantenedor, a partir de `apps/eleicoes2026`:
+`prompt_suffix` do ponteiro (bloco de raciocínio vazio do Qwen3.5; `nlu_core.THINK_VAZIO`).
+
+**Feito às 01h (20/10), por decisão do mantenedor de "iniciar já" o renome:** app **`SaibaTudoIA-NLU-Eleicoes`** com Volume próprio
+**`SaibaTudoIA-Models-Eleicoes`** (`/nlu-v3.4-20261017/` + `current.json` com `format: v2` e `prompt_suffix`), implantado com
+`NLU_APP_NAME=SaibaTudoIA-NLU-Eleicoes NLU_VOLUME_NAME=SaibaTudoIA-Models-Eleicoes python -m modal deploy backend/modal/nlu_app.py`
+(`NLU_VOLUME_NAME` é novo em `nlu_app.py`). Gate ao vivo contra o endpoint (`eval/local/2026-10-20_SaibaTudoIA-NLU-Eleicoes_nlu-v3.4_endpoint.json`):
+116 casos, JSON 100 %, **intenção 96,6 %** (v2.3: 93,7 %), entidades 100 %, latência 2,6 s média / 4,7 s máx.; reprova o gate formal só pela
+alucinação de `cargo` em 1 dos 3 casos sem cargo (o mesmo caso de sempre). Erram: "Como votar?" (→ LOCAL_VOTACAO), "Como ser mesário?" e
+"boca de urna" (→ DESCONHECIDA), "Não votei no primeiro turno…" (→ SEGUNDO_TURNO); o NLU por regras do site e do Android resolve esses antes
+da nuvem. O app antigo `saibatudo-nlu` (v2.3) continua como produção até a troca na Vercel. O que falta é só na Vercel (o classificador do
+agente bloqueou variáveis de produção), a partir de `apps/eleicoes2026`:
 ```bash
-MSYS_NO_PATHCONV=1 python -m modal volume put saibatudo-nlu-models backend/modal/ponteiros/canary-nlu-v3.4-20261017.json /canary.json
-NLU_APP_NAME=saibatudo-nlu-canary NLU_POINTER=canary.json python -m modal deploy backend/modal/nlu_app.py      # imprime a URL do /infer
-# gate ao vivo (MODAL_KEY/MODAL_SECRET do token de proxy no ambiente; nada em argv):
-python backend/modal/eval_golden.py --endpoint <URL do infer do canário> --format v2 --real-cases contracts/nlu_real_cases.json --out eval/local/$(date +%F)_canary_nlu-v3.4.json
-# Vercel (projeto saibatudo), produção: CANARY_PCT=100 manda todo mundo ao canário COM volta automática à produção (v2.3) se ele falhar
-printf '%s' '<URL do infer do canário>' | vercel env add MODAL_CANARY_ENDPOINT production --sensitive
+# URL do /infer do app novo: `python -m modal app list` ou o fim da saída do `modal deploy` (padrão https://<workspace>--saibatudoia-nlu-eleicoes-nlu-infer.<região>.modal.run)
+# Vercel (projeto saibatudo), produção: CANARY_PCT=100 manda todo mundo ao SaibaTudo IA COM volta automática à produção (v2.3) se ele falhar
+printf '%s' '<URL do infer do SaibaTudoIA-NLU-Eleicoes>' | vercel env add MODAL_CANARY_ENDPOINT production --sensitive
 printf '%s' nlu-v3.4-20261017        | vercel env add CANARY_MODEL_VERSION production
 printf '%s' 100                       | vercel env add CANARY_PCT production
 printf '%s' 30000                     | vercel env add MODAL_TIMEOUT_MS production      # tempo inicial maior (pedido de 20/10)
 gh workflow run eleicoes-data-refresh.yml                                                # publica; depois: curl -s https://saibatudo.net/api/health
 ```
-Rollback: `CANARY_PCT=0` (ou apagar `canary.json`: `modal volume rm saibatudo-nlu-models /canary.json`); a produção (v2.3) nunca saiu do lugar.
-Promover de verdade (depois de 27/10): copiar o ponteiro para `current.json` com `format: v2` + `prompt_suffix`, `modal deploy` do app de
-produção e `MODEL_VERSION=nlu-v3.4-20261017`; nomes `SaibaTudoIA-NLU-Eleicoes`/`SaibaTudoIA-Models-Eleicoes` ficam para o renome planejado.
+Rollback: `CANARY_PCT=0`; a produção (v2.3, app `saibatudo-nlu`) nunca saiu do lugar. Promover de verdade (quando o teste agradar): `MODEL_VERSION=nlu-v3.4-20261017`, `MODAL_ENDPOINT=<URL do infer do SaibaTudoIA-NLU-Eleicoes>`, `CANARY_PCT=0`, redeploy; depois `modal app stop saibatudo-nlu`
+(o Volume antigo `saibatudo-nlu-models` guarda v1-legado, v2.1, v2.3 e a cópia do v3.4 — apagar só com o v2.3 copiado para o Volume novo, se quiser rollback por lá).
+O arquivo `backend/modal/ponteiros/canary-nlu-v3.4-20261017.json` fica como modelo de ponteiro SaibaTudo IA (mesmos campos do `current.json` novo).
 
 **Regras locais melhoram com o uso:** `promover.mjs` põe as perguntas reais no contrato e marca `"lacuna": true` nas que o NLU local ainda não entende;
 `eleicoes-lacunas-nlu.yml` abre um **PR rascunho** (ou issue) com `docs/LACUNAS_NLU.md`: grupos de perguntas parecidas, termos que as distinguem **sem colidir com outras intenções** e onde mexer.

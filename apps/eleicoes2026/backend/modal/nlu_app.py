@@ -37,7 +37,9 @@ APP_NAME = os.environ.get("NLU_APP_NAME", "saibatudo-nlu")
 # do canário funciona (o proxy refaz a pergunta na produção). O ponteiro pode trazer `prompt_suffix` e `base_model` (modelos
 # SaibaTudo IA, base Qwen3.5: 20/10/2026, canário com o nlu-v3.4-20261017 copiado do Volume da química) — ver `load()`.
 POINTER = os.environ.get("NLU_POINTER", "current.json")
-VOLUME_NAME = "saibatudo-nlu-models"
+# Volume dos modelos. Padrão: o histórico (`saibatudo-nlu-models`, v1-legado/v2.x). O serviço SaibaTudo IA (20/10/2026) usa o
+# padrão de nomes do plano: NLU_APP_NAME=SaibaTudoIA-NLU-Eleicoes NLU_VOLUME_NAME=SaibaTudoIA-Models-Eleicoes (o Modal não renomeia).
+VOLUME_NAME = os.environ.get("NLU_VOLUME_NAME", "saibatudo-nlu-models")
 MODELS_DIR = "/models"
 LLAMA_CPP_PYTHON = "llama-cpp-python==0.3.19"  # mesmo runtime do gate (convert_gguf.py)
 # Compilado do código-fonte: a wheel "cpu" do índice do projeto é ligada à musl (não carrega no Debian/glibc).

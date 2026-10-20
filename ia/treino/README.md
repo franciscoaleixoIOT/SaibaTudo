@@ -219,6 +219,20 @@ Saídas em `ia/treino/out/nlu-v36-cont/` (`eval_quimica_q4.json/.log`, `eval_ele
   multilíngue (CONCEITO/CONVERSAO en/es/de/fr + eleições REGRAS_URNA/AJUDA); (C) nada por ora. A interrupção do shell de acompanhamento pelo Claude
   Code (pouca memória, 18h53) não afetou o pipeline, que seguiu até o fim.
 
+## Explica v1 (treino iniciado 20/10/2026 01h00): explicador SaibaTudo IA, um modelo para os dois apps
+Base **Qwen3-4B-Instruct-2507** (benchmark de 12/10), QLoRA 4-bit NF4 (`apps/quimica/ai_model/scripts/train_hybrid.py --target ask`, r 16,
+lr 1e-4, batch 1 × acum. 16, `max_length 1024`, **1 época**), RTX 5060 8 GB + RAM: 281 passos a ~48 s (~3 h 45). Dados — comportamento, não fatos:
+- química: `apps/quimica/backend/retrain/build_ask_dataset.py` → 6.224 treino (conceito 1.645, segurança 4.249, recusa 330) / 1.561 holdout;
+- eleições (novo, 20/10): `apps/eleicoes2026/backend/retrain/dump_respostas_ask.mjs` (motor do site + pacote: 837 perguntas de golden, nomes,
+  recusas, grade cargo × UF, institucionais e candidatos reais, com o contexto como o site envia ao `/api/ask`) → `build_ask_dataset.py`
+  (reescrita neutra determinística, recusa do app, "dado não disponível"; número fora do contexto = descarte) → 749 treino / 188 holdout;
+- mistura `ia/treino/misturar_explica.py --teto quimica:seguranca=2000 --seed 7` → **4.724 pares** (`ia/treino/out/explica-v1/`); 229 cortados
+  pelo `max_length` (trechos longos) ficam fora.
+Gates antes de publicar: `eval_fidelidade.py` (≥ 98 % sem número inventado, holdout da química), `eval_seguranca.py` (0 % úteis nos pedidos
+perigosos, ≥ 95 % respondidos nos legítimos), holdout de eleições pelo verificador do servidor (recomendação, contradição, número sem fonte)
+e painel às cegas do mantenedor. Publicação: `merge_and_export.py --target ask` → HF privado `franciscoaleixo/SaibaTudoIA-Explica` → Spaces
+(`apps/quimica/backend/hf_space_quimica`, `apps/eleicoes2026/backend/hf_space_explica`) via `ASK_MODEL_ID`/`ASK_MODEL_REVISION`.
+
 ## v3.7 (treinado 18/10 22h14 → medido 19/10 04h15: gate APROVADO sem força; PUBLICADO na química em 20/10 00h25): reforço MULTILÍNGUE sobre o LoRA v3.6, com o golden alinhado — opção B
 Decisão do mantenedor em 18/10 à noite, depois do gate do v3.6 ("Va para b"): manter o v3.4 em produção, **alinhar os 3 casos IUPAC do golden ao
 contrato** e treinar um v3.7 com reforço multilíngue antes de promover.

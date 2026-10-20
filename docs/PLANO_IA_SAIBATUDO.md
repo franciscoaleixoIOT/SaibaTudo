@@ -124,7 +124,7 @@ opt-in e filtrada; segredos em `secrets/`.
 | 2 | Corpus SaibaTudo instruct | `backend/retrain/saibatudo/` com validação e contagens por app/idioma | 1 dia | — |
 | 3 | SaibaTudo-NLU v3 (**Qwen3.5-2B**, conforme o benchmark; Qwen3-1.7B se o treino do híbrido não couber; Qwen3.5-4B se a química não passar em en/es/de/fr) | treino (~4 h), gate por app, publicação em paralelo ao atual (`MODEL_VERSION` só da química) | 1 noite | 1, 2 |
 | 4 | SaibaTudo-Explica v1 (Qwen3-4B-Instruct-2507 QLoRA, confirmado pelo benchmark) | treino (6–10 h), avaliação às cegas, Space novo, Vercel apontando para ele na **química** | 2 noites | 1, 2 |
-| 5 | Troca no app de eleições | `MODEL_VERSION` e Space da eleição apontam para a SaibaTudo IA; textos "SaibaTudo IA" | 1 dia | 3, 4, **depois de 27/10** |
+| 5 | Troca no app de eleições — **antecipada em 20/10/2026 por decisão do mantenedor** ("iniciar já"): `SaibaTudoIA-NLU-Eleicoes` + Volume próprio no ar com o nlu-v3.4 (96,6 % no endpoint), Vercel pendente; explicador v1 em treino (QLoRA, 4.724 pares de química + eleições), Space `apps/eleicoes2026/backend/hf_space_explica/` pronto | `MODEL_VERSION` e Space da eleição apontam para a SaibaTudo IA; textos "SaibaTudo IA" | 1 dia | 3, 4 |
 | 6 | Ciclo contínuo | retreino mensal com captura opt-in revisada; painel noturno compara versões; `OPERACAO.md` atualizado | contínuo | 5 |
 | 7 | (opcional) NLU-mini no Android | Qwen3.5-0.8B Q4 embarcado (57,8 % sem treino, 508 MB, 0,5 s em CPU), só se o treino o levar ao gate | 2 dias | 3 |
 
