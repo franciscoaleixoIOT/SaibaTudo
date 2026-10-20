@@ -131,7 +131,10 @@ jobs:
         run: |
           # checkout raso: `git log -1 -- arquivo` devolveria a data do commit mais recente de qualquer coisa (nunca passava de 24 h
           # com commits diários; desde 16/10 nenhum snapshot entrou). A idade certa é a do manifesto já versionado.
-          ULTIMO=$(git show HEAD:apps/eleicoes2026/data/eleicoes2026/manifest.json 2>/dev/null \
+          # A referência é a main REMOTA: o checkout pode ser anterior a um snapshot gravado por uma execução que acabou de terminar
+          # (20/10 02:56Z: a execução seguinte achou o snapshot "velho", conflitou no rebase e deixou a árvore com marcadores).
+          git fetch -q --depth=1 origin main
+          ULTIMO=$(git show FETCH_HEAD:apps/eleicoes2026/data/eleicoes2026/manifest.json 2>/dev/null \
             | python -c "import json,sys,datetime as d; m=json.load(sys.stdin); print(int(d.datetime.fromisoformat(m['generatedAt'].replace('Z','+00:00')).timestamp()))" \
             || echo 0)
           AGORA=$(date +%s)
@@ -143,9 +146,12 @@ jobs:
               echo "snapshot já está igual ao publicado"
             else
               git commit -q -m "chore(data): snapshot oficial $(date -u +%Y-%m-%dT%H:%MZ)"
-              git pull -q --rebase origin main
-              git push -q origin HEAD:main
-              echo "snapshot gravado na main"
+              if git pull -q --rebase origin main && git push -q origin HEAD:main; then
+                echo "snapshot gravado na main"
+              else
+                git rebase --abort 2>/dev/null || true
+                echo "::warning::snapshot não gravado (a main mudou durante a execução); a árvore local segue íntegra e a próxima execução tenta de novo."
+              fi
             fi
           else
             echo "último snapshot tem menos de 24 h: nada a fazer"
