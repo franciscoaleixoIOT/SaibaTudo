@@ -168,6 +168,31 @@ class TestMisturaMultilingue(unittest.TestCase):
         self.assertEqual(len(el), 6)  # 1 (apenasDeferidas) + 3 (REGRAS_URNA) + 2 da amostra
         self.assertEqual(self.resumo["secundario"]["garantidos_por_intencao"], 3)
         self.assertEqual(self.resumo["secundario"]["garantidos_por_sempre_com"], 1)
+        self.assertEqual(self.resumo["secundario"]["dos_extras_secundarios"], 0)
+
+
+class TestExtraSecundario(unittest.TestCase):
+    """v3.8: --extra-secundario põe pares inteiros de OUTRO app (extras de eleições), sem repetir a base e sem aceitar o app de foco."""
+
+    def test_extras_de_eleicoes_entram_inteiros_e_os_do_app_de_foco_nao(self):
+        base = [par("quimica", "pt-BR", f"o que é o zorbitólio número {i} zz", "CONCEITO") for i in range(3)]
+        base.append(par("eleicoes2026", "pt-BR", "quem é candidato em zorbópolis zz", "LISTAR_CANDIDATOS", cargo="GOVERNADOR", uf="SP"))
+        extras = [par("eleicoes2026", "pt-BR", f"zorbá {i}??", "LISTAR_CANDIDATOS", uf="BA") for i in range(4)]
+        extras.append(par("eleicoes2026", "pt-BR", "quem é candidato em zorbópolis zz", "LISTAR_CANDIDATOS", cargo="GOVERNADOR", uf="SP"))  # já na base
+        extras.append(par("quimica", "pt-BR", "o que é o zorbitólio novo zz", "CONCEITO"))  # app de foco: ignorado aqui
+        with tempfile.TemporaryDirectory() as tmp:
+            d = Path(tmp)
+            (d / "base.json").write_text(json.dumps(base, ensure_ascii=False), encoding="utf-8")
+            (d / "extra_sec.json").write_text(json.dumps(extras, ensure_ascii=False), encoding="utf-8")
+            out = d / "mix.json"
+            mr.main(["--base", str(d / "base.json"), "--app", "quimica", "--intencoes", "CONCEITO", "--amostra-app", "eleicoes2026=1",
+                     "--extra-secundario", str(d / "extra_sec.json"), "--out", str(out), "--seed", "5"])
+            mix = json.loads(out.read_text(encoding="utf-8"))
+            resumo = json.loads(out.with_suffix(".resumo.json").read_text(encoding="utf-8"))
+        el = [e["input"] for e in mix if e["app"] == "eleicoes2026"]
+        self.assertEqual(sorted(el), sorted(["quem é candidato em zorbópolis zz"] + [f"zorbá {i}??" for i in range(4)]))
+        self.assertEqual(resumo["secundario"]["dos_extras_secundarios"], 4)
+        self.assertEqual(len([e for e in mix if e["app"] == "quimica"]), 3)  # o extra de química NÃO entra por --extra-secundario
 
 
 if __name__ == "__main__":

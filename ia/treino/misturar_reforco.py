@@ -84,6 +84,8 @@ def main(argv=None):
     ap.add_argument("--amostra-app", action="append", default=[], metavar="APP=N", help="amostra estratificada por intenção de outro app")
     ap.add_argument("--sempre-com", action="append", default=[], help="texto na saída que garante o par do app secundário (ex.: apenasDeferidas)")
     ap.add_argument("--sempre-intencoes", default="", help="intenções do app secundário que entram inteiras, separadas por vírgula")
+    ap.add_argument("--extra-secundario", action="append", default=[],
+                    help="train.json com pares de OUTRO app que entram inteiros (ex.: extras de eleições do v3.8); passam pelo filtro de teste")
     ap.add_argument("--retencao", type=int, default=0, help="pares de retenção do app de foco, fora das intenções de foco")
     ap.add_argument("--retencao-equilibrada", action="store_true", help="divide a retenção igualmente entre os idiomas do app de foco")
     ap.add_argument("--holdouts-dir", action="append", default=[], help="pastas com holdout_*.json a excluir (além do golden dos apps)")
@@ -131,6 +133,13 @@ def main(argv=None):
         resto = [e for e in pares if not garantido(e)]
         amostra = estratificar(resto, intencao, max(0, int(n) - len(garantidos)), rng)
         parte_sec += garantidos + amostra
+    extras_sec = []
+    for p in a.extra_secundario:
+        for e in json.loads(Path(p).read_text(encoding="utf-8")):
+            if e["app"] != a.app and chave(e) not in vistos:
+                extras_sec.append(e)
+                vistos.add(chave(e))
+    parte_sec += extras_sec
     candidatos_ret = [e for e in base if e["app"] == a.app and intencao(e) not in foco]
     if a.retencao and a.retencao_equilibrada:
         idiomas = sorted({e["idioma"] for e in candidatos_ret})
@@ -170,7 +179,8 @@ def main(argv=None):
                  "por_intencao_idioma": {f"{i}/{l}": n for (i, l), n in sorted(Counter((intencao(e), e["idioma"]) for e in parte_foco).items())}},
         "secundario": {"total": len(parte_sec), "por_intencao": dict(sorted(Counter(intencao(e) for e in parte_sec).items())),
                        "garantidos_por_sempre_com": sum(1 for e in parte_sec if any(t in e["output"] for t in a.sempre_com)),
-                       "garantidos_por_intencao": sum(1 for e in parte_sec if intencao(e) in sempre_int)},
+                       "garantidos_por_intencao": sum(1 for e in parte_sec if intencao(e) in sempre_int),
+                       "dos_extras_secundarios": len(extras_sec)},
         "retencao": {"total": len(parte_ret), "equilibrada_por_idioma": a.retencao_equilibrada,
                      "por_idioma": dict(sorted(Counter(e["idioma"] for e in parte_ret).items())),
                      "por_intencao": dict(sorted(Counter(intencao(e) for e in parte_ret).items()))},

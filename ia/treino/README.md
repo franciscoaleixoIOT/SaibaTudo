@@ -233,6 +233,19 @@ perigosos, ≥ 95 % respondidos nos legítimos), holdout de eleições pelo veri
 e painel às cegas do mantenedor. Publicação: `merge_and_export.py --target ask` → HF privado `franciscoaleixo/SaibaTudoIA-Explica` → Spaces
 (`apps/quimica/backend/hf_space_quimica`, `apps/eleicoes2026/backend/hf_space_explica`) via `ASK_MODEL_ID`/`ASK_MODEL_REVISION`.
 
+## v3.8 (fila de 20/10/2026, atrás do explicador): reforço sobre o LoRA v3.7 para as classes de erro do gate do v3.7
+Pedido do mantenedor (20/10, madrugada): "aproveite e já veja isso" sobre a lista de candidatas ao v3.8. Extras NOVOS por padrão — nunca a frase do
+golden ou do holdout — em `ia/corpus/extras_v38.py` (`ia/corpus/out/v38/`): química 2.056 (elementos com erro de digitação 305 nos 5 idiomas,
+classes/misturas → CONCEITO 214, combustão com "=" → BALANCEAR 150, categoria curta da tabela 237, leis com nome → CONCEITO 170, "o que é a
+<composto do pacote>" 952, "quanto A reage com N g de B" → elemento = A 60); eleições 256 (UF curta → LISTAR_CANDIDATOS 243, mesário →
+REGRAS_URNA 25). Misturador ganhou `--extra-secundario` (pares inteiros de outro app, filtrados; +1 teste, 21 OK). Receita
+(`ia/treino/out/nlu-v38-cont/pipeline.sh`, espera o `TREINO_EXIT` do explicador para usar a GPU): `misturar_reforco.py --base v35 --extra
+extras_quimica.json --app quimica --intencoes ELEMENTO,CONCEITO,TABELA_PERIODICA,COMPOSTO,ESTEQUIOMETRIA,BALANCEAR,CONVERSAO_UNIDADE,DESCONHECIDA,COMPARAR
+--foco-teto-idioma 320 --amostra-app eleicoes2026=7000 --sempre-com apenasDeferidas --sempre-intencoes LISTAR_CANDIDATOS,REGRAS_URNA,AJUDA
+--extra-secundario extras_eleicoes.json --retencao 8000 --retencao-equilibrada` → `treinar_nlu.py --lora_init nlu-v37-cont/final --lr 1e-4 --epochs 1`
+→ `exportar_gguf.py --q8` → gate igual ao do v3.7. Critério para promover: gate formal sem força, golden em comum ≥ v3.7 (98,7 %), es ≥ 143/145,
+eleições golden ≥ 97 % e holdout ≥ 96,5 % (recuperar as perguntas só com UF), sem perder os 17 extras.
+
 ## v3.7 (treinado 18/10 22h14 → medido 19/10 04h15: gate APROVADO sem força; PUBLICADO na química em 20/10 00h25): reforço MULTILÍNGUE sobre o LoRA v3.6, com o golden alinhado — opção B
 Decisão do mantenedor em 18/10 à noite, depois do gate do v3.6 ("Va para b"): manter o v3.4 em produção, **alinhar os 3 casos IUPAC do golden ao
 contrato** e treinar um v3.7 com reforço multilíngue antes de promover.
