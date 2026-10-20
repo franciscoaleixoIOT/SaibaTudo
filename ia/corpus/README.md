@@ -32,7 +32,7 @@ Opções: `--teto-intencao-quimica-pt` (padrão 2400; 0 desliga), `--val-pct-qui
 ## Fontes e licenças
 | Fatia | Fonte | Licença registrada |
 | :-- | :-- | :-- |
-| Eleições, pt-BR | `../SaibaTudoEleicao2026/backend/retrain/out-v23/{train,val}.json`, o treino do v2.3, **como está** (nenhum exemplo novo antes de 27/10). As perguntas de `apps/eleicoes2026/backend/retrain/extra/rotuladas_*.jsonl` recebem `origem: externo` com a fonte e a licença de lá | formulações do projeto; rótulos sobre dados abertos do TSE (CC BY) |
+| Eleições, pt-BR | `../apps/eleicoes2026/backend/retrain/out-v23/{train,val}.json`, o treino do v2.3, **como está** (nenhum exemplo novo antes de 27/10). As perguntas de `apps/eleicoes2026/backend/retrain/extra/rotuladas_*.jsonl` recebem `origem: externo` com a fonte e a licença de lá | formulações do projeto; rótulos sobre dados abertos do TSE (CC BY) |
 | Eleições, holdout | `out-v23/holdout_cases.json`: as 435 perguntas reservadas do gate do v2.3 | idem |
 | Química, pt-BR | `apps/quimica/dataset/nlu/{train,val}.jsonl` (`dataset/gerar_nlu.py`), passados por `backend/retrain/build_nlu_dataset.construir`. O `val.jsonl` (divisão por entidade) vira holdout | CC BY-SA 4.0 |
 | Química, en/es/de/fr | `quimica_multilingue.py` + `quimica_idiomas/<idioma>.py`, também passados por `build_nlu_dataset.construir`. Usa nomes do pacote assinado (`elementos[].nomes`, `compostos[].nomes`/`sinonimosPorIdioma`: PubChem, Wikidata), equações, fórmulas e códigos H dos módulos de `apps/quimica/dataset/` | CC BY-SA 4.0 |

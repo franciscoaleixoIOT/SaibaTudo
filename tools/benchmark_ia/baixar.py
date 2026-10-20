@@ -25,7 +25,7 @@ import modelos as M  # noqa: E402
 
 MODELS_DIR = Path(r"C:\Users\franc\models")
 LLAMA_BIN = MODELS_DIR / "llama.cpp" / "b11575"
-LLAMA_SRC = Path(r"C:\Users\franc\AndroidStudioProjects\SaibaTudoEleicao2026\ai_model\output\.llama_cpp\b11355")
+LLAMA_SRC = Path(r"C:\Users\franc\AndroidStudioProjects\SaibaTudo\apps\eleicoes2026\ai_model\output\.llama_cpp\b11355")
 TUCANO_REPO = "TucanoBR/Tucano-2b4-Instruct"
 TUCANO_GGUF = MODELS_DIR / "tucano-2b4-instruct-Q4_K_M.gguf"
 

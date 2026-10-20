@@ -35,7 +35,7 @@ from pathlib import Path
 AQUI = Path(__file__).resolve().parent
 RAIZ = AQUI.parent.parent
 CORPUS_OUT = RAIZ / "ia" / "corpus" / "out"
-HOLDOUT_V23 = Path(r"C:\Users\franc\AndroidStudioProjects\SaibaTudoEleicao2026\backend\retrain\out-v23\holdout_cases.json")
+HOLDOUT_V23 = Path(r"C:\Users\franc\AndroidStudioProjects\SaibaTudo\apps\eleicoes2026\backend\retrain\out-v23\holdout_cases.json")
 
 APPS = {
     "eleicoes": {"pasta": "eleicoes2026", "holdouts": [CORPUS_OUT / "holdout_eleicoes.json", HOLDOUT_V23],

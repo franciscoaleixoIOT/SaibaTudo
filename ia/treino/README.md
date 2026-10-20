@@ -9,7 +9,7 @@ publica nada: nada de Modal, Vercel, Hugging Face Space nem `MODEL_VERSION`. Sa�
 `ia/treino/out/` (fora do Git).
 
 ## Requisitos (esta máquina)
-- **Python do ambiente de treino** (`C:\Users\franc\AndroidStudioProjects\SaibaTudoEleicao2026\ai_model\.venv`, torch 2.11+cu128,
+- **Python do ambiente de treino** (`C:\Users\franc\AndroidStudioProjects\SaibaTudo\apps\eleicoes2026\ai_model\.venv`, torch 2.11+cu128,
   transformers 5.17, peft 0.21.1, bitsandbytes 0.50.2, llama-cpp-python 0.3.19 só CPU). **Não instale nada nele** (treina a produção).
   Rode sempre com `-I`.
 - **Conversor do llama.cpp** na tag **b11575** (checkout esparso só de `convert_hf_to_gguf.py`, `conversion/` e `gguf-py/`) em
@@ -115,7 +115,7 @@ v3.4**, a mesma receita do v3.4 (lr 1e-4, 1 época, lote 2 × 8), com `max_lengt
 JSON seria cortado):
 
 ```bash
-PY='C:\Users\franc\AndroidStudioProjects\SaibaTudoEleicao2026\ai_model\.venv\Scripts\python.exe'
+PY='C:\Users\franc\AndroidStudioProjects\SaibaTudo\apps\eleicoes2026\ai_model\.venv\Scripts\python.exe'
 O=ia/treino/out/nlu-v35-cont
 "$PY" -I ia/treino/misturar_continuacao.py --novo ia/corpus/out/v35/train.json --antigo ia/corpus/out/v34/train.json \
   --out $O/train_cont.json --revisao 0.3 --peso-app eleicoes2026=2.5
@@ -242,6 +242,13 @@ de teste igual à do servidor; relatório em `ia/treino/out/explica-v1/publicaca
 (raiz, ignorado): o `apps/eleicoes2026/secrets/hf_token.txt` é fine-grained só de leitura (`repo.content.read`), e por isso o envio ao HF no fim de
 `pos_treino.sh` (20/10) falha sem prejuízo dos gates. Nada muda nos sites até o mantenedor apontar `HF_ASK_SPACE_URL` (eleições, após 27/10) e
 ligar `ASK_ENABLED` (química) na Vercel.
+
+**Travamento de 20/10 (05h21):** o Windows travou (Kernel-Power 41; depois três reinícios do Windows Update) durante a gravação do
+`checkpoint-200` do explicador, que ficou incompleto (`optimizer.pt` com 6,5 MB, sem `trainer_state.json` nem `scheduler.pt`): não dá para
+retomar. Guardado em `out/explica-v1/treino-travado-20261020/` (o `adapter_model.safetensors` do passo 200 está íntegro). O Python de treino
+mudou para `apps/eleicoes2026/ai_model/.venv` (a pasta antiga `SaibaTudoEleicao2026` foi apagada; recriado com as mesmas versões via `uv`).
+`train_hybrid.py` ganhou `--save_steps` (padrão 200). Fila nova, uma carga pesada por vez (`ia/treino/out/fila-20261020.sh`, log
+`fila-20261020.log`): v3.8 primeiro, depois o explicador do zero com checkpoint a cada 25 passos, depois `pos_treino.sh`.
 
 ## v3.8 (fila de 20/10/2026, atrás do explicador): reforço sobre o LoRA v3.7 para as classes de erro do gate do v3.7
 Pedido do mantenedor (20/10, madrugada): "aproveite e já veja isso" sobre a lista de candidatas ao v3.8. Extras NOVOS por padrão — nunca a frase do

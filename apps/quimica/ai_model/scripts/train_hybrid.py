@@ -65,6 +65,7 @@ def montar_argumentos(argv=None):
     p.add_argument("--lr", type=float, default=None)
     p.add_argument("--cpu_offload", default="auto", choices=["auto", "on", "off"], help="Híbrido: offload de camadas para a RAM do sistema.")
     p.add_argument("--resume", default=None)
+    p.add_argument("--save_steps", type=int, default=200, help="checkpoint a cada N passos (menor = perde menos num travamento; cada um tem ~400 MB no ask)")
     p.add_argument("--seed", type=int, default=2026, help="semente (gravada em train_meta.json): mesmo dataset + mesma semente = mesmo treino")
     p.add_argument("--sobrescrever", action="store_true", help="permite reaproveitar a pasta de saída de um treino anterior")
     a = p.parse_args(argv)
@@ -195,7 +196,7 @@ def main(argv=None):
     training_args = TrainingArguments(
         output_dir=str(a.output_dir), num_train_epochs=a.epochs, per_device_train_batch_size=a.batch_size, gradient_accumulation_steps=a.grad_accum,
         learning_rate=a.lr, lr_scheduler_type="cosine", warmup_steps=25, weight_decay=0.01, bf16=(device == "cuda"), gradient_checkpointing=True,
-        gradient_checkpointing_kwargs={"use_reentrant": False}, logging_steps=20, save_strategy="steps", save_steps=200, save_total_limit=2,
+        gradient_checkpointing_kwargs={"use_reentrant": False}, logging_steps=20, save_strategy="steps", save_steps=a.save_steps, save_total_limit=2,
         report_to=[], optim="paged_adamw_8bit", max_grad_norm=0.3,
         # 0 workers: no Windows, o spawn de subprocesso recarrega o torch e estoura o arquivo de paginação (WinError 1455).
         dataloader_num_workers=0, remove_unused_columns=False, seed=a.seed, data_seed=a.seed,

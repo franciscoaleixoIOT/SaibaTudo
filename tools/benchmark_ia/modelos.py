@@ -13,7 +13,7 @@ executado (só pesos .gguf, lidos pelo llama.cpp).
 """
 
 # Referência de produção (NLU de eleições v2.3, Qwen2.5-1.5B + LoRA mesclado), fora do Hugging Face: caminho local.
-PRODUCAO_NLU_GGUF = r"C:\Users\franc\AndroidStudioProjects\SaibaTudoEleicao2026\ai_model\output\gguf\v2.3-20261007\model-Q4_K_M.gguf"
+PRODUCAO_NLU_GGUF = r"C:\Users\franc\AndroidStudioProjects\SaibaTudo\apps\eleicoes2026\ai_model\output\gguf\v2.3-20261007\model-Q4_K_M.gguf"
 
 APACHE = "Apache 2.0"
 MARCA_LIVRE = "sim (Apache/MIT: basta manter o aviso de licença e a atribuição no model card; o nome do produto é livre)"

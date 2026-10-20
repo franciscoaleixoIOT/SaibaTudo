@@ -38,7 +38,7 @@ sys.modules.setdefault("datasets", None)
 AQUI = Path(__file__).resolve().parent
 RAIZ = AQUI.parent.parent
 ELEICOES = RAIZ / "apps" / "eleicoes2026"
-DATASET_PADRAO = Path(r"C:\Users\franc\AndroidStudioProjects\SaibaTudoEleicao2026\backend\retrain\out-v23\train.json")
+DATASET_PADRAO = Path(r"C:\Users\franc\AndroidStudioProjects\SaibaTudo\apps\eleicoes2026\backend\retrain\out-v23\train.json")
 BASE_PADRAO = "Qwen/Qwen3.5-2B"
 
 

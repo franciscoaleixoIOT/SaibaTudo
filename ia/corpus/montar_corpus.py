@@ -8,7 +8,7 @@ Por isso cada exemplo leva como `instruction` EXATAMENTE o system prompt de prod
   quimica      -> apps/quimica/backend/modal/nlu_core.py      SYSTEM_PROMPT      (formato v1)
 
 Fontes:
-  eleições (só pt-BR, como está; nada novo antes de 27/10): ../SaibaTudoEleicao2026/backend/retrain/out-v23/{train,val,holdout_cases}.json
+  eleições (só pt-BR, como está; nada novo antes de 27/10): apps/eleicoes2026/backend/retrain/out-v23/{train,val,holdout_cases}.json
            (treino do v2.3 e as 435 perguntas reservadas do gate); origem "externo" para as perguntas de backend/retrain/extra/*.jsonl.
   química pt-BR: apps/quimica/dataset/nlu/{train,val}.jsonl (gerar_nlu.py) passados por backend/retrain/build_nlu_dataset.construir
            (as mesmas garantias do montador do app: forma do contrato, evidência, contratos de teste fora; val.jsonl vira holdout).
@@ -44,7 +44,7 @@ APPS = RAIZ / "apps"
 ELEICOES = APPS / "eleicoes2026"
 QUIMICA = APPS / "quimica"
 OUT = AQUI / "out"
-V23 = Path(r"C:\Users\franc\AndroidStudioProjects\SaibaTudoEleicao2026\backend\retrain\out-v23")
+V23 = Path(r"C:\Users\franc\AndroidStudioProjects\SaibaTudo\apps\eleicoes2026\backend\retrain\out-v23")
 
 TESTES_ELEICOES = [ELEICOES / "contracts" / n for n in ("nlu_golden_cases.json", "nlu_real_cases.json", "nlu_nome_cases.json", "opiniao_cases.json")]
 TESTES_QUIMICA = [QUIMICA / "contracts" / n for n in ("nlu_golden_cases.json", "seguranca_cases.json")]

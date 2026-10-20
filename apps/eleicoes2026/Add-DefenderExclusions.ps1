@@ -13,7 +13,7 @@
 #
 #  EXECUTAR COMO ADMINISTRADOR:
 #    1) Clique com o botao direito no PowerShell -> "Executar como administrador"
-#    2) & "C:\Users\franc\AndroidStudioProjects\SaibaTudoEleicao2026\Add-DefenderExclusions.ps1"
+#    2) & "C:\Users\franc\AndroidStudioProjects\SaibaTudo\apps\eleicoes2026\Add-DefenderExclusions.ps1"
 # ============================================================================
 
 $ErrorActionPreference = 'Stop'
@@ -27,7 +27,7 @@ if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administra
 }
 
 $paths = @(
-    'C:\Users\franc\AndroidStudioProjects\SaibaTudoEleicao2026',
+    'C:\Users\franc\AndroidStudioProjects\SaibaTudo',
     'C:\Users\franc\AppData\Roaming\uv',
     'C:\Users\franc\.cache\huggingface',
     'C:\Users\franc\AppData\Local\Temp\kilo'

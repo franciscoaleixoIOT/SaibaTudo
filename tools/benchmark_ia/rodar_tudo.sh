@@ -2,7 +2,7 @@
 # Roda as etapas do benchmark em sequência (da raiz do repositório). Uso: bash tools/benchmark_ia/rodar_tudo.sh [etapas]
 # Etapas: nlu-gpu explica nlu-cpu resumo cegas (padrão: todas). PY pode ser trocado por variável de ambiente.
 set -u
-PY="${PY:-/c/Users/franc/AndroidStudioProjects/SaibaTudoEleicao2026/ai_model/.venv/Scripts/python.exe}"
+PY="${PY:-/c/Users/franc/AndroidStudioProjects/SaibaTudo/apps/eleicoes2026/ai_model/.venv/Scripts/python.exe}"
 B=tools/benchmark_ia
 ETAPAS="${*:-nlu-gpu explica nlu-cpu resumo cegas}"
 for e in $ETAPAS; do

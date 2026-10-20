@@ -5,7 +5,7 @@ nos mesmos casos e com as mesmas funções de pontuação dos gates de produçã
 Só lê os apps; não publica nada (sem Modal, Vercel, Hugging Face Space nem `MODEL_VERSION`). Relatório: `docs/BENCHMARK_IA_2026-10-12.md`.
 
 ## Requisitos (esta máquina)
-- Python do ambiente de treino: `C:\Users\franc\AndroidStudioProjects\SaibaTudoEleicao2026\ai_model\.venv\Scripts\python.exe`
+- Python do ambiente de treino: `C:\Users\franc\AndroidStudioProjects\SaibaTudo\apps\eleicoes2026\ai_model\.venv\Scripts\python.exe`
   (usa `huggingface_hub`; `torch/transformers/gguf` só para converter o Tucano). Rode sempre com `-I` (isolado).
 - **llama.cpp oficial, build CUDA** (`llama-server.exe`), em `C:\Users\franc\models\llama.cpp\b11575` (variável `LLAMA_BIN` muda o
   caminho). Motivo: o `llama-cpp-python 0.3.19` do ambiente foi compilado **sem CUDA** e não conhece Qwen3.5/SmolLM3.

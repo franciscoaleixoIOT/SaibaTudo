@@ -26,8 +26,8 @@ GOLDEN_ELEICOES = ELEICOES / "contracts" / "nlu_golden_cases.json"
 GOLDEN_QUIMICA = QUIMICA / "contracts" / "nlu_golden_cases.json"
 SEGURANCA_QUIMICA = QUIMICA / "contracts" / "seguranca_cases.json"
 # holdout de perguntas reservadas do v2.3 (fica na pasta anterior ao repositório único; fora do Git)
-HOLDOUT_ELEICOES = Path(r"C:\Users\franc\AndroidStudioProjects\SaibaTudoEleicao2026\backend\retrain\out-v23\holdout_cases.json")
-TREINO_ELEICOES = Path(r"C:\Users\franc\AndroidStudioProjects\SaibaTudoEleicao2026\backend\retrain\out-v23\train.json")
+HOLDOUT_ELEICOES = Path(r"C:\Users\franc\AndroidStudioProjects\SaibaTudo\apps\eleicoes2026\backend\retrain\out-v23\holdout_cases.json")
+TREINO_ELEICOES = Path(r"C:\Users\franc\AndroidStudioProjects\SaibaTudo\apps\eleicoes2026\backend\retrain\out-v23\train.json")
 TREINO_QUIMICA = QUIMICA / "dataset" / "nlu" / "train.jsonl"
 COMPOSTOS_QUIMICA = QUIMICA / "data" / "quimica" / "compostos"
 QA_QUIMICA = QUIMICA / "dataset" / "qa"

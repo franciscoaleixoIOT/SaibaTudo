@@ -19,7 +19,7 @@ Regras que não mudam: o modelo **não fornece fatos** (números vêm do pacote 
 **por regra antes do modelo** (`api/_lib/seguranca.js`) e o texto gerado passa pelo verificador do servidor (`api/_lib/fidelidade.js`); dataset gerado da *fixture* não treina.
 
 ## 1. Preparação (uma vez)
-- **Python do treino.** Reaproveite o ambiente do app de eleições (`..\SaibaTudoEleicao2026\ai_model\.venv\Scripts\python.exe`), que já tem torch (CUDA 12.8, Blackwell), transformers, peft,
+- **Python do treino.** Reaproveite o ambiente do app de eleições (`..\SaibaTudo\apps\eleicoes2026\ai_model\.venv\Scripts\python.exe`), que já tem torch (CUDA 12.8, Blackwell), transformers, peft,
   bitsandbytes e `llama-cpp-python==0.3.19` (a versão do gate = a do serviço). Ou crie um: `python -m venv ai_model/.venv` e instale `torch` do índice `cu128`, `ai_model/requirements.txt` e `llama-cpp-python==0.3.19`.
 - **Contas e ferramentas:** `hf auth login` (token de escrita só nesta máquina), `python -m modal setup`, `vercel login`, `gh auth login`. Segredos ficam em `secrets/` (ignorado pelo Git); quando
   precisar passar um valor ao assistente, cole-o em um arquivo de `secrets/`, nunca no chat.
