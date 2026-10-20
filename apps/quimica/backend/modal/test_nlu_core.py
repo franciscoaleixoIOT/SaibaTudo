@@ -299,6 +299,19 @@ class TestParsing(unittest.TestCase):
         self.assertFalse(core.has_valid_shape(None))
         self.assertFalse(core.has_valid_shape([]))
 
+    def test_motivo_forma_invalida(self):
+        m = core.motivo_forma_invalida
+        self.assertIsNone(m({"intent": "ELEMENTO", "elemento": "Fe"}))
+        self.assertEqual(m(None), "nao_e_objeto")
+        self.assertEqual(m({"intent": "FILTER_CANDIDATES"}), "intent_fora")
+        # v3.8 (20/10): "categoria" é do NLU local, não do contrato da nuvem
+        self.assertEqual(m({"intent": "TABELA_PERIODICA", "categoria": "gas_nobre"}), "chave_fora:categoria")
+        self.assertEqual(m({"intent": "ELEMENTO", "elemento": "Zz"}), "elemento_fora")
+        self.assertEqual(m({"intent": "COMPOSTO", "composto": " "}), "composto_vazio")
+        self.assertEqual(m({"intent": "PH", "quantidades": []}), "quantidades_forma")
+        self.assertEqual(m({"intent": "PH", "quantidades": [{"valor": 1.8e-5, "unidade": "pka"}]}), "quantidades_unidade:pka")
+        self.assertEqual(m({"intent": "PH", "quantidades": [{"valor": True, "unidade": "mol"}]}), "quantidades_valor")
+
 
 class TestVocabularioEmSincroniaComOProxy(unittest.TestCase):
     """api/_lib/vocab.js é a fonte do proxy; os vocabulários Python (treino, gramática) não podem divergir dele."""

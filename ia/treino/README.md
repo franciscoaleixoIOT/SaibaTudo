@@ -250,6 +250,26 @@ mudou para `apps/eleicoes2026/ai_model/.venv` (a pasta antiga `SaibaTudoEleicao2
 `train_hybrid.py` ganhou `--save_steps` (padrão 200). Fila nova, uma carga pesada por vez (`ia/treino/out/fila-20261020.sh`, log
 `fila-20261020.log`): v3.8 primeiro, depois o explicador do zero com checkpoint a cada 25 passos, depois `pos_treino.sh`.
 
+## v3.9 (fila de 20/10/2026, depois do explicador): o v3.8 com os extras corrigidos, sobre o LoRA v3.7
+**Resultado do v3.8 (treino 06h58 → 09h01, gate até 12h43): NÃO promovido.** Golden química Q4 com gramática: intenção 98,9 → **99,0 %**, elemento
+97,7 → 99,5 %, es 97,7 → 100 %, unidadeDestino 96,7 → 98,4 %, mas composto 99,7 → 98,2 % e **JSON nativo 98,9 → 96,8 % (< 98 %: reprovado)**; holdout
+99,3 → 99,4 %; eleições golden 95,6 → 95,7 % e holdout 94,9 → 96,3 % (abaixo de 97 / 96,5). Causas, todas nos extras do v3.8 (`extras_v38.py`), não no
+validador: (1) `tabela_categoria` ensinou a chave `categoria`, que é do NLU local e está fora do contrato da nuvem (`eval_golden.py` a ignora de
+propósito; `nlu_core.has_valid_shape` a reprova): 20 dos 31 inválidos; (2) `conceito_substancia` pôs o sal de cozinha como CONCEITO, mas o golden o
+trata como UM composto (NaCl, CID 5234): "o que é o sal de cozinha?", "Was ist Kochsalz?", "le sel est-il soluble…" passaram a CONCEITO; (3) o
+reforço de CONCEITO e de elemento puxou "hcl" para ELEMENTO H e tirou o composto de "misturar água sanitária/lejía/eau de Javel…". Os outros 11
+inválidos (Ka como unidade "pka"; 1,2 × 10²³ partículas lido como 120) já existiam no v3.7.
+**Validador e misturador (20/10):** `nlu_core.motivo_forma_invalida` diz por que a saída não tem a forma do contrato (`has_valid_shape` usa o
+mesmo código); `eval_golden.evaluate` grava `motivo_invalido` por caso e `invalidos_por_motivo` no resultado; `misturar_reforco.py` confere cada par
+contra o contrato da nuvem do app (química: forma + `combinacao_valida`; eleições: intenção + chaves v2), exclui os de fora com o motivo
+(`excluidos_fora_do_contrato`, `exemplos_fora_do_contrato` no resumo) e **aborta acima de `--max-fora-contrato` (50)**; `--sem-contrato` só para
+reproduzir misturas antigas. Na mistura do v3.8, teria barrado exatamente os 176 pares com `categoria` (e abortado). Testes: Modal 135, treino 23.
+**Receita v3.9** (`ia/treino/out/nlu-v39-cont/pipeline.sh`, espera o `FILA_FIM` de `fila-20261020.log`): `ia/corpus/extras_v39.py` (química 2.296,
+eleições 259: as famílias do v3.8 com `tabela_categoria` sem `categoria` e sem o sal em CONCEITO, mais `composto_sal` 92, `composto_formula` 90,
+`seguranca_produto` 48, `conversao_pressao` 40) → mesma mistura do v3.8 com SEGURANCA e PROPRIEDADE no foco (30.299 pares, 0 fora do contrato) →
+`treinar_nlu.py --lora_init nlu-v37-cont/final` (não sobre o v3.8) → `exportar_gguf.py --q8` → mesmo gate. Critério para promover: gate formal sem
+força, golden em comum ≥ v3.7 (98,7 %), composto ≥ 99,5 %, es ≥ 143/145, as 6 perguntas que o v3.8 errou de volta, holdout ≥ 99,3 %.
+
 ## v3.8 (fila de 20/10/2026, atrás do explicador): reforço sobre o LoRA v3.7 para as classes de erro do gate do v3.7
 Pedido do mantenedor (20/10, madrugada): "aproveite e já veja isso" sobre a lista de candidatas ao v3.8. Extras NOVOS por padrão — nunca a frase do
 golden ou do holdout — em `ia/corpus/extras_v38.py` (`ia/corpus/out/v38/`): química 2.056 (elementos com erro de digitação 305 nos 5 idiomas,

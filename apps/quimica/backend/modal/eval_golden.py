@@ -39,6 +39,7 @@ import re
 import sys
 import time
 import unicodedata
+from collections import Counter
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -196,6 +197,7 @@ def evaluate(generate, cases, label: str = "", cids=None) -> dict:
     """`generate(q) -> texto bruto do modelo`. `cids` = {cid: nomes} (carregar_cids) para medir `composto` dado como CID. Devolve métricas + detalhe."""
     n = len(cases)
     validos = intent_ok = intent_n = 0
+    invalidos = Counter()  # motivo -> casos (nlu_core.motivo_forma_invalida; "json_quebrado" = não é JSON)
     por_caso = []
     ent = {k: {"ok": 0, "n": 0, "alucina": 0, "n_nulos": 0, "nao_medido": 0} for k in ENTIDADES}
     lat = []
@@ -216,10 +218,13 @@ def evaluate(generate, cases, label: str = "", cids=None) -> dict:
                 texto, erro = "", type(e).__name__
         lat.append(time.time() - t0)
         obj = core.parse_model_output(texto)
-        valido = core.has_valid_shape(obj)
+        motivo = "json_quebrado" if obj is None else core.motivo_forma_invalida(obj)
+        valido = motivo is None
         validos += int(valido)
+        if not valido:
+            invalidos[motivo] += 1
         item = {"q": caso["q"], "json_valido": valido, "saida": (texto or "")[:600], **({"erro": erro} if erro else {}),
-                **({"servico": servico} if servico else {})}
+                **({"servico": servico} if servico else {}), **({"motivo_invalido": motivo} if motivo else {})}
         if valido:
             if "intent" in caso:
                 intent_n += 1
@@ -253,6 +258,7 @@ def evaluate(generate, cases, label: str = "", cids=None) -> dict:
         "format": core.FORMAT_VERSION,
         "n_cases": n,
         "json_valid_pct": pct(validos, n),
+        "invalidos_por_motivo": dict(invalidos.most_common()),
         "intent_acc_pct": pct(intent_ok, intent_n),
         "intent_cases": intent_n,
         **{f"{k}_acc_pct": pct(v["ok"], v["n"]) for k, v in ent.items()},
@@ -418,6 +424,8 @@ def http_generator(endpoint: str, key: str, secret: str, timeout: float = 60.0):
 def print_summary(res: dict):
     print(f"\n== {res['label'] or 'avaliação'} (formato {res['format']}, {res['n_cases']} casos)")
     print(f"   JSON válido ........ {res['json_valid_pct']}%")
+    if res.get("invalidos_por_motivo"):
+        print("   inválidos por motivo: " + ", ".join(f"{m} {n}" for m, n in res["invalidos_por_motivo"].items()))
     print(f"   intenção ........... {res['intent_acc_pct']}%  ({res['intent_cases']} casos)")
     for k in ENTIDADES:
         nm = f"  [{res[f'{k}_nao_medido']} não medidos]" if res.get(f"{k}_nao_medido") else ""

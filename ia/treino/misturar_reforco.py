@@ -41,6 +41,47 @@ def carregar_montar_corpus():
     return mod
 
 
+def _carregar_core(app: str):
+    caminho = RAIZ / "apps" / app / "backend" / "modal" / "nlu_core.py"
+    spec = importlib.util.spec_from_file_location(f"nlu_core_{app}", caminho)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+class Contrato:
+    """Confere cada par de treino contra o contrato da nuvem do app (nlu_core), ANTES do treino. Lição do v3.8 (20/10): extras com a chave
+    "categoria" (do NLU local, fora do contrato da nuvem) ensinaram o modelo a gerá-la e derrubaram o JSON nativo no gate (96,8 % < 98 %).
+    Devolve o motivo (None = par dentro do contrato)."""
+
+    def __init__(self):
+        self._cores = {}
+
+    def _core(self, app):
+        if app not in self._cores:
+            self._cores[app] = _carregar_core(app)
+        return self._cores[app]
+
+    def motivo(self, e: dict):
+        try:
+            obj = json.loads(e["output"])
+        except (KeyError, TypeError, ValueError):
+            return "json_quebrado"
+        if e["app"] == "quimica":
+            core = self._core("quimica")
+            m = core.motivo_forma_invalida(obj)
+            if m is None and not core.combinacao_valida(obj):
+                m = f"combinacao:{obj['intent']}"
+            return m
+        if e["app"] == "eleicoes2026":
+            core = self._core("eleicoes2026")
+            if not isinstance(obj, dict) or obj.get("intent") not in core.INTENTS:
+                return "intent_fora"
+            fora = [k for k in obj if k not in core.V2_KEYS]
+            return f"chave_fora:{fora[0]}" if fora else None
+        return f"app_desconhecido:{e['app']}"
+
+
 def chave(e: dict) -> str:
     return e["app"] + "|" + e["input"]
 
@@ -91,6 +132,9 @@ def main(argv=None):
     ap.add_argument("--holdouts-dir", action="append", default=[], help="pastas com holdout_*.json a excluir (além do golden dos apps)")
     ap.add_argument("--out", required=True)
     ap.add_argument("--seed", type=int, default=2026)
+    ap.add_argument("--sem-contrato", action="store_true", help="não confere os pares contra o contrato da nuvem (só para reproduzir misturas antigas)")
+    ap.add_argument("--max-fora-contrato", type=int, default=50,
+                    help="aborta se mais pares que isso estiverem fora do contrato (sinal de gerador com rótulo errado, não de ruído)")
     a = ap.parse_args(argv)
 
     MC = carregar_montar_corpus()
@@ -152,6 +196,8 @@ def main(argv=None):
         parte_ret = []
 
     excluidos = Counter()
+    contrato = Contrato()
+    fora_contrato, exemplos_fora = Counter(), {}
     vistos_mistura = set()
     mistura = []
     for nome, parte in (("foco", parte_foco), ("secundario", parte_sec), ("retencao", parte_ret)):
@@ -162,6 +208,11 @@ def main(argv=None):
             v = filtro.veredito(e["input"])
             if v:
                 excluidos[f"{nome}/{v}"] += 1
+                continue
+            m = None if a.sem_contrato else contrato.motivo(e)
+            if m:
+                fora_contrato[f"{e['app']}/{nome}/{m}"] += 1
+                exemplos_fora.setdefault(f"{e['app']}/{m}", [e["input"], e["output"]])
                 continue
             vistos_mistura.add(k)
             mistura.append({**e, "parte": nome})
@@ -185,12 +236,20 @@ def main(argv=None):
                      "por_idioma": dict(sorted(Counter(e["idioma"] for e in parte_ret).items())),
                      "por_intencao": dict(sorted(Counter(intencao(e) for e in parte_ret).items()))},
         "excluidos_por_serem_teste": dict(excluidos),
+        "excluidos_fora_do_contrato": dict(sorted(fora_contrato.items())),
+        "exemplos_fora_do_contrato": exemplos_fora,
         "por_app_idioma": dict(sorted(Counter(f"{e['app']}/{e['idioma']}" for e in mistura).items())),
         "por_intencao": dict(sorted(Counter(intencao(e) for e in mistura).items())),
         "casos_de_teste_no_filtro": len(perguntas),
     }
     Path(a.out).with_suffix(".resumo.json").write_text(json.dumps(resumo, ensure_ascii=False, indent=1), encoding="utf-8")
     print(json.dumps(resumo, ensure_ascii=False, indent=1))
+    total_fora = sum(fora_contrato.values())
+    if total_fora > a.max_fora_contrato:
+        print(f"ERRO: {total_fora} pares fora do contrato (máximo {a.max_fora_contrato}); corrija o gerador. Ver exemplos_fora_do_contrato.",
+              file=sys.stderr)
+        return 2
+    return 0
 
 
 if __name__ == "__main__":

@@ -314,35 +314,42 @@ def parse_model_output(text):
 KEYS = ["intent", "elemento", "composto", "propriedade", "quantidades", "equacao", "nivel", "unidadeDestino"]
 
 
-def has_valid_shape(obj) -> bool:
-    """Forma esperada: intent do vocabulário, só chaves do contrato, entidades do vocabulário fechado, quantidades bem formadas.
-    NÃO exige a combinação por intenção (combinacao_valida): a gramática a garante na geração; sem gramática, uma chave fora da
-    intenção conta como erro de entidade/alucinação no avaliador, não como JSON inválido."""
-    if not isinstance(obj, dict) or obj.get("intent") not in INTENTS:
-        return False
-    if any(k not in KEYS for k in obj):
-        return False
-    if "elemento" in obj and obj["elemento"] not in SIMBOLOS:
-        return False
-    if "propriedade" in obj and obj["propriedade"] not in PROPRIEDADES:
-        return False
-    if "nivel" in obj and obj["nivel"] not in NIVEIS:
-        return False
-    if "unidadeDestino" in obj and obj["unidadeDestino"] not in UNIDADES:
-        return False
+def motivo_forma_invalida(obj):
+    """Por que a saída NÃO tem a forma do contrato (None = forma válida). Motivos curtos e estáveis, agregados pelo avaliador e pelo
+    misturador de treino: "nao_e_objeto", "intent_fora", "chave_fora:<k>", "<entidade>_fora", "<entidade>_vazio", "quantidades_forma",
+    "quantidades_unidade:<u>", "quantidades_valor"."""
+    if not isinstance(obj, dict):
+        return "nao_e_objeto"
+    if obj.get("intent") not in INTENTS:
+        return "intent_fora"
+    for k in obj:
+        if k not in KEYS:
+            return f"chave_fora:{k}"
+    for k, vocab in (("elemento", SIMBOLOS), ("propriedade", PROPRIEDADES), ("nivel", NIVEIS), ("unidadeDestino", UNIDADES)):
+        if k in obj and obj[k] not in vocab:
+            return f"{k}_fora"
     for k in ("composto", "equacao"):
         if k in obj and not (isinstance(obj[k], str) and obj[k].strip()):
-            return False
+            return f"{k}_vazio"
     if "quantidades" in obj:
         q = obj["quantidades"]
         if not (isinstance(q, list) and 1 <= len(q) <= MAX_QUANTIDADES):
-            return False
+            return "quantidades_forma"
         for item in q:
-            if not (isinstance(item, dict) and set(item) == {"valor", "unidade"} and item["unidade"] in UNIDADES):
-                return False
+            if not (isinstance(item, dict) and set(item) == {"valor", "unidade"}):
+                return "quantidades_forma"
+            if item["unidade"] not in UNIDADES:
+                return f"quantidades_unidade:{item['unidade']}"
             if isinstance(item["valor"], bool) or not isinstance(item["valor"], (int, float)):
-                return False
-    return True
+                return "quantidades_valor"
+    return None
+
+
+def has_valid_shape(obj) -> bool:
+    """Forma esperada: intent do vocabulário, só chaves do contrato, entidades do vocabulário fechado, quantidades bem formadas.
+    NÃO exige a combinação por intenção (combinacao_valida): a gramática a garante na geração; sem gramática, uma chave fora da
+    intenção conta como erro de entidade/alucinação no avaliador, não como JSON inválido. O motivo: motivo_forma_invalida."""
+    return motivo_forma_invalida(obj) is None
 
 
 def format_number(valor) -> str:

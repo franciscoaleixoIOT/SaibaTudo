@@ -105,6 +105,13 @@ class TestAvaliacao(unittest.TestCase):
     def test_chave_extra_do_modelo_invalida_a_forma(self):
         r = ev.evaluate(gerador({"oi": {"intent": "AJUDA", "uf": "SP"}}), CASOS)
         self.assertLess(r["json_valid_pct"], 100.0)
+        self.assertEqual(r["invalidos_por_motivo"], {"chave_fora:uf": 1})
+        self.assertEqual([c["motivo_invalido"] for c in r["cases"] if not c["json_valido"]], ["chave_fora:uf"])
+
+    def test_motivo_de_json_quebrado_e_saida_valida_sem_motivo(self):
+        r = ev.evaluate(gerador(invalido=("oi",)), CASOS)
+        self.assertEqual(r["invalidos_por_motivo"], {"json_quebrado": 1})
+        self.assertTrue(all("motivo_invalido" not in c for c in r["cases"] if c["json_valido"]))
 
     def test_excecao_na_geracao_conta_como_invalido(self):
         def quebra(q):

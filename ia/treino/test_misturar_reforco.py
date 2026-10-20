@@ -195,5 +195,40 @@ class TestExtraSecundario(unittest.TestCase):
         self.assertEqual(len([e for e in mix if e["app"] == "quimica"]), 3)  # o extra de química NÃO entra por --extra-secundario
 
 
+
+class TestContrato(unittest.TestCase):
+    """v3.9: pares fora do contrato da nuvem saem da mistura com o motivo; muitos fora = gerador com rótulo errado = aborta."""
+
+    def rodar(self, base, *extra_args):
+        with tempfile.TemporaryDirectory() as tmp:
+            d = Path(tmp)
+            (d / "base.json").write_text(json.dumps(base, ensure_ascii=False), encoding="utf-8")
+            out = d / "mix.json"
+            rc = mr.main(["--base", str(d / "base.json"), "--app", "quimica", "--intencoes", "TABELA_PERIODICA,COMPOSTO,DESENHAR",
+                          "--out", str(out), "--seed", "5", *extra_args])
+            return rc, json.loads(out.read_text(encoding="utf-8")), json.loads(out.with_suffix(".resumo.json").read_text(encoding="utf-8"))
+
+    def base(self):
+        return [par("quimica", "pt-BR", "zorbgases zz", "TABELA_PERIODICA", categoria="gas_nobre"),   # chave do NLU local (o erro do v3.8)
+                par("quimica", "pt-BR", "zorbmetais zz", "TABELA_PERIODICA"),
+                par("quimica", "pt-BR", "o que é o zorbitol zz", "COMPOSTO", composto="zorbitol"),
+                par("quimica", "pt-BR", "desenhe zorb zz", "DESENHAR"),                                  # DESENHAR sem composto: combinação
+                par("eleicoes2026", "pt-BR", "zorbópolis zz", "LISTAR_CANDIDATOS", uf="SP", categoria="x")]
+
+    def test_pares_fora_do_contrato_saem_com_o_motivo(self):
+        rc, mix, resumo = self.rodar(self.base(), "--amostra-app", "eleicoes2026=1")
+        self.assertEqual(rc, 0)
+        self.assertEqual(sorted(e["input"] for e in mix), ["o que é o zorbitol zz", "zorbmetais zz"])
+        self.assertEqual(resumo["excluidos_fora_do_contrato"], {"eleicoes2026/secundario/chave_fora:categoria": 1,
+                                                                "quimica/foco/chave_fora:categoria": 1, "quimica/foco/combinacao:DESENHAR": 1})
+        self.assertEqual(resumo["exemplos_fora_do_contrato"]["quimica/chave_fora:categoria"][0], "zorbgases zz")
+
+    def test_aborta_acima_do_maximo_e_sem_contrato_mantem_tudo(self):
+        rc, _, _ = self.rodar(self.base(), "--max-fora-contrato", "1")
+        self.assertEqual(rc, 2)
+        rc, mix, resumo = self.rodar(self.base(), "--sem-contrato")
+        self.assertEqual((rc, len(mix), resumo["excluidos_fora_do_contrato"]), (0, 4, {}))
+
+
 if __name__ == "__main__":
     unittest.main()
