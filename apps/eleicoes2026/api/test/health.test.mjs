@@ -121,12 +121,12 @@ test('readConfig: valores padrão e limites', () => {
   assert.equal(c.dailyBudget, 300);
   assert.equal(c.rateIpPerMin, 20);
   assert.equal(c.rateIidPerDay, 60);
-  assert.equal(c.timeoutMs, 12000);
+  assert.equal(c.timeoutMs, 20000);
   assert.equal(c.reportPerHour, 5);
   assert.equal(c.modalEndpoint, '');
   assert.equal(c.mock, false);
   assert.equal(readConfig({ DAILY_BUDGET: 'abc' }).dailyBudget, 300);
-  assert.equal(readConfig({ MODAL_TIMEOUT_MS: '999999' }).timeoutMs, 25000);
+  assert.equal(readConfig({ MODAL_TIMEOUT_MS: '999999' }).timeoutMs, 45000);
   assert.equal(readConfig({ MODAL_TIMEOUT_MS: '1' }).timeoutMs, 500);
   assert.equal(readConfig({ DAILY_BUDGET: '-5' }).dailyBudget, 0);
 });

@@ -62,6 +62,12 @@ IM_START = "<|im_start|>"
 IM_END = "<|im_end|>"
 STOP_TOKENS = [IM_END, "<|endoftext|>"]
 
+# Sufixo do prompt depois de "<|im_start|>assistant\n": "" para o Qwen2.5 (v2.x) e o bloco de raciocínio VAZIO que o template do
+# Qwen3.5 põe no início do turno do assistente quando enable_thinking=False (modelos SaibaTudo IA, nlu-v3.x: treino e gate usam o
+# mesmo sufixo — ia/treino/avaliar_gguf.py). O ponteiro do Volume (`current.json`/`canary.json`) diz qual usar (`prompt_suffix`).
+THINK_VAZIO = "<think>\n\n</think>\n\n"
+SUFIXOS_PROMPT = ("", THINK_VAZIO)
+
 _CONTROLES = re.compile(
     "[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F​-‏‪-‮⁠-⁤⁦-⁩﻿]"
 )

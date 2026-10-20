@@ -27,7 +27,7 @@ const IID = '3f2b8c1e-6a4d-4c3b-9e1f-0a1b2c3d4e5f';
 
 test('contrato: intenções do site e constantes do cliente (endpoint do proxy na mesma origem, tempos, intenções sem nuvem)', () => {
   assert.equal(ENDPOINT_NUVEM, '/quimica/api/nlu');
-  assert.ok(TIMEOUT_NUVEM_MS >= 10_000 && TIMEOUT_NUVEM_EXPLICITA_MS >= 20_000 && TIMEOUT_NUVEM_EXPLICITA_MS <= 30_000, 'função da Vercel tem maxDuration 30');
+  assert.ok(TIMEOUT_NUVEM_MS >= 10_000 && TIMEOUT_NUVEM_EXPLICITA_MS >= 20_000 && TIMEOUT_NUVEM_EXPLICITA_MS <= 45_000, 'função da Vercel tem maxDuration 50');
   for (const i of SEM_NUVEM) assert.ok(INTENTS.includes(i), i);
   // as intenções aceitas do servidor são as do contrato (api/_lib/vocab.js), as mesmas do NLU local
   const vocab = readFileSync(resolve(RAIZ, 'api/_lib/vocab.js'), 'utf8');

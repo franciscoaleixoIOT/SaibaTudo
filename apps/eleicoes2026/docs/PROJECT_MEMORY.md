@@ -270,12 +270,21 @@ Lição repetida: não dizer "corrigido" sem reproduzir antes e depois. Padrões
 7. Texto gerado: avaliar o volume real (a cota de 40 min é da conta inteira) e a revisão jurídica da política 1.4.
 8. Código inerte de sugestão de estado por localização no Android (`SugestaoUf.kt`): pode ser removido numa limpeza.
 9. **Release Android com os textos do 2º turno** (19/10: local de votação, prazos de justificativa 03/12/2026 e 08/01/2027, link novo do Autoatendimento, regra "não votei no 1º turno"): subir para versionCode 7, testar num aparelho e enviar antes de 24/10, ou deixar para depois do congelamento — decisão do mantenedor. O site recebe tudo no próximo `data_refresh`.
-10. Licença da base Qwen2.5 no model card; relato privado de vulnerabilidades (*Settings › Security*); passada de acessibilidade (TalkBack) e tablets.
+10. **Canário SaibaTudo IA (nlu-v3.4-20261017) em eleições** — preparado em 20/10 (GGUF no Volume, `prompt_suffix` no serviço, ponteiro em
+    `backend/modal/ponteiros/`); faltam os comandos de `OPERACAO.md` §7 (volume put do `canary.json`, deploy do app canário, gate ao vivo,
+    variáveis da Vercel, `data_refresh`), que o classificador do agente bloqueou. Decisão do mantenedor: testar antes do congelamento.
+11. Licença da base Qwen2.5 no model card; relato privado de vulnerabilidades (*Settings › Security*); passada de acessibilidade (TalkBack) e tablets.
 
 ## 10. Segredos e backups (nunca no Git)
 `secrets/upload-keystore.p12` + `keystore.properties` (chave de **upload** do Play), `secrets/data_signing_key.pem` (assinatura dos **dados**; chave pública em `pipeline/data_signing_public.pem`), `secrets/hf_token.txt` (token do Space), `secrets/upstash.env` (URL e token do Redis). A pasta `secrets/` é ignorada pelo Git. Faça backup offline das chaves de assinatura.
 
-## 11. Histórico recente (05 a 19/10/2026)
+## 11. Histórico recente (05 a 20/10/2026)
+- **20/10 (madrugada):** (1) **tempos da nuvem maiores** (pedido do mantenedor: "o tempo inicial tem que ser maior; depois da primeira a segunda
+  funciona"): a partida a frio do Modal mediu 16,7 s ao vivo na química; `MODAL_TIMEOUT_MS` padrão 20000 e teto 45000 (`config.js`), `api/nlu.js`
+  `maxDuration: 50`, site 20 s automático / 45 s explícito (`cloud.js`); Vercel `MODAL_TIMEOUT_MS=30000` fica para o mantenedor (bloqueio do
+  classificador). (2) **SaibaTudo IA como canário:** `nlu_app.py` aceita `prompt_suffix`/`base_model` do ponteiro (Qwen3.5), `nlu_core.THINK_VAZIO`
+  + teste; GGUF `nlu-v3.4-20261017` copiado para o Volume de eleições; comandos finais em `OPERACAO.md` §7. Testes: API 228, web 178, Modal 84.
+  Android de eleições não será publicado por enquanto (decisão do mantenedor).
 - **19/10 (noite):** revisão para o 2º turno. (1) Link do Autoatendimento trocado (`autoatendimento.tse.jus.br` não resolve mais) no site, no Android e no diretório de fontes. (2) Resposta de local de votação ganhou o 2º turno: mesmo local do 1º turno em regra, TREs mudaram locais pontualmente (conferir no e-Título, "Onde votar"), cada turno é independente, justificativa até 03/12/2026 (1º) e 08/01/2027 (2º) — fonte: Manual do Eleitor 2026 do TSE; mesmos prazos na resposta de obrigatoriedade do voto. (3) NLU por regras (site e Android, idênticas): "não votei no primeiro turno, posso votar no segundo?" e variantes (faltei, perdi o 1º turno, ausência) → LOCAL_VOTACAO; 2 casos novos no golden (116). (4) Pipeline: percentual de Presidente agrupado por `SG_UE` (teste de regressão). (5) Resposta de resultado pelo pacote lista quem disputa o 2º turno (antes só os "NÃO ELEITO"). (6) Workflow: idade do snapshot pelo `generatedAt` do manifesto commitado. Testes: web 178, API 228, retrain 54, pipeline 31, workflows 6, Android 103 + lint. **Modelo v2.3 inalterado**; texto gerado continua Qwen2.5-7B (o rótulo é verdadeiro; explicador próprio só depois de 27/10).
 - **05/10:** `data_refresh` falhou 18 vezes (testes web assumiam "ninguém eleito"); resultados do 1º turno só chegaram à produção às 02:26 UTC de 06/10. Os testes de comportamento deixaram de bloquear a publicação de dados.
 - **06/10:** plano em 6 fases executado (gate endurecido, holdout, captura de perguntas com revisão humana, canário, paridade Android×site, testes de workflows). IA generativa e captura entregues desligadas. Filtro de opinião política nas 3 camadas. Política 1.3. Upstash criado e captura ligada. Botão da nuvem restaurado depois de resposta correta. Nuvem passou a seguir a conversa. Correção do 2º turno (`e:"s"` × `st`). Mensagem de falha da nuvem separada em dois motivos. Avaliação noturna e painel.

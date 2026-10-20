@@ -40,7 +40,9 @@ export function readConfig(env = process.env) {
     modalKey: (env.MODAL_KEY ?? '').trim(),
     modalSecret: (env.MODAL_SECRET ?? '').trim(),
     modelVersion: (env.MODEL_VERSION ?? '').trim() || 'dev',
-    timeoutMs: inteiro(env.MODAL_TIMEOUT_MS, 12000, 500, 25000),
+    // Partida a frio do Modal (restauro do snapshot + 1ª inferência) mediu 16,7 s ao vivo em 20/10/2026; a 2ª chamada responde em 3–4 s.
+    // Padrão e teto subiram em 20/10 (pedido do mantenedor: "o tempo inicial tem que ser maior"); a função tem maxDuration 50 (api/nlu.js).
+    timeoutMs: inteiro(env.MODAL_TIMEOUT_MS, 20000, 500, 45000),
     // Padrão conservador: 300 chamadas/dia ~ 9 mil/mês, que no pior caso (todas com container frio) fica abaixo do crédito grátis do Modal
     dailyBudget: inteiro(env.DAILY_BUDGET, 300, 0, 1_000_000),
 

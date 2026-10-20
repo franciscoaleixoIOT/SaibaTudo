@@ -25,7 +25,7 @@ Dois formatos de saída do modelo (campo `format` em `current.json`):
 > **Latência medida no gate (02/10/2026, Q4_K_M, 8 threads, formato legado, com gramática): média 10 s, máx. 15 s.** Por isso o
 > serviço usa **8 núcleos** (com 4, passaria do timeout de 14 s dos apps). Texto original da estimativa: em CPU a geração é limitada pela banda de memória; para um 1,5B Q4 em 4 núcleos o
 > esperado é da ordem de 10–20 tokens/s. Com o formato legado (~136 tokens) isso dá **~7–14 s por pergunta**, acima do
-> timeout padrão de 12 s do proxy. Meça com `bench` (passo 7) e ajuste `MODAL_TIMEOUT_MS` na Vercel; o caminho de
+> timeout padrão de 20 s do proxy (era 12 s até 20/10/2026). Meça com `bench` (passo 7) e ajuste `MODAL_TIMEOUT_MS` na Vercel; o caminho de
 > produção recomendado é o formato `v2` (≈1–3 s). Até lá, perguntas que estouram o tempo caem no NLU local (nada quebra).
 
 ---
@@ -197,7 +197,7 @@ Em *Project → Settings → Environment Variables* (ou `vercel env add NOME pro
 | `MODAL_ENDPOINT` | URL do `…-nlu-infer.modal.run` (https) |
 | `MODAL_KEY` / `MODAL_SECRET` | Token ID / Secret do passo 6 (marque como *Sensitive*) |
 | `MODEL_VERSION` | a mesma versão de `current.json` (ex.: `v1-legado`); faz parte da chave do cache |
-| `MODAL_TIMEOUT_MS` | do passo 7 (padrão 12000) |
+| `MODAL_TIMEOUT_MS` | do passo 7 (padrão 20000, máximo 45000; produção 30000 desde 20/10/2026) |
 | `DAILY_BUDGET` | chamadas/dia ao Modal (padrão 300) |
 
 Lista completa em [`docs/BACKEND.md`](../../docs/BACKEND.md#6-variáveis-de-ambiente-vercel).

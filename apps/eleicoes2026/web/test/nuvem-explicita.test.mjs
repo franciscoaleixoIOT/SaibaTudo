@@ -1,5 +1,5 @@
 // "Perguntar à IA na nuvem": botão na resposta não entendida (modo automático desligado por padrão). O toque é o consentimento
-// para enviar SÓ aquela pergunta; espera até 25 s; sucesso troca a resposta (origem NUVEM, fatos dos dados oficiais); qualquer
+// para enviar SÓ aquela pergunta; espera até 45 s; sucesso troca a resposta (origem NUVEM, fatos dos dados oficiais); qualquer
 // falha mantém a resposta original com um aviso, sem lançar exceção.
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -120,12 +120,12 @@ test('toque no botão com resposta resolvida localmente: chama a IA Generativa Q
   assert.equal(ofereceNuvem(r.resposta, false), false);
 });
 
-test('pedido explícito espera até 25 s (o modo automático continua com ~14 s)', async (t) => {
-  assert.equal(TIMEOUT_NUVEM_EXPLICITA_MS, 25_000);
-  assert.equal(TIMEOUT_NUVEM_MS, 14_000);
+test('pedido explícito espera até 45 s (o modo automático continua com ~20 s)', async (t) => {
+  assert.equal(TIMEOUT_NUVEM_EXPLICITA_MS, 45_000);
+  assert.equal(TIMEOUT_NUVEM_MS, 20_000);
   const padrao = new NuvemNlu({ installId: () => 'i', habilitada: () => false });
-  assert.equal(padrao.timeoutExplicitoMs, 25_000);
-  assert.equal(padrao.timeoutMs, 14_000);
+  assert.equal(padrao.timeoutExplicitoMs, 45_000);
+  assert.equal(padrao.timeoutMs, 20_000);
 
   t.mock.timers.enable({ apis: ['setTimeout'] });
   const escoar = () => new Promise((r) => setImmediate(r));
@@ -141,9 +141,9 @@ test('pedido explícito espera até 25 s (o modo automático continua com ~14 s)
     assert.equal(await p, null, `desiste em ${ms} ms`);
   };
   const explicita = new NuvemNlu({ fetchFn: lento, installId: () => 'iid', habilitada: () => false });
-  await espera(() => explicita.interpretarAgora(NAO_ENTENDIDA, null), 25_000);
+  await espera(() => explicita.interpretarAgora(NAO_ENTENDIDA, null), 45_000);
   const automatica = new NuvemNlu({ fetchFn: lento, installId: () => 'iid', habilitada: () => true });
-  await espera(() => automatica.interpretar(NAO_ENTENDIDA, null), 14_000);
+  await espera(() => automatica.interpretar(NAO_ENTENDIDA, null), 20_000);
 });
 
 test('falhas do pedido explícito (503 desligado/orçamento, 429, 5xx, tempo esgotado, rede, JSON inválido, interpretação desconhecida) mantêm a resposta original', async () => {

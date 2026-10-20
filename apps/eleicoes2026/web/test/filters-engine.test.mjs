@@ -236,8 +236,8 @@ test('fotos: pacote para majoritários; CDN do TSE somente quando temFoto', asyn
   if (semFoto) assert.equal(urlFotoRemota(semFoto), null);
 });
 
-test('o NLU na nuvem espera ~14 s (backend ~12 s) e depois cai para a resposta local', async () => {
-  assert.equal(TIMEOUT_NUVEM_MS, 14000);
+test('o NLU na nuvem espera ~20 s (partida a frio do backend passa de 16 s) e depois cai para a resposta local', async () => {
+  assert.equal(TIMEOUT_NUVEM_MS, 20000);
   const { gaz } = await pacoteCompleto();
   // fetch que só termina quando é abortado (simula backend lento)
   const lento = (url, init) => new Promise((_, rej) => init.signal.addEventListener('abort', () => rej(new DOMException('aborted', 'AbortError'))));
@@ -245,7 +245,7 @@ test('o NLU na nuvem espera ~14 s (backend ~12 s) e depois cai para a resposta l
   const t0 = Date.now();
   assert.equal(await n.interpretar('asdkjh qwerty', gaz), null);
   assert.ok(Date.now() - t0 >= 70);
-  assert.equal(new NuvemNlu({ installId: () => 'i', habilitada: () => true }).timeoutMs, 14000);
+  assert.equal(new NuvemNlu({ installId: () => 'i', habilitada: () => true }).timeoutMs, 20000);
 });
 
 test('o motor avisa a interface quando vai usar a nuvem (spinner "IA analisando…") e quando baixa mais UFs', async () => {

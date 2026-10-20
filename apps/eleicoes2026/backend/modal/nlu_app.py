@@ -34,7 +34,8 @@ import nlu_core as core  # noqa: E402  (lógica pura: prompt, gramática, valida
 APP_NAME = os.environ.get("NLU_APP_NAME", "saibatudo-nlu")
 # Ponteiro de versão que este app serve: "current.json" (produção) ou "canary.json" (app canário: NLU_APP_NAME=saibatudo-nlu-canary
 # NLU_POINTER=canary.json modal deploy backend/modal/nlu_app.py). Sem o ponteiro o container falha ao subir: é assim que o rollback
-# do canário funciona (o proxy refaz a pergunta na produção).
+# do canário funciona (o proxy refaz a pergunta na produção). O ponteiro pode trazer `prompt_suffix` e `base_model` (modelos
+# SaibaTudo IA, base Qwen3.5: 20/10/2026, canário com o nlu-v3.4-20261017 copiado do Volume da química) — ver `load()`.
 POINTER = os.environ.get("NLU_POINTER", "current.json")
 VOLUME_NAME = "saibatudo-nlu-models"
 MODELS_DIR = "/models"
@@ -97,11 +98,17 @@ class Nlu:
         self.fmt = cfg.get("format", "legacy")
         if self.fmt not in core.FORMATS:
             raise RuntimeError(f"formato inválido em current.json: {self.fmt}")
+        # Sufixo do prompt (igual ao treino): "" para o Qwen2.5 (v2.x), THINK_VAZIO para os modelos SaibaTudo IA (Qwen3.5, nlu-v3.x).
+        # Ponteiro sem o campo = "" (legado). Assim o MESMO serviço serve o v2.3 (current.json) e, como canário, um nlu-v3.x.
+        self.prompt_suffix = cfg.get("prompt_suffix") or ""
+        if self.prompt_suffix not in core.SUFIXOS_PROMPT:
+            raise RuntimeError(f"prompt_suffix desconhecido no ponteiro: {self.prompt_suffix!r}")
+        self.base_model = cfg.get("base_model")
         caminho = Path(MODELS_DIR) / self.version / cfg["file"]
         self.lock = threading.Lock()  # a instância do llama.cpp não é thread-safe
         self.llm = Llama(
             model_path=str(caminho),
-            n_ctx=512,             # prompt (~90-200 tokens) + saída (<= 160)
+            n_ctx=768 if self.prompt_suffix else 512,  # prompt (~90-200 tokens; o Qwen3.5 tokeniza o system prompt em mais peças) + saída (<= 160)
             n_threads=N_THREADS,
             n_threads_batch=N_THREADS,
             n_batch=256,
@@ -111,7 +118,8 @@ class Nlu:
         # Aquecimento: preenche o cache de KV com o prefixo (system prompt), reaproveitado nas próximas perguntas.
         self._gerar("quem disputa a presidência?")
         self.load_seconds = round(time.time() - t0, 2)
-        print(json.dumps({"evt": "model_loaded", "version": self.version, "format": self.fmt, "seconds": self.load_seconds}))
+        print(json.dumps({"evt": "model_loaded", "version": self.version, "format": self.fmt, "base": self.base_model,
+                          "prompt_suffix": self.prompt_suffix, "seconds": self.load_seconds}))
 
     # -------------------------------------------------------------------------------------------------
     def _gerar(self, pergunta: str):
@@ -123,7 +131,7 @@ class Nlu:
         prompt = core.build_prompt(pergunta, self.fmt)
         with self.lock:
             out = self.llm.create_completion(
-                prompt=prompt,
+                prompt=prompt + self.prompt_suffix,  # "" (Qwen2.5) ou THINK_VAZIO (Qwen3.5), conforme o ponteiro
                 grammar=grammar,
                 max_tokens=core.MAX_NEW_TOKENS[self.fmt],
                 temperature=0.0,       # determinístico (guloso)
@@ -144,6 +152,8 @@ class Nlu:
         # Log SEM o texto da pergunta nem da saída: só métricas
         print(json.dumps({"evt": "infer", "ok": ok, "ms": ms, "tokens": tokens, "stop": motivo}))
         base = {"model": self.version, "format": self.fmt, "ms": ms, "tokens": tokens}
+        if self.base_model:
+            base["base"] = self.base_model
         if not ok:
             return {"ok": False, "error": "incomplete_output" if motivo == "length" else "invalid_output", **base}
         return {"ok": True, "output": obj, **base}

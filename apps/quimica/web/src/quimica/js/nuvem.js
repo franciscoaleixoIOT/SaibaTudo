@@ -11,10 +11,10 @@ import { normalizar } from './texto.js';
 
 /** Proxy serverless da Vercel (mesma origem). É ele que guarda o segredo do Modal; o site nunca fala com o Modal. */
 export const ENDPOINT_NUVEM = '/quimica/api/nlu';
-/** Modo automático: o serviço quente responde em 2–5 s; a partida a frio pode passar de 10 s. */
-export const TIMEOUT_NUVEM_MS = 14_000;
-/** Pedido explícito: a pessoa escolheu esperar (partida a frio do modelo + função da Vercel: a primeira chamada ao vivo passou de 25 s em 14/10/2026; a função tem maxDuration 30). */
-export const TIMEOUT_NUVEM_EXPLICITA_MS = 30_000;
+/** Modo automático: o serviço quente responde em 2–5 s; a partida a frio mediu 16,7 s em 20/10/2026. Até 20 s (era 14 s: a primeira pergunta do dia caía fora do prazo). */
+export const TIMEOUT_NUVEM_MS = 20_000;
+/** Pedido explícito: a pessoa escolheu esperar (partida a frio do modelo + função da Vercel: a primeira chamada ao vivo passou de 25 s em 14/10/2026; a função tem maxDuration 50 desde 20/10). */
+export const TIMEOUT_NUVEM_EXPLICITA_MS = 45_000;
 /** Intenções cuja resposta não depende de interpretação: não há o que reinterpretar na nuvem. */
 export const SEM_NUVEM = new Set(['RECUSA_PERIGO', 'AJUDA', 'SOBRE_DADOS', 'FONTES']);
 const NIVEIS = new Set(['fundamental', 'medio', 'superior']);

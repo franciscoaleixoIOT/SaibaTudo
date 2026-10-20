@@ -334,7 +334,8 @@ cota de uploads 39.999/40.000) → health `{"ok":true,"version":"4c73bd7","model
   - "¿qué es el azúcar?" → COMPOSTO, composto "azúcar" → CID 5988 (3,5 s)
   - "Wie heißt 2-Chlor-3-methylpentan?" → NOMENCLATURA, composto "2-Chlor-3-methylpentan", sem CID (3,8 s) — o contrato admite o nome copiado
 O frio de 16,7 s na primeira chamada é o restauro do snapshot + inferência; o mantenedor relatou que "às vezes os 25 s demoram" e pediu tempo
-inicial maior (ver pendências). Volta em um comando (`promover.py --rollback`). Docs: README do treino §v3.7, MODELO §13, PENDENCIAS §13, CALCULADORAS §6.
+inicial maior: feito às 00h40 — `config.js` padrão 20000 / teto 45000, `api/nlu.js` `maxDuration: 50`, site 20 s / 45 s, Android 20 s / 45 s
+(próximo release); `MODAL_TIMEOUT_MS=35000` na Vercel fica para o mantenedor. Volta do modelo em um comando (`promover.py --rollback`). Docs: README do treino §v3.7, MODELO §13, PENDENCIAS §13, CALCULADORAS §6.
 
 ## 7. Contas e segredos
 Vercel `saibatudo-quimica` (time `franciscoaleixo-9696`); GitHub `franciscoaleixoIOT`; Hugging Face `franciscoaleixo` (PRO, 40 min/dia de ZeroGPU); Modal `franciscoaleixo/main` (US$ 30/mês grátis; já usados pelo app de eleições, ~US$ 5/mês).

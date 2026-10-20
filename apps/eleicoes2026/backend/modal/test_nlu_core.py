@@ -443,5 +443,16 @@ class TestVocabularioEmSincroniaComOProxy(unittest.TestCase):
         self.assertEqual(ids, set(core.TEMAS_V2))
 
 
+class SufixoPromptTest(unittest.TestCase):
+    def test_sufixo_prompt_saibatudo_ia(self):
+        # Modelos SaibaTudo IA (Qwen3.5) são treinados e avaliados com o bloco de raciocínio vazio depois de "assistant\n"
+        # (ia/treino/avaliar_gguf.py: THINK_VAZIO). O serviço só aceita "" (Qwen2.5) ou esse bloco.
+        self.assertEqual(core.THINK_VAZIO, "<think>\n\n</think>\n\n")
+        self.assertEqual(core.SUFIXOS_PROMPT, ("", core.THINK_VAZIO))
+        prompt = core.build_prompt("quem disputa a presidência?", "v2") + core.THINK_VAZIO
+        self.assertTrue(prompt.endswith("<|im_start|>assistant\n<think>\n\n</think>\n\n"))
+        self.assertIn(core.SYSTEM_PROMPT_V2, prompt)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

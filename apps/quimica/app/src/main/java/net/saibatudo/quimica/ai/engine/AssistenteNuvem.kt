@@ -29,10 +29,10 @@ sealed interface DesfechoNuvem {
 class AssistenteNuvem(
     private val cliente: CloudNluClient,
     private val idInstalacao: suspend () -> String,
-    /** Opção automática (perguntas não entendidas): tempo curto, para não segurar a resposta local. */
-    val timeoutAutomaticoMs: Long = 14_000,
-    /** Pedido explícito (botão): a pessoa aceitou esperar; o serviço leva até ~22 s na partida a frio. */
-    val timeoutExplicitoMs: Long = 25_000
+    /** Opção automática (perguntas não entendidas): a partida a frio do serviço mediu 16,7 s em 20/10/2026 (era 14 s e a 1ª pergunta caía fora). */
+    val timeoutAutomaticoMs: Long = 20_000,
+    /** Pedido explícito (botão): a pessoa aceitou esperar; partida a frio + função da Vercel (maxDuration 50 desde 20/10/2026). */
+    val timeoutExplicitoMs: Long = 45_000
 ) {
     suspend fun interpretar(
         pergunta: String,

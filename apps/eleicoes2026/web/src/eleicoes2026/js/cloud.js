@@ -55,10 +55,11 @@ export function validarNluNuvem(json, gaz, textoOriginal) {
   return parsed;
 }
 
-/** O backend leva até ~12 s (modelo em CPU, partida a frio): o cliente espera até ~14 s antes de seguir com a resposta local. */
-export const TIMEOUT_NUVEM_MS = 14_000;
-/** Pedido explícito ("Perguntar à IA na nuvem"): a pessoa escolheu esperar, então o cliente aguarda até 25 s (partida a frio). */
-export const TIMEOUT_NUVEM_EXPLICITA_MS = 25_000;
+/** Modo automático (só quando o NLU local não entendeu): a partida a frio do Modal passa de 16 s; quente, 2–4 s. Até 20 s antes de
+ *  seguir com a resposta local (20/10/2026; era 14 s e a primeira pergunta do dia caía fora do prazo). */
+export const TIMEOUT_NUVEM_MS = 20_000;
+/** Pedido explícito ("Perguntar à IA na nuvem"): a pessoa escolheu esperar, então o cliente aguarda até 45 s (partida a frio + função da Vercel, maxDuration 50). */
+export const TIMEOUT_NUVEM_EXPLICITA_MS = 45_000;
 
 /** Textos da IA na nuvem exibidos no app (botão na resposta, espera, falha e a chave do modo automático). */
 export const NUVEM_TEXTOS = Object.freeze({

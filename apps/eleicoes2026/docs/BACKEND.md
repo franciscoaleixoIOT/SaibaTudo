@@ -164,7 +164,7 @@ o Modal** (não gera custo). `nlu:"off"` = kill switch ativo.
 | `ASK_ENABLED` / `MODAL_ASK_ENDPOINT` | *(desligado)* | IA generativa `/api/ask` (Qwen 7B em GPU): **só liga com `ASK_ENABLED=1` E `MODAL_ASK_ENDPOINT` explícito** (+ `MODAL_KEY`/`MODAL_SECRET`). Não há derivação a partir de `MODAL_ENDPOINT` nem URL fixa; qualquer um dos dois vazio desliga. `/api/health` mostra `"ask":"on"\|"off"`. |
 | `MODAL_KEY` / `MODAL_SECRET` | — | Proxy Auth Token do Modal (`wk-…`/`ws-…`). Sem eles a nuvem fica `disabled`. |
 | `MODEL_VERSION` | `dev` | Versão em `current.json` do Modal; devolvida em `model` e **parte da chave do cache**. |
-| `MODAL_TIMEOUT_MS` | `12000` (500–25000) | Timeout total da chamada (inclui o retry). Ajuste após o `bench`. |
+| `MODAL_TIMEOUT_MS` | `20000` (500–45000) | Timeout total da chamada (inclui o retry). Subiu em 20/10/2026 (partida a frio > 16 s ao vivo; produção com 30000). A função `api/nlu.js` tem `maxDuration: 50`. |
 | `DAILY_BUDGET` | `300` | Chamadas/dia ao Modal por instância (retry conta). `0` = nunca chama o Modal. |
 | `RATE_IP_PER_MIN` / `RATE_IID_PER_DAY` | `20` / `60` | Limites em memória do `/api/nlu`. |
 | `CACHE_TTL_SECONDS` / `CACHE_MAX_ENTRIES` | `3600` / `500` | Cache LRU. |
@@ -198,7 +198,7 @@ no regime esparso.** Defina o **Workspace budget** no painel (comportamento ao e
 - **Latência em CPU (não medida):** o modelo legado gera ~136 tokens ⇒ estimativa de 7–14 s por pergunta, acima do timeout
   de 4 s; cold start soma o carregamento do GGUF. Perguntas que estouram o tempo caem no NLU local (primeira chamada após
   ociosidade tende a ser “perdida”, mas acorda o container). Caminho recomendado: formato `v2` compacto (≈ 5× menos tokens;
-  ver `backend/retrain/`). Ajuste `MODAL_TIMEOUT_MS` (≤ 25 s) após `modal run … nlu_app.py::bench`.
+  ver `backend/retrain/`). Ajuste `MODAL_TIMEOUT_MS` (≤ 45 s) após `modal run … nlu_app.py::bench`.
 - Limites em memória são **por instância** da Vercel (podem somar mais que o configurado sob carga distribuída).
 - O modelo legado só cobre bem listagem e perfil (87 % do treino era `CANDIDATE_LOOKUP`); as 16 intenções do contrato
   exigem o retreino `v2`. Mapeamentos legados extras no normalizador: `EXPLAIN_TOPIC` com rota `info/estatisticas|
@@ -215,7 +215,7 @@ no regime esparso.** Defina o **Workspace budget** no painel (comportamento ao e
 | :-- | :-- |
 | **Gasto no Modal subindo / abuso** | 1) Vercel: `MODAL_ENDPOINT` = vazio → redeploy (clientes caem no NLU local em segundos). 2) `modal app stop saibatudo-nlu`. 3) Revogue o Proxy Auth Token (painel Modal). 4) Investigue 429/`cache` nos logs; baixe `DAILY_BUDGET`/`RATE_*`; confira a regra do Firewall. |
 | **Respostas ruins/estranhas da IA** | Veja as issues `relato-ia`. Se for sistêmico: kill switch (acima) e/ou `promote --version <anterior>` + `MODEL_VERSION=<anterior>`. O NLU local segue respondendo. |
-| **Muitos 504/timeout** | `bench` no Modal; suba `MODAL_TIMEOUT_MS` (≤ 25000) **e** a duração máxima da função; considere formato `v2`/memory snapshot. |
+| **Muitos 504/timeout** | `bench` no Modal; suba `MODAL_TIMEOUT_MS` (≤ 45000) **e** a duração máxima da função (hoje 50 s); considere formato `v2`/memory snapshot. |
 | **503 `budget`** | Esperado ao atingir `DAILY_BUDGET` (zera à meia-noite de Brasília, por instância). Aumente só se o Modal budget permitir. |
 | **502 `upstream` com 401 do Modal** | Token revogado/errado: gere outro e atualize `MODAL_KEY`/`MODAL_SECRET` + redeploy. |
 | **Relatos em spam** | `GITHUB_TOKEN` vazio (desliga) ou `REPORT_PER_HOUR`/`REPORT_DAILY_MAX` menores; bloqueie/feche em lote pelo rótulo `relato-ia`. |

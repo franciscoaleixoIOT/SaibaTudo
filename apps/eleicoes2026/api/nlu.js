@@ -15,5 +15,5 @@ export const handle = createNluHandler();
 
 export default toNodeHandler(handle);
 
-// Duração máxima da função (s): o proxy já limita a chamada ao Modal por MODAL_TIMEOUT_MS (<= 20 s).
-export const config = { maxDuration: 30 };
+// Duração máxima da função (s): o proxy já limita a chamada ao Modal por MODAL_TIMEOUT_MS (<= 45 s; partida a frio > 16 s).
+export const config = { maxDuration: 50 };

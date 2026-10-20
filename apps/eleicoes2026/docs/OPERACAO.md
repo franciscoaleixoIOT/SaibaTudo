@@ -146,6 +146,29 @@ Compare 24 a 48 h (`/api/health`, painel, issues `relato-ia` por versão) e prom
 **A promoção e o rollback do canário são manuais**: não há métrica de produção acessível ao Modal para automatizá-los com segurança (os logs da Vercel não são consultáveis de lá).
 Sem canário configurado (`MODAL_CANARY_ENDPOINT` vazio ou `CANARY_PCT=0`) nada muda.
 
+**SaibaTudo IA como canário (preparado em 20/10/2026; decisão do mantenedor: "pode trocar pelo SaibaTudo IA, quero fazer os testes").**
+O NLU compartilhado (base Qwen3.5-2B, treinado também com as perguntas de eleições) na versão `nlu-v3.4-20261017` mede, no gate de eleições
+sobre o GGUF, golden 114 **97,4 %** e holdout 435 **97,0 %** (v2.3 em produção: 93,7 % / 96,8 %); o v3.7 publicado na química fica abaixo
+em eleições (95,6 % / 94,9 %), por isso o canário usa o v3.4. Ele reprova o gate formal de eleições por um caso de `cargo` (alucinação 1/3 nos
+casos sem cargo). O GGUF já está no Volume `saibatudo-nlu-models` em `/nlu-v3.4-20261017/` (copiado da química) e o serviço aceita o
+`prompt_suffix` do ponteiro (bloco de raciocínio vazio do Qwen3.5; `nlu_core.THINK_VAZIO`). Passos que o agente não pôde executar (bloqueio
+do classificador) e ficam para o mantenedor, a partir de `apps/eleicoes2026`:
+```bash
+MSYS_NO_PATHCONV=1 python -m modal volume put saibatudo-nlu-models backend/modal/ponteiros/canary-nlu-v3.4-20261017.json /canary.json
+NLU_APP_NAME=saibatudo-nlu-canary NLU_POINTER=canary.json python -m modal deploy backend/modal/nlu_app.py      # imprime a URL do /infer
+# gate ao vivo (MODAL_KEY/MODAL_SECRET do token de proxy no ambiente; nada em argv):
+python backend/modal/eval_golden.py --endpoint <URL do infer do canário> --format v2 --real-cases contracts/nlu_real_cases.json --out eval/local/$(date +%F)_canary_nlu-v3.4.json
+# Vercel (projeto saibatudo), produção: CANARY_PCT=100 manda todo mundo ao canário COM volta automática à produção (v2.3) se ele falhar
+printf '%s' '<URL do infer do canário>' | vercel env add MODAL_CANARY_ENDPOINT production --sensitive
+printf '%s' nlu-v3.4-20261017        | vercel env add CANARY_MODEL_VERSION production
+printf '%s' 100                       | vercel env add CANARY_PCT production
+printf '%s' 30000                     | vercel env add MODAL_TIMEOUT_MS production      # tempo inicial maior (pedido de 20/10)
+gh workflow run eleicoes-data-refresh.yml                                                # publica; depois: curl -s https://saibatudo.net/api/health
+```
+Rollback: `CANARY_PCT=0` (ou apagar `canary.json`: `modal volume rm saibatudo-nlu-models /canary.json`); a produção (v2.3) nunca saiu do lugar.
+Promover de verdade (depois de 27/10): copiar o ponteiro para `current.json` com `format: v2` + `prompt_suffix`, `modal deploy` do app de
+produção e `MODEL_VERSION=nlu-v3.4-20261017`; nomes `SaibaTudoIA-NLU-Eleicoes`/`SaibaTudoIA-Models-Eleicoes` ficam para o renome planejado.
+
 **Regras locais melhoram com o uso:** `promover.mjs` põe as perguntas reais no contrato e marca `"lacuna": true` nas que o NLU local ainda não entende;
 `eleicoes-lacunas-nlu.yml` abre um **PR rascunho** (ou issue) com `docs/LACUNAS_NLU.md`: grupos de perguntas parecidas, termos que as distinguem **sem colidir com outras intenções** e onde mexer.
 Uma pessoa escreve a regra nos dois NLUs (`nlu.js` e `LocalNlu.kt`; o contrato compartilhado confere a paridade) e remove a marca (o teste cobra).

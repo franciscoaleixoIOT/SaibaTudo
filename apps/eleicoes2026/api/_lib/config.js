@@ -64,7 +64,9 @@ export function readConfig(env = process.env) {
     modelVersion: (env.MODEL_VERSION ?? '').trim() || 'dev',
     // Modo mock: SOMENTE fora de produção (nunca responde por um modelo falso em produção).
     mock: env.MOCK_NLU === '1' && !emProducao,
-    timeoutMs: inteiro(env.MODAL_TIMEOUT_MS, 12000, 500, 25000),
+    // Partida a frio do Modal (restauro do snapshot + 1ª inferência) passa de 16 s ao vivo; a 2ª chamada responde em 2–4 s. Padrão e
+    // teto subiram em 20/10/2026 (pedido do mantenedor: "o tempo inicial tem que ser maior"); a função tem maxDuration 50 (api/nlu.js).
+    timeoutMs: inteiro(env.MODAL_TIMEOUT_MS, 20000, 500, 45000),
     askTimeoutMs: inteiro(env.MODAL_ASK_TIMEOUT_MS, 30000, 1000, 60000),
     // --- limites
     // Padrão conservador: 300 chamadas/dia ~ 9 mil/mês, que no pior caso (todas com container frio) fica abaixo do crédito grátis do Modal
