@@ -136,7 +136,7 @@ class TesteCoerenciaComOsClientes(unittest.TestCase):
     def test_sistemas_nacionais_cobrem_as_constantes_do_app(self):
         esperadas = {
             "https://divulgacandcontas.tse.jus.br/divulga/#",
-            "https://autoatendimento.tse.jus.br",
+            "https://www.tse.jus.br/servicos-eleitorais/autoatendimento-eleitoral#",  # o diretório é comparado sem a barra final (a rota real é #/)
             "https://resultados.tse.jus.br",
             "https://dadosabertos.tse.jus.br",
             "https://www.tse.jus.br/eleicoes/eleicoes-2026",

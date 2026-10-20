@@ -10,7 +10,7 @@ export const FONTE_DADOS = 'Tribunal Superior Eleitoral - Dados Abertos (dadosab
 export const LICENCA_DADOS = 'Creative Commons Atribuição (CC BY)';
 
 export const URL_DIVULGA_CAND_CONTAS = 'https://divulgacandcontas.tse.jus.br/divulga/#/';
-export const URL_AUTOATENDIMENTO_ELEITOR = 'https://autoatendimento.tse.jus.br/';
+export const URL_AUTOATENDIMENTO_ELEITOR = 'https://www.tse.jus.br/servicos-eleitorais/autoatendimento-eleitoral#/';
 export const URL_RESULTADOS_TSE = 'https://resultados.tse.jus.br/';
 export const URL_DADOS_ABERTOS_TSE = 'https://dadosabertos.tse.jus.br/';
 export const URL_PORTAL_TSE_2026 = 'https://www.tse.jus.br/eleicoes/eleicoes-2026';

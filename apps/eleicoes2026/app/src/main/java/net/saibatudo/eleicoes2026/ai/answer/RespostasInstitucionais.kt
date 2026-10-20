@@ -118,11 +118,14 @@ internal fun AnswerBuilder.localVotacao(p: ParsedQuery? = null): AiMenuResponse 
     return AiMenuResponse(
         targetRoute = "info/locais", menuId = AppConstants.MENU_LOCAIS_VOTACAO, intent = Intent.LOCAL_VOTACAO,
         directAnswer = "Onde votar e situação do título (sistemas oficiais):\n" +
-            "• Local de votação e título: Autoatendimento do Eleitor (${AppConstants.URL_AUTOATENDIMENTO_ELEITOR}) ou app e-Título\n" +
-            "• Justificar a ausência: app e-Título ou sistema Justifica\n" +
+            "• Local de votação e título: Autoatendimento Eleitoral do TSE (${AppConstants.URL_AUTOATENDIMENTO_ELEITOR}) ou app e-Título, opção \"Onde votar\"\n" +
+            "• 2º turno (${dataBr(regras.turno2)}): em regra, vota-se no mesmo local do 1º turno, mas alguns TREs mudaram locais pontualmente — confira o endereço antes de sair\n" +
+            "• Quem não votou no 1º turno pode votar no 2º: cada turno é uma eleição independente\n" +
+            "• Justificar a ausência: app e-Título ou Autoatendimento Eleitoral, separadamente por turno — até 03/12/2026 (1º turno) e 08/01/2027 (2º turno)\n" +
             "• No dia: leve documento oficial com foto (o e-Título com foto também vale)\n" +
             "O app não consulta dados pessoais do eleitor.",
-        suggestedQuestions = listOf("Calendário eleitoral 2026", "Ordem de votação na urna"), fonte = fonte, origem = origem
+        suggestedQuestions = listOf("Calendário eleitoral 2026", "Ordem de votação na urna"),
+        fonte = "Fonte: TSE – Autoatendimento Eleitoral e Manual do Eleitor 2026; avisos dos TREs sobre locais de votação.", origem = origem
     )
 }
 
@@ -212,7 +215,7 @@ internal fun AnswerBuilder.regrasVoto(p: ParsedQuery): AiMenuResponse {
             append("Quem deve votar (Constituição, art. 14, §1º):")
             append("\n• Obrigatório: eleitores de 18 a 70 anos.")
             append("\n• Facultativo: jovens de 16 e 17 anos, maiores de 70 anos e analfabetos.")
-            append("\n• Quem não votar deve justificar no dia da eleição ou em até 60 dias após cada turno (app e-Título ou sistema Justifica); sem justificativa, há multa e restrições até a regularização.")
+            append("\n• Quem não votar deve justificar no dia da eleição ou em até 60 dias após cada turno (app e-Título ou Autoatendimento Eleitoral; prazos: 03/12/2026 para o 1º turno e 08/01/2027 para o 2º); sem justificativa, há multa e restrições até a regularização.")
         }
     }
     return AiMenuResponse(

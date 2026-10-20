@@ -588,11 +588,14 @@ export class AnswerBuilder {
     return resposta({
       targetRoute: 'info/locais', menuId: MENU.LOCAIS_VOTACAO, intent: 'LOCAL_VOTACAO',
       directAnswer: 'Onde votar e situação do título (sistemas oficiais):\n' +
-        `• Local de votação e título: Autoatendimento do Eleitor (${URL_AUTOATENDIMENTO_ELEITOR}) ou app e-Título\n` +
-        '• Justificar a ausência: app e-Título ou sistema Justifica\n' +
+        `• Local de votação e título: Autoatendimento Eleitoral do TSE (${URL_AUTOATENDIMENTO_ELEITOR}) ou app e-Título, opção "Onde votar"\n` +
+        `• 2º turno (${dataBr(this.regras.turno2)}): em regra, vota-se no mesmo local do 1º turno, mas alguns TREs mudaram locais pontualmente — confira o endereço antes de sair\n` +
+        '• Quem não votou no 1º turno pode votar no 2º: cada turno é uma eleição independente\n' +
+        '• Justificar a ausência: app e-Título ou Autoatendimento Eleitoral, separadamente por turno — até 03/12/2026 (1º turno) e 08/01/2027 (2º turno)\n' +
         '• No dia: leve documento oficial com foto (o e-Título com foto também vale)\n' +
         'O app não consulta dados pessoais do eleitor.',
-      suggestedQuestions: ['Calendário eleitoral 2026', 'Ordem de votação na urna'], fonte: this.fonte, origem: this.origem
+      suggestedQuestions: ['Calendário eleitoral 2026', 'Ordem de votação na urna'],
+      fonte: 'Fonte: TSE – Autoatendimento Eleitoral e Manual do Eleitor 2026; avisos dos TREs sobre locais de votação.', origem: this.origem
     });
   }
 
@@ -685,7 +688,7 @@ export class AnswerBuilder {
       texto += 'Quem deve votar (Constituição, art. 14, §1º):';
       texto += '\n• Obrigatório: eleitores de 18 a 70 anos.';
       texto += '\n• Facultativo: jovens de 16 e 17 anos, maiores de 70 anos e analfabetos.';
-      texto += '\n• Quem não votar deve justificar no dia da eleição ou em até 60 dias após cada turno (app e-Título ou sistema Justifica); sem justificativa, há multa e restrições até a regularização.';
+      texto += '\n• Quem não votar deve justificar no dia da eleição ou em até 60 dias após cada turno (app e-Título ou Autoatendimento Eleitoral; prazos: 03/12/2026 para o 1º turno e 08/01/2027 para o 2º); sem justificativa, há multa e restrições até a regularização.';
     }
     return resposta({
       targetRoute: 'info/regras', menuId: MENU.REGRAS_ELEITORAIS, intent: 'REGRAS_VOTO',
@@ -1056,16 +1059,25 @@ export class AnswerBuilder {
       texto = `Eleito${eleitos.length > 1 ? 's' : ''} para ${tituloCargo(cargo)}${onde} segundo o TSE:` +
         eleitos.map((c) => `\n• ${c.numero} — ${c.nomeUrna} (${c.partido})`).join('');
     } else if (daqui.length > 0) {
-      texto = `O TSE já publicou a situação de totalização, mas ainda não há eleito definido para ${tituloCargo(cargo)}${onde}:` +
-        daqui.filter((c) => c.resultado?.situacaoTotalizacao != null).slice(0, 6)
-          .map((c) => `\n• ${c.nomeUrna}: ${c.resultado.situacaoTotalizacao}`).join('');
+      // Classificados ao 2º turno vêm na situação do 1º turno ("2º TURNO"), não em situacaoTotalizacao: sem este ramo a resposta
+      // listava só os "NÃO ELEITO" e omitia justamente quem disputa (19/10/2026).
+      const classificados = decrescente(daqui.filter((c) => resultadoSegundoTurno(c.resultado)), (c) => c.resultado.turnos?.[1]?.votos ?? 0);
+      if (classificados.length >= 2) {
+        texto = `Ninguém foi eleito no 1º turno para ${tituloCargo(cargo)}${onde}; disputam o 2º turno (${dataBr(this.regras.turno2)}), segundo o TSE:` +
+          classificados.map((c) => `\n• ${c.numero} — ${c.nomeUrna} (${c.partido})`).join('');
+      } else {
+        texto = `O TSE já publicou a situação de totalização, mas ainda não há eleito definido para ${tituloCargo(cargo)}${onde}:` +
+          daqui.filter((c) => c.resultado?.situacaoTotalizacao != null).slice(0, 6)
+            .map((c) => `\n• ${c.nomeUrna}: ${c.resultado.situacaoTotalizacao}`).join('');
+      }
     } else {
       texto = `Ainda não há resultado oficial publicado para ${tituloCargo(cargo)}${onde} (${turno}º turno).\n` +
         `A apuração do TSE é divulgada em ${URL_RESULTADOS_TSE}; assim que estiver disponível, aparece aqui.`;
     }
     return resposta({
       targetRoute: 'info/resultados', menuId: MENU.RESULTADOS, intent: p.intent, filters: fi, abrirResultados: true,
-      directAnswer: texto, candidateIds: eleitos.slice(0, 6).map((c) => c.id),
+      directAnswer: texto,
+      candidateIds: (eleitos.length > 0 ? eleitos : daqui.filter((c) => resultadoSegundoTurno(c.resultado))).slice(0, 6).map((c) => c.id),
       suggestedQuestions: ['Calendário eleitoral 2026', 'Quem disputa a Presidência?'], fonte: this.fonte, origem: this.origem
     });
   }

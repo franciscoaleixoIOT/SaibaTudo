@@ -8,7 +8,7 @@
   },
   {
    "nome": "Autoatendimento do Eleitor — Título e Local de Votação",
-   "url": "https://autoatendimento.tse.jus.br",
+   "url": "https://www.tse.jus.br/servicos-eleitorais/autoatendimento-eleitoral#/",
    "utilidade": "Consulta oficial de local de votação, situação do título e justificativa de ausência."
   },
   {
@@ -149,7 +149,7 @@
    "secoes": [
     {
      "titulo": "Autoatendimento do eleitor (Título NET)",
-     "url": "https://www.tse.jus.br/servicos-eleitorais/autoatendimento-eleitoral"
+     "url": "https://www.tse.jus.br/servicos-eleitorais/autoatendimento-eleitoral#/"
     },
     {
      "titulo": "Alistamento eleitoral",
@@ -1560,7 +1560,7 @@
    "secoes": [
     {
      "titulo": "Autoatendimento Eleitoral",
-     "url": "https://www.tse.jus.br/servicos-eleitorais/autoatendimento-eleitoral"
+     "url": "https://www.tse.jus.br/servicos-eleitorais/autoatendimento-eleitoral#/"
     },
     {
      "titulo": "Carta de serviços",
@@ -2212,7 +2212,7 @@
     },
     {
      "titulo": "Autoatendimento do eleitor",
-     "url": "https://www.tse.jus.br/servicos-eleitorais/autoatendimento-eleitoral"
+     "url": "https://www.tse.jus.br/servicos-eleitorais/autoatendimento-eleitoral#/"
     },
     {
      "titulo": "Biometria",

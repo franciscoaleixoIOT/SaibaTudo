@@ -15,7 +15,7 @@ object AppConstants {
 
     // Sistemas oficiais nacionais do TSE
     const val URL_DIVULGA_CAND_CONTAS = "https://divulgacandcontas.tse.jus.br/divulga/#/"
-    const val URL_AUTOATENDIMENTO_ELEITOR = "https://autoatendimento.tse.jus.br/"
+    const val URL_AUTOATENDIMENTO_ELEITOR = "https://www.tse.jus.br/servicos-eleitorais/autoatendimento-eleitoral#/"
     const val URL_RESULTADOS_TSE = "https://resultados.tse.jus.br/"
     const val URL_DADOS_ABERTOS_TSE = "https://dadosabertos.tse.jus.br/"
     const val URL_PORTAL_TSE_2026 = "https://www.tse.jus.br/eleicoes/eleicoes-2026"

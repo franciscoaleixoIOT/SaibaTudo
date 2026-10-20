@@ -82,7 +82,7 @@ mudar; exceção consciente com `[congelamento-ok]` na mensagem do commit (fica 
 Como o push na `main` já aconteceu quando o check roda, ele **avisa**. Para **bloquear** de fato, ative em *Settings › Branches* a regra de proteção da `main`
 exigindo a verificação "Guarda do congelamento" (ação manual, não feita por script). Também não faça merge de PRs do Dependabot nesses dias.
 
-Checklist da véspera (24/10): rodar `workflow_dispatch` do `data_refresh` e conferir o resumo; confirmar `/api/health` (`data.fase`, idade do pacote);
+Checklist da véspera (24/10): rodar `workflow_dispatch` do `data_refresh` e conferir o resumo; abrir num navegador o link do Autoatendimento Eleitoral que o app sugere (`URL_AUTOATENDIMENTO_ELEITOR`; o domínio antigo sumiu em 19/10); confirmar `/api/health` (`data.fase`, idade do pacote);
 decidir, conscientemente, se o texto gerado (`ask`) fica ligado durante o 2º turno (hoje está `on`; para desligar veja §3) e conferir `GET /api/health`; confirmar que ninguém tem deploy pendente.
 
 ## 7. O ciclo de auto-melhoria da IA (como funciona e como operar)

@@ -285,9 +285,11 @@ def carregar_resultados(cache: Path, state: dict):
             sit = clean(r.get("DS_SIT_TOT_TURNO"))
             if sit:
                 situacao[sq][turno] = sit
-            chave_cargo[sq] = (r.get("SG_UF"), r.get("DS_CARGO"))
+            # SG_UE é a unidade da ELEIÇÃO ("BR" para Presidente); SG_UF é a UF da linha (um município por linha), que para
+            # Presidente mudaria a cada arquivo e deixaria cada candidato num grupo diferente (percentuais de 100 %).
+            chave_cargo[sq] = (r.get("SG_UE") or r.get("SG_UF"), r.get("DS_CARGO"))
             ult_geracao = f"{r.get('DT_GERACAO', '')} {r.get('HH_GERACAO', '')}".strip()
-    # percentual sobre votos nominais válidos do mesmo cargo/UF/turno (majoritários)
+    # percentual sobre votos nominais válidos do mesmo cargo/unidade eleitoral/turno (majoritários; Presidente = BR)
     total = defaultdict(int)
     for sq, por_turno in votos.items():
         for turno, v in por_turno.items():

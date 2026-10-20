@@ -26,9 +26,9 @@ HEADER = ('"DT_GERACAO";"HH_GERACAO";"ANO_ELEICAO";"CD_TIPO_ELEICAO";"NM_TIPO_EL
           '"CD_SIT_TOT_TURNO";"DS_SIT_TOT_TURNO"')
 
 
-def linha(turno, uf, cargo, sq, nr, votos, sit, zona=1):
+def linha(turno, uf, cargo, sq, nr, votos, sit, zona=1, ue=None):
     campos = ['01/10/2026', '03:17:01', '2026', '2', 'Eleição Ordinária', str(turno), '6259', 'Eleição', '04/10/2026',
-              'E', uf, uf, 'ESTADO', '1', 'MUN', str(zona), '3', cargo, sq, nr, 'NOME COMPLETO', 'NOME URNA', '#NULO',
+              'E', uf, ue or uf, 'ESTADO', '1', 'MUN', str(zona), '3', cargo, sq, nr, 'NOME COMPLETO', 'NOME URNA', '#NULO',
               '12', 'APTO', '2', 'DEFERIDO', '-3', '#NE', '-3', '#NE', '-3', '#NE', 'PARTIDO ISOLADO',
               nr[:2], 'PT', 'PARTIDO', '-1', '#NULO#', '#NULO#', '#NULO#', '1', 'COL', 'PT', 'N', str(votos), 'Válido',
               str(votos), '1', sit]
@@ -52,6 +52,26 @@ class ResultadosTest(unittest.TestCase):
 
     def tearDown(self):
         self.tmp.cleanup()
+
+    def test_presidente_percentual_sobre_o_brasil_inteiro_e_nao_por_uf(self):
+        # Presidente: uma linha por município em CADA arquivo de UF (SG_UE = "BR"). O percentual é sobre a soma nacional,
+        # mesmo quando um candidato não aparece no último arquivo lido (regressão de 19/10/2026: 100 % e 99,92 %).
+        d = self.cache / 'extracted' / 'votacao_candidato_munzona'
+        (d / 'votacao_candidato_munzona_2026_RJ.csv').write_text('\n'.join([
+            HEADER,
+            linha(1, 'RJ', 'Presidente', '280001', '13', 300, '2º TURNO', ue='BR'),
+            linha(1, 'RJ', 'Presidente', '280002', '22', 500, '2º TURNO', ue='BR'),
+            linha(1, 'RJ', 'Presidente', '280003', '30', 200, 'NÃO ELEITO', ue='BR')]), encoding='latin-1')
+        (d / 'votacao_candidato_munzona_2026_TO.csv').write_text('\n'.join([
+            HEADER,
+            linha(1, 'TO', 'Presidente', '280001', '13', 700, '2º TURNO', ue='BR'),
+            linha(1, 'TO', 'Presidente', '280002', '22', 300, '2º TURNO', ue='BR')]), encoding='latin-1')
+        res, _ = build.carregar_resultados(self.cache, {'votacao_candidato_munzona': {'vazio': False}})
+        self.assertEqual(res['280001']['1']['votos'], 1000)
+        self.assertAlmostEqual(res['280001']['1']['percentual'], 50.0, places=2)   # 1000 / 2000
+        self.assertAlmostEqual(res['280002']['1']['percentual'], 40.0, places=2)   # 800 / 2000
+        self.assertAlmostEqual(res['280003']['1']['percentual'], 10.0, places=2)   # 200 / 2000 (só aparece no RJ)
+        self.assertAlmostEqual(res['250001']['1']['percentual'], 71.43, places=2)  # governador de SP não muda
 
     def test_agrega_votos_por_candidato_e_calcula_percentual_majoritario(self):
         res, meta = build.carregar_resultados(self.cache, {'votacao_candidato_munzona': {'vazio': False}})

@@ -431,6 +431,14 @@
    "intent": "LOCAL_VOTACAO"
   },
   {
+   "q": "Não votei no primeiro turno, posso votar no segundo?",
+   "intent": "LOCAL_VOTACAO"
+  },
+  {
+   "q": "Meu local de votação mudou para o 2º turno?",
+   "intent": "LOCAL_VOTACAO"
+  },
+  {
    "q": "Como funciona a biometria?",
    "intent": "LOCAL_VOTACAO"
   },

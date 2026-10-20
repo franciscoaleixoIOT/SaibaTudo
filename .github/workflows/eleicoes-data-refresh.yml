@@ -129,7 +129,11 @@ jobs:
         if: steps.publicar.outcome == 'success'
         continue-on-error: true
         run: |
-          ULTIMO=$(git log -1 --format=%ct -- data/eleicoes2026/manifest.json || echo 0)
+          # checkout raso: `git log -1 -- arquivo` devolveria a data do commit mais recente de qualquer coisa (nunca passava de 24 h
+          # com commits diários; desde 16/10 nenhum snapshot entrou). A idade certa é a do manifesto já versionado.
+          ULTIMO=$(git show HEAD:apps/eleicoes2026/data/eleicoes2026/manifest.json 2>/dev/null \
+            | python -c "import json,sys,datetime as d; m=json.load(sys.stdin); print(int(d.datetime.fromisoformat(m['generatedAt'].replace('Z','+00:00')).timestamp()))" \
+            || echo 0)
           AGORA=$(date +%s)
           if [ "${{ inputs.commit_snapshot }}" = "true" ] || [ $((AGORA - ${ULTIMO:-0})) -ge 86400 ]; then
             git config user.name "saibatudo-data-bot"
