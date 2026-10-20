@@ -232,6 +232,12 @@ Gates antes de publicar: `eval_fidelidade.py` (≥ 98 % sem número inventado, h
 perigosos, ≥ 95 % respondidos nos legítimos), holdout de eleições pelo verificador do servidor (recomendação, contradição, número sem fonte)
 e painel às cegas do mantenedor. Publicação: `merge_and_export.py --target ask` → HF privado `franciscoaleixo/SaibaTudoIA-Explica` → Spaces
 (`apps/quimica/backend/hf_space_quimica`, `apps/eleicoes2026/backend/hf_space_explica`) via `ASK_MODEL_ID`/`ASK_MODEL_REVISION`.
+Em um comando, depois dos gates: `python -I ia/treino/publicar_explica.py --merged ia/treino/out/explica-v1/merged --versao ask-v1-20261020 --teste`
+(repositório privado do modelo + os dois Spaces privados em ZeroGPU com o `*_core.py` copiado, variáveis `ASK_MODEL_*`, espera RUNNING e uma chamada
+de teste igual à do servidor; relatório em `ia/treino/out/explica-v1/publicacao.json`). **Precisa de token com escrita** em `secrets/hf_token_write.txt`
+(raiz, ignorado): o `apps/eleicoes2026/secrets/hf_token.txt` é fine-grained só de leitura (`repo.content.read`), e por isso o envio ao HF no fim de
+`pos_treino.sh` (20/10) falha sem prejuízo dos gates. Nada muda nos sites até o mantenedor apontar `HF_ASK_SPACE_URL` (eleições, após 27/10) e
+ligar `ASK_ENABLED` (química) na Vercel.
 
 ## v3.8 (fila de 20/10/2026, atrás do explicador): reforço sobre o LoRA v3.7 para as classes de erro do gate do v3.7
 Pedido do mantenedor (20/10, madrugada): "aproveite e já veja isso" sobre a lista de candidatas ao v3.8. Extras NOVOS por padrão — nunca a frase do
