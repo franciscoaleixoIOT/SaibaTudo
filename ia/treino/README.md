@@ -232,6 +232,10 @@ Gates antes de publicar: `eval_fidelidade.py` (≥ 98 % sem número inventado, h
 perigosos, ≥ 95 % respondidos nos legítimos), holdout de eleições pelo verificador do servidor (recomendação, contradição, número sem fonte)
 e painel às cegas do mantenedor. Publicação: `merge_and_export.py --target ask` → HF privado `franciscoaleixo/SaibaTudoIA-Explica` → Spaces
 (`apps/quimica/backend/hf_space_quimica`, `apps/eleicoes2026/backend/hf_space_explica`) via `ASK_MODEL_ID`/`ASK_MODEL_REVISION`.
+Holdout de eleições (188 pares nunca vistos): `python -I backend/retrain/avaliar_explica_holdout.py --gguf <model-Q4_K_M.gguf>` (de
+`apps/eleicoes2026`; prompt idêntico ao do treino e do Space) → `node backend/retrain/verificar_holdout_explica.mjs backend/retrain/out-ask/holdout_respostas.jsonl`
+(verificador do servidor + recusa sem número + "dado não disponível" + rodapé "pode conter erros"; mínimo 95 %). As 188 saídas esperadas passam 100 %
+depois da correção do falso positivo de `respostaRecomenda` (20/10; PROJECT_MEMORY de eleições §11).
 Em um comando, depois dos gates: `python -I ia/treino/publicar_explica.py --merged ia/treino/out/explica-v1/merged --versao ask-v1-20261020 --teste`
 (repositório privado do modelo + os dois Spaces privados em ZeroGPU com o `*_core.py` copiado, variáveis `ASK_MODEL_*`, espera RUNNING e uma chamada
 de teste igual à do servidor; relatório em `ia/treino/out/explica-v1/publicacao.json`). **Precisa de token com escrita** em `secrets/hf_token_write.txt`

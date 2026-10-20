@@ -37,6 +37,22 @@ test('respostaRecomenda pega recomendação, favoritismo e previsão', () => {
   ]) assert.ok(!respostaRecomenda(t), t);
 });
 
+test('respostaRecomenda não barra regras de votação nem a recusa neutra do app (textos institucionais ecoados pela IA, 20/10/2026)', () => {
+  for (const t of [
+    'Em 2026 cada eleitor vota em DOIS senadores (renovação de 2/3 do Senado).',
+    'Como votar em branco: aperte BRANCO e CONFIRMA. O voto em branco e o voto nulo não contam como válidos.',
+    'Não votei no 1º turno, posso votar no 2º? Cada turno é uma eleição independente.',
+    'Quem votou no 1º turno pode votar no segundo turno normalmente.',
+    'Vote em quem quiser: a decisão do voto é sua.',
+    'Não indico, recomendo, comparo nem prevejo candidatos: a decisão do voto é sua (Res. TSE 23.755/2026).',
+    'O aplicativo não recomenda candidatos; mostra os dados oficiais do TSE.',
+  ]) assert.ok(!respostaRecomenda(t), t);
+  for (const t of [
+    'Vote no 13 para presidente.', 'Vote em FULANO, o candidato do partido.', 'Vote na candidata do seu estado, a BELTRANA.',
+    'Não indico candidatos, mas vote em FULANO.', 'Vote nele no segundo turno.',
+  ]) assert.ok(respostaRecomenda(t), t);
+});
+
 test('números: aceita os do contexto, da pergunta e das regras; rejeita os inventados', () => {
   const context = 'FULANO (nº 13, PT) — 1.234.567 votos (46,10%)';
   assert.deepEqual(numerosNaoFundamentados('FULANO, nº 13, teve 1.234.567 votos (46,10%).', { context }), []);

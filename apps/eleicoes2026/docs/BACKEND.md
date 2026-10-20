@@ -104,6 +104,10 @@ Neutralidade e verificação (`api/_lib/neutralidade.js`, Res. TSE 23.755/2026):
 | 422 | `neutrality` | a **pergunta** pede recomendação, comparação ou previsão de candidatos (ou tenta ignorar as regras): nem chega ao Modal, sem custo de GPU |
 | 422 | `rejected` | a **resposta** gerada recomenda/prevê candidatos, contradiz a regra do 2º turno (CF arts. 28 e 77) ou traz números que não estão na pergunta, no contexto enviado nem nas regras autorizadas |
 
+Não contam como recomendação (20/10/2026): regras de votação com objeto genérico depois de "vote em/no/na" ("vota em dois senadores", "voto em
+branco", "votar no 2º turno", "vote em quem quiser") e a recusa neutra do próprio app ("Não indico, recomendo, comparo nem prevejo candidatos").
+"Vote no 13", "vote em FULANO", "vote nele" e "você deve votar em…" continuam descartados (`api/test/neutralidade.test.mjs`).
+
 Nada é "corrigido" com texto fixo: resposta reprovada vira erro e o cliente fica com a resposta local, montada só dos dados. O texto exibido
 é rotulado "Texto gerado por IA … pode conter erros". **Pré-condição para religar em escala:** montar o contexto no servidor a partir do
 pacote assinado (hoje o cliente o fornece), medir o custo real da GPU (`modal run backend/modal/qwen7b_awq_app.py::bench`) e testar o

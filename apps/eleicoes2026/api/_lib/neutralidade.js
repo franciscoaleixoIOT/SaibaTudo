@@ -38,6 +38,13 @@ export function pedeRecomendacao(pergunta) {
   return RX_PEDIDO.some((rx) => rx.test(t));
 }
 
+// Objetos GENÉRICOS depois de "vote em/no/na": são regras de votação, não recomendação ("vota em dois senadores", "voto em branco",
+// "votar no 2º turno", "vote em quem quiser"): o objeto sai e o verbo fica ("você deve votar" continua barrado). Um número de 2+
+// dígitos ("vote no 13") ou um nome continua sendo recomendação.
+const RX_VOTE_EM_GENERICO = /\b(vote|votem|vota|votar|voto)\s+(?:em|no|na)\s+(?:branco|nulo|transito|legenda|dois|duas|um|uma|cada|todos|todas|qualquer|quem|que|quantos|candidatos|candidaturas|seu|sua|urna|secao|cabine|turno|dia|data|cidade|estado|municipio|local|exterior|outr\w+|mesm\w+|(?:1|2|primeiro|segundo)(?:\s*[oa])?\b(?!\s*\d))\b/g;
+// A recusa neutra do próprio app ("Não indico, recomendo, comparo nem prevejo candidatos: a decisão do voto é sua") não é recomendação.
+const RX_RECUSA_NEUTRA = /\bnao (?:(?:indico|indica|indicamos|recomendo|recomenda|recomendamos|sugiro|sugere|sugerimos|aconselho|aconselha|aconselhamos|comparo|compara|comparamos|prevejo|preve|prevemos)\b\s*(?:nem|e|ou)?\s*)+(?:candidatos|candidaturas|chapas|votos?)\b/g;
+
 const RX_RESPOSTA = [
   /\b(vote|votem|vota|votar|voto)\s+(em|no|na|nele|nela)\b/,
   /\b(recomend\w*|sugir\w*|suger\w*|indic\w*|indiq\w*|aconselh\w*)\b[^.\n]{0,80}\b(candidat\w*|voto|votar|vote)\b/,
@@ -50,7 +57,8 @@ const RX_RESPOSTA = [
 
 /** A resposta gerada recomenda, compara ou prevê candidatos? */
 export function respostaRecomenda(resposta) {
-  const t = fold(String(resposta ?? '')).replace(/[^a-z0-9 .\n]+/g, ' ').replace(/[ \t]+/g, ' ');
+  const t = fold(String(resposta ?? '')).replace(/[^a-z0-9 .\n]+/g, ' ').replace(/[ \t]+/g, ' ')
+    .replace(RX_VOTE_EM_GENERICO, '$1 ').replace(RX_RECUSA_NEUTRA, ' ');
   return RX_RESPOSTA.some((rx) => rx.test(t));
 }
 
