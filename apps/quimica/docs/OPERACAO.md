@@ -120,6 +120,8 @@ O workflow semanal não completa o build no GitHub (`PENDENCIAS.md` §9.b); quem
 3. **Comparar com o publicado:** `python tools/comparar_pacotes.py --novo data/quimica --anterior https://saibatudo.net/quimica/data/` (§2.1). Reprovou? Corrija ou aceite com `--permitir`, **depois de ler** cada achado.
 4. **Medir a cota:** `python tools/vercel_cota.py --minimo N` (N = arquivos novos esperados).
 5. **Publicar:** `vercel deploy --prod --yes --token "$VERCEL_TOKEN_TIME"` (o token vem de `secrets/` da raiz para a variável de ambiente; **nunca** no chat nem no Git).
+   **Antes, `git pull`:** a CLI envia o diretório local inteiro, inclusive `data/quimica`. Em 20/10/2026 um deploy local feito 4 min depois do refresh
+   semanal (que já publicara o snapshot de 20/10) devolveu o pacote de 18/10 ao ar; bastou puxar o commit `chore(data)` e publicar de novo.
 6. **Conferir ao vivo:** `GET /quimica/api/health` (`data.version` = a do manifesto novo) e `https://saibatudo.net/quimica/data/manifest.json`.
 7. **Versionar:** `git add apps/quimica/data/quimica`, commit (`chore(data): ...`) e push; depois `gh run list --limit 10` para conferir **todos** os workflows disparados. Pacote com mais de 300 arquivos:
    separar do commit de código (`CLAUDE.md` da raiz, regra 6).

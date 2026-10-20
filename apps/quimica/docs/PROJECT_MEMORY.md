@@ -337,6 +337,15 @@ O frio de 16,7 s na primeira chamada é o restauro do snapshot + inferência; o 
 inicial maior: feito às 00h40 — `config.js` padrão 20000 / teto 45000, `api/nlu.js` `maxDuration: 50`, site 20 s / 45 s, Android 20 s / 45 s
 (próximo release); `MODAL_TIMEOUT_MS=35000` na Vercel fica para o mantenedor. Volta do modelo em um comando (`promover.py --rollback`). Docs: README do treino §v3.7, MODELO §13, PENDENCIAS §13, CALCULADORAS §6.
 
+### 6.z. 20/10/2026 (05h50): refresh semanal desbloqueado (issue #19) e tempos da nuvem publicados
+Depois da promoção do v3.7, o refresh semanal que a issue #19 bloqueara (CID 12836 difenilcloroarsina fora do núcleo por 1 sitelink no limite dos 2.000;
+casas decimais vinham de checkout anterior a 456ceca) foi rodado de novo com `-f permitir=compostos-sumiram:12836` (run 39364916350): aprovado, snapshot
+`715f510` (pacote 20261020T033339Z), issue #19 fechada pelo próprio workflow e #17 (alerta de frescor) fechada pelo `quimica-data-freshness.yml` disparado
+à mão. **Lição:** o deploy local dos tempos novos (commit f0eb20c; `MODAL_TIMEOUT_MS` 20 s/45 s) saiu 4 min depois do refresh e devolveu o pacote de
+18/10 ao ar, porque a CLI da Vercel sobe o diretório local inteiro — `git pull` e novo `vercel deploy --prod` resolveram (health `715f510`, `packageAgeDays: 0`).
+Registrado em OPERACAO §5 passo 5. Em paralelo (git-ignorado em `ia/treino/out/`): treino do explicador SaibaTudo IA (QLoRA Qwen3-4B, 4.724 pares) em curso
+(ETA ~09h) com cadeia pós-treino automática (fusão → GGUF + gates → HF privado `franciscoaleixo/SaibaTudoIA-Explica`), e NLU v3.8 (extras_v38) na fila da GPU.
+
 ## 7. Contas e segredos
 Vercel `saibatudo-quimica` (time `franciscoaleixo-9696`); GitHub `franciscoaleixoIOT`; Hugging Face `franciscoaleixo` (PRO, 40 min/dia de ZeroGPU); Modal `franciscoaleixo/main` (US$ 30/mês grátis; já usados pelo app de eleições, ~US$ 5/mês).
 `secrets/data_signing_key.pem` (nova, exclusiva deste app; pública em `pipeline/data_signing_public.pem`). Fazer backup offline. Modal: app `SaibaTudoIA-NLU-Quimica`, Volume `SaibaTudoIA-Models-Quimica` (nomes desde 14/10/2026; os antigos `saibatudo-quimica-*` foram apagados), par de Proxy Auth Token criado pelo mantenedor em 13/10/2026 (guardado em `secrets/modal_proxy_quimica.env` da raiz do monorepo, ignorado, e como variáveis sensíveis na Vercel; nunca no Git nem no chat).
