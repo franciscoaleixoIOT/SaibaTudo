@@ -1066,7 +1066,8 @@ export class AnswerBuilder {
     const onde = uf !== 'BR' ? ` ${ufEm(uf)}` : '';
     let texto;
     if (eleitos.length > 0) {
-      texto = `Eleito${eleitos.length > 1 ? 's' : ''} para ${tituloCargo(cargo)}${onde} segundo o TSE:` +
+      // o total vai no cabeçalho: a lista pode ser longa (70 deputados em SP) e a IA da nuvem recebe o texto cortado (21/10/2026)
+      texto = `Eleito${eleitos.length > 1 ? 's' : ''} para ${tituloCargo(cargo)}${onde} segundo o TSE${eleitos.length > 1 ? ` (${eleitos.length})` : ''}:` +
         eleitos.map((c) => `\n• ${c.numero} — ${c.nomeUrna} (${c.partido})`).join('');
     } else if (daqui.length > 0) {
       // Classificados ao 2º turno vêm na situação do 1º turno ("2º TURNO"), não em situacaoTotalizacao: sem este ramo a resposta

@@ -113,12 +113,26 @@ export function contradizSegundoTurno(resposta) {
 }
 
 /**
+ * Consulta só sobre cargo LEGISLATIVO (deputado/senador, sem presidente nem governador na pergunta ou no contexto) e o texto aplica a regra
+ * do Executivo ("50% dos votos válidos", "maioria absoluta"): deputados e senadores são eleitos em turno único, e o modelo costuma colar essa regra
+ * ("nenhum candidato obteve mais de 50% dos votos válidos, então não houve segundo turno" para deputado federal — relato de 21/10/2026).
+ */
+export function contradizLegislativo(resposta, { q = '', context = '' } = {}) {
+  const escopo = fold(`${q}\n${context}`);
+  if (!/\b(deputad|senad)\w*/.test(escopo) || /\b(president|governador)\w*/.test(escopo)) return false;
+  const r = fold(String(resposta ?? ''));
+  // só a regra do Executivo aplicada ao Legislativo ("50% dos votos válidos", "maioria absoluta"); datas e "não disputam 2º turno" passam
+  return /\b50\s*%|\bmaioria absoluta\b|\bmetade dos votos\b|\bvotos validos\b/.test(r);
+}
+
+/**
  * Verificação final da resposta gerada. Devolve { ok:true } ou { ok:false, motivo }.
- * Motivos: 'recomendacao' | 'numero_sem_fonte' | 'contradicao_2t' | 'contradiz_dados' | 'contagem_sem_fonte'.
+ * Motivos: 'recomendacao' | 'numero_sem_fonte' | 'contradicao_2t' | 'contradicao_legislativo' | 'contradiz_dados' | 'contagem_sem_fonte'.
  */
 export function verificarRespostaAsk(resposta, { q = '', context = '' } = {}) {
   if (respostaRecomenda(resposta)) return { ok: false, motivo: 'recomendacao' };
   if (contradizSegundoTurno(resposta)) return { ok: false, motivo: 'contradicao_2t' };
+  if (contradizLegislativo(resposta, { q, context })) return { ok: false, motivo: 'contradicao_legislativo' };
   if (contradizDadosDoApp(resposta, context)) return { ok: false, motivo: 'contradiz_dados' };
   const contagens = contagensSemFonte(resposta, { q, context });
   if (contagens.length > 0) return { ok: false, motivo: 'contagem_sem_fonte', numeros: contagens.slice(0, 5) };
@@ -164,12 +178,14 @@ export function contradizDadosDoApp(resposta, context = '') {
 export function contagensSemFonte(resposta, { q = '', context = '' } = {}) {
   const permitidos = numerosDe(`${q}\n${context}`);
   const t = fold(String(resposta ?? ''));
+  // "Total de deputados eleitos: 10" (dois-pontos) e "10 deputados eleitos" entraram em 21/10/2026: o modelo contou uma lista cortada
   const rx = new RegExp(
-    '\\b(?:total|numero|quantidade)\\b[^.\\n]{0,70}?\\b(?:e|sao|foi|eram|de)\\s+(?:de\\s+)?(\\d{1,6})\\b(?!\\s*(?:%|digitos|de outubro|\\/))|' +
-    '\\b(?:sao|ha|existem|temos|foram|constam|disputam)\\s+(\\d{1,6})\\s+(?:candidat|concorrent|nomes|pessoas|chapas|postulantes)', 'g');
+    '\\b(?:total|numero|quantidade)\\b[^.\\n]{0,70}?(?:\\b(?:e|sao|foi|eram|de)\\s+(?:de\\s+)?|:\\s*)(\\d{1,6})\\b(?!\\s*(?:%|digitos|de outubro|\\/))|' +
+    '\\b(?:sao|ha|existem|temos|foram|constam|disputam)\\s+(\\d{1,6})\\s+(?:candidat|concorrent|nomes|pessoas|chapas|postulantes)|' +
+    '\\b(\\d{1,6})\\s+(?:deputad\\w*|senador\\w*|candidat\\w*|governador\\w*)\\s+(?:eleit|classificad|foram eleit)', 'g');
   const sobras = [];
   for (const m of t.matchAll(rx)) {
-    const n = (m[1] ?? m[2]).replace(/^0+(?=\d)/, '');
+    const n = (m[1] ?? m[2] ?? m[3]).replace(/^0+(?=\d)/, '');
     if (!permitidos.has(n)) sobras.push(n);
   }
   return [...new Set(sobras)];

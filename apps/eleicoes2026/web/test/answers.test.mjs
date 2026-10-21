@@ -103,8 +103,10 @@ test('"quem já ganhou no 1o turno para governador?" é resultado (não listagem
   }
   const senado = await responder('quais senadores foram eleitos?', { hoje: '2026-10-21' });
   assert.ok(senado.directAnswer.includes('Senador — 1º turno') && senado.directAnswer.includes('Eleitos ('), senado.directAnswer.slice(0, 160));
-  // Deputado continua pedindo a UF (lista longa demais para um resumo nacional)
+  // Deputado continua pedindo a UF (lista longa demais para um resumo nacional); com UF, o total vai no cabeçalho (a nuvem recebe a lista cortada)
   assert.ok((await responder('quem foi eleito deputado federal?', { hoje: '2026-10-21' })).directAnswer.includes('De qual estado?'));
+  const sp = await responder('quem já ganhou no 1o turno para deputado?', { hoje: '2026-10-21', uf: 'SP', apuracao: { obter: async () => null } });
+  assert.match(sp.directAnswer, /Eleitos para Deputado Federal em São Paulo segundo o TSE \(\d{2}\):/, sp.directAnswer.slice(0, 200));
 });
 
 test('segundo turno: antes da apuração explica a regra; depois consulta o resultado', async () => {

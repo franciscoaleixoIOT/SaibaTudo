@@ -130,7 +130,7 @@ internal fun AnswerBuilder.respostaResultadosCsv(p: ParsedQuery, cargo: String, 
     val eleitos = daqui.filter { it.resultado?.eleito == true }
     val onde = if (uf != "BR") " ${Ufs.em(uf)}" else ""
     val texto = when {
-        eleitos.isNotEmpty() -> "Eleito${if (eleitos.size > 1) "s" else ""} para ${tituloCargo(cargo)}$onde segundo o TSE:" +
+        eleitos.isNotEmpty() -> "Eleito${if (eleitos.size > 1) "s" else ""} para ${tituloCargo(cargo)}$onde segundo o TSE${if (eleitos.size > 1) " (${eleitos.size})" else ""}:" +
             eleitos.joinToString("") { "\n• ${it.numero} — ${it.nomeUrna} (${it.partido})" }
         daqui.isNotEmpty() -> "O TSE já publicou a situação de totalização, mas ainda não há eleito definido para ${tituloCargo(cargo)}$onde:" +
             daqui.filter { it.resultado?.situacaoTotalizacao != null }.take(6).joinToString("") { "\n• ${it.nomeUrna}: ${it.resultado?.situacaoTotalizacao}" }

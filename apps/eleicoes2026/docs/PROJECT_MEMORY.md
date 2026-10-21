@@ -289,6 +289,15 @@ Lição repetida: não dizer "corrigido" sem reproduzir antes e depois. Padrões
   os estados", "quais estados"); "quem foi eleito governador?" com UF padrão continua respondendo o estado. Deputados continuam pedindo a UF. Mesmo
   texto no site (`answers.js`) e no Android (`RespostasResultados.kt`). A nuvem (SaibaTudo IA/Modal) só interpreta; a resposta é montada pelo
   mesmo motor, por isso falhava igual. Testes: web 180, Android (AnswerBuilderTest, NomeCandidatoTest). Modelo da nuvem inalterado.
+- **21/10 (06h):** segundo relato: "quem já ganhou no 1o turno para deputado" mostrou "Total de deputados eleitos: 10 / Nenhum candidato
+  obteve mais de 50% dos votos válidos, então não houve segundo turno". Esse texto não existe no app: é a **resposta generativa da nuvem**
+  (Qwen 7B via `/api/ask`), que recebeu a lista dos 70 eleitos de SP cortada em 1.800 caracteres (`resumoParaContexto`), contou "10" e colou a
+  regra do Executivo. O motor local responde certo. Dois buracos do verificador fechados em `api/_lib/neutralidade.js`: (1) `contagensSemFonte`
+  não casava "Total de … eleitos: 10" (dois-pontos) nem "10 deputados eleitos"; (2) novo `contradizLegislativo`: consulta só de deputado/senador
+  (sem presidente/governador na pergunta ou no contexto) com texto que aplica a regra do Executivo ("50% dos votos válidos", "maioria absoluta")
+  é descartada (`motivo: contradicao_legislativo`); datas e "não disputam 2º turno" passam. E o cabeçalho da lista de eleitos pelo pacote agora
+  traz o total — "Eleitos para Deputado Federal em São Paulo segundo o TSE (70):" — no site e no Android, para a nuvem receber o número certo
+  mesmo com a lista cortada. Testes: API 230 (+1), web 179, Android AnswerBuilderTest/paridade.
 - **20/10 (madrugada):** (1) **tempos da nuvem maiores** (pedido do mantenedor: "o tempo inicial tem que ser maior; depois da primeira a segunda
   funciona"): a partida a frio do Modal mediu 16,7 s ao vivo na química; `MODAL_TIMEOUT_MS` padrão 20000 e teto 45000 (`config.js`), `api/nlu.js`
   `maxDuration: 50`, site 20 s automático / 45 s explícito (`cloud.js`); Vercel `MODAL_TIMEOUT_MS=30000` fica para o mantenedor (bloqueio do
