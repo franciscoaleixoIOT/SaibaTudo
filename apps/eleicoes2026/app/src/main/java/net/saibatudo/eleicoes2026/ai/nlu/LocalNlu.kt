@@ -40,17 +40,68 @@ object LocalNlu {
     /** Siglas de UF que coincidem com palavras comuns: só valem após preposição/“estado”/“uf” ou em maiúsculas. */
     private val SIGLAS_AMBIGUAS = setOf("se", "pa", "to", "ma", "al", "am", "go", "es", "ac", "ap", "pe", "pi", "ro", "rr")
 
+    // Mesma lista de nlu.js (TEMAS), inclusive os temas finos de 21/10/2026 (alfabetização, hospitais, ferrovias...) -> macrotemas do pacote;
+    // conferida por contracts/propostas_cases.json (PropostasCasesTest.kt).
     private val TEMAS = mapOf(
-        "saude" to "saude", "educacao" to "educacao", "escola" to "educacao", "seguranca" to "seguranca",
-        "seguranca publica" to "seguranca", "economia" to "economia", "emprego" to "economia",
-        "meio ambiente" to "meio_ambiente", "ambiente" to "meio_ambiente", "transporte" to "transporte",
-        "mobilidade" to "transporte", "moradia" to "moradia", "habitacao" to "moradia", "agro" to "agro",
-        "agropecuaria" to "agro", "agricultura" to "agro", "cultura" to "cultura", "esporte" to "esporte",
-        "tecnologia" to "tecnologia", "inovacao" to "tecnologia", "ciencia" to "tecnologia",
-        "assistencia social" to "assistencia", "saneamento" to "saneamento", "energia" to "energia",
-        "infraestrutura" to "infraestrutura", "transparencia" to "transparencia", "corrupcao" to "transparencia",
-        "mulheres" to "mulheres", "juventude" to "juventude", "jovens" to "juventude", "idosos" to "idosos",
-        "turismo" to "turismo", "pessoa com deficiencia" to "pcd", "acessibilidade" to "pcd"
+        "saude" to "saude", "educacao" to "educacao", "escola" to "educacao", "seguranca" to "seguranca", "seguranca publica" to "seguranca",
+        "economia" to "economia", "emprego" to "economia", "meio ambiente" to "meio_ambiente", "ambiente" to "meio_ambiente",
+        "transporte" to "transporte", "mobilidade" to "transporte", "moradia" to "moradia", "habitacao" to "moradia", "agro" to "agro",
+        "agropecuaria" to "agro", "agricultura" to "agro", "cultura" to "cultura", "esporte" to "esporte", "tecnologia" to "tecnologia",
+        "inovacao" to "tecnologia", "ciencia" to "tecnologia", "assistencia social" to "assistencia", "saneamento" to "saneamento",
+        "energia" to "energia", "infraestrutura" to "infraestrutura", "transparencia" to "transparencia", "corrupcao" to "transparencia",
+        "mulheres" to "mulheres", "juventude" to "juventude", "jovens" to "juventude", "idosos" to "idosos", "turismo" to "turismo",
+        "pessoa com deficiencia" to "pcd", "acessibilidade" to "pcd", "alfabetizacao" to "educacao", "ensino superior" to "educacao",
+        "ensino tecnico" to "educacao", "ensino profissionalizante" to "educacao", "ensino medio" to "educacao", "ensino fundamental" to "educacao",
+        "valorizacao docente" to "educacao", "professores" to "educacao", "professor" to "educacao", "infraestrutura escolar" to "educacao",
+        "tecnologia na educacao" to "educacao", "educacao basica" to "educacao", "educacao inclusiva" to "educacao",
+        "educacao infantil" to "educacao", "creches" to "educacao", "creche" to "educacao", "universidades" to "educacao",
+        "universidade" to "educacao", "escolas" to "educacao", "merenda escolar" to "educacao", "evasao escolar" to "educacao",
+        "qualificacao profissional" to "educacao", "hospitais" to "saude", "hospital" to "saude", "medicamentos" to "saude",
+        "atencao primaria" to "saude", "atencao basica" to "saude", "saude mental" to "saude", "saude da familia" to "saude", "vacinacao" to "saude",
+        "vacinas" to "saude", "telemedicina" to "saude", "gestao hospitalar" to "saude", "profissionais de saude" to "saude",
+        "postos de saude" to "saude", "upa" to "saude", "crime organizado" to "seguranca", "policia" to "seguranca", "policiamento" to "seguranca",
+        "violencia" to "seguranca", "presidios" to "seguranca", "sistema prisional" to "seguranca", "inteligencia policial" to "seguranca",
+        "protecao de fronteiras" to "seguranca", "fronteiras" to "seguranca", "seguranca viaria" to "seguranca",
+        "seguranca cibernetica" to "seguranca", "defesa civil" to "seguranca", "geracao de renda" to "economia", "empreendedorismo" to "economia",
+        "micro e pequenas empresas" to "economia", "pequenas empresas" to "economia", "atracao de investimentos" to "economia",
+        "investimentos" to "economia", "comercio exterior" to "economia", "exportacoes" to "economia", "inflacao" to "economia",
+        "impostos" to "economia", "tributos" to "economia", "reforma tributaria" to "economia", "gestao fiscal" to "economia",
+        "orcamento publico" to "economia", "divida publica" to "economia", "politica industrial" to "economia", "industria" to "economia",
+        "desenvolvimento regional" to "economia", "economia criativa" to "economia", "economia verde" to "economia", "renda" to "economia",
+        "salario minimo" to "economia", "credito" to "economia", "desmatamento" to "meio_ambiente", "biodiversidade" to "meio_ambiente",
+        "bioeconomia" to "meio_ambiente", "credito de carbono" to "meio_ambiente", "carbono" to "meio_ambiente",
+        "mudancas climaticas" to "meio_ambiente", "clima" to "meio_ambiente", "sustentabilidade" to "meio_ambiente",
+        "sustentavel" to "meio_ambiente", "sustentaveis" to "meio_ambiente", "desenvolvimento sustentavel" to "meio_ambiente",
+        "preservacao ambiental" to "meio_ambiente", "unidades de conservacao" to "meio_ambiente", "recursos hidricos" to "meio_ambiente",
+        "poluicao" to "meio_ambiente", "queimadas" to "meio_ambiente", "amazonia" to "meio_ambiente", "reciclagem" to "meio_ambiente",
+        "energias renovaveis" to "energia", "energia renovavel" to "energia", "eficiencia energetica" to "energia",
+        "transicao energetica" to "energia", "energia solar" to "energia", "energia eolica" to "energia", "combustiveis" to "energia",
+        "petroleo" to "energia", "gas natural" to "energia", "eletricidade" to "energia", "conta de luz" to "energia", "ferrovias" to "transporte",
+        "ferrovia" to "transporte", "hidrovias" to "transporte", "rodovias" to "transporte", "rodovia" to "transporte", "portos" to "transporte",
+        "aeroportos" to "transporte", "portos e aeroportos" to "transporte", "mobilidade urbana" to "transporte",
+        "transporte publico" to "transporte", "transporte coletivo" to "transporte", "logistica" to "transporte",
+        "infraestrutura logistica" to "transporte", "onibus" to "transporte", "metro" to "transporte", "trens" to "transporte",
+        "obras" to "infraestrutura", "iluminacao" to "infraestrutura", "zeladoria" to "infraestrutura", "pavimentacao" to "infraestrutura",
+        "asfalto" to "infraestrutura", "planejamento urbano" to "infraestrutura", "integracao nacional" to "infraestrutura",
+        "controle interno" to "transparencia", "auditoria" to "transparencia", "combate a corrupcao" to "transparencia",
+        "participacao cidada" to "transparencia", "governo digital" to "transparencia", "eficiencia administrativa" to "transparencia",
+        "atendimento ao cidadao" to "transparencia", "servico publico" to "transparencia", "gestao publica" to "transparencia",
+        "compras publicas" to "transparencia", "desburocratizacao" to "transparencia", "combate a fome" to "assistencia", "fome" to "assistencia",
+        "pobreza" to "assistencia", "bolsa familia" to "assistencia", "programas sociais" to "assistencia",
+        "vulnerabilidade social" to "assistencia", "inclusao social" to "assistencia", "igualdade de oportunidades" to "assistencia",
+        "seguranca alimentar" to "assistencia", "protecao a infancia" to "assistencia", "infancia" to "assistencia", "pessoa idosa" to "idosos",
+        "pessoas idosas" to "idosos", "terceira idade" to "idosos", "idoso" to "idosos", "fomento as artes" to "cultura", "artes" to "cultura",
+        "patrimonio historico" to "cultura", "patrimonio cultural" to "cultura", "museus" to "cultura", "habitacao popular" to "moradia",
+        "regularizacao fundiaria" to "moradia", "deficit habitacional" to "moradia", "casa propria" to "moradia", "aluguel social" to "moradia",
+        "saneamento basico" to "saneamento", "esgoto" to "saneamento", "agua tratada" to "saneamento", "residuos solidos" to "saneamento",
+        "gestao de residuos" to "saneamento", "lixo" to "saneamento", "coleta de lixo" to "saneamento", "inovacao tecnologica" to "tecnologia",
+        "inovacao no setor produtivo" to "tecnologia", "inclusao digital" to "tecnologia", "internet" to "tecnologia",
+        "conectividade" to "tecnologia", "startups" to "tecnologia", "inteligencia artificial" to "tecnologia",
+        "pesquisa cientifica" to "tecnologia", "ciencia e tecnologia" to "tecnologia", "agricultura familiar" to "agro", "agronegocio" to "agro",
+        "assistencia tecnica rural" to "agro", "produtores rurais" to "agro", "produtor rural" to "agro", "irrigacao" to "agro",
+        "pecuaria" to "agro", "seguro rural" to "agro", "rural" to "agro", "turismo sustentavel" to "turismo", "esporte de base" to "esporte",
+        "alto rendimento" to "esporte", "atletas" to "esporte", "lazer" to "esporte", "lazer comunitario" to "esporte",
+        "violencia contra a mulher" to "mulheres", "igualdade de genero" to "mulheres"
     )
     private val RX_TEMAS = TEMAS.entries.sortedByDescending { it.key.length }.map { Regex("""\b${Regex.escape(it.key)}\b""") to it.value }
 
@@ -153,7 +204,15 @@ object LocalNlu {
             """\bvoto (e |eh )?obrigatori\w*|\bobrigad\w* a votar\b|\bobrigatori\w* (votar|o voto)\b|\bvoto facultativo\b|\bfacultativ\w*\b|""" +
             """\bquem (e|eh) obrigado\b|\bvotos validos\b|\bse eu nao votar\b|\bmulta\b"""
     )
-    private val RX_PLANO = Regex("""\bplanos? de governo\b|\bprogramas? de governo\b|\bpropostas?\b|\bplano\b""")
+    private val RX_PLANO = Regex("""\bplanos? de governo\b|\bprogramas? de governo\b|\bpropostas?\b|\bplano\b|\bplataformas? eleitora\w*\b|\bdiretrizes\b|\bprioridades\b|\bmetas\b|\bcompromissos\b|\bprogramas? registrad\w*\b|\bdocumentos? (publicos? )?(das?|dos?) candidatur\w*\b""")
+    /** Pergunta sobre propostas/planos SEM contexto de votação: as regras do processo eleitoral não se aplicam (paridade com nlu.js, 21/10/2026). */
+    private val RX_CTX_VOTACAO = Regex("""\b(vot\w*|urnas?|cabine|secao eleitoral|mesari\w*|titulo|biometri\w*|identificac\w*|levar)\b""")
+    /** "propostas/planos/documentos DAS CANDIDATURAS sobre X": plano por tema, não listagem. */
+    private val RX_DOC_CANDIDATURAS = Regex("""\b(documentos?|propostas?|planos?|programas?|compromissos|metas|diretrizes|plataformas?)( publicos?| eleitorais?| de governo)? (das?|dos?) candidatur\w*\b""")
+    private val RX_PATRIMONIO_NAO_DECLARADO = Regex("""\bpatrimonio (historico|cultural|publico|natural|artistico)\b""")
+    private val RX_PESQUISA_CIENTIFICA = Regex("""\bpesquisas? (cientific\w*|academic\w*)\b""")
+    private val RX_SOBRE_DADOS = Regex("""\bde onde (vem|vêm|sao)\b|\bfontes?\b|\bdados (sao|vem|oficiais)\b|\batualizad\w*\b|\batualizacao\b|\bultima atualizacao\b|\bversao\b""")
+    private val RX_FONTES = Regex("""\bsites? oficia\w*\b|\b(ferramentas?|canais|canal|portais|portal|sistemas?|paginas?|repositorios?) oficia\w*\b|\bcanais institucionais\b|\bdivulgacand\w*\b|\btre\b|\bonde consulto\b|\blinks? (oficia\w*|do tse)\b|\bquem fiscaliza\b|\bquem organiza (as )?eleic\w*\b|\bjustica eleitoral\b|\bo que faz (o|um) (tse|tre)\b|\bdenunciar\b|\bdenuncia\b|\bdesinformacao\b|\bfake news\b|\bpropaganda irregular\b|\bcrime eleitoral\b|\bcompra de votos\b""")
     private val RX_CONTAS = Regex(
         """\bgast\w*\b|\bdespesas?\b|\barrecad\w*\b|\breceitas?\b|\bdoac\w*\b|\bdoador\w*\b|\bprestacao de contas\b|""" +
             """\bcontas (de|da) campanha\b|\bfinanciamento\b|\bfundo (eleitoral|partidario)\b|\bcusto da campanha\b|\bquanto (custou|recebeu)\b"""
@@ -330,42 +389,45 @@ object LocalNlu {
             (t.contains("senador") && Regex("""\b(quantos votos|quantos senadores|voto duplo)\b""").containsMatchIn(t))
         ) return q(Intent.SENADO_DOIS_VOTOS)
         if (RX_REGRAS_VOTO.containsMatchIn(t)) return q(Intent.REGRAS_VOTO)
+        // pergunta sobre propostas/planos sem contexto de votação: não é documento para votar, urna, local nem regra do 2º turno (21/10/2026)
+        val sobrePropostas = (RX_PLANO.containsMatchIn(t) || RX_SOBRE_DADOS.containsMatchIn(t) || RX_FONTES.containsMatchIn(t)) && !RX_CTX_VOTACAO.containsMatchIn(t)
         val ehViolacaoCabineOuConduta = Regex("""cabine|filmar|fotograf|grava|arma|vestiment|roupa|camiseta|bermuda|chinelo|biquini|sunga|descalco|boca de urna|santinho""").containsMatchIn(t)
-        if (Regex("""\b(documentos?|identificac\w*|cnh|habilitacao|carteira de (motorista|identidade|trabalho)|rg|passaporte|reservista|certidao|carteira de trabalho|oab|crm|crea|biometri\w*|e-titulo|titulo de eleitor|titulo fisico|titulo impresso)\b""").containsMatchIn(t) && !ehViolacaoCabineOuConduta)
+        if (Regex("""\b(documentos?|identificac\w*|cnh|habilitacao|carteira de (motorista|identidade|trabalho)|rg|passaporte|reservista|certidao|carteira de trabalho|oab|crm|crea|biometri\w*|e-titulo|titulo de eleitor|titulo fisico|titulo impresso)\b""").containsMatchIn(t) && !ehViolacaoCabineOuConduta && !sobrePropostas)
             return q(Intent.LOCAL_VOTACAO)
-        if (Regex("""\bordem de votacao\b|\bcomo (funciona|vota|votar|e) (a |na )?urna\b|\bquantos (digitos|numeros)\b|\bdigitos\b|\bcomo digitar\b|\bcomo (se )?votar\b|\bcomo (eu )?voto\b|\bcomo se vota\b|\bpasso a passo\b|\burna (eletronica )?(e|eh) (segura|confiavel|auditavel|fraudavel)\b|\bseguranca da urna\b|\bvoto impresso\b|\bcomprovante\b|\bcabine\b|\bcelular\b|\bsmartphone\b|\bsmartwatch\b|\brelogio inteligente\b|\bfones? (de ouvido)?\b|\bcamera\b|\bfilmador\w*\b|\bfilmar\b|\bfotograf\w*\b|\bgrav\w* (audio|video|o voto)\b|\btransmissao (de video )?ao vivo\b|\bvideo ao vivo\b|\blive\b|\btablet\b|\bsigilo do voto\b|\bcolinhas?\b|\bmesari[oa]s?\b|\bfiscais?\b|\bfiscal partidari\w*\b|\bdelegad\w* de partido\b|\bcrachas?\b|\bbandeira partidaria\b|\badesivo\b|\bbroche\b|\bmanifestacao (silenciosa|individual)\b|\bboca de urna\b|\bsantinhos?\b|\bpanfletos?\b|\bapitos?\b|\bbuzinas?\b|\bvuvuzelas?\b|\bpalavras de ordem\b|\bpedir voto\b|\baglomerac\w*\b|\b(chinelo|chinelos|sandalia|sandalias|bermuda|bermudas|calcao|calcoes|shorts|regata|regatas|camisa|camisas|camiseta|camisetas|roupa|roupas|vestimenta|vestimentas|traje|trajes|calcado|calcados|descalco|descalca|sem camisa|biquini|sunga|maio|bone|chapeu|gorro|oculos de sol|mascara|quipa|veu|niqab|burca|saia|minissaia|destroyed|rasgad\w*|bombacha|cosplay|fantasia|fantasias|pijama|legging|top fitness|jaleco|avental|tatuag\w*|uniforme|fardad\w*|casaco|sobretudo|capa de chuva)\b|\b(posso|pode|da pra|da para) (ir de|usar|votar de|levar|entrar com)\b|\bo que (posso|pode) (levar|usar|vestir)\b|\b(filhos? pequenos?|crianca|criancas|idoso|idosos|deficienc\w*|acessibilidade|auxili\w* (na cabine|por pessoa|o eleitor)|quem (nao )?pode auxiliar|cao-guia|cao guia|libras|cegos?|surdos?|animais?|pet|pets|cachorro|gato)\b|\b(porte de armas?|armas? de fogo|armad[oa]s?|desarmad[oa]s?|cac|cacs|armamento|desord\w*|desordeir\w*|tumulto|voz de prisao|embriag\w*|autoridade de policia|expulsar|caderno de votacao|assinar (o )?caderno)\b""").containsMatchIn(t))
+        if (Regex("""\bordem de votacao\b|\bcomo (funciona|vota|votar|e) (a |na )?urna\b|\bquantos (digitos|numeros)\b|\bdigitos\b|\bcomo digitar\b|\bcomo (se )?votar\b|\bcomo (eu )?voto\b|\bcomo se vota\b|\bpasso a passo\b|\burna (eletronica )?(e|eh) (segura|confiavel|auditavel|fraudavel)\b|\bseguranca da urna\b|\bvoto impresso\b|\bcomprovante\b|\bcabine\b|\bcelular\b|\bsmartphone\b|\bsmartwatch\b|\brelogio inteligente\b|\bfones? (de ouvido)?\b|\bcamera\b|\bfilmador\w*\b|\bfilmar\b|\bfotograf\w*\b|\bgrav\w* (audio|video|o voto)\b|\btransmissao (de video )?ao vivo\b|\bvideo ao vivo\b|\blive\b|\btablet\b|\bsigilo do voto\b|\bcolinhas?\b|\bmesari[oa]s?\b|\bfiscais?\b|\bfiscal partidari\w*\b|\bdelegad\w* de partido\b|\bcrachas?\b|\bbandeira partidaria\b|\badesivo\b|\bbroche\b|\bmanifestacao (silenciosa|individual)\b|\bboca de urna\b|\bsantinhos?\b|\bpanfletos?\b|\bapitos?\b|\bbuzinas?\b|\bvuvuzelas?\b|\bpalavras de ordem\b|\bpedir voto\b|\baglomerac\w*\b|\b(chinelo|chinelos|sandalia|sandalias|bermuda|bermudas|calcao|calcoes|shorts|regata|regatas|camisa|camisas|camiseta|camisetas|roupa|roupas|vestimenta|vestimentas|traje|trajes|calcado|calcados|descalco|descalca|sem camisa|biquini|sunga|maio|bone|chapeu|gorro|oculos de sol|mascara|quipa|veu|niqab|burca|saia|minissaia|destroyed|rasgad\w*|bombacha|cosplay|fantasia|fantasias|pijama|legging|top fitness|jaleco|avental|tatuag\w*|uniforme|fardad\w*|casaco|sobretudo|capa de chuva)\b|\b(posso|pode|da pra|da para) (ir de|usar|votar de|levar|entrar com)\b|\bo que (posso|pode) (levar|usar|vestir)\b|\b(filhos? pequenos?|crianca|criancas|idoso|idosos|deficienc\w*|acessibilidade|auxili\w* (na cabine|por pessoa|o eleitor)|quem (nao )?pode auxiliar|cao-guia|cao guia|libras|cegos?|surdos?|animais?|pet|pets|cachorro|gato)\b|\b(porte de armas?|armas? de fogo|armad[oa]s?|desarmad[oa]s?|cac|cacs|armamento|desord\w*|desordeir\w*|tumulto|voz de prisao|embriag\w*|autoridade de policia|expulsar|caderno de votacao|assinar (o )?caderno)\b""").containsMatchIn(t) && !sobrePropostas)
             return q(Intent.REGRAS_URNA)
-        if (Regex("""\bonde (eu )?(voto|votar|vou votar)\b|\blocal de votacao\b|\bzona eleitoral\b|\bsecao eleitoral\b|\btitulo\b|\be-titulo\b|\bjustific\w*\b|\bdocumentos?\b|\bnao (vou|posso) votar\b|\bvot\w* em transito\b|\btransferir o titulo\b|\bregularizar (o titulo|situacao eleitoral)\b|\bconsultar (meu |minha )?(titulo|situacao eleitoral|local)\b|\bbiometri\w*\b|\bcnh\b|\bpassaporte\b|\breservista\b|\brg\b|\bcarteira de identidade\b|\bidentificacao\b|\bnao votei\b|\bnao fui votar\b|\bfaltei (a |na |no )?(votacao|eleicao|urna|primeiro turno|1o turno|1º turno)\b|\bperdi o (primeiro|1o|1º) turno\b|\bausen(cia|te) no (primeiro|1o|1º|segundo|2o|2º) turno\b|\bposso votar no (segundo|2o|2º) turno\b""").containsMatchIn(t))
+        if (Regex("""\bonde (eu )?(voto|votar|vou votar)\b|\blocal de votacao\b|\bzona eleitoral\b|\bsecao eleitoral\b|\btitulo\b|\be-titulo\b|\bjustific\w*\b|\bdocumentos?\b|\bnao (vou|posso) votar\b|\bvot\w* em transito\b|\btransferir o titulo\b|\bregularizar (o titulo|situacao eleitoral)\b|\bconsultar (meu |minha )?(titulo|situacao eleitoral|local)\b|\bbiometri\w*\b|\bcnh\b|\bpassaporte\b|\breservista\b|\brg\b|\bcarteira de identidade\b|\bidentificacao\b|\bnao votei\b|\bnao fui votar\b|\bfaltei (a |na |no )?(votacao|eleicao|urna|primeiro turno|1o turno|1º turno)\b|\bperdi o (primeiro|1o|1º) turno\b|\bausen(cia|te) no (primeiro|1o|1º|segundo|2o|2º) turno\b|\bposso votar no (segundo|2o|2º) turno\b""").containsMatchIn(t) && !sobrePropostas)
             return q(Intent.LOCAL_VOTACAO)
         if (Regex("""\bcalendario\b|\bquando (e|sera|ocorre|acontece|vai ser|tem|e a)\b|\bque dia\b|\bdata (da|das|de|do) (eleic|votac|segundo|primeiro|posse)\w*\b|\bdia (da|de) (eleic|votac)\w*\b|\bque horas\b|\bate que horas\b|\bprazos?\b|\bhorarios?\b|\bposse\b|\bdiplom\w*\b""").containsMatchIn(t))
             return q(Intent.CALENDARIO)
 
         // 3. Pesquisas registradas (antes de "resultado", que também aparece em "resultado da pesquisa")
-        if (Regex("""\bpesquisas?\b|\binstituto\b|\bdatafolha\b|\bquaest\b|\bipec\b|\batlas ?intel\b|\bpesq ?ele\b|\bintencao de voto\b""").containsMatchIn(t))
+        if (Regex("""\bpesquisas?\b|\binstituto\b|\bdatafolha\b|\bquaest\b|\bipec\b|\batlas ?intel\b|\bpesq ?ele\b|\bintencao de voto\b""").containsMatchIn(t) && !RX_PESQUISA_CIENTIFICA.containsMatchIn(t))
             return q(Intent.PESQUISAS)
 
         // 3.1 Segundo turno e resultados
-        if (Regex("""\bsegundo turno\b|\b2 ?(o|a|º|ª|°)? turno\b""").containsMatchIn(t) && !RX_RESULTADOS.containsMatchIn(t.replace("segundo turno", "")))
-            return q(Intent.SEGUNDO_TURNO)
+        if (Regex("""\bsegundo turno\b|\b2 ?(o|a|º|ª|°)? turno\b""").containsMatchIn(t) && !RX_RESULTADOS.containsMatchIn(t.replace("segundo turno", "")) && !sobrePropostas)
+            return q(Intent.SEGUNDO_TURNO)  // "propostas do 2º turno sobre saúde" é plano de governo, não a regra do 2º turno (21/10/2026)
         if (RX_RESULTADOS.containsMatchIn(t)) return q(Intent.RESULTADOS)
 
         // 4. Fontes e sobre os dados
-        if (Regex("""\bde onde (vem|vêm|sao)\b|\bfontes?\b|\bdados (sao|vem|oficiais)\b|\batualizad\w*\b|\batualizacao\b|\bultima atualizacao\b|\bversao\b""").containsMatchIn(t))
-            return q(Intent.SOBRE_DADOS)
-        if (Regex("""\bsites? oficia\w*\b|\bdivulgacand\w*\b|\btre\b|\bonde consulto\b|\blinks? (oficia\w*|do tse)\b|\bquem fiscaliza\b|\bquem organiza (as )?eleic\w*\b|\bjustica eleitoral\b|\bo que faz (o|um) (tse|tre)\b|\bdenunciar\b|\bdenuncia\b|\bdesinformacao\b|\bfake news\b|\bpropaganda irregular\b|\bcrime eleitoral\b|\bcompra de votos\b""").containsMatchIn(t))
-            return q(Intent.FONTES)
+        if (RX_SOBRE_DADOS.containsMatchIn(t)) return q(Intent.SOBRE_DADOS)
+        // "onde consultar nos canais oficiais as propostas sobre X": o pedido é o plano por tema (passo 5), não a lista de links
+        if (RX_FONTES.containsMatchIn(t) && !RX_PLANO.containsMatchIn(t)) return q(Intent.FONTES)
 
         // 5. Plano de governo, contas, patrimônio, Ficha Limpa, contagem
         val listagem = Regex("""\bquem (disputa|disputam|concorre|concorrem|sao)\b|\bcandidat\w* (a|ao|à|para|de|do|da|em|que|com)\b|\blista( de)? candidat\w*\b|\bmostr\w* (os )?candidat\w*\b|\bver (os )?candidat\w*\b|\bquais (os |sao os )?candidat\w*\b""").containsMatchIn(t)
         val falaCandidatos = listagem || Regex("""\bcandidat\w*\b""").containsMatchIn(t)
         if (RX_PLANO.containsMatchIn(t)) {
-            if (tema != null && falaCandidatos) return q(Intent.LISTAR_CANDIDATOS)
-            nome()?.let { return q(Intent.PLANO_GOVERNO, nome = it) }
+            // listagem explícita ("candidatos a/que/com...") com tema: lista filtrada; "documentos das candidaturas sobre X" é plano por tema (21/10/2026)
+            if (tema != null && listagem && !RX_DOC_CANDIDATURAS.containsMatchIn(t)) return q(Intent.LISTAR_CANDIDATOS)
+            // com tema na frase, o tema nunca vira nome de candidato ("plano de governo sobre educação" ≠ "REJANE DA EDUCAÇÃO")
+            (achado?.termo ?: resolverNome(t, raw, cargo, uf, partido, gaz, semTemas = tema != null))?.let { return q(Intent.PLANO_GOVERNO, nome = it) }
             if (numero != null) return q(Intent.PLANO_GOVERNO)
-            return q(if (tema != null) Intent.LISTAR_CANDIDATOS else Intent.PLANO_GOVERNO)
+            return q(Intent.PLANO_GOVERNO) // com tema: resposta de plano por tema; sem tema: a explicação geral
         }
         if (RX_CONTAS.containsMatchIn(t)) return q(Intent.CONTAS_CAMPANHA, nome = nome())
-        if (Regex("""\bpatrimonio\b|\bbens\b|\briqueza\b|\bric[oa]s?\b|\bdeclarou\b|\bquanto (tem|possui)\b""").containsMatchIn(t)) {
+        if (Regex("""\bpatrimonio\b|\bbens\b|\briqueza\b|\bric[oa]s?\b|\bdeclarou\b|\bquanto (tem|possui)\b""").containsMatchIn(t) && !RX_PATRIMONIO_NAO_DECLARADO.containsMatchIn(t)) {
             return q(Intent.PATRIMONIO, nome = if (!listagem) nome() else nomeEmListagem())
         }
         if (RX_ELEGIBILIDADE.containsMatchIn(t)) return q(Intent.ELEGIBILIDADE, nome = nome())
@@ -470,7 +532,17 @@ object LocalNlu {
         "simular", "simulador", "simule", "plano", "planos", "governo", "programa", "propostas", "proposta", "projetos",
         "gastou", "gastos", "gasto", "gasta", "campanha", "contas", "despesas", "receitas", "doacoes", "arrecadou",
         "chapa", "suplentes", "mulher", "mulheres", "homens", "candidatas", "feminino", "masculino", "suja",
-        "situacao", "registro", "candidatura", "inelegivel", "indeferido", "deferido", "rico", "rica", "ajuda", "voce"
+        "situacao", "registro", "candidatura", "inelegivel", "indeferido", "deferido", "rico", "rica", "ajuda", "voce",
+        // 21/10/2026: palavras de "onde consultar nos canais oficiais" e de temas que casavam com apelidos de urna (paridade com nlu.js)
+        "portal", "portais", "oficial", "oficiais", "ferramenta", "ferramentas", "canais", "canal", "fontes", "fonte", "sistemas", "sistema",
+        "pagina", "paginas", "repositorio", "repositorios", "institucional", "institucionais", "consultar", "conferir", "verificar", "acessar",
+        "pesquisar", "encontrar", "comparar", "utilizar", "acompanhar", "analisar", "divulgacao", "dados", "abertos", "publicos", "publicas",
+        "informacoes", "verificadas", "detalhamento", "historico", "documentos", "area", "setor", "registradas", "registrados", "apresentadas",
+        "declaradas", "discutidos", "relacionados", "relacionadas", "referentes", "voltadas", "consolidados", "atualizadas", "disputa", "combate",
+        "apoio", "comunitario", "comunitaria", "direitos", "humanos", "protecao", "prevencao", "gestao", "formacao", "fomento", "valorizacao",
+        "desenvolvimento", "politica", "politicas", "promocao", "inclusao", "qualidade", "servico", "servicos", "publico", "publica", "regional",
+        "popular", "basica", "basico", "social", "sociais", "cooperacao", "federativa", "relacoes", "integracao", "participacao", "cidada",
+        "coletivo", "coletiva", "coletivos"
     )
 
     /**
@@ -503,13 +575,14 @@ object LocalNlu {
 
     fun resolverNome(
         t: String, raw: String, cargo: String?, uf: String?, partido: String?, gaz: Gazetteer,
-        indicio: Boolean = true, soNome: Boolean = false, emListagem: Boolean = false
+        indicio: Boolean = true, soNome: Boolean = false, emListagem: Boolean = false, semTemas: Boolean = false
     ): String? {
         var texto = t
         for ((rx, _) in RX_CARGOS) texto = rx.replace(texto, " ")
         for ((_, _, rx) in RX_NOMES_UF) texto = rx.replace(texto, " ")
         if (partido != null) texto = texto.replace(Regex("""\b${Regex.escape(Texto.normalizar(partido))}\b"""), " ")
-        if (!indicio || emListagem) for ((rx, _) in RX_TEMAS) texto = rx.replace(texto, " ")
+        // `semTemas`: pergunta de plano/propostas com tema — o tema nunca é nome ("REJANE DA EDUCAÇÃO"), 21/10/2026
+        if (!indicio || emListagem || semTemas) for ((rx, _) in RX_TEMAS) texto = rx.replace(texto, " ")
         val tokens = texto.split(' ', '?', '!', '.', ',', ';', ':', '"', '\'', '(', ')')
             .filter { it.length >= 3 && it.any(Char::isLetter) && it !in Gazetteer.STOP_NOME && it !in STOP_EXTRA }
             // frase com cara de listagem: palavras de pergunta e de cargo não podem virar "nome" (ex.: "candidatos a prefeito")

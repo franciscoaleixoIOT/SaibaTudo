@@ -304,6 +304,25 @@ Lição repetida: não dizer "corrigido" sem reproduzir antes e depois. Padrões
   ("não há informações/dados/resultado", "não houve vitória/vencedor", "ainda não há resultado") ou inventa "segundo mandato"/"reeleito" sem
   base é descartado. API 231. O texto gerado pelo Qwen 7B sobre listas de resultado continua fraco; a troca pelo explicador SaibaTudo IA (gate
   de fidelidade no holdout de eleições) fica para depois de 27/10.
+- **21/10 (08h–09h30): NLU de propostas por tema.** O mantenedor enviou 2.000 perguntas (20 modelos × 100 temas, "onde consultar nos canais
+  oficiais as propostas/planos do 1º ou 2º turno sobre {tema}"). Rodadas no motor com o pacote real (UF padrão SP): NENHUMA recebia a resposta de
+  plano de governo — "2º turno" na frase virava SEGUNDO_TURNO (882), "portal"/"oficial"/"ferramentas" e o próprio tema viravam nome de candidato
+  (326: "FERREIRA DO PORTAL", "REJANE DA EDUCAÇÃO"), "documentos das candidaturas" caía em LOCAL_VOTACAO (200), "debates/diretrizes/plataformas/
+  prioridades/metas" não existiam no léxico (260 DESCONHECIDA + 128 listagens), e só 15 dos 100 temas eram reconhecidos. Correções, idênticas em
+  `nlu.js` e `LocalNlu.kt`: (1) `sobrePropostas` = pergunta de plano/fontes sem contexto de votação → não aplica documentos-para-votar, urna,
+  local nem regra do 2º turno; "pesquisa científica" não é pesquisa eleitoral; "patrimônio histórico/cultural" não é patrimônio declarado;
+  (2) `RX_PLANO` ganhou plataformas eleitorais, diretrizes, prioridades, metas, compromissos, programas registrados e "documentos/propostas das
+  candidaturas"; FONTES só quando a frase não pede plano; (3) `STOP_EXTRA` com ~90 palavras de "onde consultar…" e de temas; em pergunta de plano
+  com tema o tema nunca vira nome (`resolverNome(semTemas)`); (4) ~180 temas finos → macrotemas do pacote (alfabetização → educação, hospitais →
+  saúde, ferrovias → transporte, energias renováveis → energia…; 97 dos 100 temas do CSV); (5) resposta nova de PLANO_GOVERNO com tema
+  (`answers.js`/`RespostasRegistro.kt`, texto idêntico): "Propostas sobre Educação nos planos de governo registrados no TSE: • 194 candidaturas a
+  Presidente e a Governador citam o tema (detecção por palavras-chave; o app não resume nem compara) • Presidência: … • Governador em SP: … •
+  DivulgaCandContas…", filtro por tema e cartões. Listagem explícita ("candidatos a X que citam saúde") continua LISTAR_CANDIDATOS; golden
+  intocado (o "SUS" ficou fora dos sinônimos porque "Como melhorar o SUS?" é DESCONHECIDA no golden). Resultado nas 2.000: PLANO_GOVERNO 1.309,
+  SOBRE_DADOS 200, FONTES 200, LISTAR 291 (frases com "candidaturas" + tema), 0 nomes falsos, 1.940 com tema. Contrato novo
+  `contracts/propostas_cases.json` (modelos + temas + macrotema esperado; mínimos 99 % intenção / 98 % tema) conferido por
+  `web/test/propostas-cases.test.mjs` e `PropostasCasesTest.kt`; fora do gate do modelo da nuvem. Testes: web 181, Android (golden, reais, propostas,
+  AnswerBuilder, nomes, paridade).
 - **20/10 (madrugada):** (1) **tempos da nuvem maiores** (pedido do mantenedor: "o tempo inicial tem que ser maior; depois da primeira a segunda
   funciona"): a partida a frio do Modal mediu 16,7 s ao vivo na química; `MODAL_TIMEOUT_MS` padrão 20000 e teto 45000 (`config.js`), `api/nlu.js`
   `maxDuration: 50`, site 20 s automático / 45 s explícito (`cloud.js`); Vercel `MODAL_TIMEOUT_MS=30000` fica para o mantenedor (bloqueio do

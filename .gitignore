@@ -18,3 +18,6 @@ __pycache__/
 # SaibaTudo.IA (ia/): venv proprio e saidas grandes (checkpoints, GGUF, logs) ficam fora do Git
 /ia/.venv/
 /ia/**/out/
+
+# artefatos do navegador de teste (plugin Playwright do Claude Code)
+.playwright-mcp/

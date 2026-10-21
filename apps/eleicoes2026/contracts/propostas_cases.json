@@ -1,0 +1,435 @@
+{
+ "version": 1,
+ "descricao": "Regressão de 21/10/2026: 20 modelos de frase × 100 temas (2.000 perguntas) sobre onde consultar propostas/planos do 1º e do 2º turno. Antes da correção nenhuma recebia a resposta de plano de governo (SEGUNDO_TURNO 882, nome falso 326, DESCONHECIDA 260, LOCAL_VOTACAO 200...). Esperado: intent em `intencoes_aceitas`; `tema` = macrotema do pacote quando `temas[].tema` não é null; nunca `nome`. Site: web/test/propostas-cases.test.mjs; Android: PropostasCasesTest.kt. Fora do gate do modelo da nuvem.",
+ "intencoes_aceitas": [
+  "PLANO_GOVERNO",
+  "SOBRE_DADOS",
+  "FONTES"
+ ],
+ "minimo_intencao_pct": 99.0,
+ "minimo_tema_pct": 98.0,
+ "modelos": [
+  "Onde consultar nos canais oficiais as propostas apresentadas no 1º turno sobre {tema}?",
+  "Como acessar no portal oficial os planos de governo registrados no 1º turno referentes a {tema}?",
+  "Quais fontes oficiais divulgam os dados consolidados do 1º turno relacionados às candidaturas e {tema}?",
+  "Onde verificar nos portais públicos os debates e diretrizes discutidos no 1º turno para a área de {tema}?",
+  "Como pesquisar nos sistemas oficiais de divulgação as plataformas eleitorais do 1º turno voltadas para {tema}?",
+  "Em qual página oficial é possível conferir o histórico de propostas do 1º turno sobre {tema}?",
+  "Como utilizar os dados abertos oficiais para analisar as prioridades declaradas no 1º turno quanto a {tema}?",
+  "Onde encontrar nos canais institucionais os documentos públicos das candidaturas do 1º turno sobre {tema}?",
+  "Como comparar nos repositórios oficiais as metas registradas no 1º turno para o setor de {tema}?",
+  "Quais ferramentas oficiais permitem consultar informações verificadas do 1º turno acerca de {tema}?",
+  "Onde consultar nos canais oficiais o detalhamento das propostas do 2º turno sobre {tema}?",
+  "Como acessar no portal oficial os planos de governo em disputa no 2º turno referentes a {tema}?",
+  "Quais fontes oficiais reúnem as informações atualizadas do 2º turno relacionadas a {tema}?",
+  "Onde verificar nos portais públicos as diretrizes apresentadas no 2º turno para a área de {tema}?",
+  "Como pesquisar nos sistemas oficiais de divulgação os compromissos registrados no 2º turno para {tema}?",
+  "Em qual página oficial é possível conferir os documentos das candidaturas do 2º turno sobre {tema}?",
+  "Como utilizar os portais oficiais para acompanhar as propostas em debate no 2º turno quanto a {tema}?",
+  "Onde encontrar nos canais institucionais os programas registrados para o 2º turno sobre {tema}?",
+  "Como comparar nos sistemas oficiais as propostas das candidaturas do 2º turno para o setor de {tema}?",
+  "Quais ferramentas oficiais permitem consultar informações verificadas do 2º turno acerca de {tema}?"
+ ],
+ "temas": [
+  {
+   "tema": "Agricultura familiar",
+   "esperado": "agro"
+  },
+  {
+   "tema": "Agronegócio sustentável",
+   "esperado": "meio_ambiente"
+  },
+  {
+   "tema": "Alfabetização",
+   "esperado": "educacao"
+  },
+  {
+   "tema": "Apoio às micro e pequenas empresas",
+   "esperado": "economia"
+  },
+  {
+   "tema": "Assistência social",
+   "esperado": "assistencia"
+  },
+  {
+   "tema": "Assistência técnica rural",
+   "esperado": "agro"
+  },
+  {
+   "tema": "Atendimento ao cidadão",
+   "esperado": "transparencia"
+  },
+  {
+   "tema": "Atenção primária à saúde",
+   "esperado": "saude"
+  },
+  {
+   "tema": "Atração de investimentos",
+   "esperado": "economia"
+  },
+  {
+   "tema": "Biodiversidade",
+   "esperado": "meio_ambiente"
+  },
+  {
+   "tema": "Bioeconomia",
+   "esperado": "meio_ambiente"
+  },
+  {
+   "tema": "Combate ao crime organizado",
+   "esperado": "seguranca"
+  },
+  {
+   "tema": "Combate ao desmatamento",
+   "esperado": "meio_ambiente"
+  },
+  {
+   "tema": "Combate à corrupção",
+   "esperado": "transparencia"
+  },
+  {
+   "tema": "Combate à fome",
+   "esperado": "assistencia"
+  },
+  {
+   "tema": "Compras públicas sustentáveis",
+   "esperado": "transparencia"
+  },
+  {
+   "tema": "Comércio exterior",
+   "esperado": "economia"
+  },
+  {
+   "tema": "Controle interno e auditoria",
+   "esperado": "transparencia"
+  },
+  {
+   "tema": "Cooperação federativa",
+   "esperado": null
+  },
+  {
+   "tema": "Crédito de carbono",
+   "esperado": "meio_ambiente"
+  },
+  {
+   "tema": "Cultura e patrimônio histórico",
+   "esperado": "cultura"
+  },
+  {
+   "tema": "Defesa civil",
+   "esperado": "seguranca"
+  },
+  {
+   "tema": "Desburocratização",
+   "esperado": "transparencia"
+  },
+  {
+   "tema": "Desenvolvimento regional",
+   "esperado": "economia"
+  },
+  {
+   "tema": "Desenvolvimento sustentável",
+   "esperado": "meio_ambiente"
+  },
+  {
+   "tema": "Direitos da pessoa idosa",
+   "esperado": "idosos"
+  },
+  {
+   "tema": "Direitos humanos",
+   "esperado": null
+  },
+  {
+   "tema": "Economia criativa",
+   "esperado": "economia"
+  },
+  {
+   "tema": "Economia e emprego",
+   "esperado": "economia"
+  },
+  {
+   "tema": "Economia verde",
+   "esperado": "economia"
+  },
+  {
+   "tema": "Educação básica",
+   "esperado": "educacao"
+  },
+  {
+   "tema": "Educação inclusiva",
+   "esperado": "educacao"
+  },
+  {
+   "tema": "Eficiência administrativa",
+   "esperado": "transparencia"
+  },
+  {
+   "tema": "Eficiência energética",
+   "esperado": "energia"
+  },
+  {
+   "tema": "Empreendedorismo",
+   "esperado": "economia"
+  },
+  {
+   "tema": "Energias renováveis",
+   "esperado": "energia"
+  },
+  {
+   "tema": "Ensino superior",
+   "esperado": "educacao"
+  },
+  {
+   "tema": "Ensino técnico e profissionalizante",
+   "esperado": "educacao"
+  },
+  {
+   "tema": "Esporte de alto rendimento",
+   "esperado": "esporte"
+  },
+  {
+   "tema": "Esporte de base",
+   "esperado": "esporte"
+  },
+  {
+   "tema": "Ferrovias",
+   "esperado": "transporte"
+  },
+  {
+   "tema": "Fomento às artes",
+   "esperado": "cultura"
+  },
+  {
+   "tema": "Formação de profissionais de saúde",
+   "esperado": "saude"
+  },
+  {
+   "tema": "Fornecimento de medicamentos",
+   "esperado": "saude"
+  },
+  {
+   "tema": "Geração de renda",
+   "esperado": "economia"
+  },
+  {
+   "tema": "Gestão de resíduos sólidos",
+   "esperado": "saneamento"
+  },
+  {
+   "tema": "Gestão fiscal responsável",
+   "esperado": "economia"
+  },
+  {
+   "tema": "Gestão hospitalar",
+   "esperado": "saude"
+  },
+  {
+   "tema": "Governo digital",
+   "esperado": "transparencia"
+  },
+  {
+   "tema": "Habitação popular",
+   "esperado": "moradia"
+  },
+  {
+   "tema": "Hidrovias",
+   "esperado": "transporte"
+  },
+  {
+   "tema": "Hospitais públicos",
+   "esperado": "saude"
+  },
+  {
+   "tema": "Igualdade de oportunidades",
+   "esperado": "assistencia"
+  },
+  {
+   "tema": "Iluminação e zeladoria",
+   "esperado": "infraestrutura"
+  },
+  {
+   "tema": "Inclusão da pessoa com deficiência",
+   "esperado": "pcd"
+  },
+  {
+   "tema": "Infraestrutura escolar",
+   "esperado": "educacao"
+  },
+  {
+   "tema": "Infraestrutura logística",
+   "esperado": "transporte"
+  },
+  {
+   "tema": "Inovação no setor produtivo",
+   "esperado": "tecnologia"
+  },
+  {
+   "tema": "Inovação tecnológica",
+   "esperado": "tecnologia"
+  },
+  {
+   "tema": "Integração nacional",
+   "esperado": "infraestrutura"
+  },
+  {
+   "tema": "Inteligência policial",
+   "esperado": "seguranca"
+  },
+  {
+   "tema": "Lazer comunitário",
+   "esperado": "esporte"
+  },
+  {
+   "tema": "Mobilidade urbana",
+   "esperado": "transporte"
+  },
+  {
+   "tema": "Mudanças climáticas",
+   "esperado": "meio_ambiente"
+  },
+  {
+   "tema": "Orçamento público",
+   "esperado": "economia"
+  },
+  {
+   "tema": "Participação cidadã",
+   "esperado": "transparencia"
+  },
+  {
+   "tema": "Pesquisa científica",
+   "esperado": "tecnologia"
+  },
+  {
+   "tema": "Planejamento urbano",
+   "esperado": "infraestrutura"
+  },
+  {
+   "tema": "Policiamento comunitário",
+   "esperado": "seguranca"
+  },
+  {
+   "tema": "Política industrial",
+   "esperado": "economia"
+  },
+  {
+   "tema": "Portos e aeroportos",
+   "esperado": "transporte"
+  },
+  {
+   "tema": "Preservação ambiental",
+   "esperado": "meio_ambiente"
+  },
+  {
+   "tema": "Prevenção à violência",
+   "esperado": "seguranca"
+  },
+  {
+   "tema": "Proteção de fronteiras",
+   "esperado": "seguranca"
+  },
+  {
+   "tema": "Proteção à infância e juventude",
+   "esperado": "assistencia"
+  },
+  {
+   "tema": "Qualificação profissional",
+   "esperado": "educacao"
+  },
+  {
+   "tema": "Reciclagem",
+   "esperado": "meio_ambiente"
+  },
+  {
+   "tema": "Recursos hídricos",
+   "esperado": "meio_ambiente"
+  },
+  {
+   "tema": "Regularização fundiária",
+   "esperado": "moradia"
+  },
+  {
+   "tema": "Relações institucionais",
+   "esperado": null
+  },
+  {
+   "tema": "Rodovias",
+   "esperado": "transporte"
+  },
+  {
+   "tema": "Saneamento básico",
+   "esperado": "saneamento"
+  },
+  {
+   "tema": "Saúde da família",
+   "esperado": "saude"
+  },
+  {
+   "tema": "Saúde mental",
+   "esperado": "saude"
+  },
+  {
+   "tema": "Segurança alimentar",
+   "esperado": "assistencia"
+  },
+  {
+   "tema": "Segurança cibernética",
+   "esperado": "seguranca"
+  },
+  {
+   "tema": "Segurança pública",
+   "esperado": "seguranca"
+  },
+  {
+   "tema": "Segurança viária",
+   "esperado": "seguranca"
+  },
+  {
+   "tema": "Seguro rural",
+   "esperado": "agro"
+  },
+  {
+   "tema": "Serviço público de qualidade",
+   "esperado": "transparencia"
+  },
+  {
+   "tema": "Sistema prisional",
+   "esperado": "seguranca"
+  },
+  {
+   "tema": "Tecnologia na educação",
+   "esperado": "educacao"
+  },
+  {
+   "tema": "Telemedicina",
+   "esperado": "saude"
+  },
+  {
+   "tema": "Transição energética",
+   "esperado": "energia"
+  },
+  {
+   "tema": "Transparência pública",
+   "esperado": "transparencia"
+  },
+  {
+   "tema": "Transporte público coletivo",
+   "esperado": "transporte"
+  },
+  {
+   "tema": "Turismo sustentável",
+   "esperado": "turismo"
+  },
+  {
+   "tema": "Unidades de conservação",
+   "esperado": "meio_ambiente"
+  },
+  {
+   "tema": "Vacinação e prevenção",
+   "esperado": "saude"
+  },
+  {
+   "tema": "Valorização docente",
+   "esperado": "educacao"
+  }
+ ]
+}

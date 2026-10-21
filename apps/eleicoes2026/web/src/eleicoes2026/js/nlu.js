@@ -66,7 +66,58 @@ const TEMAS = [
   ['assistencia social', 'assistencia'], ['saneamento', 'saneamento'], ['energia', 'energia'],
   ['infraestrutura', 'infraestrutura'], ['transparencia', 'transparencia'], ['corrupcao', 'transparencia'],
   ['mulheres', 'mulheres'], ['juventude', 'juventude'], ['jovens', 'juventude'], ['idosos', 'idosos'],
-  ['turismo', 'turismo'], ['pessoa com deficiencia', 'pcd'], ['acessibilidade', 'pcd']
+  ['turismo', 'turismo'], ['pessoa com deficiencia', 'pcd'], ['acessibilidade', 'pcd'],
+  // 21/10/2026: temas finos dos planos (alfabetização, hospitais, ferrovias, energias renováveis...) mapeados aos macrotemas do pacote.
+  // Mesma lista em LocalNlu.kt (TEMAS); conferida por contracts/propostas_cases.json.
+  ['alfabetizacao', 'educacao'], ['ensino superior', 'educacao'], ['ensino tecnico', 'educacao'], ['ensino profissionalizante', 'educacao'],
+  ['ensino medio', 'educacao'], ['ensino fundamental', 'educacao'], ['valorizacao docente', 'educacao'], ['professores', 'educacao'],
+  ['professor', 'educacao'], ['infraestrutura escolar', 'educacao'], ['tecnologia na educacao', 'educacao'], ['educacao basica', 'educacao'],
+  ['educacao inclusiva', 'educacao'], ['educacao infantil', 'educacao'], ['creches', 'educacao'], ['creche', 'educacao'],
+  ['universidades', 'educacao'], ['universidade', 'educacao'], ['escolas', 'educacao'], ['merenda escolar', 'educacao'],
+  ['evasao escolar', 'educacao'], ['qualificacao profissional', 'educacao'], ['hospitais', 'saude'], ['hospital', 'saude'],
+  ['medicamentos', 'saude'], ['atencao primaria', 'saude'], ['atencao basica', 'saude'], ['saude mental', 'saude'], ['saude da familia', 'saude'],
+  ['vacinacao', 'saude'], ['vacinas', 'saude'], ['telemedicina', 'saude'], ['gestao hospitalar', 'saude'],
+  ['profissionais de saude', 'saude'], ['postos de saude', 'saude'], ['upa', 'saude'], ['crime organizado', 'seguranca'], ['policia', 'seguranca'],
+  ['policiamento', 'seguranca'], ['violencia', 'seguranca'], ['presidios', 'seguranca'], ['sistema prisional', 'seguranca'],
+  ['inteligencia policial', 'seguranca'], ['protecao de fronteiras', 'seguranca'], ['fronteiras', 'seguranca'], ['seguranca viaria', 'seguranca'],
+  ['seguranca cibernetica', 'seguranca'], ['defesa civil', 'seguranca'], ['geracao de renda', 'economia'], ['empreendedorismo', 'economia'],
+  ['micro e pequenas empresas', 'economia'], ['pequenas empresas', 'economia'], ['atracao de investimentos', 'economia'],
+  ['investimentos', 'economia'], ['comercio exterior', 'economia'], ['exportacoes', 'economia'], ['inflacao', 'economia'], ['impostos', 'economia'],
+  ['tributos', 'economia'], ['reforma tributaria', 'economia'], ['gestao fiscal', 'economia'], ['orcamento publico', 'economia'],
+  ['divida publica', 'economia'], ['politica industrial', 'economia'], ['industria', 'economia'], ['desenvolvimento regional', 'economia'],
+  ['economia criativa', 'economia'], ['economia verde', 'economia'], ['renda', 'economia'], ['salario minimo', 'economia'], ['credito', 'economia'],
+  ['desmatamento', 'meio_ambiente'], ['biodiversidade', 'meio_ambiente'], ['bioeconomia', 'meio_ambiente'], ['credito de carbono', 'meio_ambiente'],
+  ['carbono', 'meio_ambiente'], ['mudancas climaticas', 'meio_ambiente'], ['clima', 'meio_ambiente'], ['sustentabilidade', 'meio_ambiente'],
+  ['sustentavel', 'meio_ambiente'], ['sustentaveis', 'meio_ambiente'], ['desenvolvimento sustentavel', 'meio_ambiente'],
+  ['preservacao ambiental', 'meio_ambiente'], ['unidades de conservacao', 'meio_ambiente'], ['recursos hidricos', 'meio_ambiente'],
+  ['poluicao', 'meio_ambiente'], ['queimadas', 'meio_ambiente'], ['amazonia', 'meio_ambiente'], ['reciclagem', 'meio_ambiente'],
+  ['energias renovaveis', 'energia'], ['energia renovavel', 'energia'], ['eficiencia energetica', 'energia'], ['transicao energetica', 'energia'],
+  ['energia solar', 'energia'], ['energia eolica', 'energia'], ['combustiveis', 'energia'], ['petroleo', 'energia'], ['gas natural', 'energia'],
+  ['eletricidade', 'energia'], ['conta de luz', 'energia'], ['ferrovias', 'transporte'], ['ferrovia', 'transporte'], ['hidrovias', 'transporte'],
+  ['rodovias', 'transporte'], ['rodovia', 'transporte'], ['portos', 'transporte'], ['aeroportos', 'transporte'],
+  ['portos e aeroportos', 'transporte'], ['mobilidade urbana', 'transporte'], ['transporte publico', 'transporte'],
+  ['transporte coletivo', 'transporte'], ['logistica', 'transporte'], ['infraestrutura logistica', 'transporte'], ['onibus', 'transporte'],
+  ['metro', 'transporte'], ['trens', 'transporte'], ['obras', 'infraestrutura'], ['iluminacao', 'infraestrutura'], ['zeladoria', 'infraestrutura'],
+  ['pavimentacao', 'infraestrutura'], ['asfalto', 'infraestrutura'], ['planejamento urbano', 'infraestrutura'],
+  ['integracao nacional', 'infraestrutura'], ['controle interno', 'transparencia'], ['auditoria', 'transparencia'],
+  ['combate a corrupcao', 'transparencia'], ['participacao cidada', 'transparencia'], ['governo digital', 'transparencia'],
+  ['eficiencia administrativa', 'transparencia'], ['atendimento ao cidadao', 'transparencia'], ['servico publico', 'transparencia'],
+  ['gestao publica', 'transparencia'], ['compras publicas', 'transparencia'], ['desburocratizacao', 'transparencia'],
+  ['combate a fome', 'assistencia'], ['fome', 'assistencia'], ['pobreza', 'assistencia'], ['bolsa familia', 'assistencia'],
+  ['programas sociais', 'assistencia'], ['vulnerabilidade social', 'assistencia'], ['inclusao social', 'assistencia'],
+  ['igualdade de oportunidades', 'assistencia'], ['seguranca alimentar', 'assistencia'], ['protecao a infancia', 'assistencia'],
+  ['infancia', 'assistencia'], ['pessoa idosa', 'idosos'], ['pessoas idosas', 'idosos'], ['terceira idade', 'idosos'], ['idoso', 'idosos'],
+  ['fomento as artes', 'cultura'], ['artes', 'cultura'], ['patrimonio historico', 'cultura'], ['patrimonio cultural', 'cultura'],
+  ['museus', 'cultura'], ['habitacao popular', 'moradia'], ['regularizacao fundiaria', 'moradia'], ['deficit habitacional', 'moradia'],
+  ['casa propria', 'moradia'], ['aluguel social', 'moradia'], ['saneamento basico', 'saneamento'], ['esgoto', 'saneamento'],
+  ['agua tratada', 'saneamento'], ['residuos solidos', 'saneamento'], ['gestao de residuos', 'saneamento'], ['lixo', 'saneamento'],
+  ['coleta de lixo', 'saneamento'], ['inovacao tecnologica', 'tecnologia'], ['inovacao no setor produtivo', 'tecnologia'],
+  ['inclusao digital', 'tecnologia'], ['internet', 'tecnologia'], ['conectividade', 'tecnologia'], ['startups', 'tecnologia'],
+  ['inteligencia artificial', 'tecnologia'], ['pesquisa cientifica', 'tecnologia'], ['ciencia e tecnologia', 'tecnologia'],
+  ['agricultura familiar', 'agro'], ['agronegocio', 'agro'], ['assistencia tecnica rural', 'agro'], ['produtores rurais', 'agro'],
+  ['produtor rural', 'agro'], ['irrigacao', 'agro'], ['pecuaria', 'agro'], ['seguro rural', 'agro'], ['rural', 'agro'],
+  ['turismo sustentavel', 'turismo'], ['esporte de base', 'esporte'], ['alto rendimento', 'esporte'], ['atletas', 'esporte'], ['lazer', 'esporte'],
+  ['lazer comunitario', 'esporte'], ['violencia contra a mulher', 'mulheres'], ['igualdade de genero', 'mulheres']
 ].map(([kw, id]) => ({ kw, id, rx: rxPalavra(kw), rxG: new RegExp(`\\b${escapeRx(kw)}\\b`, 'g') }))
   .sort((a, b) => b.kw.length - a.kw.length); // sortedByDescending (estável)
 
@@ -123,7 +174,15 @@ const RX_REGRAS_VOTO = new RegExp(
   '\\bvoto (e |eh )?obrigatori\\w*|\\bobrigad\\w* a votar\\b|\\bobrigatori\\w* (votar|o voto)\\b|\\bvoto facultativo\\b|\\bfacultativ\\w*\\b|' +
   '\\bquem (e|eh) obrigado\\b|\\bvotos validos\\b|\\bse eu nao votar\\b|\\bmulta\\b'
 );
-const RX_PLANO = /\bplanos? de governo\b|\bprogramas? de governo\b|\bpropostas?\b|\bplano\b/;
+const RX_PLANO = /\bplanos? de governo\b|\bprogramas? de governo\b|\bpropostas?\b|\bplano\b|\bplataformas? eleitora\w*\b|\bdiretrizes\b|\bprioridades\b|\bmetas\b|\bcompromissos\b|\bprogramas? registrad\w*\b|\bdocumentos? (publicos? )?(das?|dos?) candidatur\w*\b/;
+/** Pergunta sobre propostas/planos SEM contexto de votação: as regras do processo eleitoral (documentos para votar, urna, local, 2º turno,
+ *  pesquisas, patrimônio) não se aplicam. Caso de 21/10/2026: "onde encontrar os documentos públicos das candidaturas do 1º turno sobre X"
+ *  caía em LOCAL_VOTACAO e "propostas do 2º turno sobre X" em SEGUNDO_TURNO. */
+const RX_CTX_VOTACAO = /\b(vot\w*|urnas?|cabine|secao eleitoral|mesari\w*|titulo|biometri\w*|identificac\w*|levar)\b/;
+/** "propostas/planos/documentos DAS CANDIDATURAS sobre X": pedido de plano por tema, não listagem ("candidaturas do 2º turno" casa com RX.listagem). */
+const RX_DOC_CANDIDATURAS = /\b(documentos?|propostas?|planos?|programas?|compromissos|metas|diretrizes|plataformas?)( publicos?| eleitorais?| de governo)? (das?|dos?) candidatur\w*\b/;
+const RX_PATRIMONIO_NAO_DECLARADO = /\bpatrimonio (historico|cultural|publico|natural|artistico)\b/;
+const RX_PESQUISA_CIENTIFICA = /\bpesquisas? (cientific\w*|academic\w*)\b/;
 const RX_CONTAS = new RegExp(
   '\\bgast\\w*\\b|\\bdespesas?\\b|\\barrecad\\w*\\b|\\breceitas?\\b|\\bdoac\\w*\\b|\\bdoador\\w*\\b|\\bprestacao de contas\\b|' +
   '\\bcontas (de|da) campanha\\b|\\bfinanciamento\\b|\\bfundo (eleitoral|partidario)\\b|\\bcusto da campanha\\b|\\bquanto (custou|recebeu)\\b'
@@ -168,7 +227,7 @@ const RX = {
   turno2: /\bsegundo turno\b|\b2 ?(o|a|º|ª|°)? turno\b/,   // "2a turno" é erro de digitação comum de "2º"
   turno1: /\bprimeiro turno\b|\b1 ?(o|a|º|ª|°)? turno\b/,
   sobreDados: /\bde onde (vem|vêm|sao)\b|\bfontes?\b|\bdados (sao|vem|oficiais)\b|\batualizad\w*\b|\batualizacao\b|\bultima atualizacao\b|\bversao\b/,
-  fontes: /\bsites? oficia\w*\b|\bdivulgacand\w*\b|\btre\b|\bonde consulto\b|\blinks? (oficia\w*|do tse)\b|\bquem fiscaliza\b|\bquem organiza (as )?eleic\w*\b|\bjustica eleitoral\b|\bo que faz (o|um) (tse|tre)\b|\bdenunciar\b|\bdenuncia\b|\bdesinformacao\b|\bfake news\b|\bpropaganda irregular\b|\bcrime eleitoral\b|\bcompra de votos\b/,
+  fontes: /\bsites? oficia\w*\b|\b(ferramentas?|canais|canal|portais|portal|sistemas?|paginas?|repositorios?) oficia\w*\b|\bcanais institucionais\b|\bdivulgacand\w*\b|\btre\b|\bonde consulto\b|\blinks? (oficia\w*|do tse)\b|\bquem fiscaliza\b|\bquem organiza (as )?eleic\w*\b|\bjustica eleitoral\b|\bo que faz (o|um) (tse|tre)\b|\bdenunciar\b|\bdenuncia\b|\bdesinformacao\b|\bfake news\b|\bpropaganda irregular\b|\bcrime eleitoral\b|\bcompra de votos\b/,
   listagem: /\bquem (disputa|disputam|concorre|concorrem|sao)\b|\bcandidat\w* (a|ao|à|para|de|do|da|em|que|com)\b|\blista( de)? candidat\w*\b|\bmostr\w* (os )?candidat\w*\b|\bver (os )?candidat\w*\b|\bquais (os |sao os )?candidat\w*\b/,
   patrimonio: /\bpatrimonio\b|\bbens\b|\briqueza\b|\bric[oa]s?\b|\bdeclarou\b|\bquanto (tem|possui)\b/,
   contar: /\bquantos\b|\bquantas\b|\bnumero de candidat\w*\b|\btotal de candidat\w*\b/,
@@ -361,35 +420,40 @@ function parseSemContexto(query, gaz) {
   // 2. Regras e informações do processo eleitoral
   if (RX.senado.test(t) || (t.includes('senador') && RX.senadoQtd.test(t))) return q('SENADO_DOIS_VOTOS');
   if (RX_REGRAS_VOTO.test(t)) return q('REGRAS_VOTO');
+  // pergunta sobre propostas/planos sem contexto de votação: não é documento para votar, urna, local nem regra do 2º turno (21/10/2026)
+  const sobrePropostas = (RX_PLANO.test(t) || RX.sobreDados.test(t) || RX.fontes.test(t)) && !RX_CTX_VOTACAO.test(t);
   const ehViolacaoCabineOuConduta = /cabine|filmar|fotograf|grava|arma|vestiment|roupa|camiseta|bermuda|chinelo|biquini|sunga|descalco|boca de urna|santinho/.test(t);
-  if (RX.docsBiometria.test(t) && !ehViolacaoCabineOuConduta) return q('LOCAL_VOTACAO');
-  if (RX.urna.test(t)) return q('REGRAS_URNA');
-  if (RX.local.test(t)) return q('LOCAL_VOTACAO');
+  if (RX.docsBiometria.test(t) && !ehViolacaoCabineOuConduta && !sobrePropostas) return q('LOCAL_VOTACAO');
+  if (RX.urna.test(t) && !sobrePropostas) return q('REGRAS_URNA');
+  if (RX.local.test(t) && !sobrePropostas) return q('LOCAL_VOTACAO');
   if (RX.calendario.test(t)) return q('CALENDARIO');
 
-  // 3. Pesquisas registradas (antes de "resultado", que também aparece em "resultado da pesquisa")
-  if (RX.pesquisas.test(t)) return q('PESQUISAS');
+  // 3. Pesquisas registradas (antes de "resultado", que também aparece em "resultado da pesquisa"); "pesquisa científica" é tema, não pesquisa eleitoral
+  if (RX.pesquisas.test(t) && !RX_PESQUISA_CIENTIFICA.test(t)) return q('PESQUISAS');
 
-  // 3.1 Segundo turno e resultados
-  if (RX.turno2.test(t) && !RX_RESULTADOS.test(t.replaceAll('segundo turno', ''))) return q('SEGUNDO_TURNO');
+  // 3.1 Segundo turno e resultados ("propostas do 2º turno sobre saúde" é plano de governo, não a regra do 2º turno)
+  if (RX.turno2.test(t) && !RX_RESULTADOS.test(t.replaceAll('segundo turno', '')) && !sobrePropostas) return q('SEGUNDO_TURNO');
   if (RX_RESULTADOS.test(t)) return q('RESULTADOS');
 
   // 4. Fontes e sobre os dados
   if (RX.sobreDados.test(t)) return q('SOBRE_DADOS');
-  if (RX.fontes.test(t)) return q('FONTES');
+  // "onde consultar nos canais oficiais as propostas sobre X": o pedido é o plano por tema (passo 5), não a lista de links
+  if (RX.fontes.test(t) && !RX_PLANO.test(t)) return q('FONTES');
 
   // 5. Plano de governo, contas, patrimônio, Ficha Limpa, contagem
   const listagem = RX.listagem.test(t);
   const falaCandidatos = listagem || RX.candidat.test(t);
   if (RX_PLANO.test(t)) {
-    if (tema != null && falaCandidatos) return q('LISTAR_CANDIDATOS');
-    const n = nome();
+    // listagem explícita ('candidatos a/que/com...') com tema: lista filtrada; 'documentos das candidaturas sobre X' é plano por tema (21/10/2026)
+    if (tema != null && listagem && !RX_DOC_CANDIDATURAS.test(t)) return q('LISTAR_CANDIDATOS');
+    // com tema na frase, o tema nunca vira nome de candidato ("plano de governo sobre educação" ≠ "REJANE DA EDUCAÇÃO")
+    const n = achado?.termo ?? resolverNome(t, raw, cargo, uf, partido, gaz, true, false, false, tema != null);
     if (n != null) return q('PLANO_GOVERNO', n);
     if (numero != null) return q('PLANO_GOVERNO');
-    return q(tema != null ? 'LISTAR_CANDIDATOS' : 'PLANO_GOVERNO');
+    return q('PLANO_GOVERNO'); // com tema: resposta de plano por tema (answers.planoGoverno); sem tema: a explicação geral
   }
   if (RX_CONTAS.test(t)) return q('CONTAS_CAMPANHA', nome());
-  if (RX.patrimonio.test(t)) return q('PATRIMONIO', !listagem ? nome() : nomeEmListagem());
+  if (RX.patrimonio.test(t) && !RX_PATRIMONIO_NAO_DECLARADO.test(t)) return q('PATRIMONIO', !listagem ? nome() : nomeEmListagem());
   if (RX_ELEGIBILIDADE.test(t)) return q('ELEGIBILIDADE', nome());
   if (RX.contar.test(t)) return q('CONTAR');
 
@@ -511,7 +575,17 @@ const STOP_EXTRA = new Set([
   'simular', 'simulador', 'simule', 'plano', 'planos', 'governo', 'programa', 'propostas', 'proposta', 'projetos',
   'gastou', 'gastos', 'gasto', 'gasta', 'campanha', 'contas', 'despesas', 'receitas', 'doacoes', 'arrecadou',
   'chapa', 'suplentes', 'mulher', 'mulheres', 'homens', 'candidatas', 'feminino', 'masculino', 'suja',
-  'situacao', 'registro', 'candidatura', 'inelegivel', 'indeferido', 'deferido', 'rico', 'rica', 'ajuda', 'voce'
+  'situacao', 'registro', 'candidatura', 'inelegivel', 'indeferido', 'deferido', 'rico', 'rica', 'ajuda', 'voce',
+  // 21/10/2026: palavras de "onde consultar nos canais oficiais" que casavam com apelidos de urna (FERREIRA DO PORTAL, MILTÃO OFICIAL...)
+  'portal', 'portais', 'oficial', 'oficiais', 'ferramenta', 'ferramentas', 'canais', 'canal', 'fontes', 'fonte', 'sistemas', 'sistema',
+  'pagina', 'paginas', 'repositorio', 'repositorios', 'institucional', 'institucionais', 'consultar', 'conferir', 'verificar', 'acessar',
+  'pesquisar', 'encontrar', 'comparar', 'utilizar', 'acompanhar', 'analisar', 'divulgacao', 'dados', 'abertos', 'publicos', 'publicas',
+  'informacoes', 'verificadas', 'detalhamento', 'historico', 'documentos', 'area', 'setor', 'registradas', 'registrados', 'apresentadas',
+  'declaradas', 'discutidos', 'relacionados', 'relacionadas', 'referentes', 'voltadas', 'consolidados', 'atualizadas', 'disputa',
+  'combate', 'apoio', 'comunitario', 'comunitaria', 'direitos', 'humanos', 'protecao', 'prevencao', 'gestao', 'formacao', 'fomento',
+  'valorizacao', 'desenvolvimento', 'politica', 'politicas', 'promocao', 'inclusao', 'qualidade', 'servico', 'servicos', 'publico', 'publica',
+  'regional', 'popular', 'basica', 'basico', 'social', 'sociais', 'cooperacao', 'federativa', 'relacoes', 'integracao', 'participacao', 'cidada',
+  'coletivo', 'coletiva', 'coletivos'
 ]);
 
 const SEPARADORES = /[ ?!.,;:"'()]/;
@@ -524,12 +598,13 @@ const TEM_LETRA = /\p{L}/u;
  *   temas citados também são removidos do texto.
  * @param {boolean} [soNome] a entrada é só um nome ("lula"): aceita uma palavra mesmo sem indício.
  */
-export function resolverNome(t, raw, cargo, uf, partido, gaz, indicio = true, soNome = false, emListagem = false) {
+export function resolverNome(t, raw, cargo, uf, partido, gaz, indicio = true, soNome = false, emListagem = false, semTemas = false) {
   let texto = t;
   for (const c of CARGOS) texto = texto.replace(c.rxG, ' ');
   for (const n of NOMES_UF_NORM) texto = texto.replace(n.rxG, ' ');
   if (partido != null) texto = texto.replace(new RegExp(`\\b${escapeRx(normalizar(partido))}\\b`, 'g'), ' ');
-  if (!indicio || emListagem) for (const tm of TEMAS) texto = texto.replace(tm.rxG, ' ');
+  // `semTemas`: pergunta de plano/propostas com tema ("plano de governo sobre educação") — o tema nunca é nome ("REJANE DA EDUCAÇÃO"), 21/10/2026
+  if (!indicio || emListagem || semTemas) for (const tm of TEMAS) texto = texto.replace(tm.rxG, ' ');
   const tokens = texto.split(SEPARADORES)
     .filter((x) => x.length >= 3 && TEM_LETRA.test(x) && !STOP_NOME.has(x) && !STOP_EXTRA.has(x) &&
       // frase com cara de listagem: palavras de pergunta e de cargo não podem virar "nome" (ex.: "candidatos a prefeito")

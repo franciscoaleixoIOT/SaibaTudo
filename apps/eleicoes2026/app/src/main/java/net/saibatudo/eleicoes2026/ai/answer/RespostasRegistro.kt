@@ -118,6 +118,27 @@ internal fun AnswerBuilder.planoGoverno(p: ParsedQuery): AiMenuResponse {
         } else {
             append("\nNão há plano de governo registrado nos dados do TSE para esta candidatura. O plano é exigido de candidatos a Presidente e a Governador (Lei 9.504/1997, art. 11, §1º, IX).")
         }
+    } else if (p.tema != null) {
+        // "Onde consultar as propostas sobre educação?" (21/10/2026; texto idêntico ao do site): aponta o DivulgaCandContas e lista as
+        // candidaturas a Presidente e a Governador cujo plano registrado cita o tema (detecção por palavras-chave do pipeline).
+        val rotulo = regras.temas[p.tema] ?: p.tema
+        val comTema = data.candidatos.filter { it.temPlanoGoverno && p.tema in it.temasPlano && it.naUrna }
+        val pres = comTema.filter { it.cargoCodigo == "PRESIDENTE" }
+        val uf = p.uf ?: ufPadrao
+        val gov = if (uf != null) comTema.filter { it.cargoCodigo == "GOVERNADOR" && it.estadoUf == uf } else emptyList()
+        fun nomes(lista: List<net.saibatudo.eleicoes2026.domain.model.Candidate>) = lista.joinToString(", ") { "${it.nomeUrna} (${it.partido})" }
+        val textoTema = "Propostas sobre $rotulo nos planos de governo registrados no TSE:\n" +
+            "• ${n(comTema.size)} candidatura${if (comTema.size == 1) "" else "s"} a Presidente e a Governador cita${if (comTema.size == 1) "" else "m"} o tema no plano " +
+            "(detecção automática por palavras-chave; o app não resume nem compara propostas)" +
+            (if (pres.isNotEmpty()) "\n• Presidência: ${nomes(pres)}" else "") +
+            (if (gov.isNotEmpty()) "\n• Governador ${Ufs.em(uf!!)}: ${nomes(gov)}" else "") +
+            "\n• O texto completo de cada plano está no DivulgaCandContas (${AppConstants.URL_DIVULGA_CAND_CONTAS}); os cartões abaixo listam as candidaturas que citam o tema."
+        return AiMenuResponse(
+            targetRoute = "menu/home", menuId = AppConstants.MENU_HOME, intent = Intent.PLANO_GOVERNO, filters = AiFilterExtraction(tema = p.tema, resetar = true),
+            directAnswer = textoTema, candidateIds = (pres + gov).take(8).map { it.id },
+            suggestedQuestions = listOf("Candidatos a Governador em ${uf ?: "SP"} que citam ${rotulo.lowercase()} no plano", "Quem disputa a Presidência?"),
+            fonte = fonte, origem = origem
+        )
     } else "Planos de governo registrados no TSE:\n" +
         "• Exigidos de candidatos a Presidente e a Governador (Lei 9.504/1997, art. 11, §1º, IX)\n" +
         "• ${n(regras.estatisticas.candidatosComPlanoGoverno)} candidaturas com plano registrado\n" +

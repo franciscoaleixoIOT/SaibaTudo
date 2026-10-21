@@ -846,6 +846,27 @@ export class AnswerBuilder {
       } else {
         texto += '\nNão há plano de governo registrado nos dados do TSE para esta candidatura. O plano é exigido de candidatos a Presidente e a Governador (Lei 9.504/1997, art. 11, §1º, IX).';
       }
+    } else if (p.tema != null) {
+      // "Onde consultar as propostas sobre educação?" (21/10/2026): o app não resume nem compara propostas; aponta o DivulgaCandContas e
+      // lista as candidaturas a Presidente e a Governador cujo plano registrado cita o tema (detecção por palavras-chave do pipeline).
+      const rotulo = this.regras.temas?.[p.tema] ?? p.tema;
+      const comTema = this.data.candidatos.filter((x) => x.temPlanoGoverno && x.temasPlano.includes(p.tema) && x.naUrna !== false);
+      const pres = comTema.filter((x) => x.cargoCodigo === 'PRESIDENTE');
+      const uf = p.uf ?? this.ufPadrao;
+      const gov = uf ? comTema.filter((x) => x.cargoCodigo === 'GOVERNADOR' && x.estadoUf === uf) : [];
+      const nomes = (lista) => lista.map((x) => `${x.nomeUrna} (${x.partido})`).join(', ');
+      texto = `Propostas sobre ${rotulo} nos planos de governo registrados no TSE:\n` +
+        `• ${n(comTema.length)} candidatura${comTema.length === 1 ? '' : 's'} a Presidente e a Governador cita${comTema.length === 1 ? '' : 'm'} o tema no plano ` +
+        '(detecção automática por palavras-chave; o app não resume nem compara propostas)' +
+        (pres.length > 0 ? `\n• Presidência: ${nomes(pres)}` : '') +
+        (gov.length > 0 ? `\n• Governador ${ufEm(uf)}: ${nomes(gov)}` : '') +
+        `\n• O texto completo de cada plano está no DivulgaCandContas (${URL_DIVULGA_CAND_CONTAS}); os cartões abaixo listam as candidaturas que citam o tema.`;
+      return resposta({
+        targetRoute: 'menu/home', menuId: MENU.HOME, intent: 'PLANO_GOVERNO', filters: filtros({ tema: p.tema, resetar: true }),
+        directAnswer: texto, candidateIds: [...pres, ...gov].slice(0, 8).map((x) => x.id),
+        suggestedQuestions: [`Candidatos a Governador em ${uf ?? 'SP'} que citam ${rotulo.toLowerCase()} no plano`, 'Quem disputa a Presidência?'],
+        fonte: this.fonte, origem: this.origem
+      });
     } else {
       texto = 'Planos de governo registrados no TSE:\n' +
         '• Exigidos de candidatos a Presidente e a Governador (Lei 9.504/1997, art. 11, §1º, IX)\n' +
