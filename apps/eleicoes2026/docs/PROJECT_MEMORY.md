@@ -279,7 +279,16 @@ Lição repetida: não dizer "corrigido" sem reproduzir antes e depois. Padrões
 ## 10. Segredos e backups (nunca no Git)
 `secrets/upload-keystore.p12` + `keystore.properties` (chave de **upload** do Play), `secrets/data_signing_key.pem` (assinatura dos **dados**; chave pública em `pipeline/data_signing_public.pem`), `secrets/hf_token.txt` (token do Space), `secrets/upstash.env` (URL e token do Redis). A pasta `secrets/` é ignorada pelo Git. Faça backup offline das chaves de assinatura.
 
-## 11. Histórico recente (05 a 20/10/2026)
+## 11. Histórico recente (05 a 21/10/2026)
+- **21/10 (05h):** mantenedor relatou que "quem já ganhou no 1o turno para governador?" não era respondida (local nem nuvem). Dois defeitos,
+  reproduzidos no motor do site com o pacote real: (1) **NLU por regras**: `RX_RESULTADOS` exigia "quem ganhou" colado; o "já" fazia a pergunta
+  cair em LISTAR_CANDIDATOS (191 candidaturas) — agora `quem (ja|afinal|mesmo)? (ganhou|…)` e `ja (ganhou|venceu|foi eleito|…)`, no site e no Android
+  (`LocalNlu.kt`, idênticos). (2) **Resposta de resultados**: Governador/Senador sem UF só pediam o estado; agora `resultadosNacionais()` resume o
+  país pelo pacote (CSV oficial do TSE): governadores eleitos no 1º turno por estado (21 estados), estados com 2º turno (A × B) e os sem definição;
+  senadores eleitos por estado. Com UF padrão, o resumo nacional só sai quando a pergunta pede o país (plural "governadores", "já ganhou", "todos
+  os estados", "quais estados"); "quem foi eleito governador?" com UF padrão continua respondendo o estado. Deputados continuam pedindo a UF. Mesmo
+  texto no site (`answers.js`) e no Android (`RespostasResultados.kt`). A nuvem (SaibaTudo IA/Modal) só interpreta; a resposta é montada pelo
+  mesmo motor, por isso falhava igual. Testes: web 180, Android (AnswerBuilderTest, NomeCandidatoTest). Modelo da nuvem inalterado.
 - **20/10 (madrugada):** (1) **tempos da nuvem maiores** (pedido do mantenedor: "o tempo inicial tem que ser maior; depois da primeira a segunda
   funciona"): a partida a frio do Modal mediu 16,7 s ao vivo na química; `MODAL_TIMEOUT_MS` padrão 20000 e teto 45000 (`config.js`), `api/nlu.js`
   `maxDuration: 50`, site 20 s automático / 45 s explícito (`cloud.js`); Vercel `MODAL_TIMEOUT_MS=30000` fica para o mantenedor (bloqueio do

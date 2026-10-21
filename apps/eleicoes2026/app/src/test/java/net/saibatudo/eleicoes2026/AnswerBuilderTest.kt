@@ -63,6 +63,22 @@ class AnswerBuilderTest {
     }
 
     @Test
+    fun governadorSemUfResumeOPaisEQuemJaGanhouEhResultado() {
+        // 21/10/2026 (paridade com answers.js): "quem já ganhou" era listagem; governador sem UF pedia o estado em vez do resumo do pacote
+        val pais = responder("quem já ganhou no 1o turno para governador?", hoje = "2026-10-21", uf = "SP")
+        assertEquals(Intent.RESULTADOS, pais.intent)
+        assertTrue(pais.directAnswer!!, pais.directAnswer!!.contains("Governador — 1º turno") && pais.directAnswer!!.contains("(SP)"))
+        assertTrue(pais.candidateIds.isNotEmpty())
+        val semUf = responder("Quem foi eleito governador?", hoje = "2026-10-21")
+        assertTrue(semUf.directAnswer!!, semUf.directAnswer!!.contains("Eleitos no 1º turno") && semUf.directAnswer!!.contains("2º turno em"))
+        val senado = responder("quais senadores foram eleitos?", hoje = "2026-10-21")
+        assertTrue(senado.directAnswer!!, senado.directAnswer!!.contains("Senador — 1º turno"))
+        // deputado continua pedindo a UF; com UF padrão e pergunta sem plural, a resposta segue sendo a do estado
+        assertTrue(responder("quem foi eleito deputado federal?", hoje = "2026-10-21").directAnswer!!.contains("De qual estado?"))
+        assertTrue(responder("Quem foi eleito governador?", hoje = "2026-10-21", uf = "SP").directAnswer!!.contains("São Paulo"))
+    }
+
+    @Test
     fun resultadosAoVivoUsamNumerosDoTseSemAlterar() {
         val ap = ApuracaoProvider { cargo, uf, turno ->
             ApuracaoCargo(

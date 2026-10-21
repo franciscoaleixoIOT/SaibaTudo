@@ -51,6 +51,11 @@ internal suspend fun AnswerBuilder.resultados(p: ParsedQuery): AiMenuResponse {
     if (uf == "DF" && cargoConsulta == "DEPUTADO_ESTADUAL") {
         cargoConsulta = "DEPUTADO_DISTRITAL"
     }
+    // Governador/Senador sem estado: resumo nacional pelo pacote em vez de pedir a UF (paridade com answers.js, 21/10/2026). Com UF padrão,
+    // só quando a pergunta pede o país ("governadores", "já ganhou", "todos os estados").
+    if (p.uf == null && cargoConsulta in setOf("GOVERNADOR", "SENADOR") && (uf == null || RX_RESULTADO_NACIONAL.containsMatchIn(textoNorm))) {
+        resultadosNacionais(p, cargoConsulta, abrir)?.let { return anotarResultado(it, generico, null, null) }
+    }
     if (uf == null) {
         return AiMenuResponse(
             targetRoute = "info/resultados", menuId = AppConstants.MENU_RESULTADOS, intent = p.intent, filters = abrir,
@@ -377,6 +382,58 @@ internal fun leituraSegundoTurno(ap: ApuracaoCargo): LeituraSegundoTurno {
 }
 
 /** Situação do 2º turno segundo o PACOTE (CSV oficial do TSE), para quando a apuração ao vivo não respondeu; null se o pacote não define. */
+/** Pergunta de resultado que pede o país inteiro (Governador/Senador sem UF): plural, "já ganhou", "todos os estados", "quais estados". */
+private val RX_RESULTADO_NACIONAL =
+    Regex("""\b(governadores|senadores|todos os estados|no brasil|no pa[ií]s|quais estados|em quais|em quantos|j[aá] (ganhou|ganharam|venceu|venceram|foi eleito|foram eleitos))\b""")
+
+/**
+ * Resumo nacional de Governador ou Senador pelo PACOTE (CSV oficial do TSE): eleitos no 1º turno por estado e, para Governador, os estados que
+ * vão ao 2º turno. null quando o pacote ainda não traz resultado de nenhum estado (a resposta volta a pedir a UF). Texto idêntico ao do site.
+ */
+internal fun AnswerBuilder.resultadosNacionais(p: ParsedQuery, cargo: String, filtros: AiFilterExtraction): AiMenuResponse? {
+    val comResultado = data.candidatos.filter { it.cargoCodigo == cargo && it.estadoUf != "BR" && it.resultado != null }
+    if (comResultado.isEmpty()) return null
+    val porUf = comResultado.groupBy { it.estadoUf }.toSortedMap()
+    fun linha(c: net.saibatudo.eleicoes2026.domain.model.Candidate) = "${c.numero} — ${c.nomeUrna} (${c.partido})"
+    fun votos1(c: net.saibatudo.eleicoes2026.domain.model.Candidate) = c.resultado?.turnos?.get(1)?.votos ?: 0L
+    val eleitos1 = mutableListOf<Pair<String, List<net.saibatudo.eleicoes2026.domain.model.Candidate>>>()
+    val segundo = mutableListOf<Pair<String, List<net.saibatudo.eleicoes2026.domain.model.Candidate>>>()
+    val semDefinicao = mutableListOf<String>()
+    for ((uf, daqui) in porUf) {
+        val el = daqui.filter { if (cargo == "GOVERNADOR") it.resultado?.eleitoNoPrimeiroTurno == true else it.resultado?.eleito == true }
+        if (el.isNotEmpty()) {
+            eleitos1 += uf to el.sortedByDescending { votos1(it) }
+            continue
+        }
+        val cl = daqui.filter { it.resultado?.segundoTurno == true }.sortedByDescending { votos1(it) }
+        if (cargo == "GOVERNADOR" && cl.size >= 2) segundo += uf to cl.take(2) else semDefinicao += uf
+    }
+    val titulo = if (cargo == "GOVERNADOR") "Governador" else "Senador"
+    val sb = StringBuilder("$titulo — 1º turno (${dataBr(regras.turno1)}), segundo o TSE.")
+    if (eleitos1.isNotEmpty()) {
+        sb.append("\n\n${if (cargo == "GOVERNADOR") "Eleitos no 1º turno" else "Eleitos"} (${eleitos1.size} estado${if (eleitos1.size == 1) "" else "s"}):")
+        for ((uf, cands) in eleitos1) sb.append("\n• ${Ufs.NOMES[uf] ?: uf} ($uf): ${cands.joinToString("; ") { linha(it) }}")
+    } else {
+        sb.append("\n\nNenhum ${titulo.lowercase()} eleito no 1º turno consta no pacote.")
+    }
+    if (segundo.isNotEmpty()) {
+        sb.append("\n\n2º turno em ${segundo.size} estado${if (segundo.size == 1) "" else "s"} (${dataBr(regras.turno2)}):")
+        for ((uf, cands) in segundo) sb.append("\n• ${Ufs.NOMES[uf] ?: uf} ($uf): ${linha(cands[0])} × ${linha(cands[1])}")
+    }
+    if (semDefinicao.isNotEmpty()) sb.append("\n\nSem eleito definido no pacote: ${semDefinicao.joinToString(", ")}.")
+    sb.append("\nPara um estado: \"Resultado para $titulo em SP\". Dados oficiais: ${AppConstants.URL_RESULTADOS_TSE}")
+    return AiMenuResponse(
+        targetRoute = "info/resultados", menuId = AppConstants.MENU_RESULTADOS, intent = p.intent, filters = filtros, abrirResultados = true,
+        directAnswer = sb.toString(), candidateIds = eleitos1.flatMap { it.second }.take(6).map { it.id },
+        suggestedQuestions = listOf(
+            "Resultado para $titulo em ${ufPadrao ?: "SP"}",
+            if (cargo == "GOVERNADOR") "Em quais estados haverá 2º turno?" else "Resultado para Governador",
+            "Resultado para Presidente"
+        ),
+        fonte = fonte, origem = origem
+    )
+}
+
 internal fun AnswerBuilder.statusSegundoTurnoPacote(cargo: String, uf: String): String? {
     val daqui = data.candidatos.filter { it.cargoCodigo == cargo && it.estadoUf == uf && it.resultado != null }
     daqui.firstOrNull { it.resultado?.eleitoNoPrimeiroTurno == true }?.let {

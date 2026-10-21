@@ -84,11 +84,27 @@ test('resultados pós-eleição: sem apuração publicada informam que não há 
   }
 });
 
-test('resultados sem cargo pedem o cargo; governador sem UF pede o estado', async () => {
+test('resultados sem cargo pedem o cargo; governador sem UF resume o país; com UF padrão responde o estado', async () => {
   assert.ok((await responder('Resultado da apuração', { hoje: '2026-10-04' })).directAnswer.includes('De qual cargo'));
-  assert.ok((await responder('Quem foi eleito governador?', { hoje: '2026-10-04' })).directAnswer.includes('De qual estado?'));
+  const pais = await responder('Quem foi eleito governador?', { hoje: '2026-10-04' });
+  assert.ok(pais.directAnswer.includes('Governador — 1º turno'), pais.directAnswer);
+  assert.ok(pais.directAnswer.includes('Eleitos no 1º turno') && pais.directAnswer.includes('São Paulo (SP)'), pais.directAnswer);
+  assert.ok(pais.directAnswer.includes('2º turno em'), pais.directAnswer);
   const comUf = await responder('Quem foi eleito governador?', { hoje: '2026-10-04', uf: 'SP', apuracao: { obter: async () => null } });
   assert.ok(comUf.directAnswer.includes('Governador em São Paulo'), comUf.directAnswer);
+});
+
+test('"quem já ganhou no 1o turno para governador?" é resultado (não listagem) e resume os estados; o plural também, mesmo com UF padrão', async () => {
+  for (const pergunta of ['quem já ganhou no 1o turno para governador?', 'Quem já foi eleito governador?', 'quais governadores foram eleitos no primeiro turno?']) {
+    const r = await responder(pergunta, { hoje: '2026-10-21', uf: 'SP', apuracao: { obter: async () => null } });
+    assert.equal(r.intent, 'RESULTADOS', pergunta);
+    assert.ok(r.directAnswer.includes('Governador — 1º turno') && r.directAnswer.includes('(SP)'), `${pergunta}: ${r.directAnswer.slice(0, 120)}`);
+    assert.ok(r.candidateIds.length > 0, pergunta);
+  }
+  const senado = await responder('quais senadores foram eleitos?', { hoje: '2026-10-21' });
+  assert.ok(senado.directAnswer.includes('Senador — 1º turno') && senado.directAnswer.includes('Eleitos ('), senado.directAnswer.slice(0, 160));
+  // Deputado continua pedindo a UF (lista longa demais para um resumo nacional)
+  assert.ok((await responder('quem foi eleito deputado federal?', { hoje: '2026-10-21' })).directAnswer.includes('De qual estado?'));
 });
 
 test('segundo turno: antes da apuração explica a regra; depois consulta o resultado', async () => {

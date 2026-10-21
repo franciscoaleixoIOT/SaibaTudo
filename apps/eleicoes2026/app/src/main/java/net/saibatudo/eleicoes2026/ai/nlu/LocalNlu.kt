@@ -131,7 +131,9 @@ object LocalNlu {
     )
 
     private val RX_RESULTADOS = Regex(
-        """\b(quem (ganhou|venceu|foi eleito|foram eleitos|esta ganhando|esta na frente|lidera|ficou em)|resultados?|apuracao|apurado\w*|""" +
+        // "quem JÁ ganhou no 1º turno para governador?" (21/10/2026; paridade com nlu.js): o advérbio entre "quem" e o verbo levava à listagem
+        """\b(quem (ja |afinal |mesmo )?(ganhou|venceu|foi eleito|foram eleitos|esta ganhando|esta na frente|lidera|ficou em)|ja (ganhou|venceu|foi eleito|foram eleitos)|""" +
+            """resultados?|apuracao|apurado\w*|""" +
             """votos (teve|recebeu|obteve|tem)|quantos votos|eleitos?|mais votad\w*|percentual de votos|totalizacao|boletim de urna|""" +
             """passou para o segundo|quem passou)\b"""
     )

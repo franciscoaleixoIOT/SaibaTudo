@@ -71,6 +71,8 @@ class NomeCandidatoTest {
         assertEquals(Intent.LISTAR_CANDIDATOS, LocalNlu.parse("candidatos a governador do PT em SP", gaz).intent)
         assertEquals(Intent.CONTAR, LocalNlu.parse("quantos candidatos a governador em SP", gaz).intent)
         assertEquals(Intent.RESULTADOS, LocalNlu.parse("Quem foi eleito governador em SP?", gaz).intent)
+        // 21/10/2026: "quem JÁ ganhou" caía em listagem (paridade com nlu.js)
+        assertEquals(Intent.RESULTADOS, LocalNlu.parse("quem já ganhou no 1o turno para governador?", gaz).intent)
         for (q in listOf("quem vai pro segundo turno?", "haverá 2º turno para presidente?")) assertFalse(q, LocalNlu.parse(q, gaz).intent == Intent.PERFIL_CANDIDATO)
         assertEquals("13", LocalNlu.parse("quem é o 13?", gaz).numero)
     }

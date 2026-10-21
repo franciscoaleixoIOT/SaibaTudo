@@ -8,10 +8,13 @@
 import {
   MENU, ModeloCargo, normalizar, SISTEMAS_OFICIAIS_TSE, URL_AUTOATENDIMENTO_ELEITOR, URL_CALENDARIO_TSE, URL_DADOS_ABERTOS_TSE,
   URL_DIVULGA_CAND_CONTAS, URL_PORTAL_TSE_2026, URL_RESULTADOS_TSE, FICHA_LIMPA, HISTORICO, decimal2, fichaLimpa, fichaLimpaTexto,
-  inteiro, moeda, primeiraMaiuscula, resultadoEleito, resultadoEleitoNoPrimeiroTurno, resultadoSegundoTurno, tituloCargo, tituloPalavras, ufEm, ufPor
+  inteiro, moeda, NOMES_UF, primeiraMaiuscula, resultadoEleito, resultadoEleitoNoPrimeiroTurno, resultadoSegundoTurno, tituloCargo, tituloPalavras, ufEm, ufPor
 } from './model.js';
 import { FASES, diasEntre, faseDe, formatarBr } from './phase.js';
 import { filtrar, novoFiltro } from './filters.js';
+
+/** Pergunta de resultado que pede o país inteiro (Governador/Senador sem UF): plural, "já ganhou", "todos os estados", "quais estados". */
+const RX_RESULTADO_NACIONAL = /\b(governadores|senadores|todos os estados|no brasil|no pais|quais estados|em quais|em quantos|ja (ganhou|ganharam|venceu|venceram|foi eleito|foram eleitos))\b/;
 
 export const ORIGEM_ROTULO = {
   LOCAL: 'IA local • dados oficiais',
@@ -962,6 +965,7 @@ export class AnswerBuilder {
   // ------------------------------------------------------------------ resultados
 
   async resultados(p) {
+
     const textoNorm = normalizar(p.textoOriginal ?? '');
     // "deputado mais votado" sem federal/estadual: a Câmara é o padrão e o aviso oferece a Assembleia (antes o app pedia o cargo
     // de novo, e a IA da nuvem recebia esse pedido como contexto e dizia que não tinha o dado — 11/10/2026)
@@ -992,6 +996,12 @@ export class AnswerBuilder {
     const uf = cargo === 'PRESIDENTE' ? 'BR' : (p.uf ?? this.ufPadrao);
     if (uf === 'DF' && cargoConsulta === 'DEPUTADO_ESTADUAL') {
       cargoConsulta = 'DEPUTADO_DISTRITAL';
+    }
+    // Governador/Senador sem estado: resumo nacional pelo pacote (CSV oficial do TSE) em vez de pedir a UF — "quem já ganhou no 1º turno para
+    // governador?", "quais governadores foram eleitos?" (21/10/2026). Com UF padrão, só quando a pergunta pede o país ("governadores", "já ganhou").
+    if (p.uf == null && ['GOVERNADOR', 'SENADOR'].includes(cargoConsulta) && (uf == null || RX_RESULTADO_NACIONAL.test(textoNorm))) {
+      const nacional = this.resultadosNacionais(p, cargoConsulta, abrir);
+      if (nacional) return anotarResultado(nacional, { generico, uf: null, maisVotado: null });
     }
     if (uf == null) {
       return resposta({
@@ -1079,6 +1089,56 @@ export class AnswerBuilder {
       directAnswer: texto,
       candidateIds: (eleitos.length > 0 ? eleitos : daqui.filter((c) => resultadoSegundoTurno(c.resultado))).slice(0, 6).map((c) => c.id),
       suggestedQuestions: ['Calendário eleitoral 2026', 'Quem disputa a Presidência?'], fonte: this.fonte, origem: this.origem
+    });
+  }
+
+  /** Resumo nacional de Governador ou Senador pelo PACOTE (CSV oficial do TSE): eleitos no 1º turno por estado e, para Governador, os estados
+   *  que vão ao 2º turno. null quando o pacote ainda não traz resultado de nenhum estado (a resposta volta a pedir a UF). */
+  resultadosNacionais(p, cargo, fi) {
+    const comResultado = this.data.candidatos.filter((c) => c.cargoCodigo === cargo && c.estadoUf !== 'BR' && c.resultado != null);
+    if (comResultado.length === 0) return null;
+    const porUf = new Map();
+    for (const c of comResultado) {
+      if (!porUf.has(c.estadoUf)) porUf.set(c.estadoUf, []);
+      porUf.get(c.estadoUf).push(c);
+    }
+    const ufs = [...porUf.keys()].sort();
+    const nomeUf = (uf) => NOMES_UF[uf] ?? uf;
+    const linha = (c) => `${c.numero} — ${c.nomeUrna} (${c.partido})`;
+    const eleitos1 = [];
+    const segundo = [];
+    const semDefinicao = [];
+    for (const uf of ufs) {
+      const daqui = porUf.get(uf);
+      const el = daqui.filter((c) => (cargo === 'GOVERNADOR' ? resultadoEleitoNoPrimeiroTurno(c.resultado) : resultadoEleito(c.resultado)));
+      if (el.length > 0) {
+        eleitos1.push({ uf, cands: decrescente(el, (c) => c.resultado.turnos?.[1]?.votos ?? 0) });
+        continue;
+      }
+      const cl = decrescente(daqui.filter((c) => resultadoSegundoTurno(c.resultado)), (c) => c.resultado.turnos?.[1]?.votos ?? 0);
+      if (cargo === 'GOVERNADOR' && cl.length >= 2) segundo.push({ uf, cands: cl.slice(0, 2) });
+      else semDefinicao.push(uf);
+    }
+    const titulo = cargo === 'GOVERNADOR' ? 'Governador' : 'Senador';
+    let texto = `${titulo} — 1º turno (${dataBr(this.regras.turno1)}), segundo o TSE.`;
+    if (eleitos1.length > 0) {
+      texto += `\n\n${cargo === 'GOVERNADOR' ? 'Eleitos no 1º turno' : 'Eleitos'} (${eleitos1.length} estado${eleitos1.length === 1 ? '' : 's'}):`;
+      for (const { uf, cands } of eleitos1) texto += `\n• ${nomeUf(uf)} (${uf}): ${cands.map(linha).join('; ')}`;
+    } else {
+      texto += `\n\nNenhum ${titulo.toLowerCase()} eleito no 1º turno consta no pacote.`;
+    }
+    if (segundo.length > 0) {
+      texto += `\n\n2º turno em ${segundo.length} estado${segundo.length === 1 ? '' : 's'} (${dataBr(this.regras.turno2)}):`;
+      for (const { uf, cands } of segundo) texto += `\n• ${nomeUf(uf)} (${uf}): ${linha(cands[0])} × ${linha(cands[1])}`;
+    }
+    if (semDefinicao.length > 0) texto += `\n\nSem eleito definido no pacote: ${semDefinicao.join(', ')}.`;
+    texto += `\nPara um estado: "Resultado para ${titulo} em SP". Dados oficiais: ${URL_RESULTADOS_TSE}`;
+    return resposta({
+      targetRoute: 'info/resultados', menuId: MENU.RESULTADOS, intent: p.intent, filters: fi, abrirResultados: true,
+      directAnswer: texto,
+      candidateIds: eleitos1.flatMap((e) => e.cands).slice(0, 6).map((c) => c.id),
+      suggestedQuestions: [`Resultado para ${titulo} em ${this.ufPadrao ?? 'SP'}`, cargo === 'GOVERNADOR' ? 'Em quais estados haverá 2º turno?' : 'Resultado para Governador', 'Resultado para Presidente'],
+      fonte: this.fonte, origem: this.origem
     });
   }
 
