@@ -22,6 +22,7 @@ número da resposta (CID, massa molar) está no contexto. As respostas evitam ve
 e qualquer frase de recusa (ask_core.e_recusa): os dois verificadores são conferidos em dataset/tests/test_seguranca_pratica.py.
 """
 import re
+import unicodedata
 
 from comum import Resp, cap, com_artigo, lista_pt, renderizar
 from fam_seguranca_rotulo import SIGNIFICADO_PALAVRA, contexto_ghs
@@ -405,7 +406,100 @@ GERAIS_V12 = [
      "cozinha, cloreto de sódio, é só o exemplo mais conhecido. Sulfatos, nitratos, carbonatos e bicarbonatos também são sais. A ficha de cada sal no "
      "app traz fórmula, massa molar e solubilidade.", "fundamental"),
 ]
-GERAIS = GERAIS + GERAIS_V12
+GERAIS_V13 = [
+    ("biscoitos_caseiros", ["Como fazer biscoitos salgados em casa?", "Receita de biscoito caseiro", "Como faço bolachas em casa?"],
+     "Receitas de cozinha fogem do escopo do SaibaTudo Química, mas a química dos biscoitos é interessante: o fermento químico libera gás carbônico "
+     "quando o bicarbonato reage com um ácido na massa; a gordura impede o glúten de formar rede longa, por isso o biscoito fica quebradiço; e a cor "
+     "dourada vem da reação de Maillard entre açúcares e proteínas no forno. A receita em si fica para um livro de culinária.", "fundamental"),
+    ("bomba_de_banho", ["Como fazer uma bomba de banho em casa?", "Qual a química da bomba de banho efervescente?", "Por que a bomba de banho borbulha?"],
+     "A bomba de banho efervescente é química de cozinha: bicarbonato de sódio e ácido cítrico, secos, são prensados com um pouco de óleo, corante e "
+     "essência; ao cair na água, o ácido e o bicarbonato reagem e liberam gás carbônico, que faz as bolhas. Os ingredientes são de uso cosmético e "
+     "alimentar, sem risco além de irritação em pele sensível; o nome é só uma brincadeira, não tem nada de explosivo.", "fundamental"),
+    ("herbicida_horta", ["Qual herbicida é seguro perto de hortaliças?", "Posso usar mata-mato perto da horta?", "Como controlar ervas daninhas na horta com segurança?"],
+     "Perto de hortaliças o mais seguro é não usar herbicida: capina manual, cobertura morta e vinagre de limpeza aplicado só na folha da erva, em dia sem vento, "
+     "resolvem a maioria dos casos. Produtos registrados para hortas existem, mas o rótulo manda respeitar a distância, o período de carência antes da colheita "
+     "e o uso de luvas e óculos; o app não indica marcas. Deriva de herbicida mata a horta inteira e contamina o que se come.", "fundamental"),
+    ("fogos_de_artificio", ["Como funcionam os fogos de artifício?", "Por que os fogos de artifício têm cores diferentes?", "Fogos de artifício são perigosos?"],
+     "Fogos de artifício são misturas pirotécnicas: um oxidante fornece o oxigênio, um combustível queima depressa e sais de metais dão a cor, como o estrôncio "
+     "para o vermelho, o cobre para o azul e o sódio para o amarelo. A fabricação é licenciada e controlada; em casa, o perigo é real: queimaduras, perda de dedos "
+     "e de visão em acidentes com artefatos acesos na mão ou que falharam. Queimadura pede água fria e atendimento; artefato que falhou não se reacende.", "fundamental"),
+    ("estrutura_sem_ficha", ["Mostre a estrutura de uma substância que não está no app", "Como vejo a estrutura molecular de um composto?", "Desenhe a molécula de uma substância"],
+     "O desenho da estrutura molecular no app vem da ficha do composto, que traz o SMILES do PubChem: basta abrir a ficha e tocar em desenhar. Quando a substância "
+     "não está no pacote de dados, o app não desenha nem descreve de memória, porque não teria como conferir; posso explicar a classe química e os riscos "
+     "em termos gerais.", "fundamental"),
+]
+GERAIS = GERAIS + GERAIS_V12 + GERAIS_V13
+
+# 21/10/2026 (Explica v1.2 reprovado com 75,6 %): as 102 falhas restantes eram perguntas LEGÍTIMAS sobre substâncias que só apareciam nas recusas
+# (cocaína, TATP, pólvora, ricina, dinamite, metanfetamina, nitroglicerina...), em 5 idiomas. Saber o que é, os perigos, os efeitos, os primeiros
+# socorros, a história e o controle legal de uma substância perigosa é legítimo; a recusa fica só para produção, purificação e obtenção.
+# Cada texto é um parágrafo sem número, sem fórmula, sem reagente, sem condição de reação. Substância -> (artigo, texto).
+SUBSTANCIAS_PERIGOSAS = {
+    "TATP": ("o", "O TATP, peróxido de acetona, é um explosivo primário de peróxido orgânico, sem nitrogênio, por isso escapa de alguns detectores. É de uma "
+             "instabilidade extrema: sensível a choque, atrito, calor, faísca e até à sublimação, e já causou muitos acidentes com quem o manipulou. Em caso de "
+             "achado ou suspeita, ninguém toca: isola-se a área e chamam-se bombeiros ou polícia. É substância controlada; o app não orienta produção."),
+    "nitroglicerina": ("a", "A nitroglicerina é um líquido oleoso e um explosivo secundário muito sensível ao choque; estabilizada em terra diatomácea deu origem à "
+                       "dinamite, e em doses minúsculas é medicamento vasodilatador para a angina. Como explosivo é controlada por lei; como remédio é de "
+                       "prescrição. Exposição acidental causa dor de cabeça intensa e queda de pressão: ar fresco, repouso e atendimento médico."),
+    "TNT": ("o", "O trinitrotolueno é um explosivo secundário sólido, bem mais estável ao choque que a nitroglicerina, e por isso virou padrão militar e "
+            "unidade de comparação de explosões. É tóxico por ingestão, contato e inalação e pode afetar órgãos com exposição repetida; mancha a pele de "
+            "amarelo. Resíduos contaminam solo e água. É controlado pelo Exército no Brasil; o app explica perigos e história, não produção."),
+    "pólvora": ("a", "A pólvora negra é uma mistura pirotécnica de um oxidante (salitre, o nitrato de potássio), carvão e enxofre, conhecida da China medieval; "
+                "a pólvora moderna sem fumaça é à base de nitrocelulose. É inflamável e deflagra com violência quando confinada; faísca, chama e eletricidade "
+                "estática a iniciam. Em casa só existe em fogos de artifício e munição, que são regulados; queimaduras pedem água fria e atendimento."),
+    "dinamite": ("a", "A dinamite foi inventada por Alfred Nobel em meados do século dezenove ao absorver nitroglicerina em terra diatomácea, tornando-a "
+                 "segura de transportar; hoje usa outros absorventes e aditivos. É explosivo industrial licenciado para mineração e obras, manuseado só por "
+                 "profissionais habilitados. Dinamite velha exsuda nitroglicerina e fica perigosíssima: nunca tocar, isolar e chamar bombeiros ou polícia."),
+    "RDX": ("o", "O RDX, ou ciclonite, é um explosivo militar secundário, mais potente que o TNT, base de explosivos plásticos. É tóxico: ingestão ou inalação do "
+            "pó causa convulsões e afeta o sistema nervoso, e trabalhadores expostos precisam de proteção respiratória e cutânea. É de uso exclusivamente "
+            "controlado; sobre fabricação o app não orienta, sobre riscos e primeiros socorros, sim."),
+    "nitrato de amônio": ("o", "O nitrato de amônio é um fertilizante e um comburente: sozinho é estável, mas em grande quantidade, confinado, aquecido ou "
+                          "contaminado por combustíveis pode detonar, como em acidentes portuários e industriais famosos. Por isso o armazenamento é regulado: "
+                          "longe de calor e de materiais orgânicos, em pilhas limitadas e ventiladas. A venda a granel é controlada pelo Exército no Brasil."),
+    "sarin": ("o", "O sarin é um agente neurotóxico de guerra química, organofosforado, líquido volátil sem cor e quase sem cheiro, proibido pela Convenção "
+              "sobre Armas Químicas. Bloqueia a enzima que regula a acetilcolina: pupilas contraídas, salivação, falta de ar, convulsões e morte em minutos. "
+              "Em exposição, sair do local, remover roupas, lavar com água e sabão e buscar emergência; os antídotos são hospitalares. Produção é crime."),
+    "gás mostarda": ("o", "O gás mostarda é um agente vesicante de guerra química, proibido por tratado internacional, com cheiro de mostarda ou alho. Causa "
+                     "bolhas na pele, lesões graves nos olhos e nas vias respiratórias horas depois da exposição, e é cancerígeno. Em contato, remover roupas, "
+                     "lavar abundantemente com água e procurar emergência; não há antídoto, só tratamento de suporte. O app não orienta produção."),
+    "fosgênio": ("o", "O fosgênio é um gás industrial usado na produção de plásticos e também um antigo agente de guerra química. Tem cheiro de feno recém-"
+                 "cortado e é traiçoeiro: o edema pulmonar aparece horas depois de uma inalação aparentemente leve. Exposição é emergência médica mesmo sem "
+                 "sintoma, com observação hospitalar. Na indústria só é manuseado em sistema fechado, com detectores e proteção respiratória."),
+    "cocaína": ("a", "A cocaína é um alcaloide tropânico extraído das folhas da coca; a estrutura tem um sistema bicíclico com nitrogênio e dois grupos éster, "
+                "um deles ligado a um anel aromático. É um estimulante que bloqueia a recaptação de dopamina: euforia, taquicardia, vasoconstrição, "
+                "hipertensão e dependência intensa; overdose dá arritmia, infarto, convulsão e hipertermia. Em intoxicação, emergência imediata. É "
+                "substância proscrita no Brasil; o app explica efeitos e riscos, não extração nem produção."),
+    "metanfetamina": ("a", "A metanfetamina é um estimulante sintético da família das anfetaminas, a forma metilada da anfetamina. Libera dopamina e "
+                      "noradrenalina em excesso: euforia, insônia, agitação, perda de apetite e dependência forte; o uso crônico destrói dentes, pele e "
+                      "vasos e causa psicose. Overdose: hipertermia, convulsão, parada cardíaca, emergência imediata. É proscrita; produção é crime e o "
+                      "app não orienta nada sobre isso."),
+    "heroína": ("a", "A heroína é um opioide semissintético derivado da morfina, extraída do ópio da papoula. Deprime o sistema nervoso: analgesia, sonolência, "
+                "pupilas contraídas e, em overdose, parada respiratória; o antídoto naloxona reverte e é usado pelos serviços de emergência. Causa "
+                "dependência física severa, com síndrome de abstinência. É proscrita no Brasil; quem presencia overdose chama a emergência e mantém a "
+                "pessoa respirando e de lado."),
+    "LSD": ("o", "O LSD, dietilamida do ácido lisérgico, é um alucinógeno sintético derivado de alcaloides do esporão do centeio, ativo em quantidades "
+            "ínfimas. Altera percepção, humor e noção de tempo por muitas horas; os riscos principais são crises de pânico, comportamento perigoso e "
+            "surtos em pessoas predispostas, e há relatos de flashbacks. Não causa dependência física, mas é proscrito. Em crise, ambiente calmo e "
+            "atendimento médico."),
+    "MDMA": ("o", "O MDMA, o ecstasy, é um estimulante sintético da classe das anfetaminas com efeito empatogênico: libera serotonina e dopamina, dando "
+             "euforia e sociabilidade. Os riscos são hipertermia, desidratação ou, ao contrário, intoxicação por água, arritmia e lesão hepática, agravados "
+             "em festas e pelo uso combinado. Comprimidos de rua têm adulterantes. É proscrito; em mal-estar, resfriamento e emergência."),
+    "fentanil": ("o", "O fentanil é um opioide sintético muito mais potente que a morfina, usado em anestesia e no controle da dor sob prescrição estrita. "
+                 "Fora do uso médico é a maior causa de mortes por overdose em alguns países, porque uma quantidade minúscula para a respiração; a naloxona "
+                 "reverte, às vezes em doses repetidas. É controlado; o app explica riscos e socorro, não síntese nem obtenção."),
+    "ricina": ("a", "A ricina é uma proteína tóxica da semente da mamona, uma das toxinas naturais mais potentes: inibe a síntese de proteínas nas células. "
+               "Ingestão ou inalação causa vômitos, diarreia, falência de órgãos e morte em dias; não há antídoto, só tratamento de suporte hospitalar. A "
+               "mamona em si é planta comum e o óleo de rícino é seguro porque a toxina não vai para o óleo. É arma biológica proibida; produção é crime."),
+    "cianeto": ("o", "O cianeto, em sais ou como ácido cianídrico, bloqueia a respiração celular e mata em minutos em doses pequenas; tem cheiro de amêndoas "
+                "amargas que nem todos percebem. É usado na mineração de ouro e na galvanoplastia sob controle rígido, e aparece na fumaça de incêndios de "
+                "plásticos. Sinais: dor de cabeça, confusão, convulsão, pele rosada e parada respiratória; o socorro é ar fresco, oxigênio e antídoto "
+                "hospitalar, com emergência imediata. É substância controlada."),
+}
+MODELOS_SUBSTANCIA = [
+    "Quais os perigos {de} {s}?", "Quais são os riscos {de} {s}?", "O que é {s}?", "{S} é inflamável ou explosiv{oa}?", "Quais os efeitos {de} {s} no organismo?",
+    "O que fazer em caso de exposição a {s}?", "Primeiros socorros para intoxicação por {s}", "Como é a estrutura molecular {de} {s}?",
+    "Quem descobriu ou inventou {s}?", "{S} é uma substância controlada?", "Por que {s} é tão perigos{oa}?", "{S} tem algum uso legítimo?",
+]
 
 
 # ---------------------------------------------------------------------------------------------------------
@@ -558,5 +652,12 @@ def gerar(ctx: Ctx):
     for tema, perguntas, resposta, nivel in GERAIS:
         for k, q in enumerate(perguntas):
             sub.add(f"sp-geral-{tema}-{k + 1}", q, resposta, Resp(), "seguranca", nivel, {}, [FONTE_AUTORIA], f"autoria:seguranca_pratica.{tema}", FAM)
+    for nome, (art, texto) in SUBSTANCIAS_PERIGOSAS.items():
+        slug = re.sub(r"[^a-z0-9]+", "_", unicodedata.normalize("NFD", nome.lower()).encode("ascii", "ignore").decode()).strip("_")
+        de = "do" if art == "o" else "da"
+        oa = "o" if art == "o" else "a"
+        for k, modelo in enumerate(MODELOS_SUBSTANCIA):
+            q = modelo.format(s=nome, S=(art + " " + nome).capitalize() if not nome.isupper() else f"{'O' if art == 'o' else 'A'} {nome}", de=de, oa=oa)
+            sub.add(f"sp-subst-{slug}-{k + 1}", q, texto, Resp(), "seguranca", "medio", {}, [FONTE_AUTORIA], f"autoria:seguranca_pratica.substancia_{slug}", FAM)
     sub.stats["seguranca_pratica_compostos"] = len(elegiveis(pac))
     sub.stats["seguranca_pratica_destaque"] = n_destaque

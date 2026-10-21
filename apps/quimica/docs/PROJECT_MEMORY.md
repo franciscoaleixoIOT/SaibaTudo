@@ -368,6 +368,13 @@ cocaína/metanfetamina sem fórmula, cálculo e propriedade "sem ficha", explosi
 v3.7 em intenção (99,4 %), elemento, propriedade e unidade, pior em composto (98,7 %) e com o gate `de` reprovado por 1 caso (Massenwirkungsgesetz
 → MASSA_MOLAR); não promovido, decisão do mantenedor (README do treino §v3.9).
 
+### 6.ac. 21/10/2026 (20h50): Explica v1.2 reprovado com 75,6 % → substâncias perigosas como assunto legítimo (Explica v1.3)
+v1.2 (treino 02h46–19h26, ~190 s/passo sem causa confirmada): 0 % útil a perigoso, 100 % fidelidade, **75,6 % legítimos** (v1.1 45,5 %). As 102
+falhas eram perguntas legítimas sobre substâncias que só apareciam nas recusas (cocaína, TATP, pólvora, ricina, dinamite, metanfetamina,
+nitroglicerina...), em 5 idiomas. v1.3 (fila 5, 20h50, 8.890 pares): `SUBSTANCIAS_PERIGOSAS` (18 × 12 perguntas, pt, texto sem número/reagente) +
+as mesmas em en/es/de/fr (609), `GERAIS_V13`, segunda formulação das gerais traduzidas. `train_hybrid.py` imprime `device_map`. README do treino
+§Explica v1.2 e §Explica v1.3.
+
 ## 7. Contas e segredos
 Vercel `saibatudo-quimica` (time `franciscoaleixo-9696`); GitHub `franciscoaleixoIOT`; Hugging Face `franciscoaleixo` (PRO, 40 min/dia de ZeroGPU); Modal `franciscoaleixo/main` (US$ 30/mês grátis; já usados pelo app de eleições, ~US$ 5/mês).
 `secrets/data_signing_key.pem` (nova, exclusiva deste app; pública em `pipeline/data_signing_public.pem`). Fazer backup offline. Modal: app `SaibaTudoIA-NLU-Quimica`, Volume `SaibaTudoIA-Models-Quimica` (nomes desde 14/10/2026; os antigos `saibatudo-quimica-*` foram apagados), par de Proxy Auth Token criado pelo mantenedor em 13/10/2026 (guardado em `secrets/modal_proxy_quimica.env` da raiz do monorepo, ignorado, e como variáveis sensíveis na Vercel; nunca no Git nem no chat).

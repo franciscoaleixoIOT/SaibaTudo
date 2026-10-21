@@ -4,7 +4,7 @@
  "licenca": "CC BY-SA 4.0",
  "fonteDados": "real",
  "versaoDados": "20261020T033339Z-5bb39b8e232b",
- "total": 67275,
+ "total": 67500,
  "porArquivo": {
   "elementos": 7010,
   "compostos": 32299,
@@ -12,7 +12,7 @@
   "nomenclatura": 3934,
   "regras": 370,
   "desenho": 3893,
-  "seguranca": 6422,
+  "seguranca": 6647,
   "recusas": 413,
   "conceitos": 2022,
   "comparacoes": 1411,
@@ -26,11 +26,11 @@
   "fato": 42545,
   "nomenclatura": 4026,
   "recusa": 413,
-  "seguranca": 6662
+  "seguranca": 6887
  },
  "porNivel": {
-  "fundamental": 21832,
-  "medio": 24023,
+  "fundamental": 21847,
+  "medio": 24233,
   "superior": 21420
  },
  "elementos": 118,
@@ -550,7 +550,7 @@
   "conceitos_texto_pessoa": 4,
   "conceitos_texto_uso": 62,
   "desenho": 3893,
-  "duplicadas_descartadas": 300,
+  "duplicadas_descartadas": 302,
   "elementos": 7010,
   "elementos_ausente:afinidade": 61,
   "elementos_ausente:densidade": 22,
@@ -575,16 +575,16 @@
   "nomenclatura": 3934,
   "nomenclatura_regras_validadas": 241,
   "nomenclatura_sem_validacao": 675,
-  "perguntas_repetidas_com_respostas_diferentes": 171,
+  "perguntas_repetidas_com_respostas_diferentes": 173,
   "ph_fortes_disponiveis": 14,
   "ph_listas_fortes_de": "regras.json",
   "recusas": 419,
   "regras": 370,
   "regras_sais_classificados": 178,
   "regras_sal_sem_regra": 16,
-  "removidos_por_casos_de_seguranca": 34,
+  "removidos_por_casos_de_seguranca": 38,
   "seguranca": 1020,
-  "seguranca_pratica": 1384,
+  "seguranca_pratica": 1613,
   "seguranca_pratica_compostos": 479,
   "seguranca_pratica_destaque": 38,
   "seguranca_rotulo": 3961,
@@ -660,5 +660,5 @@
   "pergunta repetida com resposta diferente: 'Some as massas atômicas e dê a massa molar de C6H12O6.' (ca-mm-90008-2)",
   "pergunta repetida com resposta diferente: 'Some as massas atômicas e dê a massa molar de C4H4N2.' (ca-mm-9259-2)"
  ],
- "avisosTotal": 173
+ "avisosTotal": 175
 }

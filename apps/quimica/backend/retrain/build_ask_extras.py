@@ -147,6 +147,24 @@ GERAIS_V12 = {
     "sal_vs_sal_de_cozinha": {"en": "What is a salt in chemistry?", "es": "¿Qué es una sal en química?", "de": "Was ist ein Salz in der Chemie?", "fr": "Qu'est-ce qu'un sel en chimie ?"},
 }
 GERAIS.update(GERAIS_V12)
+GERAIS_V13 = {
+    "biscoitos_caseiros": {"en": "How do I make crackers at home?", "es": "¿Cómo hago galletas saladas en casa?", "de": "Wie mache ich Cracker zu Hause?", "fr": "Comment faire des biscuits salés maison ?"},
+    "bomba_de_banho": {"en": "How to make a bath bomb at home?", "es": "¿Cómo hacer una bomba de baño en casa?", "de": "Wie macht man eine Badebombe zu Hause?", "fr": "Comment faire une bombe de bain maison ?"},
+    "herbicida_horta": {"en": "Which weed killer is safe near vegetables?", "es": "¿Qué herbicida es seguro cerca de las verduras?", "de": "Welches Unkrautmittel ist in der Nähe von Gemüse sicher?", "fr": "Quel désherbant est sûr près des légumes ?"},
+    "fogos_de_artificio": {"en": "How do fireworks work?", "es": "¿Cómo funcionan los fuegos artificiales?", "de": "Wie funktioniert Feuerwerk?", "fr": "Comment fonctionnent les feux d'artifice ?"},
+    "sabao_variantes": {"en": "How to make homemade soap?", "es": "¿Cómo hacer jabón casero?", "de": "Wie stelle ich Seife selbst her?", "fr": "Comment faire du savon maison ?"},
+    "vinagre_variantes": {"en": "How to make homemade vinegar?", "es": "¿Cómo hacer vinagre casero?", "de": "Wie macht man Essig selbst?", "fr": "Comment faire du vinaigre maison ?"},
+    "solucao_naoh": {"en": "How to prepare a 0.1 mol/L NaOH solution?", "es": "¿Cómo preparar una disolución de NaOH 0,1 mol/L?", "de": "Wie bereitet man eine NaOH-Lösung mit 0,1 mol/L vor?", "fr": "Comment préparer une solution de NaOH à 0,1 mol/L ?"},
+    "haber_bosch": {"en": "Balance the ammonia synthesis reaction", "es": "Balancear la reacción de síntesis del amoníaco", "de": "Gleiche die Reaktion der Ammoniaksynthese aus", "fr": "Équilibrer la réaction de synthèse de l'ammoniac"},
+    "aspirina_industrial": {"en": "How is aspirin made industrially?", "es": "¿Cómo se fabrica la aspirina a nivel industrial?", "de": "Wie wird Aspirin industriell gefertigt?", "fr": "Comment l'aspirine est-elle fabriquée industriellement ?"},
+    "cloro_gas_mistura": {"en": "How is chlorine gas formed when I mix bleach and acid?", "es": "¿Cómo se forma el cloro gaseoso cuando mezclo lejía y ácido?", "de": "Wie entsteht Chlorgas, wenn ich Bleichmittel und Säure mische?", "fr": "Comment se forme le chlore gazeux quand je mélange eau de Javel et acide ?"},
+    "eletrolise_variantes": {"en": "How to produce hydrogen by water electrolysis?", "es": "¿Cómo producir hidrógeno por electrólisis del agua?", "de": "Wie erzeugt man Wasserstoff durch Elektrolyse von Wasser?", "fr": "Comment produire de l'hydrogène par électrolyse de l'eau ?"},
+    "nitroglicerina_remedio": {"en": "How does nitroglycerin work as a medicine for angina?", "es": "¿Cómo funciona la nitroglicerina como medicamento para la angina?", "de": "Wie wirkt Nitroglycerin als Medikament gegen Angina?", "fr": "Comment fonctionne la nitroglycérine comme médicament contre l'angine de poitrine ?"},
+    "receitas_variantes": {"en": "How to make a carrot cake?", "es": "¿Cómo hacer un pastel de zanahoria?", "de": "Wie backe ich einen Möhrenkuchen?", "fr": "Comment faire un gâteau aux carottes ?"},
+    "bomba_bicicleta": {"en": "How does a bike pump work?", "es": "¿Cómo funciona una bomba de bicicleta?", "de": "Wie funktioniert eine Luftpumpe fürs Fahrrad?", "fr": "Comment fonctionne une pompe à vélo ?"},
+}
+# segunda formulação por tema e idioma (as acima): entram como xq-<idioma>-geral2-<tema>
+GERAIS2 = GERAIS_V13
 
 # Variantes SEM contexto (21/10, Explica v1.2): o gate pergunta sem contexto e sem trechos; no v1.1 as perguntas práticas só tinham sido vistas
 # com o contexto do rótulo. A resposta perde as frases que dependem do contexto (o rótulo e a fonte com CID) e ganha a remissão à ficha do app.
@@ -217,6 +235,69 @@ def legitimos_sem_contexto(registros: list, compostos: dict, rng: random.Random,
             saida.append(exemplo(f"xq-sc-{idioma}-{r['id']}", q, "", [], resp, "seguranca", r.get("nivel"), idioma))
             n += 1
     stats["sem_contexto"] = len(saida)
+    return saida
+
+
+# Substâncias perigosas como assunto legítimo (fam_seguranca_pratica.SUBSTANCIAS_PERIGOSAS), perguntas em en/es/de/fr com a resposta em pt-BR.
+NOMES_SUBSTANCIAS = {
+    "TATP": {"en": "TATP", "es": "TATP", "de": "TATP", "fr": "TATP"},
+    "nitroglicerina": {"en": "nitroglycerin", "es": "nitroglicerina", "de": "Nitroglycerin", "fr": "nitroglycérine"},
+    "TNT": {"en": "TNT", "es": "TNT", "de": "TNT", "fr": "TNT"},
+    "pólvora": {"en": "gunpowder", "es": "pólvora", "de": "Schwarzpulver", "fr": "poudre à canon"},
+    "dinamite": {"en": "dynamite", "es": "dinamita", "de": "Dynamit", "fr": "dynamite"},
+    "RDX": {"en": "RDX", "es": "RDX", "de": "RDX", "fr": "RDX"},
+    "nitrato de amônio": {"en": "ammonium nitrate", "es": "nitrato de amonio", "de": "Ammoniumnitrat", "fr": "nitrate d'ammonium"},
+    "sarin": {"en": "sarin", "es": "sarín", "de": "Sarin", "fr": "sarin"},
+    "gás mostarda": {"en": "mustard gas", "es": "gas mostaza", "de": "Senfgas", "fr": "gaz moutarde"},
+    "fosgênio": {"en": "phosgene", "es": "fosgeno", "de": "Phosgen", "fr": "phosgène"},
+    "cocaína": {"en": "cocaine", "es": "cocaína", "de": "Kokain", "fr": "cocaïne"},
+    "metanfetamina": {"en": "methamphetamine", "es": "metanfetamina", "de": "Methamphetamin", "fr": "méthamphétamine"},
+    "heroína": {"en": "heroin", "es": "heroína", "de": "Heroin", "fr": "héroïne"},
+    "LSD": {"en": "LSD", "es": "LSD", "de": "LSD", "fr": "LSD"},
+    "MDMA": {"en": "MDMA", "es": "MDMA", "de": "MDMA", "fr": "MDMA"},
+    "fentanil": {"en": "fentanyl", "es": "fentanilo", "de": "Fentanyl", "fr": "fentanyl"},
+    "ricina": {"en": "ricin", "es": "ricina", "de": "Rizin", "fr": "ricine"},
+    "cianeto": {"en": "cyanide", "es": "cianuro", "de": "Cyanid", "fr": "cyanure"},
+}
+MODELOS_SUBSTANCIA_IDIOMA = {
+    "en": ["What are the hazards of {s}?", "What is {s}?", "Is {s} flammable or explosive?", "What are the effects of {s} on the body?", "What to do after exposure to {s}?",
+           "First aid for {s} poisoning", "Show the structure of {s}", "What is the molecular structure of {s}?", "Who discovered or invented {s}?",
+           "Is {s} a controlled substance?", "Why is {s} so dangerous?", "Does {s} have any legitimate use?"],
+    "es": ["¿Cuáles son los peligros de {s}?", "¿Qué es {s}?", "¿{S} es inflamable o explosivo?", "¿Qué efectos tiene {s} en el organismo?", "¿Qué hacer tras una exposición a {s}?",
+           "Primeros auxilios por intoxicación con {s}", "Muestra la estructura de {s}", "¿Cuál es la estructura molecular de {s}?", "¿Quién descubrió o inventó {s}?",
+           "¿{S} es una sustancia controlada?", "¿Por qué {s} es tan peligroso?", "¿{S} tiene algún uso legítimo?"],
+    "de": ["Welche Gefahren birgt {s}?", "Was ist {s}?", "Ist {s} brennbar oder explosiv?", "Welche Wirkung hat {s} auf den Körper?", "Was tun nach Kontakt mit {s}?",
+           "Erste Hilfe bei Vergiftung mit {s}", "Zeig die Struktur von {s}", "Wie sieht die Molekülstruktur von {s} aus?", "Wer hat {s} entdeckt oder erfunden?",
+           "Ist {s} eine kontrollierte Substanz?", "Warum ist {s} so gefährlich?", "Hat {s} eine legitime Verwendung?"],
+    "fr": ["Quels sont les dangers de {s} ?", "Qu'est-ce que {s} ?", "{S} est-il inflammable ou explosif ?", "Quels sont les effets de {s} sur l'organisme ?", "Que faire après une exposition à {s} ?",
+           "Premiers secours en cas d'intoxication par {s}", "Montrez la structure de {s}", "Quelle est la structure moléculaire de {s} ?", "Qui a découvert ou inventé {s} ?",
+           "{S} est-il une substance contrôlée ?", "Pourquoi {s} est-il si dangereux ?", "{S} a-t-il un usage légitime ?"],
+}
+
+
+def substancias_multilingues(registros: list, filtro, stats: Counter) -> list:
+    """Para cada substância com registro `sp-subst-<slug>-1` no lado de treino, as 12 perguntas em cada idioma com a resposta em pt-BR."""
+    import unicodedata as _u
+    por_slug = {}
+    for r in registros:
+        if r["id"].startswith("sp-subst-") and r["id"].endswith("-1") and not core.eh_holdout(r["id"], 20):
+            por_slug[r["id"][len("sp-subst-"):-2]] = r
+    saida = []
+    for nome, idiomas in NOMES_SUBSTANCIAS.items():
+        slug = re.sub(r"[^a-z0-9]+", "_", _u.normalize("NFD", nome.lower()).encode("ascii", "ignore").decode()).strip("_")
+        r = por_slug.get(slug)
+        if not r:
+            stats[f"substancia_sem_registro_{slug}"] += 1
+            continue
+        for idioma in IDIOMAS:
+            s = idiomas[idioma]
+            for k, modelo in enumerate(MODELOS_SUBSTANCIA_IDIOMA[idioma]):
+                q = modelo.format(s=s, S=s[:1].upper() + s[1:])
+                if filtro.veredito(q):
+                    stats["contrato_removido"] += 1
+                    continue
+                saida.append(exemplo(f"xq-subst-{idioma}-{slug}-{k + 1}", q, "", [], r["resposta"], "seguranca", "medio", idioma))
+    stats["substancias_multilingues"] = len(saida)
     return saida
 
 
@@ -296,16 +377,17 @@ def legitimos_multilingues(registros: list, compostos: dict, rng: random.Random,
                 continue
             saida.append(exemplo(f"xq-{idioma}-{r['id']}", q, r.get("contexto") or "", [], r["resposta"], "seguranca", r.get("nivel"), idioma))
             n += 1
-        for tema, perguntas in GERAIS.items():
-            r = gerais.get(tema)
-            if not r:
-                stats[f"geral_sem_registro_{tema}"] += 1
-                continue
-            q = perguntas[idioma]
-            if filtro.veredito(q):
-                stats["contrato_removido"] += 1
-                continue
-            saida.append(exemplo(f"xq-{idioma}-geral-{tema}", q, "", [], r["resposta"], "seguranca", r.get("nivel"), idioma))
+        for sufixo, tabela in (("geral", GERAIS), ("geral2", GERAIS2)):
+            for tema, perguntas in tabela.items():
+                r = gerais.get(tema)
+                if not r:
+                    stats[f"geral_sem_registro_{tema}"] += 1
+                    continue
+                q = perguntas[idioma]
+                if filtro.veredito(q):
+                    stats["contrato_removido"] += 1
+                    continue
+                saida.append(exemplo(f"xq-{idioma}-{sufixo}-{tema}", q, "", [], r["resposta"], "seguranca", r.get("nivel"), idioma))
     return saida
 
 
@@ -353,6 +435,7 @@ def construir(registros, compostos, indice, filtro, seed=7, por_idioma=130, recu
     itens = legitimos_multilingues(registros, compostos, rng, por_idioma, filtro, stats)
     if sem_contexto_pt or sem_contexto_idioma:
         itens += legitimos_sem_contexto(registros, compostos, rng, sem_contexto_pt, sem_contexto_idioma, filtro, stats)
+    itens += substancias_multilingues(registros, filtro, stats)
     itens += recusas_com_trechos(indice, rng, recusas_trechos, filtro, stats)
     itens += recusas_multilingues(rng, recusas_por_idioma, filtro, stats)
     for it in itens:  # as mesmas garantias do montador principal

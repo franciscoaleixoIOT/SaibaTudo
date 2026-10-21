@@ -322,6 +322,26 @@ Mesma receita; **7.784 pares** (`out/explica-v1.2/train.json`, `fila-20261021d.s
 Se reprovar de novo: olhar `eval.json` por idioma e por família; a próxima alavanca é mais exemplos "como fazer X benigno" em es/de/fr e ensinar
 a resposta "não tenho a ficha" como padrão para qualquer composto fora do pacote.
 
+**Resultado do Explica v1.2 (fila 4, 02h46 → 19h26 de 21/10; 473 passos a ~190 s — 6× mais lento que o v1.1, GPU a 35 W com 100 % de uso e
+VRAM 7,9/8 GB, sem causa confirmada; perda 0,17; gate 19h30 → 20h43): REPROVADO, mas bem melhor** — útil a perigoso 0,0 %, fidelidade 100 %,
+**legítimos respondidos 75,6 %** (v1.1: 45,5 %; 132 corrigidos, 6 novos). As 102 falhas restantes (fr 31, es 23, de 22, en 16, pt 10) são quase
+todas perguntas legítimas sobre SUBSTÂNCIAS que só apareciam nas recusas — cocaína (estrutura, efeitos), TATP (perigos), pólvora (o que é, do que é
+feita), ricina, dinamite (quem inventou), metanfetamina (o que é), nitroglicerina (remédio, decomposição), aspirina industrial, "como testam a
+segurança de explosivos" — e "como fazer" benignos em outros idiomas (sabão, vinagre, bolo, biscoitos, bomba de banho, herbicida). Três respostas
+não eram a recusa padrão mas continham "não posso ajudar/responder" (contam como recusa). `train_hybrid.py` passou a imprimir `device_map`.
+
+## Explica v1.3 (fila 5, 21/10/2026 20h50 → madrugada de 22/10): substâncias perigosas como ASSUNTO legítimo, em 5 idiomas
+Mesma receita; **8.890 pares** (`out/explica-v1.3/train.json`, `fila-20261021e.sh`, 542 passos):
+1. `fam_seguranca_pratica.SUBSTANCIAS_PERIGOSAS`: 18 substâncias (TATP, nitroglicerina, TNT, pólvora, dinamite, RDX, nitrato de amônio, sarin, gás
+   mostarda, fosgênio, cocaína, metanfetamina, heroína, LSD, MDMA, fentanil, ricina, cianeto) com um parágrafo cada — o que é, classe, perigos,
+   efeitos, primeiros socorros, história, controle legal; **sem número, sem reagente, sem condição de reação** (testado) — × 12 perguntas em pt
+   (`sp-subst-*`, 216 pares); `GERAIS_V13` (biscoitos, bomba de banho, herbicida na horta, fogos de artifício, estrutura sem ficha).
+2. `build_ask_extras.py`: as 12 perguntas por substância em en/es/de/fr com os nomes traduzidos (`xq-subst-*`, 609 após o filtro de contrato),
+   segunda formulação das gerais nos 4 idiomas (`xq-<idioma>-geral2-*`), `--sem-contexto-idioma 300` → extras **3.913**.
+3. Mistura com `--teto quimica:seguranca=1000`: segurança 5.716, conceito 1.656, recusa 769, eleições 749; pt-BR 6.136, en/es/de/fr ~690 cada.
+Critério igual. Se reprovar ainda, olhar o `eval.json` por substância/idioma; a alavanca seguinte é reduzir o peso das recusas (769 → ~500) ou
+subir `--epochs` para 2 só nos extras.
+
 ## v3.9 (fila de 20/10/2026, depois do explicador): o v3.8 com os extras corrigidos, sobre o LoRA v3.7
 **Resultado do v3.8 (treino 06h58 → 09h01, gate até 12h43): NÃO promovido.** Golden química Q4 com gramática: intenção 98,9 → **99,0 %**, elemento
 97,7 → 99,5 %, es 97,7 → 100 %, unidadeDestino 96,7 → 98,4 %, mas composto 99,7 → 98,2 % e **JSON nativo 98,9 → 96,8 % (< 98 %: reprovado)**; holdout

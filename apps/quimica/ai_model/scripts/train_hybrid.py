@@ -184,6 +184,8 @@ def main(argv=None):
         trust_remote_code=True, torch_dtype=torch.bfloat16 if device == "cuda" else torch.float32, attn_implementation="sdpa",
     )
     model.config.use_cache = False
+    # 21/10/2026: registra onde cada camada ficou (GPU ou CPU) para explicar passos lentos (v1.2: ~190 s/passo contra ~31 s no v1.1)
+    print("device_map:", getattr(model, "hf_device_map", None), flush=True)
     model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=True, gradient_checkpointing_kwargs={"use_reentrant": False})
     lora = LoraConfig(
         r=16, lora_alpha=32, lora_dropout=0.05, bias="none", task_type="CAUSAL_LM",

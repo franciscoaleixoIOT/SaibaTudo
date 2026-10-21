@@ -25,7 +25,7 @@ class TestSegurancaPratica(unittest.TestCase):
 
     def test_existe_e_e_do_tipo_seguranca(self):
         self.assertGreater(len(self.compostos), 20)
-        total = sum(len(p) for _, p, _, _ in fsp.GERAIS)
+        total = sum(len(p) for _, p, _, _ in fsp.GERAIS) + len(fsp.SUBSTANCIAS_PERIGOSAS) * len(fsp.MODELOS_SUBSTANCIA)
         self.assertLessEqual(len(self.gerais), total)   # os quase iguais aos casos do gate saem em gerar_qa.filtrar_contra_casos_de_seguranca
         self.assertGreater(len(self.gerais), total * 0.7)
         for r in self.regs:
@@ -74,6 +74,10 @@ class TestSegurancaPratica(unittest.TestCase):
             for k, texto in tabela.items():
                 self.assertNotRegex(texto, r"\d", (k, texto))
                 self.assertFalse(ask_core.ensina_producao(texto), (k, texto))
+        for nome, (art, texto) in fsp.SUBSTANCIAS_PERIGOSAS.items():  # substâncias perigosas como assunto: sem número, sem reagente de produção
+            self.assertNotRegex(texto, r"\d", nome)
+            self.assertIn(art, ("o", "a"), nome)
+            self.assertFalse(ask_core.ensina_producao(texto), nome)
         for tema, perguntas, resposta, nivel in fsp.GERAIS:
             self.assertNotRegex(resposta, r"\d", tema)
             self.assertIn(nivel, ("fundamental", "medio", "superior"), tema)
