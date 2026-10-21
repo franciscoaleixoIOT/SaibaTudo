@@ -24,6 +24,7 @@ class Argumentos(unittest.TestCase):
         self.assertEqual(nlu.max_length, 256)
         self.assertEqual(nlu.output_dir.name, "SaibaTudo-Quimica-NLU-hybrid")
         ask = th.montar_argumentos(["--target", "ask", "--version", "ask-v1-20261101"])
+        self.assertEqual(th.montar_argumentos(["--target", "ask", "--version", "ask-v1.1-20261021"]).version, "ask-v1.1-20261021")  # minor (Explica v1.1)
         self.assertEqual(ask.base_model, "Qwen/Qwen3-4B-Instruct-2507")
         self.assertEqual(ask.max_length, 1024)
         self.assertEqual((ask.batch_size, ask.grad_accum), (1, 16), "4B em 8 GB: lote 1 com acúmulo de gradiente")

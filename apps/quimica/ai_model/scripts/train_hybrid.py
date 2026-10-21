@@ -48,13 +48,13 @@ PRESETS = {
         "max_length": 1024, "epochs": 2.0, "batch_size": 1, "grad_accum": 16, "lr": 1e-4,
     },
 }
-RX_VERSAO = re.compile(r"^(nlu|ask)-v\d+-\d{8}$")
+RX_VERSAO = re.compile(r"^(nlu|ask)-v\d+(\.\d+)?-\d{8}$")  # minor = continuação/correção (nlu-v3.1, ask-v1.1), como em convert_local.py
 
 
 def montar_argumentos(argv=None):
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--target", choices=sorted(PRESETS), required=True)
-    p.add_argument("--version", required=True, help="nome da versão que este treino vai gerar: nlu-v1-AAAAMMDD ou ask-v1-AAAAMMDD")
+    p.add_argument("--version", required=True, help="nome da versão que este treino vai gerar: nlu-v1-AAAAMMDD, ask-v1-AAAAMMDD ou com minor ask-v1.1-AAAAMMDD")
     p.add_argument("--base_model", default=None, help="padrão: o da predefinição do --target")
     p.add_argument("--dataset", default=None, help="array JSON de {instruction,input,output} (padrão: backend/retrain/out-<target>/train.json)")
     p.add_argument("--output_dir", default=None)
@@ -76,7 +76,7 @@ def montar_argumentos(argv=None):
     a = p.parse_args(argv)
     m = re.match(RX_VERSAO, a.version)
     if not m or m.group(1) != a.target:
-        p.error(f"--version inválida para --target {a.target}: {a.version!r} (esperado {a.target}-v<N>-AAAAMMDD)")
+        p.error(f"--version inválida para --target {a.target}: {a.version!r} (esperado {a.target}-v<N>[.<m>]-AAAAMMDD)")
     pre = PRESETS[a.target]
     for k in ("base_model", "dataset", "output_dir", "epochs", "batch_size", "grad_accum", "max_length", "lr"):
         if getattr(a, k) is None:
