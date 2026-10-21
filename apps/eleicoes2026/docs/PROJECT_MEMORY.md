@@ -298,6 +298,12 @@ Lição repetida: não dizer "corrigido" sem reproduzir antes e depois. Padrões
   é descartada (`motivo: contradicao_legislativo`); datas e "não disputam 2º turno" passam. E o cabeçalho da lista de eleitos pelo pacote agora
   traz o total — "Eleitos para Deputado Federal em São Paulo segundo o TSE (70):" — no site e no Android, para a nuvem receber o número certo
   mesmo com a lista cortada. Testes: API 230 (+1), web 179, Android AnswerBuilderTest/paridade.
+- **21/10 (07h):** teste ao vivo depois do deploy (3bd0b63): o Qwen 7B gerou, para a mesma pergunta, "Não há informações sobre vitórias no
+  1º turno… foram confirmados para o segundo mandato, mas não houve vitória direta" com a lista dos 70 eleitos no contexto. Regra nova
+  `negaDadosDoApp` (`motivo: nega_dados`): contexto com eleitos ("Deputados eleitos (70):", "— ELEITO", "foi eleito") e texto que nega o dado
+  ("não há informações/dados/resultado", "não houve vitória/vencedor", "ainda não há resultado") ou inventa "segundo mandato"/"reeleito" sem
+  base é descartado. API 231. O texto gerado pelo Qwen 7B sobre listas de resultado continua fraco; a troca pelo explicador SaibaTudo IA (gate
+  de fidelidade no holdout de eleições) fica para depois de 27/10.
 - **20/10 (madrugada):** (1) **tempos da nuvem maiores** (pedido do mantenedor: "o tempo inicial tem que ser maior; depois da primeira a segunda
   funciona"): a partida a frio do Modal mediu 16,7 s ao vivo na química; `MODAL_TIMEOUT_MS` padrão 20000 e teto 45000 (`config.js`), `api/nlu.js`
   `maxDuration: 50`, site 20 s automático / 45 s explícito (`cloud.js`); Vercel `MODAL_TIMEOUT_MS=30000` fica para o mantenedor (bloqueio do

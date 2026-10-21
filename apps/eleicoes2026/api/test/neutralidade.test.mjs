@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  contagensSemFonte, contradizLegislativo, contradizSegundoTurno, numerosNaoFundamentados, pedeRecomendacao, respostaRecomenda, verificarRespostaAsk,
+  contagensSemFonte, contradizLegislativo, contradizSegundoTurno, negaDadosDoApp, numerosNaoFundamentados, pedeRecomendacao, respostaRecomenda, verificarRespostaAsk,
 } from '../_lib/neutralidade.js';
 
 const aqui = dirname(fileURLToPath(import.meta.url));
@@ -79,6 +79,18 @@ test('legislativo: texto gerado que fala em 2º turno ou 50 % para deputado/sena
   assert.ok(!contradizLegislativo('Os deputados eleitos estão listados acima.', { q: 'deputados eleitos em SP', context: ctx }));
   assert.ok(!contradizLegislativo('O segundo turno será em 25/10/2026.', { q: 'pergunta sobre o senado' }));  // só a data: inofensivo
   assert.ok(contradizLegislativo('Para senador não houve segundo turno porque ninguém fez maioria absoluta.', { q: 'quem ganhou para senador?' }));
+});
+
+test('nega os dados do app: o app apurou eleitos e o texto diz que "não há informações" ou inventa "segundo mandato" (caso real de 21/10/2026)', () => {
+  const ctx = 'Dados apurados no sistema:\nDeputado Federal — SP, 1º turno. Totalização final.\nDeputados eleitos (70):\n• 2211 — LUCAS PAVANATO (PL): 1.000.000 votos — ELEITO';
+  const gerado = 'Não há informações sobre vitórias no 1º turno para deputado federal em São Paulo em 2026. Todos os deputados federais eleitos em São Paulo no 1º turno ' +
+    'foram confirmados para o segundo mandato, mas não houve vitória direta no 1º turno nesta eleição.';
+  assert.ok(negaDadosDoApp(gerado, ctx));
+  assert.equal(verificarRespostaAsk(gerado, { q: 'quem já ganhou no 1o turno para deputado?', context: ctx }).motivo, 'nega_dados');
+  assert.ok(negaDadosDoApp('Ainda não há resultado definido para deputado federal.', ctx));
+  assert.ok(!negaDadosDoApp('Os 70 deputados federais eleitos em São Paulo estão listados acima, com LUCAS PAVANATO entre eles.', ctx));
+  assert.ok(!negaDadosDoApp('Não há informações sobre isso.', 'Dados apurados no sistema:\nA votação ainda não ocorreu.'));  // sem eleitos no contexto, não se aplica
+  assert.ok(!negaDadosDoApp('Foi reeleito.', 'Histórico: eleito 2 vezes… reeleito em 2022. • TARCÍSIO foi eleito(a) em 1º turno'));
 });
 
 test('verificarRespostaAsk devolve o motivo', () => {

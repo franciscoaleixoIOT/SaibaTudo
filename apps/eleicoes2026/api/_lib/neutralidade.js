@@ -126,14 +126,32 @@ export function contradizLegislativo(resposta, { q = '', context = '' } = {}) {
 }
 
 /**
+ * O app apurou eleitos (o contexto traz "Deputados eleitos (70):", "Eleitos para …", "— ELEITO") e o texto gerado NEGA o dado ("não há
+ * informações sobre vitórias", "não houve vitória direta", "ainda não há resultado") ou inventa "segundo mandato"/"reeleito" sem base.
+ * Caso real de 21/10/2026 (Qwen 7B, deputado federal em SP): "Não há informações sobre vitórias no 1º turno… foram confirmados para o
+ * segundo mandato, mas não houve vitória direta". Fato crítico não vem do modelo: divergiu, descarta.
+ */
+export function negaDadosDoApp(resposta, context = '') {
+  const c = fold(String(context ?? ''));
+  const r = fold(String(resposta ?? ''));
+  const ctxTemEleitos = /\beleit[oa]s?\b[^\n]{0,30}\(\d+\)|\beleit[oa]s? para\b|— eleit[oa]\b|\bfoi eleit[oa]\b|\bforam eleit[oa]s\b/.test(c);
+  if (!ctxTemEleitos) return false;
+  if (/\bnao (?:ha|existem|temos|tenho|constam|encontr\w+) (?:informac\w+|dados?|registros?|resultados?|vencedor\w*|eleit\w*|vitori\w+)\b/.test(r)) return true;
+  if (/\b(?:nao houve|sem) (?:vitoria|vencedor|eleit[oa]s?)\b|\bainda nao (?:ha|houve|foi|foram|tem) (?:resultado|eleit|vencedor|definic)/.test(r)) return true;
+  if (/\bsegundo mandato\b|\breeleit\w*/.test(r) && !/\breeleit|\bmandato|\bvezes? eleit/.test(c)) return true;
+  return false;
+}
+
+/**
  * Verificação final da resposta gerada. Devolve { ok:true } ou { ok:false, motivo }.
- * Motivos: 'recomendacao' | 'numero_sem_fonte' | 'contradicao_2t' | 'contradicao_legislativo' | 'contradiz_dados' | 'contagem_sem_fonte'.
+ * Motivos: 'recomendacao' | 'numero_sem_fonte' | 'contradicao_2t' | 'contradicao_legislativo' | 'contradiz_dados' | 'nega_dados' | 'contagem_sem_fonte'.
  */
 export function verificarRespostaAsk(resposta, { q = '', context = '' } = {}) {
   if (respostaRecomenda(resposta)) return { ok: false, motivo: 'recomendacao' };
   if (contradizSegundoTurno(resposta)) return { ok: false, motivo: 'contradicao_2t' };
   if (contradizLegislativo(resposta, { q, context })) return { ok: false, motivo: 'contradicao_legislativo' };
   if (contradizDadosDoApp(resposta, context)) return { ok: false, motivo: 'contradiz_dados' };
+  if (negaDadosDoApp(resposta, context)) return { ok: false, motivo: 'nega_dados' };
   const contagens = contagensSemFonte(resposta, { q, context });
   if (contagens.length > 0) return { ok: false, motivo: 'contagem_sem_fonte', numeros: contagens.slice(0, 5) };
   const sobras = numerosNaoFundamentados(resposta, { q, context });
