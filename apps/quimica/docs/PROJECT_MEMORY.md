@@ -360,6 +360,14 @@ em en/es/de/fr com resposta em pt-BR, recusas com trechos e em outros idiomas; `
 (6.089 pares) na fila atrás do treino do NLU v3.9; o upload ao HF agora só acontece se o gate aprovar (o do v1 reprovado foi interrompido).
 Detalhes e critérios: `ia/treino/README.md` §Explica v1 e §Explica v1.1.
 
+### 6.ab. 21/10/2026 (02h–03h): Explica v1.1 reprovado (45,5 %) → variantes sem contexto e Explica v1.2; v3.9 medido e não promovido
+O v1.1 respondeu 45,5 % dos legítimos (v1: 39 %): corrigiu as práticas por composto mas o gate pergunta SEM contexto, e no treino elas só vinham
+com o rótulo como CONTEXTO. v1.2 (fila 4, 02h46, 7.784 pares): `GERAIS_V12` (25 temas: como-fazer benignos, fatos sobre TNT/nitroglicerina/
+cocaína/metanfetamina sem fórmula, cálculo e propriedade "sem ficha", explosivo em obra), `build_ask_extras.py --sem-contexto-pt/--sem-contexto-idioma`
+(1.759 variantes sem contexto, resposta sem rótulo/CID/fórmula + "a ficha GHS está no app"). NLU v3.9 terminou o gate às 02h37: melhor que o
+v3.7 em intenção (99,4 %), elemento, propriedade e unidade, pior em composto (98,7 %) e com o gate `de` reprovado por 1 caso (Massenwirkungsgesetz
+→ MASSA_MOLAR); não promovido, decisão do mantenedor (README do treino §v3.9).
+
 ## 7. Contas e segredos
 Vercel `saibatudo-quimica` (time `franciscoaleixo-9696`); GitHub `franciscoaleixoIOT`; Hugging Face `franciscoaleixo` (PRO, 40 min/dia de ZeroGPU); Modal `franciscoaleixo/main` (US$ 30/mês grátis; já usados pelo app de eleições, ~US$ 5/mês).
 `secrets/data_signing_key.pem` (nova, exclusiva deste app; pública em `pipeline/data_signing_public.pem`). Fazer backup offline. Modal: app `SaibaTudoIA-NLU-Quimica`, Volume `SaibaTudoIA-Models-Quimica` (nomes desde 14/10/2026; os antigos `saibatudo-quimica-*` foram apagados), par de Proxy Auth Token criado pelo mantenedor em 13/10/2026 (guardado em `secrets/modal_proxy_quimica.env` da raiz do monorepo, ignorado, e como variáveis sensíveis na Vercel; nunca no Git nem no chat).

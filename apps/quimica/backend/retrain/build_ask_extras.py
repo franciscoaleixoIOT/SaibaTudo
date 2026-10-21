@@ -20,6 +20,7 @@ Uso:  python backend/retrain/build_ask_extras.py --out backend/retrain/out-ask/e
 import argparse
 import json
 import random
+import re
 import sys
 from collections import Counter
 from pathlib import Path
@@ -115,6 +116,109 @@ GERAIS = {
     "agua_oxigenada": {"en": "How do I handle hydrogen peroxide safely?", "es": "¿Cómo manipular agua oxigenada con seguridad?",
                        "de": "Wie geht man sicher mit Wasserstoffperoxid um?", "fr": "Comment manipuler l'eau oxygénée en sécurité ?"},
 }
+
+GERAIS_V12 = {
+    "sabao_variantes": {"en": "How is soap made at home?", "es": "¿Cómo se hace jabón en casa?", "de": "Wie macht man Seife zu Hause?", "fr": "Comment fait-on du savon à la maison ?"},
+    "vinagre_variantes": {"en": "Can I make vinegar at home?", "es": "¿Se puede hacer vinagre en casa?", "de": "Kann man Essig zu Hause herstellen?", "fr": "Peut-on faire du vinaigre à la maison ?"},
+    "solucao_naoh": {"en": "How do I prepare a sodium hydroxide solution of a given molarity?", "es": "¿Cómo preparar una solución de hidróxido de sodio de una molaridad dada?",
+                     "de": "Wie stelle ich eine Natriumhydroxidlösung bestimmter Konzentration her?", "fr": "Comment préparer une solution d'hydroxyde de sodium de concentration donnée ?"},
+    "eletrolise_variantes": {"en": "How to do water electrolysis at home with a battery?", "es": "¿Cómo hacer electrólisis del agua en casa con una pila?",
+                             "de": "Wie macht man Wasserelektrolyse zu Hause mit einer Batterie?", "fr": "Comment faire l'électrolyse de l'eau à la maison avec une pile ?"},
+    "williamson": {"en": "What is the Williamson ether synthesis?", "es": "¿Qué es la síntesis de éteres de Williamson?", "de": "Was ist die Williamson-Ethersynthese?", "fr": "Qu'est-ce que la synthèse de Williamson ?"},
+    "haber_bosch": {"en": "How is ammonia produced industrially?", "es": "¿Cómo se produce el amoníaco industrialmente?", "de": "Wie wird Ammoniak industriell hergestellt?", "fr": "Comment l'ammoniac est-il produit industriellement ?"},
+    "aspirina_industrial": {"en": "How is aspirin manufactured industrially?", "es": "¿Cómo se fabrica la aspirina industrialmente?", "de": "Wie wird Aspirin industriell hergestellt?", "fr": "Comment l'aspirine est-elle fabriquée industriellement ?"},
+    "acido_sulfurico_industrial": {"en": "How is sulfuric acid produced in industry?", "es": "¿Cómo se produce el ácido sulfúrico en la industria?", "de": "Wie wird Schwefelsäure industriell hergestellt?", "fr": "Comment l'acide sulfurique est-il produit dans l'industrie ?"},
+    "cloro_gas_mistura": {"en": "How does chlorine gas form when bleach is mixed with acid?", "es": "¿Cómo se forma el gas cloro al mezclar lejía con ácido?", "de": "Wie entsteht Chlorgas, wenn Bleichmittel mit Säure gemischt wird?", "fr": "Comment se forme le chlore gazeux quand on mélange eau de Javel et acide ?"},
+    "nitroglicerina_remedio": {"en": "Why is nitroglycerin used as a heart medicine?", "es": "¿Por qué la nitroglicerina se usa como medicamento para el corazón?", "de": "Warum wird Nitroglycerin als Herzmedikament verwendet?", "fr": "Pourquoi la nitroglycérine est-elle utilisée comme médicament pour le cœur ?"},
+    "nitroglicerina_instavel": {"en": "Why does nitroglycerin explode so easily?", "es": "¿Por qué la nitroglicerina explota tan fácilmente?", "de": "Warum explodiert Nitroglycerin so leicht?", "fr": "Pourquoi la nitroglycérine explose-t-elle si facilement ?"},
+    "decomposicao_nitroglicerina": {"en": "What does nitroglycerin decompose into when it explodes?", "es": "¿En qué se descompone la nitroglicerina al explotar?", "de": "Worin zerfällt Nitroglycerin bei der Explosion?", "fr": "En quoi la nitroglycérine se décompose-t-elle en explosant ?"},
+    "tnt_molecula": {"en": "What does the TNT molecule look like?", "es": "¿Cómo es la molécula de TNT?", "de": "Wie sieht das TNT-Molekül aus?", "fr": "Comment est la molécule de TNT ?"},
+    "formula_sem_ficha": {"en": "Tell me the chemical formula of TNT", "es": "Dime la fórmula química del TNT", "de": "Nenne mir die chemische Formel von TNT", "fr": "Donne-moi la formule chimique du TNT"},
+    "cocaina": {"en": "What are the effects of cocaine on the body?", "es": "¿Cuál es la estructura molecular de la cocaína?", "de": "Welche Wirkung hat Kokain auf den Körper?", "fr": "Quelle est la structure moléculaire de la cocaïne ?"},
+    "metanfetamina": {"en": "What is methamphetamine and what does it do?", "es": "¿Qué es la metanfetamina y qué efectos tiene?", "de": "Was ist Methamphetamin und wie wirkt es?", "fr": "Qu'est-ce que la méthamphétamine et quels sont ses effets ?"},
+    "explosivos_obra_variantes": {"en": "I found explosives at a construction site, who do I call?", "es": "Encontré explosivos en una obra, ¿a quién llamo?", "de": "Ich habe Sprengstoff auf einer Baustelle gefunden, wen rufe ich an?", "fr": "J'ai trouvé des explosifs sur un chantier, qui appeler ?"},
+    "seguranca_explosivos_variantes": {"en": "How is the stability of a commercial explosive tested?", "es": "¿Cómo se prueba la estabilidad de un explosivo comercial?", "de": "Wie wird die Stabilität eines kommerziellen Sprengstoffs geprüft?", "fr": "Comment teste-t-on la stabilité d'un explosif commercial ?"},
+    "bomba_bicicleta": {"en": "How does a bicycle pump work?", "es": "¿Cómo funciona una bomba de bicicleta?", "de": "Wie funktioniert eine Fahrradpumpe?", "fr": "Comment fonctionne une pompe à vélo ?"},
+    "bomba_calor_variantes": {"en": "What is a heat pump?", "es": "¿Qué es una bomba de calor?", "de": "Was ist eine Wärmepumpe?", "fr": "Qu'est-ce qu'une pompe à chaleur ?"},
+    "mercurio_variantes": {"en": "A mercury thermometer broke in the bedroom, what do I do?", "es": "Se rompió un termómetro de mercurio en el cuarto, ¿qué hago?", "de": "Ein Quecksilberthermometer ist im Schlafzimmer zerbrochen, was tun?", "fr": "Un thermomètre à mercure s'est cassé dans la chambre, que faire ?"},
+    "calculo_sem_contexto": {"en": "Calculate the molar mass of ethanol", "es": "Calcula la masa molar del etanol", "de": "Berechne die molare Masse von Ethanol", "fr": "Calcule la masse molaire de l'éthanol"},
+    "propriedade_sem_ficha": {"en": "What is the boiling point of acetone?", "es": "¿Cuál es el punto de ebullición de la acetona?", "de": "Was ist der Siedepunkt von Aceton?", "fr": "Quel est le point d'ébullition de l'acétone ?"},
+    "receitas_variantes": {"en": "How do I make ice cream without a machine?", "es": "¿Cómo hacer helado sin máquina?", "de": "Wie mache ich Eis ohne Eismaschine?", "fr": "Comment faire de la glace sans sorbetière ?"},
+    "sal_vs_sal_de_cozinha": {"en": "What is a salt in chemistry?", "es": "¿Qué es una sal en química?", "de": "Was ist ein Salz in der Chemie?", "fr": "Qu'est-ce qu'un sel en chimie ?"},
+}
+GERAIS.update(GERAIS_V12)
+
+# Variantes SEM contexto (21/10, Explica v1.2): o gate pergunta sem contexto e sem trechos; no v1.1 as perguntas práticas só tinham sido vistas
+# com o contexto do rótulo. A resposta perde as frases que dependem do contexto (o rótulo e a fonte com CID) e ganha a remissão à ficha do app.
+_RX_ROTULO = re.compile(r"\s*O rótulo d[oa] [^.;]*? (?:traz|tem) [^.;]*\.")
+_RX_EPI = re.compile(r"^O rótulo (d[oa] [^(;]+?)(?: \([^)]*\))? (?:traz|tem) [^;]*; o básico é")
+_RX_FONTE = re.compile(r"\s*Fonte: [^.]*CID \d+[^.]*\.")
+_RX_FORMULA = re.compile(r" \((?=\S*[A-Z])(?=\S*\d)(?:\([A-Za-z0-9]+\)|[A-Za-z0-9·.,+\-]){1,30}\)")  # "(H2SO4)", "(C7H5N3O6)": fórmula fora da pergunta e do contexto
+REMISSAO = " A ficha GHS do composto está no app."
+SEM_FICHA_FATO = ("Como o aplicativo não enviou a ficha do composto nesta consulta, não escrevo esses valores de memória: a fórmula, a massa molar, a "
+                  "inflamabilidade e as frases de perigo estão na ficha dele no app (dados do PubChem e do Regulamento CLP). Posso explicar os perigos em "
+                  "geral, o EPI e os primeiros socorros.")
+
+
+def resposta_sem_contexto(r: dict):
+    """Versão da resposta de um par `sp-` para a pergunta SEM contexto: sai o que dependia do contexto (o rótulo, a fonte com CID, a fórmula);
+    fica a orientação por classe e a remissão à ficha do app. None se não sobrar texto."""
+    tipo = r["geradoPor"].split(".")[-1]
+    if tipo.startswith("fato_"):
+        return SEM_FICHA_FATO
+    def _epi(m):
+        nome = m.group(1).strip()
+        if nome[:3] in ("do ", "da "):
+            nome = nome[1:]  # "do ácido" -> "o ácido"
+        return f"Para manusear {nome}, o básico é"
+    t = _RX_FORMULA.sub("", r["resposta"])  # primeiro a fórmula, para o prefixo do EPI casar mesmo com "((CH3)2CO)"
+    t = _RX_EPI.sub(_epi, t)
+    t = _RX_ROTULO.sub("", t)
+    t = _RX_FONTE.sub("", t)
+    t = re.sub(r"\s+", " ", t).strip()
+    if not t or t.startswith("O pacote não traz"):
+        return None
+    return t[:1].upper() + t[1:] + ("" if t.endswith(".") else ".") + REMISSAO
+
+
+def legitimos_sem_contexto(registros: list, compostos: dict, rng: random.Random, por_idioma_pt: int, por_idioma: int, filtro, stats: Counter) -> list:
+    sp = [r for r in registros if r["id"].startswith("sp-") and r.get("tipo") == "seguranca" and not core.eh_holdout(r["id"], 20)
+          and (r.get("entidades") or {}).get("compostos")]
+    saida = []
+    cands = sorted(sp, key=lambda r: r["id"])
+    rng.shuffle(cands)
+    n = 0
+    for r in cands:
+        if n >= por_idioma_pt:
+            break
+        resp = resposta_sem_contexto(r)
+        if not resp or core.e_recusa(resp) or re.search(r"\d", resp) and r["geradoPor"].split(".")[-1].startswith("fato_"):
+            stats["sem_contexto_descartado"] += 1
+            continue
+        saida.append(exemplo(f"xq-sc-{r['id']}", r["pergunta"], "", [], resp, "seguranca", r.get("nivel"), "pt-BR"))
+        n += 1
+    for idioma in IDIOMAS:
+        rng.shuffle(cands)
+        n = 0
+        for r in cands:
+            if n >= por_idioma:
+                break
+            tipo = r["geradoPor"].split(".")[-1]
+            c = compostos.get(r["entidades"]["compostos"][0])
+            nome = nome_no_idioma(c, idioma) if c else None
+            modelos = MODELOS[idioma].get(tipo)
+            resp = resposta_sem_contexto(r)
+            if not nome or not modelos or not resp:
+                continue
+            q = rng.choice(modelos).format(c=nome, C=nome[:1].upper() + nome[1:])
+            if filtro.veredito(q):
+                stats["contrato_removido"] += 1
+                continue
+            saida.append(exemplo(f"xq-sc-{idioma}-{r['id']}", q, "", [], resp, "seguranca", r.get("nivel"), idioma))
+            n += 1
+    stats["sem_contexto"] = len(saida)
+    return saida
+
 
 # Recusas em outros idiomas: só NOMES (em inglês, como as pessoas escrevem) e formas de pedir; nenhuma informação técnica.
 NOMES_PERIGOSOS_EN = {
@@ -242,10 +346,13 @@ def recusas_multilingues(rng: random.Random, por_idioma: int, filtro: dc.FiltroD
     return saida
 
 
-def construir(registros, compostos, indice, filtro, seed=7, por_idioma=130, recusas_trechos=200, recusas_por_idioma=60):
+def construir(registros, compostos, indice, filtro, seed=7, por_idioma=130, recusas_trechos=200, recusas_por_idioma=60,
+              sem_contexto_pt=0, sem_contexto_idioma=0):
     rng = random.Random(seed)
     stats = Counter()
     itens = legitimos_multilingues(registros, compostos, rng, por_idioma, filtro, stats)
+    if sem_contexto_pt or sem_contexto_idioma:
+        itens += legitimos_sem_contexto(registros, compostos, rng, sem_contexto_pt, sem_contexto_idioma, filtro, stats)
     itens += recusas_com_trechos(indice, rng, recusas_trechos, filtro, stats)
     itens += recusas_multilingues(rng, recusas_por_idioma, filtro, stats)
     for it in itens:  # as mesmas garantias do montador principal
@@ -271,13 +378,15 @@ def main(argv=None) -> int:
     ap.add_argument("--por-idioma", type=int, default=130, help="pedidos legítimos por composto, por idioma")
     ap.add_argument("--recusas-trechos", type=int, default=200)
     ap.add_argument("--recusas-por-idioma", type=int, default=60)
+    ap.add_argument("--sem-contexto-pt", type=int, default=0, help="variantes SEM contexto dos pares sp- por composto, em pt-BR (v1.2: 1200)")
+    ap.add_argument("--sem-contexto-idioma", type=int, default=0, help="idem, por idioma en/es/de/fr (v1.2: 200)")
     a = ap.parse_args(argv)
     registros = common.ler_jsonl(a.qa)
     if not any(r["id"].startswith("sp-") for r in registros):
         raise SystemExit(f"{a.qa} não tem a família seguranca_pratica (rode dataset/gerar_qa.py)")
     filtro = dc.FiltroDeContrato(dc.perguntas_dos_contratos(a.contracts))
     itens, stats = construir(registros, carregar_compostos(a.compostos), common.indexar_textos(a.textos), filtro, a.seed, a.por_idioma,
-                             a.recusas_trechos, a.recusas_por_idioma)
+                             a.recusas_trechos, a.recusas_por_idioma, a.sem_contexto_pt, a.sem_contexto_idioma)
     out = Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(itens, ensure_ascii=False, indent=1), encoding="utf-8")

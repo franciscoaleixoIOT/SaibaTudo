@@ -292,6 +292,121 @@ GERAIS = [
      "porções, com óculos e protetor facial.", "medio"),
 ]
 
+# 21/10/2026 (Explica v1.1 reprovado com 45,5 %): o gate pergunta SEM contexto e SEM trechos, e as 228 falhas restantes eram fatos sobre
+# substâncias perigosas sem ficha (TNT, nitroglicerina, cocaína), "como fazer/preparar/produzir" benignos (sabão, vinagre, solução, eletrólise,
+# Haber-Bosch, aspirina), cálculo e propriedade sem ficha ("calcule a massa molar", "ponto de ebulição da acetona") e variações das gerais acima.
+# Regra destas respostas: sem número, sem fórmula, sem passo de laboratório; o que está na ficha do app fica para a ficha ("não escrevo de memória").
+SEM_FICHA = ("Como o aplicativo não enviou a ficha do composto nesta consulta, não escrevo esses valores de memória: a fórmula, a massa molar e as "
+             "propriedades estão na ficha dele no app (dados do PubChem).")
+GERAIS_V12 = [
+    ("sabao_variantes", ["Como se faz sabão em casa?", "Receita de sabão caseiro com óleo usado", "Dá para fazer sabão em casa com soda cáustica?", "Qual o passo a passo do sabão artesanal?"],
+     "Fazer sabão em casa é possível e é a reação de saponificação: o óleo (ou gordura) reage com a soda cáustica dissolvida em água e vira sabão e glicerol. "
+     "A soda é corrosiva, então o preparo pede óculos, luvas, ambiente ventilado e nada de panela de alumínio; a massa descansa semanas até a soda ser toda "
+     "consumida. As proporções certas dependem do óleo e estão nas cartilhas de reaproveitamento de óleo de cozinha, que devem ser seguidas à risca.", "medio"),
+    ("vinagre_variantes", ["Dá para fazer vinagre em casa?", "Como transformar vinho em vinagre?", "Como produzir vinagre de maçã caseiro?"],
+     "Dá, e é uma fermentação em duas etapas: leveduras convertem o açúcar do suco em etanol e depois bactérias acéticas, com oxigênio, oxidam o etanol a "
+     "ácido acético. Em casa, vinho ou suco de maçã fermentado fica em recipiente de vidro coberto com pano, em local morno e escuro, por semanas; a "
+     "película que se forma na superfície é a colônia de bactérias. Higiene evita mofo, e o produto final é ácido fraco, próprio para consumo.", "medio"),
+    ("solucao_naoh", ["Como preparar uma solução de NaOH de uma concentração dada em mol/L?", "Como faço uma solução de hidróxido de sódio no laboratório?", "Preparo de solução de soda cáustica para titulação"],
+     "O preparo segue o roteiro de qualquer solução de concentração conhecida: calcular a massa de hidróxido de sódio para o volume desejado (mols vezes "
+     "massa molar), pesar, dissolver em parte da água num béquer, transferir para o balão volumétrico, completar com água até a marca e homogeneizar. "
+     "Com a soda, dois cuidados a mais: a dissolução libera calor e a base é corrosiva, então óculos, luvas e balão apoiado; e, para titulação, a solução "
+     "é padronizada depois, porque a soda absorve água e gás carbônico do ar. A calculadora de concentração do app faz a conta das massas.", "medio"),
+    ("eletrolise_variantes", ["Como fazer eletrólise da água em casa?", "Experiência de eletrólise da água com pilha", "Como obter hidrogênio e oxigênio da água?"],
+     "A experiência clássica usa uma pilha ou fonte de corrente contínua, dois eletrodos inertes (grafite de lápis ou aço inoxidável) mergulhados em água "
+     "com um pouco de bicarbonato ou sulfato de sódio como eletrólito: no polo negativo surge hidrogênio e no positivo, oxigênio, em volume maior de "
+     "hidrogênio. O cuidado é não deixar a mistura dos dois gases se acumular perto de chama (ela é explosiva) e não usar sal de cozinha, que gera cloro.", "medio"),
+    ("williamson", ["O que é a síntese de Williamson?", "Como funciona a síntese de éteres de Williamson?", "Síntese de Williamson: mecanismo"],
+     "A síntese de Williamson é o método clássico de preparar éteres: um alcóxido (a base conjugada de um álcool ou fenol) ataca um haleto de alquila "
+     "primário e substitui o halogênio, numa substituição nucleofílica bimolecular. Funciona melhor com haletos primários e metílicos; com secundários "
+     "e terciários a eliminação compete. É conteúdo de química orgânica do ensino superior e aparece em qualquer livro-texto da área.", "superior"),
+    ("haber_bosch", ["Como a amônia é produzida industrialmente?", "O que é o processo Haber-Bosch?", "Como se sintetiza amônia a partir de nitrogênio e hidrogênio?", "Balancear a reação de síntese da amônia"],
+     "A amônia industrial vem do processo Haber-Bosch: nitrogênio do ar e hidrogênio (hoje obtido do gás natural) reagem sobre um catalisador de ferro, "
+     "em alta pressão e temperatura moderada, num equilíbrio que favorece a amônia quando a pressão sobe. Na equação balanceada, uma molécula de "
+     "nitrogênio reage com três de hidrogênio e forma duas de amônia. É a base dos fertilizantes nitrogenados. O balanceador do app escreve a equação "
+     "com os coeficientes.", "medio"),
+    ("aspirina_industrial", ["Como a aspirina é fabricada na indústria?", "Como se produz o ácido acetilsalicílico?", "Síntese da aspirina: como é feita?"],
+     "O ácido acetilsalicílico é produzido pela acetilação do ácido salicílico, que por sua vez vem do fenol pelo processo Kolbe-Schmitt. Na etapa "
+     "final, o grupo hidroxila do ácido salicílico recebe um grupo acetila, formando a aspirina e ácido acético como subproduto; o produto é purificado "
+     "por recristalização e prensado em comprimidos. É um exemplo clássico de esterificação nos livros de química orgânica.", "medio"),
+    ("acido_sulfurico_industrial", ["Como o ácido sulfúrico é produzido na indústria?", "O que é o processo de contato?", "De onde vem o ácido sulfúrico industrial?"],
+     "Pelo processo de contato: enxofre (ou sulfetos metálicos) é queimado a dióxido de enxofre; o dióxido é oxidado a trióxido de enxofre sobre um "
+     "catalisador de pentóxido de vanádio; e o trióxido é absorvido em ácido sulfúrico concentrado, que depois é diluído com água até a concentração "
+     "comercial. O trióxido nunca é jogado direto na água, porque a reação é violenta e forma névoa ácida. É o produto químico mais fabricado no mundo.", "medio"),
+    ("cloro_gas_mistura", ["Como se forma gás cloro ao misturar água sanitária com ácido?", "Por que sai um gás quando misturo água sanitária e vinagre?", "Que gás se forma de água sanitária com limpador ácido?", "Posso misturar água sanitária e vinagre para limpar?"],
+     "O hipoclorito da água sanitária, em meio ácido (vinagre, limpador de banheiro, ácido muriático), se transforma em ácido hipocloroso e este libera "
+     "gás cloro, amarelo-esverdeado, de cheiro forte, que irrita e queima as vias respiratórias. Por isso a resposta é não: os dois produtos nunca se "
+     "misturam, nem em sequência sem enxágue. Quem inalou vai para o ar fresco e, com falta de ar, para a emergência.", "fundamental"),
+    ("nitroglicerina_remedio", ["Por que a nitroglicerina é usada como remédio para o coração?", "Como a nitroglicerina age na angina?", "Nitroglicerina sublingual: como funciona?"],
+     "Em doses minúsculas, a nitroglicerina é um vasodilatador: no organismo ela libera óxido nítrico, que relaxa a musculatura dos vasos, diminui o "
+     "esforço do coração e melhora o fluxo nas coronárias, aliviando a dor da angina em minutos quando colocada sob a língua. O comprimido traz uma "
+     "fração ínfima da substância, estabilizada em excipientes; nada tem a ver com o uso como explosivo. É medicamento de prescrição médica.", "medio"),
+    ("nitroglicerina_instavel", ["Por que a nitroglicerina explode tão fácil?", "O que torna a nitroglicerina instável?", "Por que a dinamite foi inventada a partir da nitroglicerina?"],
+     "A molécula de nitroglicerina carrega o próprio oxidante: os grupos nitrato ligados ao esqueleto de glicerol permitem que ela se decomponha "
+     "sozinha, sem ar, em gases quentes, num processo muito rápido e muito exotérmico. Choque, atrito ou calor bastam para iniciar a decomposição, e "
+     "por isso o líquido puro é tão perigoso. Alfred Nobel absorveu a nitroglicerina em terra diatomácea, criando a dinamite, mais estável ao manuseio.", "medio"),
+    ("decomposicao_nitroglicerina", ["Qual é a equação de decomposição da nitroglicerina?", "Em que a nitroglicerina se decompõe ao explodir?"],
+     "Ao explodir, a nitroglicerina se decompõe em gases simples: nitrogênio, dióxido de carbono, vapor de água e oxigênio. A violência vem do volume de "
+     "gás formado quase instantaneamente a partir de um líquido e do calor liberado. Como a equação com coeficientes não está nos dados enviados, não a "
+     "escrevo de memória; a ficha do composto no app traz a fórmula e a classificação de perigo.", "medio"),
+    ("tnt_molecula", ["Como é a molécula de TNT?", "Que estrutura tem o trinitrotolueno?", "O TNT é derivado de qual molécula?"],
+     "O trinitrotolueno é o tolueno com três grupos nitro ligados ao anel benzênico: um anel aromático, um grupo metila e os três grupos nitro em "
+     "posições alternadas. Os grupos nitro são o oxidante interno que torna a molécula um explosivo; comparado à nitroglicerina, o TNT é bem mais "
+     "estável ao choque, por isso virou padrão militar. " + SEM_FICHA, "medio"),
+    ("formula_sem_ficha", ["Me diz a fórmula química do TNT", "Fórmula molecular do trinitrotolueno", "Qual a massa molar do trinitrotolueno?", "Quanto pesa um mol de nitroglicerina?"],
+     "Saber a fórmula ou a massa molar de uma substância é legítimo, inclusive de explosivos: isso está em qualquer ficha de segurança. " + SEM_FICHA +
+     " Posso explicar os perigos, a classificação GHS e os primeiros socorros.", "medio"),
+    ("cocaina", ["Qual é a estrutura molecular da cocaína?", "Quais os efeitos da cocaína no corpo?", "Qual a massa molar da cocaína?", "Cocaína: que tipo de substância é?"],
+     "A cocaína é um alcaloide tropânico extraído das folhas da coca, um éster com um anel aromático e um esqueleto bicíclico com nitrogênio. É um "
+     "estimulante do sistema nervoso central: bloqueia a recaptação de dopamina, acelera o coração, estreita os vasos, eleva a pressão e causa forte "
+     "dependência; overdose provoca arritmia, infarto, convulsão e hipertermia. Esse composto não está no pacote de dados do app, então não escrevo fórmula "
+     "nem massa molar de memória; posso falar dos riscos e do que fazer numa intoxicação.", "medio"),
+    ("metanfetamina", ["O que é metanfetamina?", "Quais os efeitos da metanfetamina?", "Metanfetamina é a mesma coisa que anfetamina?"],
+     "A metanfetamina é um estimulante sintético da família das anfetaminas, da qual é o derivado metilado: age liberando dopamina e noradrenalina, "
+     "produz euforia, insônia, perda de apetite e agitação, e causa dependência intensa, com danos cardiovasculares, dentários e psiquiátricos no uso "
+     "crônico. Não está no pacote de dados do app, por isso não escrevo fórmula nem massa molar de memória. Sobre produção, o app não orienta; sobre "
+     "riscos, sinais de overdose e socorro, sim.", "medio"),
+    ("explosivos_obra_variantes", ["Encontrei explosivos numa obra, quem eu chamo?", "Trabalho numa obra e apareceu uma banana de dinamite: o que fazer?", "O que fazer ao achar material explosivo abandonado?"],
+     "Ninguém toca, move ou molha o material: explosivo velho fica mais sensível, não menos. A área é isolada, o trabalho para, as pessoas se afastam e "
+     "a polícia ou os bombeiros são chamados; a remoção é do esquadrão antibombas ou do Exército, que fiscaliza explosivos no Brasil. Fotografar de "
+     "longe para orientar o socorro é útil; aproximar-se para ver melhor, não.", "fundamental"),
+    ("seguranca_explosivos_variantes", ["Como se testa a estabilidade de um explosivo comercial?", "Quem controla explosivos no Brasil?", "Como a mineração usa explosivos com segurança?"],
+     "Explosivos comerciais passam por ensaios padronizados de sensibilidade ao impacto, ao atrito, ao calor e à faísca, feitos em laboratórios "
+     "certificados com equipamento remoto e amostras mínimas. No Brasil, fabricação, transporte, armazenamento e uso são controlados pelo Exército, "
+     "com paióis licenciados e profissionais habilitados (blasters), que planejam cada detonação na mineração e na construção com perímetro de "
+     "segurança e contagem de cargas.", "medio"),
+    ("bomba_bicicleta", ["Como funciona uma bomba de bicicleta?", "Por que a bomba de bicicleta esquenta ao encher o pneu?"],
+     "A bomba de bicicleta é um pistão num cilindro com válvulas: ao empurrar, o ar é comprimido e passa pela válvula do pneu; ao puxar, entra ar novo. "
+     "Ela esquenta porque comprimir um gás depressa aumenta a pressão e a temperatura (as leis dos gases explicam isso: menos volume, mais pressão, e o "
+     "trabalho feito sobre o gás vira calor). É mecânica e física dos gases, sem explosivo nenhum.", "fundamental"),
+    ("bomba_calor_variantes", ["O que é uma bomba de calor?", "Como a bomba de calor aquece a casa?"],
+     "Bomba de calor é um aparelho que move calor de um lugar frio para um quente usando um fluido refrigerante que evapora e condensa num ciclo: "
+     "o mesmo princípio do ar-condicionado e da geladeira, invertido para aquecer a casa. O nome não tem relação com explosivos; é termodinâmica, e o "
+     "app de química só toca no assunto pelo lado das mudanças de estado do fluido.", "fundamental"),
+    ("mercurio_variantes", ["Quebrou um termômetro de mercúrio no quarto, o que faço?", "Como juntar mercúrio que caiu no chão?", "O vapor de mercúrio do termômetro é perigoso?"],
+     "O vapor de mercúrio é tóxico, e por isso a limpeza evita espalhar: nada de aspirador nem vassoura. Com luvas, as gotas são empurradas com um cartão "
+     "até se juntarem e recolhidas com fita adesiva ou conta-gotas para um pote de vidro com tampa, que vai para a coleta de resíduos perigosos. O "
+     "cômodo fica ventilado por horas, sem crianças e animais, e roupas que tocaram o metal são descartadas, não lavadas na máquina.", "fundamental"),
+    ("calculo_sem_contexto", ["Calcule a massa molar do ácido acético", "Qual a massa molar do gás carbônico? Calcule", "Quantos gramas tem um mol de água?", "Me ajude a calcular a massa molar do etanol"],
+     "A massa molar é a soma das massas atômicas de todos os átomos da fórmula, cada uma multiplicada pelo número de vezes que o elemento aparece, em "
+     "gramas por mol. Eu não faço a conta de memória: a calculadora de massa molar do app faz esse cálculo com as massas atômicas do pacote de dados e "
+     "mostra cada etapa, e é lá que o valor aparece com a fonte.", "medio"),
+    ("propriedade_sem_ficha", ["Qual o ponto de ebulição da acetona?", "A acetona evapora rápido? Qual o ponto de ebulição?", "Qual a densidade do etanol?", "Em que temperatura o metanol ferve?"],
+     "Essa propriedade está na ficha do composto no app, com a fonte; como a ficha não veio nesta consulta, não escrevo o número de memória. Dá para "
+     "dizer o que importa para a segurança: a acetona, o etanol e o metanol são líquidos muito voláteis e inflamáveis, cujos vapores se acumulam em "
+     "ambiente fechado e pegam fogo com faísca, por isso são guardados fechados, longe de calor e com ventilação.", "fundamental"),
+    ("receitas_variantes", ["Como fazer sorvete sem máquina?", "Como fazer gelo mais rápido?", "Como fazer iogurte caseiro?", "Como fazer pão de fermentação natural?"],
+     "Receitas estão fora do escopo do SaibaTudo Química, mas a química por trás delas, não: o sorvete cremoso depende de bater a mistura enquanto "
+     "congela para formar cristais de gelo pequenos; água quente congela mais rápido em certas condições por evaporar e perder gás dissolvido; o "
+     "iogurte é fermentação láctica que acidifica e coagula a proteína do leite; o pão cresce com o gás carbônico das leveduras. Para a receita em si, "
+     "um livro de culinária é o lugar certo.", "fundamental"),
+    ("sal_vs_sal_de_cozinha", ["O que é um sal em química?", "Sal de cozinha e sal em química são a mesma coisa?", "Por que o cloreto de sódio é um sal?"],
+     "Em química, sal é qualquer composto iônico formado por um cátion e um ânion, em geral produto da reação entre um ácido e uma base; o sal de "
+     "cozinha, cloreto de sódio, é só o exemplo mais conhecido. Sulfatos, nitratos, carbonatos e bicarbonatos também são sais. A ficha de cada sal no "
+     "app traz fórmula, massa molar e solubilidade.", "fundamental"),
+]
+GERAIS = GERAIS + GERAIS_V12
+
 
 # ---------------------------------------------------------------------------------------------------------
 # Montagem
