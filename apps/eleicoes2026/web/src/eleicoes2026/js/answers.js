@@ -16,10 +16,16 @@ import { filtrar, novoFiltro } from './filters.js';
 /** Pergunta de resultado que pede o país inteiro (Governador/Senador sem UF): plural, "já ganhou", "todos os estados", "quais estados". */
 const RX_RESULTADO_NACIONAL = /\b(governadores|senadores|todos os estados|no brasil|no pais|quais estados|em quais|em quantos|ja (ganhou|ganharam|venceu|venceram|foi eleito|foram eleitos))\b/;
 
+/** Rótulo da origem para o cabeçalho e a cópia: o texto gerado nomeia o modelo que respondeu (`modelo`, enviado pelo Space; hoje "SaibaTudo IA"). */
+export function rotuloOrigem(r) {
+  if (r?.origem === 'GENERATIVA' && typeof r.modelo === 'string' && r.modelo.trim()) return `Texto gerado por IA (${r.modelo.trim()}) • Nuvem`;
+  return ORIGEM_ROTULO[r?.origem] ?? ORIGEM_ROTULO.LOCAL;
+}
+
 export const ORIGEM_ROTULO = {
   LOCAL: 'IA local • dados oficiais',
   NUVEM: 'IA na nuvem + dados oficiais',
-  GENERATIVA: 'Texto gerado por IA (Qwen 7B) • Nuvem',
+  GENERATIVA: 'Texto gerado por IA • Nuvem',
   AVISO: 'Aviso'
 };
 

@@ -28,5 +28,8 @@ hf upload franciscoaleixo/SaibaTudoIA-Explica-Eleicoes ai_model/output/space_bui
 Space **privado**; o servidor chama com `HF_TOKEN` (token de leitura) em `HF_ASK_SPACE_URL`. Variáveis do Space (Settings → Variables):
 `ASK_MODEL_ID` (repositório privado do explicador ajustado, ex.: `franciscoaleixo/SaibaTudoIA-Explica`), `ASK_MODEL_REVISION` (SHA da revisão
 publicada) e `ASK_MODEL_LABEL` (padrão "SaibaTudo IA"). Sem elas, serve a base `Qwen/Qwen3-4B-Instruct-2507`.
+**Segredo obrigatório** (Settings → Secrets): `HF_TOKEN` = token de LEITURA do dono (fine-grained, `repo.content.read`), porque o modelo
+está em repositório privado e o Space não herda permissão do dono; sem ele a carga falha com 401 (lição de 22/10/2026).
+`ia/treino/publicar_explica.py` grava variáveis e segredo de uma vez.
 Para trocar o app de eleições para este Space: `HF_ASK_SPACE_URL=https://franciscoaleixo-saibatudoia-explica-eleicoes.hf.space` na Vercel
 (`docs/PROJECT_MEMORY.md` §4.6) e redeploy pelo `eleicoes-data-refresh.yml`.

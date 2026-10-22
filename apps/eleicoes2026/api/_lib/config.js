@@ -43,7 +43,7 @@ export function readConfig(env = process.env) {
   const modalAskEndpoint = urlSegura(env.MODAL_ASK_ENDPOINT);
   const askEnabled = (env.ASK_ENABLED ?? '').trim() === '1';
   return {
-    // --- NLU e IA Generativa (Qwen 7B)
+    // --- NLU e IA Generativa (texto gerado: Space da SaibaTudo IA no Hugging Face; Modal como reserva)
     modalEndpoint,
     // Canário do NLU: uma versão nova do modelo recebe CANARY_PCT % das instalações (balde estável por iid) antes de ser promovida.
     // Falha do canário => a MESMA pergunta é refeita na produção (o eleitor não percebe). Rollback: apagar canary.json no Modal.

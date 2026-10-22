@@ -26,4 +26,6 @@ hf upload franciscoaleixo/saibatudo-quimica ai_model/output/space_build . --repo
 
 Space **privado**; o servidor chama com `HF_TOKEN` (token de leitura, fine-grained) em `HF_ASK_SPACE_URL`. Variáveis do Space (Settings → Variables):
 `ASK_MODEL_ID` (padrão `Qwen/Qwen3-4B-Instruct-2507`), `ASK_MODEL_REVISION` (SHA da revisão publicada do modelo ajustado) e `ASK_MODEL_LABEL`.
+**Segredo obrigatório** (Settings → Secrets): `HF_TOKEN` = token de LEITURA do dono (fine-grained, `repo.content.read`): o modelo está em
+repositório privado e o Space não herda permissão do dono; sem ele a carga falha (lição de 22/10/2026). `ia/treino/publicar_explica.py` grava tudo.
 Passo a passo completo em `docs/MODELO.md`.

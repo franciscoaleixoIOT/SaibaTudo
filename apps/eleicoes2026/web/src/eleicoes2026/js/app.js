@@ -1,6 +1,6 @@
 // Controlador do PWA: estado, roteamento (History API), carga de dados sob demanda, atualização periódica e renderização
 // da tela principal (porte de MainViewModel.kt + MainAppScreen.kt). Sem frameworks.
-import { ORIGEM_ROTULO, SUGESTOES_PADRAO } from './answers.js';
+import { SUGESTOES_PADRAO, rotuloOrigem } from './answers.js';
 import { BUILD } from './build-info.js';
 import { NUVEM_TEXTOS, NuvemNlu, enviarRelato, ofereceNuvem, pedirANuvem, textoFalhaNuvem } from './cloud.js';
 import { FilaMelhoria, melhoriaLigada } from './melhoria.js';
@@ -754,7 +754,7 @@ function renderBusca() {
 
 /** Copia a resposta em texto plano (texto, fonte e aviso de origem). Padrão dos apps SaibaTudo. */
 async function copiarResposta(r) {
-  const origem = ORIGEM_ROTULO[r.origem] ?? ORIGEM_ROTULO.LOCAL;
+  const origem = rotuloOrigem(r);
   const texto = `${r.directAnswer ?? ''}\n\n${r.fonte ?? ''}\nResposta da IA (${origem}) — SaibaTudo Eleições 2026, https://saibatudo.net/eleicoes2026/`;
   try { await navigator.clipboard.writeText(texto.trim()); toast('Resposta copiada.'); } catch { toast('Não foi possível copiar neste navegador.'); }
 }
@@ -769,7 +769,7 @@ function renderResposta() {
     h('div', { class: 'resp-cab' },
       h('span', { class: 'resp-ic' }, icon('sparkles', 20)),
       h('div', { class: 'resp-corpo' },
-        h('p', { class: 'resp-tit' }, `Resposta da IA • ${ORIGEM_ROTULO[r.origem] ?? ORIGEM_ROTULO.LOCAL}`),
+        h('p', { class: 'resp-tit' }, `Resposta da IA • ${rotuloOrigem(r)}`),
         textoResposta(r.directAnswer ?? ''),
         r.fonte ? h('p', { class: 'resp-fonte' }, r.fonte) : null),
       h('button', { type: 'button', class: 'btn-icone mini-btn', 'aria-label': 'Fechar resposta', onClick: () => { S.resposta = null; renderResposta(); } }, icon('x', 18))),

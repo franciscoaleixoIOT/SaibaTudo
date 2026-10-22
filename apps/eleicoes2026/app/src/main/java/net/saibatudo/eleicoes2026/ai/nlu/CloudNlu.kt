@@ -102,7 +102,8 @@ class CloudNluClient(
 }
 
 /**
- * Cliente da IA Generativa na nuvem (API própria saibatudo.net/api/ask → Modal Qwen2.5-7B).
+ * Cliente da IA Generativa na nuvem (API própria saibatudo.net/api/ask → Space da SaibaTudo IA no Hugging Face; Modal como reserva).
+ * O servidor devolve também `model`, o rótulo do modelo que respondeu — o app o mostra em vez de um nome fixo.
  * Envia a pergunta do usuário e o contexto dos dados oficiais do TSE para gerar respostas detalhadas e fundamentadas.
  */
 class CloudAskClient(
@@ -112,7 +113,12 @@ class CloudAskClient(
 ) {
     private val json = "application/json; charset=utf-8".toMediaType()
 
-    suspend fun responder(pergunta: String, contexto: String = "", installId: String): String? = withContext(Dispatchers.IO) {
+    /** Texto gerado e o rótulo do modelo que o escreveu (campo `model` da API; null se o servidor não informar). */
+    data class TextoGerado(val texto: String, val modelo: String?)
+
+    suspend fun responder(pergunta: String, contexto: String = "", installId: String): String? = gerar(pergunta, contexto, installId)?.texto
+
+    suspend fun gerar(pergunta: String, contexto: String = "", installId: String): TextoGerado? = withContext(Dispatchers.IO) {
         val corpo = JsonObject().apply {
             addProperty("q", pergunta.take(300))
             addProperty("context", contexto.take(3000))
@@ -128,7 +134,10 @@ class CloudAskClient(
                 if (txt.length > 50_000) return@withContext null
                 val raiz = JsonParser.parseString(txt).asJsonObject
                 if (raiz.get("ok")?.asBoolean != true) return@withContext null
-                raiz.get("answer")?.takeIf { it.isJsonPrimitive }?.asString?.trim()?.takeIf { it.isNotEmpty() }
+                val texto = raiz.get("answer")?.takeIf { it.isJsonPrimitive }?.asString?.trim()?.takeIf { it.isNotEmpty() }
+                    ?: return@withContext null
+                val modelo = raiz.get("model")?.takeIf { it.isJsonPrimitive }?.asString?.trim()?.takeIf { it.isNotEmpty() }
+                TextoGerado(texto, modelo)
             }
         } catch (_: IOException) {
             null

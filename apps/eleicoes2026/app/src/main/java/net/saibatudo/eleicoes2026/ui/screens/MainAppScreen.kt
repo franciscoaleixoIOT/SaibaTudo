@@ -427,7 +427,7 @@ private fun CartaoResposta(
                     consultandoNuvem -> Row(verticalAlignment = Alignment.CenterVertically) {
                         CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
                         Spacer(Modifier.width(8.dp))
-                        Text("Consultando modelo de IA na nuvem (Qwen2.5)…", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("Consultando a SaibaTudo IA na nuvem…", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     oferecerNuvem -> Column {
                         OutlinedButton(onClick = onPerguntarNuvem, shape = RoundedCornerShape(10.dp)) {

@@ -94,7 +94,7 @@ test('toque no botão: envia UMA requisição só com o texto da pergunta e a re
   assert.equal(chamadas.length, 1);
 });
 
-test('toque no botão com resposta resolvida localmente: chama a IA Generativa Qwen 7B via /api/ask', async () => {
+test('toque no botão com resposta resolvida localmente: chama a IA generativa (SaibaTudo IA) via /api/ask e rotula com o modelo devolvido', async () => {
   const chamadas = [];
   const fetchFn = async (url, init) => {
     chamadas.push({ url, init });
@@ -102,7 +102,7 @@ test('toque no botão com resposta resolvida localmente: chama a IA Generativa Q
       return new Response(JSON.stringify({
         ok: true,
         answer: 'Os candidatos a presidente contam com os seguintes vices registrados...',
-        model: 'Qwen2.5-7B-Instruct-AWQ'
+        model: 'SaibaTudo IA'
       }), { headers: { 'content-type': 'application/json' } });
     }
     return new Response(JSON.stringify({ ok: true, nlu: {} }), { headers: { 'content-type': 'application/json' } });

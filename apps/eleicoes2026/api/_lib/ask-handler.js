@@ -1,5 +1,5 @@
 // Núcleo do POST /api/ask (Request/Response padrão).
-// Conecta a camada serverless da Vercel ao modelo generativo Qwen2.5-7B: Space no ZeroGPU do Hugging Face (principal) e
+// Conecta a camada serverless da Vercel ao modelo generativo (SaibaTudo IA, explicador treinado; antes Qwen2.5-7B): Space no ZeroGPU do Hugging Face (principal) e
 // Modal.com (reserva, com orçamento diário próprio). Ver chamarAsk.
 // O TEXTO DA PERGUNTA NUNCA É REGISTRADO em log (só status, latência, cache, client).
 
@@ -132,7 +132,8 @@ export async function chamarHfAsk(cfg, q, context, { doFetch, now, budget }) {
     if (!rawAnswer) return { ok: false, kind: 'bad_output' };
     const v = verificarRespostaAsk(rawAnswer, { q, context });
     if (!v.ok) return { ok: false, kind: 'rejected', motivo: v.motivo };
-    return { ok: true, answer: rawAnswer, model: typeof dados.model === 'string' ? dados.model : 'Qwen2.5-7B-Instruct', provedor: 'hf' };
+    // rótulo do Space (ASK_MODEL_LABEL; hoje "SaibaTudo IA"): os apps mostram exatamente o que o servidor devolve
+    return { ok: true, answer: rawAnswer, model: typeof dados.model === 'string' && dados.model.trim() ? dados.model.trim() : 'SaibaTudo IA', provedor: 'hf' };
   } catch (e) {
     if (e && e.name === 'AbortError') return { ok: false, kind: 'timeout' };
     return { ok: false, kind: 'upstream' };

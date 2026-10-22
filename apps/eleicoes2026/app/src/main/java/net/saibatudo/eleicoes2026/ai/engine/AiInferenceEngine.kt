@@ -11,7 +11,7 @@ interface AiInferenceEngine {
 
     /**
      * Pedido EXPLÍCITO do usuário ("Perguntar à IA na nuvem").
-     * Prioridade: resposta generativa com Qwen 7B ancorada no TSE se a pergunta já foi entendida,
+     * Prioridade: resposta generativa (SaibaTudo IA) ancorada no TSE se a pergunta já foi entendida,
      * ou interpretação estruturada via NLU na nuvem se não foi entendida.
      */
     suspend fun perguntarNaNuvem(query: String, respostaAtual: AiMenuResponse? = null): AiMenuResponse? = null

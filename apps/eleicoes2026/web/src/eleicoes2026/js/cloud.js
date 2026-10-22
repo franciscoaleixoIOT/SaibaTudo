@@ -138,7 +138,8 @@ export class NuvemNlu {
   }
 
   /**
-   * Resposta generativa da Qwen 7B ancorada no TSE (POST /api/ask).
+   * Resposta generativa da SaibaTudo IA (explicador treinado, no Space do Hugging Face) ancorada no TSE (POST /api/ask).
+   * `model` é o rótulo devolvido pelo servidor (ASK_MODEL_LABEL do Space); o app nunca o inventa.
    * @param {string} pergunta
    * @param {string} [contexto]
    * @param {number} [timeoutMs]
@@ -159,7 +160,7 @@ export class NuvemNlu {
       if (txt.length > 50000) return null;
       const raiz = JSON.parse(txt);
       if (raiz?.ok !== true || typeof raiz.answer !== 'string' || !raiz.answer.trim()) return null;
-      return { answer: raiz.answer.trim(), model: raiz.model || 'Qwen2.5-7B-Instruct-AWQ' };
+      return { answer: raiz.answer.trim(), model: typeof raiz.model === 'string' && raiz.model.trim() ? raiz.model.trim() : 'IA na nuvem' };
     } catch {
       return null;
     } finally {
@@ -184,7 +185,7 @@ export const ofereceNuvem = (resposta, automatica) =>
 
 /**
  * Executa o pedido explícito para a resposta `atual`. Sucesso ⇒ `{ ok: true, resposta }` com a nova resposta
- * (texto gerado com Qwen 7B só quando `generativo` — IA generativa ligada no pacote assinado —; senão, montada dos dados oficiais via NLU na nuvem).
+ * (texto gerado pela SaibaTudo IA só quando `generativo` — IA generativa ligada no pacote assinado —; senão, montada dos dados oficiais via NLU na nuvem).
  * Qualquer falha ⇒ `{ ok: false, resposta: atual }`. Nunca lança.
  * @param {{engine: {perguntarANuvem(q: string, atual?: object, opts?: object): Promise<object|null>}, atual: object, pergunta: string, generativo?: boolean}} o
  */

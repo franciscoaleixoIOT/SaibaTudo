@@ -107,13 +107,15 @@ class HybridAskTest {
     fun comOAskLigadoDevolveTextoGeradoRotuladoESemTratarComoDadoOficial() = runBlocking {
         val c = Cenario(askLigado = true)
         try {
-            c.enfileirarAsk("""{"ok":true,"answer":"Explicação gerada pelo modelo.","model":"Qwen2.5-7B"}""")
+            c.enfileirarAsk("""{"ok":true,"answer":"Explicação gerada pelo modelo.","model":"SaibaTudo IA"}""")
             val local = resolvida(c, "Quem disputa a Presidência?")
             val r = c.motor.perguntarNaNuvem("Quem disputa a Presidência?", local)
             assertNotNull(r)
             assertEquals(OrigemResposta.GENERATIVA, r!!.origem)
             assertEquals("Explicação gerada pelo modelo.", r.directAnswer)
-            assertEquals(HybridAiInferenceEngine.FONTE_GERADA, r.fonte)
+            assertEquals(HybridAiInferenceEngine.fonteGerada("SaibaTudo IA"), r.fonte)
+            assertTrue("o rótulo nomeia o modelo que respondeu (campo model da API)", r.fonte!!.contains("SaibaTudo IA"))
+            assertFalse("nome fixo de modelo não aparece mais", r.fonte!!.contains("Qwen"))
             assertTrue("o rótulo diz que pode conter erros", r.fonte!!.contains("pode conter erros"))
             assertFalse("nunca se apresenta como fundamentada no TSE", r.fonte!!.contains("Fundamentada"))
             assertEquals(1, c.ask.requestCount)

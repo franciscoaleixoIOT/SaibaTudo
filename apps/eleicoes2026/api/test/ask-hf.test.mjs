@@ -1,4 +1,4 @@
-// Texto gerado pelo Qwen 7B: Space do Hugging Face (ZeroGPU) como provedor PRINCIPAL e Modal como RESERVA, e o verificador
+// Texto gerado (SaibaTudo IA; antes Qwen 7B): Space do Hugging Face (ZeroGPU) como provedor PRINCIPAL e Modal como RESERVA, e o verificador
 // reforçado (contagem inventada, contradição com o que o app apurou). O recurso continua desligado sem ASK_ENABLED=1.
 import test from 'node:test';
 import assert from 'node:assert/strict';

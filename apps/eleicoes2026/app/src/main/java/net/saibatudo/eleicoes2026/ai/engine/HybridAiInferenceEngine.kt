@@ -9,10 +9,10 @@ import net.saibatudo.eleicoes2026.ai.nlu.CloudAskClient
 import net.saibatudo.eleicoes2026.ai.nlu.CloudNluClient
 
 /**
- * Motor HÍBRIDO: LOCAL primeiro, nuvem como apoio de interpretação e IA Generativa (Qwen 7B).
+ * Motor HÍBRIDO: LOCAL primeiro, nuvem como apoio de interpretação e IA Generativa (SaibaTudo IA, explicador treinado).
  *
  *  1. O NLU local responde quase tudo (grátis, offline, determinístico).
- *  2. Se a pergunta já foi entendida e o usuário quer aprofundar na nuvem, chama a IA Generativa (Qwen 7B no Modal).
+ *  2. Se a pergunta já foi entendida e o usuário quer aprofundar na nuvem, chama a IA Generativa (Space da SaibaTudo IA; Modal como reserva).
  *  3. Se NÃO entendeu E o usuário consentiu, a pergunta é enviada ao NLU na nuvem para reinterpretação.
  */
 class HybridAiInferenceEngine(
@@ -50,19 +50,19 @@ class HybridAiInferenceEngine(
                 baseContexto
             }
             val gerada = withTimeoutOrNull(timeoutExplicitoMs) {
-                askClient.responder(query, contexto, idInstalacao())
+                askClient.gerar(query, contexto, idInstalacao())
             }
-            if (!gerada.isNullOrBlank()) {
+            if (gerada != null && gerada.texto.isNotBlank()) {
                 return AiMenuResponse(
                     targetRoute = respostaAtual.targetRoute,
                     menuId = respostaAtual.menuId,
                     submenuId = respostaAtual.submenuId,
                     intent = respostaAtual.intent,
                     filters = respostaAtual.filters,
-                    directAnswer = gerada,
+                    directAnswer = gerada.texto,
                     suggestedQuestions = respostaAtual.suggestedQuestions,
                     candidateIds = respostaAtual.candidateIds,
-                    fonte = FONTE_GERADA,
+                    fonte = fonteGerada(gerada.modelo),
                     origem = OrigemResposta.GENERATIVA,
                     resolvida = true
                 )
@@ -91,19 +91,19 @@ class HybridAiInferenceEngine(
                 append("Regras Eleições 2026: 2º turno em 25/10/2026 exclusivamente para Presidente e Governador se o primeiro colocado não alcançar mais de 50% dos votos válidos no 1º turno (04/10/2026). Senadores e Deputados são eleitos em turno único no 1º turno.")
             }
             val gerada = withTimeoutOrNull(timeoutExplicitoMs) {
-                askClient.responder(query, contexto, idInstalacao())
+                askClient.gerar(query, contexto, idInstalacao())
             }
-            if (!gerada.isNullOrBlank()) {
+            if (gerada != null && gerada.texto.isNotBlank()) {
                 return AiMenuResponse(
                     targetRoute = respostaAtual?.targetRoute ?: "menu/home",
                     menuId = respostaAtual?.menuId ?: "home",
                     submenuId = respostaAtual?.submenuId,
                     intent = respostaAtual?.intent ?: Intent.DESCONHECIDA,
                     filters = respostaAtual?.filters ?: AiFilterExtraction(),
-                    directAnswer = gerada,
+                    directAnswer = gerada.texto,
                     suggestedQuestions = respostaAtual?.suggestedQuestions ?: listOf("Quem disputa a Presidência?", "Calendário eleitoral 2026"),
                     candidateIds = emptyList(),
-                    fonte = FONTE_GERADA,
+                    fonte = fonteGerada(gerada.modelo),
                     origem = OrigemResposta.GENERATIVA,
                     resolvida = true
                 )
@@ -141,7 +141,12 @@ class HybridAiInferenceEngine(
             return texto.take(if (corte > max / 2) corte else max) + "\n(Texto cortado: a lista acima está INCOMPLETA. Não conte os itens nem informe totais que não estejam escritos.)"
         }
 
-        /** Rótulo honesto: é texto de modelo, não dado oficial. A neutralidade (Res. TSE 23.755/2026) é reforçada no proxy. */
-        const val FONTE_GERADA = "Texto gerado por IA (Qwen2.5-7B) • pode conter erros; confira nos dados oficiais e no site do TSE"
+        /** Rótulo honesto: é texto de modelo, não dado oficial. A neutralidade (Res. TSE 23.755/2026) é reforçada no proxy.
+         *  Nomeia o modelo que respondeu (campo `model` da API: "SaibaTudo IA" no Space treinado; a reserva no Modal informa o seu). */
+        fun fonteGerada(modelo: String?): String =
+            "Texto gerado por IA (${modelo?.takeIf { it.isNotBlank() } ?: "nuvem"}) • pode conter erros; confira nos dados oficiais e no site do TSE"
+
+        /** Rótulo do provedor principal (SaibaTudo IA), para quem precisa do texto sem ter a resposta. */
+        val FONTE_GERADA: String = fonteGerada("SaibaTudo IA")
     }
 }

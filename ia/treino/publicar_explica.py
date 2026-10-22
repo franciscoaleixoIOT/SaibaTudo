@@ -6,14 +6,17 @@ SaibaTudo.IA — publicação do EXPLICADOR (SaibaTudo-Explica) no Hugging Face,
   1. repositório PRIVADO do modelo (`--modelo`), criado se não existir, com o diretório fundido (`--merged`) enviado como uma revisão;
   2. os dois Spaces PRIVADOS (Gradio, ZeroGPU `zero-a10g`), criados se não existirem, com o código de `backend/hf_space_*` + o `*_core.py`
      copiado de `backend/modal/` (o prompt é o do treino): `--space-eleicoes` e `--space-quimica`;
-  3. as variáveis dos Spaces: ASK_MODEL_ID = `--modelo`, ASK_MODEL_REVISION = SHA da revisão enviada, ASK_MODEL_LABEL = `--rotulo`;
+  3. as variáveis dos Spaces: ASK_MODEL_ID = `--modelo`, ASK_MODEL_REVISION = SHA da revisão enviada, ASK_MODEL_LABEL = `--rotulo`,
+     e o SEGREDO `HF_TOKEN` (token de LEITURA, `--token-leitura`; padrão `apps/eleicoes2026/secrets/hf_token.txt`): sem ele o Space não
+     consegue baixar o modelo do repositório privado (transformers lê `HF_TOKEN` do ambiente). Lição de 22/10/2026;
   4. `--teste`: espera o Space ficar RUNNING e chama `/gradio_api/call/ask` como o servidor do app faz (api/_lib/ask-handler.js).
 
-Nada muda nos sites: eleições continua no Space `saibatudo-qwen7b` até `HF_ASK_SPACE_URL` apontar para o Space novo (Vercel, depois do
-congelamento de 24-26/10), e química continua com `ASK_ENABLED` desligado. Os dois ficam para o mantenedor.
+Nada muda nos sites por si só: cada app passa a usar o Space novo quando `HF_ASK_SPACE_URL` (eleições; decisão do mantenedor em 22/10/2026,
+antes do congelamento de 24-26/10, com o gate do holdout de eleições aprovado) e `ASK_ENABLED` + `HF_ASK_SPACE_URL` (química) apontarem
+para ele na Vercel e o app for republicado (`<app>-data-refresh.yml`).
 
-Token: o `hf_token.txt` de eleições só LÊ (fine-grained, `repo.content.read`). Para publicar, grave um token com escrita em repositórios e
-Spaces em `secrets/hf_token_write.txt` (raiz; ignorado) — nunca no Git nem no chat.
+Token: o da CLI do Hugging Face (`hf auth login`, com escrita — decisão do mantenedor em 20/10) ou, se existir, `secrets/hf_token_write.txt`
+(raiz; ignorado). O `hf_token.txt` de eleições só LÊ (fine-grained, `repo.content.read`). Nunca no Git nem no chat.
 
   python -I ia/treino/publicar_explica.py --merged ia/treino/out/explica-v1/merged --versao ask-v1-20261020 --teste
   python -I ia/treino/publicar_explica.py --so-spaces --teste          # só republica o código dos Spaces (modelo já enviado)
@@ -48,11 +51,26 @@ CONTEXTO_TESTE = {
 
 
 def ler_token(caminho: Path) -> str:
+    """Token de escrita: o arquivo `secrets/hf_token_write.txt` se existir; senão o da CLI (`hf auth login`, decisão do mantenedor em 20/10)."""
     if not caminho.is_file():
-        sys.exit(f"token de escrita ausente: {caminho} (grave um token do Hugging Face com escrita em repositórios e Spaces; nunca no Git nem no chat)")
+        from huggingface_hub import get_token
+        t = get_token() or ""
+        if not t:
+            sys.exit(f"sem token: nem {caminho} nem login da CLI (hf auth login)")
+        return t
     t = caminho.read_text(encoding="utf-8").strip()
     if not t.startswith("hf_"):
         sys.exit("token inválido (esperado começar por hf_)")
+    return t
+
+
+def ler_token_leitura(caminho: Path) -> str:
+    """Token de LEITURA (fine-grained, repo.content.read no namespace) para o segredo HF_TOKEN dos Spaces."""
+    if not caminho.is_file():
+        sys.exit(f"token de leitura ausente: {caminho} (o Space precisa dele como segredo HF_TOKEN para baixar o modelo privado)")
+    t = caminho.read_text(encoding="utf-8").strip()
+    if not t.startswith("hf_"):
+        sys.exit("token de leitura inválido (esperado começar por hf_)")
     return t
 
 
@@ -108,6 +126,8 @@ def chamar_space(url_base: str, token: str, dados: list, timeout: int = 180) -> 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--token-file", default=str(RAIZ / "secrets" / "hf_token_write.txt"))
+    ap.add_argument("--token-leitura", default=str(ELE / "secrets" / "hf_token.txt"),
+                    help="token de LEITURA gravado como segredo HF_TOKEN nos Spaces (para baixar o modelo privado); mesmo token que a Vercel usa")
     ap.add_argument("--modelo", default="franciscoaleixo/SaibaTudoIA-Explica", help="repositório privado do modelo fundido")
     ap.add_argument("--merged", help="diretório do modelo fundido a enviar (omita com --so-spaces)")
     ap.add_argument("--versao", default="", help="rótulo da versão na mensagem do commit (ex.: ask-v1-20261020)")
@@ -123,6 +143,7 @@ def main(argv=None):
 
     from huggingface_hub import HfApi  # import tardio: o venv do treino tem a biblioteca
     token = ler_token(Path(a.token_file))
+    token_leitura = ler_token_leitura(Path(a.token_leitura))
     api = HfApi(token=token)
     quem = api.whoami()
     print("conta:", quem.get("name"), "| token:", quem.get("auth", {}).get("accessToken", {}).get("displayName"))
@@ -156,6 +177,9 @@ def main(argv=None):
                               commit_message=f"Explica {a.versao or ''}: codigo do Space + {SPACES[nome][1].name}".strip())
             for k, v in (("ASK_MODEL_ID", a.modelo), ("ASK_MODEL_REVISION", sha), ("ASK_MODEL_LABEL", a.rotulo)):
                 api.add_space_variable(rid, k, v)
+            # segredo (não variável): o modelo está em repositório privado; sem HF_TOKEN o Space falha ao carregar (lição de 22/10/2026)
+            api.add_space_secret(rid, "HF_TOKEN", token_leitura)
+            print("  variáveis ASK_MODEL_* e segredo HF_TOKEN gravados")
             info = api.space_info(rid)
             hw = info.runtime.hardware if info.runtime else None
             if hw and hw != a.hardware and hw != "cpu-basic":

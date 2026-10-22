@@ -130,7 +130,7 @@ export class Engine {
   /**
    * "Perguntar à IA na nuvem": pedido EXPLÍCITO para uma pergunta que o usuário quer aprofundar na nuvem
    * (o toque é o consentimento para enviar só esta pergunta).
-   * Prioridade: resposta generativa ancorada com Qwen 7B via /api/ask.
+   * Prioridade: resposta generativa ancorada (SaibaTudo IA, explicador treinado) via /api/ask.
    * Fallback: reinterpretação NLU estruturada com montagem via AnswerBuilder.
    * Retorna a resposta (origem GENERATIVA ou NUVEM) ou null se a nuvem falhar. Nunca lança.
    */
@@ -189,6 +189,7 @@ export class Engine {
             suggestedQuestions: respostaAtual?.suggestedQuestions ?? [],
             candidateIds: respostaAtual?.candidateIds ?? [],
             fonte: `Texto gerado por IA (${gen.model}) • pode conter erros; confira nos dados oficiais e no site do TSE`,
+            modelo: gen.model,
             origem: 'GENERATIVA',
             resolvida: true,
             abrirResultados: false,
