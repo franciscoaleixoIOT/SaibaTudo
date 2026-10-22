@@ -394,6 +394,15 @@ vergiften", "chlorine gas by mixing cleaning products") receberam a resposta de 
 camada quantizada na RAM não roda (bitsandbytes/accelerate); tudo na GPU 587 s/passo (despejo); `--cpu_modules lm_head,model.embed_tokens`
 (novo em `train_hybrid.py`) **42 s/passo** com 768 tokens → 1 época ≈ 6–8 h. Viável; decisão do mantenedor. README do treino §Base maior.
 
+### 6.ag. 22/10/2026 (tarde): Space do explicador no ar; Vercel parcial; v1.5 e v1.6
+Space privado `franciscoaleixo/saibatudo-quimica` (ZeroGPU) com o ask-v1.3 (revisão `1692fb8`) RUNNING e respondendo ao teste. Lições: o Space precisa
+do **segredo** `HF_TOKEN` (leitura) para baixar o modelo privado (`publicar_explica.py --token-leitura` grava) e de `transformers>=5.17` (modelo salvo
+pelo 5.17; o 4.x quebra no tokenizer). Vercel: `HF_ASK_SPACE_URL`, `ASK_MODEL_VERSION=ask-v1.3-20261021`, `ASK_ENABLED=1` gravados via API REST;
+`QUIMICA_ASK_ENABLED=1` no GitHub. **Pendente (mantenedor):** `HF_TOKEN` na Vercel (o agente não grava segredos) e `gh workflow run
+quimica-data-refresh.yml`; sem o token, não publicar (o pacote ligaria o botão e a API responderia 503). v1.5 (eleições ×3, 768 tokens): química 0 % /
+81,1 % / 99,2 % — reprovado só pelo limite de 95 %; causa raiz do explicador fraco em eleições = truncamento a 768 (2.779 amostras descartadas);
+v1.6 a 1.280 tokens em treino (fila 8). MODELO.md §8 continua valendo.
+
 ## 7. Contas e segredos
 Vercel `saibatudo-quimica` (time `franciscoaleixo-9696`); GitHub `franciscoaleixoIOT`; Hugging Face `franciscoaleixo` (PRO, 40 min/dia de ZeroGPU); Modal `franciscoaleixo/main` (US$ 30/mês grátis; já usados pelo app de eleições, ~US$ 5/mês).
 `secrets/data_signing_key.pem` (nova, exclusiva deste app; pública em `pipeline/data_signing_public.pem`). Fazer backup offline. Modal: app `SaibaTudoIA-NLU-Quimica`, Volume `SaibaTudoIA-Models-Quimica` (nomes desde 14/10/2026; os antigos `saibatudo-quimica-*` foram apagados), par de Proxy Auth Token criado pelo mantenedor em 13/10/2026 (guardado em `secrets/modal_proxy_quimica.env` da raiz do monorepo, ignorado, e como variáveis sensíveis na Vercel; nunca no Git nem no chat).

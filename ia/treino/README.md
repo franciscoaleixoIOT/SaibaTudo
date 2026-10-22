@@ -388,8 +388,10 @@ Nada muda em produção: a química segue com `ask: off` no Modal e o Qwen 7B do
 
 **Decisão do mantenedor (22/10 07h): opção 1.** `python backend/modal/regatear.py --version ask-v1.3-20261021 --min-respondido 80 --motivo "..."`
 reescreveu o `meta.json` do v1.3 como aprovado (veredito original, limites antigos/novos, motivo e data em `gate_notes`; arquivos e hashes intocados).
-Publicação em curso: `publicar_explica.py --merged out/explica-v1.3/merged --versao ask-v1.3-20261021 --so quimica --teste` (repositório privado
-do modelo + Space privado da química em ZeroGPU + teste). Só depois do Space responder: `ASK_ENABLED=1`, `HF_ASK_SPACE_URL`, `HF_TOKEN` (leitura),
+Publicação feita em 22/10 (upload de 8,0 GB em ~8 h pelo Wi-Fi; revisão `1692fb8`): Space `franciscoaleixo/saibatudo-quimica` RUNNING e respondendo
+(duas lições: o Space precisa do SEGREDO `HF_TOKEN` para ler o modelo privado — o script agora grava — e de `transformers>=5.17` porque o modelo fundido
+foi salvo pelo 5.17; o 4.x quebra no `tokenizer_config.json`). Vercel da química: `HF_ASK_SPACE_URL`, `ASK_MODEL_VERSION`, `ASK_ENABLED` gravados e
+`QUIMICA_ASK_ENABLED=1` no GitHub; **falta `HF_TOKEN`** (segredo; o agente não pode gravar) e o `quimica-data-refresh.yml`. Receita original: `ASK_ENABLED=1`, `HF_ASK_SPACE_URL`, `HF_TOKEN` (leitura),
 `ASK_MODEL_VERSION=ask-v1.3-20261021` na Vercel, variável `QUIMICA_ASK_ENABLED=1` no GitHub e `gh workflow run quimica-data-refresh.yml`
 (MODELO.md §8).
 
@@ -410,7 +412,14 @@ o gate de eleições do ask-v1.3 (Q4_K_M, CPU 12 threads, 188 pares em 28 min; `
 Causa provável: eleições era **8 % da mistura** (749 de 8.890 pares) — o modelo não fixou o rodapé nem a recusa "não recebi do aplicativo os dados".
 **Decisão tomada pelo agente (reversível, nada publicado):** eleições continua no Qwen 7B; **Explica v1.5** em treino (fila 7, `out/fila-20261022g.sh`):
 mistura do v1.3 com eleições ×3 (10.388 pares; 476 passos a ~24 s ≈ 3h15), `pos_treino.sh` roda o gate da química E o de eleições e **não envia nada ao HF**.
-Resultados em `out/explica-v1.5/pos_treino.log`, `apps/eleicoes2026/backend/retrain/out-ask/holdout_gate_v15.json`. Se aprovar nos dois: `publicar_explica.py
+**Resultado do v1.5 (22/10 14h43):** química útil a perigoso 0 %, legítimos **81,1 %**, fidelidade 99,2 % (mesmo perfil do v1.3; passa só no limite de 80 %);
+eleições **34/188 = 18,1 %** (153 falhas só por rodapé; **93,6 % sem a regra do rodapé**; 9 números sem fonte, quase todos datas estropiadas: "18/10/2006",
+"18/10/20+", "14h38min" inventado). **Causa raiz encontrada:** com `--max_length 768`, `mascarar_prompt` descartou **2.779 das 10.388 amostras** (truncadas
+antes da saída) — os pares de eleições têm mediana de **1.016 tokens** (551 de 749 acima de 768; contexto do TSE longo), logo o modelo quase não viu
+eleições nem o rodapé, que fica no fim. Sonda de 14h47 (`out/probe-4b-1280/`): 1.280 tokens com `--cpu_modules lm_head,model.embed_tokens` (bf16 na RAM)
+e `--cpu_offload off` → **53 s/passo** em amostras longas, VRAM 5,8–6,9 GB, GPU a 85 W (sem despejo). **v1.6 em treino desde 14h49** (fila 8,
+`out/fila-20261022h.sh`): mesma mistura, `--max_length 1280`, ~5–6 h + gates; eleições ≤ 1.268 tokens: 558 de 749 pares entram.
+Resultados em `out/explica-v1.6/pos_treino.log`, `apps/eleicoes2026/backend/retrain/out-ask/holdout_gate_v16.json`. Se aprovar nos dois: `publicar_explica.py
 --merged out/explica-v1.5/merged --versao ask-v1.5-20261022 --teste` (grava também o segredo `HF_TOKEN` nos Spaces — lição de 22/10) e `HF_ASK_SPACE_URL`
 na Vercel pela API REST (CLI ausente) + `eleicoes-data-refresh.yml`, até 23/10 (congelamento 24–26/10). Se reprovar: ficar no Qwen 7B até depois de 27/10.
 

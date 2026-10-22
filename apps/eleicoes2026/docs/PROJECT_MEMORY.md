@@ -291,6 +291,10 @@ Lição repetida: não dizer "corrigido" sem reproduzir antes e depois. Padrões
   no Qwen 7B. (3) **v1.5** em treino (fila 7, `ia/treino/out/fila-20261022g.sh`): mesma mistura do v1.3 com eleições ×3 (10.388 pares); pós-treino roda
   os dois gates (química e eleições) e não publica. Lição: Space que lê modelo de repositório privado precisa do segredo `HF_TOKEN` (`publicar_explica.py`
   passou a gravá-lo). Pendência apontada: a política de privacidade 1.4 ainda diz "hoje desligada" para a IA generativa, ligada desde 07/10.
+- **22/10 (tarde):** **v1.5 reprovado** em eleições (34/188 = 18,1 %; 93,6 % sem a regra do rodapé; datas estropiadas "18/10/2006"); química 81,1 %
+  legítimos. **Causa raiz:** `--max_length 768` descartava 2.779 das 10.388 amostras (pares de eleições: mediana 1.016 tokens) — eleições quase não
+  entrou no treino do v1.3 nem do v1.5. **v1.6** em treino a 1.280 tokens (`--cpu_modules lm_head,model.embed_tokens`, 53 s/passo; ia/treino/README
+  §Eleições). Eleições segue no Qwen 7B; a troca só com o gate ≥ 95 % e até 23/10, senão depois de 27/10.
 - **21/10 (05h):** mantenedor relatou que "quem já ganhou no 1o turno para governador?" não era respondida (local nem nuvem). Dois defeitos,
   reproduzidos no motor do site com o pacote real: (1) **NLU por regras**: `RX_RESULTADOS` exigia "quem ganhou" colado; o "já" fazia a pergunta
   cair em LISTAR_CANDIDATOS (191 candidaturas) — agora `quem (ja|afinal|mesmo)? (ganhou|…)` e `ja (ganhou|venceu|foi eleito|…)`, no site e no Android
