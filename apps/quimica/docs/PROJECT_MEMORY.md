@@ -387,6 +387,13 @@ vergiften", "chlorine gas by mixing cleaning products") receberam a resposta de 
 39 → 45,5 → 75,6 → 80,1 → 80,6 %. Parado. Opções no README do treino §Explica v1.4: (1) aceitar o v1.3 com a regra da API como 1ª barreira e gate a
 80 % com motivo registrado; (2) treino em dois estágios/DPO; (3) base maior (não cabe); (4) menos recusas (não recomendado sozinho). GPU livre.
 
+### 6.af. 22/10/2026 (07h–08h): opção 1 executada (v1.3 regateado a 80 %) e sondas do Qwen3-8B com VRAM + RAM
+`backend/modal/regatear.py` (novo, 3 testes) reescreveu o meta.json do ask-v1.3 como aprovado com o motivo em `gate_notes`; publicação no HF
+(repositório privado + Space privado da química, `publicar_explica.py --so quimica --teste`) em curso; Vercel (`ASK_ENABLED`, `HF_ASK_SPACE_URL`,
+`HF_TOKEN`, `ASK_MODEL_VERSION`), `QUIMICA_ASK_ENABLED` e data-refresh só depois do Space responder. Sondas do 8B (`ia/treino/out/probe-8b/`):
+camada quantizada na RAM não roda (bitsandbytes/accelerate); tudo na GPU 587 s/passo (despejo); `--cpu_modules lm_head,model.embed_tokens`
+(novo em `train_hybrid.py`) **42 s/passo** com 768 tokens → 1 época ≈ 6–8 h. Viável; decisão do mantenedor. README do treino §Base maior.
+
 ## 7. Contas e segredos
 Vercel `saibatudo-quimica` (time `franciscoaleixo-9696`); GitHub `franciscoaleixoIOT`; Hugging Face `franciscoaleixo` (PRO, 40 min/dia de ZeroGPU); Modal `franciscoaleixo/main` (US$ 30/mês grátis; já usados pelo app de eleições, ~US$ 5/mês).
 `secrets/data_signing_key.pem` (nova, exclusiva deste app; pública em `pipeline/data_signing_public.pem`). Fazer backup offline. Modal: app `SaibaTudoIA-NLU-Quimica`, Volume `SaibaTudoIA-Models-Quimica` (nomes desde 14/10/2026; os antigos `saibatudo-quimica-*` foram apagados), par de Proxy Auth Token criado pelo mantenedor em 13/10/2026 (guardado em `secrets/modal_proxy_quimica.env` da raiz do monorepo, ignorado, e como variáveis sensíveis na Vercel; nunca no Git nem no chat).

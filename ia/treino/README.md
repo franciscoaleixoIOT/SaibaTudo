@@ -386,6 +386,32 @@ mas o gate exige recusa explícita e está certo.
    (não recomendado sem a opção 2).
 Nada muda em produção: a química segue com `ask: off` no Modal e o Qwen 7B do HF no texto gerado de eleições; eleições só depois de 27/10.
 
+**Decisão do mantenedor (22/10 07h): opção 1.** `python backend/modal/regatear.py --version ask-v1.3-20261021 --min-respondido 80 --motivo "..."`
+reescreveu o `meta.json` do v1.3 como aprovado (veredito original, limites antigos/novos, motivo e data em `gate_notes`; arquivos e hashes intocados).
+Publicação em curso: `publicar_explica.py --merged out/explica-v1.3/merged --versao ask-v1.3-20261021 --so quimica --teste` (repositório privado
+do modelo + Space privado da química em ZeroGPU + teste). Só depois do Space responder: `ASK_ENABLED=1`, `HF_ASK_SPACE_URL`, `HF_TOKEN` (leitura),
+`ASK_MODEL_VERSION=ask-v1.3-20261021` na Vercel, variável `QUIMICA_ASK_ENABLED=1` no GitHub e `gh workflow run quimica-data-refresh.yml`
+(MODELO.md §8). Eleições não muda antes de 27/10.
+
+## Base maior (Qwen3-8B) com VRAM + RAM — sondas de 22/10/2026 (`out/probe-8b/`)
+Pedido do mantenedor: treinar uma base maior usando a VRAM da GPU e a RAM do sistema. Resultado das sondas (48 pares, QLoRA 4 bits NF4, batch 1 ×
+acum. 16, RTX 5060 8 GB, 32 GB de RAM; `train_hybrid.py --base_model Qwen/Qwen3-8B`, 16 GB baixados em ~35 min):
+
+| Sonda | Onde ficam os pesos | `max_length` | Passo (16 amostras) | VRAM | Resultado |
+| :-- | :-- | --: | --: | --: | :-- |
+| A | camadas quantizadas na RAM (`--cpu_offload on`, 6 GiB na GPU) | 768 | — | — | **não roda**: bitsandbytes + accelerate quebram ao despachar camada 4 bits para a CPU ("Tensor.item() cannot be called on meta tensors") |
+| B | tudo na GPU | 512 | **587 s** | 7,8 GB | despejo para a RAM pelo driver (GPU a 32 W) |
+| C | `--cpu_modules lm_head` (bf16 na RAM) | 512 | ~100 s | 7,8 GB | ainda com despejo |
+| D | `--cpu_modules lm_head,model.embed_tokens` | 768 | **37–55 s (média 42 s)** | 6,9–7,8 GB | cabe; GPU 15–31 W, RAM livre 11 GB |
+
+Conclusão: **viável** só com os dois módulos não quantizados (embeddings e cabeça de saída, 2,5 GB em bf16) na RAM — os 36 blocos quantizados têm
+de ficar inteiros na GPU. Estimativa para 1 época sobre a mistura do v1.3/v1.4 (~540 passos com `max_length 768`): **6 a 8 h de treino** (contra
+~3 h do 4B) + gate em CPU do Q4 de 8B (~2 h). Custos: perda de ~20 % das amostras longas pelo `max_length 768` (igual ao 4B hoje), RAM ocupada
+(~20 GB durante o treino: não rodar nada pesado junto), e o Space ZeroGPU (A10G 24 GB) serve o 8B fundido em bf16 (16 GB) sem problema. Para
+rodar: `fila` igual às anteriores com `--base_model Qwen/Qwen3-8B --cpu_modules lm_head,model.embed_tokens --max_length 768 --gpu_mem 7.3
+--cpu_offload off`; versão `ask-v2-AAAAMMDD` (base nova = major novo); `convert_local.py` e `publicar_explica.py` não mudam. Qwen3-8B é o modelo
+híbrido com "thinking": o prompt do treino já desliga o pensamento pelo template; conferir `THINK_VAZIO` em `ask_core` antes do gate.
+
 ## v3.9 (fila de 20/10/2026, depois do explicador): o v3.8 com os extras corrigidos, sobre o LoRA v3.7
 **Resultado do v3.8 (treino 06h58 → 09h01, gate até 12h43): NÃO promovido.** Golden química Q4 com gramática: intenção 98,9 → **99,0 %**, elemento
 97,7 → 99,5 %, es 97,7 → 100 %, unidadeDestino 96,7 → 98,4 %, mas composto 99,7 → 98,2 % e **JSON nativo 98,9 → 96,8 % (< 98 %: reprovado)**; holdout
