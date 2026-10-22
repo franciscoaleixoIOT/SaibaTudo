@@ -73,6 +73,9 @@ def montar_argumentos(argv=None):
     p.add_argument("--save_steps", type=int, default=200, help="checkpoint a cada N passos (menor = perde menos num travamento; cada um tem ~400 MB no ask)")
     p.add_argument("--seed", type=int, default=2026, help="semente (gravada em train_meta.json): mesmo dataset + mesma semente = mesmo treino")
     p.add_argument("--sobrescrever", action="store_true", help="permite reaproveitar a pasta de saída de um treino anterior")
+    p.add_argument("--cpu_modules", default="", help="módulos NÃO quantizados que ficam na RAM (ex.: lm_head ou lm_head,model.embed_tokens) para uma "
+                   "base maior que a VRAM. 22/10/2026: camada QUANTIZADA na CPU quebra (bitsandbytes + accelerate: meta tensors); lm_head e "
+                   "embed_tokens não são quantizados e podem ir para a RAM em bf16 (custa tempo no PCIe/CPU, mas roda).")
     a = p.parse_args(argv)
     m = re.match(RX_VERSAO, a.version)
     if not m or m.group(1) != a.target:
@@ -83,6 +86,33 @@ def montar_argumentos(argv=None):
             setattr(a, k, pre[k])
     a.dataset, a.output_dir = Path(a.dataset), Path(a.output_dir)
     return a
+
+
+def montar_device_map(base_model: str, cpu_modules: list) -> dict:
+    """device_map explícito: tudo na GPU 0, menos os módulos listados (por nome completo, ex. "lm_head", "model.embed_tokens"), que vão para a
+    CPU. Enumera os módulos de primeiro e segundo nível do modelo vazio (sem baixar pesos) para que o mapa cubra o modelo inteiro."""
+    from accelerate import init_empty_weights
+    from transformers import AutoConfig, AutoModelForCausalLM
+
+    cfg = AutoConfig.from_pretrained(base_model, trust_remote_code=True)
+    with init_empty_weights():
+        vazio = AutoModelForCausalLM.from_config(cfg, trust_remote_code=True)
+    mapa = {}
+    for nome, mod in vazio.named_children():
+        if nome in cpu_modules:
+            mapa[nome] = "cpu"
+            continue
+        filhos = list(mod.named_children())
+        if not filhos:
+            mapa[nome] = 0
+            continue
+        for sub, _ in filhos:
+            completo = f"{nome}.{sub}"
+            mapa[completo] = "cpu" if (completo in cpu_modules or sub in cpu_modules) else 0
+    faltam = [m for m in cpu_modules if m not in mapa and m not in {k.split(".")[-1] for k in mapa}]
+    if faltam:
+        raise SystemExit(f"--cpu_modules: módulos desconhecidos {faltam}; disponíveis: {sorted(mapa)}")
+    return mapa
 
 
 def resolve_gpu_memory(torch):
@@ -161,6 +191,8 @@ def main(argv=None):
     bnb = BitsAndBytesConfig(
         load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.bfloat16 if device == "cuda" else torch.float32,
         bnb_4bit_use_double_quant=True,
+        # 22/10/2026: camadas que o device_map puser na CPU (base maior que a VRAM, --cpu_offload on) ficam em fp32 na RAM em vez de erro
+        llm_int8_enable_fp32_cpu_offload=(a.cpu_offload == "on" or bool(a.cpu_modules)),
     )
 
     # Memória híbrida: VRAM local + RAM (offload) — permite bases maiores se necessário
@@ -179,8 +211,13 @@ def main(argv=None):
             max_memory["cpu"] = f"{int(ram * 0.75)}GiB"
         print(f"Memória híbrida: GPU={max_memory.get(0)} CPU_offload={'auto' if a.cpu_offload == 'auto' else max_memory.get('cpu')}")
 
+    device_map = "auto"
+    if a.cpu_modules and device == "cuda":
+        device_map = montar_device_map(a.base_model, [m.strip() for m in a.cpu_modules.split(",") if m.strip()])
+        max_memory = {}
+        print(f"device_map explícito (--cpu_modules): {device_map}", flush=True)
     model = AutoModelForCausalLM.from_pretrained(
-        a.base_model, quantization_config=bnb if device == "cuda" else None, device_map="auto", max_memory=max_memory or None,
+        a.base_model, quantization_config=bnb if device == "cuda" else None, device_map=device_map, max_memory=max_memory or None,
         trust_remote_code=True, torch_dtype=torch.bfloat16 if device == "cuda" else torch.float32, attn_implementation="sdpa",
     )
     model.config.use_cache = False
