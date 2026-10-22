@@ -339,8 +339,14 @@ Mesma receita; **8.890 pares** (`out/explica-v1.3/train.json`, `fila-20261021e.s
 2. `build_ask_extras.py`: as 12 perguntas por substância em en/es/de/fr com os nomes traduzidos (`xq-subst-*`, 609 após o filtro de contrato),
    segunda formulação das gerais nos 4 idiomas (`xq-<idioma>-geral2-*`), `--sem-contexto-idioma 300` → extras **3.913**.
 3. Mistura com `--teto quimica:seguranca=1000`: segurança 5.716, conceito 1.656, recusa 769, eleições 749; pt-BR 6.136, en/es/de/fr ~690 cada.
-Critério igual. Se reprovar ainda, olhar o `eval.json` por substância/idioma; a alavanca seguinte é reduzir o peso das recusas (769 → ~500) ou
-subir `--epochs` para 2 só nos extras.
+**Causa dos treinos lentos, achada em 21/10 21h30 (duas reinicializações do v1.3):** v1 55 s, v1.2 190 s e v1.3 68–76 s por passo contra 31 s do
+v1.1 — sempre com a VRAM em 7,8/8 GB e a GPU "100 % ocupada" a ~35 W. No Windows, quando a VRAM enche, o driver NVIDIA despeja alocações CUDA para a
+RAM do sistema (sysmem fallback) em vez de dar OOM, e cada passo atravessa o PCIe. `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` não mudou nada;
+**`--max_length 768`** (em vez de 1024) baixou a VRAM para 7,5 GB e o passo para **23 s a 79 W** (`treino-reinicio1-76s/`, `treino-reinicio2-68s/`
+guardam as tentativas). Custo: 1.849 das 8.890 amostras (entrada longa: contexto GHS, eleições, conceitos com trechos compridos) ficam fora do
+treino → 441 passos, ~2 h 50. Regra prática na RTX 5060 de 8 GB: `power.draw` abaixo de ~50 W com 100 % de uso = despejo; reduzir ativações
+(`--max_length`) até caber. Critério do gate igual. Se reprovar ainda, olhar o `eval.json` por substância/idioma; a alavanca seguinte é reduzir o peso
+das recusas (769 → ~500) ou subir `--epochs` para 2 só nos extras.
 
 ## v3.9 (fila de 20/10/2026, depois do explicador): o v3.8 com os extras corrigidos, sobre o LoRA v3.7
 **Resultado do v3.8 (treino 06h58 → 09h01, gate até 12h43): NÃO promovido.** Golden química Q4 com gramática: intenção 98,9 → **99,0 %**, elemento
