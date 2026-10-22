@@ -240,7 +240,7 @@ Em um comando, depois dos gates: `python -I ia/treino/publicar_explica.py --merg
 (repositório privado do modelo + os dois Spaces privados em ZeroGPU com o `*_core.py` copiado, variáveis `ASK_MODEL_*`, espera RUNNING e uma chamada
 de teste igual à do servidor; relatório em `ia/treino/out/explica-v1/publicacao.json`). **Precisa de token com escrita** em `secrets/hf_token_write.txt`
 (raiz, ignorado): o `apps/eleicoes2026/secrets/hf_token.txt` é fine-grained só de leitura (`repo.content.read`), e por isso o envio ao HF no fim de
-`pos_treino.sh` (20/10) falha sem prejuízo dos gates. Nada muda nos sites até o mantenedor apontar `HF_ASK_SPACE_URL` (eleições, após 27/10) e
+`pos_treino.sh` (20/10) falha sem prejuízo dos gates. Nada muda nos sites até o mantenedor apontar `HF_ASK_SPACE_URL` (eleições: só com o gate do holdout aprovado; ver §Eleições, 22/10) e
 ligar `ASK_ENABLED` (química) na Vercel.
 
 **Travamento de 20/10 (05h21):** o Windows travou (Kernel-Power 41; depois três reinícios do Windows Update) durante a gravação do
@@ -391,7 +391,28 @@ reescreveu o `meta.json` do v1.3 como aprovado (veredito original, limites antig
 Publicação em curso: `publicar_explica.py --merged out/explica-v1.3/merged --versao ask-v1.3-20261021 --so quimica --teste` (repositório privado
 do modelo + Space privado da química em ZeroGPU + teste). Só depois do Space responder: `ASK_ENABLED=1`, `HF_ASK_SPACE_URL`, `HF_TOKEN` (leitura),
 `ASK_MODEL_VERSION=ask-v1.3-20261021` na Vercel, variável `QUIMICA_ASK_ENABLED=1` no GitHub e `gh workflow run quimica-data-refresh.yml`
-(MODELO.md §8). Eleições não muda antes de 27/10.
+(MODELO.md §8).
+
+## Eleições: gate do ask-v1.3 REPROVADO e v1.5 em treino (22/10/2026)
+Pedido do mantenedor (22/10 09h): "no eleições ainda aparece como IA da nuvem o Qwen; ajustar para usar a IA treinada". Antes de trocar `HF_ASK_SPACE_URL`,
+o gate de eleições do ask-v1.3 (Q4_K_M, CPU 12 threads, 188 pares em 28 min; `avaliar_explica_holdout.py` + `verificar_holdout_explica.mjs`, mínimo 95 %):
+
+| Medida | Resultado |
+| :-- | --: |
+| Aprovados com todas as regras | **10/188 = 5,3 %** |
+| Falhas só por falta do rodapé "pode conter erros" | 174 |
+| Aprovados ignorando a regra do rodapé | 158/178 = 88,8 % |
+| Número sem fonte (inventado/trocado) | 10 (ex.: R$ 535.811 por 1.235.811; 589.396 por 689.396; 70292 por 70192; "25/10/22") |
+| Resposta de memória sem contexto (calendário, "não votei") | 3 |
+| Recusa com número (cita "LC 64/90") | 4 |
+| Contradiz os dados / recomendação | 2 + 2 |
+
+Causa provável: eleições era **8 % da mistura** (749 de 8.890 pares) — o modelo não fixou o rodapé nem a recusa "não recebi do aplicativo os dados".
+**Decisão tomada pelo agente (reversível, nada publicado):** eleições continua no Qwen 7B; **Explica v1.5** em treino (fila 7, `out/fila-20261022g.sh`):
+mistura do v1.3 com eleições ×3 (10.388 pares; 476 passos a ~24 s ≈ 3h15), `pos_treino.sh` roda o gate da química E o de eleições e **não envia nada ao HF**.
+Resultados em `out/explica-v1.5/pos_treino.log`, `apps/eleicoes2026/backend/retrain/out-ask/holdout_gate_v15.json`. Se aprovar nos dois: `publicar_explica.py
+--merged out/explica-v1.5/merged --versao ask-v1.5-20261022 --teste` (grava também o segredo `HF_TOKEN` nos Spaces — lição de 22/10) e `HF_ASK_SPACE_URL`
+na Vercel pela API REST (CLI ausente) + `eleicoes-data-refresh.yml`, até 23/10 (congelamento 24–26/10). Se reprovar: ficar no Qwen 7B até depois de 27/10.
 
 ## Base maior (Qwen3-8B) com VRAM + RAM — sondas de 22/10/2026 (`out/probe-8b/`)
 Pedido do mantenedor: treinar uma base maior usando a VRAM da GPU e a RAM do sistema. Resultado das sondas (48 pares, QLoRA 4 bits NF4, batch 1 ×

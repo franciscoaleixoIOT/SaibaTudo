@@ -52,7 +52,10 @@ Se o resumo do job mostrar "testes de comportamento falharam", a publicação fo
 
 1. Atualizar a política de privacidade (já descreve o recurso, versão 1.2) e confirmar a tela de consentimento.
 2. Montar o contexto no servidor a partir do pacote assinado (hoje o app o fornece e o servidor não consegue verificá-lo).
-3. **Provedor principal: Space no ZeroGPU do Hugging Face** (`franciscoaleixo/saibatudo-qwen7b`, privado; código em `backend/hf_space_qwen7b/`). A cota da conta PRO
+3. **Provedor principal: Space no ZeroGPU do Hugging Face** (`franciscoaleixo/saibatudo-qwen7b`, privado; código em `backend/hf_space_qwen7b/`). **Troca pelo
+   explicador SaibaTudo IA** (`backend/hf_space_explica/`, publicado por `ia/treino/publicar_explica.py`): só com o gate do holdout de eleições ≥ 95 %
+   (`backend/retrain/avaliar_explica_holdout.py` + `verificar_holdout_explica.mjs`). 22/10/2026: ask-v1.3 **reprovou** (5,3 %; 88,8 % sem a regra do
+   rodapé — números trocados, respostas de memória sem contexto); v1.5 com eleições ×3 na mistura em treino. A cota da conta PRO
    (40 min de GPU por dia) só conta o tempo em que a GPU trabalha: medido em 07/10/2026, **3,0 s por resposta em média** (0,7 a 10 s), ou cerca de 800 respostas por dia.
    Na Vercel: `HF_ASK_SPACE_URL=https://franciscoaleixo-saibatudo-qwen7b.hf.space` e `HF_TOKEN=<token de leitura, de preferência restrito a esse Space>` (segredo).
    Limites: `HF_ASK_DAILY_BUDGET` (padrão 400 chamadas/dia) e, para a **reserva no Modal**, `MODAL_ASK_DAILY_BUDGET` (padrão 15/dia). Com o Hugging Face configurado, o Modal

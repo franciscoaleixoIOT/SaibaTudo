@@ -19,7 +19,7 @@
 | Site/PWA `saibatudo.net` e API | No ar na Vercel. Versão publicada = commit curto em `GET /api/health` (conferir contra `git rev-parse --short HEAD`). |
 | Pacote de dados | Atualizado a cada 30 min pelo GitHub Actions, assinado (ECDSA P-256). Já traz os resultados do 1º turno (governadores e deputados); **Presidente só pela apuração ao vivo do TSE** (ver §7). 19/10: percentual de Presidente no pacote agrupado por `SG_UE` (antes, pela UF da linha: 100 % e 99,92 % para os dois classificados). |
 | IA de interpretação (NLU) | Modelo **`v2.3-20261007`** no Modal (CPU). Intenção 93,7 % nos 111 casos de referência e 96,8 % em 435 perguntas reservadas. Treino e conversão **locais**. |
-| IA generativa (texto gerado) | **Ligada desde 07/10.** Space privado `franciscoaleixo/saibatudo-qwen7b` no ZeroGPU do Hugging Face (principal), Modal L4 como reserva (15/dia). Só roda quando a pessoa toca em "Gerar explicação com IA". |
+| IA generativa (texto gerado) | **Ligada desde 07/10.** Space privado `franciscoaleixo/saibatudo-qwen7b` no ZeroGPU do Hugging Face (principal), Modal L4 como reserva (15/dia). Só roda quando a pessoa toca em "Gerar explicação com IA". Desde 22/10 o rótulo nomeia o modelo que respondeu (`model` da API). Troca pelo explicador SaibaTudo IA: ask-v1.3 reprovou no holdout de eleições em 22/10 (5,3 %); v1.5 em treino. |
 | Captura de perguntas ("Ajudar a melhorar o app") | Servidor ligado desde 06/10, Redis no Upstash. No app é **opt-in, desligado por padrão**. Filtro de dado pessoal e de opinião política no aparelho e no servidor. |
 | Política de privacidade | **Versão 1.4** (07/10/2026), em `docs/PRIVACIDADE.md` e `web/src/privacidade/index.html` (devem ser idênticas). |
 | Android | Teste fechado na Play em andamento. A **1.0.3 (versionCode 4)** foi enviada à Play; a **1.0.4 (versionCode 5)** foi gerada mas não publicada; a **1.0.5 (versionCode 6)** (12/10/2026) traz a 1.0.4 + "deputado mais votado" + ponta a ponta do Android 15 sem `statusBarColor`/`navigationBarColor` (apontados pelo Play Console). AAB assinado em `app/build/outputs/bundle/release/`; falta testar num aparelho e enviar (`docs/RELEASE_1.0.5.md`). **19/10:** o código do app ganhou os textos do 2º turno (local de votação, prazos de justificativa, link novo do Autoatendimento) e a regra "não votei no 1º turno"; só chegam a quem instalar um release novo (versionCode 7), decisão do mantenedor. |
@@ -279,7 +279,18 @@ Lição repetida: não dizer "corrigido" sem reproduzir antes e depois. Padrões
 ## 10. Segredos e backups (nunca no Git)
 `secrets/upload-keystore.p12` + `keystore.properties` (chave de **upload** do Play), `secrets/data_signing_key.pem` (assinatura dos **dados**; chave pública em `pipeline/data_signing_public.pem`), `secrets/hf_token.txt` (token do Space), `secrets/upstash.env` (URL e token do Redis). A pasta `secrets/` é ignorada pelo Git. Faça backup offline das chaves de assinatura.
 
-## 11. Histórico recente (05 a 21/10/2026)
+## 11. Histórico recente (05 a 22/10/2026)
+- **22/10 (manhã):** mantenedor: "no eleições ainda aparece como IA da nuvem o Qwen; ajustar para usar a IA treinada". (1) **Rótulos** (0d7ef34): site e
+  Android deixam de dizer "Qwen" fixo e mostram o `model` devolvido pelo servidor (`rotuloOrigem()` em answers.js + `modelo` na resposta GENERATIVA;
+  Android `CloudAskClient.gerar()` + `HybridAiInferenceEngine.fonteGerada()` — entra no release 7). API: padrão do Space HF passa a "SaibaTudo IA".
+  (2) **Gate de eleições do ask-v1.3** (explicador compartilhado, aprovado na química a 80 %): 188 pares do holdout em CPU (28 min) + verificador →
+  **REPROVADO: 10/188 = 5,3 %** (mínimo 95 %). 174 falhas só por falta do rodapé "pode conter erros" (eleições era 8 % da mistura: 749 de 8.890 pares);
+  **sem a regra do rodapé, 158/178 = 88,8 %**, ainda abaixo — e com erros reais: patrimônio R$ 535.811 em vez de 1.235.811, despesas 589.396 em vez de
+  689.396, nº 70292 em vez de 70192, "25/10/22", calendário e "não votei no 1º turno" respondidos de memória sem contexto, "foi eleito?" respondido com
+  "não foi eleita" quando o app pediu o cargo (`backend/retrain/out-ask/holdout_gate_v13.json`). **`HF_ASK_SPACE_URL` NÃO foi trocado**: eleições segue
+  no Qwen 7B. (3) **v1.5** em treino (fila 7, `ia/treino/out/fila-20261022g.sh`): mesma mistura do v1.3 com eleições ×3 (10.388 pares); pós-treino roda
+  os dois gates (química e eleições) e não publica. Lição: Space que lê modelo de repositório privado precisa do segredo `HF_TOKEN` (`publicar_explica.py`
+  passou a gravá-lo). Pendência apontada: a política de privacidade 1.4 ainda diz "hoje desligada" para a IA generativa, ligada desde 07/10.
 - **21/10 (05h):** mantenedor relatou que "quem já ganhou no 1o turno para governador?" não era respondida (local nem nuvem). Dois defeitos,
   reproduzidos no motor do site com o pacote real: (1) **NLU por regras**: `RX_RESULTADOS` exigia "quem ganhou" colado; o "já" fazia a pergunta
   cair em LISTAR_CANDIDATOS (191 candidaturas) — agora `quem (ja|afinal|mesmo)? (ganhou|…)` e `ja (ganhou|venceu|foi eleito|…)`, no site e no Android
