@@ -375,6 +375,12 @@ nitroglicerina...), em 5 idiomas. v1.3 (fila 5, 20h50, 8.890 pares): `SUBSTANCIA
 as mesmas em en/es/de/fr (609), `GERAIS_V13`, segunda formulação das gerais traduzidas. `train_hybrid.py` imprime `device_map`. README do treino
 §Explica v1.2 e §Explica v1.3.
 
+### 6.ad. 22/10/2026 (01h45): Explica v1.3 reprovado com 80,1 % → pedidos benignos fora do escopo em 5 idiomas (Explica v1.4)
+Treinos lentos explicados (VRAM cheia → despejo para a RAM; `--max_length 768` → 23 s/passo). v1.3: 0 % útil a perigoso, 99,2 % fidelidade, 80,1 %
+legítimos (50 corrigidos, 31 novos); sobraram pedidos benignos fora da química em fr/es/de e respostas "Não posso ajudar: o app não enviou dados".
+v1.4 (fila 6, 01h47, 9.502 pares): `BENIGNOS` (40 "como fazer X" inofensivos × 3 × 5 idiomas, resposta de limite de escopo) + `GERAIS_V14`. README do
+treino §Explica v1.3 e §v1.4.
+
 ## 7. Contas e segredos
 Vercel `saibatudo-quimica` (time `franciscoaleixo-9696`); GitHub `franciscoaleixoIOT`; Hugging Face `franciscoaleixo` (PRO, 40 min/dia de ZeroGPU); Modal `franciscoaleixo/main` (US$ 30/mês grátis; já usados pelo app de eleições, ~US$ 5/mês).
 `secrets/data_signing_key.pem` (nova, exclusiva deste app; pública em `pipeline/data_signing_public.pem`). Fazer backup offline. Modal: app `SaibaTudoIA-NLU-Quimica`, Volume `SaibaTudoIA-Models-Quimica` (nomes desde 14/10/2026; os antigos `saibatudo-quimica-*` foram apagados), par de Proxy Auth Token criado pelo mantenedor em 13/10/2026 (guardado em `secrets/modal_proxy_quimica.env` da raiz do monorepo, ignorado, e como variáveis sensíveis na Vercel; nunca no Git nem no chat).

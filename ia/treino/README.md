@@ -348,6 +348,24 @@ treino → 441 passos, ~2 h 50. Regra prática na RTX 5060 de 8 GB: `power.draw`
 (`--max_length`) até caber. Critério do gate igual. Se reprovar ainda, olhar o `eval.json` por substância/idioma; a alavanca seguinte é reduzir o peso
 das recusas (769 → ~500) ou subir `--epochs` para 2 só nos extras.
 
+**Resultado do Explica v1.3 (fila 5, terceira tentativa 21h30 → 00h21 de 22/10 a 23 s/passo; gate 00h22 → 01h42): REPROVADO, 80,1 %** — útil a
+perigoso 0,0 %, fidelidade 99,2 %, legítimos **80,1 %** (v1.2 75,6 %): 50 casos corrigidos e 31 NOVOS quebrados (o modelo oscila entre rodadas). Das 83
+falhas (fr 29, es 19, de 16, pt 10, en 9), 71 são a recusa padrão — agora quase só em pedidos BENIGNOS fora da química em fr/es/de ("sorvete sem
+máquina", "biscoitos", "montar uma estante", "vinho", "bomba hidráulica") e em cocaína/explosivos — e 12 são respostas que começam com "Não posso
+ajudar com isso: o aplicativo não enviou dados…" (o modelo fundiu o início da recusa com a resposta de "sem ficha"; contam como recusa).
+
+## Explica v1.4 (fila 6, 22/10/2026 01h47 → ~05h): pedidos benignos fora do escopo em 5 idiomas
+Mesma receita com `--max_length 768`; **9.502 pares** (7.653 efetivos; `out/explica-v1.4/`, `fila-20261022f.sh`, 479 passos a ~22 s):
+1. `build_ask_extras.BENIGNOS`: 40 pedidos "como fazer X" inofensivos (pão, sorvete sem máquina, cerveja, vinho, queijo, velas, slime, estante, horta,
+   pipa, bolo, biscoitos, kombucha, vulcão de bicarbonato, pilha de limão, bomba hidráulica, foguete de garrafa PET…) × 3 formulações × 5 idiomas =
+   589, todos com a MESMA resposta de limite de escopo ("Isso foge do escopo do SaibaTudo Química… posso explicar a química envolvida"), que não é
+   recusa de segurança.
+2. `GERAIS_V14` (pt + 4 idiomas): largar a droga (CAPS AD, grupos de apoio), o que diz a lei sobre produção de drogas/explosivos, bomba hidráulica,
+   montar estante, velocidade de reação.
+Extras **4.514**; mistura: segurança 6.317, recusa 769 (8,1 %), eleições 749. Se reprovar ainda e as falhas forem as mesmas famílias em fr/es/de, a
+alavanca seguinte é diminuir as recusas (769 → ~450, mantendo todas as categorias) e trocar o início da resposta "sem ficha" para não começar por
+"Como o aplicativo…" (o modelo confunde com "Não posso ajudar…").
+
 ## v3.9 (fila de 20/10/2026, depois do explicador): o v3.8 com os extras corrigidos, sobre o LoRA v3.7
 **Resultado do v3.8 (treino 06h58 → 09h01, gate até 12h43): NÃO promovido.** Golden química Q4 com gramática: intenção 98,9 → **99,0 %**, elemento
 97,7 → 99,5 %, es 97,7 → 100 %, unidadeDestino 96,7 → 98,4 %, mas composto 99,7 → 98,2 % e **JSON nativo 98,9 → 96,8 % (< 98 %: reprovado)**; holdout

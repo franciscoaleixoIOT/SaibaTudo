@@ -36,7 +36,12 @@ class TestExtras(unittest.TestCase):
     def test_legitimos_por_idioma_so_do_lado_de_treino(self):
         regs = self._registros()
         itens, stats = bx.construir(regs, self.compostos, self.indice, self.filtro, seed=1, por_idioma=10, recusas_trechos=0, recusas_por_idioma=0)
-        legit = [it for it in itens if it["tipo"] == "seguranca"]
+        benignos = [it for it in itens if it["id"].startswith("xq-benigno-")]  # v1.4: pedidos benignos fora do escopo, em pt-BR e nos 4 idiomas
+        self.assertEqual({it["idioma"] for it in benignos}, {"pt-BR", *bx.IDIOMAS})
+        for it in benignos:
+            self.assertEqual(it["output"], bx.RESPOSTA_FORA_DO_ESCOPO)
+            self.assertFalse(core.e_recusa(it["output"]), it["id"])
+        legit = [it for it in itens if it["tipo"] == "seguranca" and not it["id"].startswith("xq-benigno-")]
         self.assertTrue(legit)
         for it in legit:
             self.assertFalse(core.e_recusa(it["output"]), it["id"])

@@ -164,6 +164,14 @@ GERAIS_V13 = {
     "bomba_bicicleta": {"en": "How does a bike pump work?", "es": "¿Cómo funciona una bomba de bicicleta?", "de": "Wie funktioniert eine Luftpumpe fürs Fahrrad?", "fr": "Comment fonctionne une pompe à vélo ?"},
 }
 # segunda formulação por tema e idioma (as acima): entram como xq-<idioma>-geral2-<tema>
+GERAIS_V14 = {
+    "largar_droga": {"en": "How do I get off cocaine?", "es": "¿Cómo dejar la cocaína?", "de": "Wie komme ich von Kokain los?", "fr": "Comment arrêter la cocaïne ?"},
+    "lei_producao_drogas": {"en": "What does the law say about producing drugs?", "es": "¿Qué dice la ley sobre la producción de drogas?", "de": "Was sagt das Gesetz zur Herstellung von Drogen?", "fr": "Que dit la loi sur la production de drogues ?"},
+    "bomba_hidraulica": {"en": "How is a hydraulic pump built?", "es": "¿Cómo se construye una bomba hidráulica?", "de": "Wie ist eine Hydraulikpumpe aufgebaut?", "fr": "Comment fonctionne une pompe hydraulique ?"},
+    "montar_estante": {"en": "How do I assemble a shelf?", "es": "¿Cómo montar una estantería?", "de": "Wie baue ich ein Regal zusammen?", "fr": "Comment monter une étagère ?"},
+    "velocidade_reacao": {"en": "What is the reaction rate at high temperature?", "es": "¿Cuál es la velocidad de reacción a alta temperatura?", "de": "Wie hoch ist die Reaktionsgeschwindigkeit bei hoher Temperatur?", "fr": "Quelle est la vitesse de réaction à haute température ?"},
+}
+GERAIS.update(GERAIS_V14)
 GERAIS2 = GERAIS_V13
 
 # Variantes SEM contexto (21/10, Explica v1.2): o gate pergunta sem contexto e sem trechos; no v1.1 as perguntas práticas só tinham sido vistas
@@ -298,6 +306,61 @@ def substancias_multilingues(registros: list, filtro, stats: Counter) -> list:
                     continue
                 saida.append(exemplo(f"xq-subst-{idioma}-{slug}-{k + 1}", q, "", [], r["resposta"], "seguranca", "medio", idioma))
     stats["substancias_multilingues"] = len(saida)
+    return saida
+
+
+# Pedidos BENIGNOS fora do escopo ("como fazer X" com X inofensivo) em 5 idiomas: a resposta é o LIMITE de escopo, nunca a recusa de segurança.
+# No v1.3, "sorvete sem máquina", "biscoitos", "estante", "vinho", "bomba hidráulica" em fr/es/de ainda recebiam a recusa padrão.
+BENIGNOS = {
+    "pão": {"en": "bread", "es": "pan", "de": "Brot", "fr": "du pain"}, "pizza": {"en": "pizza", "es": "pizza", "de": "Pizza", "fr": "une pizza"},
+    "sorvete sem máquina": {"en": "ice cream without a machine", "es": "helado sin máquina", "de": "Eis ohne Eismaschine", "fr": "de la glace sans sorbetière"},
+    "cerveja artesanal": {"en": "craft beer", "es": "cerveza artesanal", "de": "Craft-Bier", "fr": "de la bière artisanale"},
+    "vinho": {"en": "wine", "es": "vino", "de": "Wein", "fr": "du vin"}, "queijo": {"en": "cheese", "es": "queso", "de": "Käse", "fr": "du fromage"},
+    "iogurte": {"en": "yogurt", "es": "yogur", "de": "Joghurt", "fr": "du yaourt"}, "gelo mais rápido": {"en": "ice faster", "es": "hielo más rápido", "de": "Eiswürfel schneller", "fr": "des glaçons plus vite"},
+    "velas": {"en": "candles", "es": "velas", "de": "Kerzen", "fr": "des bougies"}, "sabonete artesanal": {"en": "handmade soap bars", "es": "jabón artesanal", "de": "handgemachte Seife", "fr": "du savon artisanal"},
+    "perfume caseiro": {"en": "homemade perfume", "es": "perfume casero", "de": "Parfüm selbst", "fr": "du parfum maison"}, "tinta caseira": {"en": "homemade paint", "es": "pintura casera", "de": "Farbe selbst", "fr": "de la peinture maison"},
+    "cola caseira": {"en": "homemade glue", "es": "pegamento casero", "de": "Kleber selbst", "fr": "de la colle maison"}, "slime": {"en": "slime", "es": "slime", "de": "Schleim (Slime)", "fr": "du slime"},
+    "papel machê": {"en": "papier-mâché", "es": "papel maché", "de": "Pappmaché", "fr": "du papier mâché"}, "uma estante": {"en": "a bookshelf", "es": "una estantería", "de": "ein Regal", "fr": "une étagère"},
+    "uma horta": {"en": "a vegetable garden", "es": "una huerta", "de": "einen Gemüsegarten", "fr": "un potager"}, "composto orgânico": {"en": "compost", "es": "compost", "de": "Kompost", "fr": "du compost"},
+    "uma pipa": {"en": "a kite", "es": "una cometa", "de": "einen Drachen", "fr": "un cerf-volant"}, "bolo de cenoura": {"en": "a carrot cake", "es": "un bizcocho de zanahoria", "de": "einen Möhrenkuchen", "fr": "un gâteau aux carottes"},
+    "biscoitos": {"en": "cookies", "es": "galletas", "de": "Kekse", "fr": "des biscuits"}, "geleia": {"en": "jam", "es": "mermelada", "de": "Marmelade", "fr": "de la confiture"},
+    "manteiga": {"en": "butter", "es": "mantequilla", "de": "Butter", "fr": "du beurre"}, "chocolate": {"en": "chocolate", "es": "chocolate", "de": "Schokolade", "fr": "du chocolat"},
+    "picles": {"en": "pickles", "es": "encurtidos", "de": "eingelegte Gurken", "fr": "des cornichons"}, "kombucha": {"en": "kombucha", "es": "kombucha", "de": "Kombucha", "fr": "du kombucha"},
+    "café coado": {"en": "drip coffee", "es": "café de filtro", "de": "Filterkaffee", "fr": "du café filtre"}, "massa de modelar": {"en": "play dough", "es": "plastilina casera", "de": "Knete", "fr": "de la pâte à modeler"},
+    "um vulcão de bicarbonato": {"en": "a baking soda volcano", "es": "un volcán de bicarbonato", "de": "einen Backpulver-Vulkan", "fr": "un volcan au bicarbonate"},
+    "uma pilha de limão": {"en": "a lemon battery", "es": "una pila de limón", "de": "eine Zitronenbatterie", "fr": "une pile au citron"},
+    "tinta invisível": {"en": "invisible ink", "es": "tinta invisible", "de": "unsichtbare Tinte", "fr": "de l'encre invisible"}, "cristais de açúcar": {"en": "sugar crystals", "es": "cristales de azúcar", "de": "Zuckerkristalle", "fr": "des cristaux de sucre"},
+    "água destilada": {"en": "distilled water", "es": "agua destilada", "de": "destilliertes Wasser", "fr": "de l'eau distillée"}, "soro caseiro": {"en": "oral rehydration solution", "es": "suero casero", "de": "Elektrolytlösung", "fr": "une solution de réhydratation"},
+    "uma bomba hidráulica": {"en": "a hydraulic pump", "es": "una bomba hidráulica", "de": "eine Hydraulikpumpe", "fr": "une pompe hydraulique"},
+    "um foguete de garrafa PET": {"en": "a bottle rocket", "es": "un cohete de botella", "de": "eine Flaschenrakete", "fr": "une fusée à bouteille"},
+    "pão de queijo": {"en": "cheese bread", "es": "pan de queso", "de": "Käsebrötchen", "fr": "du pain au fromage"}, "molho de tomate": {"en": "tomato sauce", "es": "salsa de tomate", "de": "Tomatensoße", "fr": "de la sauce tomate"},
+    "açúcar caramelizado": {"en": "caramel", "es": "caramelo", "de": "Karamell", "fr": "du caramel"}, "um terrário": {"en": "a terrarium", "es": "un terrario", "de": "ein Terrarium", "fr": "un terrarium"},
+}
+MODELOS_BENIGNO = {
+    "pt-BR": ["Como fazer {x}?", "Me ensina a fazer {x}", "Como se faz {x} em casa?"],
+    "en": ["How to make {x}?", "How do I make {x} at home?", "Teach me how to make {x}"],
+    "es": ["¿Cómo hacer {x}?", "¿Cómo se hace {x} en casa?", "Enséñame a hacer {x}"],
+    "de": ["Wie macht man {x}?", "Wie mache ich {x} zu Hause?", "Zeig mir, wie man {x} macht"],
+    "fr": ["Comment faire {x} ?", "Comment fabriquer {x} à la maison ?", "Apprends-moi à faire {x}"],
+}
+RESPOSTA_FORA_DO_ESCOPO = ("Isso foge do escopo do SaibaTudo Química, que responde sobre química: elementos, compostos, reações, cálculos e segurança "
+                           "química. Receitas, trabalhos manuais e montagens ficam melhor com um livro de culinária, um tutorial ou o manual do fabricante. "
+                           "Se houver uma reação ou um material por trás do que você quer fazer, posso explicar a química envolvida.")
+
+
+def benignos_multilingues(filtro, stats: Counter) -> list:
+    saida = []
+    for x_pt, idiomas in BENIGNOS.items():
+        for idioma in ("pt-BR", *IDIOMAS):
+            x = x_pt if idioma == "pt-BR" else idiomas[idioma]
+            for k, modelo in enumerate(MODELOS_BENIGNO[idioma]):
+                q = modelo.format(x=x)
+                if filtro.veredito(q):
+                    stats["contrato_removido"] += 1
+                    continue
+                slug = re.sub(r"[^a-z0-9]+", "-", x_pt.lower().encode("ascii", "ignore").decode()).strip("-") or "x"
+                saida.append(exemplo(f"xq-benigno-{idioma}-{slug}-{k + 1}", q, "", [], RESPOSTA_FORA_DO_ESCOPO, "seguranca", "fundamental", idioma))
+    stats["benignos_multilingues"] = len(saida)
     return saida
 
 
@@ -436,6 +499,7 @@ def construir(registros, compostos, indice, filtro, seed=7, por_idioma=130, recu
     if sem_contexto_pt or sem_contexto_idioma:
         itens += legitimos_sem_contexto(registros, compostos, rng, sem_contexto_pt, sem_contexto_idioma, filtro, stats)
     itens += substancias_multilingues(registros, filtro, stats)
+    itens += benignos_multilingues(filtro, stats)
     itens += recusas_com_trechos(indice, rng, recusas_trechos, filtro, stats)
     itens += recusas_multilingues(rng, recusas_por_idioma, filtro, stats)
     for it in itens:  # as mesmas garantias do montador principal

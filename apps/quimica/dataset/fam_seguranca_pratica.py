@@ -428,7 +428,30 @@ GERAIS_V13 = [
      "não está no pacote de dados, o app não desenha nem descreve de memória, porque não teria como conferir; posso explicar a classe química e os riscos "
      "em termos gerais.", "fundamental"),
 ]
-GERAIS = GERAIS + GERAIS_V12 + GERAIS_V13
+GERAIS_V14 = [
+    ("largar_droga", ["Como me livrar do vício em cocaína?", "Onde buscar ajuda para parar de usar drogas?", "Como ajudar alguém dependente de metanfetamina?"],
+     "Procurar ajuda é o caminho certo e existe atendimento gratuito: no SUS, os Centros de Atenção Psicossocial para álcool e drogas (CAPS AD) e as unidades "
+     "básicas de saúde acolhem sem julgamento, e grupos de apoio como Narcóticos Anônimos ajudam a manter a abstinência. A dependência é uma condição de "
+     "saúde, não falta de vontade; a retirada abrupta de alguns opioides e do álcool precisa de acompanhamento médico. Em crise ou overdose, emergência.", "fundamental"),
+    ("lei_producao_drogas", ["O que diz a lei sobre a produção de drogas no Brasil?", "Produzir droga é crime?", "Qual a pena para fabricar explosivos sem autorização?"],
+     "No Brasil, produzir, fabricar, preparar ou transportar drogas proscritas é crime de tráfico pela Lei de Drogas, com pena de reclusão e multa, "
+     "independentemente da quantidade; o porte para uso pessoal tem tratamento diferente, sem prisão. Fabricar, guardar ou transportar explosivos e seus "
+     "artefatos sem autorização do Exército também é crime, previsto no Estatuto do Desarmamento e no Código Penal, agravado quando há risco a pessoas. "
+     "O app explica a lei e os perigos; não orienta produção.", "medio"),
+    ("bomba_hidraulica", ["Como funciona uma bomba hidráulica?", "Como se constrói uma bomba d'água?", "O que é uma bomba de recalque?"],
+     "A bomba hidráulica move líquido transferindo energia mecânica para ele: um rotor ou pistão aumenta a pressão e empurra a água pela tubulação, "
+     "como nas bombas de poço, de piscina e de recalque dos prédios. É engenharia e física de fluidos, sem explosivo nenhum no nome; a química entra "
+     "só na escolha de materiais resistentes à corrosão e no tratamento da água bombeada.", "fundamental"),
+    ("montar_estante", ["Como montar uma estante?", "Como fixar uma prateleira na parede?", "Que bucha usar para parede de gesso?"],
+     "Montagem de móveis e fixações em parede fogem do escopo do SaibaTudo Química, que responde sobre química; um manual do fabricante ou um vídeo de "
+     "marcenaria resolve melhor. A química aparece de leve nos materiais: colas de PVA para madeira, buchas de náilon para alvenaria e buchas especiais "
+     "para gesso, e tintas e vernizes que precisam secar em local ventilado.", "fundamental"),
+    ("velocidade_reacao", ["Qual é a velocidade de uma reação em alta temperatura?", "Por que a temperatura aumenta a velocidade das reações?", "O que é energia de ativação?"],
+     "A velocidade de uma reação cresce com a temperatura porque mais moléculas têm energia suficiente para vencer a energia de ativação e as colisões são "
+     "mais frequentes; é a ideia da equação de Arrhenius, estudada em cinética química. Catalisadores aceleram por abrir um caminho de menor energia de "
+     "ativação. Valores numéricos dependem de cada reação e estão nos livros e nas fichas; o app não calcula velocidades de memória.", "medio"),
+]
+GERAIS = GERAIS + GERAIS_V12 + GERAIS_V13 + GERAIS_V14
 
 # 21/10/2026 (Explica v1.2 reprovado com 75,6 %): as 102 falhas restantes eram perguntas LEGÍTIMAS sobre substâncias que só apareciam nas recusas
 # (cocaína, TATP, pólvora, ricina, dinamite, metanfetamina, nitroglicerina...), em 5 idiomas. Saber o que é, os perigos, os efeitos, os primeiros
