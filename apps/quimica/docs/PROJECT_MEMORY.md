@@ -401,7 +401,8 @@ pelo 5.17; o 4.x quebra no tokenizer). Vercel: `HF_ASK_SPACE_URL`, `ASK_MODEL_VE
 `QUIMICA_ASK_ENABLED=1` no GitHub. **Pendente (mantenedor):** `HF_TOKEN` na Vercel (o agente não grava segredos) e `gh workflow run
 quimica-data-refresh.yml`; sem o token, não publicar (o pacote ligaria o botão e a API responderia 503). v1.5 (eleições ×3, 768 tokens): química 0 % /
 81,1 % / 99,2 % — reprovado só pelo limite de 95 %; causa raiz do explicador fraco em eleições = truncamento a 768 (2.779 amostras descartadas);
-v1.6 a 1.280 tokens em treino (fila 8). MODELO.md §8 continua valendo.
+v1.6 a 1.280 tokens (fila 8): química 0 % / **73,4 %** / 100 % — pior que o v1.3 em legítimos (mais recusas com as amostras longas); eleições 76,6 %.
+Reprovado nos dois; a química continua no v1.3. Próximo ciclo (após 27/10): explicador de eleições separado do da química. MODELO.md §8 continua valendo.
 
 ## 7. Contas e segredos
 Vercel `saibatudo-quimica` (time `franciscoaleixo-9696`); GitHub `franciscoaleixoIOT`; Hugging Face `franciscoaleixo` (PRO, 40 min/dia de ZeroGPU); Modal `franciscoaleixo/main` (US$ 30/mês grátis; já usados pelo app de eleições, ~US$ 5/mês).

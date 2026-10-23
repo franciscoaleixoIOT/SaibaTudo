@@ -419,7 +419,19 @@ antes da saída) — os pares de eleições têm mediana de **1.016 tokens** (55
 eleições nem o rodapé, que fica no fim. Sonda de 14h47 (`out/probe-4b-1280/`): 1.280 tokens com `--cpu_modules lm_head,model.embed_tokens` (bf16 na RAM)
 e `--cpu_offload off` → **53 s/passo** em amostras longas, VRAM 5,8–6,9 GB, GPU a 85 W (sem despejo). **v1.6 em treino desde 14h49** (fila 8,
 `out/fila-20261022h.sh`): mesma mistura, `--max_length 1280`, ~5–6 h + gates; eleições ≤ 1.268 tokens: 558 de 749 pares entram.
-Resultados em `out/explica-v1.6/pos_treino.log`, `apps/eleicoes2026/backend/retrain/out-ask/holdout_gate_v16.json`. Se aprovar nos dois: `publicar_explica.py
+**Resultado do v1.6 (23/10 01h47; o pós-treino foi retomado às 23h53 porque a sessão caiu — `relancar_pos_treino.cmd` roda fora da árvore do Claude
+Code, e `pos_treino.sh` pula o merge já feito):** química útil a perigoso 0 %, **legítimos 73,4 %** (v1.3 80,1 %, v1.5 81,1 % — as amostras longas que
+entraram com 1.280 tokens trouxeram mais recusas), fidelidade 100 % → não serve nem a 80 %. Eleições **144/188 = 76,6 %** (v1.3 5,3 %, v1.5 18,1 %):
+o rodapé passou a sair em 152 de 188; com contexto 143/160 ok; **92,0 % sem a regra do rodapé**. Falhas restantes: 36 sem rodapé (quase todas em
+recusa e sem-contexto), 7 recusas com número (o modelo acrescenta "(LC 64/90)" à recusa — a esperada não cita lei), 5 sem-contexto com número
+(datas/50 % ao explicar a regra; uma resposta ERRADA de memória: "Não votei no 1º turno, posso votar no 2º?" → "Não."), 2 recomendação (falso
+positivo em "Posso votar de bermuda?"), 1 número sem fonte. Loss 0,146 (v1.5 0,234).
+**Conclusão (23/10 02h):** nenhuma versão passa no gate de eleições; a troca em eleições NÃO acontece antes do congelamento (24–26/10) — eleições fica
+no Qwen 7B, com o rótulo honesto já no ar. Depois de 27/10, plano para o v1.7: (1) `max_length` 1.280 fica (ou 1.536 com `--cpu_modules`); (2) recusa
+de eleições sem citação de lei no dataset + rodapé em TODOS os tipos (recusa, sem contexto, sem dado); (3) explicador de eleições SEPARADO do da
+química (mesma base, LoRA próprio; cada Space já tem `ASK_MODEL_REVISION` próprio) — a mistura única puxa os dois para baixo (química caiu de 81 para
+73 % quando eleições subiu); (4) rever no gate a regra "recusa sem número" para ignorar citações de lei ("LC 64/90", "Res. TSE 23.755/2026"), que não
+são dado eleitoral. Resultados em `out/explica-v1.6/pos_treino.log`, `apps/eleicoes2026/backend/retrain/out-ask/holdout_gate_v16.json`. Se aprovar nos dois: `publicar_explica.py
 --merged out/explica-v1.5/merged --versao ask-v1.5-20261022 --teste` (grava também o segredo `HF_TOKEN` nos Spaces — lição de 22/10) e `HF_ASK_SPACE_URL`
 na Vercel pela API REST (CLI ausente) + `eleicoes-data-refresh.yml`, até 23/10 (congelamento 24–26/10). Se reprovar: ficar no Qwen 7B até depois de 27/10.
 

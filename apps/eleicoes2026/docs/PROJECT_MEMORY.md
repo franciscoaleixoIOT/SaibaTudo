@@ -295,6 +295,10 @@ Lição repetida: não dizer "corrigido" sem reproduzir antes e depois. Padrões
   legítimos. **Causa raiz:** `--max_length 768` descartava 2.779 das 10.388 amostras (pares de eleições: mediana 1.016 tokens) — eleições quase não
   entrou no treino do v1.3 nem do v1.5. **v1.6** em treino a 1.280 tokens (`--cpu_modules lm_head,model.embed_tokens`, 53 s/passo; ia/treino/README
   §Eleições). Eleições segue no Qwen 7B; a troca só com o gate ≥ 95 % e até 23/10, senão depois de 27/10.
+- **23/10 (01h47):** **v1.6 reprovado** — eleições 144/188 = 76,6 % (92,0 % sem a regra do rodapé; v1.3 5,3 %, v1.5 18,1 %), química 73,4 %
+  legítimos. Falhas: rodapé ausente em recusa/sem-contexto, "(LC 64/90)" na recusa, uma resposta errada de memória ("não votei no 1º turno" → "Não").
+  **Decisão: eleições fica no Qwen 7B durante o congelamento**; retomar após 27/10 com explicador de eleições separado (ia/treino/README §Eleições,
+  plano v1.7). Nada mudou na Vercel de eleições. GPU livre.
 - **21/10 (05h):** mantenedor relatou que "quem já ganhou no 1o turno para governador?" não era respondida (local nem nuvem). Dois defeitos,
   reproduzidos no motor do site com o pacote real: (1) **NLU por regras**: `RX_RESULTADOS` exigia "quem ganhou" colado; o "já" fazia a pergunta
   cair em LISTAR_CANDIDATOS (191 candidaturas) — agora `quem (ja|afinal|mesmo)? (ganhou|…)` e `ja (ganhou|venceu|foi eleito|…)`, no site e no Android
