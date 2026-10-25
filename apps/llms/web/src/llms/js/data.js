@@ -80,22 +80,22 @@ export class Vetores {
     };
     const manifestoBytes = await baixar('manifest.json');
     let manifesto;
-    try { manifesto = JSON.parse(new TextDecoder().decode(manifestoBytes)); } catch { throw new ErroDados('manifesto', 'JSON inválido'); }
-    if (!manifesto || typeof manifesto !== 'object' || !manifesto.files || typeof manifesto.version !== 'string') throw new ErroDados('manifesto', 'campos ausentes');
+    try { manifesto = JSON.parse(new TextDecoder().decode(manifestoBytes)); } catch { throw new ErroDados('manifesto', 'invalid JSON'); }
+    if (!manifesto || typeof manifesto !== 'object' || !manifesto.files || typeof manifesto.version !== 'string') throw new ErroDados('manifesto', 'missing fields');
     if (manifesto.schemaVersion !== SCHEMA_SUPORTADO) throw new ErroDados('manifesto', `schemaVersion ${manifesto.schemaVersion}`);
     const sigB64 = new TextDecoder().decode(await baixar('manifest.sig')).trim();
     let sig;
     if (!subtleDisponivel()) sig = { estado: 'indisponivel' };
     else if (await verificarManifesto(manifestoBytes, sigB64, chavePublicaB64)) sig = { estado: 'verificada' };
-    else throw new ErroDados('assinatura', 'assinatura do manifesto não confere');
+    else throw new ErroDados('assinatura', 'manifest signature mismatch');
     const conteudo = {};
     for (const nome of ARQUIVOS) {
       const meta = manifesto.files[nome];
-      if (!meta || typeof meta.sha256 !== 'string' || typeof meta.bytes !== 'number') throw new ErroDados('manifesto', `sem ${nome}`);
+      if (!meta || typeof meta.sha256 !== 'string' || typeof meta.bytes !== 'number') throw new ErroDados('manifesto', `missing ${nome}`);
       const bytes = await baixar(nome, meta.sha256);
-      if (bytes.length !== meta.bytes) throw new ErroDados('hash', `${nome}: ${bytes.length} bytes, esperados ${meta.bytes}`);
+      if (bytes.length !== meta.bytes) throw new ErroDados('hash', `${nome}: ${bytes.length} bytes, expected ${meta.bytes}`);
       const hex = await sha256Hex(bytes);
-      if (hex && hex !== meta.sha256) throw new ErroDados('hash', `${nome}: sha256 divergente`);
+      if (hex && hex !== meta.sha256) throw new ErroDados('hash', `${nome}: sha256 mismatch`);
       conteudo[nome] = bytes;
     }
     const json = (nome) => JSON.parse(new TextDecoder().decode(conteudo[nome]));
@@ -104,7 +104,7 @@ export class Vetores {
     const esc = conteudo['escalas.f32'];
     const escalas = new Float32Array(esc.byteLength / 4);
     new Uint8Array(escalas.buffer).set(esc); // cópia alinhada, little-endian como o pipeline grava
-    if (!Array.isArray(palavras) || q.length !== palavras.length * DIMENSOES || escalas.length !== palavras.length) throw new ErroDados('manifesto', 'tamanhos dos arquivos não batem');
+    if (!Array.isArray(palavras) || q.length !== palavras.length * DIMENSOES || escalas.length !== palavras.length) throw new ErroDados('manifesto', 'file sizes do not match');
     return new Vetores({ palavras, q, escalas, glossario: json('glossario.json'), presets: json('presets.json'), manifesto, sig });
   }
 

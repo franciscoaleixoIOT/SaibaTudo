@@ -32,17 +32,17 @@ export function derParaRaw(der) {
     let n = der[i++];
     if (n & 0x80) {
       const k = n & 0x7f;
-      if (k < 1 || k > 2) throw new Error('DER inválido (comprimento)');
+      if (k < 1 || k > 2) throw new Error('DER: invalid length');
       n = 0;
       for (let j = 0; j < k; j++) n = (n << 8) | der[i++];
     }
     return n;
   };
-  if (der[i++] !== 0x30) throw new Error('DER inválido (sequência)');
+  if (der[i++] !== 0x30) throw new Error('DER: invalid sequence');
   const total = le();
-  if (i + total !== der.length) throw new Error('DER inválido (tamanho)');
+  if (i + total !== der.length) throw new Error('DER: invalid size');
   const inteiro = () => {
-    if (der[i++] !== 0x02) throw new Error('DER inválido (inteiro)');
+    if (der[i++] !== 0x02) throw new Error('DER: invalid integer');
     const n = le();
     let v = der.slice(i, i + n);
     i += n;
