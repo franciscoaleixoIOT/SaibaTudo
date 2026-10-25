@@ -45,6 +45,11 @@ export default {
       titulo: 'Embeddings erkunden',
       subtitulo: 'Wählen Sie Wörter und sehen Sie ihre GloVe-Vektoren auf drei Achsen. König − Mann + Frau ≈ Königin.'
     },
+    aprenda: {
+      titulo: 'Lernen: die Bausteine eines Sprachmodells', subtitulo: 'Sechs kurze Abschnitte, von der Vorhersage des nächsten Tokens bis zur Softmax. Jeder hat ein „Ausprobieren“, das in den Explorer führt.',
+      secaoN: 'Abschnitt {n} von {total}', experimente: 'Ausprobieren', abrir: 'Im Explorer öffnen', referencias: 'Literatur', link: 'ansehen', navegacao: 'Benachbarte Abschnitte', irExplorar: 'Zum Explorer', indice: 'Alle Abschnitte',
+      autoria: 'Text des SaibaTudo-Projekts (MIT) mit wissenschaftlichen Quellen. In den anderen Sprachen von einem Agenten übersetzt; Prüfung durch Muttersprachler steht aus.'
+    },
     presets: {
       realeza: { nome: 'Königtum und Geschlecht', nota: 'Die Differenz König − Königin ähnelt Mann − Frau: eine Richtung des Raums trägt das grammatische Geschlecht.' },
       capitais: { nome: 'Länder und Hauptstädte', nota: 'Jedes Land liegt in ähnlichem Abstand zu seiner Hauptstadt: die Richtung „Hauptstadt von“ wiederholt sich.' },

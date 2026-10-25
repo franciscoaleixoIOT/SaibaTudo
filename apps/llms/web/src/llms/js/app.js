@@ -7,6 +7,7 @@ import { aoMudarInstalacao, ehIos, iniciarInstalacao, instalar, jaInstalado, pod
 import { aplicarAparencia, carregar, salvarIdioma } from './prefs.js';
 import { roteador, toast } from './ui/componentes.js';
 import { seletorIdioma, viewConfig } from './ui/config.js';
+import { viewAprenda } from './ui/aprenda.js';
 import { viewInicio } from './ui/inicio.js';
 
 export { toast };
@@ -22,6 +23,7 @@ const ABAS = [
 
 const ROTAS = [
   [/^\/llms\/?$/, viewInicio, []],
+  [/^\/llms\/aprenda(?:\/([a-z]+))?\/?$/, viewAprenda, ['secao']],
   [/^\/llms\/configuracoes\/?$/, viewConfig, []]
 ];
 

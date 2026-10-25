@@ -45,6 +45,11 @@ export default {
       titulo: '探索词嵌入',
       subtitulo: '选择单词，查看它们的 GloVe 向量投影到三个坐标轴上。国王 − 男人 + 女人 ≈ 女王。'
     },
+    aprenda: {
+      titulo: '学习：语言模型的各个部件', subtitulo: '六个简短的章节，从预测下一个 token 到 softmax。每一节都有一个“试一试”，带你进入探索器。',
+      secaoN: '第 {n} 节，共 {total} 节', experimente: '试一试', abrir: '在探索器中打开', referencias: '参考文献', link: '查看', navegacao: '相邻章节', irExplorar: '前往探索器', indice: '全部章节',
+      autoria: '文本由 SaibaTudo 项目撰写（MIT），附学术参考文献。其他语言由智能体翻译；母语者审校待定。'
+    },
     presets: {
       realeza: { nome: '王室与性别', nota: '国王 − 女王 的差向量与 男人 − 女人 相似：空间中的一个方向承载了语法性别。' },
       capitais: { nome: '国家与首都', nota: '每个国家与自己首都的距离都相近：“……的首都”这一方向反复出现。' },

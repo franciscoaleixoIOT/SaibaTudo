@@ -45,6 +45,11 @@ export default {
       titulo: 'Explore embeddings',
       subtitulo: 'Pick words and see their GloVe vectors projected onto three axes. King − man + woman ≈ queen.'
     },
+    aprenda: {
+      titulo: 'Learn: the parts of a language model', subtitulo: 'Six short lessons, from next-token prediction to softmax. Each has a "Try it" that takes you to the explorer.',
+      secaoN: 'Lesson {n} of {total}', experimente: 'Try it', abrir: 'Open in the explorer', referencias: 'References', link: 'view', navegacao: 'Neighbouring lessons', irExplorar: 'Go to the explorer', indice: 'All lessons',
+      autoria: 'Text written by the SaibaTudo project (MIT), with academic references. Translated by an agent in the other languages; native-speaker review pending.'
+    },
     presets: {
       realeza: { nome: 'Royalty and gender', nota: 'The difference king − queen resembles man − woman: one direction of the space carries grammatical gender.' },
       capitais: { nome: 'Countries and capitals', nota: 'Each country sits at a similar distance from its own capital: the "capital of" direction repeats.' },

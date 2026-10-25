@@ -45,6 +45,11 @@ export default {
       titulo: 'Explorar embeddings',
       subtitulo: 'Elige palabras y mira sus vectores de GloVe proyectados en tres ejes. Rey − hombre + mujer ≈ reina.'
     },
+    aprenda: {
+      titulo: 'Aprende: las piezas de un modelo de lenguaje', subtitulo: 'Seis secciones cortas, de la predicción del siguiente token a la softmax. Cada una tiene un "Pruébalo" que lleva al explorador.',
+      secaoN: 'Sección {n} de {total}', experimente: 'Pruébalo', abrir: 'Abrir en el explorador', referencias: 'Referencias', link: 'ver', navegacao: 'Secciones vecinas', irExplorar: 'Ir al explorador', indice: 'Todas las secciones',
+      autoria: 'Texto escrito por el proyecto SaibaTudo (MIT), con referencias académicas. Traducido por agente en los demás idiomas; revisión por hablante nativo pendiente.'
+    },
     presets: {
       realeza: { nome: 'Realeza y género', nota: 'La diferencia rey − reina se parece a hombre − mujer: una dirección del espacio lleva el género gramatical.' },
       capitais: { nome: 'Países y capitales', nota: 'Cada país queda a una distancia parecida de su propia capital: la dirección "capital de" se repite.' },

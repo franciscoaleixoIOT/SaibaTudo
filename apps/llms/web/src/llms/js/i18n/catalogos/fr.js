@@ -45,6 +45,11 @@ export default {
       titulo: 'Explorer les embeddings',
       subtitulo: 'Choisissez des mots et voyez leurs vecteurs GloVe projetés sur trois axes. Roi − homme + femme ≈ reine.'
     },
+    aprenda: {
+      titulo: 'Apprendre : les pièces d’un modèle de langage', subtitulo: 'Six sections courtes, de la prédiction du token suivant à la softmax. Chacune a un « Essayez » qui mène à l’explorateur.',
+      secaoN: 'Section {n} sur {total}', experimente: 'Essayez', abrir: 'Ouvrir dans l’explorateur', referencias: 'Références', link: 'voir', navegacao: 'Sections voisines', irExplorar: 'Aller à l’explorateur', indice: 'Toutes les sections',
+      autoria: 'Texte écrit par le projet SaibaTudo (MIT), avec des références académiques. Traduit par un agent dans les autres langues ; relecture par un locuteur natif en attente.'
+    },
     presets: {
       realeza: { nome: 'Royauté et genre', nota: 'La différence roi − reine ressemble à homme − femme : une direction de l’espace porte le genre grammatical.' },
       capitais: { nome: 'Pays et capitales', nota: 'Chaque pays se trouve à une distance semblable de sa capitale : la direction « capitale de » se répète.' },

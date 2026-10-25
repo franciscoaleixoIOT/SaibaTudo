@@ -346,3 +346,13 @@ canvas.molecula { max-width: 100%; height: auto; }
 .chip-duplo .chip { border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
 .chip-remover { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 28px; border: 1px solid var(--outline-v); border-left: 0; border-radius: 0 999px 999px 0; background: var(--surface); color: var(--txt2); cursor: pointer; }
 .chip-remover:hover, .chip-remover:focus-visible { color: #B91C1C; background: color-mix(in srgb, #B91C1C 10%, var(--surface)); }
+/* ---------- Aprenda ---------- */
+.indice-secoes { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; counter-reset: s; }
+.indice-secoes a { display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start; padding: 10px 12px; border: 1px solid var(--outline-v); border-radius: 12px; background: var(--surface); text-decoration: none; color: inherit; }
+.indice-secoes a[aria-current="page"] { border-color: var(--primary); }
+.indice-secoes .num { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--primary); color: #fff; font-weight: 600; }
+.secao-aprenda .paragrafo { max-width: 72ch; line-height: 1.6; margin: 0 0 12px; }
+.lista-experimente { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.lista-experimente li { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.nav-secoes { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin: 16px 0; }
+.indice-dobravel summary { cursor: pointer; font-weight: 600; margin: 8px 0; }
