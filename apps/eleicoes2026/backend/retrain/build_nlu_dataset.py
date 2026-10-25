@@ -271,6 +271,9 @@ T["RESULTADOS"] = [
     ("Resultado do {turno} para {cargo}", {}), ("Apuração {uf_em}", {}), ("Boletim de urna {uf_em}", {}),
     ("Quem venceu {uf_em}?", {}), ("Como foi a votação de {nome}?", {}),
     ("Resultados da eleição para {cargo}", {}), ("{nome} foi eleito?", {}),
+    ("Qual o status da votação atual?", {}), ("Como está a votação agora?", {}),
+    ("Qual o andamento da apuração?", {}), ("Quantas urnas foram apuradas?", {}),
+    ("Parcial da apuração para {cargo}", {}), ("Status da votação para {cargo} {uf_em}", {}),
 ]
 
 T["SEGUNDO_TURNO"] = [

@@ -76,6 +76,22 @@ class AnswerBuilderTest {
         // deputado continua pedindo a UF; com UF padrão e pergunta sem plural, a resposta segue sendo a do estado
         assertTrue(responder("quem foi eleito deputado federal?", hoje = "2026-10-21").directAnswer!!.contains("De qual estado?"))
         assertTrue(responder("Quem foi eleito governador?", hoje = "2026-10-21", uf = "SP").directAnswer!!.contains("São Paulo"))
+        val ap2t = ApuracaoProvider { cargo, uf, turno ->
+            if (cargo == "PRESIDENTE" && turno == 2) ApuracaoCargo(
+                cargo, uf, turno, "25/10/2026 18:10:00", "42,50", false,
+                listOf(
+                    LinhaApuracao("280002542548", "13", "LULA", "PT", 25100000, "50,40", false),
+                    LinhaApuracao("280002551544", "22", "FLAVIO BOLSONARO", "PL", 24700000, "49,60", false)
+                )
+            ) else null
+        }
+        val status2t = responder("qual status das votação atual", hoje = "2026-10-25", uf = "SP", apuracao = ap2t)
+        assertEquals(Intent.RESULTADOS, status2t.intent)
+        assertTrue(status2t.directAnswer!!, status2t.directAnswer!!.contains("Status da votação e apuração — 2º turno"))
+        assertTrue(status2t.directAnswer!!, status2t.directAnswer!!.contains("42,50% das seções totalizadas"))
+        assertTrue(status2t.directAnswer!!, status2t.directAnswer!!.contains("13 — LULA (PT): 25.100.000 votos (50,40%)"))
+        assertTrue(status2t.directAnswer!!, status2t.directAnswer!!.contains("Governador (SP):"))
+        assertTrue(status2t.abrirResultados)
     }
 
     @Test

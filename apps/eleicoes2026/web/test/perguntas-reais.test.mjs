@@ -45,7 +45,7 @@ const ESPERADAS = [
   ['o que acontece se eu votar nulo', 'REGRAS_VOTO'], ['voto é obrigatório?', 'REGRAS_VOTO'],
   ['pesquisas', 'PESQUISAS'], ['quem está na frente nas pesquisas', 'PESQUISAS'],
   ['quem vai ganhar', 'RECOMENDACAO'], ['em quem votar', 'RECOMENDACAO'],
-  ['resultado', 'RESULTADOS'], ['segundo turno', 'SEGUNDO_TURNO'], ['quantos candidatos', 'CONTAR'],
+  ['resultado', 'RESULTADOS'], ['qual status das votação atual', 'RESULTADOS'], ['como está a votação', 'RESULTADOS'], ['andamento da votação', 'RESULTADOS'], ['quantas urnas foram apuradas', 'RESULTADOS'], ['segundo turno', 'SEGUNDO_TURNO'], ['quantos candidatos', 'CONTAR'],
   ['quantas mulheres candidatas', 'CONTAR'], ['simular voto', 'SIMULADOR'], ['simulador', 'SIMULADOR'],
   ['oi', 'AJUDA'], ['bom dia', 'AJUDA'], ['obrigado', 'AJUDA'], ['ajuda', 'AJUDA'], ['sobre o app', 'AJUDA'],
   ['de onde vem os dados', 'SOBRE_DADOS']

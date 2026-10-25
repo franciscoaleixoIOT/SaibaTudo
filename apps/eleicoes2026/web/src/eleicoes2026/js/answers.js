@@ -1009,16 +1009,7 @@ export class AnswerBuilder {
       });
     }
     const cargosValidos = ['PRESIDENTE', 'GOVERNADOR', 'SENADOR', 'DEPUTADO_FEDERAL', 'DEPUTADO_ESTADUAL', 'DEPUTADO_DISTRITAL'];
-    if (cargo == null || !cargosValidos.includes(cargo)) {
-      return resposta({
-        targetRoute: 'info/resultados', menuId: MENU.RESULTADOS, intent: p.intent, filters: abrir, abrirResultados: true,
-        directAnswer: 'De qual cargo você quer ver os resultados?\n' +
-          '• Presidente, Governador, Senador, Deputado Federal e Deputado Estadual/Distrital\n' +
-          '• Para cargos estaduais, informe também o estado (ex.: "Resultado para Deputado Federal em SP")',
-        suggestedQuestions: ['Resultado para Presidente', `Resultado para Governador em ${this.ufPadrao ?? 'SP'}`, `Resultado para Deputado Federal em ${this.ufPadrao ?? 'SP'}`],
-        fonte: this.fonte, origem: this.origem
-      });
-    }
+    if (cargo == null || !cargosValidos.includes(cargo)) return this.panoramaResultados(p, abrir);
     let cargoConsulta = cargo;
     const uf = cargo === 'PRESIDENTE' ? 'BR' : (p.uf ?? this.ufPadrao);
     if (uf === 'DF' && cargoConsulta === 'DEPUTADO_ESTADUAL') {
@@ -1044,6 +1035,87 @@ export class AnswerBuilder {
     const comVotos = Boolean(ap && apTemVotos(ap));
     const r = comVotos ? this.respostaApuracao(p, ap, abrir) : this.respostaResultadosCsv(p, cargoConsulta, uf, turno, abrir);
     return anotarResultado(r, { generico, uf, maisVotado: comVotos && /mais votad/.test(textoNorm) ? decrescente(ap.linhas, (l) => l.votos)[0] : null });
+  }
+
+  /** Panorama geral da votação/apuração quando a pergunta não especifica o cargo (ex.: "qual status das votação atual", "como está a apuração"). */
+  async panoramaResultados(p, fi) {
+    const turno = p.turno ?? (['ENTRE_TURNOS', 'DIA_2T', 'POS_ELEICAO'].includes(this.fase.id) ? 2 : 1);
+    const uf = p.uf ?? this.ufPadrao;
+    let apPres = await this.obterApuracao('PRESIDENTE', 'BR', turno);
+    if (!apPres && turno === 2) apPres = await this.obterApuracao('PRESIDENTE', 'BR', 1);
+    const comVotosPres = Boolean(apPres && apTemVotos(apPres));
+    let apGov = uf != null ? await this.obterApuracao('GOVERNADOR', uf, turno) : null;
+    if (!apGov && uf != null && turno === 2) apGov = await this.obterApuracao('GOVERNADOR', uf, 1);
+    const comVotosGov = Boolean(apGov && apTemVotos(apGov));
+
+    let cabecalho;
+    if (this.fase.id === 'DIA_1T') {
+      cabecalho = `Status da votação e apuração — 1º turno (${dataBr(this.regras.turno1)}, votação das 8h às 17h pelo horário de Brasília):`;
+    } else if (this.fase.id === 'DIA_2T') {
+      cabecalho = `Status da votação e apuração — 2º turno (${dataBr(this.regras.turno2)}, votação das 8h às 17h pelo horário de Brasília):`;
+    } else if (this.fase.id === 'ENTRE_TURNOS') {
+      cabecalho = `Status da apuração — 1º turno realizado em ${dataBr(this.regras.turno1)} (2º turno em ${dataBr(this.regras.turno2)}):`;
+    } else {
+      cabecalho = `Status dos resultados das Eleições 2026 (1º turno em ${dataBr(this.regras.turno1)} e 2º turno em ${dataBr(this.regras.turno2)}):`;
+    }
+
+    let linhaPres;
+    const ids = [];
+    if (comVotosPres) {
+      const ord = decrescente(apPres.linhas, (l) => l.votos);
+      const and = apPres.totalizacaoFinal ? 'Totalização final'
+        : 'Apuração em andamento' + (apPres.secoesTotalizadasPct != null ? ` (${apPres.secoesTotalizadasPct}% das seções totalizadas)` : '');
+      const top = ord.slice(0, 2).map((l) => `${l.numero} — ${l.nome} (${l.partido}): ${inteiro(l.votos)} votos${l.percentual != null ? ` (${l.percentual}%)` : ''}${l.eleito ? ' — ELEITO' : (l.segundoTurno ? ' — 2º TURNO' : '')}`).join(' | ');
+      linhaPres = `• Presidente da República (${apPres.turno}º turno — ${and}): ${top}`;
+      for (const l of ord.slice(0, 2)) if (l.sqCandidato != null && this.data.porId.has(l.sqCandidato)) ids.push(l.sqCandidato);
+    } else {
+      const daquiPres = this.data.candidatos.filter((c) => c.cargoCodigo === 'PRESIDENTE' && c.estadoUf === 'BR' && c.resultado != null);
+      const elPres = daquiPres.find((c) => resultadoEleito(c.resultado));
+      const clPres = decrescente(daquiPres.filter((c) => resultadoSegundoTurno(c.resultado)), (c) => c.resultado.turnos?.[1]?.votos ?? 0);
+      if (elPres) {
+        linhaPres = `• Presidente da República: ${elPres.numero} — ${elPres.nomeUrna} (${elPres.partido}) — ELEITO segundo o TSE`;
+        ids.push(elPres.id);
+      } else if (clPres.length >= 2) {
+        linhaPres = `• Presidente da República (2º turno): disputam ${clPres.slice(0, 2).map((c) => `${c.numero} — ${c.nomeUrna} (${c.partido})`).join(' e ')}`;
+        ids.push(...clPres.slice(0, 2).map((c) => c.id));
+      } else {
+        linhaPres = `• Presidente da República: apuração divulgada em tempo real pelo TSE em ${URL_RESULTADOS_TSE}`;
+      }
+    }
+
+    let linhaGov = '';
+    if (uf != null) {
+      if (comVotosGov) {
+        const ordG = decrescente(apGov.linhas, (l) => l.votos);
+        const andG = apGov.totalizacaoFinal ? 'Totalização final'
+          : 'Apuração em andamento' + (apGov.secoesTotalizadasPct != null ? ` (${apGov.secoesTotalizadasPct}% das seções totalizadas)` : '');
+        const topG = ordG.slice(0, 2).map((l) => `${l.numero} — ${l.nome} (${l.partido}): ${inteiro(l.votos)} votos${l.percentual != null ? ` (${l.percentual}%)` : ''}${l.eleito ? ' — ELEITO' : (l.segundoTurno ? ' — 2º TURNO' : '')}`).join(' | ');
+        linhaGov = `\n• Governador (${uf}, ${apGov.turno}º turno — ${andG}): ${topG}`;
+      } else {
+        const daquiGov = this.data.candidatos.filter((c) => c.cargoCodigo === 'GOVERNADOR' && c.estadoUf === uf && c.resultado != null);
+        const elGov = daquiGov.find((c) => resultadoEleito(c.resultado));
+        const clGov = decrescente(daquiGov.filter((c) => resultadoSegundoTurno(c.resultado)), (c) => c.resultado.turnos?.[1]?.votos ?? 0);
+        if (elGov) {
+          linhaGov = `\n• Governador (${uf}): ${elGov.numero} — ${elGov.nomeUrna} (${elGov.partido}) — ELEITO segundo o TSE`;
+        } else if (clGov.length >= 2) {
+          linhaGov = `\n• Governador (${uf} — 2º turno): disputam ${clGov.slice(0, 2).map((c) => `${c.numero} — ${c.nomeUrna} (${c.partido})`).join(' e ')}`;
+        }
+      }
+    }
+
+    const texto = `${cabecalho}\n${linhaPres}${linhaGov}\n` +
+      'De qual cargo você quer ver os resultados?\n' +
+      '• Presidente, Governador, Senador, Deputado Federal e Deputado Estadual/Distrital\n' +
+      '• Para cargos estaduais, informe também o estado (ex.: "Resultado para Deputado Federal em SP")';
+    return resposta({
+      targetRoute: 'info/resultados', menuId: MENU.RESULTADOS, intent: p.intent, filters: fi, abrirResultados: true,
+      apuracao: comVotosPres ? apPres : null,
+      directAnswer: texto,
+      candidateIds: ids,
+      suggestedQuestions: ['Resultado para Presidente', `Resultado para Governador em ${this.ufPadrao ?? 'SP'}`, `Resultado para Deputado Federal em ${this.ufPadrao ?? 'SP'}`],
+      fonte: (comVotosPres || comVotosGov) ? 'Fonte: TSE – resultados.tse.jus.br (ao vivo), consultado agora.' : this.fonte,
+      origem: this.origem
+    });
   }
 
   async obterApuracao(cargo, uf, turno) {

@@ -184,7 +184,11 @@ object LocalNlu {
     private val RX_RESULTADOS = Regex(
         // "quem JÁ ganhou no 1º turno para governador?" (21/10/2026; paridade com nlu.js): o advérbio entre "quem" e o verbo levava à listagem
         """\b(quem (ja |afinal |mesmo )?(ganhou|venceu|foi eleito|foram eleitos|esta ganhando|esta na frente|lidera|ficou em)|ja (ganhou|venceu|foi eleito|foram eleitos)|""" +
-            """resultados?|apuracao|apurado\w*|""" +
+            """resultados?|apuracao|apurad[oa]s?|""" +
+            """(status|andamento|parcial|situacao|panorama|resumo) (atual )?((da|das|do|dos|na|nas) )?(votac\w*|eleic\w*|apurac\w*|urnas?|pleito)|""" +
+            """como (esta|ta|anda|segue|vai|estao) (a |as |o |os )?(votac\w*|eleic\w*|apurac\w*|urnas?|pleito)|""" +
+            """(votac\w*|eleic\w*|apurac\w*) (atual|agora|hoje|em andamento|neste momento)|""" +
+            """quantas (urnas|secoes)|secoes totalizad\w*|(percentual|porcentagem) de (urnas|secoes)|""" +
             """votos (teve|recebeu|obteve|tem)|quantos votos|eleitos?|mais votad\w*|percentual de votos|totalizacao|boletim de urna|""" +
             """passou para o segundo|quem passou)\b"""
     )

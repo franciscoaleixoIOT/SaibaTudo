@@ -35,17 +35,7 @@ internal suspend fun AnswerBuilder.resultados(p: ParsedQuery): AiMenuResponse {
         )
     }
     val cargosValidos = setOf("PRESIDENTE", "GOVERNADOR", "SENADOR", "DEPUTADO_FEDERAL", "DEPUTADO_ESTADUAL", "DEPUTADO_DISTRITAL")
-    if (cargo == null || cargo !in cargosValidos) {
-        return AiMenuResponse(
-            targetRoute = "info/resultados", menuId = AppConstants.MENU_RESULTADOS, intent = p.intent, filters = abrir,
-            abrirResultados = true,
-            directAnswer = "De qual cargo você quer ver os resultados?\n" +
-                "• Presidente, Governador, Senador, Deputado Federal e Deputado Estadual/Distrital\n" +
-                "• Para cargos estaduais, informe também o estado (ex.: \"Resultado para Deputado Federal em SP\")",
-            suggestedQuestions = listOf("Resultado para Presidente", "Resultado para Governador em ${ufPadrao ?: "SP"}", "Resultado para Deputado Federal em ${ufPadrao ?: "SP"}"),
-            fonte = fonte, origem = origem
-        )
-    }
+    if (cargo == null || cargo !in cargosValidos) return panoramaResultados(p, abrir)
     var cargoConsulta = cargo
     val uf = if (cargo == "PRESIDENTE") "BR" else (p.uf ?: ufPadrao)
     if (uf == "DF" && cargoConsulta == "DEPUTADO_ESTADUAL") {
@@ -88,6 +78,87 @@ internal fun AnswerBuilder.anotarResultado(r: AiMenuResponse, generico: String?,
     return r.copy(directAnswer = linhas.joinToString("\n") + "\n\n" + atual)
 }
 
+internal suspend fun AnswerBuilder.panoramaResultados(p: ParsedQuery, fi: AiFilterExtraction): AiMenuResponse {
+    val turno = p.turno ?: if (fase in setOf(FaseEleitoral.ENTRE_TURNOS, FaseEleitoral.DIA_2T, FaseEleitoral.POS_ELEICAO)) 2 else 1
+    val uf = p.uf ?: ufPadrao
+    val apPres = obterApuracao("PRESIDENTE", "BR", turno) ?: (if (turno == 2) obterApuracao("PRESIDENTE", "BR", 1) else null)
+    val comVotosPres = apPres != null && apPres.temVotos
+    val apGov = if (uf != null) (obterApuracao("GOVERNADOR", uf, turno) ?: (if (turno == 2) obterApuracao("GOVERNADOR", uf, 1) else null)) else null
+    val comVotosGov = apGov != null && apGov.temVotos
+
+    val cabecalho = when (fase) {
+        FaseEleitoral.DIA_1T -> "Status da votação e apuração — 1º turno (${dataBr(regras.turno1)}, votação das 8h às 17h pelo horário de Brasília):"
+        FaseEleitoral.DIA_2T -> "Status da votação e apuração — 2º turno (${dataBr(regras.turno2)}, votação das 8h às 17h pelo horário de Brasília):"
+        FaseEleitoral.ENTRE_TURNOS -> "Status da apuração — 1º turno realizado em ${dataBr(regras.turno1)} (2º turno em ${dataBr(regras.turno2)}):"
+        else -> "Status dos resultados das Eleições 2026 (1º turno em ${dataBr(regras.turno1)} e 2º turno em ${dataBr(regras.turno2)}):"
+    }
+
+    val ids = mutableListOf<String>()
+    val linhaPres = if (comVotosPres) {
+        val ord = apPres!!.linhas.sortedByDescending { it.votos }
+        val and = if (apPres.totalizacaoFinal) "Totalização final" else
+            "Apuração em andamento" + (apPres.secoesTotalizadasPct?.let { " (${it}% das seções totalizadas)" } ?: "")
+        val top = ord.take(2).joinToString(" | ") { l ->
+            "${l.numero} — ${l.nome} (${l.partido}): ${inteiro.format(l.votos)} votos" +
+                (l.percentual?.let { " ($it%)" } ?: "") +
+                (if (l.eleito) " — ELEITO" else if (l.segundoTurno) " — 2º TURNO" else "")
+        }
+        ord.take(2).mapNotNull { it.sqCandidato }.filter { data.porId.containsKey(it) }.forEach { ids += it }
+        "• Presidente da República (${apPres.turno}º turno — $and): $top"
+    } else {
+        val daquiPres = data.candidatos.filter { it.cargoCodigo == "PRESIDENTE" && it.estadoUf == "BR" && it.resultado != null }
+        val elPres = daquiPres.firstOrNull { it.resultado?.eleito == true }
+        val clPres = daquiPres.filter { it.resultado?.segundoTurno == true }.sortedByDescending { it.resultado?.turnos?.get(1)?.votos ?: 0L }
+        when {
+            elPres != null -> {
+                ids += elPres.id
+                "• Presidente da República: ${elPres.numero} — ${elPres.nomeUrna} (${elPres.partido}) — ELEITO segundo o TSE"
+            }
+            clPres.size >= 2 -> {
+                ids += clPres.take(2).map { it.id }
+                "• Presidente da República (2º turno): disputam ${clPres.take(2).joinToString(" e ") { "${it.numero} — ${it.nomeUrna} (${it.partido})" }}"
+            }
+            else -> "• Presidente da República: apuração divulgada em tempo real pelo TSE em ${AppConstants.URL_RESULTADOS_TSE}"
+        }
+    }
+
+    var linhaGov = ""
+    if (uf != null) {
+        if (comVotosGov) {
+            val ordG = apGov!!.linhas.sortedByDescending { it.votos }
+            val andG = if (apGov.totalizacaoFinal) "Totalização final" else
+                "Apuração em andamento" + (apGov.secoesTotalizadasPct?.let { " (${it}% das seções totalizadas)" } ?: "")
+            val topG = ordG.take(2).joinToString(" | ") { l ->
+                "${l.numero} — ${l.nome} (${l.partido}): ${inteiro.format(l.votos)} votos" +
+                    (l.percentual?.let { " ($it%)" } ?: "") +
+                    (if (l.eleito) " — ELEITO" else if (l.segundoTurno) " — 2º TURNO" else "")
+            }
+            linhaGov = "\n• Governador ($uf, ${apGov.turno}º turno — $andG): $topG"
+        } else {
+            val daquiGov = data.candidatos.filter { it.cargoCodigo == "GOVERNADOR" && it.estadoUf == uf && it.resultado != null }
+            val elGov = daquiGov.firstOrNull { it.resultado?.eleito == true }
+            val clGov = daquiGov.filter { it.resultado?.segundoTurno == true }.sortedByDescending { it.resultado?.turnos?.get(1)?.votos ?: 0L }
+            if (elGov != null) {
+                linhaGov = "\n• Governador ($uf): ${elGov.numero} — ${elGov.nomeUrna} (${elGov.partido}) — ELEITO segundo o TSE"
+            } else if (clGov.size >= 2) {
+                linhaGov = "\n• Governador ($uf — 2º turno): disputam ${clGov.take(2).joinToString(" e ") { "${it.numero} — ${it.nomeUrna} (${it.partido})" }}"
+            }
+        }
+    }
+
+    val texto = "$cabecalho\n$linhaPres$linhaGov\n" +
+        "De qual cargo você quer ver os resultados?\n" +
+        "• Presidente, Governador, Senador, Deputado Federal e Deputado Estadual/Distrital\n" +
+        "• Para cargos estaduais, informe também o estado (ex.: \"Resultado para Deputado Federal em SP\")"
+    return AiMenuResponse(
+        targetRoute = "info/resultados", menuId = AppConstants.MENU_RESULTADOS, intent = p.intent, filters = fi,
+        abrirResultados = true, directAnswer = texto, candidateIds = ids,
+        suggestedQuestions = listOf("Resultado para Presidente", "Resultado para Governador em ${ufPadrao ?: "SP"}", "Resultado para Deputado Federal em ${ufPadrao ?: "SP"}"),
+        fonte = if (comVotosPres || comVotosGov) "Fonte: TSE – resultados.tse.jus.br (ao vivo), consultado agora." else fonte,
+        origem = origem
+    )
+}
+
 internal suspend fun AnswerBuilder.obterApuracao(cargo: String, uf: String, turno: Int): ApuracaoCargo? =
     try { apuracao?.obter(cargo, uf, turno) } catch (_: Exception) { null }
 
@@ -128,10 +199,13 @@ internal fun AnswerBuilder.respostaApuracao(p: ParsedQuery, ap: ApuracaoCargo, f
 internal fun AnswerBuilder.respostaResultadosCsv(p: ParsedQuery, cargo: String, uf: String, turno: Int, filtros: AiFilterExtraction): AiMenuResponse {
     val daqui = data.candidatos.filter { it.cargoCodigo == cargo && it.estadoUf == uf && it.resultado != null }
     val eleitos = daqui.filter { it.resultado?.eleito == true }
+    val classificados = daqui.filter { it.resultado?.segundoTurno == true }.sortedByDescending { it.resultado?.turnos?.get(1)?.votos ?: 0L }
     val onde = if (uf != "BR") " ${Ufs.em(uf)}" else ""
     val texto = when {
         eleitos.isNotEmpty() -> "Eleito${if (eleitos.size > 1) "s" else ""} para ${tituloCargo(cargo)}$onde segundo o TSE${if (eleitos.size > 1) " (${eleitos.size})" else ""}:" +
             eleitos.joinToString("") { "\n• ${it.numero} — ${it.nomeUrna} (${it.partido})" }
+        classificados.size >= 2 -> "Ninguém foi eleito no 1º turno para ${tituloCargo(cargo)}$onde; disputam o 2º turno (${dataBr(regras.turno2)}), segundo o TSE:" +
+            classificados.joinToString("") { "\n• ${it.numero} — ${it.nomeUrna} (${it.partido})" }
         daqui.isNotEmpty() -> "O TSE já publicou a situação de totalização, mas ainda não há eleito definido para ${tituloCargo(cargo)}$onde:" +
             daqui.filter { it.resultado?.situacaoTotalizacao != null }.take(6).joinToString("") { "\n• ${it.nomeUrna}: ${it.resultado?.situacaoTotalizacao}" }
         else -> "Ainda não há resultado oficial publicado para ${tituloCargo(cargo)}$onde (${turno}º turno).\n" +
@@ -139,7 +213,7 @@ internal fun AnswerBuilder.respostaResultadosCsv(p: ParsedQuery, cargo: String, 
     }
     return AiMenuResponse(
         targetRoute = "info/resultados", menuId = AppConstants.MENU_RESULTADOS, intent = p.intent, filters = filtros,
-        abrirResultados = true, directAnswer = texto, candidateIds = eleitos.take(6).map { it.id },
+        abrirResultados = true, directAnswer = texto, candidateIds = (if (eleitos.isNotEmpty()) eleitos else classificados).take(6).map { it.id },
         suggestedQuestions = listOf("Calendário eleitoral 2026", "Quem disputa a Presidência?"), fonte = fonte, origem = origem
     )
 }

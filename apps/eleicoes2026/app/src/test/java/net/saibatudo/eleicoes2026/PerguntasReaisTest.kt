@@ -44,7 +44,7 @@ class PerguntasReaisTest {
         "o que acontece se eu votar nulo" to Intent.REGRAS_VOTO, "voto é obrigatório?" to Intent.REGRAS_VOTO,
         "pesquisas" to Intent.PESQUISAS, "quem está na frente nas pesquisas" to Intent.PESQUISAS,
         "quem vai ganhar" to Intent.RECOMENDACAO, "em quem votar" to Intent.RECOMENDACAO,
-        "resultado" to Intent.RESULTADOS, "segundo turno" to Intent.SEGUNDO_TURNO, "quantos candidatos" to Intent.CONTAR,
+        "resultado" to Intent.RESULTADOS, "qual status das votação atual" to Intent.RESULTADOS, "como está a votação" to Intent.RESULTADOS, "andamento da votação" to Intent.RESULTADOS, "quantas urnas foram apuradas" to Intent.RESULTADOS, "segundo turno" to Intent.SEGUNDO_TURNO, "quantos candidatos" to Intent.CONTAR,
         "quantas mulheres candidatas" to Intent.CONTAR, "simular voto" to Intent.SIMULADOR, "simulador" to Intent.SIMULADOR,
         "oi" to Intent.AJUDA, "bom dia" to Intent.AJUDA, "obrigado" to Intent.AJUDA, "ajuda" to Intent.AJUDA, "sobre o app" to Intent.AJUDA,
         "de onde vem os dados" to Intent.SOBRE_DADOS

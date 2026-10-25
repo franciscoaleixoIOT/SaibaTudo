@@ -92,6 +92,21 @@ test('resultados sem cargo pedem o cargo; governador sem UF resume o país; com 
   assert.ok(pais.directAnswer.includes('2º turno em'), pais.directAnswer);
   const comUf = await responder('Quem foi eleito governador?', { hoje: '2026-10-04', uf: 'SP', apuracao: { obter: async () => null } });
   assert.ok(comUf.directAnswer.includes('Governador em São Paulo'), comUf.directAnswer);
+  const status2t = await responder('qual status das votação atual', { hoje: '2026-10-25', uf: 'SP', apuracao: {
+    obter: async (cargo, uf, turno) => cargo === 'PRESIDENTE' && turno === 2 ? {
+      cargo, uf, turno, geradoEm: '25/10/2026 18:10:00', secoesTotalizadasPct: '42,50', totalizacaoFinal: false,
+      linhas: [
+        { sqCandidato: '280002542548', numero: '13', nome: 'LULA', partido: 'PT', votos: 25100000, percentual: '50,40', eleito: false, segundoTurno: false },
+        { sqCandidato: '280002551544', numero: '22', nome: 'FLAVIO BOLSONARO', partido: 'PL', votos: 24700000, percentual: '49,60', eleito: false, segundoTurno: false }
+      ]
+    } : null
+  } });
+  assert.equal(status2t.intent, 'RESULTADOS');
+  assert.ok(status2t.directAnswer.includes('Status da votação e apuração — 2º turno'), status2t.directAnswer);
+  assert.ok(status2t.directAnswer.includes('42,50% das seções totalizadas'), status2t.directAnswer);
+  assert.ok(status2t.directAnswer.includes('13 — LULA (PT): 25.100.000 votos (50,40%)'), status2t.directAnswer);
+  assert.ok(status2t.directAnswer.includes('Governador (SP):'), status2t.directAnswer);
+  assert.ok(status2t.abrirResultados);
 });
 
 test('"quem já ganhou no 1o turno para governador?" é resultado (não listagem) e resume os estados; o plural também, mesmo com UF padrão', async () => {
