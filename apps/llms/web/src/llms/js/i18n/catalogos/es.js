@@ -54,6 +54,26 @@ export default {
       numeros: { nome: 'Números', nota: 'Del uno al diez, los vectores se alinean en una franja; los números cercanos quedan cerca.' },
       lideres: { nome: 'Países y líderes', nota: 'Nota histórica: Italia − Alemania + Hitler se acerca a Mussolini porque el corpus (Wikipedia y noticias) asocia a cada dictador del Eje con su país. Es una regularidad estadística de los textos, no un juicio de la app.' }
     },
+    explorador: {
+      palavras: 'Palabras en el gráfico', palavrasAria: 'Palabras elegidas', adicionarRotulo: 'Añadir palabra', adicionarPlaceholder: 'Escribe una palabra en inglés (o traducida) y pulsa Intro',
+      botaoAdicionar: 'Añadir', limpar: 'Limpiar', remover: 'Quitar {palavra}', destacar: 'Destacar {palavra} y ver sus vecinos', adicionarEsta: 'Añadir al gráfico',
+      modoDimensoes: '3 dimensiones', modoPca: 'PCA', diferencas: 'Mostrar diferencias (flechas entre pares)',
+      presetsTitulo: 'Ejemplos listos', tabelaTitulo: 'Coordenadas en los 3 ejes', tabelaLegenda: 'Coordenadas de cada palabra en los ejes elegidos', tabelaPalavra: 'Palabra',
+      semPalavras: 'Aún no hay palabras. Escribe una arriba, elige un ejemplo o pídeselo al asistente.',
+      eixo: 'Eje {n}', eixoDimensao: 'dimensión {n} del vector', eixoPca: 'componente principal {n} ({pct} % de la varianza)',
+      aviso: { pcaPoucasPalavras: 'El PCA necesita al menos 3 palabras; se muestran las 3 dimensiones de mayor varianza.' },
+      avisoLimite: 'Como máximo {n} palabras en el gráfico.', naoEncontrada: '“{palavra}” no está entre las 100 mil palabras de GloVe (en inglés, sin acentos). Sugerencias:',
+      traduzida: '{original} → {en} (traducido por el glosario)',
+      vizinhosTitulo: 'Vecinos más cercanos', vizinhosVazio: 'Toca una palabra del gráfico o un chip para ver las 10 palabras más cercanas (coseno).', vizinhosDe: 'Las 10 palabras más cercanas a {palavra}:', cosseno: 'coseno',
+      analogiaTitulo: 'Analogía (a − b + c)', analogiaExplicacao: 'Resta b de a y suma c: las palabras más cercanas al resultado completan la analogía. Ej.: king − man + woman ≈ queen.',
+      analogiaA: 'palabra a', analogiaB: 'palabra b', analogiaC: 'palabra c', analogiaBotao: 'Calcular', analogiaLimpar: 'Quitar del gráfico', analogiaInvalida: 'Elige tres palabras distintas del gráfico (a y c no pueden ser iguales).',
+      analogiaResultado: '{a} − {b} + {c} ≈',
+      direcaoTitulo: 'Dirección y producto escalar', direcaoExplicacao: 'La diferencia w1 − w2 define una dirección (ej.: cats − cat, el plural). El producto escalar de cada palabra con esa dirección mide cuánto “apunta” hacia allí.',
+      direcaoW1: 'palabra w1', direcaoW2: 'palabra w2', direcaoLista: 'Palabras a medir, separadas por comas (vacío = las del gráfico)', direcaoBotao: 'Medir', direcaoInvalida: 'Elige dos palabras distintas.',
+      direcaoResultado: 'Producto escalar con la dirección {w1} − {w2}:',
+      graficoAria: 'Gráfico 3D de las palabras elegidas; arrastra para girar, usa la rueda o pinza para acercar, las flechas del teclado giran. La tabla de abajo tiene las mismas coordenadas.',
+      calculadoNoAparelho: 'Calculado en tu dispositivo a partir de GloVe (Pennington, Socher y Manning, 2014; licencia PDDL 1.0). Palabras en inglés.'
+    },
     config: {
       titulo: 'Configuración', salva: 'Preferencia guardada en este dispositivo.', aparencia: 'Apariencia', tema: 'Tema', tamanhoTexto: 'Tamaño del texto', idioma: 'Idioma',
       idiomaAjuda: 'Cambia la interfaz, las respuestas y el intérprete de preguntas. Las palabras del gráfico siguen en inglés, el idioma de GloVe.',

@@ -52,6 +52,15 @@ mkdirSync(OUT, { recursive: true });
 cpSync(join(SRC, 'llms'), OUT, { recursive: true });
 log(`✔ web/src/llms → ${relative(RAIZ, OUT)}`);
 
+// chave pública do pacote no cliente: a fonte traz o marcador; o build injeta a mesma chave com que verifica o manifesto
+{
+  const f = join(OUT, 'js', 'verify.js');
+  const s = readFileSync(f, 'utf8');
+  if (!s.includes("/*__CHAVE_PUBLICA__*/ ''")) falhar('marcador __CHAVE_PUBLICA__ ausente em js/verify.js');
+  writeFileSync(f, s.replace("/*__CHAVE_PUBLICA__*/ ''", JSON.stringify(PUB_KEY_B64 ?? '')));
+  log(PUB_KEY_B64 ? '✔ chave pública do pacote injetada em js/verify.js' : '! sem chave pública: o cliente não verificará a assinatura');
+}
+
 // minificação conservadora de JS/CSS (NO_MINIFY=1 desliga). sw.js, build-info.js e vendor/ não passam por aqui.
 if (process.env.NO_MINIFY !== '1') {
   let antes = 0;

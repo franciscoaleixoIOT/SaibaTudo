@@ -54,6 +54,26 @@ export default {
       numeros: { nome: 'Nombres', nota: 'De un à dix, les vecteurs s’alignent sur une bande ; les nombres voisins restent voisins.' },
       lideres: { nome: 'Pays et dirigeants', nota: 'Note historique : Italie − Allemagne + Hitler aboutit près de Mussolini parce que le corpus (Wikipédia et presse) associe chaque dictateur de l’Axe à son pays. C’est une régularité statistique des textes, pas un jugement de l’application.' }
     },
+    explorador: {
+      palavras: 'Mots dans le graphique', palavrasAria: 'Mots choisis', adicionarRotulo: 'Ajouter un mot', adicionarPlaceholder: 'Saisissez un mot en anglais (ou traduit) puis Entrée',
+      botaoAdicionar: 'Ajouter', limpar: 'Effacer', remover: 'Retirer {palavra}', destacar: 'Mettre {palavra} en évidence et voir ses voisins', adicionarEsta: 'Ajouter au graphique',
+      modoDimensoes: '3 dimensions', modoPca: 'ACP', diferencas: 'Afficher les différences (flèches entre paires)',
+      presetsTitulo: 'Exemples prêts', tabelaTitulo: 'Coordonnées sur les 3 axes', tabelaLegenda: 'Coordonnées de chaque mot sur les axes choisis', tabelaPalavra: 'Mot',
+      semPalavras: 'Aucun mot pour l’instant. Saisissez-en un ci-dessus, choisissez un exemple ou demandez à l’assistant.',
+      eixo: 'Axe {n}', eixoDimensao: 'dimension {n} du vecteur', eixoPca: 'composante principale {n} ({pct} % de la variance)',
+      aviso: { pcaPoucasPalavras: 'L’ACP a besoin d’au moins 3 mots ; affichage des 3 dimensions de plus grande variance.' },
+      avisoLimite: 'Au plus {n} mots dans le graphique.', naoEncontrada: '« {palavra} » ne fait pas partie des 100 000 mots de GloVe (anglais, sans accents). Suggestions :',
+      traduzida: '{original} → {en} (traduit par le glossaire)',
+      vizinhosTitulo: 'Plus proches voisins', vizinhosVazio: 'Touchez un mot du graphique ou une puce pour voir les 10 mots les plus proches (cosinus).', vizinhosDe: 'Les 10 mots les plus proches de {palavra} :', cosseno: 'cosinus',
+      analogiaTitulo: 'Analogie (a − b + c)', analogiaExplicacao: 'On soustrait b de a et on ajoute c : les mots les plus proches du résultat complètent l’analogie. Ex. : king − man + woman ≈ queen.',
+      analogiaA: 'mot a', analogiaB: 'mot b', analogiaC: 'mot c', analogiaBotao: 'Calculer', analogiaLimpar: 'Retirer du graphique', analogiaInvalida: 'Choisissez trois mots différents du graphique (a et c ne peuvent pas être identiques).',
+      analogiaResultado: '{a} − {b} + {c} ≈',
+      direcaoTitulo: 'Direction et produit scalaire', direcaoExplicacao: 'La différence w1 − w2 définit une direction (ex. : cats − cat, le pluriel). Le produit scalaire de chaque mot avec cette direction mesure combien il « pointe » dans ce sens.',
+      direcaoW1: 'mot w1', direcaoW2: 'mot w2', direcaoLista: 'Mots à mesurer, séparés par des virgules (vide = ceux du graphique)', direcaoBotao: 'Mesurer', direcaoInvalida: 'Choisissez deux mots différents.',
+      direcaoResultado: 'Produit scalaire avec la direction {w1} − {w2} :',
+      graficoAria: 'Graphique 3D des mots choisis ; faites glisser pour tourner, molette ou pincement pour zoomer, les flèches du clavier font tourner. Le tableau ci-dessous a les mêmes coordonnées.',
+      calculadoNoAparelho: 'Calculé sur votre appareil à partir de GloVe (Pennington, Socher et Manning, 2014 ; licence PDDL 1.0). Mots en anglais.'
+    },
     config: {
       titulo: 'Paramètres', salva: 'Préférence enregistrée sur cet appareil.', aparencia: 'Apparence', tema: 'Thème', tamanhoTexto: 'Taille du texte', idioma: 'Langue',
       idiomaAjuda: 'Change l’interface, les réponses et l’interpréteur de questions. Les mots du graphique restent en anglais, la langue de GloVe.',

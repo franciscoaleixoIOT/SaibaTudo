@@ -54,6 +54,26 @@ export default {
       numeros: { nome: 'Zahlen', nota: 'Von eins bis zehn reihen sich die Vektoren in einem Band auf; nahe Zahlen bleiben nah.' },
       lideres: { nome: 'Länder und Anführer', nota: 'Historischer Hinweis: Italien − Deutschland + Hitler landet nahe Mussolini, weil das Korpus (Wikipedia und Nachrichten) jeden Achsen-Diktator mit seinem Land verbindet. Das ist eine statistische Regelmäßigkeit der Texte, kein Urteil der App.' }
     },
+    explorador: {
+      palavras: 'Wörter im Diagramm', palavrasAria: 'Gewählte Wörter', adicionarRotulo: 'Wort hinzufügen', adicionarPlaceholder: 'Ein englisches (oder übersetztes) Wort eingeben und Enter drücken',
+      botaoAdicionar: 'Hinzufügen', limpar: 'Leeren', remover: '{palavra} entfernen', destacar: '{palavra} hervorheben und Nachbarn zeigen', adicionarEsta: 'Zum Diagramm hinzufügen',
+      modoDimensoes: '3 Dimensionen', modoPca: 'PCA', diferencas: 'Differenzen zeigen (Pfeile zwischen Paaren)',
+      presetsTitulo: 'Fertige Beispiele', tabelaTitulo: 'Koordinaten auf den 3 Achsen', tabelaLegenda: 'Koordinaten jedes Wortes auf den gewählten Achsen', tabelaPalavra: 'Wort',
+      semPalavras: 'Noch keine Wörter. Geben Sie oben eines ein, wählen Sie ein Beispiel oder fragen Sie den Assistenten.',
+      eixo: 'Achse {n}', eixoDimensao: 'Dimension {n} des Vektors', eixoPca: 'Hauptkomponente {n} ({pct} % der Varianz)',
+      aviso: { pcaPoucasPalavras: 'PCA braucht mindestens 3 Wörter; gezeigt werden die 3 Dimensionen mit der größten Varianz.' },
+      avisoLimite: 'Höchstens {n} Wörter im Diagramm.', naoEncontrada: '„{palavra}“ gehört nicht zu den 100 000 GloVe-Wörtern (Englisch, ohne Akzente). Vorschläge:',
+      traduzida: '{original} → {en} (über das Glossar übersetzt)',
+      vizinhosTitulo: 'Nächste Nachbarn', vizinhosVazio: 'Tippen Sie auf ein Wort im Diagramm oder einen Chip, um die 10 nächsten Wörter zu sehen (Kosinus).', vizinhosDe: 'Die 10 Wörter, die {palavra} am nächsten sind:', cosseno: 'Kosinus',
+      analogiaTitulo: 'Analogie (a − b + c)', analogiaExplicacao: 'b von a abziehen und c addieren: die Wörter, die dem Ergebnis am nächsten liegen, vervollständigen die Analogie. Z. B. king − man + woman ≈ queen.',
+      analogiaA: 'Wort a', analogiaB: 'Wort b', analogiaC: 'Wort c', analogiaBotao: 'Berechnen', analogiaLimpar: 'Aus dem Diagramm entfernen', analogiaInvalida: 'Wählen Sie drei verschiedene Wörter aus dem Diagramm (a und c dürfen nicht gleich sein).',
+      analogiaResultado: '{a} − {b} + {c} ≈',
+      direcaoTitulo: 'Richtung und Skalarprodukt', direcaoExplicacao: 'Die Differenz w1 − w2 definiert eine Richtung (z. B. cats − cat, der Plural). Das Skalarprodukt jedes Wortes mit dieser Richtung misst, wie stark es dorthin „zeigt“.',
+      direcaoW1: 'Wort w1', direcaoW2: 'Wort w2', direcaoLista: 'Zu messende Wörter, durch Komma getrennt (leer = die im Diagramm)', direcaoBotao: 'Messen', direcaoInvalida: 'Wählen Sie zwei verschiedene Wörter.',
+      direcaoResultado: 'Skalarprodukt mit der Richtung {w1} − {w2}:',
+      graficoAria: '3D-Diagramm der gewählten Wörter; ziehen zum Drehen, Mausrad oder Zwei-Finger-Geste zum Zoomen, Pfeiltasten drehen. Die Tabelle darunter hat dieselben Koordinaten.',
+      calculadoNoAparelho: 'Auf Ihrem Gerät aus GloVe berechnet (Pennington, Socher & Manning, 2014; Lizenz PDDL 1.0). Englische Wörter.'
+    },
     config: {
       titulo: 'Einstellungen', salva: 'Einstellung auf diesem Gerät gespeichert.', aparencia: 'Darstellung', tema: 'Design', tamanhoTexto: 'Textgröße', idioma: 'Sprache',
       idiomaAjuda: 'Ändert die Oberfläche, die Antworten und den Frageninterpreter. Die Wörter im Diagramm bleiben Englisch, die Sprache von GloVe.',

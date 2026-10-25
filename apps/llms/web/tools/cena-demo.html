@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>cena3d — demo manual (não publicada)</title>
+<link rel="stylesheet" href="/llms/css/base.css">
+<style>
+  body { padding: 16px; }
+  canvas { width: 100%; max-width: 640px; height: 420px; border: 1px solid #8884; border-radius: 12px; display: block; --cor-ponto: #2F80ED; --cor-eixo: #6B7280; --cor-seta: #D97706; --cor-texto: #111827; --cor-destaque: #B45309; }
+  :root[data-theme="dark"] canvas { --cor-ponto: #7FB3FF; --cor-eixo: #8A94A6; --cor-seta: #FFB86B; --cor-texto: #E6EDF3; --cor-destaque: #FFD166; }
+  p { max-width: 640px; }
+</style>
+</head>
+<body>
+<p>Demo manual da cena 3D: arraste para girar, roda/pinça para zoom, duplo toque reinicia, setas do teclado giram (foque o canvas). Rode
+  <code>DATA_DIR=web/test/fixtures/data-llms NO_MINIFY=1 node web/build.mjs</code>, copie este arquivo para <code>web/dist/llms/demo.html</code> e abra em <code>node web/serve.mjs</code>.</p>
+<canvas id="c" aria-label="demo"></canvas>
+<p id="destaque">destaque: —</p>
+<script type="module">
+  import { Cena3D } from '/llms/js/cena3d.js';
+  const cena = new Cena3D(document.getElementById('c'), { aoDestacar: (i) => { document.getElementById('destaque').textContent = `destaque: ${i ?? '—'}`; } });
+  cena.definir({
+    pontos: [{ x: 0.9, y: 0.2, z: 0.1, rotulo: 'king' }, { x: 0.8, y: 0.9, z: 0.2, rotulo: 'queen' }, { x: -0.5, y: 0.1, z: -0.3, rotulo: 'man' }, { x: -0.6, y: 0.8, z: -0.2, rotulo: 'woman' }, { x: 0.1, y: -0.7, z: 0.6, rotulo: 'cat' }, { x: 0.2, y: -0.6, z: 0.8, rotulo: 'cats' }],
+    eixos: [{ rotulo: 'd7' }, { rotulo: 'd21' }, { rotulo: 'd40' }],
+    setas: [{ de: 2, para: 0 }, { de: 3, para: 1 }]
+  });
+</script>
+</body>
+</html>

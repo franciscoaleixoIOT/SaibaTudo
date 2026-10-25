@@ -237,7 +237,9 @@ export class Cena3D {
     const eventos = {
       pointerdown: (e) => {
         c.setPointerCapture?.(e.pointerId);
-        this._ponteiros.set(e.pointerId, this._posicaoLocal(e));
+        const pos = this._posicaoLocal(e);
+        this._inicio = { ...pos, id: e.pointerId };
+        this._ponteiros.set(e.pointerId, pos);
         if (this._ponteiros.size === 2) { const [a, b] = [...this._ponteiros.values()]; this._pinca = Math.hypot(a.x - b.x, a.y - b.y); }
         const agora = Date.now();
         if (e.pointerType === 'touch' && agora - ultimoToque < 300) this.reiniciar();
@@ -257,7 +259,13 @@ export class Cena3D {
         }
         this.girar((pos.x - antes.x) * 0.01, (pos.y - antes.y) * 0.01);
       },
-      pointerup: (e) => { this._ponteiros.delete(e.pointerId); this._pinca = 0; },
+      pointerup: (e) => {
+        // toque/clique sem arrastar (< 4 px) destaca o ponto mais próximo — no celular não há pointermove sem pressionar
+        const pos = this._posicaoLocal(e);
+        if (this._inicio?.id === e.pointerId && Math.hypot(pos.x - this._inicio.x, pos.y - this._inicio.y) < 4) this.destacar(this._pontoProximo(pos.x, pos.y));
+        this._inicio = null;
+        this._ponteiros.delete(e.pointerId); this._pinca = 0;
+      },
       pointercancel: (e) => { this._ponteiros.delete(e.pointerId); this._pinca = 0; },
       pointerleave: () => { if (!this._ponteiros.size) this.destacar(null); },
       wheel: (e) => { e.preventDefault(); this.zoom(e.deltaY < 0 ? 1.1 : 1 / 1.1); },

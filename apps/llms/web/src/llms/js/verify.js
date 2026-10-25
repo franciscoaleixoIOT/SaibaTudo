@@ -1,9 +1,9 @@
 // Verificação de integridade e autenticidade do pacote de dados (WebCrypto): SHA-256 dos arquivos e assinatura
 // ECDSA P-256 / SHA-256 do manifesto. Equivalente a ManifestVerifier.kt. Funciona no navegador e no Node.
 
-/** Chave pública X.509 SubjectPublicKeyInfo (Base64) — espelho de pipeline/data_signing_public.b64. Vazia até a chave real ser gerada (Task 18):
- * sem chave, nada é verificado e o app sinaliza os dados como não autenticados. Os testes passam a chave de teste por parâmetro. */
-export const CHAVE_PUBLICA_B64 = '';
+/** Chave pública X.509 SubjectPublicKeyInfo (Base64) — espelho de pipeline/data_signing_public.b64. Na FONTE fica só o marcador: web/build.mjs injeta a chave
+ * de pipeline/data_signing_public.b64 (ou PUB_KEY_B64, nos testes) em dist. Sem chave, nada é verificado e o app sinaliza os dados como não autenticados. */
+export const CHAVE_PUBLICA_B64 = /*__CHAVE_PUBLICA__*/ '';
 
 export const subtleDisponivel = () => typeof globalThis.crypto?.subtle?.digest === 'function';
 

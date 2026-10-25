@@ -54,6 +54,26 @@ export default {
       numeros: { nome: 'Numbers', nota: 'From one to ten, the vectors line up along a band; nearby numbers stay nearby.' },
       lideres: { nome: 'Countries and leaders', nota: 'Historical note: Italy − Germany + Hitler lands near Mussolini because the corpus (Wikipedia and news) associates each Axis dictator with his country. It is a statistical regularity of the texts, not a judgement by the app.' }
     },
+    explorador: {
+      palavras: 'Words in the chart', palavrasAria: 'Chosen words', adicionarRotulo: 'Add word', adicionarPlaceholder: 'Type an English word (or a translated one) and press Enter',
+      botaoAdicionar: 'Add', limpar: 'Clear', remover: 'Remove {palavra}', destacar: 'Highlight {palavra} and see its neighbours', adicionarEsta: 'Add to the chart',
+      modoDimensoes: '3 dimensions', modoPca: 'PCA', diferencas: 'Show differences (arrows between pairs)',
+      presetsTitulo: 'Ready-made examples', tabelaTitulo: 'Coordinates on the 3 axes', tabelaLegenda: 'Coordinates of each word on the chosen axes', tabelaPalavra: 'Word',
+      semPalavras: 'No words yet. Type one above, pick an example or ask the assistant.',
+      eixo: 'Axis {n}', eixoDimensao: 'dimension {n} of the vector', eixoPca: 'principal component {n} ({pct} % of the variance)',
+      aviso: { pcaPoucasPalavras: 'PCA needs at least 3 words; showing the 3 dimensions with the largest variance.' },
+      avisoLimite: 'At most {n} words in the chart.', naoEncontrada: '“{palavra}” is not among the 100,000 GloVe words (English, no accents). Suggestions:',
+      traduzida: '{original} → {en} (translated by the glossary)',
+      vizinhosTitulo: 'Nearest neighbours', vizinhosVazio: 'Tap a word in the chart or a chip to see the 10 nearest words (cosine).', vizinhosDe: 'The 10 words nearest to {palavra}:', cosseno: 'cosine',
+      analogiaTitulo: 'Analogy (a − b + c)', analogiaExplicacao: 'Subtract b from a and add c: the words nearest to the result complete the analogy. E.g. king − man + woman ≈ queen.',
+      analogiaA: 'word a', analogiaB: 'word b', analogiaC: 'word c', analogiaBotao: 'Compute', analogiaLimpar: 'Remove from chart', analogiaInvalida: 'Choose three different words from the chart (a and c cannot be the same).',
+      analogiaResultado: '{a} − {b} + {c} ≈',
+      direcaoTitulo: 'Direction and dot product', direcaoExplicacao: 'The difference w1 − w2 defines a direction (e.g. cats − cat, the plural). The dot product of each word with that direction measures how much it “points” that way.',
+      direcaoW1: 'word w1', direcaoW2: 'word w2', direcaoLista: 'Words to measure, comma-separated (empty = those in the chart)', direcaoBotao: 'Measure', direcaoInvalida: 'Choose two different words.',
+      direcaoResultado: 'Dot product with the direction {w1} − {w2}:',
+      graficoAria: '3D chart of the chosen words; drag to rotate, use the wheel or pinch to zoom, arrow keys rotate. The table below has the same coordinates.',
+      calculadoNoAparelho: 'Computed on your device from GloVe (Pennington, Socher & Manning, 2014; PDDL 1.0 licence). English words.'
+    },
     config: {
       titulo: 'Settings', salva: 'Preference saved on this device.', aparencia: 'Appearance', tema: 'Theme', tamanhoTexto: 'Text size', idioma: 'Language',
       idiomaAjuda: 'Changes the interface, the answers and the question interpreter. The words in the chart stay in English, the language of GloVe.',

@@ -1,6 +1,10 @@
 // Ponto de entrada do PWA /llms/.
-import { iniciarApp, toast } from './app.js';
+import { iniciarApp, registrarCarregador, toast } from './app.js';
+import { Vetores } from './data.js';
 import { t } from './i18n/index.js';
+
+// pacote de dados (vetores do GloVe): carga verificada antes de montar a casca; falha vira aviso e o app segue sem o explorador
+registrarCarregador(async (S) => { S.vetores = await Vetores.carregar(); });
 
 /** Service worker: somente em HTTPS (produção) ou localhost. */
 function registrarServiceWorker() {

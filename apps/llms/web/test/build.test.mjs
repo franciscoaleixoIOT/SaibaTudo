@@ -33,6 +33,9 @@ test('estrutura de dist: tudo sob /llms/ (páginas, manifestos por idioma, catá
     assert.ok(existsSync(join(L(), ...p.split('/'))), `faltando em dist/llms: ${p}`);
   }
   assert.deepEqual(readdirSync(OUT), ['llms'], 'nada fora de /llms/ (o projeto é servido assim, direto ou por rewrite)');
+  // a chave pública que assina o pacote é injetada no cliente pelo build (a fonte traz só o marcador): o site verifica com a mesma chave do build
+  assert.ok(ler('js/verify.js').includes(CHAVE_TESTE_B64), 'verify.js em dist com a chave pública do build');
+  assert.ok(!ler('js/verify.js').includes('__CHAVE_PUBLICA__'), 'marcador substituído');
 });
 
 test('dados em dist são cópias byte a byte do pacote assinado e conferem com o manifesto', () => {

@@ -54,6 +54,26 @@ export default {
       numeros: { nome: '数字', nota: '从一到十，向量排列成一条带状；相邻的数字彼此靠近。' },
       lideres: { nome: '国家与领导人', nota: '历史说明：意大利 − 德国 + 希特勒 接近 墨索里尼，是因为语料（维基百科和新闻）把每位轴心国独裁者与其国家联系在一起。这是文本的统计规律，不是本应用的评判。' }
     },
+    explorador: {
+      palavras: '图中的单词', palavrasAria: '已选单词', adicionarRotulo: '添加单词', adicionarPlaceholder: '输入一个英文单词（或已翻译的词）并按回车',
+      botaoAdicionar: '添加', limpar: '清空', remover: '移除 {palavra}', destacar: '高亮 {palavra} 并查看近邻', adicionarEsta: '添加到图中',
+      modoDimensoes: '3 个维度', modoPca: 'PCA', diferencas: '显示差向量（词对之间的箭头）',
+      presetsTitulo: '现成示例', tabelaTitulo: '3 个坐标轴上的坐标', tabelaLegenda: '每个单词在所选坐标轴上的坐标', tabelaPalavra: '单词',
+      semPalavras: '还没有单词。在上方输入一个、选择一个示例，或向助手提问。',
+      eixo: '坐标轴 {n}', eixoDimensao: '向量的第 {n} 维', eixoPca: '第 {n} 主成分（占方差的 {pct} %）',
+      aviso: { pcaPoucasPalavras: 'PCA 至少需要 3 个单词；现在显示方差最大的 3 个维度。' },
+      avisoLimite: '图中最多 {n} 个单词。', naoEncontrada: '“{palavra}” 不在 GloVe 的 10 万个单词中（英文，无重音符号）。建议：',
+      traduzida: '{original} → {en}（由词汇表翻译）',
+      vizinhosTitulo: '最近邻', vizinhosVazio: '点按图中的单词或标签，查看最接近的 10 个单词（余弦）。', vizinhosDe: '与 {palavra} 最接近的 10 个单词：', cosseno: '余弦',
+      analogiaTitulo: '类比（a − b + c）', analogiaExplicacao: '从 a 中减去 b 再加上 c：最接近结果的单词补全类比。例如 king − man + woman ≈ queen。',
+      analogiaA: '单词 a', analogiaB: '单词 b', analogiaC: '单词 c', analogiaBotao: '计算', analogiaLimpar: '从图中移除', analogiaInvalida: '请从图中选择三个不同的单词（a 和 c 不能相同）。',
+      analogiaResultado: '{a} − {b} + {c} ≈',
+      direcaoTitulo: '方向与点积', direcaoExplicacao: '差向量 w1 − w2 定义一个方向（例如 cats − cat，即复数）。每个单词与该方向的点积衡量它“指向”那里的程度。',
+      direcaoW1: '单词 w1', direcaoW2: '单词 w2', direcaoLista: '要测量的单词，用逗号分隔（留空 = 图中的单词）', direcaoBotao: '测量', direcaoInvalida: '请选择两个不同的单词。',
+      direcaoResultado: '与方向 {w1} − {w2} 的点积：',
+      graficoAria: '所选单词的三维图；拖动旋转，滚轮或双指缩放，方向键旋转。下方表格有相同的坐标。',
+      calculadoNoAparelho: '在您的设备上根据 GloVe 计算（Pennington、Socher 和 Manning，2014；许可 PDDL 1.0）。单词为英文。'
+    },
     config: {
       titulo: '设置', salva: '偏好已保存在此设备上。', aparencia: '外观', tema: '主题', tamanhoTexto: '文字大小', idioma: '语言',
       idiomaAjuda: '更改界面、回答和问题解析器。图表中的单词仍为英文，即 GloVe 的语言。',

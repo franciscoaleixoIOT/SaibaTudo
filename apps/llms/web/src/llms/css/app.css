@@ -319,3 +319,30 @@ canvas.molecula { max-width: 100%; height: auto; }
 
 /* alvos de foco e âncoras ficam abaixo da barra fixa (appbar + abas) */
 [tabindex="-1"], :target { scroll-margin-top: 120px; }
+
+/* ---------- explorador de embeddings (SaibaTudo LLMs) ---------- */
+.explorador { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 900px) { .explorador { grid-template-columns: minmax(0, 1.2fr) minmax(300px, 1fr); align-items: start; } .explorador-grafico { position: sticky; top: calc(var(--topo, 112px) + 8px); } }
+.cena3d { width: 100%; aspect-ratio: 1 / 1; max-height: 70vh; display: block; border: 1px solid var(--outline-v); border-radius: 14px; background: var(--surface); touch-action: none; cursor: grab;
+  --cor-ponto: #2F80ED; --cor-eixo: #6B7280; --cor-seta: #D97706; --cor-texto: var(--txt); --cor-destaque: #B45309; }
+.cena3d:active { cursor: grabbing; }
+.cena3d:focus-visible { outline: 3px solid color-mix(in srgb, var(--primary) 40%, transparent); outline-offset: 2px; }
+:root[data-theme="dark"] .cena3d { --cor-ponto: #7FB3FF; --cor-eixo: #8A94A6; --cor-seta: #FFB86B; --cor-destaque: #FFD166; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .cena3d { --cor-ponto: #7FB3FF; --cor-eixo: #8A94A6; --cor-seta: #FFB86B; --cor-destaque: #FFD166; } }
+.explorador-painel { display: grid; gap: 10px; align-content: start; }
+.linha-campo { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.linha-campo .campo { flex: 1 1 160px; min-width: 0; }
+.campo.peq { padding: 6px 10px; font-size: .9rem; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.lista-vizinhos { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.lista-vizinhos li { display: flex; align-items: center; gap: 6px; font-size: .9rem; }
+.barras { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.barras li { display: grid; grid-template-columns: minmax(70px, 25%) 1fr auto; gap: 8px; align-items: center; font-size: .875rem; }
+.barra { display: block; height: 10px; border-radius: 5px; background: var(--primary); min-width: 2px; }
+.barra.neg { background: #D97706; }
+.barra-rotulo { overflow-wrap: anywhere; }
+.mini { font-size: .75rem; }
+.chip-duplo { display: inline-flex; align-items: center; gap: 2px; }
+.chip-duplo .chip { border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
+.chip-remover { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 28px; border: 1px solid var(--outline-v); border-left: 0; border-radius: 0 999px 999px 0; background: var(--surface); color: var(--txt2); cursor: pointer; }
+.chip-remover:hover, .chip-remover:focus-visible { color: #B91C1C; background: color-mix(in srgb, #B91C1C 10%, var(--surface)); }
