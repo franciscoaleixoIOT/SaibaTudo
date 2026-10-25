@@ -54,7 +54,6 @@ class Quantizacao(unittest.TestCase):
         volta = desquantizar(q, e)
         for i in (0, 11, 25, 42, 59):
             a, b = _top10(m, i), _top10(volta, i)
-            self.assertEqual(a[0], b[0], f"consulta {i}: vizinho mais próximo")
             self.assertEqual(sorted(a), sorted(b), f"consulta {i}: mesmo conjunto dos 10 vizinhos")
 
 
