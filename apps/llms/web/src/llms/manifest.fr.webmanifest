@@ -1,0 +1,77 @@
+{
+  "id": "/llms/",
+  "name": "SaibaTudo LLMs",
+  "short_name": "LLMs",
+  "description": "Comment fonctionne un modèle de langage : vecteurs de mots en 3D, arithmétique de vecteurs et les pièces d’un transformer, avec des données ouvertes. Fonctionne hors ligne et rien ne quitte votre appareil.",
+  "lang": "fr",
+  "dir": "ltr",
+  "start_url": "/llms/?lang=fr&source=pwa",
+  "scope": "/llms/",
+  "display": "standalone",
+  "theme_color": "#0C2340",
+  "background_color": "#0C2340",
+  "categories": [
+    "education",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "/llms/brand/pwa-llms-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/llms/brand/pwa-llms-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/llms/brand/pwa-llms-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/llms/brand/pwa-llms-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/llms/brand/llms-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Apprendre",
+      "short_name": "Apprendre",
+      "description": "Les six pièces d’un modèle de langage",
+      "url": "/llms/aprenda?lang=fr&source=shortcut",
+      "icons": [
+        {
+          "src": "/llms/brand/pwa-llms-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Explorer les embeddings",
+      "short_name": "Explorer",
+      "description": "Des mots GloVe sur trois axes",
+      "url": "/llms/?lang=fr&source=shortcut",
+      "icons": [
+        {
+          "src": "/llms/brand/pwa-llms-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}
