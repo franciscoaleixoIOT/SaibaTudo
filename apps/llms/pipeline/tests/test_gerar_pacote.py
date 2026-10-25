@@ -14,7 +14,7 @@ AQUI = Path(__file__).resolve().parent
 sys.path.insert(0, str(AQUI.parent))
 
 import sign  # noqa: E402
-from gerar_pacote import LIMITE, desquantizar, escrever_pacote, filtrar_palavras, quantizar  # noqa: E402
+from gerar_pacote import LIMITE, carregar_keyedvectors, carregar_word2vec, desquantizar, escrever_pacote, filtrar_palavras, quantizar  # noqa: E402
 
 
 def _top10(matriz: np.ndarray, i: int) -> list:
@@ -83,6 +83,39 @@ class Pacote(unittest.TestCase):
             gravado = json.loads((saida / "manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(gravado["files"]["vetores.i8"]["bytes"], 150)
             self.assertEqual(len(gravado["files"]["vetores.i8"]["sha256"]), 64)
+
+
+class Fontes(unittest.TestCase):
+    def test_carregar_keyedvectors_devolve_ordem_e_matriz(self):
+        from gensim.models import KeyedVectors
+        kv = KeyedVectors(vector_size=50)
+        m = np.random.default_rng(5).normal(size=(3, 50)).astype(np.float32)
+        kv.add_vectors(["the", "king", "queen"], m)
+        with tempfile.TemporaryDirectory() as tmp:
+            caminho = Path(tmp) / "glove.model"
+            kv.save(str(caminho))
+            palavras, matriz = carregar_keyedvectors(caminho)
+        self.assertEqual(palavras, ["the", "king", "queen"])
+        self.assertEqual(matriz.dtype, np.float32)
+        self.assertTrue(np.allclose(matriz, m))
+
+    def test_carregar_word2vec_binario_em_zip(self):
+        import zipfile
+        from gensim.models import KeyedVectors
+        kv = KeyedVectors(vector_size=50)
+        m = np.random.default_rng(9).normal(size=(3, 50)).astype(np.float32)
+        kv.add_vectors(["the", "king", "queen"], m)
+        with tempfile.TemporaryDirectory() as tmp:
+            binario = Path(tmp) / "glove.6B.50d.bin"
+            kv.save_word2vec_format(str(binario), binary=True)
+            z = Path(tmp) / "glove.6B.50d.zip"
+            with zipfile.ZipFile(z, "w") as zf:
+                zf.write(binario, arcname="glove.6B.50d.bin")
+            palavras, matriz = carregar_word2vec(z)
+            palavras2, _ = carregar_word2vec(binario)
+        self.assertEqual(palavras, ["the", "king", "queen"])
+        self.assertEqual(palavras2, palavras)
+        self.assertTrue(np.allclose(matriz, m, atol=1e-6))
 
 
 if __name__ == "__main__":

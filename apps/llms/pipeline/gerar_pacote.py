@@ -6,7 +6,9 @@
     python pipeline/gerar_pacote.py --saida web/test/fixtures/data-llms --fonte gensim --palavras web/test/fixtures/palavras_fixture.txt \
         --chave web/test/fixtures/chave_teste.pem --glossario contracts/glossario.json --presets contracts/presets.json
 
-Fonte: `--fonte gensim` baixa o modelo pelo gensim.downloader (66 MB, cache em pipeline/.cache); `--fonte <arquivo.txt>` lê o formato texto
+Fonte: `--fonte gensim` baixa o modelo pelo gensim.downloader (66 MB, do GitHub, cache em pipeline/.cache); `--fonte hf` baixa o espelho
+fse/glove-wiki-gigaword-50 do Hugging Face (mesmo modelo, formato KeyedVectors); `--fonte <glove.6B.50d.zip>` lê o espelho do Zenodo
+(registro 4925376, word2vec binário em zip); `--fonte <arquivo.txt>` lê o formato texto
 do Stanford ("palavra v1 … v50" por linha). Licença dos vetores: PDDL 1.0 (Open Data Commons); referência: Pennington, Socher & Manning (2014).
 
 Seleção: na ordem de frequência do GloVe, as primeiras `--limite` palavras alfabéticas (`^[a-z]+(?:[-'][a-z]+)*$`, até 20 caracteres):
@@ -125,6 +127,54 @@ def carregar_gensim(cache: Path):
     return palavras, np.asarray(kv.vectors, dtype=np.float32)
 
 
+def carregar_keyedvectors(caminho: Path):
+    """Modelo salvo pelo gensim (KeyedVectors.save: <nome>.model + <nome>.model.vectors.npy). Devolve (palavras, matriz float32)."""
+    from gensim.models import KeyedVectors  # import tardio
+
+    kv = KeyedVectors.load(str(caminho))
+    return list(kv.index_to_key), np.asarray(kv.vectors, dtype=np.float32)
+
+
+REPO_HF = "fse/glove-wiki-gigaword-50"
+
+
+def carregar_hf(cache: Path):
+    """Espelho do mesmo modelo no Hugging Face (repositório fse/glove-wiki-gigaword-50, formato KeyedVectors do gensim)."""
+    from huggingface_hub import hf_hub_download  # import tardio
+
+    cache.mkdir(parents=True, exist_ok=True)
+    modelo = hf_hub_download(REPO_HF, "glove-wiki-gigaword-50.model", cache_dir=str(cache))
+    hf_hub_download(REPO_HF, "glove-wiki-gigaword-50.model.vectors.npy", cache_dir=str(cache))
+    return carregar_keyedvectors(Path(modelo))
+
+
+def carregar_word2vec(caminho: Path):
+    """Formato word2vec BINÁRIO (ex.: espelho do Zenodo 4925376: glove.6B.50d.zip com um .bin dentro, convertido pelo gensim).
+    Aceita o .zip (primeiro arquivo que não seja diretório) ou o binário já extraído. Devolve (palavras em ordem, matriz float32)."""
+    import zipfile
+
+    from gensim.models import KeyedVectors  # import tardio
+
+    caminho = Path(caminho)
+    if caminho.suffix.lower() == ".zip":
+        with zipfile.ZipFile(caminho) as zf:
+            nomes = [n for n in zf.namelist() if not n.endswith("/")]
+            if not nomes:
+                raise SystemExit(f"zip vazio: {caminho}")
+            destino = caminho.with_suffix("")
+            if not destino.exists():
+                destino.parent.mkdir(parents=True, exist_ok=True)
+                with zf.open(nomes[0]) as origem, open(destino, "wb") as saida:
+                    while True:
+                        bloco = origem.read(1 << 20)
+                        if not bloco:
+                            break
+                        saida.write(bloco)
+            caminho = destino
+    kv = KeyedVectors.load_word2vec_format(str(caminho), binary=True)
+    return list(kv.index_to_key), np.asarray(kv.vectors, dtype=np.float32)
+
+
 def carregar_texto(caminho: Path):
     """Formato texto do Stanford: 'palavra v1 … v50' por linha, em ordem de frequência."""
     palavras: list[str] = []
@@ -155,7 +205,7 @@ def selecionar(palavras: list[str], matriz: np.ndarray, limite: int, restringir:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--saida", required=True)
-    ap.add_argument("--fonte", default="gensim", help="'gensim' ou caminho do arquivo texto do GloVe")
+    ap.add_argument("--fonte", default="gensim", help="'gensim', 'hf' (espelho fse/glove-wiki-gigaword-50), um .zip/.bin word2vec binário (espelho Zenodo 4925376) ou o arquivo texto do GloVe")
     ap.add_argument("--limite", type=int, default=LIMITE)
     ap.add_argument("--palavras", help="arquivo com uma palavra por linha: restringe o vocabulário (fixture)")
     ap.add_argument("--chave", required=True, help="chave privada ECDSA (PEM) para assinar o manifesto")
@@ -166,6 +216,10 @@ def main(argv=None) -> int:
 
     if a.fonte == "gensim":
         palavras, matriz = carregar_gensim(Path(a.cache))
+    elif a.fonte == "hf":
+        palavras, matriz = carregar_hf(Path(a.cache))
+    elif a.fonte.lower().endswith((".zip", ".bin")):
+        palavras, matriz = carregar_word2vec(Path(a.fonte))
     else:
         palavras, matriz = carregar_texto(Path(a.fonte))
     restringir = None
