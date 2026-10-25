@@ -1,0 +1,36 @@
+{
+  "version": "20261025T163006Z-f66bfe641722",
+  "generatedAt": "2026-10-25T16:30:06Z",
+  "schemaVersion": 1,
+  "files": {
+    "vocab.json": {
+      "bytes": 3024,
+      "sha256": "f66bfe64172296239a03666b28d9e9bb13c0c17bdcf6e4295efd816bcc4ab39a"
+    },
+    "vetores.i8": {
+      "bytes": 18000,
+      "sha256": "37d81d8eeb332e1014b71a276d67a39f67415d5b992785cdfd19a6778a3f3bb7"
+    },
+    "escalas.f32": {
+      "bytes": 1440,
+      "sha256": "34420c6b0fdb5f7c68040a24479321d4f1c90f3fe520c5a8fe684bac57b000d0"
+    },
+    "glossario.json": {
+      "bytes": 30085,
+      "sha256": "b7971d1d4301347aecb16a1d5b38ffd7a8b7b23f5e69169d0035157605333b9c"
+    },
+    "presets.json": {
+      "bytes": 530,
+      "sha256": "bbdb91fad899d1f6100a2a294c22a1fa2c6a7d12afca12763213357601b1e88b"
+    }
+  },
+  "vetores": {
+    "nome": "GloVe 6B (Wikipedia 2014 + Gigaword 5), 50 dimensões — glove-wiki-gigaword-50",
+    "licenca": "PDDL 1.0",
+    "url": "https://nlp.stanford.edu/projects/glove/",
+    "referencia": "Pennington, Socher & Manning (2014), GloVe: Global Vectors for Word Representation",
+    "palavras": 360,
+    "dimensoes": 50,
+    "quantizacao": "int8 por vetor (escala = max|x|/127)"
+  }
+}
