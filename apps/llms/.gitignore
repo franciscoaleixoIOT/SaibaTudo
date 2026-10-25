@@ -1,0 +1,17 @@
+# segredos
+secrets/
+*.pem
+!pipeline/data_signing_public.pem
+!web/test/fixtures/chave_teste.pem
+!web/test/fixtures/chave_teste_public.pem
+
+# caches e saídas reproduzíveis
+pipeline/.cache/
+web/dist/
+web/.screenshots/
+
+# node / python
+node_modules/
+__pycache__/
+*.pyc
+.venv/
