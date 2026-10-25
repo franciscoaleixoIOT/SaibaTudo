@@ -5,14 +5,14 @@
  "intencoes": {
   "saudacao": "^(?:salut|bonjour|bonsoir|coucou|hello|hi|hey)\\b[!.,]*\\s*$",
   "ajuda": "\\b(?:aide|aidez?-moi|comment (?:utiliser|ca marche|faire)|que (?:peux-tu|sais-tu) faire|que puis-je demander)\\b",
-  "sobreDados": "\\b(?:d ou viennent les donnees|a propos des donnees|quelles donnees|source des donnees|licence des donnees|quel corpus|quels vecteurs)\\b",
+  "sobreDados": "\\b(?:d[' ]?ou viennent les donnees|a propos des donnees|quelles donnees|source des donnees|licence des donnees|quel corpus|quels vecteurs)\\b",
   "fontes": "\\b(?:sources?|references?|bibliographie|article de glove|qui a fait glove)\\b",
   "mostrar": "\\b(?:montr\\w*|affich\\w*|ajout\\w*|mets?|mettre|place\\w*|dessin\\w*|trac\\w*|visualis\\w*|voir|inclu\\w*|projet\\w*|dans le graphique)\\b",
   "analogia": "[a-z'-]+\\s*[-−–]\\s*[a-z'-]+\\s*\\+\\s*[a-z'-]+|\\b(?:analogie|est a|comme .* est a|complete)\\b",
   "vizinhos": "\\b(?:voisins?|proches? de|semblables?|similaires? a|ressembl\\w*|apparent\\w*|mots comme|lies? a)\\b",
   "similaridade": "\\b(?:similarite|similitude|ressemblance|sont[- ]ils (?:proches|similaires|semblables)|cosinus (?:entre|de)|distance entre|a quel point)\\b",
   "direcao": "\\b(?:direction|produit scalaire|axe du pluriel|axe du genre|separer (?:singulier|pluriel))\\b",
-  "conceito": "\\b(?:qu est[- ]ce (?:que|qu)|c est quoi|que (?:veut dire|signifie)|expliqu\\w*|defin\\w*|comment (?:fonctionne|marche)|pourquoi|a quoi sert|notion de|concept de)\\b",
+  "conceito": "\\b(?:qu[' ]?est[- ]ce (?:que|qu)|c[' ]?est quoi|que (?:veut dire|signifie)|expliqu\\w*|defin\\w*|comment (?:fonctionne|marche)|pourquoi|a quoi sert|notion de|concept de)\\b",
   "preset": "\\b(?:exemples?|presets?|predefini\\w*|prets?)\\b",
   "limpar": "\\b(?:effac\\w*|vid\\w*|nettoy\\w*|supprim\\w* tout|enlev\\w* tout|recommenc\\w*|reinitialis\\w*|reset)\\b"
  },
@@ -23,7 +23,8 @@
   "estaPara": "([a-z'-]+)\\s+est a\\s+([a-z'-]+)\\s+ce que\\s+([a-z'-]+)\\s+est a\\s*([a-z'-]*)",
   "aspas": "[\"“”'‘’«»]([^\"“”'‘’«»]+)[\"“”'‘’«»]",
   "continuacao": "^(?:et|aussi|maintenant|encore|plus|et aussi|et le|et la|et les|qu en est[- ]il de)\\b",
-  "plural": "\\b(?:pluriels?|singuliers?)\\b"
+  "plural": "\\b(?:pluriels?|singuliers?)\\b",
+  "pergunta": "\\b(?:quel|quelle|quels|quelles|qui|ou|quand|combien)\\b"
  },
  "conceitos": {
   "embedding": [
@@ -131,10 +132,7 @@
  "presets": {
   "realeza": [
    "royaute",
-   "roi et reine",
-   "rois et reines",
    "genre",
-   "homme et femme",
    "royal"
   ],
   "capitais": [
@@ -147,25 +145,21 @@
   "plural": [
    "pluriel",
    "pluriels",
-   "singulier et pluriel",
-   "chat et chats"
+   "singulier et pluriel"
   ],
   "familia": [
    "famille",
    "parents",
-   "pere et mere",
    "parente"
   ],
   "cores": [
    "couleurs",
-   "couleur",
-   "rouge bleu vert"
+   "couleur"
   ],
   "numeros": [
    "nombres",
    "chiffres",
    "un a dix",
-   "un deux trois",
    "compter"
   ],
   "lideres": [

@@ -12,7 +12,7 @@ const CONTRATOS = resolve(RAIZ, 'contracts/lexico');
 const GERADOS = resolve(RAIZ, 'web/src/llms/js/nlu/lex');
 const CABECALHO = '// gerado — não editar.';
 const INTENCOES = ['saudacao', 'ajuda', 'sobreDados', 'fontes', 'mostrar', 'analogia', 'vizinhos', 'similaridade', 'direcao', 'conceito', 'preset', 'limpar'];
-const PISTAS = ['separadorLista', 'menos', 'mais', 'estaPara', 'aspas', 'continuacao', 'plural'];
+const PISTAS = ['separadorLista', 'menos', 'mais', 'estaPara', 'aspas', 'continuacao', 'plural', 'pergunta'];
 const CONCEITOS = ['embedding', 'token', 'atencao', 'mlp', 'softmax', 'temperatura', 'transformer', 'parametro', 'proximoToken', 'dimensao', 'vetor', 'cosseno'];
 const PRESETS = ['realeza', 'capitais', 'plural', 'familia', 'cores', 'numeros', 'lideres'];
 
@@ -36,7 +36,7 @@ test('há um contrato e um gerado para cada um dos seis idiomas, e o gerado est�
   }
 });
 
-test('todos os léxicos têm a mesma estrutura: 12 intenções, 7 pistas, 12 conceitos, 7 presets, stopPalavras; zh sem fronteira de palavra e sem normalização de acentos', () => {
+test('todos os léxicos têm a mesma estrutura: 12 intenções, 8 pistas, 12 conceitos, 7 presets, stopPalavras; zh sem fronteira de palavra e sem normalização de acentos', () => {
   for (const idioma of IDIOMAS) {
     const b = LEXICOS_BRUTOS[idioma];
     assert.deepEqual(Object.keys(b.intencoes).sort(), [...INTENCOES].sort(), `${idioma}: intenções`);

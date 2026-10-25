@@ -24,7 +24,8 @@ export default {
   "estaPara": "([a-z'-]+)\\s+is to\\s+([a-z'-]+)\\s+as\\s+([a-z'-]+)\\s+is to\\s*([a-z'-]*)",
   "aspas": "[\"“”'‘’«»]([^\"“”'‘’«»]+)[\"“”'‘’«»]",
   "continuacao": "^(?:and|also|now|plus|too|what about|how about|and also)\\b",
-  "plural": "\\b(?:plurals?|singulars?)\\b"
+  "plural": "\\b(?:plurals?|singulars?)\\b",
+  "pergunta": "\\b(?:which|who|where|when|how many|how much|what is the|what are the)\\b"
  },
  "conceitos": {
   "embedding": [
@@ -129,10 +130,7 @@ export default {
  "presets": {
   "realeza": [
    "royalty",
-   "king and queen",
-   "kings and queens",
    "gender",
-   "man and woman",
    "royal"
   ],
   "capitais": [
@@ -145,27 +143,23 @@ export default {
   "plural": [
    "plural",
    "plurals",
-   "singular and plural",
-   "cat and cats"
+   "singular and plural"
   ],
   "familia": [
    "family",
    "relatives",
-   "father and mother",
    "kinship"
   ],
   "cores": [
    "colors",
    "colours",
    "color",
-   "colour",
-   "red blue green"
+   "colour"
   ],
   "numeros": [
    "numbers",
    "numerals",
    "one to ten",
-   "one two three",
    "counting"
   ],
   "lideres": [

@@ -31,7 +31,7 @@ PROIBIDOS = (
 )
 CHAVES_OBRIGATORIAS = ("idioma", "versao", "intencoes", "pistas", "conceitos", "presets", "stopPalavras", "semFronteira", "normalizarAcentos")
 INTENCOES = ("saudacao", "ajuda", "sobreDados", "fontes", "mostrar", "analogia", "vizinhos", "similaridade", "direcao", "conceito", "preset", "limpar")
-PISTAS = ("separadorLista", "menos", "mais", "estaPara", "aspas", "continuacao", "plural")
+PISTAS = ("separadorLista", "menos", "mais", "estaPara", "aspas", "continuacao", "plural", "pergunta")
 
 
 def serializar(dados: dict) -> str:

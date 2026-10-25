@@ -24,7 +24,8 @@ export default {
   "estaPara": "([a-z'-]+)\\s+es a\\s+([a-z'-]+)\\s+(?:como|lo que)\\s+([a-z'-]+)\\s+es a\\s*([a-z'-]*)",
   "aspas": "[\"“”'‘’«»]([^\"“”'‘’«»]+)[\"“”'‘’«»]",
   "continuacao": "^(?:y|tambien|ahora|mas|junto|y el|y la|y las|y los|pon tambien|y tambien)\\b",
-  "plural": "\\b(?:plural(?:es)?|singular(?:es)?)\\b"
+  "plural": "\\b(?:plural(?:es)?|singular(?:es)?)\\b",
+  "pergunta": "\\b(?:cual|cuales|quien|donde|cuando|cuanto[s]?|cuanta[s]?)\\b"
  },
  "conceitos": {
   "embedding": [
@@ -130,10 +131,7 @@ export default {
  "presets": {
   "realeza": [
    "realeza",
-   "rey y reina",
-   "reyes y reinas",
    "genero",
-   "hombre y mujer",
    "real"
   ],
   "capitais": [
@@ -146,25 +144,21 @@ export default {
   "plural": [
    "plural",
    "plurales",
-   "singular y plural",
-   "gato y gatos"
+   "singular y plural"
   ],
   "familia": [
    "familia",
    "parientes",
-   "padre y madre",
    "parentesco"
   ],
   "cores": [
    "colores",
-   "color",
-   "rojo azul verde"
+   "color"
   ],
   "numeros": [
    "numeros",
    "numerales",
    "uno a diez",
-   "uno dos tres",
    "contar"
   ],
   "lideres": [

@@ -24,7 +24,8 @@ export default {
   "estaPara": "([a-z'-]+)\\s+verhalt sich zu\\s+([a-z'-]+)\\s+wie\\s+([a-z'-]+)\\s+zu\\s*([a-z'-]*)",
   "aspas": "[\"“”'‘’«»]([^\"“”'‘’«»]+)[\"“”'‘’«»]",
   "continuacao": "^(?:und|auch|jetzt|noch|dazu|und auch|was ist mit)\\b",
-  "plural": "\\b(?:plural|plurale|singular|singulare|mehrzahl|einzahl)\\b"
+  "plural": "\\b(?:plural|plurale|singular|singulare|mehrzahl|einzahl)\\b",
+  "pergunta": "\\b(?:welche[rsn]?|wer|wo|wann|wie viele|wie viel)\\b"
  },
  "conceitos": {
   "embedding": [
@@ -128,10 +129,7 @@ export default {
  "presets": {
   "realeza": [
    "konigtum",
-   "konig und konigin",
-   "konige und koniginnen",
    "geschlecht",
-   "mann und frau",
    "royal"
   ],
   "capitais": [
@@ -144,25 +142,21 @@ export default {
   "plural": [
    "plural",
    "mehrzahl",
-   "singular und plural",
-   "katze und katzen"
+   "singular und plural"
   ],
   "familia": [
    "familie",
    "verwandte",
-   "vater und mutter",
    "verwandtschaft"
   ],
   "cores": [
    "farben",
-   "farbe",
-   "rot blau grun"
+   "farbe"
   ],
   "numeros": [
    "zahlen",
    "zahlworter",
    "eins bis zehn",
-   "eins zwei drei",
    "zahlen"
   ],
   "lideres": [

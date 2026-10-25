@@ -23,7 +23,8 @@
   "estaPara": "([a-z'-]+)\\s+esta para\\s+([a-z'-]+)\\s+(?:assim )?como\\s+([a-z'-]+)\\s+esta para\\s*([a-z'-]*)",
   "aspas": "[\"“”'‘’«»]([^\"“”'‘’«»]+)[\"“”'‘’«»]",
   "continuacao": "^(?:e|tambem|agora|mais|junto|e o|e a|e as|e os|coloque tambem|e tambem)\\b",
-  "plural": "\\b(?:plural|plurais|singular|singulares)\\b"
+  "plural": "\\b(?:plural|plurais|singular|singulares)\\b",
+  "pergunta": "\\b(?:qual|quais|quem|onde|quando|quanto[s]?|quanta[s]?)\\b"
  },
  "conceitos": {
   "embedding": [
@@ -130,10 +131,7 @@
  "presets": {
   "realeza": [
    "realeza",
-   "rei e rainha",
-   "reis e rainhas",
    "genero",
-   "homem e mulher",
    "royal"
   ],
   "capitais": [
@@ -146,25 +144,21 @@
   "plural": [
    "plural",
    "plurais",
-   "singular e plural",
-   "gato e gatos"
+   "singular e plural"
   ],
   "familia": [
    "familia",
    "parentes",
-   "pai e mae",
    "parentesco"
   ],
   "cores": [
    "cores",
-   "cor",
-   "vermelho azul verde"
+   "cor"
   ],
   "numeros": [
    "numeros",
    "numerais",
    "um a dez",
-   "um dois tres",
    "contagem"
   ],
   "lideres": [
