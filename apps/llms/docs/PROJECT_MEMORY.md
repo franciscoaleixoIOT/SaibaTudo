@@ -44,6 +44,10 @@ Guia do app: `../CLAUDE.md`. Plano e spec do S1 na raiz do repositório (`docs/s
 - A ferramenta de shell mutila barras invertidas em heredocs: scripts com regex vão para arquivo e são executados.
 - `replaceChildren(null)` cria um nó de texto "null": filtrar os ramos condicionais.
 - O upload ao HF Hub pode cair num 500 do servidor no meio: repetir `publicar.py` (idempotente).
+- **CRLF quebra assinatura (26/10):** o `manifest.json` gravado no Windows saía com CRLF e era assinado assim; o Git normalizava para LF e o CI no
+  Ubuntu rejeitava a assinatura (primeiro CI da main vermelho). Correção: pipeline grava LF (`newline='
+'`), `.gitattributes` com `-text` para o
+  pacote e a fixture, manifestos re-assinados; deploy 3 com o pacote LF. Regra: bytes assinados nunca passam por conversão de fim de linha.
 - A fixture de 360 palavras esconde o que o vocabulário real faz: o GloVe de 100 mil tem "rei", "gato", "sources", "tan"… Rodar o golden também sobre
   `data/llms` (o teste faz isso sozinho quando o pacote existe).
 - O e2e persiste o idioma salvo entre cenários (`?lang=zh` → próximo cenário em zh): cada cenário com perguntas em português abre com `?lang=pt-BR`.
