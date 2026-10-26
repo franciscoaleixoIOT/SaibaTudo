@@ -32,6 +32,12 @@
 - Resposta rejeitada pelo verificador: o app mostra o aviso e mantém a resposta local; o log tem só `rejected_<motivo>`.
 - Pacote inválido no ar: o app avisa e desliga o explorador; republicar com o pacote correto.
 
+### Limites aceitos do verificador (S1)
+O verificador (`api/_lib/fidelidade.js`) desconta só a frase do rodapé e confere TODO o resto (antes e depois): números fora do enviado, escrita
+(Han) e dado pessoal. Ficam de fora, por decisão do S1: número por extenso ("noventa e sete centésimos"), dígito único ("dimensão 7"), corpo em
+outro idioma latino com o rodapé certo e resposta zh com um único caractere Han. O cliente mostra o texto sempre rotulado com o modelo, abaixo da
+resposta local, que permanece.
+
 ## 5. Domínio e home (27/10/2026)
 Branch `llms-dominio`: três rewrites `/llms*` e três `/zh*` em `apps/eleicoes2026/vercel.json`, exclusão `/llms/` em `portal/src/sw.js`, cartão fixo
 do app em `portal/src/index.html` + catálogos (6, com `zh.js`), `IDIOMAS` do portal com `zh`, `tests/rotas.test.mjs`. Depois do merge:

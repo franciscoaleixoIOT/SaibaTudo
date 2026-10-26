@@ -237,7 +237,10 @@ export default {
   "vecinas",
   "similares",
   "es",
-  "esta"
+  "esta",
+  "tan",
+  "cerca",
+  "cerca de"
  ],
  "semFronteira": false,
  "normalizarAcentos": true

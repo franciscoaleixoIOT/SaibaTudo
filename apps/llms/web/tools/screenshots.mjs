@@ -45,9 +45,18 @@ let seq = 0;
 const pend = new Map();
 const problemas = [];
 let contexto = '';
+let respostaNuvemMock = null; // { atrasoMs, corpo }: quando definido, /llms/api/ask é respondido aqui (Fetch.fulfillRequest)
 ws.addEventListener('message', (m) => {
   const d = JSON.parse(m.data);
   if (d.id && pend.has(d.id)) { const { ok, err } = pend.get(d.id); pend.delete(d.id); d.error ? err(new Error(d.error.message)) : ok(d.result); return; }
+  if (d.method === 'Fetch.requestPaused') {
+    const { requestId, request } = d.params;
+    if (respostaNuvemMock && /\/llms\/api\/ask/.test(request.url) && request.method === 'POST') {
+      const corpo = Buffer.from(JSON.stringify(respostaNuvemMock.corpo)).toString('base64');
+      setTimeout(() => cdp('Fetch.fulfillRequest', { requestId, responseCode: 200, responseHeaders: [{ name: 'Content-Type', value: 'application/json' }], body: corpo }).catch(() => {}), respostaNuvemMock.atrasoMs);
+    } else cdp('Fetch.continueRequest', { requestId }).catch(() => {});
+    return;
+  }
   if (d.method === 'Runtime.exceptionThrown') problemas.push(`[${contexto}] exceção: ${d.params.exceptionDetails.exception?.description ?? d.params.exceptionDetails.text}`);
   if (d.method === 'Runtime.consoleAPICalled' && ['error', 'assert'].includes(d.params.type)) problemas.push(`[${contexto}] console.${d.params.type}: ${d.params.args.map((a) => a.value ?? a.description).join(' ')}`);
   // o /llms/api/ask não existe no servidor local: o 404 esperado do botão da nuvem não é problema
@@ -95,7 +104,7 @@ const chipsDoGrafico = () => avaliar("[...document.querySelectorAll('.chip-duplo
 
 const CENARIOS = {
   async inicio(p) {
-    await abrir('/llms/', "document.querySelector('#pergunta') && document.querySelector('canvas.cena3d')");
+    await abrir('/llms/?lang=pt-BR', "document.querySelector('#pergunta') && document.querySelector('canvas.cena3d')"); // o idioma salvo por outro cenário (zh/de/en) não pode mudar as perguntas em português
     await foto(`${p}-inicio`);
     await perguntar('mostre king, queen, man e woman');
     const chips = await chipsDoGrafico();
@@ -105,11 +114,43 @@ const CENARIOS = {
     await perguntar('king - man + woman', "document.querySelector('.cartao-resposta .lista-pontos li')");
     if (!(await texto('.cartao-resposta')).includes('queen')) throw new Error('analogia sem queen');
     await foto(`${p}-resposta-analogia`);
+    await perguntar('vizinhos de king', "document.querySelector('#titulo-resposta')?.textContent.includes('king')");
+    const cartaoVizinhos = await texto('.cartao-resposta');
+    if (!(await avaliar("!!document.querySelector('.cartao-resposta .lista-pontos li')"))) throw new Error(`vizinhos sem lista: ${cartaoVizinhos.slice(0, 300)}`);
+    await esperar("document.querySelector('.explorador-painel .bloco .lista-vizinhos li')", 5000); // a ação destacar do assistente acende os vizinhos no explorador
     await perguntar('o que é um token?');
     if (!(await avaliar("!!document.querySelector('.cartao-resposta a[href=\"/llms/aprenda/tokens\"]')"))) throw new Error('conceito sem o botão Abrir');
     await perguntar('xqzv blorpt');
     if (!(await avaliar("document.querySelectorAll('.cartao-resposta .chips button').length >= 1"))) throw new Error('não entendi sem sugestões');
     await foto(`${p}-nao-entendi`);
+  },
+  async nuvem(p) {
+    await abrir('/llms/?lang=pt-BR', "document.querySelector('#pergunta') && document.querySelector('canvas.cena3d')"); // o idioma salvo por outro cenário (zh/de/en) não pode mudar as perguntas em português
+    await cdp('Fetch.enable', { patterns: [{ urlPattern: '*/llms/api/ask*', requestStage: 'Request' }] });
+    const botaoNuvem = "[...document.querySelectorAll('.cartao-resposta .resposta-acoes button')].find((b) => /nuvem|cloud/i.test(b.textContent)).click()";
+    try {
+      // caminho feliz: a resposta gerada entra na mesma resposta, rotulada com o modelo
+      respostaNuvemMock = { atrasoMs: 300, corpo: { ok: true, answer: 'MARCADOR_NUVEM_UM texto gerado por IA, pode conter erros.', model: 'modelo-teste' } };
+      await perguntar('mostre man');
+      await avaliar(botaoNuvem);
+      await esperar("document.querySelector('dialog.dialogo[open]')");
+      await avaliar("document.querySelector('dialog.dialogo form .btn-primario').click()");
+      await esperar("document.querySelector('.cartao-resposta').innerText.includes('MARCADOR_NUVEM_UM')");
+      if (!(await texto('.cartao-resposta')).includes('modelo-teste')) throw new Error('texto gerado sem o nome do modelo');
+      await foto(`${p}-nuvem-resposta`);
+      // corrida: segunda pergunta enquanto a nuvem da primeira ainda responde → o texto gerado NÃO pode cair sob a segunda
+      respostaNuvemMock = { atrasoMs: 2500, corpo: { ok: true, answer: 'MARCADOR_NUVEM_DOIS texto gerado por IA, pode conter erros.', model: 'modelo-teste' } };
+      await perguntar('mostre king');
+      await avaliar(botaoNuvem);
+      await esperar("document.querySelector('dialog.dialogo[open]')");
+      await avaliar("document.querySelector('dialog.dialogo form .btn-primario').click()");
+      await perguntar('mostre queen');
+      await dormir(3500);
+      const txt = await texto('.cartao-resposta');
+      if (txt.includes('MARCADOR_NUVEM_DOIS')) throw new Error('texto da nuvem da 1ª pergunta apareceu sob a 2ª resposta');
+      if (!txt.includes('queen')) throw new Error('2ª resposta não está no cartão');
+      await foto(`${p}-nuvem-corrida`);
+    } finally { respostaNuvemMock = null; await cdp('Fetch.disable'); }
   },
   async explorador(p) {
     await abrir('/llms/?palavras=king,queen,man,woman', "document.querySelectorAll('.chip-duplo').length === 4");

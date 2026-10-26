@@ -40,6 +40,7 @@ export function responder(parsed, { vetores, estado, idioma }) {
   const traduzidas = parsed.palavras.filter((p) => p.traduzida).map((p) => `${p.original} → ${p.en}`);
   const avisosPalavras = [];
   if (traduzidas.length) avisosPalavras.push({ tipo: 'texto', texto: t('respostas.mostrar.traduzidas', { lista: juntar(traduzidas) }) });
+  if (parsed.normalizadas?.length) avisosPalavras.push({ tipo: 'texto', texto: t('respostas.mostrar.normalizadas', { lista: juntar(parsed.normalizadas.map((x) => `${x.de} → ${x.para}`)) }) });
   if (parsed.desconhecidas.length) avisosPalavras.push({ tipo: 'aviso', texto: t('respostas.mostrar.desconhecidas', { lista: juntar(parsed.desconhecidas) }) });
   const fim = (r) => ({ ...base, ...r, sugestoes: sugestoesPara(parsed.intencao, parsed, vetores) });
 
@@ -63,10 +64,12 @@ export function responder(parsed, { vetores, estado, idioma }) {
     case 'ANALOGIA': {
       const { a, b, c } = parsed.analogia;
       const r = vetores.analogia(idx(a), idx(b), idx(c), 5);
+      // analogia digitada com palavra do preset "líderes": a nota histórica acompanha, como no preset
+      const notaLideres = [a, b, c].some((w) => (vetores.presets?.lideres ?? []).includes(w)) ? [{ tipo: 'texto', texto: t('ui.presets.lideres.nota') }] : [];
       return fim({ titulo: t('respostas.analogia.titulo'), blocos: [
         { tipo: 'texto', texto: t('respostas.analogia.texto', { a, b, c }) },
         { tipo: 'lista', itens: r.resultados.map((x) => t('respostas.analogia.item', { palavra: x.palavra, cos: fmtNumero(x.cos, COS) })) },
-        { tipo: 'texto', texto: t('respostas.analogia.explicacao') }, ...avisosPalavras],
+        { tipo: 'texto', texto: t('respostas.analogia.explicacao') }, ...notaLideres, ...avisosPalavras],
       acoes: [{ tipo: 'analogia', a: idx(a), b: idx(b), c: idx(c) }] });
     }
     case 'DIRECAO': {

@@ -39,6 +39,12 @@ test('rejeita sem rodapé do idioma; aceita o rodapé com maiúsculas e no fim',
   assert.equal(verificarFidelidade(comRodape('The chart shows king and queen.', 'pt-BR'), dados({ lang: 'en' })).motivo, 'rodape', 'rodapé de outro idioma não vale');
 });
 
+test('o que vem depois do rodapé também é verificado: número fora do permitido ou escrita errada reprovam', () => {
+  assert.deepEqual(verificarFidelidade('Explicação do gráfico. texto gerado por IA, pode conter erros. O cosseno é 0.97 e há 42 dimensões.', dados()), { ok: false, motivo: 'numero' });
+  assert.deepEqual(verificarFidelidade('Explicação do gráfico. texto gerado por IA, pode conter erros.\nO cosseno 0,87 está no contexto.', dados()), { ok: true }, 'número permitido depois do rodapé passa');
+  assert.deepEqual(verificarFidelidade('O gráfico mostra king. texto gerado por IA, pode conter erros. 你好世界再见朋友', dados()), { ok: false, motivo: 'escrita' });
+});
+
 test('escrita do idioma: zh exige caracteres Han; outro idioma com 5+ Han é rejeitado', () => {
   assert.deepEqual(verificarFidelidade(`图表显示 king 和 queen，余弦 0.87。${RODAPES.zh}`, dados({ lang: 'zh' })), { ok: true });
   assert.deepEqual(verificarFidelidade(`The chart shows king and queen. ${RODAPES.zh}`, dados({ lang: 'zh' })), { ok: false, motivo: 'escrita' });

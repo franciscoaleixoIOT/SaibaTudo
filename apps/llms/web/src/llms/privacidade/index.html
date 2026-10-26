@@ -57,7 +57,7 @@
     <h2>7. Compartilhamento e operadores</h2>
     <p><strong>Vercel</strong> (hospedagem do site e da função que encaminha a pergunta) e <strong>Hugging Face</strong> (servidor onde o modelo roda, nos EUA) atuam como operadores, apenas para executar o que você pediu. Ao “Relatar problema”, você abre uma issue pública no <strong>GitHub</strong> com a pergunta no título; nada é enviado sem você confirmar lá.</p>
     <h2>8. Retenção</h2>
-    <p>Não guardamos o texto das perguntas nem as respostas. O servidor mantém, por até 1 hora, um cache da resposta associado a um resumo irreversível (hash) da pergunta, sem identificação. Métricas técnicas (tempo, status, erro) ficam em logs sem o texto. O código da instalação só existe no seu aparelho e serve ao limite de uso por dia.</p>
+    <p>Não guardamos o texto das perguntas. A resposta gerada fica por até 1 hora num cache em memória do servidor, sob um resumo irreversível (hash SHA-256) da pergunta, do idioma, do contexto e dos trechos, sem identificação: perguntas iguais recebem a mesma resposta sem chamar o modelo de novo. Métricas técnicas (tempo, status, erro) ficam em logs sem o texto. O código da instalação (UUID) viaja com a pergunta e serve, junto com o endereço IP, só ao limite de uso (por minuto e por dia); o servidor guarda apenas um resumo dele, nunca o código em claro.</p>
     <h2>9. Seus direitos</h2>
     <p>Como quase nada é coletado, a maioria dos direitos se exerce no próprio aparelho (apagar dados, desligar a nuvem). Para qualquer pedido ou dúvida: <a href="mailto:saibatudo@saibatudo.net">saibatudo@saibatudo.net</a>.</p>
     <h2>10. Crianças</h2>

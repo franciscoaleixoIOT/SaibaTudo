@@ -243,6 +243,17 @@ export class Vetores {
   sugerirTraduzindo(texto, idioma) {
     const p = normalizarPalavra(texto);
     if (!p || this._indice.has(p)) return null;
+    const tr = this.traduzir(p, idioma);
+    return tr ? { en: tr.en, traduzida: true } : null;
+  }
+
+  /**
+   * Tradução pelo glossário do idioma, mesmo quando o texto também é uma palavra do GloVe (o GloVe de 100 mil tem "rei", "gato", "azul"…):
+   * { en } ou null. Quem decide a prioridade é o interpretador (nlu.js).
+   */
+  traduzir(texto, idioma) {
+    const p = normalizarPalavra(texto);
+    if (!p) return null;
     if (!this._glossarioInverso) {
       this._glossarioInverso = new Map();
       for (const [en, trad] of Object.entries(this.glossario)) {
@@ -253,6 +264,6 @@ export class Vetores {
       }
     }
     const en = this._glossarioInverso.get(`${idioma}|${p}`);
-    return en && this._indice.has(en) ? { en, traduzida: true } : null;
+    return en && this._indice.has(en) ? { en } : null;
   }
 }

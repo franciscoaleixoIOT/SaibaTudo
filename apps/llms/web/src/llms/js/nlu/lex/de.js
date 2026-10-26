@@ -239,7 +239,8 @@ export default {
   "ihn",
   "ihr",
   "uber",
-  "aus"
+  "aus",
+  "ins"
  ],
  "semFronteira": false,
  "normalizarAcentos": true

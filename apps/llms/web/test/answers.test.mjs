@@ -84,6 +84,17 @@ test('DESCONHECIDA: ecoa a pergunta, sugere palavras próximas e traz chips; SAU
   assert.ok(textos(R('fontes')).includes('GloVe'));
 });
 
+test('aviso de normalização (Rei → rei) e nota histórica na analogia digitada com palavra do preset líderes', () => {
+  const r = R('mostre Rei e Rainha');
+  assert.ok(textos(r).includes('Rei → rei') && textos(r).includes('Rainha → rainha'), textos(r));
+  assert.ok(textos(r).includes(t('respostas.mostrar.normalizadas', { lista: 'Rei → rei, Rainha → rainha' })));
+  assert.ok(!textos(R('mostre rei e rainha')).includes('→ rei'), 'sem maiúsculas, sem aviso');
+  const a = R('italy - germany + hitler', 'en');
+  assert.equal(a.intencao, 'ANALOGIA');
+  assert.ok(textos(a).includes(t('ui.presets.lideres.nota')), 'nota histórica na analogia digitada');
+  assert.ok(!textos(R('king - man + woman', 'en')).includes(t('ui.presets.lideres.nota')));
+});
+
 test('rotuloOrigem: montada no aparelho com a data dos dados; texto gerado nomeia o modelo', () => {
   definirIdioma('pt-BR');
   const local = rotuloOrigem({ origem: 'LOCAL', dadosDe: '2026-10-25T16:30:06Z' });

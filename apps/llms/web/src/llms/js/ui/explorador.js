@@ -201,7 +201,7 @@ export function montarExplorador({ vetores, estado, aoMudar }) {
     } catch { /* sem history */ }
   }
 
-  /** Ações vindas do assistente (answers.js): adicionar, analogia, direcao, preset, limpar. */
+  /** Ações vindas do assistente (answers.js): adicionar, analogia, direcao, preset, limpar, modo (destacar: ver `destacar`). */
   function aplicarAcao(acao) {
     switch (acao?.tipo) {
       case 'adicionar': { const r = adicionar(atual, acao.indices ?? []); if (r.recusadas.length) toast(t('ui.explorador.avisoLimite', { n: MAX_PALAVRAS })); emitir(r.estado); break; }
@@ -214,6 +214,12 @@ export function montarExplorador({ vetores, estado, aoMudar }) {
     }
   }
 
+  /** Destaca (ou tira o destaque de) uma palavra pelo índice no vocabulário: acende o ponto na cena e o painel de vizinhos. */
+  function destacar(indice) {
+    const k = atual.palavras.indexOf(indice);
+    destacarPonto(k < 0 ? null : k);
+  }
+
   atualizar(estado);
-  return { node, atualizar, aplicarAcao, destruir: () => cena.destruir() };
+  return { node, atualizar, aplicarAcao, destacar, destruir: () => cena.destruir() };
 }

@@ -10,59 +10,72 @@ const HAN = /[一-鿿]+/g;
 const FORMULA_ANALOGIA = /([a-z'-]+)\s*[-−–]\s*([a-z'-]+)\s*\+\s*([a-z'-]+)/;
 const FORMULA_DIRECAO = /^\s*([a-z'-]+)\s*[-−–]\s*([a-z'-]+)\s*[?!.]*\s*$/;
 
-/** Resolve um token no vocabulário ou no glossário do idioma: {en, original, traduzida} ou null. */
+/**
+ * Resolve um token: primeiro o glossário do idioma da interface (fora do inglês), depois o vocabulário. O GloVe de 100 mil palavras contém
+ * "rei", "gato", "azul", "roi", "rey"…: quem escreve em português quer king, não o token "rei" do corpus inglês. {en, original, traduzida} ou null.
+ */
 function resolverToken(tok, vetores, idioma) {
+  const trad = idioma !== 'en' ? vetores.traduzir(tok, idioma) : null;
+  if (trad && trad.en !== tok) return { en: trad.en, original: tok, traduzida: true };
   const i = vetores.indice(tok);
   if (i >= 0) return { en: vetores.palavra(i), original: tok, traduzida: false };
-  const trad = vetores.sugerirTraduzindo(tok, idioma);
-  return trad ? { en: trad.en, original: tok, traduzida: true } : null;
+  return null;
 }
 
-/** Sequências Han: tenta a sequência inteira no glossário e, se falhar, pedaços de 1 a 4 caracteres (ganancioso da esquerda). */
-function tokensHan(run, vetores, idioma) {
+/**
+ * Sequências Han (sem fronteira de palavra): em cada posição, o termo mais longo do glossário (até 6 caracteres) concorre com a stopPalavra mais
+ * longa que começa ali; o glossário só ganha se for MAIS longo (和平 vence 和; 埃及 vence 及; 词 empata com 词 e continua stopPalavra, como
+ * "palavra" em português). Ganancioso da esquerda.
+ */
+function tokensHan(run, vetores, idioma, stopsHan) {
   const saida = [];
-  const inteiro = resolverToken(run, vetores, idioma);
-  if (inteiro) return [inteiro];
   let i = 0;
   while (i < run.length) {
-    let achou = null;
-    for (let n = Math.min(4, run.length - i); n >= 1; n--) {
+    let g = null;
+    for (let n = Math.min(6, run.length - i); n >= 1; n--) {
       const r = resolverToken(run.slice(i, i + n), vetores, idioma);
-      if (r) { achou = r; i += n; break; }
+      if (r) { g = { r, n }; break; }
     }
-    if (achou) saida.push(achou); else i += 1;
+    const s = stopsHan.find((sp) => run.startsWith(sp, i));
+    if (s && (!g || g.n <= s.length)) { i += s.length; continue; }
+    if (g) { saida.push(g.r); i += g.n; } else i += 1;
   }
   return saida;
 }
 
+const TOKEN_BRUTO = /[\p{L}][\p{L}'-]*/gu;
+
 /**
  * Palavras do GloVe citadas no texto: entre aspas (valem mesmo sendo stopPalavras) e tokens latinos fora das stopPalavras; em chinês também
- * as sequências Han pelo glossário. Devolve { palavras: [{en, original, traduzida}], desconhecidas: [] } sem repetição (por `en`).
+ * as sequências Han pelo glossário. Um token com inicial maiúscula fora do começo do texto ("São Paulo") também escapa das stopPalavras.
+ * Devolve { palavras: [{en, original, traduzida}], desconhecidas: [], normalizadas: [{de, para}] } sem repetição (por `en`); `normalizadas`
+ * lista o que mudou ao tirar maiúsculas e acentos (o GloVe só tem minúsculas sem acento), para o app avisar.
  */
 export function extrairPalavras(texto, lex, vetores, idioma) {
   const norm = normalizarParaLexico(texto, lex);
-  const palavras = []; const desconhecidas = []; const vistos = new Set();
+  const palavras = []; const desconhecidas = []; const normalizadas = []; const vistos = new Set();
   const empurrar = (r) => { if (r && !vistos.has(r.en)) { vistos.add(r.en); palavras.push(r); } };
   const aspas = new RegExp(lex.pistas.aspas.source, 'g');
   const citadas = new Set();
   for (const m of norm.matchAll(aspas)) for (const tok of m[1].split(/\s+/).filter(Boolean)) citadas.add(tok);
-  const candidatos = [];
-  for (const m of norm.matchAll(LATINA)) candidatos.push(m[0]);
-  for (const tok of candidatos) {
-    const citado = citadas.has(tok);
+  const latina = new RegExp(`^${LATINA.source}$`);
+  for (const m of String(texto ?? '').matchAll(TOKEN_BRUTO)) {
+    const bruto = m[0]; const tok = normalizarParaLexico(bruto, lex);
+    if (!latina.test(tok)) continue;
+    const maiuscula = m.index > 0 && bruto[0] !== bruto[0].toLowerCase();
+    const citado = citadas.has(tok) || maiuscula;
     if (!citado && (lex.stopPalavras.has(tok) || tok.length < 2)) continue;
     const r = resolverToken(tok, vetores, idioma);
-    if (r) empurrar(r); else if (!desconhecidas.includes(tok)) desconhecidas.push(tok);
+    if (r) {
+      empurrar(r);
+      if (bruto !== tok && !normalizadas.some((x) => x.de === bruto)) normalizadas.push({ de: bruto, para: tok });
+    } else if (!desconhecidas.includes(tok)) desconhecidas.push(tok);
   }
   if (lex.semFronteira) {
-    for (const m of norm.matchAll(HAN)) {
-      // tira as stopPalavras Han (de, 和…) das pontas antes de procurar
-      let run = m[0];
-      for (const sp of lex.stopPalavras) { if (sp && /[一-鿿]/.test(sp)) run = run.split(sp).join(' '); }
-      for (const pedaco of run.split(' ').filter(Boolean)) for (const r of tokensHan(pedaco, vetores, idioma)) empurrar(r);
-    }
+    const stopsHan = [...lex.stopPalavras].filter((sp) => /[一-鿿]/.test(sp)).sort((a, b) => b.length - a.length);
+    for (const m of norm.matchAll(HAN)) for (const r of tokensHan(m[0], vetores, idioma, stopsHan)) empurrar(r);
   }
-  return { palavras, desconhecidas };
+  return { palavras, desconhecidas, normalizadas };
 }
 
 const contem = (norm, termos) => {
@@ -94,22 +107,24 @@ const contarPalavras = (norm, lex) => (lex.semFronteira ? norm.replace(/\s+/g, '
 
 /**
  * Interpreta a pergunta.
- * @returns {{ intencao: string, palavras: {en, original, traduzida}[], desconhecidas: string[], analogia: {a,b,c}|null, direcao: {w1,w2}|null, preset: string|null, conceito: string|null, continuacao: boolean }}
+ * @returns {{ intencao: string, palavras: {en, original, traduzida}[], desconhecidas: string[], normalizadas: {de, para}[], analogia: {a,b,c}|null, direcao: {w1,w2}|null, preset: string|null, conceito: string|null, continuacao: boolean }}
  */
 export function parse(pergunta, lex, { vetores, idioma, contexto = null }) {
   const norm = normalizarParaLexico(pergunta, lex);
-  const base = { intencao: 'DESCONHECIDA', original: String(pergunta ?? '').trim(), palavras: [], desconhecidas: [], analogia: null, direcao: null, preset: null, conceito: null, continuacao: false };
+  const base = { intencao: 'DESCONHECIDA', original: String(pergunta ?? '').trim(), palavras: [], desconhecidas: [], normalizadas: [], analogia: null, direcao: null, preset: null, conceito: null, continuacao: false };
   if (!norm) return base;
   const I = lex.intencoes; const Pi = lex.pistas;
-  const { palavras, desconhecidas } = extrairPalavras(pergunta, lex, vetores, idioma);
-  const r = { ...base, palavras, desconhecidas };
+  const { palavras, desconhecidas, normalizadas } = extrairPalavras(pergunta, lex, vetores, idioma);
+  const r = { ...base, palavras, desconhecidas, normalizadas };
   const en = (tok) => resolverToken(tok, vetores, idioma)?.en ?? null;
 
   const conceito = conceitoDe(norm, lex);
   if (I.saudacao.test(norm)) return { ...r, intencao: 'SAUDACAO' };
   if (I.ajuda.test(norm) && !conceito) return { ...r, intencao: 'AJUDA' };
   if (I.sobreDados.test(norm)) return { ...r, intencao: 'SOBRE_DADOS' };
-  if (I.fontes.test(norm) && !palavras.length) return { ...r, intencao: 'FONTES' };
+  // fontes: as palavras achadas têm de estar dentro do próprio termo ("sources", "fontes" e "références" existem no GloVe)
+  const mf = I.fontes.exec(norm);
+  if (mf && palavras.every((p) => mf[0].includes(normalizarParaLexico(p.original, lex)))) return { ...r, intencao: 'FONTES' };
   if (I.limpar.test(norm) && !FORMULA_ANALOGIA.test(norm)) return { ...r, intencao: 'LIMPAR' };
 
   // analogia por fórmula ("king - man + woman") ou por "a está para b como c está para"

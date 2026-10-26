@@ -17,6 +17,7 @@ export function createSlidingWindow({ windowMs, maxKeys = 5000, now = Date.now }
   if (!(windowMs > 0)) throw new Error('windowMs inválido');
   /** @type {Map<string, number[]>} */
   const store = new Map();
+  const chaves = () => [...store.keys()];
 
   function podar(chave, t) {
     const arr = store.get(chave);

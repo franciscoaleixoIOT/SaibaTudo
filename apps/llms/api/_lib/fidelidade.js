@@ -1,6 +1,6 @@
 // Verificador de FIDELIDADE do texto gerado (/api/ask): o modelo explica, os dados respondem. A resposta é REJEITADA quando:
 //   (a) traz um número (2 ou mais dígitos, ou decimal) que não está na pergunta, no contexto do gráfico nem nos trechos enviados;
-//   (b) não termina com o rodapé do idioma ("texto gerado por IA…"), que o prompt exige;
+//   (b) não traz o rodapé do idioma ("texto gerado por IA…"), que o prompt exige; a frase do rodapé é descontada e TODO o resto (antes e depois) é verificado;
 //   (c) está na escrita errada: zh pedido sem caracteres Han, ou outro idioma com 5+ caracteres Han;
 //   (d) contém dado pessoal aparente (e-mail, telefone, documento, URL…);
 //   (e) passa de MAX_RESPOSTA caracteres.
@@ -63,8 +63,12 @@ export function verificarFidelidade(resposta, dados) {
   const texto = String(resposta ?? '').trim();
   if (!texto || texto.length > MAX_RESPOSTA) return { ok: false, motivo: 'tamanho' };
   const rodape = RODAPES[dados.lang] ?? RODAPES['pt-BR'];
-  if (!texto.toLowerCase().includes(rodape.toLowerCase())) return { ok: false, motivo: 'rodape' };
-  const corpo = texto.slice(0, texto.toLowerCase().lastIndexOf(rodape.toLowerCase()));
+  const inicioRodape = texto.toLowerCase().lastIndexOf(rodape.toLowerCase());
+  if (inicioRodape < 0) return { ok: false, motivo: 'rodape' };
+  // desconta só a FRASE do rodapé (até o fim da frase ou da linha); o que vem antes e depois dela é o corpo verificado
+  const depois = texto.slice(inicioRodape + rodape.length);
+  const fimFrase = depois.search(/[.。!！?？\n]/);
+  const corpo = `${texto.slice(0, inicioRodape)} ${fimFrase < 0 ? '' : depois.slice(fimFrase + 1)}`;
   const han = (corpo.match(HAN) ?? []).length; // conta só o corpo: o rodapé em zh tem caracteres Han por definição
   if (dados.lang === 'zh' ? han === 0 : han >= 5) return { ok: false, motivo: 'escrita' };
   if (temDadoPessoal(texto)) return { ok: false, motivo: 'dadopessoal' };

@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createAskHandler, createAskState, lerSseGradio } from '../_lib/ask-handler.js';
 import { RODAPES } from '../_lib/fidelidade.js';
-import { capturarLog, mkRequest, novoIid, relogio } from './_helpers.mjs';
+import { capturarLog, mkRequest, novoIid, relogio, IID_V4 } from './_helpers.mjs';
 
 const ENV = Object.freeze({ ASK_ENABLED: '1', HF_ASK_SPACE_URL: 'https://x-saibatudo-llms.hf.space', HF_TOKEN: 'hf_teste', ASK_MODEL_VERSION: 'qwen3-4b-base', HF_ASK_DAILY_BUDGET: '100' });
 const corpo = (extra = {}) => ({ q: 'o que mostra o gráfico?', lang: 'pt-BR', context: 'palavras: king, queen; cosseno 0.87', trechos: [{ id: 'pt-BR:embeddings', texto: 'Vetores de 50 números.' }], v: 1, client: 'web', iid: novoIid(), ...extra });
@@ -27,6 +27,19 @@ const montar = (fetch, env = ENV) => {
   const handle = createAskHandler({ env: () => env, fetch, now, log, state: createAskState({ now }) });
   return { handle, eventos, now };
 };
+
+test('cache e limitador não guardam a pergunta nem o iid em claro: chaves são resumos (hash)', async () => {
+  const now = relogio();
+  const { log } = capturarLog();
+  const state = createAskState({ now });
+  const handle = createAskHandler({ env: () => ENV, fetch: spaceFalso(`O gráfico mostra king. ${RODAPES['pt-BR']}.`).fetch, now, log, state });
+  const r = await handle(post(corpo({ q: 'palavra secreta xyzzy no gráfico', iid: IID_V4 })));
+  assert.equal(r.status, 200);
+  const chaves = [...state.cache.keys()];
+  assert.equal(chaves.length, 1);
+  assert.ok(!/xyzzy|secreta/.test(chaves[0]) && /^ask\|[0-9a-f]{64}$/.test(chaves[0]), chaves[0]);
+  assert.ok(!JSON.stringify(state.iidWindow.chaves?.() ?? []).includes(IID_V4), 'iid em claro no limitador');
+});
 
 test('lerSseGradio: pega o último evento complete/error', () => {
   assert.deepEqual(lerSseGradio('event: heartbeat\ndata: 1\n\nevent: complete\ndata: [1]\n'), { evento: 'complete', dado: '[1]' });

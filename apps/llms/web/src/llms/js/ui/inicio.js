@@ -121,7 +121,8 @@ export function viewInicio({ vetores, query, navegar }) {
       ultima = { pergunta: q, resposta: r, parsed };
       aplicarAcoes(r.acoes, { navegar });
       renderResposta();
-      ganchos.aoResponder?.({ ultima, vetores, estado: estadoExplorador, respostaEl, renderResposta, acrescentar: (campos) => { if (ultima) { Object.assign(ultima.resposta, campos); renderResposta(); } } });
+      const alvo = ultima; // a nuvem pode responder depois de outra pergunta: só anexa se a resposta exibida ainda for esta
+      ganchos.aoResponder?.({ ultima, vetores, estado: estadoExplorador, respostaEl, renderResposta, acrescentar: (campos) => { if (ultima === alvo) { Object.assign(ultima.resposta, campos); renderResposta(); } } });
       requestAnimationFrame(() => { respostaEl.querySelector('#titulo-resposta')?.focus({ preventScroll: false }); anunciar(r.titulo); });
     } finally {
       processando = false; spinner.hidden = true; atualizarBotoes();

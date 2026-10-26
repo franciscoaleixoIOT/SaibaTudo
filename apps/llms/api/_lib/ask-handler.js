@@ -1,6 +1,7 @@
 // Núcleo do POST /api/ask (Request/Response padrão): explicação gerada, ANCORADA no contexto do gráfico e nos trechos das seções que o app
 // enviou. Provedor único no S1: Space privado do Hugging Face (ZeroGPU). A resposta só sai se passar no verificador (fidelidade.js).
 // O TEXTO DA PERGUNTA E A RESPOSTA NUNCA SÃO REGISTRADOS em log. Porte do ask-handler.js da química, sem Modal e sem segurança química.
+import { createHash } from 'node:crypto';
 import { askAtivo, readConfig } from './config.js';
 import { createSharedLimiter, orcamentoComCompartilhado } from './compartilhado.js';
 import { temDadoPessoal } from './dadopessoal.js';
@@ -17,6 +18,8 @@ export function defaultLog(evento) {
 }
 
 /** Estado em memória da instância (limitadores, orçamento, cache, requisições em andamento). */
+const resumo = (texto) => createHash('sha256').update(String(texto)).digest('hex');
+
 export function createAskState({ now = Date.now, cacheMax = 500, cacheTtlMs = 3600_000, shared = null } = {}) {
   const compartilhado = shared ?? createSharedLimiter({ now });
   return {
@@ -115,15 +118,16 @@ export function createAskHandler(deps = {}) {
     // --- rate limit (IP por minuto e iid por dia), local e depois compartilhado (Redis opcional; falha aberto)
     const ip = clientIp(request);
     const porIp = state.ipWindow.check(ip, cfg.rateIpPerMin);
-    const porIid = state.iidWindow.check(iid, cfg.rateIidPerDay);
+    const iidResumo = resumo(iid).slice(0, 32); // o UUID da instalação nunca é guardado em claro (memória ou Redis)
+    const porIid = state.iidWindow.check(iidResumo, cfg.rateIidPerDay);
     if (!porIp.allowed || !porIid.allowed) {
       meta.err = 'rate_limited';
       return responder(429, { ok: false, error: 'rate_limited' }, { 'Retry-After': String(Math.ceil(Math.max(porIp.retryAfterMs, porIid.retryAfterMs) / 1000)) });
     }
     state.ipWindow.record(ip);
-    state.iidWindow.record(iid);
+    state.iidWindow.record(iidResumo);
     const globalIp = await state.shared.hit(`ask:ip:${ip}`, 60, cfg.rateIpPerMin);
-    const globalIid = globalIp.allowed ? await state.shared.hit(`ask:iid:${iid}`, 86400, cfg.rateIidPerDay) : globalIp;
+    const globalIid = globalIp.allowed ? await state.shared.hit(`ask:iid:${iidResumo}`, 86400, cfg.rateIidPerDay) : globalIp;
     if (!globalIp.allowed || !globalIid.allowed) {
       meta.err = 'rate_limited';
       return responder(429, { ok: false, error: 'rate_limited' }, { 'Retry-After': String(Math.ceil(Math.max(globalIp.retryAfterMs, globalIid.retryAfterMs) / 1000)) });
@@ -132,9 +136,9 @@ export function createAskHandler(deps = {}) {
     // --- dado pessoal na pergunta: nunca chega ao modelo (nem ao log)
     if (temDadoPessoal(q)) { meta.err = 'dadopessoal'; return responder(422, { ok: false, error: 'dadopessoal' }); }
 
-    // --- cache (a chave inclui a versão do modelo, o idioma, o contexto e os trechos)
+    // --- cache: a chave é um resumo SHA-256 de versão do modelo + idioma + pergunta normalizada + contexto + trechos (nada em claro)
     const ids = trechos.map((t) => t.id).join(',');
-    const chave = `ask|${cfg.askModelVersion}|${lang}|${normalizeQuestion(q)}|${normalizeQuestion(context)}|${ids}|${normalizeQuestion(trechos.map((t) => t.texto).join(' '))}`;
+    const chave = `ask|${resumo(`${cfg.askModelVersion}|${lang}|${normalizeQuestion(q)}|${normalizeQuestion(context)}|${ids}|${normalizeQuestion(trechos.map((t) => t.texto).join(' '))}`)}`;
     const emCache = state.cache.get(chave);
     if (emCache) { meta.cache = 'hit'; return responder(200, { ok: true, answer: emCache.answer, model: emCache.model, cached: true }); }
     meta.cache = 'miss';

@@ -88,6 +88,11 @@ test('sugerir: prefixo ("kin" → king primeiro), aproximação ("quenn" → que
   assert.deepEqual(V.sugerirTraduzindo('König', 'de'), { en: 'king', traduzida: true });
   assert.equal(V.sugerirTraduzindo('xqzv', 'pt-BR'), null);
   assert.equal(V.sugerirTraduzindo('king', 'pt-BR'), null, 'palavra que já é inglesa não é tradução');
+  // traduzir: só o glossário, mesmo quando o token também existe no GloVe (o GloVe 100 mil tem "rei", "gato", "azul"…)
+  assert.deepEqual(V.traduzir('rei', 'pt-BR'), { en: 'king' });
+  assert.deepEqual(V.traduzir('Rei', 'pt-BR'), { en: 'king' });
+  assert.equal(V.traduzir('king', 'pt-BR'), null, 'palavra inglesa não tem entrada pt no glossário');
+  assert.equal(V.traduzir('rei', 'en'), null);
 });
 
 test('matriz devolve um Float32Array de 50 por índice, na ordem pedida', () => {

@@ -1,6 +1,6 @@
-// Cache LRU com TTL, em memória (por instância). Só guarda a interpretação NORMALIZADA
-// (intenção/entidades) — nunca o texto da pergunta: a chave é um texto normalizado (minúsculas,
-// sem acentos, espaços colapsados) e fica apenas na memória da instância, com TTL de 1 h.
+// Cache LRU com TTL, em memória (por instância). Guarda a RESPOSTA gerada (answer + model) por até 1 h, sob uma chave que é um resumo SHA-256
+// (ask-handler.js) da pergunta normalizada + idioma + contexto + trechos + versão do modelo: o texto da pergunta nunca fica guardado, nem em
+// memória. `normalizeQuestion` (minúsculas, sem acentos, espaços colapsados) só serve para perguntas iguais caírem na mesma chave.
 
 /** Chave de cache: minúsculas, sem acentos, só letras/dígitos separados por 1 espaço. */
 export function normalizeQuestion(q) {
@@ -40,5 +40,6 @@ export function createCache({ maxEntries = 500, ttlMs = 60 * 60 * 1000, now = Da
     delete: (chave) => store.delete(chave),
     clear: () => store.clear(),
     size: () => store.size,
+    keys: () => [...store.keys()],
   };
 }

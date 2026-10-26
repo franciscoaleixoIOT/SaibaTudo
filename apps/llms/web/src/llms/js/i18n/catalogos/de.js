@@ -126,7 +126,7 @@ export default {
     limpar: { titulo: 'Diagramm geleert', texto: 'Ich habe alle Wörter aus dem Diagramm entfernt.' },
     preset: { texto: 'Beispiel „{nome}“ geladen: {lista}.' },
     conceito: { leiaMais: 'Der vollständige Abschnitt steht unter Lernen; tippen Sie auf die Schaltfläche, um ihn zu öffnen.' },
-    mostrar: { titulo: 'Wörter im Diagramm', texto: 'Ich habe {lista} ins Diagramm gesetzt.', textoContinuacao: 'Ich habe {lista} zum Diagramm hinzugefügt.', traduzidas: 'Über das Glossar übersetzt: {lista}.', desconhecidas: 'In GloVe nicht gefunden: {lista}.' },
+    mostrar: { titulo: 'Wörter im Diagramm', texto: 'Ich habe {lista} ins Diagramm gesetzt.', textoContinuacao: 'Ich habe {lista} zum Diagramm hinzugefügt.', traduzidas: 'Über das Glossar übersetzt: {lista}.', normalizadas: 'GloVe kennt nur Kleinbuchstaben ohne Akzente; ich habe {lista} verwendet.', desconhecidas: 'In GloVe nicht gefunden: {lista}.' },
     analogia: { titulo: 'Analogie', texto: '{a} − {b} + {c} ≈', item: '{palavra} (Kosinus {cos})', explicacao: 'Ich habe den Vektor von b von a abgezogen, c addiert und die Wörter gesucht, die dem Ergebnis am nächsten liegen (ohne a, b und c).' },
     vizinhos: { titulo: 'Nachbarn von {palavra}', texto: 'Die 10 Wörter, die {palavra} am nächsten sind, nach Kosinus:' },
     similaridade: { titulo: 'Ähnlichkeit', texto: 'Kosinus zwischen {a} und {b}: {cos}.', escala: 'Nahe 1 = Vektoren fast in derselben Richtung (ähnliche Kontexte); nahe 0 = kein Zusammenhang; negativ = entgegengesetzte Richtungen.' },

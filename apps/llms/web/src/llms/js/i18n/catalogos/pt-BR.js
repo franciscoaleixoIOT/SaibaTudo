@@ -127,7 +127,7 @@ export default {
     limpar: { titulo: 'Gráfico limpo', texto: 'Tirei todas as palavras do gráfico.' },
     preset: { texto: 'Carreguei o exemplo "{nome}": {lista}.' },
     conceito: { leiaMais: 'A seção completa está em Aprenda; toque no botão para abrir.' },
-    mostrar: { titulo: 'Palavras no gráfico', texto: 'Coloquei {lista} no gráfico.', textoContinuacao: 'Acrescentei {lista} ao gráfico.', traduzidas: 'Traduzi pelo glossário: {lista}.', desconhecidas: 'Não encontrei no GloVe: {lista}.' },
+    mostrar: { titulo: 'Palavras no gráfico', texto: 'Coloquei {lista} no gráfico.', textoContinuacao: 'Acrescentei {lista} ao gráfico.', traduzidas: 'Traduzi pelo glossário: {lista}.', normalizadas: 'O GloVe só tem minúsculas sem acento; usei {lista}.', desconhecidas: 'Não encontrei no GloVe: {lista}.' },
     analogia: { titulo: 'Analogia', texto: '{a} − {b} + {c} ≈', item: '{palavra} (cosseno {cos})', explicacao: 'Subtraí o vetor de b do de a, somei o de c e procurei as palavras mais próximas do resultado (fora de a, b e c).' },
     vizinhos: { titulo: 'Vizinhos de {palavra}', texto: 'As 10 palavras mais próximas de {palavra}, pelo cosseno:' },
     similaridade: { titulo: 'Similaridade', texto: 'Cosseno entre {a} e {b}: {cos}.', escala: 'Perto de 1 = vetores quase na mesma direção (contextos parecidos); perto de 0 = sem relação; negativo = direções opostas.' },

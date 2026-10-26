@@ -126,7 +126,7 @@ export default {
     limpar: { titulo: '图表已清空', texto: '我已移除图中的所有单词。' },
     preset: { texto: '已加载示例“{nome}”：{lista}。' },
     conceito: { leiaMais: '完整章节在“学习”中；点按按钮打开。' },
-    mostrar: { titulo: '图中的单词', texto: '我把 {lista} 放到了图中。', textoContinuacao: '我把 {lista} 加到了图中。', traduzidas: '由词汇表翻译：{lista}。', desconhecidas: '在 GloVe 中未找到：{lista}。' },
+    mostrar: { titulo: '图中的单词', texto: '我把 {lista} 放到了图中。', textoContinuacao: '我把 {lista} 加到了图中。', traduzidas: '由词汇表翻译：{lista}。', normalizadas: 'GloVe 只有不带重音的小写单词；我使用了 {lista}。', desconhecidas: '在 GloVe 中未找到：{lista}。' },
     analogia: { titulo: '类比', texto: '{a} − {b} + {c} ≈', item: '{palavra}（余弦 {cos}）', explicacao: '我用 a 的向量减去 b 的向量，加上 c 的向量，再寻找最接近结果的单词（不含 a、b、c）。' },
     vizinhos: { titulo: '{palavra} 的近邻', texto: '按余弦排序，与 {palavra} 最接近的 10 个单词：' },
     similaridade: { titulo: '相似度', texto: '{a} 和 {b} 的余弦：{cos}。', escala: '接近 1 = 向量方向几乎相同（语境相似）；接近 0 = 无关；负数 = 方向相反。' },

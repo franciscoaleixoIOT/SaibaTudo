@@ -126,7 +126,7 @@ export default {
     limpar: { titulo: 'Chart cleared', texto: 'I removed every word from the chart.' },
     preset: { texto: 'I loaded the "{nome}" example: {lista}.' },
     conceito: { leiaMais: 'The full lesson is under Learn; tap the button to open it.' },
-    mostrar: { titulo: 'Words in the chart', texto: 'I put {lista} in the chart.', textoContinuacao: 'I added {lista} to the chart.', traduzidas: 'Translated by the glossary: {lista}.', desconhecidas: 'Not found in GloVe: {lista}.' },
+    mostrar: { titulo: 'Words in the chart', texto: 'I put {lista} in the chart.', textoContinuacao: 'I added {lista} to the chart.', traduzidas: 'Translated by the glossary: {lista}.', normalizadas: 'GloVe has only lowercase, unaccented words; I used {lista}.', desconhecidas: 'Not found in GloVe: {lista}.' },
     analogia: { titulo: 'Analogy', texto: '{a} − {b} + {c} ≈', item: '{palavra} (cosine {cos})', explicacao: 'I subtracted the vector of b from a, added c and looked for the words nearest to the result (excluding a, b and c).' },
     vizinhos: { titulo: 'Neighbours of {palavra}', texto: 'The 10 words nearest to {palavra}, by cosine:' },
     similaridade: { titulo: 'Similarity', texto: 'Cosine between {a} and {b}: {cos}.', escala: 'Near 1 = vectors in almost the same direction (similar contexts); near 0 = unrelated; negative = opposite directions.' },

@@ -245,7 +245,9 @@ export default {
   "elle",
   "ils",
   "elles",
-  "y"
+  "y",
+  "qui",
+  "ressemble"
  ],
  "semFronteira": false,
  "normalizarAcentos": true

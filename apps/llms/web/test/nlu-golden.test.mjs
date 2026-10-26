@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { BASE, CHAVE_TESTE_B64, RAIZ, fetchDeDisco } from './support.mjs';
+import { BASE, CHAVE_TESTE_B64, DADOS_REAIS, RAIZ, fetchDeDisco } from './support.mjs';
 import { Vetores } from '../src/llms/js/data.js';
 import { IDIOMAS } from '../src/llms/js/i18n/index.js';
 import { lexico } from '../src/llms/js/nlu/lex/index.js';
@@ -46,6 +46,39 @@ test('extrairPalavras: maiúsculas e vírgulas, "hot dog" vira duas palavras, de
   assert.deepEqual(r.palavras[0], { en: 'king', original: 'rei', traduzida: true });
   assert.deepEqual(r.desconhecidas, ['xqzv']);
   assert.deepEqual(en(extrairPalavras('"king" e "queen"', lexico('pt-BR'), V, 'pt-BR')), ['king', 'queen'], 'aspas valem como palavras mesmo quando são stopPalavras');
+});
+
+test('chinês: termo do glossário vence a stopPalavra que ele contém (埃及, 和平, 想法); termo igual a uma stopPalavra continua stopPalavra (词)', () => {
+  assert.deepEqual(en(P('显示 埃及', 'zh')), ['egypt']);
+  assert.deepEqual(en(P('显示 和平 和 战争', 'zh')), ['peace', 'war']);
+  assert.deepEqual(en(P('显示 想法 和 国王', 'zh')), ['idea', 'king']);
+  assert.deepEqual(en(P('显示 国王 这个词', 'zh')), ['king'], '词 continua sendo stopPalavra');
+});
+
+test('normalizadas: maiúsculas e acentos são avisados (Rei → rei) sem mudar a palavra achada; token com maiúscula fora do início não é stopPalavra', () => {
+  const r = extrairPalavras('mostre Rei e Rainha', lexico('pt-BR'), V, 'pt-BR');
+  assert.deepEqual(en(r), ['king', 'queen']);
+  assert.deepEqual(r.normalizadas, [{ de: 'Rei', para: 'rei' }, { de: 'Rainha', para: 'rainha' }]);
+  assert.deepEqual(extrairPalavras('mostre rei', lexico('pt-BR'), V, 'pt-BR').normalizadas, []);
+  assert.deepEqual(P('King, Queen', 'en').normalizadas, [{ de: 'King', para: 'king' }, { de: 'Queen', para: 'queen' }]);
+});
+
+test('pacote real (100 mil palavras): golden inteiro 100 %, FONTES mesmo com "sources" no vocabulário, "São Paulo" vira sao + paulo com aviso', { skip: DADOS_REAIS ? false : 'sem data/llms' }, async () => {
+  const chave = readFileSync(resolve(RAIZ, 'pipeline/data_signing_public.b64'), 'utf8').trim();
+  const VR = await Vetores.carregar({ fetch: fetchDeDisco(DADOS_REAIS), base: BASE, chavePublicaB64: chave });
+  const PR = (q, idioma = 'pt-BR', contexto = null) => parse(q, lexico(idioma), { vetores: VR, idioma, contexto });
+  const falhas = [];
+  for (const c of GOLDEN) {
+    const idioma = c.idioma ?? 'pt-BR';
+    const r = PR(c.q, idioma, c.contexto ? PR(c.contexto, idioma) : null);
+    if (r.intencao !== c.intencao) falhas.push(`${idioma} "${c.q}": ${c.intencao} → ${r.intencao}`);
+    if (c.palavras && JSON.stringify(en(r)) !== JSON.stringify(c.palavras)) falhas.push(`${idioma} "${c.q}": palavras ${JSON.stringify(en(r))}`);
+  }
+  assert.deepEqual(falhas, [], `${falhas.length} casos falham com o vocabulário real`);
+  for (const [q, idioma] of [['sources', 'en'], ['fontes', 'pt-BR'], ['références', 'fr'], ['fuentes', 'es']]) assert.equal(PR(q, idioma).intencao, 'FONTES', q);
+  const sp = PR('mostre São Paulo');
+  assert.deepEqual(en(sp), ['sao', 'paulo']);
+  assert.deepEqual(sp.normalizadas, [{ de: 'São', para: 'sao' }, { de: 'Paulo', para: 'paulo' }]);
 });
 
 test('parse: casos de borda', () => {

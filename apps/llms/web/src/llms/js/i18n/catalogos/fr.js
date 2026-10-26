@@ -126,7 +126,7 @@ export default {
     limpar: { titulo: 'Graphique effacé', texto: 'J’ai retiré tous les mots du graphique.' },
     preset: { texto: 'J’ai chargé l’exemple « {nome} » : {lista}.' },
     conceito: { leiaMais: 'La section complète est dans Apprendre ; touchez le bouton pour l’ouvrir.' },
-    mostrar: { titulo: 'Mots dans le graphique', texto: 'J’ai placé {lista} dans le graphique.', textoContinuacao: 'J’ai ajouté {lista} au graphique.', traduzidas: 'Traduit par le glossaire : {lista}.', desconhecidas: 'Introuvable dans GloVe : {lista}.' },
+    mostrar: { titulo: 'Mots dans le graphique', texto: 'J’ai placé {lista} dans le graphique.', textoContinuacao: 'J’ai ajouté {lista} au graphique.', traduzidas: 'Traduit par le glossaire : {lista}.', normalizadas: 'GloVe ne contient que des minuscules sans accents ; j’ai utilisé {lista}.', desconhecidas: 'Introuvable dans GloVe : {lista}.' },
     analogia: { titulo: 'Analogie', texto: '{a} − {b} + {c} ≈', item: '{palavra} (cosinus {cos})', explicacao: 'J’ai soustrait le vecteur de b à celui de a, ajouté celui de c et cherché les mots les plus proches du résultat (hors a, b et c).' },
     vizinhos: { titulo: 'Voisins de {palavra}', texto: 'Les 10 mots les plus proches de {palavra}, par cosinus :' },
     similaridade: { titulo: 'Similarité', texto: 'Cosinus entre {a} et {b} : {cos}.', escala: 'Proche de 1 = vecteurs presque dans la même direction (contextes semblables) ; proche de 0 = sans rapport ; négatif = directions opposées.' },

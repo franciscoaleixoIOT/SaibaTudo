@@ -26,12 +26,27 @@ Guia do app: `../CLAUDE.md`. Plano e spec do S1 na raiz do repositório (`docs/s
   eleições, SW da home, IDIOMAS + zh, `portal/src/portal/i18n/zh.js`, seção `llms` nos seis catálogos, botão, cartão e ícone; testes do portal
   10/10 e da raiz 9/9). Merge em **27/10/2026** (congelamento de eleições até 26/10) e depois `gh workflow run eleicoes-data-refresh.yml`.
 
+- **Revisão final da branch (26/10/2026, revisor novo em Opus):** 0 críticos, 7 importantes, todos corrigidos com teste RED→GREEN no mesmo dia:
+  (1) o verificador só olhava o texto antes do rodapé → agora desconta só a frase do rodapé e confere o resto; (2) resposta da nuvem podia cair sob
+  outra pergunta feita enquanto esperava → só anexa se a resposta exibida ainda for a que pediu (e2e com `/llms/api/ask` simulado pelo CDP);
+  (3) em chinês as stopwords cortavam 12 termos do glossário (和平, 埃及, 想法…) → concorrência por comprimento; (4) FONTES falhava com o
+  vocabulário real ("sources", "fontes" existem no GloVe) → palavras achadas têm de estar dentro do termo; o golden roda também sobre o pacote real
+  e revelou mais 15 casos: **o glossário agora vem antes do vocabulário fora do inglês** ("rei" era token do GloVe) e es/fr/de ganharam stopwords
+  ("tan", "cerca", "qui", "ins"); (5) política de privacidade descrevia um cache por hash que não existia → chave do cache e iid do limitador
+  virados em SHA-256 e texto corrigido nos 6 idiomas; (6) ação `destacar` do assistente não fazia nada → `destacar()` no explorador; (7) maiúsculas e
+  acentos eram normalizados em silêncio → aviso "Rei → rei" e "São Paulo" vira sao + paulo. Extra: analogia digitada com palavra do preset
+  "líderes" recebe a nota histórica. Menores adiados no ledger (`.superpowers/sdd/…/progress.md`): destaque na cena ao clicar no chip, `remover`
+  não limpa analogia, poda de fatias antigas no SW, bundle minificado sem teste no CI, `role` do canvas, `decodeURIComponent` da query.
+
 ## 3. Lições
 - Outro agente (kilo) comitou na árvore principal durante o S1 e a trocou de branch; o trabalho seguiu num **worktree** próprio.
 - O `import gensim` trava com `scipy 1.18.1` nesta máquina: venv com `scipy<1.17`. Processos presos impediram recriar a venv (`.venv` → `.venv2`).
 - A ferramenta de shell mutila barras invertidas em heredocs: scripts com regex vão para arquivo e são executados.
 - `replaceChildren(null)` cria um nó de texto "null": filtrar os ramos condicionais.
 - O upload ao HF Hub pode cair num 500 do servidor no meio: repetir `publicar.py` (idempotente).
+- A fixture de 360 palavras esconde o que o vocabulário real faz: o GloVe de 100 mil tem "rei", "gato", "sources", "tan"… Rodar o golden também sobre
+  `data/llms` (o teste faz isso sozinho quando o pacote existe).
+- O e2e persiste o idioma salvo entre cenários (`?lang=zh` → próximo cenário em zh): cada cenário com perguntas em português abre com `?lang=pt-BR`.
 - O service worker serve o shell antigo na primeira visita depois de um build: limpar caches ao testar no navegador.
 
 ## 4. Pendências

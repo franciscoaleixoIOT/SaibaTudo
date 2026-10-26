@@ -57,7 +57,7 @@
     <h2>7. Sharing and processors</h2>
     <p><strong>Vercel</strong> (hosting of the site and of the function that forwards the question) and <strong>Hugging Face</strong> (server where the model runs, USA) act as processors, only to execute what you asked. “Report a problem” opens a public <strong>GitHub</strong> issue with the question in the title; nothing is sent until you confirm there.</p>
     <h2>8. Retention</h2>
-    <p>We keep neither the question texts nor the answers. The server keeps, for up to 1 hour, a cache of the answer keyed by an irreversible digest (hash) of the question, without identification. Technical metrics (time, status, error) go to logs without the text. The installation code exists only on your device and serves the daily usage limit.</p>
+    <p>We do not keep the question texts. The generated answer stays for up to 1 hour in an in-memory cache on the server, keyed by an irreversible digest (SHA-256 hash) of the question, language, context and snippets, without identification: identical questions get the same answer without calling the model again. Technical metrics (time, status, error) go to logs without the text. The installation code (UUID) travels with the question and serves, together with the IP address, only the usage limits (per minute and per day); the server keeps only a digest of it, never the code itself.</p>
     <h2>9. Your rights</h2>
     <p>Since almost nothing is collected, most rights are exercised on the device itself (delete data, turn off the cloud). For any request or question: <a href="mailto:saibatudo@saibatudo.net">saibatudo@saibatudo.net</a>.</p>
     <h2>10. Children</h2>
