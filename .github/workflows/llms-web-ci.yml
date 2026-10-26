@@ -1,0 +1,43 @@
+name: LLMs — Web, API, pipeline e Space CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths: [ "apps/llms/**", ".github/workflows/llms-web-ci.yml" ]
+  pull_request:
+    paths: [ "apps/llms/**", ".github/workflows/llms-web-ci.yml" ]
+
+defaults:
+  run:
+    working-directory: apps/llms
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Testes do site/PWA (projeção, vetores, explorador, NLU golden, conteúdo, i18n, privacidade, service worker, build)
+        run: node --test "web/test/*.test.mjs"
+      - name: Testes da API (health, verificador, ask)
+        run: node --test "api/test/*.test.mjs"
+      - name: Build do site com a fixture assinada
+        env:
+          DATA_DIR: web/test/fixtures/data-llms
+        run: PUB_KEY_B64="$(cat web/test/fixtures/chave_teste_public.b64)" node web/build.mjs
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Testes do pipeline, dos contratos, dos workflows e do prompt do Space (Python; sem baixar o GloVe)
+        run: |
+          pip install numpy ecdsa==0.19.2 pyyaml==6.0.2 "scipy<1.17" "gensim>=4.3"
+          python -m unittest discover -s pipeline/tests
+          python -m unittest discover -s tools -p "test_*.py"
+          python -m unittest discover -s backend/hf_space_llms -p "test_*.py"
+          python tools/gerar_lexico.py --check
+      - name: Pacote de dados assinado e íntegro (quando versionado)
+        run: |
+          if [ -f data/llms/manifest.json ]; then python pipeline/sign.py verify data/llms/manifest.json --public pipeline/data_signing_public.pem; else echo "sem pacote versionado ainda"; fi
