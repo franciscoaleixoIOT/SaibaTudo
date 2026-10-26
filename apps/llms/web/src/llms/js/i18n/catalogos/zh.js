@@ -55,6 +55,14 @@ export default {
       secaoN: '第 {n} 节，共 {total} 节', experimente: '试一试', abrir: '在探索器中打开', referencias: '参考文献', link: '查看', navegacao: '相邻章节', irExplorar: '前往探索器', indice: '全部章节',
       autoria: '文本由 SaibaTudo 项目撰写（MIT），附学术参考文献。其他语言由智能体翻译；母语者审校待定。'
     },
+    sobre: {
+      titulo: '关于数据', subtitulo: '向量从哪里来、数值如何计算，以及云端 AI 做什么（不做什么）。',
+      vetores: '词向量', fonte: '来源', licenca: '许可', palavras: '单词数', dimensoes: '维度', quantizacao: '量化', versaoPacote: '数据包版本', geradoEm: '生成时间',
+      ingles: 'GloVe 是在英文文本（2014 年维基百科和 Gigaword 5 新闻）上训练的：单词是英文的，关联（包括偏见）也是这些文本中的关联。词汇表翻译示例单词以便使用；最常见的 10 万个单词进入数据包，向量以 int8 存储（每个向量一个缩放系数）。',
+      comoCalcula: '数值如何计算', calculos: ['余弦和点积：在此设备上由 int8 向量计算，除量化外不做其他舍入。', '近邻和类比：按余弦遍历整个词表；类比为 a − b + c，排除 a、b、c。', '图表坐标轴：所选单词之间方差最大的 3 个维度，或 3 个主成分（PCA）及其解释的方差。', '没有任何数值来自语言模型；当你请求时，生成的文本会被标注并在服务器上校验。'],
+      ia: '云端 AI（可选）', iaTexto: '默认关闭。当你请求时，项目服务器把问题、语言、图表摘要和章节摘录发送给 Hugging Face Space 中的一个开放模型（Qwen3-4B-Instruct-2507，Apache 2.0）；回答带着模型名称返回，若包含发送内容之外的数字则会被拒绝。',
+      referencias: '参考文献', licencas: '许可', traducoes: '翻译', revisao: { pendente: '由智能体翻译，母语者审校待定', humana: '源文本，已审校' }, codigo: 'GitHub 上的应用源代码'
+    },
     presets: {
       realeza: { nome: '王室与性别', nota: '国王 − 女王 的差向量与 男人 − 女人 相似：空间中的一个方向承载了语法性别。' },
       capitais: { nome: '国家与首都', nota: '每个国家与自己首都的距离都相近：“……的首都”这一方向反复出现。' },

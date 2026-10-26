@@ -55,6 +55,14 @@ export default {
       secaoN: 'Lesson {n} of {total}', experimente: 'Try it', abrir: 'Open in the explorer', referencias: 'References', link: 'view', navegacao: 'Neighbouring lessons', irExplorar: 'Go to the explorer', indice: 'All lessons',
       autoria: 'Text written by the SaibaTudo project (MIT), with academic references. Translated by an agent in the other languages; native-speaker review pending.'
     },
+    sobre: {
+      titulo: 'About the data', subtitulo: 'Where the vectors come from, how the numbers are computed and what the cloud AI does (and does not do).',
+      vetores: 'Word vectors', fonte: 'Source', licenca: 'Licence', palavras: 'Words', dimensoes: 'Dimensions', quantizacao: 'Quantisation', versaoPacote: 'Package version', geradoEm: 'Generated on',
+      ingles: 'GloVe was trained on English texts (Wikipedia 2014 and Gigaword 5 news): the words are English and the associations, biases included, are those of these texts. The glossary translates example words for convenience; the 100,000 most frequent words go into the package, with vectors stored as int8 (one scale per vector).',
+      comoCalcula: 'How the numbers are computed', calculos: ['Cosine and dot product: computed on this device from the int8 vectors, with no rounding beyond the quantisation.', 'Neighbours and analogies: a scan of the whole vocabulary by cosine; the analogy is a − b + c excluding a, b and c.', 'Chart axes: the 3 dimensions with the largest variance among the chosen words, or the 3 principal components (PCA) with their explained variance.', 'No number comes from a language model; generated text, when you ask for it, is labelled and checked on the server.'],
+      ia: 'Cloud AI (optional)', iaTexto: 'Off by default. When you ask, the project server sends the question, the language, a chart summary and lesson excerpts to an open model (Qwen3-4B-Instruct-2507, Apache 2.0) in a Hugging Face Space; the answer comes back labelled with the model name and is rejected if it contains a number that is not in what was sent.',
+      referencias: 'References', licencas: 'Licences', traducoes: 'Translations', revisao: { pendente: 'translated by an agent, native-speaker review pending', humana: 'source text, reviewed' }, codigo: 'App source code on GitHub'
+    },
     presets: {
       realeza: { nome: 'Royalty and gender', nota: 'The difference king − queen resembles man − woman: one direction of the space carries grammatical gender.' },
       capitais: { nome: 'Countries and capitals', nota: 'Each country sits at a similar distance from its own capital: the "capital of" direction repeats.' },

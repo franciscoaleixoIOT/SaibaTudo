@@ -55,6 +55,14 @@ export default {
       secaoN: 'Section {n} sur {total}', experimente: 'Essayez', abrir: 'Ouvrir dans l’explorateur', referencias: 'Références', link: 'voir', navegacao: 'Sections voisines', irExplorar: 'Aller à l’explorateur', indice: 'Toutes les sections',
       autoria: 'Texte écrit par le projet SaibaTudo (MIT), avec des références académiques. Traduit par un agent dans les autres langues ; relecture par un locuteur natif en attente.'
     },
+    sobre: {
+      titulo: 'À propos des données', subtitulo: 'D’où viennent les vecteurs, comment les nombres sont calculés et ce que fait (et ne fait pas) l’IA dans le nuage.',
+      vetores: 'Vecteurs de mots', fonte: 'Source', licenca: 'Licence', palavras: 'Mots', dimensoes: 'Dimensions', quantizacao: 'Quantification', versaoPacote: 'Version du paquet', geradoEm: 'Généré le',
+      ingles: 'GloVe a été entraîné sur des textes en anglais (Wikipédia 2014 et dépêches Gigaword 5) : les mots sont anglais et les associations, biais compris, sont celles de ces textes. Le glossaire traduit des mots d’exemple pour faciliter ; les 100 000 mots les plus fréquents entrent dans le paquet, avec les vecteurs stockés en int8 (une échelle par vecteur).',
+      comoCalcula: 'Comment les nombres sont calculés', calculos: ['Cosinus et produit scalaire : calculés sur cet appareil à partir des vecteurs int8, sans arrondi au-delà de la quantification.', 'Voisins et analogies : parcours de tout le vocabulaire par cosinus ; l’analogie est a − b + c en excluant a, b et c.', 'Axes du graphique : les 3 dimensions de plus grande variance parmi les mots choisis, ou les 3 composantes principales (ACP) avec leur variance expliquée.', 'Aucun nombre ne vient d’un modèle de langage ; le texte généré, quand vous le demandez, est étiqueté et vérifié sur le serveur.'],
+      ia: 'IA dans le nuage (optionnelle)', iaTexto: 'Désactivée par défaut. Quand vous la demandez, le serveur du projet envoie la question, la langue, un résumé du graphique et des extraits des sections à un modèle ouvert (Qwen3-4B-Instruct-2507, Apache 2.0) dans un Space Hugging Face ; la réponse revient étiquetée avec le nom du modèle et est rejetée si elle contient un nombre absent de ce qui a été envoyé.',
+      referencias: 'Références', licencas: 'Licences', traducoes: 'Traductions', revisao: { pendente: 'traduction par un agent, relecture par un locuteur natif en attente', humana: 'texte source, relu' }, codigo: 'Code source de l’application sur GitHub'
+    },
     presets: {
       realeza: { nome: 'Royauté et genre', nota: 'La différence roi − reine ressemble à homme − femme : une direction de l’espace porte le genre grammatical.' },
       capitais: { nome: 'Pays et capitales', nota: 'Chaque pays se trouve à une distance semblable de sa capitale : la direction « capitale de » se répète.' },

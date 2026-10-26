@@ -55,6 +55,14 @@ export default {
       secaoN: 'Abschnitt {n} von {total}', experimente: 'Ausprobieren', abrir: 'Im Explorer öffnen', referencias: 'Literatur', link: 'ansehen', navegacao: 'Benachbarte Abschnitte', irExplorar: 'Zum Explorer', indice: 'Alle Abschnitte',
       autoria: 'Text des SaibaTudo-Projekts (MIT) mit wissenschaftlichen Quellen. In den anderen Sprachen von einem Agenten übersetzt; Prüfung durch Muttersprachler steht aus.'
     },
+    sobre: {
+      titulo: 'Über die Daten', subtitulo: 'Woher die Vektoren kommen, wie die Zahlen berechnet werden und was die Cloud-KI tut (und nicht tut).',
+      vetores: 'Wortvektoren', fonte: 'Quelle', licenca: 'Lizenz', palavras: 'Wörter', dimensoes: 'Dimensionen', quantizacao: 'Quantisierung', versaoPacote: 'Paketversion', geradoEm: 'Erzeugt am',
+      ingles: 'GloVe wurde auf englischen Texten trainiert (Wikipedia 2014 und Gigaword-5-Nachrichten): Die Wörter sind englisch und die Assoziationen, Verzerrungen eingeschlossen, sind die dieser Texte. Das Glossar übersetzt Beispielwörter zur Erleichterung; die 100 000 häufigsten Wörter kommen ins Paket, mit Vektoren als int8 (eine Skala pro Vektor).',
+      comoCalcula: 'Wie die Zahlen berechnet werden', calculos: ['Kosinus und Skalarprodukt: auf diesem Gerät aus den int8-Vektoren berechnet, ohne Rundung über die Quantisierung hinaus.', 'Nachbarn und Analogien: Durchlauf des gesamten Vokabulars nach Kosinus; die Analogie ist a − b + c ohne a, b und c.', 'Diagrammachsen: die 3 Dimensionen mit der größten Varianz unter den gewählten Wörtern oder die 3 Hauptkomponenten (PCA) mit erklärter Varianz.', 'Keine Zahl stammt aus einem Sprachmodell; generierter Text wird, wenn Sie ihn anfordern, gekennzeichnet und auf dem Server geprüft.'],
+      ia: 'Cloud-KI (optional)', iaTexto: 'Standardmäßig aus. Auf Anfrage sendet der Projektserver die Frage, die Sprache, eine Zusammenfassung des Diagramms und Auszüge der Abschnitte an ein offenes Modell (Qwen3-4B-Instruct-2507, Apache 2.0) in einem Hugging-Face-Space; die Antwort kommt mit dem Modellnamen gekennzeichnet zurück und wird abgelehnt, wenn sie eine Zahl enthält, die nicht im Gesendeten steht.',
+      referencias: 'Literatur', licencas: 'Lizenzen', traducoes: 'Übersetzungen', revisao: { pendente: 'von einem Agenten übersetzt, Prüfung durch Muttersprachler steht aus', humana: 'Quelltext, geprüft' }, codigo: 'Quellcode der App auf GitHub'
+    },
     presets: {
       realeza: { nome: 'Königtum und Geschlecht', nota: 'Die Differenz König − Königin ähnelt Mann − Frau: eine Richtung des Raums trägt das grammatische Geschlecht.' },
       capitais: { nome: 'Länder und Hauptstädte', nota: 'Jedes Land liegt in ähnlichem Abstand zu seiner Hauptstadt: die Richtung „Hauptstadt von“ wiederholt sich.' },

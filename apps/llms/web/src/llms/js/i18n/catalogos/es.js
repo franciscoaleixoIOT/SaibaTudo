@@ -55,6 +55,14 @@ export default {
       secaoN: 'Sección {n} de {total}', experimente: 'Pruébalo', abrir: 'Abrir en el explorador', referencias: 'Referencias', link: 'ver', navegacao: 'Secciones vecinas', irExplorar: 'Ir al explorador', indice: 'Todas las secciones',
       autoria: 'Texto escrito por el proyecto SaibaTudo (MIT), con referencias académicas. Traducido por agente en los demás idiomas; revisión por hablante nativo pendiente.'
     },
+    sobre: {
+      titulo: 'Sobre los datos', subtitulo: 'De dónde vienen los vectores, cómo se calculan los números y qué hace (y qué no hace) la IA en la nube.',
+      vetores: 'Vectores de palabras', fonte: 'Fuente', licenca: 'Licencia', palavras: 'Palabras', dimensoes: 'Dimensiones', quantizacao: 'Cuantización', versaoPacote: 'Versión del paquete', geradoEm: 'Generado el',
+      ingles: 'GloVe se entrenó con textos en inglés (Wikipedia 2014 y noticias de Gigaword 5): las palabras son inglesas y las asociaciones, sesgos incluidos, son las de esos textos. El glosario traduce palabras de ejemplo para facilitar; las 100 mil palabras más frecuentes entran en el paquete, con los vectores guardados en int8 (una escala por vector).',
+      comoCalcula: 'Cómo se calculan los números', calculos: ['Coseno y producto escalar: calculados en este dispositivo a partir de los vectores int8, sin redondear más allá de la cuantización.', 'Vecinos y analogías: recorrido de todo el vocabulario por coseno; la analogía es a − b + c excluyendo a, b y c.', 'Ejes del gráfico: las 3 dimensiones de mayor varianza entre las palabras elegidas, o las 3 componentes principales (PCA) con su varianza explicada.', 'Ningún número viene de un modelo de lenguaje; el texto generado, cuando lo pides, se etiqueta y se verifica en el servidor.'],
+      ia: 'IA en la nube (opcional)', iaTexto: 'Desactivada por defecto. Cuando la pides, el servidor del proyecto envía la pregunta, el idioma, un resumen del gráfico y fragmentos de las secciones a un modelo abierto (Qwen3-4B-Instruct-2507, Apache 2.0) en un Space de Hugging Face; la respuesta vuelve etiquetada con el nombre del modelo y se rechaza si trae un número que no esté en lo enviado.',
+      referencias: 'Referencias', licencas: 'Licencias', traducoes: 'Traducciones', revisao: { pendente: 'traducción por agente, revisión por hablante nativo pendiente', humana: 'texto fuente, revisado' }, codigo: 'Código fuente de la app en GitHub'
+    },
     presets: {
       realeza: { nome: 'Realeza y género', nota: 'La diferencia rey − reina se parece a hombre − mujer: una dirección del espacio lleva el género gramatical.' },
       capitais: { nome: 'Países y capitales', nota: 'Cada país queda a una distancia parecida de su propia capital: la dirección "capital de" se repite.' },

@@ -56,6 +56,14 @@ export default {
       secaoN: 'Seção {n} de {total}', experimente: 'Experimente', abrir: 'Abrir no explorador', referencias: 'Referências', link: 'ver', navegacao: 'Seções vizinhas', irExplorar: 'Ir ao explorador', indice: 'Todas as seções',
       autoria: 'Texto de autoria do projeto SaibaTudo (MIT), com referências acadêmicas. Tradução por agente nos outros idiomas; revisão por falante nativo pendente.'
     },
+    sobre: {
+      titulo: 'Sobre os dados', subtitulo: 'De onde vêm os vetores, como os números são calculados e o que a IA na nuvem faz (e não faz).',
+      vetores: 'Vetores de palavras', fonte: 'Fonte', licenca: 'Licença', palavras: 'Palavras', dimensoes: 'Dimensões', quantizacao: 'Quantização', versaoPacote: 'Versão do pacote', geradoEm: 'Gerado em',
+      ingles: 'O GloVe foi treinado em textos em inglês (Wikipédia 2014 e notícias do Gigaword 5): as palavras são inglesas e as associações, inclusive vieses, são as desses textos. O glossário traduz palavras de exemplo para facilitar; as 100 mil palavras mais frequentes entram no pacote, com os vetores guardados em int8 (uma escala por vetor).',
+      comoCalcula: 'Como os números são calculados', calculos: ['Cosseno e produto escalar: calculados neste aparelho a partir dos vetores int8, sem arredondar além da quantização.', 'Vizinhos e analogias: varredura de todo o vocabulário por cosseno; a analogia é a − b + c excluindo a, b e c.', 'Eixos do gráfico: as 3 dimensões de maior variância entre as palavras escolhidas, ou as 3 componentes principais (PCA) com a variância explicada.', 'Nenhum número vem de modelo de linguagem; o texto gerado, quando você pede, é rotulado e verificado no servidor.'],
+      ia: 'IA na nuvem (opcional)', iaTexto: 'Desligada por padrão. Quando você pede, o servidor do projeto envia a pergunta, o idioma, um resumo do gráfico e trechos das seções a um modelo aberto (Qwen3-4B-Instruct-2507, Apache 2.0) num Space do Hugging Face; a resposta volta rotulada com o nome do modelo e é rejeitada se trouxer número que não esteja no que foi enviado.',
+      referencias: 'Referências', licencas: 'Licenças', traducoes: 'Traduções', revisao: { pendente: 'tradução por agente, revisão por falante nativo pendente', humana: 'texto-fonte, revisado' }, codigo: 'Código-fonte do app no GitHub'
+    },
     presets: {
       realeza: { nome: 'Realeza e gênero', nota: 'A diferença rei − rainha é parecida com homem − mulher: uma direção do espaço carrega o gênero gramatical.' },
       capitais: { nome: 'Países e capitais', nota: 'Cada país fica a uma distância parecida da própria capital: a direção "capital de" se repete.' },

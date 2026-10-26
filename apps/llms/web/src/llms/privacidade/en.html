@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Privacy policy — SaibaTudo LLMs</title>
+  <meta name="description" content="SaibaTudo LLMs privacy policy: no account, ads or trackers; nothing leaves your device without your tap.">
+  <link rel="canonical" href="https://saibatudo.net/llms/privacidade/en">
+  <link rel="alternate" hreflang="pt-BR" href="https://saibatudo.net/llms/privacidade">
+  <link rel="alternate" hreflang="en" href="https://saibatudo.net/llms/privacidade/en">
+  <link rel="alternate" hreflang="es" href="https://saibatudo.net/llms/privacidade/es">
+  <link rel="alternate" hreflang="de" href="https://saibatudo.net/llms/privacidade/de">
+  <link rel="alternate" hreflang="fr" href="https://saibatudo.net/llms/privacidade/fr">
+  <link rel="alternate" hreflang="zh" href="https://saibatudo.net/llms/privacidade/zh">
+  <link rel="alternate" hreflang="x-default" href="https://saibatudo.net/llms/privacidade">
+  <meta name="theme-color" content="#0C2340">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="/llms/brand/llms-icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/llms/css/base.css">
+  <link rel="stylesheet" href="/llms/css/app.css">
+  <script src="/llms/js/theme-init.js"></script>
+</head>
+<body>
+  <a class="skip" href="#conteudo">Skip to content</a>
+  <header class="appbar">
+    <a class="appbar-marca" href="/llms/?lang=en" aria-label="SaibaTudo LLMs, home">
+      <img class="appbar-logo" src="/llms/brand/llms-icon.svg" width="38" height="38" alt="">
+      <div class="appbar-textos"><div class="appbar-titulo">SaibaTudo LLMs</div><div class="appbar-sub">Privacy policy</div></div>
+    </a>
+  </header>
+  <main id="conteudo" class="tela-corpo" tabindex="-1">
+    <h1>Privacy Policy — SaibaTudo LLMs</h1>
+    <p><strong>Version 1.0 — 25 October 2026</strong> · Applies to the site/PWA at <code>saibatudo.net/llms</code>. The Portuguese page is the source text of this policy; this is a translation.</p>
+    <p class="pequeno mudo">Other languages: <a href="/llms/privacidade" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a> · <span lang="en">English</span> · <a href="/llms/privacidade/es" hreflang="es" lang="es">Español</a> · <a href="/llms/privacidade/de" hreflang="de" lang="de">Deutsch</a> · <a href="/llms/privacidade/fr" hreflang="fr" lang="fr">Français</a> · <a href="/llms/privacidade/zh" hreflang="zh" lang="zh">中文</a></p>
+    <p class="pequeno mudo"><a href="/llms/privacidade" hreflang="pt-BR" lang="pt-BR">Source text (Portuguese)</a></p>
+    <p class="aviso-caixa"><strong>In one sentence:</strong>&nbsp;SaibaTudo LLMs has no account, ads, trackers or usage analytics. The word vectors and every computation stay on your device, and <strong>nothing you type is sent to our servers</strong> unless you tap “Ask the cloud AI” (or turn on the automatic mode): then only that question, the language, a chart summary and lesson excerpts are sent, for the model to explain.</p>
+
+    <h2>1. Who we are</h2>
+    <p>SaibaTudo is an independent, open-source (MIT licence), non-profit project. Controller: <strong>Francisco Aleixo</strong> (developer) — contact: <a href="mailto:saibatudo@saibatudo.net">saibatudo@saibatudo.net</a>.</p>
+    <h2>2. What we do NOT collect</h2>
+    <p>We do not ask for name, e-mail, phone, documents, contacts, photos or files. There is no login, no ads, no advertising SDKs, no Google Analytics, Firebase or third-party crash reporting. We do not sell or share data. The app does not use location, camera, microphone or contacts.</p>
+    <h2>3. What stays only on your device</h2>
+    <p>Browser storage holds: theme, text size, language, the history of your last 50 questions (only for the ↑/↓ keys of the field), the “automatic cloud AI” switch and, if you use the cloud AI, a random installation code (UUID), plus the cache of the app and of the vector package for offline use. “Delete the data on this device”, in Settings, removes all of it.</p>
+    <h2>4. Network connections the app makes</h2>
+    <div class="tabela-rolagem"><table class="tabela-dados">
+      <thead><tr><th>Purpose</th><th>Destination</th><th>What is sent</th><th>When</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Load the app and the data</strong></td><td><code>saibatudo.net</code> (Vercel hosting)</td><td>ordinary HTTPS request (the provider records IP and browser in server logs)</td><td>when you open the app and, in the background, to check for a new (digitally signed) package</td></tr>
+        <tr><td><strong>Links to external sources</strong></td><td>GitHub, Stanford NLP, ACL Anthology, arXiv, Hugging Face</td><td>ordinary request by your browser (the destination sees your IP); none of our data</td><td>only when you tap an external link</td></tr>
+        <tr><td><strong>Cloud AI</strong> (optional, off by default)</td><td><code>saibatudo.net/llms/api/ask</code> (Vercel) → <strong>Hugging Face</strong> (Space where the model runs, USA)</td><td>the question text (up to 400 characters), the language, a summary of the current chart (words, axes, cosines), lesson excerpts and a random installation code (UUID); only when you tap “Ask the cloud AI” or turn on the “automatic cloud AI” switch</td><td>generate a natural-language explanation, labelled with the model name and verified on the server (numbers outside what was sent are rejected). The text is not logged; we keep only technical metrics and a 1-hour cache without identification</td></tr>
+      </tbody>
+    </table></div>
+    <h2>5. Origin of the data shown</h2>
+    <p>The word vectors are <strong>GloVe 6B</strong> (Pennington, Socher &amp; Manning, 2014; Wikipedia 2014 + Gigaword 5), published by Stanford University under the PDDL 1.0 licence: 100,000 English words, 50 dimensions, packaged and digitally signed by the project. The app verifies the signature before using the package. The lesson texts are written by the project.</p>
+    <h2>6. Purpose and legal basis (LGPD, Brazilian Law 13.709/2018)</h2>
+    <p>Loading connections are necessary to provide the service (art. 7, V). The cloud AI only works with your <strong>consent</strong>, by tap or by the switch in Settings (art. 7, I), and can be turned off at any time. No data is used for advertising or profiling.</p>
+    <h2>7. Sharing and processors</h2>
+    <p><strong>Vercel</strong> (hosting of the site and of the function that forwards the question) and <strong>Hugging Face</strong> (server where the model runs, USA) act as processors, only to execute what you asked. “Report a problem” opens a public <strong>GitHub</strong> issue with the question in the title; nothing is sent until you confirm there.</p>
+    <h2>8. Retention</h2>
+    <p>We keep neither the question texts nor the answers. The server keeps, for up to 1 hour, a cache of the answer keyed by an irreversible digest (hash) of the question, without identification. Technical metrics (time, status, error) go to logs without the text. The installation code exists only on your device and serves the daily usage limit.</p>
+    <h2>9. Your rights</h2>
+    <p>Since almost nothing is collected, most rights are exercised on the device itself (delete data, turn off the cloud). For any request or question: <a href="mailto:saibatudo@saibatudo.net">saibatudo@saibatudo.net</a>.</p>
+    <h2>10. Children</h2>
+    <p>The app collects no personal data from anyone, including children and teenagers, and has no content aimed at children under 13. The cloud AI is optional and off by default.</p>
+    <h2>11. Security</h2>
+    <p>Everything travels over HTTPS. The vector package is signed (ECDSA P-256) and checked on the device; the site uses a strict content security policy (no external scripts) and loads nothing from third parties. The AI answer is verified on the server before it reaches you.</p>
+    <h2>12. Changes</h2>
+    <p>Changes to this policy are published here with a new version and date; the code of the app and of this page is public on GitHub, with history.</p>
+
+    <p class="pequeno mudo"><a href="/llms/?lang=en">← SaibaTudo LLMs</a></p>
+  </main>
+</body>
+</html>

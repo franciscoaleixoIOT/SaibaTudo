@@ -9,6 +9,7 @@ import { roteador, toast } from './ui/componentes.js';
 import { seletorIdioma, viewConfig } from './ui/config.js';
 import { viewAprenda } from './ui/aprenda.js';
 import { viewInicio } from './ui/inicio.js';
+import { viewSobreDados } from './ui/sobre.js';
 
 export { toast };
 
@@ -24,6 +25,7 @@ const ABAS = [
 const ROTAS = [
   [/^\/llms\/?$/, viewInicio, []],
   [/^\/llms\/aprenda(?:\/([a-z]+))?\/?$/, viewAprenda, ['secao']],
+  [/^\/llms\/sobre-os-dados\/?$/, viewSobreDados, []],
   [/^\/llms\/configuracoes\/?$/, viewConfig, []]
 ];
 
