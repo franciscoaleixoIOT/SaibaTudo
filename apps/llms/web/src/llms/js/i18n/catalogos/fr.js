@@ -48,7 +48,7 @@ export default {
       enviar: 'Demander', limparCampo: 'Vider le champ', analisando: 'Analyse en cours…', ultimaPergunta: 'Dernière question', anterior: 'Question précédente', proxima: 'Question suivante',
       sugestoesTitulo: 'Vous pouvez aussi demander', copiar: 'Copier la réponse', copiado: 'Réponse copiée.', fechar: 'Fermer la réponse', relatar: 'Signaler un problème dans cette réponse',
       relatarAjuda: 'Ouvre une issue publique sur GitHub avec la question en titre ; rien n’est envoyé avant votre confirmation là-bas.',
-      respostaAria: 'Réponse', historicoVazio: 'Aucune question pour l’instant.'
+      abrir: 'Ouvrir', respostaAria: 'Réponse', historicoVazio: 'Aucune question pour l’instant.'
     },
     aprenda: {
       titulo: 'Apprendre : les pièces d’un modèle de langage', subtitulo: 'Six sections courtes, de la prédiction du token suivant à la softmax. Chacune a un « Essayez » qui mène à l’explorateur.',
@@ -62,6 +62,12 @@ export default {
       comoCalcula: 'Comment les nombres sont calculés', calculos: ['Cosinus et produit scalaire : calculés sur cet appareil à partir des vecteurs int8, sans arrondi au-delà de la quantification.', 'Voisins et analogies : parcours de tout le vocabulaire par cosinus ; l’analogie est a − b + c en excluant a, b et c.', 'Axes du graphique : les 3 dimensions de plus grande variance parmi les mots choisis, ou les 3 composantes principales (ACP) avec leur variance expliquée.', 'Aucun nombre ne vient d’un modèle de langage ; le texte généré, quand vous le demandez, est étiqueté et vérifié sur le serveur.'],
       ia: 'IA dans le nuage (optionnelle)', iaTexto: 'Désactivée par défaut. Quand vous la demandez, le serveur du projet envoie la question, la langue, un résumé du graphique et des extraits des sections à un modèle ouvert (Qwen3-4B-Instruct-2507, Apache 2.0) dans un Space Hugging Face ; la réponse revient étiquetée avec le nom du modèle et est rejetée si elle contient un nombre absent de ce qui a été envoyé.',
       referencias: 'Références', licencas: 'Licences', traducoes: 'Traductions', revisao: { pendente: 'traduction par un agent, relecture par un locuteur natif en attente', humana: 'texte source, relu' }, codigo: 'Code source de l’application sur GitHub'
+    },
+    nuvem: {
+      botao: 'Demander à l’IA dans le nuage', consultando: 'Consultation de l’IA dans le nuage…', titulo: 'Explication de l’IA dans le nuage',
+      consentimento: 'Envoyer cette question à l’IA dans le nuage ? Le texte de la question, la langue, un résumé du graphique actuel et des extraits des sections partent vers notre serveur, avec un code aléatoire de cette installation. Rien n’est conservé avec la question. La réponse est générée par un modèle (aujourd’hui Qwen3-4B), étiquetée et vérifiée : les nombres absents de ce qui a été envoyé sont rejetés.',
+      confirmar: 'Envoyer', cancelar: 'Pas maintenant', lembrar: 'Ne plus demander (mode automatique ; désactivable dans les Paramètres)',
+      falha: { desligada: 'L’IA dans le nuage est désactivée dans cette version. La réponse ci-dessus a été construite sur votre appareil.', cota: 'L’IA dans le nuage a atteint sa limite d’usage pour le moment. Réessayez plus tard.', timeout: 'L’IA dans le nuage a mis trop de temps ; l’appel a été annulé.', rejeitada: 'L’IA dans le nuage a répondu, mais le texte n’a pas passé la vérification (nombre ou langue inattendus) et a été écarté.', dadopessoal: 'La question semble contenir des données personnelles et n’a pas été envoyée au nuage.', rede: 'Impossible de joindre l’IA dans le nuage (pas de réseau ou service indisponible).' }
     },
     presets: {
       realeza: { nome: 'Royauté et genre', nota: 'La différence roi − reine ressemble à homme − femme : une direction de l’espace porte le genre grammatical.' },

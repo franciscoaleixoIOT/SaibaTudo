@@ -48,7 +48,7 @@ export default {
       enviar: 'Fragen', limparCampo: 'Feld leeren', analisando: 'Wird analysiert…', ultimaPergunta: 'Letzte Frage', anterior: 'Vorige Frage', proxima: 'Nächste Frage',
       sugestoesTitulo: 'Sie können auch fragen', copiar: 'Antwort kopieren', copiado: 'Antwort kopiert.', fechar: 'Antwort schließen', relatar: 'Problem mit dieser Antwort melden',
       relatarAjuda: 'Öffnet ein öffentliches GitHub-Issue mit der Frage im Titel; nichts wird gesendet, bevor Sie dort bestätigen.',
-      respostaAria: 'Antwort', historicoVazio: 'Noch keine Fragen.'
+      abrir: 'Öffnen', respostaAria: 'Antwort', historicoVazio: 'Noch keine Fragen.'
     },
     aprenda: {
       titulo: 'Lernen: die Bausteine eines Sprachmodells', subtitulo: 'Sechs kurze Abschnitte, von der Vorhersage des nächsten Tokens bis zur Softmax. Jeder hat ein „Ausprobieren“, das in den Explorer führt.',
@@ -62,6 +62,12 @@ export default {
       comoCalcula: 'Wie die Zahlen berechnet werden', calculos: ['Kosinus und Skalarprodukt: auf diesem Gerät aus den int8-Vektoren berechnet, ohne Rundung über die Quantisierung hinaus.', 'Nachbarn und Analogien: Durchlauf des gesamten Vokabulars nach Kosinus; die Analogie ist a − b + c ohne a, b und c.', 'Diagrammachsen: die 3 Dimensionen mit der größten Varianz unter den gewählten Wörtern oder die 3 Hauptkomponenten (PCA) mit erklärter Varianz.', 'Keine Zahl stammt aus einem Sprachmodell; generierter Text wird, wenn Sie ihn anfordern, gekennzeichnet und auf dem Server geprüft.'],
       ia: 'Cloud-KI (optional)', iaTexto: 'Standardmäßig aus. Auf Anfrage sendet der Projektserver die Frage, die Sprache, eine Zusammenfassung des Diagramms und Auszüge der Abschnitte an ein offenes Modell (Qwen3-4B-Instruct-2507, Apache 2.0) in einem Hugging-Face-Space; die Antwort kommt mit dem Modellnamen gekennzeichnet zurück und wird abgelehnt, wenn sie eine Zahl enthält, die nicht im Gesendeten steht.',
       referencias: 'Literatur', licencas: 'Lizenzen', traducoes: 'Übersetzungen', revisao: { pendente: 'von einem Agenten übersetzt, Prüfung durch Muttersprachler steht aus', humana: 'Quelltext, geprüft' }, codigo: 'Quellcode der App auf GitHub'
+    },
+    nuvem: {
+      botao: 'Die Cloud-KI fragen', consultando: 'Cloud-KI wird gefragt…', titulo: 'Erklärung der Cloud-KI',
+      consentimento: 'Diese Frage an die Cloud-KI senden? An unseren Server gehen der Fragetext, die Sprache, eine Zusammenfassung des aktuellen Diagramms und Auszüge der Abschnitte sowie ein zufälliger Code dieser Installation. Nichts wird zusammen mit der Frage gespeichert. Die Antwort erzeugt ein Modell (derzeit Qwen3-4B), gekennzeichnet und geprüft: Zahlen außerhalb des Gesendeten werden abgelehnt.',
+      confirmar: 'Senden', cancelar: 'Jetzt nicht', lembrar: 'Nicht mehr fragen (automatischer Modus; in den Einstellungen abschaltbar)',
+      falha: { desligada: 'Die Cloud-KI ist in dieser Version aus. Die Antwort oben wurde auf Ihrem Gerät erstellt.', cota: 'Die Cloud-KI hat ihr Nutzungslimit vorerst erreicht. Versuchen Sie es später.', timeout: 'Die Cloud-KI hat zu lange gebraucht; der Aufruf wurde abgebrochen.', rejeitada: 'Die Cloud-KI hat geantwortet, aber der Text bestand die Prüfung nicht (Zahl oder Sprache außerhalb des Erwarteten) und wurde verworfen.', dadopessoal: 'Die Frage scheint personenbezogene Daten zu enthalten und wurde nicht an die Cloud gesendet.', rede: 'Die Cloud-KI war nicht erreichbar (kein Netz oder Dienst ausgefallen).' }
     },
     presets: {
       realeza: { nome: 'Königtum und Geschlecht', nota: 'Die Differenz König − Königin ähnelt Mann − Frau: eine Richtung des Raums trägt das grammatische Geschlecht.' },

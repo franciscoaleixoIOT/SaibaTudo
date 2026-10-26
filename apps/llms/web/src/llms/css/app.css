@@ -373,3 +373,8 @@ canvas.molecula { max-width: 100%; height: auto; }
 .resposta-acoes { display: flex; flex-wrap: wrap; gap: 8px; }
 .resposta-origem { margin: 0; display: flex; align-items: center; gap: 4px; }
 .bloco-gerado { border-left: 3px solid #D97706; padding-left: 10px; }
+/* ---------- diálogo de consentimento ---------- */
+.dialogo { border: 1px solid var(--outline-v); border-radius: 16px; padding: 18px 20px; max-width: min(520px, 92vw); background: var(--surface); color: inherit; }
+.dialogo::backdrop { background: rgba(0, 0, 0, .45); }
+.dialogo h2 { margin: 0 0 8px; font-size: 1.1rem; }
+.dialogo .resposta-acoes { margin-top: 12px; }

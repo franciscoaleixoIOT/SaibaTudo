@@ -49,7 +49,7 @@ export default {
       enviar: 'Perguntar', limparCampo: 'Limpar o campo', analisando: 'Analisando…', ultimaPergunta: 'Última pergunta', anterior: 'Pergunta anterior', proxima: 'Pergunta seguinte',
       sugestoesTitulo: 'Você também pode perguntar', copiar: 'Copiar resposta', copiado: 'Resposta copiada.', fechar: 'Fechar resposta', relatar: 'Relatar problema nesta resposta',
       relatarAjuda: 'Abre uma issue pública no GitHub com a pergunta no título; nada é enviado sem você confirmar lá.',
-      respostaAria: 'Resposta', historicoVazio: 'Nenhuma pergunta ainda.'
+      abrir: 'Abrir', respostaAria: 'Resposta', historicoVazio: 'Nenhuma pergunta ainda.'
     },
     aprenda: {
       titulo: 'Aprenda: as peças de um modelo de linguagem', subtitulo: 'Seis seções curtas, da previsão do próximo token à softmax. Cada uma tem um "Experimente" que leva ao explorador.',
@@ -63,6 +63,12 @@ export default {
       comoCalcula: 'Como os números são calculados', calculos: ['Cosseno e produto escalar: calculados neste aparelho a partir dos vetores int8, sem arredondar além da quantização.', 'Vizinhos e analogias: varredura de todo o vocabulário por cosseno; a analogia é a − b + c excluindo a, b e c.', 'Eixos do gráfico: as 3 dimensões de maior variância entre as palavras escolhidas, ou as 3 componentes principais (PCA) com a variância explicada.', 'Nenhum número vem de modelo de linguagem; o texto gerado, quando você pede, é rotulado e verificado no servidor.'],
       ia: 'IA na nuvem (opcional)', iaTexto: 'Desligada por padrão. Quando você pede, o servidor do projeto envia a pergunta, o idioma, um resumo do gráfico e trechos das seções a um modelo aberto (Qwen3-4B-Instruct-2507, Apache 2.0) num Space do Hugging Face; a resposta volta rotulada com o nome do modelo e é rejeitada se trouxer número que não esteja no que foi enviado.',
       referencias: 'Referências', licencas: 'Licenças', traducoes: 'Traduções', revisao: { pendente: 'tradução por agente, revisão por falante nativo pendente', humana: 'texto-fonte, revisado' }, codigo: 'Código-fonte do app no GitHub'
+    },
+    nuvem: {
+      botao: 'Perguntar à IA na nuvem', consultando: 'Consultando a IA na nuvem…', titulo: 'Explicação da IA na nuvem',
+      consentimento: 'Enviar esta pergunta à IA na nuvem? Vão ao nosso servidor o texto da pergunta, o idioma, um resumo do gráfico atual e trechos das seções, mais um código aleatório desta instalação. Nada é guardado com a pergunta. A resposta é gerada por um modelo (hoje Qwen3-4B), rotulada e verificada: números fora do que foi enviado são rejeitados.',
+      confirmar: 'Enviar', cancelar: 'Agora não', lembrar: 'Não perguntar de novo (modo automático; pode desligar em Configurações)',
+      falha: { desligada: 'A IA na nuvem está desligada nesta versão. A resposta acima foi montada no aparelho.', cota: 'A IA na nuvem atingiu o limite de uso por agora. Tente mais tarde.', timeout: 'A IA na nuvem demorou demais e a chamada foi cancelada.', rejeitada: 'A IA na nuvem respondeu, mas o texto não passou na verificação (número ou idioma fora do esperado) e foi descartado.', dadopessoal: 'A pergunta parece conter dado pessoal e não foi enviada à nuvem.', rede: 'Não foi possível falar com a IA na nuvem (sem rede ou serviço fora do ar).' }
     },
     presets: {
       realeza: { nome: 'Realeza e gênero', nota: 'A diferença rei − rainha é parecida com homem − mulher: uma direção do espaço carrega o gênero gramatical.' },

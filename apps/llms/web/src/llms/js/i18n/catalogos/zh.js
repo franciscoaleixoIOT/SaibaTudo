@@ -48,7 +48,7 @@ export default {
       enviar: '提问', limparCampo: '清空输入框', analisando: '正在分析…', ultimaPergunta: '上一个问题', anterior: '上一条', proxima: '下一条',
       sugestoesTitulo: '你还可以问', copiar: '复制回答', copiado: '回答已复制。', fechar: '关闭回答', relatar: '报告此回答的问题',
       relatarAjuda: '在 GitHub 上打开一个公开 issue，问题作为标题；在你确认之前不会发送任何内容。',
-      respostaAria: '回答', historicoVazio: '还没有问题。'
+      abrir: '打开', respostaAria: '回答', historicoVazio: '还没有问题。'
     },
     aprenda: {
       titulo: '学习：语言模型的各个部件', subtitulo: '六个简短的章节，从预测下一个 token 到 softmax。每一节都有一个“试一试”，带你进入探索器。',
@@ -62,6 +62,12 @@ export default {
       comoCalcula: '数值如何计算', calculos: ['余弦和点积：在此设备上由 int8 向量计算，除量化外不做其他舍入。', '近邻和类比：按余弦遍历整个词表；类比为 a − b + c，排除 a、b、c。', '图表坐标轴：所选单词之间方差最大的 3 个维度，或 3 个主成分（PCA）及其解释的方差。', '没有任何数值来自语言模型；当你请求时，生成的文本会被标注并在服务器上校验。'],
       ia: '云端 AI（可选）', iaTexto: '默认关闭。当你请求时，项目服务器把问题、语言、图表摘要和章节摘录发送给 Hugging Face Space 中的一个开放模型（Qwen3-4B-Instruct-2507，Apache 2.0）；回答带着模型名称返回，若包含发送内容之外的数字则会被拒绝。',
       referencias: '参考文献', licencas: '许可', traducoes: '翻译', revisao: { pendente: '由智能体翻译，母语者审校待定', humana: '源文本，已审校' }, codigo: 'GitHub 上的应用源代码'
+    },
+    nuvem: {
+      botao: '询问云端 AI', consultando: '正在询问云端 AI…', titulo: '云端 AI 的解释',
+      consentimento: '把这个问题发送给云端 AI 吗？问题文本、语言、当前图表的摘要和章节摘录，以及本次安装的随机代码，会发送到我们的服务器。不会与问题一起保存任何内容。回答由模型（目前为 Qwen3-4B）生成，带有标注并经过校验：发送内容之外的数字会被拒绝。',
+      confirmar: '发送', cancelar: '暂不', lembrar: '不再询问（自动模式；可在设置中关闭）',
+      falha: { desligada: '此版本中云端 AI 已关闭。上面的回答是在您的设备上生成的。', cota: '云端 AI 暂时达到了使用上限。请稍后再试。', timeout: '云端 AI 响应太慢，调用已取消。', rejeitada: '云端 AI 已回答，但文本未通过校验（数字或语言超出预期）并已被丢弃。', dadopessoal: '问题似乎包含个人数据，未发送到云端。', rede: '无法联系云端 AI（无网络或服务不可用）。' }
     },
     presets: {
       realeza: { nome: '王室与性别', nota: '国王 − 女王 的差向量与 男人 − 女人 相似：空间中的一个方向承载了语法性别。' },

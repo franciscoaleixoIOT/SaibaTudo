@@ -31,7 +31,7 @@ export const ganchos = { aoResponder: null };
 /** Aplica as ações de uma resposta ao explorador (e navegação). */
 export function aplicarAcoes(acoes, { navegar }) {
   for (const a of acoes ?? []) {
-    if (a.tipo === 'irPara') { navegar?.(a.rota); continue; }
+    if (a.tipo === 'irPara') continue; // vira um botao na resposta (renderResposta): a pessoa escolhe quando abrir a secao
     if (a.tipo === 'destacar') { explorador?.destacar?.(a.indice); continue; }
     explorador?.aplicarAcao(a);
   }
@@ -99,7 +99,7 @@ export function viewInicio({ vetores, query, navegar }) {
       ...r.blocos.map(blocoEl).filter(Boolean),
       r.gerado ? h('div', { class: 'bloco bloco-gerado' }, h('p', { class: 'bloco-texto' }, r.gerado.texto), h('p', { class: 'mini mudo' }, rotuloOrigem({ origem: 'GENERATIVA', modelo: r.gerado.modelo }))) : null,
       h('p', { class: 'resposta-origem mini mudo' }, icon('verified', 14), ' ', rotuloOrigem(r)),
-      h('div', { class: 'resposta-acoes' }, copiar, relatar, ...(r.extras ?? [])),
+      h('div', { class: 'resposta-acoes' }, ...r.acoes.filter((a) => a.tipo === 'irPara').map((a) => h('a', { class: 'btn btn-primario peq', href: a.rota }, icon('book', 16), t('ui.inicio.abrir'))), copiar, relatar, ...(r.extras ?? [])),
       r.sugestoes?.length ? h('div', null, h('p', { class: 'pequeno mudo' }, t('ui.inicio.sugestoesTitulo')), h('div', { class: 'chips' }, r.sugestoes.map((s) => chip({ rotulo: s, icone: 'sparkles', classe: 'sug', onClick: () => enviar(s) })))) : null
     ].filter(Boolean));
     respostaEl.hidden = false;
