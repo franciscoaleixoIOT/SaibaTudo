@@ -3,7 +3,8 @@
 Todo app SaibaTudo (site/PWA e Android) tem uma caixa de pergunta em linguagem natural respondida por dados. Este documento
 fixa o que ela precisa ter, para que um app novo nasça com a mesma experiência e os antigos não regridam. A implementação
 de referência é a do site de Eleições (`apps/eleicoes2026/web/src/eleicoes2026/`); a de Química (`apps/quimica/web/src/quimica/`)
-segue o mesmo padrão desde 12/10/2026. Quando um app ganhar uma melhoria desta lista, porte para os outros e atualize aqui.
+segue o mesmo padrão desde 12/10/2026. A de LLMs (`apps/llms/web/src/llms/js/ui/inicio.js`) segue o padrão desde 25/10/2026, com a IA na nuvem
+opt-in que só explica (botão em cada resposta, consentimento por pergunta ou chave em Configurações, rótulo com o nome do modelo). Quando um app ganhar uma melhoria desta lista, porte para os outros e atualize aqui.
 
 ## 1. Campo de pergunta (obrigatório)
 | Item | Comportamento | Referência |
