@@ -24,7 +24,10 @@ Guia do app: `../CLAUDE.md`. Plano e spec do S1 na raiz do repositório (`docs/s
   do HF; a repetição subiu), RUNNING, teste do `publicar.py --teste` ok em pt-BR (6,4 s de GPU) e zh (3,2 s) com rodapé de IA gerada.
 - Domínio `/llms/` e home em chinês: **preparados na branch `llms-dominio`** (commit 549cc39: rotas `/llms*` e `/zh*` no `vercel.json` de
   eleições, SW da home, IDIOMAS + zh, `portal/src/portal/i18n/zh.js`, seção `llms` nos seis catálogos, botão, cartão e ícone; testes do portal
-  10/10 e da raiz 9/9). Merge em **27/10/2026** (congelamento de eleições até 26/10) e depois `gh workflow run eleicoes-data-refresh.yml`.
+  10/10 e da raiz 9/9). **Mergeada na main em 26/10/2026** (1bf75fa2, com `[congelamento-ok]` porque as eleições terminaram em 25/10 e o
+  mantenedor autorizou descongelar); `eleicoes-data-refresh.yml` republicou o proxy e `portal-ci.yml` a home. Conferido ao vivo:
+  saibatudo.net/llms/ (health ok, 100 000 palavras, SW no escopo /llms/, analogia king − man + woman funciona), saibatudo.net/zh/ (lang zh,
+  link `/llms/?lang=zh`, química cai em `en`) e cartão + botão do LLMs na home em pt-BR.
 
 - **Revisão final da branch (26/10/2026, revisor novo em Opus):** 0 críticos, 7 importantes, todos corrigidos com teste RED→GREEN no mesmo dia:
   (1) o verificador só olhava o texto antes do rodapé → agora desconta só a frase do rodapé e confere o resto; (2) resposta da nuvem podia cair sob

@@ -7,7 +7,7 @@
 2. `gh workflow run llms-data-refresh.yml` (sob demanda; verifica a assinatura, roda os testes de integridade, builda e faz `vercel deploy --prod`
    no projeto `saibatudo-llms` com `VERCEL_TOKEN_TIME`). Push na `main` não publica.
 3. Conferir: `curl https://saibatudo-llms.vercel.app/llms/api/health` → `"ok":true`, `"data":{…,"palavras":100000}`, `"ask":"on"|"off"`.
-4. Depois de 27/10/2026 (rota no `vercel.json` de eleições): `https://saibatudo.net/llms/` e `.../llms/api/health`.
+4. Pelo domínio (rota no `vercel.json` de eleições, no ar desde 26/10/2026): `https://saibatudo.net/llms/` e `.../llms/api/health`.
 
 ## 2. Variáveis e segredos
 | Onde | Nome | Quem grava | Para quê |
@@ -38,8 +38,8 @@ O verificador (`api/_lib/fidelidade.js`) desconta só a frase do rodapé e confe
 outro idioma latino com o rodapé certo e resposta zh com um único caractere Han. O cliente mostra o texto sempre rotulado com o modelo, abaixo da
 resposta local, que permanece.
 
-## 5. Domínio e home (27/10/2026)
-Branch `llms-dominio`: três rewrites `/llms*` e três `/zh*` em `apps/eleicoes2026/vercel.json`, exclusão `/llms/` em `portal/src/sw.js`, cartão fixo
+## 5. Domínio e home (no ar em 26/10/2026)
+Merge 1bf75fa2 da branch `llms-dominio` (com `[congelamento-ok]`: eleições encerradas em 25/10, mantenedor autorizou descongelar): três rewrites `/llms*` e três `/zh*` em `apps/eleicoes2026/vercel.json`, exclusão `/llms/` em `portal/src/sw.js`, cartão fixo
 do app em `portal/src/index.html` + catálogos (6, com `zh.js`), `IDIOMAS` do portal com `zh`, `tests/rotas.test.mjs`. Depois do merge:
 `gh workflow run eleicoes-data-refresh.yml` (as regras de proxy só valem após o deploy de eleições) e `portal-ci.yml` publica a home.
 

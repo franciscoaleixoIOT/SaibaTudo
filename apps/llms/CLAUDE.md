@@ -7,7 +7,7 @@
 
 O app ensina **como um modelo de linguagem funciona**: um explorador 3D de vetores de palavras (GloVe, 100 mil palavras em inglês, 50 dimensões,
 projetadas em 3 eixos por variância ou PCA), um assistente por regras em **seis idiomas (pt-BR, en, es, de, fr e zh)**, seis seções didáticas
-próprias e uma IA na nuvem opcional que só explica. Rota `saibatudo.net/llms/` (proxy no `vercel.json` de eleições; até lá, `saibatudo-llms.vercel.app/llms/`).
+próprias e uma IA na nuvem opcional que só explica. Rota `saibatudo.net/llms/` (proxy no `vercel.json` de eleições, no ar desde 26/10/2026; alias direto `saibatudo-llms.vercel.app/llms/`).
 
 ## Regras que não se negociam
 1. **Dados com licença e fonte.** Os vetores são o GloVe 6B (Stanford, **PDDL 1.0**); o pacote é gerado localmente (`pipeline/gerar_pacote.py`),
