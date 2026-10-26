@@ -72,6 +72,7 @@
         <p class="hero-sub">{{hero.sub}}</p>
         <p class="hero-acoes"><a class="btn btn-ouro grande" href="/eleicoes2026/">{{hero.abrirEleicoes}}</a>
           <a class="btn btn-ouro grande" href="/quimica/">{{hero.abrirQuimica}}</a>
+          <a class="btn btn-ouro grande" href="/llms/">{{hero.abrirLLMs}}</a>
           <a class="btn btn-ouro grande" href="/achavagaia/">{{hero.abrirAchaVagaIA}}</a></p>
       </div>
     </section>
@@ -114,6 +115,24 @@
             <a class="btn btn-primario grande" href="/quimica/">{{quimica.abrir}}</a>
           </div>
           <p class="mini mudo">{{quimica.nota}}</p>
+        </div>
+      </article>
+      <article class="card app-principal app-llms">
+        <img class="app-icone" src="/portal/brand/svg/llms-icon.svg" width="88" height="88" alt="">
+        <div class="app-corpo">
+          <p class="selo">{{llms.selo}}</p>
+          <h3>{{llms.nome}}</h3>
+          <p>{{llms.descricao}}</p>
+          <ul class="vantagens">
+            <li>{{llms.vantagens.0}}</li>
+            <li>{{llms.vantagens.1}}</li>
+            <li>{{llms.vantagens.2}}</li>
+            <li>{{llms.vantagens.3}}</li>
+          </ul>
+          <div class="acoes">
+            <a class="btn btn-primario grande" href="/llms/">{{llms.abrir}}</a>
+          </div>
+          <p class="mini mudo">{{llms.nota}}</p>
         </div>
       </article>
       <article class="card app-principal app-achavagaia">
@@ -177,6 +196,7 @@
       </div>
       <p class="acoes"><a class="btn btn-primario" href="/eleicoes2026/">{{instalar.abrirEleicoes}}</a>
         <a class="btn btn-primario" href="/quimica/">{{instalar.abrirQuimica}}</a>
+        <a class="btn btn-primario" href="/llms/">{{instalar.abrirLLMs}}</a>
         <button type="button" id="btn-instalar" class="btn btn-contorno" hidden><span data-icone="download" data-tam="18"></span>{{instalar.portal}}</button></p>
     </section>
 
@@ -192,6 +212,7 @@
           <h3>{{projeto.fontes.titulo}}</h3>
           <p>{{projeto.fontes.eleicoes}}</p>
           <p>{{projeto.fontes.quimica}}</p>
+          <p>{{projeto.fontes.llms}}</p>
           <p><a href="/sobre-os-dados">{{projeto.fontes.link}}</a></p>
         </article>
         <article class="card">

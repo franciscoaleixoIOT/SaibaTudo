@@ -55,7 +55,11 @@ export function renderizar(molde, idioma, catalogo) {
     if (!(k in NUMEROS_QUIMICA)) falhar(`catálogo ${idioma}: número desconhecido {num:${k}} (ver NUMEROS_QUIMICA em apps.js)`);
     return `<span data-num="${k}">${fmt.format(NUMEROS_QUIMICA[k])}</span>`;
   });
-  if (idioma !== PADRAO) s = s.replace(/href="\/quimica\/"/g, `href="/quimica/?lang=${idioma}"`);
+  if (idioma !== PADRAO) {
+    const langQuimica = idioma === 'zh' ? 'en' : idioma; // a química ainda não fala chinês: a página zh leva ao inglês
+    s = s.replace(/href="\/quimica\/"/g, `href="/quimica/?lang=${langQuimica}"`);
+    s = s.replace(/href="\/llms\/"/g, `href="/llms/?lang=${idioma}"`);
+  }
   if (/\{\{|\{num:/.test(s)) falhar(`página ${idioma}: marcador não resolvido: ${/\{\{[^}]*\}\}|\{num:[^}]*\}/.exec(s)[0]}`);
   return s;
 }

@@ -77,6 +77,18 @@
       "destination": "https://saibatudo-portal.vercel.app/fr/:path*"
     },
     {
+      "source": "/zh",
+      "destination": "https://saibatudo-portal.vercel.app/zh/"
+    },
+    {
+      "source": "/zh/",
+      "destination": "https://saibatudo-portal.vercel.app/zh/"
+    },
+    {
+      "source": "/zh/:path*",
+      "destination": "https://saibatudo-portal.vercel.app/zh/:path*"
+    },
+    {
       "source": "/quimica",
       "destination": "https://saibatudo-quimica.vercel.app/quimica/"
     },
@@ -99,6 +111,18 @@
     {
       "source": "/achavagaia/:path*",
       "destination": "https://saibatudo-achavagaia.vercel.app/achavagaia/:path*"
+    },
+    {
+      "source": "/llms",
+      "destination": "https://saibatudo-llms.vercel.app/llms/"
+    },
+    {
+      "source": "/llms/",
+      "destination": "https://saibatudo-llms.vercel.app/llms/"
+    },
+    {
+      "source": "/llms/:path*",
+      "destination": "https://saibatudo-llms.vercel.app/llms/:path*"
     },
     {
       "source": "/eleicoes2026/:path((?!.*\\.).*)",

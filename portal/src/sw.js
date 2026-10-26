@@ -1,6 +1,6 @@
 /* SaibaTudo — service worker da home (escopo /). Gerado por portal/build.mjs (VERSAO e PRECACHE são preenchidos no build).
  * A home é um projeto próprio (portal/), servido em saibatudo.net/ pelo proxy do projeto de eleições.
- * Nunca intercepta /api/*, /data/*, /quimica/* e /achavagaia/* (outros projetos, servidos por proxy, com service worker e dados
+ * Nunca intercepta /api/*, /data/*, /quimica/*, /achavagaia/* e /llms/* (outros projetos, servidos por proxy, com service worker e dados
  * próprios: cache-primeiro aqui prenderia JS e dados antigos), as navegações de /eleicoes2026/ (o app tem o próprio service
  * worker) nem outros métodos além de GET. As páginas por idioma (/, /en/, /es/, /de/, /fr/) são páginas da home: rede primeiro,
  * cache se offline. */
@@ -33,6 +33,7 @@ self.addEventListener('fetch', (event) => {
   if (p.startsWith('/api/') || p.startsWith('/data/')) return;
   if (p === '/quimica' || p.startsWith('/quimica/')) return; // SaibaTudo Química: nada passa por este cache
   if (p === '/achavagaia' || p.startsWith('/achavagaia/')) return; // SaibaTudo AchaVagaIA: idem
+  if (p === '/llms' || p.startsWith('/llms/')) return; // SaibaTudo LLMs: idem
   if (p.startsWith('/eleicoes2026/') && req.mode === 'navigate') return; // o app tem o próprio service worker
   if (req.mode === 'navigate') { event.respondWith(redeOuCache(event, req)); return; }
   event.respondWith(cacheOuRede(event, req));

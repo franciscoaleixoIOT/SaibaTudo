@@ -16,6 +16,7 @@ const por = Object.fromEntries(eleicoes.rewrites.map((r) => [r.source, r.destina
 const PORTAL = 'https://saibatudo-portal.vercel.app';
 const QUIMICA = 'https://saibatudo-quimica.vercel.app';
 const ACHAVAGAIA = 'https://saibatudo-achavagaia.vercel.app';
+const LLMS = 'https://saibatudo-llms.vercel.app';
 const OUTROS = IDIOMAS.filter((i) => i !== PADRAO);
 /** Páginas do próprio projeto de eleições (não precisam de regra de proxy). */
 const PROPRIOS = ['/eleicoes2026/', '/privacidade', '/sobre-os-dados'];
@@ -35,7 +36,7 @@ test('a home vem do portal (proxy) e eleições não gera mais os arquivos da ho
 });
 
 test('home em cinco idiomas: as três formas do endereço de cada idioma (/en, /en/, /en/*) vão ao portal, e eleições não tem pasta com esse nome', () => {
-  assert.deepEqual(IDIOMAS, ['pt-BR', 'en', 'es', 'de', 'fr']);
+  assert.deepEqual(IDIOMAS, ['pt-BR', 'en', 'es', 'de', 'fr', 'zh']);
   for (const i of OUTROS) {
     assert.equal(por[`/${i}`], `${PORTAL}/${i}/`, `/${i}`);
     assert.equal(por[`/${i}/`], `${PORTAL}/${i}/`, `/${i}/`);
@@ -44,7 +45,7 @@ test('home em cinco idiomas: as três formas do endereço de cada idioma (/en, /
     assert.ok(existsSync(join(tmp, i, 'index.html')), `o build do portal não gerou /${i}/`);
   }
   // nenhuma regra de idioma se mistura com as rotas de eleições (que ficam sob /eleicoes2026/ e /data/)
-  for (const r of eleicoes.rewrites) if (/^\/(en|es|de|fr)(\/|$)/.test(r.source)) assert.ok(r.destination.startsWith(`${PORTAL}/`), r.source);
+  for (const r of eleicoes.rewrites) if (/^\/(en|es|de|fr|zh)(\/|$)/.test(r.source)) assert.ok(r.destination.startsWith(`${PORTAL}/`), r.source);
 });
 
 test('cada cartão da home tem rota: app do próprio domínio de eleições ou regra exata de proxy (a barra final é literal)', async () => {
@@ -56,6 +57,14 @@ test('química: as três formas do endereço vão ao projeto de química', () =>
   assert.equal(por['/quimica'], `${QUIMICA}/quimica/`);
   assert.equal(por['/quimica/'], `${QUIMICA}/quimica/`);
   assert.equal(por['/quimica/:path*'], `${QUIMICA}/quimica/:path*`);
+});
+
+test('LLMs: as três formas do endereço vão ao projeto saibatudo-llms, antes do SPA de eleições', () => {
+  assert.equal(por['/llms'], `${LLMS}/llms/`);
+  assert.equal(por['/llms/'], `${LLMS}/llms/`);
+  assert.equal(por['/llms/:path*'], `${LLMS}/llms/:path*`);
+  const fontes = eleicoes.rewrites.map((r) => r.source);
+  assert.ok(fontes.indexOf('/llms/:path*') < fontes.findIndex((f) => f.startsWith('/eleicoes2026/')), 'proxy antes do SPA de eleições');
 });
 
 test('AchaVagaIA: as três formas do endereço vão ao projeto saibatudo-achavagaia (sempre em /achavagaia/ na origem)', () => {
@@ -72,7 +81,7 @@ test('o service worker da home (escopo /) não intercepta nenhum app servido por
   const regras = eleicoes.rewrites.filter((r) => /^\/[a-zA-Z0-9-]+\/:path\*$/.test(r.source)).map((r) => [r.source.split('/')[1], r.destination]);
   const apps = [...new Set(regras.filter(([, d]) => !d.startsWith(`${PORTAL}/`)).map(([p]) => p))];
   const daHome = [...new Set(regras.filter(([, d]) => d.startsWith(`${PORTAL}/`)).map(([p]) => p))];
-  assert.ok(apps.includes('quimica') && apps.includes('achavagaia'), 'química e AchaVagaIA são apps por proxy');
+  assert.ok(apps.includes('quimica') && apps.includes('achavagaia') && apps.includes('llms'), 'química, AchaVagaIA e LLMs são apps por proxy');
   for (const p of apps) assert.ok(sw.includes(`p.startsWith('/${p}/')`), `portal/src/sw.js precisa ignorar /${p}/`);
   assert.ok(daHome.includes('portal') && OUTROS.every((i) => daHome.includes(i)), 'portal e idiomas vão ao portal');
   for (const p of daHome) assert.ok(!sw.includes(`p.startsWith('/${p}/')`), `portal/src/sw.js não deve ignorar /${p}/ (é da home)`);
@@ -86,12 +95,14 @@ test('todo link das cinco páginas da home tem rota (próprio de eleições, pá
     for (const i of IDIOMAS) assert.ok(html.includes(`<link rel="alternate" hreflang="${i}" href="${ORIGEM}${caminho(i)}">`), `${idioma}: hreflang ${i}`);
     assert.ok(html.includes(`<link rel="alternate" hreflang="x-default" href="${ORIGEM}/">`), `${idioma}: x-default`);
     const links = [...html.matchAll(/href="(\/[^"#]*)"/g)].map((m) => m[1]).filter((u) => !u.startsWith('/portal/') && u !== '/manifest.webmanifest');
-    const esperadoQuimica = idioma === PADRAO ? '/quimica/' : `/quimica/?lang=${idioma}`;
-    assert.ok(links.includes(esperadoQuimica) && links.includes('/eleicoes2026/') && links.includes('/achavagaia/'), `${idioma}: a home leva aos três apps`);
+    const esperadoQuimica = idioma === PADRAO ? '/quimica/' : `/quimica/?lang=${idioma === 'zh' ? 'en' : idioma}`; // a química não tem zh
+    const esperadoLlms = idioma === PADRAO ? '/llms/' : `/llms/?lang=${idioma}`;
+    assert.ok(links.includes(esperadoQuimica) && links.includes(esperadoLlms) && links.includes('/eleicoes2026/') && links.includes('/achavagaia/'), `${idioma}: a home leva aos quatro apps`);
     for (const u of links) {
       const p = u.split(/[?#]/)[0];
       assert.ok(PROPRIOS.includes(p) || inicio.includes(p) || por[p], `${idioma}: link da home sem rota: ${u}`);
       if (p === '/quimica/') assert.equal(u, esperadoQuimica, `${idioma}: link de química`);
+      if (p === '/llms/') assert.equal(u, esperadoLlms, `${idioma}: link do LLMs (seis idiomas)`);
       if (p === '/achavagaia/') assert.equal(u, '/achavagaia/', `${idioma}: link do AchaVagaIA (só em português: sem ?lang=)`);
     }
     for (const i of OUTROS) if (i !== idioma) assert.ok(links.includes(caminho(i)), `${idioma}: seletor sem ${caminho(i)}`);

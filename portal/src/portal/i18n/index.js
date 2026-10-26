@@ -2,7 +2,7 @@
 // Para adicionar um idioma: crie portal/src/portal/i18n/<codigo>.js com as mesmas chaves de pt-BR.js (o teste confere),
 // acrescente o código aqui, as três regras de proxy em apps/eleicoes2026/vercel.json (ver portal/README.md) e os textos
 // de execução em portal/src/portal/home.js (UI e AVISO) e as traduções de EM_BREVE em apps.js.
-export const IDIOMAS = ['pt-BR', 'en', 'es', 'de', 'fr'];
+export const IDIOMAS = ['pt-BR', 'en', 'es', 'de', 'fr', 'zh'];
 export const PADRAO = 'pt-BR';
 export const ORIGEM = 'https://saibatudo.net';
 

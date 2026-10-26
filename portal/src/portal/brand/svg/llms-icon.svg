@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="t d"><title id="t">SaibaTudo LLMs</title><desc id="d">Ícone do app: três eixos e três pontos, vetores de palavras em 3D</desc><clipPath id="b"><rect width="512" height="512" rx="112"/></clipPath>
+<g clip-path="url(#b)"><rect width="512" height="512" fill="#0C2340"/>
+<polygon points="0,372 512,196 512,512 0,512" fill="#143A66"/><g transform="translate(256 256) scale(5.5) translate(-54 -54)">
+<polygon fill="#FFFFFF" points="51.47,65.51 91.47,79.51 92.53,76.49 52.53,62.49"/>
+<polygon fill="#FFFFFF" points="93.89,78.66 85.35,78.85 87.33,73.19"/>
+<polygon fill="#FFFFFF" points="53.6,64 53.6,18 50.4,18 50.4,64"/>
+<polygon fill="#FFFFFF" points="52,16 55,24 49,24"/>
+<polygon fill="#FFFFFF" points="51.13,62.66 17.13,84.66 18.87,87.34 52.87,65.34"/>
+<polygon fill="#FFFFFF" points="16.32,87.09 21.41,80.22 24.67,85.26"/>
+<circle fill="#FFFFFF" cx="52" cy="64" r="2.6"/>
+<circle fill="#7FB3FF" cx="76" cy="40" r="6.5"/>
+<circle fill="#FFB81C" cx="38" cy="34" r="5.5"/>
+<circle fill="#22C55E" cx="70" cy="72" r="5"/></g></g></svg>

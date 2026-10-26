@@ -26,7 +26,7 @@ const existe = (u, base = OUT) => {
 const semQuery = (u) => u.split(/[?#]/)[0];
 const OUTROS = IDIOMAS.filter((i) => i !== PADRAO);
 /** Links de navegação para páginas de outros projetos no mesmo domínio (não são recursos da home). */
-const PAGINAS = ['/eleicoes2026/', '/privacidade', '/sobre-os-dados', '/quimica/', '/achavagaia/'];
+const PAGINAS = ['/eleicoes2026/', '/privacidade', '/sobre-os-dados', '/quimica/', '/llms/', '/achavagaia/'];
 const catalogo = async (idioma) => (await import(pathToFileURL(join(SRC, 'portal/i18n', `${idioma}.js`)).href)).default;
 
 before(() => { roda(OUT); });
@@ -56,20 +56,20 @@ test('todo recurso local da home existe no próprio projeto (independente de ele
   // os três apps têm o MESMO destaque (decisão do mantenedor, 12/10/2026): botão dourado no topo e cartão principal com ícone
   // próprio e o mesmo botão primário grande
   const html = pagina(PADRAO);
-  assert.match(html, /class="hero-acoes">[\s\S]*href="\/eleicoes2026\/"[\s\S]*href="\/quimica\/"[\s\S]*href="\/achavagaia\/"[\s\S]*?<\/p>/);
-  assert.equal((html.match(/class="card app-principal/g) || []).length, 3);
-  assert.ok(html.includes('/portal/brand/svg/quimica-icon.svg') && html.includes('/portal/brand/svg/eleicoes2026-icon.svg') && html.includes('/portal/brand/svg/achavagaia-icon.svg'));
+  assert.match(html, /class="hero-acoes">[\s\S]*href="\/eleicoes2026\/"[\s\S]*href="\/quimica\/"[\s\S]*href="\/llms\/"[\s\S]*href="\/achavagaia\/"[\s\S]*?<\/p>/);
+  assert.equal((html.match(/class="card app-principal/g) || []).length, 4);
+  assert.ok(html.includes('/portal/brand/svg/quimica-icon.svg') && html.includes('/portal/brand/svg/eleicoes2026-icon.svg') && html.includes('/portal/brand/svg/achavagaia-icon.svg') && html.includes('/portal/brand/svg/llms-icon.svg'));
   for (const idioma of IDIOMAS) {
     const h = pagina(idioma);
     const hero = /class="hero-acoes">([\s\S]*?)<\/p>/.exec(h)[1];
     const botoesHero = [...hero.matchAll(/<a class="([^"]+)" href="(\/[^"]*)"/g)].map((m) => m.slice(1));
-    assert.deepEqual(botoesHero.map((b) => b[0]), Array(3).fill('btn btn-ouro grande'), `${idioma}: botões do topo com o mesmo destaque`);
-    assert.deepEqual(botoesHero.map((b) => b[1].split('?')[0]), ['/eleicoes2026/', '/quimica/', '/achavagaia/'], `${idioma}: botões do topo`);
+    assert.deepEqual(botoesHero.map((b) => b[0]), Array(4).fill('btn btn-ouro grande'), `${idioma}: botões do topo com o mesmo destaque`);
+    assert.deepEqual(botoesHero.map((b) => b[1].split('?')[0]), ['/eleicoes2026/', '/quimica/', '/llms/', '/achavagaia/'], `${idioma}: botões do topo`);
     const cartoes = [...h.matchAll(/<article class="card app-principal[^"]*">([\s\S]*?)<\/article>/g)].map((m) => m[1]);
-    assert.equal(cartoes.length, 3, `${idioma}: cartões principais`);
+    assert.equal(cartoes.length, 4, `${idioma}: cartões principais`);
     const abrir = cartoes.map((x) => /<a class="(btn btn-primario grande)" href="(\/[^"]*)"/.exec(x));
     assert.ok(abrir.every(Boolean), `${idioma}: cada cartão tem o botão primário grande`);
-    assert.deepEqual(abrir.map((m) => m[2].split('?')[0]), ['/eleicoes2026/', '/quimica/', '/achavagaia/'], `${idioma}: botões dos cartões`);
+    assert.deepEqual(abrir.map((m) => m[2].split('?')[0]), ['/eleicoes2026/', '/quimica/', '/llms/', '/achavagaia/'], `${idioma}: botões dos cartões`);
     assert.ok(cartoes.every((x) => x.includes('<img class="app-icone"')), `${idioma}: cada cartão tem ícone`);
   }
   assert.ok(existsSync(join(OUT, 'portal/brand/svg/achavagaia-icon.svg')));
@@ -115,6 +115,7 @@ test('catálogos: mesmas chaves que pt-BR, sem vazios, mesmas marcas inline e {n
     assert.equal(c.eleicoes.nome, 'SaibaTudo — Eleições 2026', `${idioma}: marca traduzida`);
     assert.equal(c.quimica.nome, 'SaibaTudo — Química', `${idioma}: marca traduzida`);
     assert.equal(c.achavagaia.nome, 'SaibaTudo — AchaVagaIA', `${idioma}: marca traduzida`);
+    assert.equal(c.llms.nome, 'SaibaTudo — LLMs', `${idioma}: marca traduzida`);
     assert.ok(c.meta.titulo.startsWith('SaibaTudo') && c.nomeNativo && c.ogLocale && c.eleicoes.apenasPortugues && c.achavagaia.apenasPortugues, idioma);
   }
   // pt-BR: só eleicoes.apenasPortugues e achavagaia.apenasPortugues podem ser vazios (o selo "só em português" não aparece na página em português)
@@ -148,7 +149,11 @@ test('uma página por idioma: lang, título, canônica, hreflang (cinco + x-defa
     // química no idioma da página; eleições sempre em português, com selo fora do português
     const quimica = [...html.matchAll(/href="(\/quimica\/[^"]*)"/g)].map((m) => m[1]);
     assert.ok(quimica.length >= 3, `${idioma}: links de química`);
-    for (const u of quimica) assert.equal(u, idioma === PADRAO ? '/quimica/' : `/quimica/?lang=${idioma}`, `${idioma}: ${u}`);
+    const langQuimica = idioma === 'zh' ? 'en' : idioma; // a química ainda não fala chinês
+    for (const u of quimica) assert.equal(u, idioma === PADRAO ? '/quimica/' : `/quimica/?lang=${langQuimica}`, `${idioma}: ${u}`);
+    const llms = [...html.matchAll(/href="(\/llms\/[^"]*)"/g)].map((m) => m[1]);
+    assert.ok(llms.length >= 3, `${idioma}: links do LLMs`);
+    for (const u of llms) assert.equal(u, idioma === PADRAO ? '/llms/' : `/llms/?lang=${idioma}`, `${idioma}: ${u}`);
     assert.ok(html.includes('href="/eleicoes2026/"') && !html.includes('/eleicoes2026/?lang'), `${idioma}: eleições`);
     const selos = [...html.matchAll(/<span class="tag tag-neutro selo-idioma">([^<]+)<\/span>/g)].map((m) => m[1]);
     if (idioma === PADRAO) assert.deepEqual(selos, [], 'a página em português não tem selo "só em português"');

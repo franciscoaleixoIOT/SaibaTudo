@@ -36,7 +36,8 @@ export const EM_BREVE = [
       en: { titulo: 'Upcoming elections', descricao: 'New editions of SaibaTudo Eleições on the same model: official data, neutrality and open source, one per election.' },
       es: { titulo: 'Próximas elecciones', descricao: 'Nuevas ediciones de SaibaTudo Eleições con el mismo modelo: datos oficiales, neutralidad y código abierto, una por elección.' },
       de: { titulo: 'Kommende Wahlen', descricao: 'Neue Ausgaben von SaibaTudo Eleições nach demselben Modell: amtliche Daten, Neutralität und offener Code, eine pro Wahl.' },
-      fr: { titulo: 'Prochaines élections', descricao: 'De nouvelles éditions de SaibaTudo Eleições sur le même modèle : données officielles, neutralité et code ouvert, une par élection.' }
+      fr: { titulo: 'Prochaines élections', descricao: 'De nouvelles éditions de SaibaTudo Eleições sur le même modèle : données officielles, neutralité et code ouvert, une par élection.' },
+      zh: { titulo: '下一届选举', descricao: '同一模式下的新版 SaibaTudo Eleições：官方数据、中立和开源，每届选举一个。' }
     }
   },
   {
@@ -48,7 +49,8 @@ export const EM_BREVE = [
       en: { titulo: 'Other civic topics', descricao: 'Independent tools for looking up official public information. Suggestions and contributions are welcome on GitHub.' },
       es: { titulo: 'Otros temas cívicos', descricao: 'Herramientas independientes para consultar información pública oficial. Las sugerencias y contribuciones son bienvenidas en GitHub.' },
       de: { titulo: 'Weitere Bürgerthemen', descricao: 'Unabhängige Werkzeuge zum Nachschlagen amtlicher öffentlicher Informationen. Vorschläge und Beiträge sind auf GitHub willkommen.' },
-      fr: { titulo: 'Autres thèmes civiques', descricao: 'Des outils indépendants pour consulter des informations publiques officielles. Suggestions et contributions sont bienvenues sur GitHub.' }
+      fr: { titulo: 'Autres thèmes civiques', descricao: 'Des outils indépendants pour consulter des informations publiques officielles. Suggestions et contributions sont bienvenues sur GitHub.' },
+      zh: { titulo: '其他公民主题', descricao: '用于查询官方公开信息的独立工具。欢迎在 GitHub 上提出建议和贡献。' }
     }
   }
 ];
