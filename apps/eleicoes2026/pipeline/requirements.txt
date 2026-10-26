@@ -1,4 +1,4 @@
 # Dependências do pipeline de dados (Python puro; funcionam onde extensões C são bloqueadas)
-pypdf==6.19.0
+pypdf==6.21.2
 ecdsa==0.19.2
 six==1.17.0
