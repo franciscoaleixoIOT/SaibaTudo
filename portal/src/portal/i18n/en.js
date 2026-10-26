@@ -28,6 +28,7 @@ export default {
     sub: 'Independent, open-source, ad-free apps that bring together official open data — from elections to chemistry — so you can check the facts and decide for yourself.',
     abrirEleicoes: 'Open the 2026 Elections app',
     abrirQuimica: 'Open the Chemistry app',
+    abrirLLMs: 'Open the LLMs app',
     abrirAchaVagaIA: 'Open AchaVagaIA'
   },
   apps: { titulo: 'Our apps' },
@@ -60,6 +61,19 @@ export default {
     ],
     abrir: 'Open the Chemistry app',
     nota: 'Works offline and nothing leaves your device. The Android version is in preparation; meanwhile, the web app can be installed.'
+  },
+  llms: {
+    selo: 'Language models — from word vectors to the transformer',
+    nome: 'SaibaTudo — LLMs',
+    descricao: 'Understand how a language model works in an interactive 3D chart: pick words, the app projects their GloVe vectors onto three axes, does vector arithmetic (king − man + woman ≈ queen) and shows neighbours and dot products. Six short lessons and an assistant in six languages, Chinese included.',
+    vantagens: [
+      '100,000 GloVe word vectors (Stanford, PDDL licence), computed on your device and verified by digital signature',
+      '3D explorer: the 3 dimensions with the largest variance or PCA, analogies, neighbours and the plural direction',
+      'Six original lessons: tokens, embeddings, attention, layers, softmax and temperature',
+      'Optional cloud AI that only explains, labelled with the model name and verified: no number comes from the model'
+    ],
+    abrir: 'Open the LLMs app',
+    nota: 'Works offline and nothing leaves your device without your tap. Interface in six languages; the words are English (the language of GloVe), with example words translated by the glossary.'
   },
   achavagaia: {
     selo: 'Careers — résumé and job search',
@@ -113,6 +127,7 @@ export default {
     },
     abrirEleicoes: 'Open the 2026 Elections app',
     abrirQuimica: 'Open the Chemistry app',
+    abrirLLMs: 'Open the LLMs app',
     portal: 'Install the SaibaTudo portal'
   },
   projeto: {
@@ -125,6 +140,7 @@ export default {
       titulo: 'Official sources',
       eleicoes: 'Elections: the <a href="https://dadosabertos.tse.jus.br/" target="_blank" rel="noopener noreferrer">TSE Open Data Portal</a>, CC BY 4.0 license; in case of discrepancy, the official TSE website always prevails.',
       quimica: 'Chemistry: PubChem (public domain), Wikidata (CC0), CODATA/NIST, ChEBI (CC BY 4.0), Wikipedia and Wikibooks (CC BY-SA 4.0); the app’s “About the data” page lists the version and license of each source.',
+      llms: 'LLMs: GloVe 6B word vectors (Stanford University, PDDL 1.0 licence); lesson texts written by the project, with academic references.',
       link: 'About the data: version, sources and limitations (in Portuguese)'
     },
     neutralidade: {

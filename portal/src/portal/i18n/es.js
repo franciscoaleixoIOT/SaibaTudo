@@ -29,6 +29,7 @@ export default {
     sub: 'Aplicaciones independientes, de código abierto y sin anuncios, que reúnen datos oficiales y abiertos — de las elecciones a la química — para que consultes los hechos y decidas por tu cuenta.',
     abrirEleicoes: 'Abrir la app Elecciones 2026',
     abrirQuimica: 'Abrir la app Química',
+    abrirLLMs: 'Abrir la app LLMs',
     abrirAchaVagaIA: 'Abrir AchaVagaIA'
   },
   apps: { titulo: 'Nuestras apps' },
@@ -61,6 +62,19 @@ export default {
     ],
     abrir: 'Abrir la app Química',
     nota: 'Funciona sin conexión y nada sale de tu dispositivo. La versión para Android está en preparación; mientras tanto, la app web se puede instalar.'
+  },
+  llms: {
+    selo: 'Modelos de lenguaje — del vector de palabra al transformer',
+    nome: 'SaibaTudo — LLMs',
+    descricao: 'Entiende cómo funciona un modelo de lenguaje en un gráfico 3D interactivo: elige palabras, la app proyecta los vectores de GloVe en tres ejes, hace aritmética de vectores (king − man + woman ≈ queen) y muestra vecinos y producto escalar. Seis lecciones cortas y un asistente en seis idiomas, chino incluido.',
+    vantagens: [
+      '100 mil vectores de palabras de GloVe (Stanford, licencia PDDL), calculados en tu dispositivo y verificados por firma digital',
+      'Explorador 3D: las 3 dimensiones de mayor varianza o PCA, analogías, vecinos y la dirección del plural',
+      'Seis lecciones de autoría propia: tokens, embeddings, atención, capas, softmax y temperatura',
+      'IA en la nube opcional, que solo explica, etiquetada con el nombre del modelo y verificada: ningún número viene del modelo'
+    ],
+    abrir: 'Abrir la app LLMs',
+    nota: 'Funciona sin conexión y nada sale de tu dispositivo sin tu toque. Interfaz en seis idiomas; las palabras son en inglés (el idioma de GloVe), con ejemplos traducidos por el glosario.'
   },
   achavagaia: {
     selo: 'Carrera — currículum y búsqueda de empleo',
@@ -114,6 +128,7 @@ export default {
     },
     abrirEleicoes: 'Abrir la app Elecciones 2026',
     abrirQuimica: 'Abrir la app Química',
+    abrirLLMs: 'Abrir la app LLMs',
     portal: 'Instalar el portal SaibaTudo'
   },
   projeto: {
@@ -126,6 +141,7 @@ export default {
       titulo: 'Fuentes oficiales',
       eleicoes: 'Elecciones: <a href="https://dadosabertos.tse.jus.br/" target="_blank" rel="noopener noreferrer">Portal de Datos Abiertos del TSE</a>, licencia CC BY 4.0; en caso de discrepancia, siempre prevalece el sitio oficial del TSE.',
       quimica: 'Química: PubChem (dominio público), Wikidata (CC0), CODATA/NIST, ChEBI (CC BY 4.0), Wikipedia y Wikilibros (CC BY-SA 4.0); la página «Sobre los datos» de la app indica la versión y la licencia de cada fuente.',
+      llms: 'LLMs: vectores GloVe 6B (Universidad de Stanford, licencia PDDL 1.0); textos de las lecciones escritos por el proyecto, con referencias académicas.',
       link: 'Sobre los datos: versión, fuentes y limitaciones (en portugués)'
     },
     neutralidade: {
