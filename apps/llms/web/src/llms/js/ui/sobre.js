@@ -7,9 +7,9 @@ import { kvEl, linkExterno } from './componentes.js';
 
 export const LICENCAS = [
   { nome: 'GloVe 6B (Wikipedia 2014 + Gigaword 5), 50d', licenca: 'PDDL 1.0', url: 'https://nlp.stanford.edu/projects/glove/' },
-  { nome: 'SaibaTudo LLMs (código, textos e glossário)', licenca: 'MIT', url: 'https://github.com/franciscoaleixoIOT/SaibaTudo' },
-  { nome: 'Qwen3-4B-Instruct-2507 (IA na nuvem, opcional)', licenca: 'Apache 2.0', url: 'https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507' },
-  { nome: 'Poppins (fonte)', licenca: 'OFL 1.1', url: 'https://fonts.google.com/specimen/Poppins' }
+  { nome: 'SaibaTudo LLMs', licenca: 'MIT', url: 'https://github.com/franciscoaleixoIOT/SaibaTudo' },
+  { nome: 'Qwen3-4B-Instruct-2507', licenca: 'Apache 2.0', url: 'https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507' },
+  { nome: 'Poppins', licenca: 'OFL 1.1', url: 'https://fonts.google.com/specimen/Poppins' }
 ];
 
 export function viewSobreDados({ vetores }) {
@@ -21,7 +21,7 @@ export function viewSobreDados({ vetores }) {
     { rotulo: t('ui.sobre.dimensoes'), valor: String(vetores.dimensoes) },
     { rotulo: t('ui.sobre.quantizacao'), valor: m.vetores?.quantizacao ?? 'int8' },
     { rotulo: t('ui.sobre.versaoPacote'), valor: m.version },
-    { rotulo: t('ui.sobre.geradoEm'), valor: fmtData(m.generatedAt, { comHora: true }) ?? m.generatedAt },
+    { rotulo: t('ui.sobre.geradoEm'), valor: fmtData(m.generatedAt) ?? m.generatedAt },
     { rotulo: t('ui.config.assinatura'), valor: t(`ui.config.assinaturaValor.${vetores.sig?.estado ?? 'indisponivel'}`) }
   ]) : h('p', { class: 'mudo' }, t('ui.config.semDados'));
   const revisao = IDIOMAS.map((i) => `${NOMES_IDIOMAS[i]}: ${t(`ui.sobre.revisao.${CATALOGOS[i].revisao}`)}`);
