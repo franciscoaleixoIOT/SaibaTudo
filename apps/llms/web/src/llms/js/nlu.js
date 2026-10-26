@@ -98,7 +98,7 @@ const contarPalavras = (norm, lex) => (lex.semFronteira ? norm.replace(/\s+/g, '
  */
 export function parse(pergunta, lex, { vetores, idioma, contexto = null }) {
   const norm = normalizarParaLexico(pergunta, lex);
-  const base = { intencao: 'DESCONHECIDA', palavras: [], desconhecidas: [], analogia: null, direcao: null, preset: null, conceito: null, continuacao: false };
+  const base = { intencao: 'DESCONHECIDA', original: String(pergunta ?? '').trim(), palavras: [], desconhecidas: [], analogia: null, direcao: null, preset: null, conceito: null, continuacao: false };
   if (!norm) return base;
   const I = lex.intencoes; const Pi = lex.pistas;
   const { palavras, desconhecidas } = extrairPalavras(pergunta, lex, vetores, idioma);

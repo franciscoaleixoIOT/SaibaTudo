@@ -44,7 +44,12 @@ export default {
     componentes: { fonte: 'Fonte: ', passoAPasso: 'Passo a passo' },
     inicio: {
       titulo: 'Explorar embeddings',
-      subtitulo: 'Escolha palavras e veja os vetores do GloVe projetados em três eixos. Rei − homem + mulher ≈ rainha.'
+      subtitulo: 'Escolha palavras e veja os vetores do GloVe projetados em três eixos. Rei − homem + mulher ≈ rainha.',
+      campoRotulo: 'Pergunte ou peça palavras para o gráfico', placeholder: 'Ex.: mostre king, queen, man e woman · king − man + woman · o que é um token?',
+      enviar: 'Perguntar', limparCampo: 'Limpar o campo', analisando: 'Analisando…', ultimaPergunta: 'Última pergunta', anterior: 'Pergunta anterior', proxima: 'Pergunta seguinte',
+      sugestoesTitulo: 'Você também pode perguntar', copiar: 'Copiar resposta', copiado: 'Resposta copiada.', fechar: 'Fechar resposta', relatar: 'Relatar problema nesta resposta',
+      relatarAjuda: 'Abre uma issue pública no GitHub com a pergunta no título; nada é enviado sem você confirmar lá.',
+      respostaAria: 'Resposta', historicoVazio: 'Nenhuma pergunta ainda.'
     },
     aprenda: {
       titulo: 'Aprenda: as peças de um modelo de linguagem', subtitulo: 'Seis seções curtas, da previsão do próximo token à softmax. Cada uma tem um "Experimente" que leva ao explorador.',
@@ -93,5 +98,27 @@ export default {
       privacidade: 'Privacidade', privacidadeTexto: 'Guardamos neste aparelho só o tema, o tamanho do texto, o idioma e o histórico de perguntas, além do cache para uso offline. ', politica: 'Política de privacidade',
       apagar: 'Apagar os dados deste aparelho', confirmar: 'Toque de novo para confirmar', apagados: 'Dados apagados. Recarregando…'
     }
-  }
+  },
+
+  respostas: {
+    origem: { local: 'Montada no aparelho • dados GloVe de {data}', generativa: 'Texto gerado por IA ({modelo}) • Nuvem — pode conter erros', nuvem: 'IA na nuvem' },
+    sugestoes: {
+      padrao: ['mostre king, queen, man e woman', 'king − man + woman', 'vizinhos de tower', 'direção do plural', 'mostre as capitais', 'o que é um embedding?'],
+      vizinhosDe: 'vizinhos de {palavra}', analogiaCom: '{a} − {b} + {c}', plural: 'direção do plural', conceitoToken: 'o que é um token?', mostrar: 'mostre {palavra}'
+    },
+    saudacao: { titulo: 'Olá!', texto: 'Sou o assistente do SaibaTudo LLMs. Peça palavras para o gráfico, uma analogia, os vizinhos de uma palavra ou a explicação de um conceito.' },
+    ajuda: { titulo: 'O que dá para pedir', texto: 'Entendo pedidos sobre o gráfico (palavras em inglês ou traduzidas pelo glossário) e perguntas sobre conceitos das seis seções. Exemplos:', exemplos: ['mostre king, queen, man e woman', 'king − man + woman', 'vizinhos de tower', 'cat e dog são parecidas?', 'direção do plural', 'o que é atenção?'] },
+    sobreDados: { titulo: 'Sobre os dados', texto: 'Os vetores vêm do GloVe (Pennington, Socher & Manning, 2014; Wikipédia 2014 + Gigaword 5; licença PDDL 1.0): {n} palavras em inglês, 50 dimensões, pacote {versao}, verificado por assinatura digital neste aparelho.' },
+    fontes: { titulo: 'Fontes', itens: ['GloVe 6B, 50 dimensões — Stanford NLP (PDDL 1.0)', 'Pennington, Socher & Manning (2014), GloVe: Global Vectors for Word Representation', 'Mikolov et al. (2013), Linguistic Regularities in Continuous Space Word Representations', 'Vaswani et al. (2017), Attention Is All You Need'] },
+    limpar: { titulo: 'Gráfico limpo', texto: 'Tirei todas as palavras do gráfico.' },
+    preset: { texto: 'Carreguei o exemplo "{nome}": {lista}.' },
+    conceito: { leiaMais: 'A seção completa está em Aprenda; toque no botão para abrir.' },
+    mostrar: { titulo: 'Palavras no gráfico', texto: 'Coloquei {lista} no gráfico.', textoContinuacao: 'Acrescentei {lista} ao gráfico.', traduzidas: 'Traduzi pelo glossário: {lista}.', desconhecidas: 'Não encontrei no GloVe: {lista}.' },
+    analogia: { titulo: 'Analogia', texto: '{a} − {b} + {c} ≈', item: '{palavra} (cosseno {cos})', explicacao: 'Subtraí o vetor de b do de a, somei o de c e procurei as palavras mais próximas do resultado (fora de a, b e c).' },
+    vizinhos: { titulo: 'Vizinhos de {palavra}', texto: 'As 10 palavras mais próximas de {palavra}, pelo cosseno:' },
+    similaridade: { titulo: 'Similaridade', texto: 'Cosseno entre {a} e {b}: {cos}.', escala: 'Perto de 1 = vetores quase na mesma direção (contextos parecidos); perto de 0 = sem relação; negativo = direções opostas.' },
+    direcao: { titulo: 'Direção e produto escalar', texto: 'Direção {w1} − {w2}. Produto escalar de cada palavra com essa direção:', palavra: 'Palavra', produto: 'Produto escalar', explicacao: 'Valores maiores apontam mais para o lado de {w1}; menores, para o lado de {w2}.' },
+    naoEntendi: { titulo: 'Não entendi', texto: 'Não entendi "{q}". Posso colocar palavras no gráfico, calcular analogias, vizinhos e direções, ou explicar conceitos das seções.', sugestoesPalavras: 'Palavras parecidas no GloVe: {lista}.', palavrasAchadas: 'Reconheci as palavras {lista}; peça "mostre" para colocá-las no gráfico.' },
+    copiar: { pergunta: 'Pergunta:', rodape: 'Fonte: GloVe (PDDL 1.0) • SaibaTudo LLMs • https://saibatudo.net/llms/' }
+  },
 };

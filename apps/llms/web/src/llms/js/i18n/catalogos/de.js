@@ -43,7 +43,12 @@ export default {
     componentes: { fonte: 'Quelle: ', passoAPasso: 'Schritt für Schritt' },
     inicio: {
       titulo: 'Embeddings erkunden',
-      subtitulo: 'Wählen Sie Wörter und sehen Sie ihre GloVe-Vektoren auf drei Achsen. König − Mann + Frau ≈ Königin.'
+      subtitulo: 'Wählen Sie Wörter und sehen Sie ihre GloVe-Vektoren auf drei Achsen. König − Mann + Frau ≈ Königin.',
+      campoRotulo: 'Fragen Sie etwas oder nennen Sie Wörter für das Diagramm', placeholder: 'Z. B. zeige king, queen, man und woman · king − man + woman · was ist ein Token?',
+      enviar: 'Fragen', limparCampo: 'Feld leeren', analisando: 'Wird analysiert…', ultimaPergunta: 'Letzte Frage', anterior: 'Vorige Frage', proxima: 'Nächste Frage',
+      sugestoesTitulo: 'Sie können auch fragen', copiar: 'Antwort kopieren', copiado: 'Antwort kopiert.', fechar: 'Antwort schließen', relatar: 'Problem mit dieser Antwort melden',
+      relatarAjuda: 'Öffnet ein öffentliches GitHub-Issue mit der Frage im Titel; nichts wird gesendet, bevor Sie dort bestätigen.',
+      respostaAria: 'Antwort', historicoVazio: 'Noch keine Fragen.'
     },
     aprenda: {
       titulo: 'Lernen: die Bausteine eines Sprachmodells', subtitulo: 'Sechs kurze Abschnitte, von der Vorhersage des nächsten Tokens bis zur Softmax. Jeder hat ein „Ausprobieren“, das in den Explorer führt.',
@@ -92,5 +97,27 @@ export default {
       privacidade: 'Datenschutz', privacidadeTexto: 'Auf diesem Gerät speichern wir nur Design, Textgröße, Sprache und den Fragenverlauf sowie den Cache für die Offline-Nutzung. ', politica: 'Datenschutzerklärung',
       apagar: 'Daten auf diesem Gerät löschen', confirmar: 'Zum Bestätigen erneut tippen', apagados: 'Daten gelöscht. Wird neu geladen…'
     }
-  }
+  },
+
+  respostas: {
+    origem: { local: 'Auf Ihrem Gerät erstellt • GloVe-Daten vom {data}', generativa: 'KI-generierter Text ({modelo}) • Cloud — kann Fehler enthalten', nuvem: 'Cloud-KI' },
+    sugestoes: {
+      padrao: ['zeige king, queen, man und woman', 'king − man + woman', 'nachbarn von tower', 'pluralrichtung', 'zeige die hauptstädte', 'was ist ein embedding?'],
+      vizinhosDe: 'nachbarn von {palavra}', analogiaCom: '{a} − {b} + {c}', plural: 'pluralrichtung', conceitoToken: 'was ist ein token?', mostrar: 'zeige {palavra}'
+    },
+    saudacao: { titulo: 'Hallo!', texto: 'Ich bin der Assistent von SaibaTudo LLMs. Nennen Sie Wörter für das Diagramm, eine Analogie, die Nachbarn eines Wortes oder einen Begriff, den ich erklären soll.' },
+    ajuda: { titulo: 'Was Sie fragen können', texto: 'Ich verstehe Anfragen zum Diagramm (englische Wörter oder über das Glossar übersetzte) und Fragen zu den Begriffen der sechs Abschnitte. Beispiele:', exemplos: ['zeige king, queen, man und woman', 'king − man + woman', 'nachbarn von tower', 'sind cat und dog ähnlich?', 'pluralrichtung', 'was ist attention?'] },
+    sobreDados: { titulo: 'Über die Daten', texto: 'Die Vektoren stammen aus GloVe (Pennington, Socher & Manning, 2014; Wikipedia 2014 + Gigaword 5; Lizenz PDDL 1.0): {n} englische Wörter, 50 Dimensionen, Paket {versao}, auf diesem Gerät per digitaler Signatur geprüft.' },
+    fontes: { titulo: 'Quellen', itens: ['GloVe 6B, 50 Dimensionen — Stanford NLP (PDDL 1.0)', 'Pennington, Socher & Manning (2014), GloVe: Global Vectors for Word Representation', 'Mikolov et al. (2013), Linguistic Regularities in Continuous Space Word Representations', 'Vaswani et al. (2017), Attention Is All You Need'] },
+    limpar: { titulo: 'Diagramm geleert', texto: 'Ich habe alle Wörter aus dem Diagramm entfernt.' },
+    preset: { texto: 'Beispiel „{nome}“ geladen: {lista}.' },
+    conceito: { leiaMais: 'Der vollständige Abschnitt steht unter Lernen; tippen Sie auf die Schaltfläche, um ihn zu öffnen.' },
+    mostrar: { titulo: 'Wörter im Diagramm', texto: 'Ich habe {lista} ins Diagramm gesetzt.', textoContinuacao: 'Ich habe {lista} zum Diagramm hinzugefügt.', traduzidas: 'Über das Glossar übersetzt: {lista}.', desconhecidas: 'In GloVe nicht gefunden: {lista}.' },
+    analogia: { titulo: 'Analogie', texto: '{a} − {b} + {c} ≈', item: '{palavra} (Kosinus {cos})', explicacao: 'Ich habe den Vektor von b von a abgezogen, c addiert und die Wörter gesucht, die dem Ergebnis am nächsten liegen (ohne a, b und c).' },
+    vizinhos: { titulo: 'Nachbarn von {palavra}', texto: 'Die 10 Wörter, die {palavra} am nächsten sind, nach Kosinus:' },
+    similaridade: { titulo: 'Ähnlichkeit', texto: 'Kosinus zwischen {a} und {b}: {cos}.', escala: 'Nahe 1 = Vektoren fast in derselben Richtung (ähnliche Kontexte); nahe 0 = kein Zusammenhang; negativ = entgegengesetzte Richtungen.' },
+    direcao: { titulo: 'Richtung und Skalarprodukt', texto: 'Richtung {w1} − {w2}. Skalarprodukt jedes Wortes mit dieser Richtung:', palavra: 'Wort', produto: 'Skalarprodukt', explicacao: 'Größere Werte zeigen stärker zu {w1}; kleinere zu {w2}.' },
+    naoEntendi: { titulo: 'Nicht verstanden', texto: 'Ich habe „{q}“ nicht verstanden. Ich kann Wörter ins Diagramm setzen, Analogien, Nachbarn und Richtungen berechnen oder die Begriffe der Abschnitte erklären.', sugestoesPalavras: 'Ähnliche GloVe-Wörter: {lista}.', palavrasAchadas: 'Ich habe die Wörter {lista} erkannt; sagen Sie „zeige“, um sie ins Diagramm zu setzen.' },
+    copiar: { pergunta: 'Frage:', rodape: 'Quelle: GloVe (PDDL 1.0) • SaibaTudo LLMs • https://saibatudo.net/llms/' }
+  },
 };

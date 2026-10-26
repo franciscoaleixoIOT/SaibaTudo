@@ -356,3 +356,20 @@ canvas.molecula { max-width: 100%; height: auto; }
 .lista-experimente li { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .nav-secoes { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin: 16px 0; }
 .indice-dobravel summary { cursor: pointer; font-weight: 600; margin: 8px 0; }
+/* ---------- assistente (padrão dos apps SaibaTudo) ---------- */
+.assistente { display: grid; gap: 10px; margin-bottom: 18px; }
+.assistente-linha { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; }
+.assistente-linha textarea { flex: 1 1 240px; min-width: 0; resize: none; padding: 10px 12px; border: 1px solid var(--outline-v); border-radius: 12px; background: var(--surface); color: inherit; font: inherit; line-height: 1.4; }
+.assistente-linha textarea:focus { border-color: var(--primary); outline: 3px solid color-mix(in srgb, var(--primary) 30%, transparent); outline-offset: 0; }
+.btn-limpar-campo[hidden] { display: none; }
+.spinner.peq { width: 18px; height: 18px; border-width: 2px; }
+.ultima-pergunta .link { background: none; border: 0; padding: 0; color: var(--primary); text-decoration: underline; cursor: pointer; font: inherit; }
+.btn-icone.mini { width: 26px; height: 26px; font-size: .7rem; }
+.cartao-resposta { border: 1px solid var(--outline-v); border-radius: 14px; background: var(--surface); padding: 14px 16px; display: grid; gap: 10px; }
+.cartao-resposta[hidden] { display: none; }
+.resposta-topo { display: flex; align-items: start; justify-content: space-between; gap: 8px; }
+.resposta-topo h2 { margin: 0; font-size: 1.15rem; }
+.resposta-pergunta { margin: 0; font-style: italic; }
+.resposta-acoes { display: flex; flex-wrap: wrap; gap: 8px; }
+.resposta-origem { margin: 0; display: flex; align-items: center; gap: 4px; }
+.bloco-gerado { border-left: 3px solid #D97706; padding-left: 10px; }

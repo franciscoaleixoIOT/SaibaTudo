@@ -43,7 +43,12 @@ export default {
     componentes: { fonte: 'Source: ', passoAPasso: 'Step by step' },
     inicio: {
       titulo: 'Explore embeddings',
-      subtitulo: 'Pick words and see their GloVe vectors projected onto three axes. King − man + woman ≈ queen.'
+      subtitulo: 'Pick words and see their GloVe vectors projected onto three axes. King − man + woman ≈ queen.',
+      campoRotulo: 'Ask something or request words for the chart', placeholder: 'E.g. show king, queen, man and woman · king − man + woman · what is a token?',
+      enviar: 'Ask', limparCampo: 'Clear the field', analisando: 'Analysing…', ultimaPergunta: 'Last question', anterior: 'Previous question', proxima: 'Next question',
+      sugestoesTitulo: 'You can also ask', copiar: 'Copy answer', copiado: 'Answer copied.', fechar: 'Close answer', relatar: 'Report a problem with this answer',
+      relatarAjuda: 'Opens a public GitHub issue with the question in the title; nothing is sent until you confirm there.',
+      respostaAria: 'Answer', historicoVazio: 'No questions yet.'
     },
     aprenda: {
       titulo: 'Learn: the parts of a language model', subtitulo: 'Six short lessons, from next-token prediction to softmax. Each has a "Try it" that takes you to the explorer.',
@@ -92,5 +97,27 @@ export default {
       privacidade: 'Privacy', privacidadeTexto: 'We keep on this device only the theme, the text size, the language and the question history, plus the cache for offline use. ', politica: 'Privacy policy',
       apagar: 'Delete the data on this device', confirmar: 'Tap again to confirm', apagados: 'Data deleted. Reloading…'
     }
-  }
+  },
+
+  respostas: {
+    origem: { local: 'Built on your device • GloVe data from {data}', generativa: 'AI-generated text ({modelo}) • Cloud — may contain errors', nuvem: 'cloud AI' },
+    sugestoes: {
+      padrao: ['show king, queen, man and woman', 'king − man + woman', 'neighbours of tower', 'plural direction', 'show the capitals', 'what is an embedding?'],
+      vizinhosDe: 'neighbours of {palavra}', analogiaCom: '{a} − {b} + {c}', plural: 'plural direction', conceitoToken: 'what is a token?', mostrar: 'show {palavra}'
+    },
+    saudacao: { titulo: 'Hello!', texto: 'I am the SaibaTudo LLMs assistant. Ask for words in the chart, an analogy, the neighbours of a word or the explanation of a concept.' },
+    ajuda: { titulo: 'What you can ask', texto: 'I understand requests about the chart (English words, or words translated by the glossary) and questions about the concepts of the six lessons. Examples:', exemplos: ['show king, queen, man and woman', 'king − man + woman', 'neighbours of tower', 'are cat and dog similar?', 'plural direction', 'what is attention?'] },
+    sobreDados: { titulo: 'About the data', texto: 'The vectors come from GloVe (Pennington, Socher & Manning, 2014; Wikipedia 2014 + Gigaword 5; PDDL 1.0 licence): {n} English words, 50 dimensions, package {versao}, verified by digital signature on this device.' },
+    fontes: { titulo: 'Sources', itens: ['GloVe 6B, 50 dimensions — Stanford NLP (PDDL 1.0)', 'Pennington, Socher & Manning (2014), GloVe: Global Vectors for Word Representation', 'Mikolov et al. (2013), Linguistic Regularities in Continuous Space Word Representations', 'Vaswani et al. (2017), Attention Is All You Need'] },
+    limpar: { titulo: 'Chart cleared', texto: 'I removed every word from the chart.' },
+    preset: { texto: 'I loaded the "{nome}" example: {lista}.' },
+    conceito: { leiaMais: 'The full lesson is under Learn; tap the button to open it.' },
+    mostrar: { titulo: 'Words in the chart', texto: 'I put {lista} in the chart.', textoContinuacao: 'I added {lista} to the chart.', traduzidas: 'Translated by the glossary: {lista}.', desconhecidas: 'Not found in GloVe: {lista}.' },
+    analogia: { titulo: 'Analogy', texto: '{a} − {b} + {c} ≈', item: '{palavra} (cosine {cos})', explicacao: 'I subtracted the vector of b from a, added c and looked for the words nearest to the result (excluding a, b and c).' },
+    vizinhos: { titulo: 'Neighbours of {palavra}', texto: 'The 10 words nearest to {palavra}, by cosine:' },
+    similaridade: { titulo: 'Similarity', texto: 'Cosine between {a} and {b}: {cos}.', escala: 'Near 1 = vectors in almost the same direction (similar contexts); near 0 = unrelated; negative = opposite directions.' },
+    direcao: { titulo: 'Direction and dot product', texto: 'Direction {w1} − {w2}. Dot product of each word with that direction:', palavra: 'Word', produto: 'Dot product', explicacao: 'Larger values point more towards {w1}; smaller ones towards {w2}.' },
+    naoEntendi: { titulo: 'I did not understand', texto: 'I did not understand "{q}". I can put words in the chart, compute analogies, neighbours and directions, or explain the concepts of the lessons.', sugestoesPalavras: 'Similar GloVe words: {lista}.', palavrasAchadas: 'I recognised the words {lista}; say "show" to put them in the chart.' },
+    copiar: { pergunta: 'Question:', rodape: 'Source: GloVe (PDDL 1.0) • SaibaTudo LLMs • https://saibatudo.net/llms/' }
+  },
 };

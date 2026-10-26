@@ -43,7 +43,12 @@ export default {
     componentes: { fonte: '来源：', passoAPasso: '逐步说明' },
     inicio: {
       titulo: '探索词嵌入',
-      subtitulo: '选择单词，查看它们的 GloVe 向量投影到三个坐标轴上。国王 − 男人 + 女人 ≈ 女王。'
+      subtitulo: '选择单词，查看它们的 GloVe 向量投影到三个坐标轴上。国王 − 男人 + 女人 ≈ 女王。',
+      campoRotulo: '提问，或为图表指定单词', placeholder: '例如：显示 king、queen、man 和 woman · king − man + woman · 什么是 token？',
+      enviar: '提问', limparCampo: '清空输入框', analisando: '正在分析…', ultimaPergunta: '上一个问题', anterior: '上一条', proxima: '下一条',
+      sugestoesTitulo: '你还可以问', copiar: '复制回答', copiado: '回答已复制。', fechar: '关闭回答', relatar: '报告此回答的问题',
+      relatarAjuda: '在 GitHub 上打开一个公开 issue，问题作为标题；在你确认之前不会发送任何内容。',
+      respostaAria: '回答', historicoVazio: '还没有问题。'
     },
     aprenda: {
       titulo: '学习：语言模型的各个部件', subtitulo: '六个简短的章节，从预测下一个 token 到 softmax。每一节都有一个“试一试”，带你进入探索器。',
@@ -92,5 +97,27 @@ export default {
       privacidade: '隐私', privacidadeTexto: '我们只在此设备上保存主题、文字大小、语言和提问历史，以及用于离线使用的缓存。', politica: '隐私政策',
       apagar: '删除此设备上的数据', confirmar: '再次点按以确认', apagados: '数据已删除。正在重新加载…'
     }
-  }
+  },
+
+  respostas: {
+    origem: { local: '在您的设备上生成 • GloVe 数据日期 {data}', generativa: 'AI 生成的文本（{modelo}）• 云端 — 可能有误', nuvem: '云端 AI' },
+    sugestoes: {
+      padrao: ['显示 king、queen、man 和 woman', 'king − man + woman', 'tower 的近邻', '复数方向', '显示首都', '什么是词嵌入？'],
+      vizinhosDe: '{palavra} 的近邻', analogiaCom: '{a} − {b} + {c}', plural: '复数方向', conceitoToken: '什么是 token？', mostrar: '显示 {palavra}'
+    },
+    saudacao: { titulo: '你好！', texto: '我是 SaibaTudo LLMs 的助手。你可以让我把单词放到图中、计算类比、查看某个单词的近邻，或解释一个概念。' },
+    ajuda: { titulo: '可以问什么', texto: '我能理解关于图表的请求（英文单词，或由词汇表翻译的词），以及关于六个章节概念的问题。例如：', exemplos: ['显示 king、queen、man 和 woman', 'king − man + woman', 'tower 的近邻', 'cat 和 dog 相似吗？', '复数方向', '什么是注意力？'] },
+    sobreDados: { titulo: '关于数据', texto: '向量来自 GloVe（Pennington、Socher 和 Manning，2014；维基百科 2014 + Gigaword 5；许可 PDDL 1.0）：{n} 个英文单词，50 个维度，数据包 {versao}，已在此设备上通过数字签名验证。' },
+    fontes: { titulo: '来源', itens: ['GloVe 6B，50 维 — Stanford NLP（PDDL 1.0）', 'Pennington, Socher & Manning (2014), GloVe: Global Vectors for Word Representation', 'Mikolov et al. (2013), Linguistic Regularities in Continuous Space Word Representations', 'Vaswani et al. (2017), Attention Is All You Need'] },
+    limpar: { titulo: '图表已清空', texto: '我已移除图中的所有单词。' },
+    preset: { texto: '已加载示例“{nome}”：{lista}。' },
+    conceito: { leiaMais: '完整章节在“学习”中；点按按钮打开。' },
+    mostrar: { titulo: '图中的单词', texto: '我把 {lista} 放到了图中。', textoContinuacao: '我把 {lista} 加到了图中。', traduzidas: '由词汇表翻译：{lista}。', desconhecidas: '在 GloVe 中未找到：{lista}。' },
+    analogia: { titulo: '类比', texto: '{a} − {b} + {c} ≈', item: '{palavra}（余弦 {cos}）', explicacao: '我用 a 的向量减去 b 的向量，加上 c 的向量，再寻找最接近结果的单词（不含 a、b、c）。' },
+    vizinhos: { titulo: '{palavra} 的近邻', texto: '按余弦排序，与 {palavra} 最接近的 10 个单词：' },
+    similaridade: { titulo: '相似度', texto: '{a} 和 {b} 的余弦：{cos}。', escala: '接近 1 = 向量方向几乎相同（语境相似）；接近 0 = 无关；负数 = 方向相反。' },
+    direcao: { titulo: '方向与点积', texto: '方向 {w1} − {w2}。每个单词与该方向的点积：', palavra: '单词', produto: '点积', explicacao: '数值越大越指向 {w1} 一侧；越小越指向 {w2} 一侧。' },
+    naoEntendi: { titulo: '没听懂', texto: '我没有理解“{q}”。我可以把单词放到图中、计算类比、近邻和方向，或解释章节中的概念。', sugestoesPalavras: 'GloVe 中相近的单词：{lista}。', palavrasAchadas: '我识别出了单词 {lista}；说“显示”即可把它们放到图中。' },
+    copiar: { pergunta: '问题：', rodape: '来源：GloVe（PDDL 1.0）• SaibaTudo LLMs • https://saibatudo.net/llms/' }
+  },
 };
