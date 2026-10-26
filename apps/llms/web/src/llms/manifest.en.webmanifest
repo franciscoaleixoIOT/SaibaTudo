@@ -1,0 +1,77 @@
+{
+  "id": "/llms/",
+  "name": "SaibaTudo LLMs",
+  "short_name": "LLMs",
+  "description": "How a language model works: word vectors in 3D, vector arithmetic and the parts of a transformer, with open data. Works offline and nothing leaves your device.",
+  "lang": "en",
+  "dir": "ltr",
+  "start_url": "/llms/?lang=en&source=pwa",
+  "scope": "/llms/",
+  "display": "standalone",
+  "theme_color": "#0C2340",
+  "background_color": "#0C2340",
+  "categories": [
+    "education",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "/llms/brand/pwa-llms-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/llms/brand/pwa-llms-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/llms/brand/pwa-llms-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/llms/brand/pwa-llms-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/llms/brand/llms-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Learn",
+      "short_name": "Learn",
+      "description": "The six parts of a language model",
+      "url": "/llms/aprenda?lang=en&source=shortcut",
+      "icons": [
+        {
+          "src": "/llms/brand/pwa-llms-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Explore embeddings",
+      "short_name": "Explore",
+      "description": "GloVe words on three axes",
+      "url": "/llms/?lang=en&source=shortcut",
+      "icons": [
+        {
+          "src": "/llms/brand/pwa-llms-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}

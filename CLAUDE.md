@@ -9,6 +9,8 @@ continuam valendo dentro da pasta.
   os outros apps.
   **Congelamento de 24 a 26/10/2026** (guarda: `.github/workflows/eleicoes-congelamento.yml`).
 - `apps/quimica/` — SaibaTudo Química. Vercel `saibatudo-quimica`, servido em saibatudo.net/quimica/ por proxy.
+- `apps/llms/` — SaibaTudo LLMs (como um modelo de linguagem funciona: vetores de palavras em 3D, lições, assistente em seis idiomas com
+  chinês). Vercel `saibatudo-llms`, servido em saibatudo.net/llms/ por proxy (rota ligada em 27/10/2026); antes, `saibatudo-llms.vercel.app/llms/`.
 
 ## Regras do repositório
 1. **Cada app é autocontido.** Scripts e testes usam caminhos relativos à pasta do app: rode tudo de dentro dela.

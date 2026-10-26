@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>隐私政策 — SaibaTudo LLMs</title>
+  <meta name="description" content="SaibaTudo LLMs 隐私政策：无账户、无广告、无跟踪器；未经您点击，任何内容都不会离开您的设备。">
+  <link rel="canonical" href="https://saibatudo.net/llms/privacidade/zh">
+  <link rel="alternate" hreflang="pt-BR" href="https://saibatudo.net/llms/privacidade">
+  <link rel="alternate" hreflang="en" href="https://saibatudo.net/llms/privacidade/en">
+  <link rel="alternate" hreflang="es" href="https://saibatudo.net/llms/privacidade/es">
+  <link rel="alternate" hreflang="de" href="https://saibatudo.net/llms/privacidade/de">
+  <link rel="alternate" hreflang="fr" href="https://saibatudo.net/llms/privacidade/fr">
+  <link rel="alternate" hreflang="zh" href="https://saibatudo.net/llms/privacidade/zh">
+  <link rel="alternate" hreflang="x-default" href="https://saibatudo.net/llms/privacidade">
+  <meta name="theme-color" content="#0C2340">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="/llms/brand/llms-icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/llms/css/base.css">
+  <link rel="stylesheet" href="/llms/css/app.css">
+  <script src="/llms/js/theme-init.js"></script>
+</head>
+<body>
+  <a class="skip" href="#conteudo">跳到正文</a>
+  <header class="appbar">
+    <a class="appbar-marca" href="/llms/?lang=zh" aria-label="SaibaTudo LLMs，首页">
+      <img class="appbar-logo" src="/llms/brand/llms-icon.svg" width="38" height="38" alt="">
+      <div class="appbar-textos"><div class="appbar-titulo">SaibaTudo LLMs</div><div class="appbar-sub">隐私政策</div></div>
+    </a>
+  </header>
+  <main id="conteudo" class="tela-corpo" tabindex="-1">
+    <h1>隐私政策 — SaibaTudo LLMs</h1>
+    <p><strong>版本 1.0 — 2026 年 10 月 25 日</strong> · 适用于 <code>saibatudo.net/llms</code> 上的网站/PWA。葡萄牙语页面是本政策的源文本；本页为译文。</p>
+    <p class="pequeno mudo">其他语言： <a href="/llms/privacidade" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a> · <a href="/llms/privacidade/en" hreflang="en" lang="en">English</a> · <a href="/llms/privacidade/es" hreflang="es" lang="es">Español</a> · <a href="/llms/privacidade/de" hreflang="de" lang="de">Deutsch</a> · <a href="/llms/privacidade/fr" hreflang="fr" lang="fr">Français</a> · <span lang="zh">中文</span></p>
+    <p class="pequeno mudo"><a href="/llms/privacidade" hreflang="pt-BR" lang="pt-BR">源文本（葡萄牙语）</a></p>
+    <p class="aviso-caixa"><strong>一句话：</strong>SaibaTudo LLMs 没有账户、广告、跟踪器或使用分析。词向量和所有计算都留在您的设备上，<strong>您输入的任何内容都不会发送到我们的服务器</strong>，除非您点按“询问云端 AI”（或开启自动模式）：那时只会发送那个问题、语言、图表摘要和章节摘录，供模型解释。</p>
+
+    <h2>1. 我们是谁</h2>
+    <p>SaibaTudo 是一个独立的开源（MIT 许可）非营利项目。负责人：<strong>Francisco Aleixo</strong>（开发者）— 联系方式：<a href="mailto:saibatudo@saibatudo.net">saibatudo@saibatudo.net</a>。</p>
+    <h2>2. 我们不收集什么</h2>
+    <p>我们不索取姓名、电子邮件、电话、证件、联系人、照片或文件。没有登录、广告、广告 SDK、Google Analytics、Firebase 或第三方崩溃报告。我们不出售也不共享数据。应用不使用位置、摄像头、麦克风或联系人。</p>
+    <h2>3. 只留在您设备上的内容</h2>
+    <p>浏览器存储中保存：主题、文字大小、语言、您最近 50 个问题的历史（仅用于输入框的 ↑/↓ 键）、“自动使用云端 AI”开关，以及如果您使用云端 AI，本次安装的随机代码（UUID）；还有用于离线使用的应用和向量数据包缓存。设置中的“删除此设备上的数据”会清除以上全部内容。</p>
+    <h2>4. 应用发起的网络连接</h2>
+    <div class="tabela-rolagem"><table class="tabela-dados">
+      <thead><tr><th>目的</th><th>目标</th><th>发送的内容</th><th>时间</th></tr></thead>
+      <tbody>
+        <tr><td><strong>加载应用和数据</strong></td><td><code>saibatudo.net</code>（Vercel 托管）</td><td>普通 HTTPS 请求（服务商在服务器日志中记录 IP 和浏览器）</td><td>打开应用时，以及在后台检查是否有新的（经数字签名的）数据包时</td></tr>
+        <tr><td><strong>指向外部来源的链接</strong></td><td>GitHub、Stanford NLP、ACL Anthology、arXiv、Hugging Face</td><td>您浏览器发出的普通请求（目标网站能看到您的 IP）；不含我们的任何数据</td><td>仅当您点按外部链接时</td></tr>
+        <tr><td><strong>云端 AI</strong>（可选，默认关闭）</td><td><code>saibatudo.net/llms/api/ask</code>（Vercel）→ <strong>Hugging Face</strong>（运行模型的 Space，美国）</td><td>问题文本（最多 400 个字符）、语言、当前图表的摘要（单词、坐标轴、余弦）、章节摘录和本次安装的随机代码（UUID）；仅当您点按“询问云端 AI”或开启“自动使用云端 AI”开关时</td><td>生成自然语言的解释，标注模型名称并在服务器上校验（发送内容之外的数字会被拒绝）。文本不记录日志；我们只保留技术指标和 1 小时的无身份缓存</td></tr>
+      </tbody>
+    </table></div>
+    <h2>5. 所展示数据的来源</h2>
+    <p>词向量是 <strong>GloVe 6B</strong>（Pennington、Socher 和 Manning，2014；维基百科 2014 + Gigaword 5），由斯坦福大学以 PDDL 1.0 许可发布：10 万个英文单词，50 个维度，由本项目打包并进行数字签名。应用在使用数据包前会验证签名。章节文本由本项目撰写。</p>
+    <h2>6. 目的与法律依据（LGPD，巴西第 13.709/2018 号法律）</h2>
+    <p>加载连接是提供服务所必需的（第 7 条第 V 项）。云端 AI 仅在您通过点按或设置中的开关给出<strong>同意</strong>后才工作（第 7 条第 I 项），并可随时关闭。任何数据都不用于广告或画像。</p>
+    <h2>7. 共享与处理者</h2>
+    <p><strong>Vercel</strong>（网站和转发问题的函数的托管方）和 <strong>Hugging Face</strong>（运行模型的服务器，美国）作为处理者，仅执行您所请求的操作。“报告问题”会在 <strong>GitHub</strong> 上打开一个公开 issue，问题作为标题；在您确认之前不会发送任何内容。</p>
+    <h2>8. 保留期限</h2>
+    <p>我们不保存问题文本。生成的回答最多在服务器内存缓存中保留 1 小时，键为问题、语言、上下文和片段的不可逆摘要（SHA-256 哈希），不含身份信息：相同的问题会得到相同的回答，而无需再次调用模型。技术指标（时间、状态、错误）记录在不含文本的日志中。安装代码（UUID）随问题一起发送，与 IP 地址一起仅用于使用限制（每分钟和每天）；服务器只保存它的摘要，从不保存明文代码。</p>
+    <h2>9. 您的权利</h2>
+    <p>由于几乎不收集任何数据，大多数权利可在设备本身上行使（删除数据、关闭云端）。任何请求或疑问：<a href="mailto:saibatudo@saibatudo.net">saibatudo@saibatudo.net</a>。</p>
+    <h2>10. 儿童</h2>
+    <p>应用不收集任何人的个人数据，包括儿童和青少年，也没有面向 13 岁以下儿童的内容。云端 AI 是可选的，默认关闭。</p>
+    <h2>11. 安全</h2>
+    <p>所有传输都通过 HTTPS。向量数据包经过签名（ECDSA P-256）并在设备上校验；网站采用严格的内容安全策略（无外部脚本），不加载任何第三方内容。AI 的回答在到达您之前会在服务器上校验。</p>
+    <h2>12. 变更</h2>
+    <p>本政策的变更会在此以新版本和日期发布；应用和本页的代码在 GitHub 上公开，并有历史记录。</p>
+
+    <p class="pequeno mudo"><a href="/llms/?lang=zh">← SaibaTudo LLMs</a></p>
+  </main>
+</body>
+</html>

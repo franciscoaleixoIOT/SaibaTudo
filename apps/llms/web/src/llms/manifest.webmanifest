@@ -1,0 +1,77 @@
+{
+  "id": "/llms/",
+  "name": "SaibaTudo LLMs",
+  "short_name": "LLMs",
+  "description": "Como um modelo de linguagem funciona: vetores de palavras em 3D, aritmética de vetores e as peças de um transformer, com dados abertos. Funciona offline e nada sai do seu aparelho.",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "start_url": "/llms/?source=pwa",
+  "scope": "/llms/",
+  "display": "standalone",
+  "theme_color": "#0C2340",
+  "background_color": "#0C2340",
+  "categories": [
+    "education",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "/llms/brand/pwa-llms-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/llms/brand/pwa-llms-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/llms/brand/pwa-llms-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/llms/brand/pwa-llms-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/llms/brand/llms-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Aprenda",
+      "short_name": "Aprenda",
+      "description": "As seis peças de um modelo de linguagem",
+      "url": "/llms/aprenda?source=shortcut",
+      "icons": [
+        {
+          "src": "/llms/brand/pwa-llms-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Explorar embeddings",
+      "short_name": "Explorar",
+      "description": "Palavras do GloVe em três eixos",
+      "url": "/llms/?source=shortcut",
+      "icons": [
+        {
+          "src": "/llms/brand/pwa-llms-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Política de privacidade — SaibaTudo LLMs</title>
+  <meta name="description" content="Política de privacidade do SaibaTudo LLMs: sem cadastro, anúncios ou rastreadores; nada sai do seu aparelho sem o seu toque.">
+  <link rel="canonical" href="https://saibatudo.net/llms/privacidade">
+  <link rel="alternate" hreflang="pt-BR" href="https://saibatudo.net/llms/privacidade">
+  <link rel="alternate" hreflang="en" href="https://saibatudo.net/llms/privacidade/en">
+  <link rel="alternate" hreflang="es" href="https://saibatudo.net/llms/privacidade/es">
+  <link rel="alternate" hreflang="de" href="https://saibatudo.net/llms/privacidade/de">
+  <link rel="alternate" hreflang="fr" href="https://saibatudo.net/llms/privacidade/fr">
+  <link rel="alternate" hreflang="zh" href="https://saibatudo.net/llms/privacidade/zh">
+  <link rel="alternate" hreflang="x-default" href="https://saibatudo.net/llms/privacidade">
+  <meta name="theme-color" content="#0C2340">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="/llms/brand/llms-icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/llms/css/base.css">
+  <link rel="stylesheet" href="/llms/css/app.css">
+  <script src="/llms/js/theme-init.js"></script>
+</head>
+<body>
+  <a class="skip" href="#conteudo">Ir para o conteúdo</a>
+  <header class="appbar">
+    <a class="appbar-marca" href="/llms/" aria-label="SaibaTudo LLMs, início">
+      <img class="appbar-logo" src="/llms/brand/llms-icon.svg" width="38" height="38" alt="">
+      <div class="appbar-textos"><div class="appbar-titulo">SaibaTudo LLMs</div><div class="appbar-sub">Política de privacidade</div></div>
+    </a>
+  </header>
+  <main id="conteudo" class="tela-corpo" tabindex="-1">
+    <h1>Política de Privacidade — SaibaTudo LLMs</h1>
+    <p><strong>Versão 1.0 — 25 de outubro de 2026</strong> · Aplica-se ao site/PWA em <code>saibatudo.net/llms</code>. Esta página é o texto-fonte da política; as outras línguas são traduções.</p>
+    <p class="pequeno mudo">Outras línguas: <span lang="pt-BR">Português (Brasil)</span> · <a href="/llms/privacidade/en" hreflang="en" lang="en">English</a> · <a href="/llms/privacidade/es" hreflang="es" lang="es">Español</a> · <a href="/llms/privacidade/de" hreflang="de" lang="de">Deutsch</a> · <a href="/llms/privacidade/fr" hreflang="fr" lang="fr">Français</a> · <a href="/llms/privacidade/zh" hreflang="zh" lang="zh">中文</a></p>
+    
+    <p class="aviso-caixa"><strong>Em uma frase:</strong>&nbsp;o SaibaTudo LLMs não tem cadastro, anúncios, rastreadores nem análise de uso. Os vetores de palavras e todos os cálculos ficam no seu aparelho, e <strong>nada do que você digita é enviado aos nossos servidores</strong>, a menos que você toque em “Perguntar à IA na nuvem” (ou ligue o modo automático): aí vão só aquela pergunta, o idioma, um resumo do gráfico e trechos das seções, para o modelo explicar.</p>
+
+    <h2>1. Quem somos</h2>
+    <p>O SaibaTudo é um projeto independente, de código aberto (licença MIT) e sem fins lucrativos. Responsável: <strong>Francisco Aleixo</strong> (desenvolvedor) — contato: <a href="mailto:saibatudo@saibatudo.net">saibatudo@saibatudo.net</a>.</p>
+    <h2>2. O que NÃO coletamos</h2>
+    <p>Não pedimos nome, e-mail, telefone, documentos, contatos, fotos ou arquivos. Não há login, anúncios, SDKs de publicidade, Google Analytics, Firebase ou relatórios de falhas de terceiros. Não vendemos nem compartilhamos dados. O aplicativo não usa localização, câmera, microfone nem contatos.</p>
+    <h2>3. O que fica só no seu aparelho</h2>
+    <p>No armazenamento do navegador ficam: tema, tamanho do texto, idioma, o histórico das suas últimas 50 perguntas (só para as setas ↑/↓ do campo), a chave “IA na nuvem automática” e, se você usar a IA na nuvem, um código aleatório desta instalação (UUID), além do cache do app e do pacote de vetores para uso offline. “Apagar os dados deste aparelho”, em Configurações, apaga tudo isso.</p>
+    <h2>4. Conexões de rede que o aplicativo faz</h2>
+    <div class="tabela-rolagem"><table class="tabela-dados">
+      <thead><tr><th>Para quê</th><th>Destino</th><th>O que é enviado</th><th>Quando</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Carregar o aplicativo e os dados</strong></td><td><code>saibatudo.net</code> (hospedagem Vercel)</td><td>requisição HTTPS comum (o provedor registra IP e navegador em logs de servidor)</td><td>ao abrir o aplicativo e, em segundo plano, para verificar se há pacote novo (assinado digitalmente)</td></tr>
+        <tr><td><strong>Links para fontes externas</strong></td><td>GitHub, Stanford NLP, ACL Anthology, arXiv, Hugging Face</td><td>requisição comum do seu navegador (o site de destino vê o seu IP); nenhum dado nosso</td><td>somente quando você toca num link externo</td></tr>
+        <tr><td><strong>IA na nuvem</strong> (opcional, desligada por padrão)</td><td><code>saibatudo.net/llms/api/ask</code> (Vercel) → <strong>Hugging Face</strong> (Space onde o modelo roda, EUA)</td><td>o texto da pergunta (até 400 caracteres), o idioma, um resumo do gráfico atual (palavras, eixos, cossenos), trechos das seções didáticas e um código aleatório desta instalação (UUID); só quando você toca em “Perguntar à IA na nuvem” ou liga a chave “IA na nuvem automática”</td><td>gerar uma explicação em linguagem natural, rotulada com o nome do modelo e verificada no servidor (números fora do que foi enviado são rejeitados). O texto não fica em log; guardamos só métricas técnicas e um cache de 1 hora sem identificação</td></tr>
+      </tbody>
+    </table></div>
+    <h2>5. Origem dos dados exibidos</h2>
+    <p>Os vetores de palavras são o <strong>GloVe 6B</strong> (Pennington, Socher &amp; Manning, 2014; Wikipédia 2014 + Gigaword 5), publicado pela Universidade Stanford sob a licença PDDL 1.0: 100 mil palavras em inglês, 50 dimensões, empacotadas e assinadas digitalmente pelo projeto. O app verifica a assinatura antes de usar o pacote. Os textos das seções são de autoria do projeto.</p>
+    <h2>6. Finalidade e base legal (LGPD, Lei 13.709/2018)</h2>
+    <p>As conexões de carregamento são necessárias para prestar o serviço (art. 7º, V). A IA na nuvem só funciona com o seu <strong>consentimento</strong> por toque ou pela chave em Configurações (art. 7º, I), e pode ser desligada a qualquer momento. Nenhum dado é usado para publicidade ou perfis.</p>
+    <h2>7. Compartilhamento e operadores</h2>
+    <p><strong>Vercel</strong> (hospedagem do site e da função que encaminha a pergunta) e <strong>Hugging Face</strong> (servidor onde o modelo roda, nos EUA) atuam como operadores, apenas para executar o que você pediu. Ao “Relatar problema”, você abre uma issue pública no <strong>GitHub</strong> com a pergunta no título; nada é enviado sem você confirmar lá.</p>
+    <h2>8. Retenção</h2>
+    <p>Não guardamos o texto das perguntas. A resposta gerada fica por até 1 hora num cache em memória do servidor, sob um resumo irreversível (hash SHA-256) da pergunta, do idioma, do contexto e dos trechos, sem identificação: perguntas iguais recebem a mesma resposta sem chamar o modelo de novo. Métricas técnicas (tempo, status, erro) ficam em logs sem o texto. O código da instalação (UUID) viaja com a pergunta e serve, junto com o endereço IP, só ao limite de uso (por minuto e por dia); o servidor guarda apenas um resumo dele, nunca o código em claro.</p>
+    <h2>9. Seus direitos</h2>
+    <p>Como quase nada é coletado, a maioria dos direitos se exerce no próprio aparelho (apagar dados, desligar a nuvem). Para qualquer pedido ou dúvida: <a href="mailto:saibatudo@saibatudo.net">saibatudo@saibatudo.net</a>.</p>
+    <h2>10. Crianças</h2>
+    <p>O app não coleta dados pessoais de ninguém, inclusive de crianças e adolescentes, e não tem conteúdo direcionado a menores de 13 anos. A IA na nuvem é opcional e desligada por padrão.</p>
+    <h2>11. Segurança</h2>
+    <p>Tudo trafega por HTTPS. O pacote de vetores é assinado (ECDSA P-256) e conferido no aparelho; o site usa política de segurança de conteúdo estrita (sem scripts externos) e não carrega nada de terceiros. A resposta da IA é verificada no servidor antes de chegar a você.</p>
+    <h2>12. Alterações</h2>
+    <p>Mudanças nesta política são publicadas aqui com nova versão e data; o código do app e desta página é público no GitHub, com histórico.</p>
+
+    <p class="pequeno mudo"><a href="/llms/">← SaibaTudo LLMs</a></p>
+  </main>
+</body>
+</html>

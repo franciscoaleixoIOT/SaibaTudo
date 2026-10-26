@@ -1,0 +1,246 @@
+{
+  "idioma": "es",
+  "versao": 1,
+  "descricao": "Léxico del intérprete de SaibaTudo LLMs en español. Regexes sobre el texto normalizado (minúsculas, sin acentos).",
+  "intencoes": {
+    "saudacao": "^(?:hola|buenos dias|buenas tardes|buenas noches|hey|hello|hi|que tal)\\b[!.,]*\\s*$",
+    "ajuda": "\\b(?:ayuda|ayudame|como (?:se usa|funciona|hago)|que (?:puedes|sabes) hacer|que puedo preguntar)\\b",
+    "sobreDados": "\\b(?:de donde (?:vienen|salen|son) (?:los|estos) datos|sobre los datos|que datos|fuente de los datos|licencia de los datos|que corpus|que vectores)\\b",
+    "fontes": "\\b(?:fuentes?|referencias?|bibliografia|articulo de glove|quien hizo glove)\\b",
+    "mostrar": "\\b(?:muestr\\w*|mostrar|coloc\\w*|anad\\w*|añad\\w*|agreg\\w*|pon|pongas?|dibuj\\w*|grafic\\w*|visualiz\\w*|ver|incluy\\w*|proyect\\w*|en el grafico)\\b",
+    "analogia": "[a-z'-]+\\s*[-−–]\\s*[a-z'-]+\\s*\\+\\s*[a-z'-]+|\\b(?:analogia|es a|asi como|completa)\\b",
+    "vizinhos": "\\b(?:vecin\\w*|parecid\\w*|semejant\\w*|similar(?!idad)\\w*|cercan\\w*|proxim\\w*|cerca de|relacionad\\w*|se parecen a)\\b",
+    "similaridade": "\\b(?:son parecid\\w*|se parecen|similaridad|similitud|semejanza|coseno (?:entre|de)|distancia entre|que tan (?:parecid|cercan|similar)\\w*|cuanto se parecen)\\b",
+    "direcao": "\\b(?:direccion|producto escalar|producto punto|eje del plural|eje del genero|separar? (?:singular|plural))\\b",
+    "conceito": "\\b(?:que (?:es|son|significa|quiere decir)|qu es|explica|explicame|defin\\w*|como funciona\\w*|por que|porque|para que sirve|concepto de)\\b",
+    "preset": "\\b(?:ejemplos?|presets?|predefinid\\w*|listos?)\\b",
+    "limpar": "\\b(?:limpi\\w*|borr\\w*|quit\\w* todo|elimin\\w* todo|empez\\w* de nuevo|reinici\\w*|resetea\\w*|vaci\\w*)\\b"
+  },
+  "pistas": {
+    "separadorLista": "\\s*(?:,|;|\\by\\b|\\be\\b|\\bo\\b|\\bu\\b|\\bcon\\b)\\s*",
+    "menos": "\\s[-−–]\\s|[-−–]",
+    "mais": "\\+",
+    "estaPara": "([a-z'-]+)\\s+es a\\s+([a-z'-]+)\\s+(?:como|lo que)\\s+([a-z'-]+)\\s+es a\\s*([a-z'-]*)",
+    "aspas": "[\"“”'‘’«»]([^\"“”'‘’«»]+)[\"“”'‘’«»]",
+    "continuacao": "^(?:y|tambien|ahora|mas|junto|y el|y la|y las|y los|pon tambien|y tambien)\\b",
+    "plural": "\\b(?:plural(?:es)?|singular(?:es)?)\\b",
+    "pergunta": "\\b(?:cual|cuales|quien|donde|cuando|cuanto[s]?|cuanta[s]?)\\b"
+  },
+  "conceitos": {
+    "embedding": [
+      "embedding",
+      "embeddings",
+      "vector de palabra",
+      "vectores de palabras",
+      "representacion vectorial",
+      "word2vec",
+      "glove"
+    ],
+    "token": [
+      "token",
+      "tokens",
+      "tokenizacion",
+      "tokenizador",
+      "subpalabra",
+      "trozo de palabra"
+    ],
+    "atencao": [
+      "atencion",
+      "attention",
+      "mecanismo de atencion",
+      "cabeza de atencion",
+      "cabezas de atencion"
+    ],
+    "mlp": [
+      "mlp",
+      "perceptron",
+      "capa densa",
+      "capas",
+      "feed-forward",
+      "feedforward",
+      "red neuronal"
+    ],
+    "softmax": [
+      "softmax",
+      "probabilidad",
+      "probabilidades",
+      "distribucion de probabilidad",
+      "logit",
+      "logits"
+    ],
+    "temperatura": [
+      "temperatura",
+      "temperature",
+      "creatividad del modelo",
+      "aleatoriedad"
+    ],
+    "transformer": [
+      "transformer",
+      "transformers",
+      "arquitectura",
+      "llm",
+      "modelo de lenguaje",
+      "gpt",
+      "chatgpt"
+    ],
+    "parametro": [
+      "parametro",
+      "parametros",
+      "peso",
+      "pesos",
+      "entrenamiento",
+      "miles de millones de parametros"
+    ],
+    "proximoToken": [
+      "siguiente token",
+      "proximo token",
+      "siguiente palabra",
+      "predecir",
+      "prediccion",
+      "autocompletar",
+      "generar texto"
+    ],
+    "dimensao": [
+      "dimension",
+      "dimensiones",
+      "eje",
+      "ejes",
+      "50 dimensiones",
+      "coordenada",
+      "coordenadas",
+      "pca",
+      "componente principal"
+    ],
+    "vetor": [
+      "vector",
+      "vectores",
+      "flecha",
+      "flechas",
+      "aritmetica de vectores",
+      "suma de vectores"
+    ],
+    "cosseno": [
+      "coseno",
+      "similitud coseno",
+      "producto escalar",
+      "angulo entre",
+      "distancia"
+    ]
+  },
+  "presets": {
+    "realeza": [
+      "realeza",
+      "genero",
+      "real"
+    ],
+    "capitais": [
+      "capitales",
+      "capital",
+      "paises y capitales",
+      "paises",
+      "ciudades"
+    ],
+    "plural": [
+      "plural",
+      "plurales",
+      "singular y plural"
+    ],
+    "familia": [
+      "familia",
+      "parientes",
+      "parentesco"
+    ],
+    "cores": [
+      "colores",
+      "color"
+    ],
+    "numeros": [
+      "numeros",
+      "numerales",
+      "uno a diez",
+      "contar"
+    ],
+    "lideres": [
+      "lideres",
+      "dictadores",
+      "paises y lideres",
+      "hitler",
+      "mussolini",
+      "napoleon"
+    ]
+  },
+  "stopPalavras": [
+    "el",
+    "la",
+    "los",
+    "las",
+    "un",
+    "una",
+    "unos",
+    "unas",
+    "de",
+    "del",
+    "y",
+    "e",
+    "o",
+    "u",
+    "en",
+    "con",
+    "para",
+    "por",
+    "que",
+    "cual",
+    "cuales",
+    "como",
+    "me",
+    "mi",
+    "se",
+    "al",
+    "a",
+    "palabra",
+    "palabras",
+    "grafico",
+    "vector",
+    "vectores",
+    "muestra",
+    "muestre",
+    "mostrar",
+    "coloca",
+    "pon",
+    "ponga",
+    "anade",
+    "agrega",
+    "ver",
+    "dibuja",
+    "tambien",
+    "ahora",
+    "junto",
+    "mas",
+    "menos",
+    "favor",
+    "por favor",
+    "quiero",
+    "quisiera",
+    "puedes",
+    "podrias",
+    "entre",
+    "son",
+    "parecidas",
+    "parecidos",
+    "parecida",
+    "parecido",
+    "semejantes",
+    "cercanas",
+    "cercanos",
+    "vecinos",
+    "vecinas",
+    "similares",
+    "es",
+    "esta",
+    "tan",
+    "cerca",
+    "cerca de"
+  ],
+  "semFronteira": false,
+  "normalizarAcentos": true
+}

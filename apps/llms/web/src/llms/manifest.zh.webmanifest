@@ -1,0 +1,77 @@
+{
+  "id": "/llms/",
+  "name": "SaibaTudo LLMs",
+  "short_name": "LLMs",
+  "description": "语言模型是如何工作的：三维词向量、向量运算和 Transformer 的各个部件，基于开放数据。可离线使用，任何内容都不会离开您的设备。",
+  "lang": "zh",
+  "dir": "ltr",
+  "start_url": "/llms/?lang=zh&source=pwa",
+  "scope": "/llms/",
+  "display": "standalone",
+  "theme_color": "#0C2340",
+  "background_color": "#0C2340",
+  "categories": [
+    "education",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "/llms/brand/pwa-llms-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/llms/brand/pwa-llms-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/llms/brand/pwa-llms-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/llms/brand/pwa-llms-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/llms/brand/llms-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "学习",
+      "short_name": "学习",
+      "description": "语言模型的六个部件",
+      "url": "/llms/aprenda?lang=zh&source=shortcut",
+      "icons": [
+        {
+          "src": "/llms/brand/pwa-llms-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "探索词嵌入",
+      "short_name": "探索",
+      "description": "三个坐标轴上的 GloVe 单词",
+      "url": "/llms/?lang=zh&source=shortcut",
+      "icons": [
+        {
+          "src": "/llms/brand/pwa-llms-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}

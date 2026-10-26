@@ -1,0 +1,23 @@
+# A CLI da Vercel NÃO lê o .gitignore: sobe tudo o que não estiver listado aqui (inclusive secrets/ e caches).
+# O deploy leva só o que o build remoto e as funções usam: web/ (sem testes e sem ferramentas, exceto minify.mjs), api/ (sem testes), data/, brand/,
+# a chave PÚBLICA do pacote e vercel.json. A cota de uploads é da conta inteira: manter a lista curta.
+/secrets/
+*.pem
+.env*
+/.venv*/
+/backend/
+/contracts/
+/docs/
+/tools/
+/pipeline/.cache/
+/pipeline/tests/
+/web/test/
+/web/tools/screenshots.mjs
+/web/tools/gerar_icones.mjs
+/web/tools/cena-demo.html
+/web/dist/
+/api/test/
+/CLAUDE.md
+/README.md
+__pycache__/
+node_modules/

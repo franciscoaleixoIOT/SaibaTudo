@@ -65,7 +65,7 @@ apps/llms/
 
 ---
 
-### Tarefa 1: Pipeline do pacote (filtro, quantização, manifesto assinado)
+### Task 1: Pipeline do pacote (filtro, quantização, manifesto assinado)
 
 **Files:**
 - Create: `apps/llms/pipeline/sign.py` (cópia de `apps/quimica/pipeline/sign.py`, sem mudança), `apps/llms/pipeline/gerar_pacote.py`, `apps/llms/pipeline/requirements.txt` (`ecdsa==0.19.2`, `numpy>=1.26`, `gensim>=4.3`), `apps/llms/pipeline/tests/test_gerar_pacote.py`, `apps/llms/.gitignore` (`secrets/`, `pipeline/.cache/`, `web/dist/`, `__pycache__/`), `apps/llms/LICENSE` (MIT, mesmo texto de `apps/quimica/LICENSE`).
@@ -108,7 +108,7 @@ def test_escrever_pacote_assina_e_lista_arquivos(self):  # tmpdir + chave gerada
 - [ ] **Passo 4: rodar e ver passar** — mesmo comando → `OK`.
 - [ ] **Passo 5: commit** — `git add apps/llms/pipeline apps/llms/.gitignore apps/llms/LICENSE` · `feat(llms): pipeline do pacote GloVe (filtro, int8 por vetor, manifesto assinado)`.
 
-### Tarefa 2: Glossário, presets e fixture assinada
+### Task 2: Glossário, presets e fixture assinada
 
 **Files:**
 - Create: `apps/llms/contracts/glossario.json`, `apps/llms/contracts/presets.json`, `apps/llms/tools/test_contratos.py`, `apps/llms/web/test/fixtures/palavras_fixture.txt`, `apps/llms/web/test/fixtures/chave_teste.pem` (+ `chave_teste_public.b64`), `apps/llms/web/test/fixtures/data-llms/*` (gerado), `apps/llms/web/test/fixtures/README.md`.
@@ -124,7 +124,7 @@ def test_escrever_pacote_assina_e_lista_arquivos(self):  # tmpdir + chave gerada
 - [ ] **Passo 4: gerar a fixture** — `python pipeline/sign.py gen --private web/test/fixtures/chave_teste.pem --public web/test/fixtures/chave_teste_public.pem` e `python pipeline/gerar_pacote.py --saida web/test/fixtures/data-llms --fonte gensim --palavras web/test/fixtures/palavras_fixture.txt --chave web/test/fixtures/chave_teste.pem --glossario contracts/glossario.json --presets contracts/presets.json` (primeira execução baixa 66 MB para `pipeline/.cache`). Conferir `python pipeline/sign.py verify web/test/fixtures/data-llms/manifest.json --public web/test/fixtures/chave_teste_public.pem`.
 - [ ] **Passo 5: rodar os testes e ver passar**; commit — `feat(llms): glossario (300 palavras, 5 idiomas), presets e fixture assinada do GloVe`.
 
-### Tarefa 3: Casca do site (build, service worker, i18n em 6 idiomas)
+### Task 3: Casca do site (build, service worker, i18n em 6 idiomas)
 
 **Files:**
 - Create (cópias adaptadas da química, `quimica`→`llms`, `Química`→`LLMs`): `web/package.json`, `web/build.mjs`, `web/serve.mjs`, `web/tools/minify.mjs`, `web/src/llms/{index.html,offline.html,sw.js,manifest.webmanifest,manifest.{en,es,de,fr,zh}.webmanifest}`, `web/src/llms/css/{base,app}.css`, `web/src/llms/js/{main,app,dom,prefs,install,icons,texto,formato,theme-init,build-info}.js`, `web/src/llms/js/i18n/{idiomas,index}.js`, `web/src/llms/js/i18n/catalogos/{pt-BR,en,es,de,fr,zh}.js`, `web/src/llms/js/ui/{componentes,config}.js`, `web/test/{support,build.test,sw.test,i18n.test}.mjs`.
@@ -143,7 +143,7 @@ def test_escrever_pacote_assina_e_lista_arquivos(self):  # tmpdir + chave gerada
 - [ ] **Passo 4: rodar e ver passar**; `node build.mjs` com `DATA_DIR=test/fixtures/data-llms` e `node serve.mjs` → abrir `http://localhost:<porta>/llms/` e ver a casca em 6 idiomas (`?lang=zh`).
 - [ ] **Passo 5: commit** — `feat(llms): casca do site (build, PWA, i18n em seis idiomas com chines)`.
 
-### Tarefa 4: `verify.js` e a classe `Vetores` (`data.js`)
+### Task 4: `verify.js` e a classe `Vetores` (`data.js`)
 
 **Files:**
 - Create: `web/src/llms/js/verify.js` (cópia da química com `CHAVE_PUBLICA_B64` do app), `web/src/llms/js/data.js`, `web/test/data.test.mjs`.
@@ -168,7 +168,7 @@ def test_escrever_pacote_assina_e_lista_arquivos(self):  # tmpdir + chave gerada
 - [ ] **Passo 4: rodar e ver passar**; medir `vizinhos` com `console.time` na fixture (só sanidade).
 - [ ] **Passo 5: commit** — `feat(llms): carga verificada do pacote e operacoes sobre os vetores (vizinhos, analogia, direcao)`.
 
-### Tarefa 5: `projecao.js` (variância e PCA)
+### Task 5: `projecao.js` (variância e PCA)
 
 **Files:** Create `web/src/llms/js/projecao.js`, `web/test/projecao.test.mjs`.
 
@@ -182,7 +182,7 @@ def test_escrever_pacote_assina_e_lista_arquivos(self):  # tmpdir + chave gerada
 - [ ] **Passo 2: falhar. Passo 3: implementar. Passo 4: passar.**
 - [ ] **Passo 5: commit** — `feat(llms): projecao em 3 eixos por variancia e PCA (iteracao de potencia)`.
 
-### Tarefa 6: `cena3d.js` (Canvas 2D)
+### Task 6: `cena3d.js` (Canvas 2D)
 
 **Files:** Create `web/src/llms/js/cena3d.js`, `web/test/cena3d.test.mjs`.
 
@@ -200,7 +200,7 @@ def test_escrever_pacote_assina_e_lista_arquivos(self):  # tmpdir + chave gerada
 - [ ] **Passo 4: passar**; abrir uma página de teste manual (`web/tools/cena-demo.html`, não publicada: build ignora `tools/`) com 6 pontos e girar com mouse e toque (emulação do Chrome).
 - [ ] **Passo 5: commit** — `feat(llms): cena 3D em Canvas 2D (orbita, zoom, setas, rotulos sem colisao)`.
 
-### Tarefa 7: Estado do explorador (`explorador.js` sem DOM) e tela
+### Task 7: Estado do explorador (`explorador.js` sem DOM) e tela
 
 **Files:** Create `web/src/llms/js/explorador.js` (estado puro), `web/src/llms/js/ui/explorador.js` (DOM), `web/test/explorador.test.mjs`; Modify `web/src/llms/js/ui/inicio.js` (criado na Tarefa 11; aqui nasce com o explorador e sem assistente) e catálogos (`ui.explorador.*`, `ui.presets.*`).
 
@@ -218,7 +218,7 @@ def test_escrever_pacote_assina_e_lista_arquivos(self):  # tmpdir + chave gerada
 - [ ] **Passo 6: rodar o site com a fixture** e conferir no navegador: adicionar, remover, PCA, setas, analogia, URL.
 - [ ] **Passo 7: commit** — `feat(llms): explorador de embeddings (estado puro, painel, presets, analogia, direcao, estado na URL)`.
 
-### Tarefa 8: Léxico em 6 idiomas e gerador
+### Task 8: Léxico em 6 idiomas e gerador
 
 **Files:** Create `contracts/lexico/{pt-BR,en,es,de,fr,zh}.json`, `tools/gerar_lexico.py` (cópia adaptada: `SAIDA = web/src/llms/js/nlu/lex`, `IDIOMAS` com zh), `web/src/llms/js/nlu/lex/index.js` (cópia adaptada: `IDIOMAS_LEXICO`, `LEXICOS_BRUTOS`, `compilar`, `lexico(idioma)`), `web/test/lexico.test.mjs`.
 
@@ -229,7 +229,7 @@ def test_escrever_pacote_assina_e_lista_arquivos(self):  # tmpdir + chave gerada
 - [ ] **Passo 2: falhar. Passo 3: escrever** os 6 JSON (pt-BR primeiro; en/es/de/fr/zh com as mesmas intenções; zh por termos: "显示", "加上", "类比", "相似", "邻近", "方向", "什么是"), rodar `python tools/gerar_lexico.py`.
 - [ ] **Passo 4: passar. Passo 5: commit** — `feat(llms): lexico do interpretador em seis idiomas e gerador`.
 
-### Tarefa 9: Catálogos completos e `conteudo/` (seis seções próprias)
+### Task 9: Catálogos completos e `conteudo/` (seis seções próprias)
 
 **Files:** Create `web/src/llms/js/conteudo/{pt-BR,en,es,de,fr,zh}.js`, `web/src/llms/js/conteudo/index.js`, `web/src/llms/js/ui/aprenda.js`, `web/test/conteudo.test.mjs`; Modify os 6 catálogos (`ui.aprenda.*`, `ui.explorador.*` completos, `ui.sobre.*`, `respostas.*`).
 
@@ -242,7 +242,7 @@ def test_escrever_pacote_assina_e_lista_arquivos(self):  # tmpdir + chave gerada
 - [ ] **Passo 2: falhar. Passo 3: escrever** o conteúdo em pt-BR (autoria própria; a seção `embeddings` explica dimensões, direções, aritmética, cosseno/produto escalar e por que projetar; `softmax` traz a fórmula em texto `p_i = e^(z_i/T) / Σ e^(z_j/T)`), traduzir para os 5 idiomas; completar os catálogos.
 - [ ] **Passo 4: passar (inclui o teste de paridade da Tarefa 3). Passo 5: commit** — `feat(llms): seis secoes didaticas proprias em seis idiomas e tela Aprenda`.
 
-### Tarefa 10: NLU local (`nlu.js`) e casos golden
+### Task 10: NLU local (`nlu.js`) e casos golden
 
 **Files:** Create `web/src/llms/js/nlu.js`, `contracts/nlu_golden_cases.json`, `web/test/nlu-golden.test.mjs`.
 
@@ -256,7 +256,7 @@ def test_escrever_pacote_assina_e_lista_arquivos(self):  # tmpdir + chave gerada
 - [ ] **Passo 2: falhar. Passo 3: implementar `nlu.js` e escrever o golden** (≥ 180 casos). **Passo 4: passar.**
 - [ ] **Passo 5: commit** — `feat(llms): interpretador local por regras com glossario e golden em seis idiomas`.
 
-### Tarefa 11: Respostas montadas e tela Início (assistente padrão)
+### Task 11: Respostas montadas e tela Início (assistente padrão)
 
 **Files:** Create `web/src/llms/js/answers.js`, `web/src/llms/js/ui/inicio.js` (assistente + explorador), `web/test/answers.test.mjs`, `web/test/prefs-historico.test.mjs` (porte); Modify catálogos (`respostas.*`).
 
@@ -269,7 +269,7 @@ def test_escrever_pacote_assina_e_lista_arquivos(self):  # tmpdir + chave gerada
 - [ ] **Passo 2–4.** **Passo 5: conferir no navegador** os itens obrigatórios de `docs/PADRAO_ASSISTENTE.md` §1–§5.
 - [ ] **Passo 6: commit** — `feat(llms): respostas montadas no aparelho e tela Inicio no padrao do assistente`.
 
-### Tarefa 12: Sobre os dados, configurações, privacidade em 6 idiomas, manifestos e marca
+### Task 12: Sobre os dados, configurações, privacidade em 6 idiomas, manifestos e marca
 
 **Files:** Create `web/src/llms/js/ui/sobre.js`, `web/src/llms/privacidade/{index,en,es,de,fr,zh}.html`, `docs/PRIVACIDADE.{pt-BR,en,es,de,fr,zh}.md`, `web/test/privacidade.test.mjs`, `brand/llms-icon.svg`, `web/tools/gerar_icones.mjs` (cópia adaptada), `brand/png/*`; Modify `ui/config.js` (tema, tamanho do texto, idioma, instalar, modo automático da nuvem, apagar dados, limpar histórico), manifestos.
 
@@ -277,7 +277,7 @@ def test_escrever_pacote_assina_e_lista_arquivos(self):  # tmpdir + chave gerada
 - [ ] **Passo 2–4**: escrever a política (pt-BR → 5 traduções), `sobre.js` (fonte GloVe + PDDL + referência, versão do pacote, assinatura verificada, licenças do código e da base Qwen3, `revisao: pendente` dos catálogos), ícone (eixos 3D com três pontos, cores da marca) e PNGs por `node web/tools/gerar_icones.mjs`.
 - [ ] **Passo 5: commit** — `feat(llms): sobre os dados, configuracoes, politica de privacidade em seis idiomas e marca`.
 
-### Tarefa 13: API — `health.js`, `_lib` e verificador de fidelidade
+### Task 13: API — `health.js`, `_lib` e verificador de fidelidade
 
 **Files:** Create `api/package.json`, `api/health.js`, `api/_lib/{http,cache,ratelimit,compartilhado,validate,dadopessoal,config}.js` (cópias adaptadas: `validate.js` ganha `lang` ∈ IDIOMAS obrigatório em `validateAskBody`; `config.js` sem Modal/NLU: `askEnabled`, `hfAskUrl`, `hfToken`, `askHfDailyBudget` (padrão 200), `askHfTimeoutMs` (25000), `allowedOrigins`, `askModelVersion`), `api/_lib/fidelidade.js`, `api/test/{_helpers,health,fidelidade}.test.mjs`, `api/README.md`.
 
@@ -290,7 +290,7 @@ def test_escrever_pacote_assina_e_lista_arquivos(self):  # tmpdir + chave gerada
 - [ ] **Passo 1: testes**: `fidelidade`: resposta com "0,87" presente no contexto → ok; "0,91" ausente → `numero`; sem rodapé → `rodape`; zh sem Han → `escrita`; pt com "你好世界再见" → `escrita`; CPF no texto → `dadopessoal`. `validateAskBody` sem `lang` → erro. `health` com manifesto da fixture → `data.version` igual.
 - [ ] **Passo 2–4.** **Passo 5: commit** — `feat(llms): API health e verificador de fidelidade (numeros, rodape, escrita do idioma)`.
 
-### Tarefa 14: `ask-handler.js`, `ask.js` e o Space (`backend/hf_space_llms`)
+### Task 14: `ask-handler.js`, `ask.js` e o Space (`backend/hf_space_llms`)
 
 **Files:** Create `api/_lib/ask-handler.js` (porte sem Modal), `api/ask.js`, `api/test/ask-handler.test.mjs`, `backend/hf_space_llms/{app.py,ask_core.py,requirements.txt,README.md,publicar.py,test_ask_core.py}`, `vercel.json`, `.vercelignore`.
 
@@ -305,7 +305,7 @@ def test_escrever_pacote_assina_e_lista_arquivos(self):  # tmpdir + chave gerada
 - [ ] **Passo 2–4.** **Passo 5: commit** — `feat(llms): /api/ask com Space do Hugging Face (Qwen3-4B) e Space llms`.
 - [ ] **Passo 6 (operação, gasta ZeroGPU):** `python backend/hf_space_llms/publicar.py --space franciscoaleixo/saibatudo-llms --teste` → anotar a URL do Space (`https://franciscoaleixo-saibatudo-llms.hf.space`) para a Vercel.
 
-### Tarefa 15: Cliente da nuvem (`nuvem.js`) e integração na tela
+### Task 15: Cliente da nuvem (`nuvem.js`) e integração na tela
 
 **Files:** Create `web/src/llms/js/nuvem.js`, `web/test/nuvem.test.mjs`; Modify `ui/inicio.js`, `ui/config.js`, catálogos (`ui.nuvem.*`: consentimento, botão, indisponível, erro, rótulo).
 
@@ -320,7 +320,7 @@ def test_escrever_pacote_assina_e_lista_arquivos(self):  # tmpdir + chave gerada
 - [ ] **Passo 2–4.** **Passo 5: tela**: botão "Perguntar à IA na nuvem" após cada resposta e no "não entendi", diálogo de consentimento padrão (por pergunta; modo automático em configurações, desligado por padrão), estados de indisponível com aviso claro.
 - [ ] **Passo 6: commit** — `feat(llms): IA na nuvem opt-in no assistente, com rotulo do modelo e contexto do grafico`.
 
-### Tarefa 16: Workflows, validador e e2e
+### Task 16: Workflows, validador e e2e
 
 **Files:** Create `.github/workflows/llms-web-ci.yml`, `.github/workflows/llms-data-refresh.yml`, `apps/llms/tools/test_workflows.py` (cópia com `glob("llms-*.yml")`), `apps/llms/web/tools/screenshots.mjs` (adaptado: cenários `inicio`, `explorador-preset`, `pca`, `aprenda`, `sobre`, `zh`, `offline`), `apps/llms/web/test/e2e.test.mjs`.
 
@@ -331,7 +331,7 @@ def test_escrever_pacote_assina_e_lista_arquivos(self):  # tmpdir + chave gerada
 - [ ] **Passo 2: escrever os workflows e o screenshots.mjs.** **Passo 3:** `python -m unittest discover -s tools` passa; `E2E=1 npm test` passa no Chrome local (sem erro de console nem CSP; offline após a primeira carga).
 - [ ] **Passo 4: commit** — `ci(llms): workflows llms-web-ci e llms-data-refresh, validador e verificacao no navegador`.
 
-### Tarefa 17: Documentos do app e da raiz
+### Task 17: Documentos do app e da raiz
 
 **Files:** Create `apps/llms/{README.md,CLAUDE.md}`, `apps/llms/docs/{ARCHITECTURE,DATA_CONTRACT,I18N,FONTES_E_LICENCAS,OPERACAO,PLANO,PROJECT_MEMORY}.md`; Modify `CLAUDE.md` (raiz: linha do app em "Uma pasta por app" e nota no item 8), `docs/PADRAO_ASSISTENTE.md` (linha "LLMs segue o padrão desde …").
 
@@ -339,7 +339,7 @@ def test_escrever_pacote_assina_e_lista_arquivos(self):  # tmpdir + chave gerada
 - [ ] **Passo 2:** `node --test "tests/*.test.mjs"` na raiz continua verde (nada de rota mudou ainda).
 - [ ] **Passo 3: commit** — `docs(llms): guia do app, arquitetura, contrato de dados, i18n com chines, fontes, operacao e plano S1-S5`.
 
-### Tarefa 18: Pacote real, projeto Vercel e primeiro deploy
+### Task 18: Pacote real, projeto Vercel e primeiro deploy
 
 **Files:** Create `apps/llms/secrets/data_signing_key.pem` (ignorado), `apps/llms/pipeline/data_signing_public.{pem,b64}`, `apps/llms/data/llms/*` (commit só de dados), `apps/llms/web/src/llms/js/verify.js` (chave pública real).
 
@@ -352,7 +352,7 @@ def test_escrever_pacote_assina_e_lista_arquivos(self):  # tmpdir + chave gerada
 - [ ] **Passo 7:** `gh workflow run llms-data-refresh.yml`; `gh run watch`; `curl https://saibatudo-llms.vercel.app/llms/api/health` → `"ok":true,"ask":"on"`.
 - [ ] **Passo 8 (teste ao vivo, Playwright):** abrir `/llms/?lang=pt-BR`, `?lang=en`, `?lang=zh`: preset realeza, PCA, analogia; uma pergunta à nuvem em pt e zh com consentimento; sem erro de console. Registrar resultado em `docs/PROJECT_MEMORY.md`; commit `docs(llms): primeiro deploy em saibatudo-llms.vercel.app`.
 
-### Tarefa 19 (só em 27/10/2026 ou depois): domínio, home em chinês e cartão
+### Task 19 (só em 27/10/2026 ou depois): domínio, home em chinês e cartão
 
 **Files:** Modify `apps/eleicoes2026/vercel.json` (6 rewrites: `/llms`, `/llms/`, `/llms/:path*` → `https://saibatudo-llms.vercel.app/llms/…`; `/zh`, `/zh/`, `/zh/:path*` → `https://saibatudo-portal.vercel.app/zh/…`), `portal/src/sw.js` (exclusão `/llms`), `portal/src/portal/i18n/index.js` (`IDIOMAS` + `'zh'`), Create `portal/src/portal/i18n/zh.js`, Modify `portal/src/portal/textos.js` (`UI.zh`, `AVISO.zh`), `portal/src/portal/apps.js` (`traducoes.zh` em `EM_BREVE`), `portal/src/index.html` (cartão fixo `card app-principal` do SaibaTudo LLMs com `btn btn-primario grande` e botão no hero `btn btn-ouro grande`; textos nos 6 catálogos; ícone `portal/src/portal/brand/svg/llms.svg`; na página zh a química linka `/quimica/?lang=en` e eleições/AchaVagaIA levam o selo "só em português"), `tests/rotas.test.mjs` (IDIOMAS com 6; teste `llms: as três formas do endereço`; `/zh*` → portal), `CLAUDE.md` raiz (rota no ar).
 

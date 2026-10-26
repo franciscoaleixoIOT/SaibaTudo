@@ -1,0 +1,72 @@
+{
+ "realeza": [
+  "king",
+  "queen",
+  "man",
+  "woman",
+  "prince",
+  "princess"
+ ],
+ "capitais": [
+  "france",
+  "paris",
+  "germany",
+  "berlin",
+  "italy",
+  "rome",
+  "japan",
+  "tokyo",
+  "spain",
+  "madrid"
+ ],
+ "plural": [
+  "cat",
+  "cats",
+  "dog",
+  "dogs",
+  "one",
+  "two",
+  "three",
+  "four"
+ ],
+ "familia": [
+  "father",
+  "mother",
+  "son",
+  "daughter",
+  "brother",
+  "sister",
+  "uncle",
+  "aunt"
+ ],
+ "cores": [
+  "red",
+  "blue",
+  "green",
+  "yellow",
+  "black",
+  "white",
+  "orange",
+  "purple"
+ ],
+ "numeros": [
+  "one",
+  "two",
+  "three",
+  "four",
+  "five",
+  "six",
+  "seven",
+  "eight",
+  "nine",
+  "ten"
+ ],
+ "lideres": [
+  "germany",
+  "italy",
+  "hitler",
+  "mussolini",
+  "france",
+  "napoleon"
+ ]
+}

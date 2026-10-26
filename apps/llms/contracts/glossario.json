@@ -1,0 +1,2522 @@
+{
+ "king": {
+  "pt-BR": "rei",
+  "es": "rey",
+  "de": "König",
+  "fr": "roi",
+  "zh": "国王"
+ },
+ "queen": {
+  "pt-BR": "rainha",
+  "es": "reina",
+  "de": "Königin",
+  "fr": "reine",
+  "zh": "女王"
+ },
+ "man": {
+  "pt-BR": "homem",
+  "es": "hombre",
+  "de": "Mann",
+  "fr": "homme",
+  "zh": "男人"
+ },
+ "woman": {
+  "pt-BR": "mulher",
+  "es": "mujer",
+  "de": "Frau",
+  "fr": "femme",
+  "zh": "女人"
+ },
+ "prince": {
+  "pt-BR": "príncipe",
+  "es": "príncipe",
+  "de": "Prinz",
+  "fr": "prince",
+  "zh": "王子"
+ },
+ "princess": {
+  "pt-BR": "princesa",
+  "es": "princesa",
+  "de": "Prinzessin",
+  "fr": "princesse",
+  "zh": "公主"
+ },
+ "boy": {
+  "pt-BR": "menino",
+  "es": "niño",
+  "de": "Junge",
+  "fr": "garçon",
+  "zh": "男孩"
+ },
+ "girl": {
+  "pt-BR": "menina",
+  "es": "niña",
+  "de": "Mädchen",
+  "fr": "fille",
+  "zh": "女孩"
+ },
+ "men": {
+  "pt-BR": "homens",
+  "es": "hombres",
+  "de": "Männer",
+  "fr": "hommes",
+  "zh": "男人们"
+ },
+ "women": {
+  "pt-BR": "mulheres",
+  "es": "mujeres",
+  "de": "Frauen",
+  "fr": "femmes",
+  "zh": "女人们"
+ },
+ "emperor": {
+  "pt-BR": "imperador",
+  "es": "emperador",
+  "de": "Kaiser",
+  "fr": "empereur",
+  "zh": "皇帝"
+ },
+ "empress": {
+  "pt-BR": "imperatriz",
+  "es": "emperatriz",
+  "de": "Kaiserin",
+  "fr": "impératrice",
+  "zh": "皇后"
+ },
+ "actor": {
+  "pt-BR": "ator",
+  "es": "actor",
+  "de": "Schauspieler",
+  "fr": "acteur",
+  "zh": "男演员"
+ },
+ "actress": {
+  "pt-BR": "atriz",
+  "es": "actriz",
+  "de": "Schauspielerin",
+  "fr": "actrice",
+  "zh": "女演员"
+ },
+ "lord": {
+  "pt-BR": "lorde",
+  "es": "señor",
+  "de": "Herr",
+  "fr": "seigneur",
+  "zh": "领主"
+ },
+ "lady": {
+  "pt-BR": "dama",
+  "es": "dama",
+  "de": "Dame",
+  "fr": "dame",
+  "zh": "女士"
+ },
+ "gentleman": {
+  "pt-BR": "cavalheiro",
+  "es": "caballero",
+  "de": "Gentleman",
+  "fr": "gentleman",
+  "zh": "绅士"
+ },
+ "throne": {
+  "pt-BR": "trono",
+  "es": "trono",
+  "de": "Thron",
+  "fr": "trône",
+  "zh": "王位"
+ },
+ "crown": {
+  "pt-BR": "coroa",
+  "es": "corona",
+  "de": "Krone",
+  "fr": "couronne",
+  "zh": "王冠"
+ },
+ "kingdom": {
+  "pt-BR": "reino",
+  "es": "reino",
+  "de": "Königreich",
+  "fr": "royaume",
+  "zh": "王国"
+ },
+ "palace": {
+  "pt-BR": "palácio",
+  "es": "palacio",
+  "de": "Palast",
+  "fr": "palais",
+  "zh": "宫殿"
+ },
+ "castle": {
+  "pt-BR": "castelo",
+  "es": "castillo",
+  "de": "Burg",
+  "fr": "château",
+  "zh": "城堡"
+ },
+ "monarch": {
+  "pt-BR": "monarca",
+  "es": "monarca",
+  "de": "Monarch",
+  "fr": "monarque",
+  "zh": "君主"
+ },
+ "royal": {
+  "pt-BR": "real",
+  "es": "real",
+  "de": "königlich",
+  "fr": "royal",
+  "zh": "王室的"
+ },
+ "father": {
+  "pt-BR": "pai",
+  "es": "padre",
+  "de": "Vater",
+  "fr": "père",
+  "zh": "父亲"
+ },
+ "mother": {
+  "pt-BR": "mãe",
+  "es": "madre",
+  "de": "Mutter",
+  "fr": "mère",
+  "zh": "母亲"
+ },
+ "son": {
+  "pt-BR": "filho",
+  "es": "hijo",
+  "de": "Sohn",
+  "fr": "fils",
+  "zh": "儿子"
+ },
+ "daughter": {
+  "pt-BR": "filha",
+  "es": "hija",
+  "de": "Tochter",
+  "fr": "fille",
+  "zh": "女儿"
+ },
+ "brother": {
+  "pt-BR": "irmão",
+  "es": "hermano",
+  "de": "Bruder",
+  "fr": "frère",
+  "zh": "兄弟"
+ },
+ "sister": {
+  "pt-BR": "irmã",
+  "es": "hermana",
+  "de": "Schwester",
+  "fr": "sœur",
+  "zh": "姐妹"
+ },
+ "uncle": {
+  "pt-BR": "tio",
+  "es": "tío",
+  "de": "Onkel",
+  "fr": "oncle",
+  "zh": "叔叔"
+ },
+ "aunt": {
+  "pt-BR": "tia",
+  "es": "tía",
+  "de": "Tante",
+  "fr": "tante",
+  "zh": "阿姨"
+ },
+ "grandfather": {
+  "pt-BR": "avô",
+  "es": "abuelo",
+  "de": "Großvater",
+  "fr": "grand-père",
+  "zh": "祖父"
+ },
+ "grandmother": {
+  "pt-BR": "avó",
+  "es": "abuela",
+  "de": "Großmutter",
+  "fr": "grand-mère",
+  "zh": "祖母"
+ },
+ "husband": {
+  "pt-BR": "marido",
+  "es": "esposo",
+  "de": "Ehemann",
+  "fr": "mari",
+  "zh": "丈夫"
+ },
+ "wife": {
+  "pt-BR": "esposa",
+  "es": "esposa",
+  "de": "Ehefrau",
+  "fr": "épouse",
+  "zh": "妻子"
+ },
+ "nephew": {
+  "pt-BR": "sobrinho",
+  "es": "sobrino",
+  "de": "Neffe",
+  "fr": "neveu",
+  "zh": "侄子"
+ },
+ "niece": {
+  "pt-BR": "sobrinha",
+  "es": "sobrina",
+  "de": "Nichte",
+  "fr": "nièce",
+  "zh": "侄女"
+ },
+ "baby": {
+  "pt-BR": "bebê",
+  "es": "bebé",
+  "de": "Baby",
+  "fr": "bébé",
+  "zh": "婴儿"
+ },
+ "child": {
+  "pt-BR": "criança",
+  "es": "niño",
+  "de": "Kind",
+  "fr": "enfant",
+  "zh": "孩子"
+ },
+ "children": {
+  "pt-BR": "crianças",
+  "es": "niños",
+  "de": "Kinder",
+  "fr": "enfants",
+  "zh": "孩子们"
+ },
+ "family": {
+  "pt-BR": "família",
+  "es": "familia",
+  "de": "Familie",
+  "fr": "famille",
+  "zh": "家庭"
+ },
+ "parents": {
+  "pt-BR": "pais",
+  "es": "padres",
+  "de": "Eltern",
+  "fr": "parents",
+  "zh": "父母"
+ },
+ "friend": {
+  "pt-BR": "amigo",
+  "es": "amigo",
+  "de": "Freund",
+  "fr": "ami",
+  "zh": "朋友"
+ },
+ "france": {
+  "pt-BR": "França",
+  "es": "Francia",
+  "de": "Frankreich",
+  "fr": "France",
+  "zh": "法国"
+ },
+ "paris": {
+  "pt-BR": "Paris",
+  "es": "París",
+  "de": "Paris",
+  "fr": "Paris",
+  "zh": "巴黎"
+ },
+ "germany": {
+  "pt-BR": "Alemanha",
+  "es": "Alemania",
+  "de": "Deutschland",
+  "fr": "Allemagne",
+  "zh": "德国"
+ },
+ "berlin": {
+  "pt-BR": "Berlim",
+  "es": "Berlín",
+  "de": "Berlin",
+  "fr": "Berlin",
+  "zh": "柏林"
+ },
+ "italy": {
+  "pt-BR": "Itália",
+  "es": "Italia",
+  "de": "Italien",
+  "fr": "Italie",
+  "zh": "意大利"
+ },
+ "rome": {
+  "pt-BR": "Roma",
+  "es": "Roma",
+  "de": "Rom",
+  "fr": "Rome",
+  "zh": "罗马"
+ },
+ "japan": {
+  "pt-BR": "Japão",
+  "es": "Japón",
+  "de": "Japan",
+  "fr": "Japon",
+  "zh": "日本"
+ },
+ "tokyo": {
+  "pt-BR": "Tóquio",
+  "es": "Tokio",
+  "de": "Tokio",
+  "fr": "Tokyo",
+  "zh": "东京"
+ },
+ "spain": {
+  "pt-BR": "Espanha",
+  "es": "España",
+  "de": "Spanien",
+  "fr": "Espagne",
+  "zh": "西班牙"
+ },
+ "madrid": {
+  "pt-BR": "Madri",
+  "es": "Madrid",
+  "de": "Madrid",
+  "fr": "Madrid",
+  "zh": "马德里"
+ },
+ "brazil": {
+  "pt-BR": "Brasil",
+  "es": "Brasil",
+  "de": "Brasilien",
+  "fr": "Brésil",
+  "zh": "巴西"
+ },
+ "brasilia": {
+  "pt-BR": "Brasília",
+  "es": "Brasilia",
+  "de": "Brasília",
+  "fr": "Brasilia",
+  "zh": "巴西利亚"
+ },
+ "portugal": {
+  "pt-BR": "Portugal",
+  "es": "Portugal",
+  "de": "Portugal",
+  "fr": "Portugal",
+  "zh": "葡萄牙"
+ },
+ "lisbon": {
+  "pt-BR": "Lisboa",
+  "es": "Lisboa",
+  "de": "Lissabon",
+  "fr": "Lisbonne",
+  "zh": "里斯本"
+ },
+ "china": {
+  "pt-BR": "China",
+  "es": "China",
+  "de": "China",
+  "fr": "Chine",
+  "zh": "中国"
+ },
+ "beijing": {
+  "pt-BR": "Pequim",
+  "es": "Pekín",
+  "de": "Peking",
+  "fr": "Pékin",
+  "zh": "北京"
+ },
+ "russia": {
+  "pt-BR": "Rússia",
+  "es": "Rusia",
+  "de": "Russland",
+  "fr": "Russie",
+  "zh": "俄罗斯"
+ },
+ "moscow": {
+  "pt-BR": "Moscou",
+  "es": "Moscú",
+  "de": "Moskau",
+  "fr": "Moscou",
+  "zh": "莫斯科"
+ },
+ "england": {
+  "pt-BR": "Inglaterra",
+  "es": "Inglaterra",
+  "de": "England",
+  "fr": "Angleterre",
+  "zh": "英格兰"
+ },
+ "london": {
+  "pt-BR": "Londres",
+  "es": "Londres",
+  "de": "London",
+  "fr": "Londres",
+  "zh": "伦敦"
+ },
+ "argentina": {
+  "pt-BR": "Argentina",
+  "es": "Argentina",
+  "de": "Argentinien",
+  "fr": "Argentine",
+  "zh": "阿根廷"
+ },
+ "mexico": {
+  "pt-BR": "México",
+  "es": "México",
+  "de": "Mexiko",
+  "fr": "Mexique",
+  "zh": "墨西哥"
+ },
+ "canada": {
+  "pt-BR": "Canadá",
+  "es": "Canadá",
+  "de": "Kanada",
+  "fr": "Canada",
+  "zh": "加拿大"
+ },
+ "india": {
+  "pt-BR": "Índia",
+  "es": "India",
+  "de": "Indien",
+  "fr": "Inde",
+  "zh": "印度"
+ },
+ "egypt": {
+  "pt-BR": "Egito",
+  "es": "Egipto",
+  "de": "Ägypten",
+  "fr": "Égypte",
+  "zh": "埃及"
+ },
+ "australia": {
+  "pt-BR": "Austrália",
+  "es": "Australia",
+  "de": "Australien",
+  "fr": "Australie",
+  "zh": "澳大利亚"
+ },
+ "country": {
+  "pt-BR": "país",
+  "es": "país",
+  "de": "Land",
+  "fr": "pays",
+  "zh": "国家"
+ },
+ "city": {
+  "pt-BR": "cidade",
+  "es": "ciudad",
+  "de": "Stadt",
+  "fr": "ville",
+  "zh": "城市"
+ },
+ "capital": {
+  "pt-BR": "capital",
+  "es": "capital",
+  "de": "Hauptstadt",
+  "fr": "capitale",
+  "zh": "首都"
+ },
+ "europe": {
+  "pt-BR": "Europa",
+  "es": "Europa",
+  "de": "Europa",
+  "fr": "Europe",
+  "zh": "欧洲"
+ },
+ "asia": {
+  "pt-BR": "Ásia",
+  "es": "Asia",
+  "de": "Asien",
+  "fr": "Asie",
+  "zh": "亚洲"
+ },
+ "africa": {
+  "pt-BR": "África",
+  "es": "África",
+  "de": "Afrika",
+  "fr": "Afrique",
+  "zh": "非洲"
+ },
+ "america": {
+  "pt-BR": "América",
+  "es": "América",
+  "de": "Amerika",
+  "fr": "Amérique",
+  "zh": "美洲"
+ },
+ "hitler": {
+  "pt-BR": "Hitler",
+  "es": "Hitler",
+  "de": "Hitler",
+  "fr": "Hitler",
+  "zh": "希特勒"
+ },
+ "mussolini": {
+  "pt-BR": "Mussolini",
+  "es": "Mussolini",
+  "de": "Mussolini",
+  "fr": "Mussolini",
+  "zh": "墨索里尼"
+ },
+ "napoleon": {
+  "pt-BR": "Napoleão",
+  "es": "Napoleón",
+  "de": "Napoleon",
+  "fr": "Napoléon",
+  "zh": "拿破仑"
+ },
+ "president": {
+  "pt-BR": "presidente",
+  "es": "presidente",
+  "de": "Präsident",
+  "fr": "président",
+  "zh": "总统"
+ },
+ "minister": {
+  "pt-BR": "ministro",
+  "es": "ministro",
+  "de": "Minister",
+  "fr": "ministre",
+  "zh": "部长"
+ },
+ "government": {
+  "pt-BR": "governo",
+  "es": "gobierno",
+  "de": "Regierung",
+  "fr": "gouvernement",
+  "zh": "政府"
+ },
+ "war": {
+  "pt-BR": "guerra",
+  "es": "guerra",
+  "de": "Krieg",
+  "fr": "guerre",
+  "zh": "战争"
+ },
+ "peace": {
+  "pt-BR": "paz",
+  "es": "paz",
+  "de": "Frieden",
+  "fr": "paix",
+  "zh": "和平"
+ },
+ "history": {
+  "pt-BR": "história",
+  "es": "historia",
+  "de": "Geschichte",
+  "fr": "histoire",
+  "zh": "历史"
+ },
+ "election": {
+  "pt-BR": "eleição",
+  "es": "elección",
+  "de": "Wahl",
+  "fr": "élection",
+  "zh": "选举"
+ },
+ "vote": {
+  "pt-BR": "voto",
+  "es": "voto",
+  "de": "Stimme",
+  "fr": "vote",
+  "zh": "投票"
+ },
+ "cat": {
+  "pt-BR": "gato",
+  "es": "gato",
+  "de": "Katze",
+  "fr": "chat",
+  "zh": "猫"
+ },
+ "cats": {
+  "pt-BR": "gatos",
+  "es": "gatos",
+  "de": "Katzen",
+  "fr": "chats",
+  "zh": "猫们"
+ },
+ "dog": {
+  "pt-BR": "cachorro",
+  "es": "perro",
+  "de": "Hund",
+  "fr": "chien",
+  "zh": "狗"
+ },
+ "dogs": {
+  "pt-BR": "cachorros",
+  "es": "perros",
+  "de": "Hunde",
+  "fr": "chiens",
+  "zh": "狗们"
+ },
+ "house": {
+  "pt-BR": "casa",
+  "es": "casa",
+  "de": "Haus",
+  "fr": "maison",
+  "zh": "房子"
+ },
+ "houses": {
+  "pt-BR": "casas",
+  "es": "casas",
+  "de": "Häuser",
+  "fr": "maisons",
+  "zh": "房子们"
+ },
+ "car": {
+  "pt-BR": "carro",
+  "es": "coche",
+  "de": "Auto",
+  "fr": "voiture",
+  "zh": "汽车"
+ },
+ "cars": {
+  "pt-BR": "carros",
+  "es": "coches",
+  "de": "Autos",
+  "fr": "voitures",
+  "zh": "汽车们"
+ },
+ "book": {
+  "pt-BR": "livro",
+  "es": "libro",
+  "de": "Buch",
+  "fr": "livre",
+  "zh": "书"
+ },
+ "books": {
+  "pt-BR": "livros",
+  "es": "libros",
+  "de": "Bücher",
+  "fr": "livres",
+  "zh": "书籍"
+ },
+ "tree": {
+  "pt-BR": "árvore",
+  "es": "árbol",
+  "de": "Baum",
+  "fr": "arbre",
+  "zh": "树"
+ },
+ "trees": {
+  "pt-BR": "árvores",
+  "es": "árboles",
+  "de": "Bäume",
+  "fr": "arbres",
+  "zh": "树木"
+ },
+ "bird": {
+  "pt-BR": "pássaro",
+  "es": "pájaro",
+  "de": "Vogel",
+  "fr": "oiseau",
+  "zh": "鸟"
+ },
+ "birds": {
+  "pt-BR": "pássaros",
+  "es": "pájaros",
+  "de": "Vögel",
+  "fr": "oiseaux",
+  "zh": "鸟类"
+ },
+ "kings": {
+  "pt-BR": "reis",
+  "es": "reyes",
+  "de": "Könige",
+  "fr": "rois",
+  "zh": "国王们"
+ },
+ "queens": {
+  "pt-BR": "rainhas",
+  "es": "reinas",
+  "de": "Königinnen",
+  "fr": "reines",
+  "zh": "女王们"
+ },
+ "apple": {
+  "pt-BR": "maçã",
+  "es": "manzana",
+  "de": "Apfel",
+  "fr": "pomme",
+  "zh": "苹果"
+ },
+ "apples": {
+  "pt-BR": "maçãs",
+  "es": "manzanas",
+  "de": "Äpfel",
+  "fr": "pommes",
+  "zh": "苹果们"
+ },
+ "day": {
+  "pt-BR": "dia",
+  "es": "día",
+  "de": "Tag",
+  "fr": "jour",
+  "zh": "天"
+ },
+ "days": {
+  "pt-BR": "dias",
+  "es": "días",
+  "de": "Tage",
+  "fr": "jours",
+  "zh": "天数"
+ },
+ "word": {
+  "pt-BR": "palavra",
+  "es": "palabra",
+  "de": "Wort",
+  "fr": "mot",
+  "zh": "词"
+ },
+ "words": {
+  "pt-BR": "palavras",
+  "es": "palabras",
+  "de": "Wörter",
+  "fr": "mots",
+  "zh": "词语"
+ },
+ "one": {
+  "pt-BR": "um",
+  "es": "uno",
+  "de": "eins",
+  "fr": "un",
+  "zh": "一"
+ },
+ "two": {
+  "pt-BR": "dois",
+  "es": "dos",
+  "de": "zwei",
+  "fr": "deux",
+  "zh": "二"
+ },
+ "three": {
+  "pt-BR": "três",
+  "es": "tres",
+  "de": "drei",
+  "fr": "trois",
+  "zh": "三"
+ },
+ "four": {
+  "pt-BR": "quatro",
+  "es": "cuatro",
+  "de": "vier",
+  "fr": "quatre",
+  "zh": "四"
+ },
+ "five": {
+  "pt-BR": "cinco",
+  "es": "cinco",
+  "de": "fünf",
+  "fr": "cinq",
+  "zh": "五"
+ },
+ "six": {
+  "pt-BR": "seis",
+  "es": "seis",
+  "de": "sechs",
+  "fr": "six",
+  "zh": "六"
+ },
+ "seven": {
+  "pt-BR": "sete",
+  "es": "siete",
+  "de": "sieben",
+  "fr": "sept",
+  "zh": "七"
+ },
+ "eight": {
+  "pt-BR": "oito",
+  "es": "ocho",
+  "de": "acht",
+  "fr": "huit",
+  "zh": "八"
+ },
+ "nine": {
+  "pt-BR": "nove",
+  "es": "nueve",
+  "de": "neun",
+  "fr": "neuf",
+  "zh": "九"
+ },
+ "ten": {
+  "pt-BR": "dez",
+  "es": "diez",
+  "de": "zehn",
+  "fr": "dix",
+  "zh": "十"
+ },
+ "hundred": {
+  "pt-BR": "cem",
+  "es": "cien",
+  "de": "hundert",
+  "fr": "cent",
+  "zh": "百"
+ },
+ "thousand": {
+  "pt-BR": "mil",
+  "es": "mil",
+  "de": "tausend",
+  "fr": "mille",
+  "zh": "千"
+ },
+ "million": {
+  "pt-BR": "milhão",
+  "es": "millón",
+  "de": "Million",
+  "fr": "million",
+  "zh": "百万"
+ },
+ "first": {
+  "pt-BR": "primeiro",
+  "es": "primero",
+  "de": "erste",
+  "fr": "premier",
+  "zh": "第一"
+ },
+ "second": {
+  "pt-BR": "segundo",
+  "es": "segundo",
+  "de": "zweite",
+  "fr": "deuxième",
+  "zh": "第二"
+ },
+ "half": {
+  "pt-BR": "metade",
+  "es": "mitad",
+  "de": "Hälfte",
+  "fr": "moitié",
+  "zh": "一半"
+ },
+ "number": {
+  "pt-BR": "número",
+  "es": "número",
+  "de": "Zahl",
+  "fr": "nombre",
+  "zh": "数字"
+ },
+ "red": {
+  "pt-BR": "vermelho",
+  "es": "rojo",
+  "de": "rot",
+  "fr": "rouge",
+  "zh": "红色"
+ },
+ "blue": {
+  "pt-BR": "azul",
+  "es": "azul",
+  "de": "blau",
+  "fr": "bleu",
+  "zh": "蓝色"
+ },
+ "green": {
+  "pt-BR": "verde",
+  "es": "verde",
+  "de": "grün",
+  "fr": "vert",
+  "zh": "绿色"
+ },
+ "yellow": {
+  "pt-BR": "amarelo",
+  "es": "amarillo",
+  "de": "gelb",
+  "fr": "jaune",
+  "zh": "黄色"
+ },
+ "black": {
+  "pt-BR": "preto",
+  "es": "negro",
+  "de": "schwarz",
+  "fr": "noir",
+  "zh": "黑色"
+ },
+ "white": {
+  "pt-BR": "branco",
+  "es": "blanco",
+  "de": "weiß",
+  "fr": "blanc",
+  "zh": "白色"
+ },
+ "orange": {
+  "pt-BR": "laranja",
+  "es": "naranja",
+  "de": "orange",
+  "fr": "orange",
+  "zh": "橙色"
+ },
+ "purple": {
+  "pt-BR": "roxo",
+  "es": "morado",
+  "de": "lila",
+  "fr": "violet",
+  "zh": "紫色"
+ },
+ "pink": {
+  "pt-BR": "rosa",
+  "es": "rosa",
+  "de": "rosa",
+  "fr": "rose",
+  "zh": "粉色"
+ },
+ "brown": {
+  "pt-BR": "marrom",
+  "es": "marrón",
+  "de": "braun",
+  "fr": "brun",
+  "zh": "棕色"
+ },
+ "gray": {
+  "pt-BR": "cinza",
+  "es": "gris",
+  "de": "grau",
+  "fr": "gris",
+  "zh": "灰色"
+ },
+ "gold": {
+  "pt-BR": "ouro",
+  "es": "oro",
+  "de": "Gold",
+  "fr": "or",
+  "zh": "金"
+ },
+ "silver": {
+  "pt-BR": "prata",
+  "es": "plata",
+  "de": "Silber",
+  "fr": "argent",
+  "zh": "银"
+ },
+ "color": {
+  "pt-BR": "cor",
+  "es": "color",
+  "de": "Farbe",
+  "fr": "couleur",
+  "zh": "颜色"
+ },
+ "horse": {
+  "pt-BR": "cavalo",
+  "es": "caballo",
+  "de": "Pferd",
+  "fr": "cheval",
+  "zh": "马"
+ },
+ "cow": {
+  "pt-BR": "vaca",
+  "es": "vaca",
+  "de": "Kuh",
+  "fr": "vache",
+  "zh": "牛"
+ },
+ "pig": {
+  "pt-BR": "porco",
+  "es": "cerdo",
+  "de": "Schwein",
+  "fr": "cochon",
+  "zh": "猪"
+ },
+ "sheep": {
+  "pt-BR": "ovelha",
+  "es": "oveja",
+  "de": "Schaf",
+  "fr": "mouton",
+  "zh": "羊"
+ },
+ "lion": {
+  "pt-BR": "leão",
+  "es": "león",
+  "de": "Löwe",
+  "fr": "lion",
+  "zh": "狮子"
+ },
+ "tiger": {
+  "pt-BR": "tigre",
+  "es": "tigre",
+  "de": "Tiger",
+  "fr": "tigre",
+  "zh": "老虎"
+ },
+ "elephant": {
+  "pt-BR": "elefante",
+  "es": "elefante",
+  "de": "Elefant",
+  "fr": "éléphant",
+  "zh": "大象"
+ },
+ "monkey": {
+  "pt-BR": "macaco",
+  "es": "mono",
+  "de": "Affe",
+  "fr": "singe",
+  "zh": "猴子"
+ },
+ "fish": {
+  "pt-BR": "peixe",
+  "es": "pez",
+  "de": "Fisch",
+  "fr": "poisson",
+  "zh": "鱼"
+ },
+ "snake": {
+  "pt-BR": "cobra",
+  "es": "serpiente",
+  "de": "Schlange",
+  "fr": "serpent",
+  "zh": "蛇"
+ },
+ "mouse": {
+  "pt-BR": "rato",
+  "es": "ratón",
+  "de": "Maus",
+  "fr": "souris",
+  "zh": "老鼠"
+ },
+ "rabbit": {
+  "pt-BR": "coelho",
+  "es": "conejo",
+  "de": "Kaninchen",
+  "fr": "lapin",
+  "zh": "兔子"
+ },
+ "wolf": {
+  "pt-BR": "lobo",
+  "es": "lobo",
+  "de": "Wolf",
+  "fr": "loup",
+  "zh": "狼"
+ },
+ "bear": {
+  "pt-BR": "urso",
+  "es": "oso",
+  "de": "Bär",
+  "fr": "ours",
+  "zh": "熊"
+ },
+ "animal": {
+  "pt-BR": "animal",
+  "es": "animal",
+  "de": "Tier",
+  "fr": "animal",
+  "zh": "动物"
+ },
+ "puppy": {
+  "pt-BR": "filhote",
+  "es": "cachorro",
+  "de": "Welpe",
+  "fr": "chiot",
+  "zh": "小狗"
+ },
+ "kitten": {
+  "pt-BR": "gatinho",
+  "es": "gatito",
+  "de": "Kätzchen",
+  "fr": "chaton",
+  "zh": "小猫"
+ },
+ "bread": {
+  "pt-BR": "pão",
+  "es": "pan",
+  "de": "Brot",
+  "fr": "pain",
+  "zh": "面包"
+ },
+ "cheese": {
+  "pt-BR": "queijo",
+  "es": "queso",
+  "de": "Käse",
+  "fr": "fromage",
+  "zh": "奶酪"
+ },
+ "milk": {
+  "pt-BR": "leite",
+  "es": "leche",
+  "de": "Milch",
+  "fr": "lait",
+  "zh": "牛奶"
+ },
+ "coffee": {
+  "pt-BR": "café",
+  "es": "café",
+  "de": "Kaffee",
+  "fr": "café",
+  "zh": "咖啡"
+ },
+ "tea": {
+  "pt-BR": "chá",
+  "es": "té",
+  "de": "Tee",
+  "fr": "thé",
+  "zh": "茶"
+ },
+ "wine": {
+  "pt-BR": "vinho",
+  "es": "vino",
+  "de": "Wein",
+  "fr": "vin",
+  "zh": "葡萄酒"
+ },
+ "beer": {
+  "pt-BR": "cerveja",
+  "es": "cerveza",
+  "de": "Bier",
+  "fr": "bière",
+  "zh": "啤酒"
+ },
+ "water": {
+  "pt-BR": "água",
+  "es": "agua",
+  "de": "Wasser",
+  "fr": "eau",
+  "zh": "水"
+ },
+ "rice": {
+  "pt-BR": "arroz",
+  "es": "arroz",
+  "de": "Reis",
+  "fr": "riz",
+  "zh": "米饭"
+ },
+ "meat": {
+  "pt-BR": "carne",
+  "es": "carne",
+  "de": "Fleisch",
+  "fr": "viande",
+  "zh": "肉"
+ },
+ "sushi": {
+  "pt-BR": "sushi",
+  "es": "sushi",
+  "de": "Sushi",
+  "fr": "sushi",
+  "zh": "寿司"
+ },
+ "pizza": {
+  "pt-BR": "pizza",
+  "es": "pizza",
+  "de": "Pizza",
+  "fr": "pizza",
+  "zh": "披萨"
+ },
+ "pasta": {
+  "pt-BR": "macarrão",
+  "es": "pasta",
+  "de": "Pasta",
+  "fr": "pâtes",
+  "zh": "意面"
+ },
+ "chocolate": {
+  "pt-BR": "chocolate",
+  "es": "chocolate",
+  "de": "Schokolade",
+  "fr": "chocolat",
+  "zh": "巧克力"
+ },
+ "sugar": {
+  "pt-BR": "açúcar",
+  "es": "azúcar",
+  "de": "Zucker",
+  "fr": "sucre",
+  "zh": "糖"
+ },
+ "salt": {
+  "pt-BR": "sal",
+  "es": "sal",
+  "de": "Salz",
+  "fr": "sel",
+  "zh": "盐"
+ },
+ "fruit": {
+  "pt-BR": "fruta",
+  "es": "fruta",
+  "de": "Obst",
+  "fr": "fruit",
+  "zh": "水果"
+ },
+ "banana": {
+  "pt-BR": "banana",
+  "es": "plátano",
+  "de": "Banane",
+  "fr": "banane",
+  "zh": "香蕉"
+ },
+ "food": {
+  "pt-BR": "comida",
+  "es": "comida",
+  "de": "Essen",
+  "fr": "nourriture",
+  "zh": "食物"
+ },
+ "dinner": {
+  "pt-BR": "jantar",
+  "es": "cena",
+  "de": "Abendessen",
+  "fr": "dîner",
+  "zh": "晚餐"
+ },
+ "breakfast": {
+  "pt-BR": "café da manhã",
+  "es": "desayuno",
+  "de": "Frühstück",
+  "fr": "petit-déjeuner",
+  "zh": "早餐"
+ },
+ "sun": {
+  "pt-BR": "sol",
+  "es": "sol",
+  "de": "Sonne",
+  "fr": "soleil",
+  "zh": "太阳"
+ },
+ "moon": {
+  "pt-BR": "lua",
+  "es": "luna",
+  "de": "Mond",
+  "fr": "lune",
+  "zh": "月亮"
+ },
+ "star": {
+  "pt-BR": "estrela",
+  "es": "estrella",
+  "de": "Stern",
+  "fr": "étoile",
+  "zh": "星星"
+ },
+ "sky": {
+  "pt-BR": "céu",
+  "es": "cielo",
+  "de": "Himmel",
+  "fr": "ciel",
+  "zh": "天空"
+ },
+ "sea": {
+  "pt-BR": "mar",
+  "es": "mar",
+  "de": "Meer",
+  "fr": "mer",
+  "zh": "海"
+ },
+ "ocean": {
+  "pt-BR": "oceano",
+  "es": "océano",
+  "de": "Ozean",
+  "fr": "océan",
+  "zh": "海洋"
+ },
+ "river": {
+  "pt-BR": "rio",
+  "es": "río",
+  "de": "Fluss",
+  "fr": "rivière",
+  "zh": "河"
+ },
+ "mountain": {
+  "pt-BR": "montanha",
+  "es": "montaña",
+  "de": "Berg",
+  "fr": "montagne",
+  "zh": "山"
+ },
+ "forest": {
+  "pt-BR": "floresta",
+  "es": "bosque",
+  "de": "Wald",
+  "fr": "forêt",
+  "zh": "森林"
+ },
+ "flower": {
+  "pt-BR": "flor",
+  "es": "flor",
+  "de": "Blume",
+  "fr": "fleur",
+  "zh": "花"
+ },
+ "rain": {
+  "pt-BR": "chuva",
+  "es": "lluvia",
+  "de": "Regen",
+  "fr": "pluie",
+  "zh": "雨"
+ },
+ "snow": {
+  "pt-BR": "neve",
+  "es": "nieve",
+  "de": "Schnee",
+  "fr": "neige",
+  "zh": "雪"
+ },
+ "wind": {
+  "pt-BR": "vento",
+  "es": "viento",
+  "de": "Wind",
+  "fr": "vent",
+  "zh": "风"
+ },
+ "fire": {
+  "pt-BR": "fogo",
+  "es": "fuego",
+  "de": "Feuer",
+  "fr": "feu",
+  "zh": "火"
+ },
+ "earth": {
+  "pt-BR": "terra",
+  "es": "tierra",
+  "de": "Erde",
+  "fr": "terre",
+  "zh": "地球"
+ },
+ "island": {
+  "pt-BR": "ilha",
+  "es": "isla",
+  "de": "Insel",
+  "fr": "île",
+  "zh": "岛"
+ },
+ "beach": {
+  "pt-BR": "praia",
+  "es": "playa",
+  "de": "Strand",
+  "fr": "plage",
+  "zh": "海滩"
+ },
+ "desert": {
+  "pt-BR": "deserto",
+  "es": "desierto",
+  "de": "Wüste",
+  "fr": "désert",
+  "zh": "沙漠"
+ },
+ "summer": {
+  "pt-BR": "verão",
+  "es": "verano",
+  "de": "Sommer",
+  "fr": "été",
+  "zh": "夏天"
+ },
+ "winter": {
+  "pt-BR": "inverno",
+  "es": "invierno",
+  "de": "Winter",
+  "fr": "hiver",
+  "zh": "冬天"
+ },
+ "spring": {
+  "pt-BR": "primavera",
+  "es": "primavera",
+  "de": "Frühling",
+  "fr": "printemps",
+  "zh": "春天"
+ },
+ "autumn": {
+  "pt-BR": "outono",
+  "es": "otoño",
+  "de": "Herbst",
+  "fr": "automne",
+  "zh": "秋天"
+ },
+ "tower": {
+  "pt-BR": "torre",
+  "es": "torre",
+  "de": "Turm",
+  "fr": "tour",
+  "zh": "塔"
+ },
+ "building": {
+  "pt-BR": "edifício",
+  "es": "edificio",
+  "de": "Gebäude",
+  "fr": "bâtiment",
+  "zh": "建筑"
+ },
+ "skyscraper": {
+  "pt-BR": "arranha-céu",
+  "es": "rascacielos",
+  "de": "Wolkenkratzer",
+  "fr": "gratte-ciel",
+  "zh": "摩天大楼"
+ },
+ "bridge": {
+  "pt-BR": "ponte",
+  "es": "puente",
+  "de": "Brücke",
+  "fr": "pont",
+  "zh": "桥"
+ },
+ "church": {
+  "pt-BR": "igreja",
+  "es": "iglesia",
+  "de": "Kirche",
+  "fr": "église",
+  "zh": "教堂"
+ },
+ "school": {
+  "pt-BR": "escola",
+  "es": "escuela",
+  "de": "Schule",
+  "fr": "école",
+  "zh": "学校"
+ },
+ "hospital": {
+  "pt-BR": "hospital",
+  "es": "hospital",
+  "de": "Krankenhaus",
+  "fr": "hôpital",
+  "zh": "医院"
+ },
+ "university": {
+  "pt-BR": "universidade",
+  "es": "universidad",
+  "de": "Universität",
+  "fr": "université",
+  "zh": "大学"
+ },
+ "street": {
+  "pt-BR": "rua",
+  "es": "calle",
+  "de": "Straße",
+  "fr": "rue",
+  "zh": "街道"
+ },
+ "road": {
+  "pt-BR": "estrada",
+  "es": "carretera",
+  "de": "Straße",
+  "fr": "route",
+  "zh": "道路"
+ },
+ "door": {
+  "pt-BR": "porta",
+  "es": "puerta",
+  "de": "Tür",
+  "fr": "porte",
+  "zh": "门"
+ },
+ "window": {
+  "pt-BR": "janela",
+  "es": "ventana",
+  "de": "Fenster",
+  "fr": "fenêtre",
+  "zh": "窗户"
+ },
+ "table": {
+  "pt-BR": "mesa",
+  "es": "mesa",
+  "de": "Tisch",
+  "fr": "table",
+  "zh": "桌子"
+ },
+ "chair": {
+  "pt-BR": "cadeira",
+  "es": "silla",
+  "de": "Stuhl",
+  "fr": "chaise",
+  "zh": "椅子"
+ },
+ "bed": {
+  "pt-BR": "cama",
+  "es": "cama",
+  "de": "Bett",
+  "fr": "lit",
+  "zh": "床"
+ },
+ "kitchen": {
+  "pt-BR": "cozinha",
+  "es": "cocina",
+  "de": "Küche",
+  "fr": "cuisine",
+  "zh": "厨房"
+ },
+ "garden": {
+  "pt-BR": "jardim",
+  "es": "jardín",
+  "de": "Garten",
+  "fr": "jardin",
+  "zh": "花园"
+ },
+ "train": {
+  "pt-BR": "trem",
+  "es": "tren",
+  "de": "Zug",
+  "fr": "train",
+  "zh": "火车"
+ },
+ "bus": {
+  "pt-BR": "ônibus",
+  "es": "autobús",
+  "de": "Bus",
+  "fr": "bus",
+  "zh": "公交车"
+ },
+ "plane": {
+  "pt-BR": "avião",
+  "es": "avión",
+  "de": "Flugzeug",
+  "fr": "avion",
+  "zh": "飞机"
+ },
+ "ship": {
+  "pt-BR": "navio",
+  "es": "barco",
+  "de": "Schiff",
+  "fr": "navire",
+  "zh": "船"
+ },
+ "bicycle": {
+  "pt-BR": "bicicleta",
+  "es": "bicicleta",
+  "de": "Fahrrad",
+  "fr": "vélo",
+  "zh": "自行车"
+ },
+ "phone": {
+  "pt-BR": "telefone",
+  "es": "teléfono",
+  "de": "Telefon",
+  "fr": "téléphone",
+  "zh": "电话"
+ },
+ "computer": {
+  "pt-BR": "computador",
+  "es": "computadora",
+  "de": "Computer",
+  "fr": "ordinateur",
+  "zh": "电脑"
+ },
+ "clock": {
+  "pt-BR": "relógio",
+  "es": "reloj",
+  "de": "Uhr",
+  "fr": "horloge",
+  "zh": "钟"
+ },
+ "money": {
+  "pt-BR": "dinheiro",
+  "es": "dinero",
+  "de": "Geld",
+  "fr": "argent",
+  "zh": "钱"
+ },
+ "key": {
+  "pt-BR": "chave",
+  "es": "llave",
+  "de": "Schlüssel",
+  "fr": "clé",
+  "zh": "钥匙"
+ },
+ "head": {
+  "pt-BR": "cabeça",
+  "es": "cabeza",
+  "de": "Kopf",
+  "fr": "tête",
+  "zh": "头"
+ },
+ "hand": {
+  "pt-BR": "mão",
+  "es": "mano",
+  "de": "Hand",
+  "fr": "main",
+  "zh": "手"
+ },
+ "eye": {
+  "pt-BR": "olho",
+  "es": "ojo",
+  "de": "Auge",
+  "fr": "œil",
+  "zh": "眼睛"
+ },
+ "heart": {
+  "pt-BR": "coração",
+  "es": "corazón",
+  "de": "Herz",
+  "fr": "cœur",
+  "zh": "心"
+ },
+ "blood": {
+  "pt-BR": "sangue",
+  "es": "sangre",
+  "de": "Blut",
+  "fr": "sang",
+  "zh": "血"
+ },
+ "doctor": {
+  "pt-BR": "médico",
+  "es": "médico",
+  "de": "Arzt",
+  "fr": "médecin",
+  "zh": "医生"
+ },
+ "nurse": {
+  "pt-BR": "enfermeira",
+  "es": "enfermera",
+  "de": "Krankenschwester",
+  "fr": "infirmière",
+  "zh": "护士"
+ },
+ "medicine": {
+  "pt-BR": "remédio",
+  "es": "medicina",
+  "de": "Medizin",
+  "fr": "médicament",
+  "zh": "药"
+ },
+ "disease": {
+  "pt-BR": "doença",
+  "es": "enfermedad",
+  "de": "Krankheit",
+  "fr": "maladie",
+  "zh": "疾病"
+ },
+ "teacher": {
+  "pt-BR": "professor",
+  "es": "profesor",
+  "de": "Lehrer",
+  "fr": "enseignant",
+  "zh": "教师"
+ },
+ "student": {
+  "pt-BR": "estudante",
+  "es": "estudiante",
+  "de": "Student",
+  "fr": "étudiant",
+  "zh": "学生"
+ },
+ "farmer": {
+  "pt-BR": "agricultor",
+  "es": "agricultor",
+  "de": "Bauer",
+  "fr": "agriculteur",
+  "zh": "农民"
+ },
+ "soldier": {
+  "pt-BR": "soldado",
+  "es": "soldado",
+  "de": "Soldat",
+  "fr": "soldat",
+  "zh": "士兵"
+ },
+ "engineer": {
+  "pt-BR": "engenheiro",
+  "es": "ingeniero",
+  "de": "Ingenieur",
+  "fr": "ingénieur",
+  "zh": "工程师"
+ },
+ "scientist": {
+  "pt-BR": "cientista",
+  "es": "científico",
+  "de": "Wissenschaftler",
+  "fr": "scientifique",
+  "zh": "科学家"
+ },
+ "artist": {
+  "pt-BR": "artista",
+  "es": "artista",
+  "de": "Künstler",
+  "fr": "artiste",
+  "zh": "艺术家"
+ },
+ "lawyer": {
+  "pt-BR": "advogado",
+  "es": "abogado",
+  "de": "Anwalt",
+  "fr": "avocat",
+  "zh": "律师"
+ },
+ "writer": {
+  "pt-BR": "escritor",
+  "es": "escritor",
+  "de": "Schriftsteller",
+  "fr": "écrivain",
+  "zh": "作家"
+ },
+ "musician": {
+  "pt-BR": "músico",
+  "es": "músico",
+  "de": "Musiker",
+  "fr": "musicien",
+  "zh": "音乐家"
+ },
+ "police": {
+  "pt-BR": "polícia",
+  "es": "policía",
+  "de": "Polizei",
+  "fr": "police",
+  "zh": "警察"
+ },
+ "worker": {
+  "pt-BR": "trabalhador",
+  "es": "trabajador",
+  "de": "Arbeiter",
+  "fr": "travailleur",
+  "zh": "工人"
+ },
+ "job": {
+  "pt-BR": "emprego",
+  "es": "trabajo",
+  "de": "Arbeit",
+  "fr": "emploi",
+  "zh": "工作"
+ },
+ "time": {
+  "pt-BR": "tempo",
+  "es": "tiempo",
+  "de": "Zeit",
+  "fr": "temps",
+  "zh": "时间"
+ },
+ "year": {
+  "pt-BR": "ano",
+  "es": "año",
+  "de": "Jahr",
+  "fr": "année",
+  "zh": "年"
+ },
+ "month": {
+  "pt-BR": "mês",
+  "es": "mes",
+  "de": "Monat",
+  "fr": "mois",
+  "zh": "月"
+ },
+ "week": {
+  "pt-BR": "semana",
+  "es": "semana",
+  "de": "Woche",
+  "fr": "semaine",
+  "zh": "周"
+ },
+ "hour": {
+  "pt-BR": "hora",
+  "es": "hora",
+  "de": "Stunde",
+  "fr": "heure",
+  "zh": "小时"
+ },
+ "minute": {
+  "pt-BR": "minuto",
+  "es": "minuto",
+  "de": "Minute",
+  "fr": "minute",
+  "zh": "分钟"
+ },
+ "morning": {
+  "pt-BR": "manhã",
+  "es": "mañana",
+  "de": "Morgen",
+  "fr": "matin",
+  "zh": "早上"
+ },
+ "night": {
+  "pt-BR": "noite",
+  "es": "noche",
+  "de": "Nacht",
+  "fr": "nuit",
+  "zh": "夜晚"
+ },
+ "today": {
+  "pt-BR": "hoje",
+  "es": "hoy",
+  "de": "heute",
+  "fr": "aujourd'hui",
+  "zh": "今天"
+ },
+ "yesterday": {
+  "pt-BR": "ontem",
+  "es": "ayer",
+  "de": "gestern",
+  "fr": "hier",
+  "zh": "昨天"
+ },
+ "tomorrow": {
+  "pt-BR": "amanhã",
+  "es": "mañana",
+  "de": "morgen",
+  "fr": "demain",
+  "zh": "明天"
+ },
+ "monday": {
+  "pt-BR": "segunda-feira",
+  "es": "lunes",
+  "de": "Montag",
+  "fr": "lundi",
+  "zh": "星期一"
+ },
+ "sunday": {
+  "pt-BR": "domingo",
+  "es": "domingo",
+  "de": "Sonntag",
+  "fr": "dimanche",
+  "zh": "星期日"
+ },
+ "january": {
+  "pt-BR": "janeiro",
+  "es": "enero",
+  "de": "Januar",
+  "fr": "janvier",
+  "zh": "一月"
+ },
+ "december": {
+  "pt-BR": "dezembro",
+  "es": "diciembre",
+  "de": "Dezember",
+  "fr": "décembre",
+  "zh": "十二月"
+ },
+ "happy": {
+  "pt-BR": "feliz",
+  "es": "feliz",
+  "de": "glücklich",
+  "fr": "heureux",
+  "zh": "快乐"
+ },
+ "sad": {
+  "pt-BR": "triste",
+  "es": "triste",
+  "de": "traurig",
+  "fr": "triste",
+  "zh": "悲伤"
+ },
+ "angry": {
+  "pt-BR": "zangado",
+  "es": "enojado",
+  "de": "wütend",
+  "fr": "en colère",
+  "zh": "愤怒"
+ },
+ "love": {
+  "pt-BR": "amor",
+  "es": "amor",
+  "de": "Liebe",
+  "fr": "amour",
+  "zh": "爱"
+ },
+ "hate": {
+  "pt-BR": "ódio",
+  "es": "odio",
+  "de": "Hass",
+  "fr": "haine",
+  "zh": "恨"
+ },
+ "fear": {
+  "pt-BR": "medo",
+  "es": "miedo",
+  "de": "Angst",
+  "fr": "peur",
+  "zh": "恐惧"
+ },
+ "joy": {
+  "pt-BR": "alegria",
+  "es": "alegría",
+  "de": "Freude",
+  "fr": "joie",
+  "zh": "喜悦"
+ },
+ "big": {
+  "pt-BR": "grande",
+  "es": "grande",
+  "de": "groß",
+  "fr": "grand",
+  "zh": "大"
+ },
+ "small": {
+  "pt-BR": "pequeno",
+  "es": "pequeño",
+  "de": "klein",
+  "fr": "petit",
+  "zh": "小"
+ },
+ "good": {
+  "pt-BR": "bom",
+  "es": "bueno",
+  "de": "gut",
+  "fr": "bon",
+  "zh": "好"
+ },
+ "bad": {
+  "pt-BR": "mau",
+  "es": "malo",
+  "de": "schlecht",
+  "fr": "mauvais",
+  "zh": "坏"
+ },
+ "hot": {
+  "pt-BR": "quente",
+  "es": "caliente",
+  "de": "heiß",
+  "fr": "chaud",
+  "zh": "热"
+ },
+ "cold": {
+  "pt-BR": "frio",
+  "es": "frío",
+  "de": "kalt",
+  "fr": "froid",
+  "zh": "冷"
+ },
+ "fast": {
+  "pt-BR": "rápido",
+  "es": "rápido",
+  "de": "schnell",
+  "fr": "rapide",
+  "zh": "快"
+ },
+ "slow": {
+  "pt-BR": "lento",
+  "es": "lento",
+  "de": "langsam",
+  "fr": "lent",
+  "zh": "慢"
+ },
+ "old": {
+  "pt-BR": "velho",
+  "es": "viejo",
+  "de": "alt",
+  "fr": "vieux",
+  "zh": "老"
+ },
+ "young": {
+  "pt-BR": "jovem",
+  "es": "joven",
+  "de": "jung",
+  "fr": "jeune",
+  "zh": "年轻"
+ },
+ "new": {
+  "pt-BR": "novo",
+  "es": "nuevo",
+  "de": "neu",
+  "fr": "nouveau",
+  "zh": "新"
+ },
+ "rich": {
+  "pt-BR": "rico",
+  "es": "rico",
+  "de": "reich",
+  "fr": "riche",
+  "zh": "富"
+ },
+ "poor": {
+  "pt-BR": "pobre",
+  "es": "pobre",
+  "de": "arm",
+  "fr": "pauvre",
+  "zh": "穷"
+ },
+ "strong": {
+  "pt-BR": "forte",
+  "es": "fuerte",
+  "de": "stark",
+  "fr": "fort",
+  "zh": "强"
+ },
+ "weak": {
+  "pt-BR": "fraco",
+  "es": "débil",
+  "de": "schwach",
+  "fr": "faible",
+  "zh": "弱"
+ },
+ "beautiful": {
+  "pt-BR": "bonito",
+  "es": "hermoso",
+  "de": "schön",
+  "fr": "beau",
+  "zh": "美丽"
+ },
+ "tall": {
+  "pt-BR": "alto",
+  "es": "alto",
+  "de": "groß",
+  "fr": "grand",
+  "zh": "高"
+ },
+ "short": {
+  "pt-BR": "baixo",
+  "es": "bajo",
+  "de": "kurz",
+  "fr": "court",
+  "zh": "矮"
+ },
+ "light": {
+  "pt-BR": "luz",
+  "es": "luz",
+  "de": "Licht",
+  "fr": "lumière",
+  "zh": "光"
+ },
+ "dark": {
+  "pt-BR": "escuro",
+  "es": "oscuro",
+  "de": "dunkel",
+  "fr": "sombre",
+  "zh": "黑暗"
+ },
+ "walk": {
+  "pt-BR": "andar",
+  "es": "caminar",
+  "de": "gehen",
+  "fr": "marcher",
+  "zh": "走"
+ },
+ "walked": {
+  "pt-BR": "andou",
+  "es": "caminó",
+  "de": "ging",
+  "fr": "a marché",
+  "zh": "走了"
+ },
+ "walking": {
+  "pt-BR": "andando",
+  "es": "caminando",
+  "de": "gehend",
+  "fr": "marchant",
+  "zh": "正在走"
+ },
+ "run": {
+  "pt-BR": "correr",
+  "es": "correr",
+  "de": "laufen",
+  "fr": "courir",
+  "zh": "跑"
+ },
+ "ran": {
+  "pt-BR": "correu",
+  "es": "corrió",
+  "de": "lief",
+  "fr": "a couru",
+  "zh": "跑了"
+ },
+ "running": {
+  "pt-BR": "correndo",
+  "es": "corriendo",
+  "de": "laufend",
+  "fr": "courant",
+  "zh": "正在跑"
+ },
+ "eat": {
+  "pt-BR": "comer",
+  "es": "comer",
+  "de": "essen",
+  "fr": "manger",
+  "zh": "吃"
+ },
+ "drink": {
+  "pt-BR": "beber",
+  "es": "beber",
+  "de": "trinken",
+  "fr": "boire",
+  "zh": "喝"
+ },
+ "sleep": {
+  "pt-BR": "dormir",
+  "es": "dormir",
+  "de": "schlafen",
+  "fr": "dormir",
+  "zh": "睡觉"
+ },
+ "read": {
+  "pt-BR": "ler",
+  "es": "leer",
+  "de": "lesen",
+  "fr": "lire",
+  "zh": "读"
+ },
+ "write": {
+  "pt-BR": "escrever",
+  "es": "escribir",
+  "de": "schreiben",
+  "fr": "écrire",
+  "zh": "写"
+ },
+ "speak": {
+  "pt-BR": "falar",
+  "es": "hablar",
+  "de": "sprechen",
+  "fr": "parler",
+  "zh": "说"
+ },
+ "think": {
+  "pt-BR": "pensar",
+  "es": "pensar",
+  "de": "denken",
+  "fr": "penser",
+  "zh": "想"
+ },
+ "learn": {
+  "pt-BR": "aprender",
+  "es": "aprender",
+  "de": "lernen",
+  "fr": "apprendre",
+  "zh": "学习"
+ },
+ "teach": {
+  "pt-BR": "ensinar",
+  "es": "enseñar",
+  "de": "lehren",
+  "fr": "enseigner",
+  "zh": "教"
+ },
+ "play": {
+  "pt-BR": "jogar",
+  "es": "jugar",
+  "de": "spielen",
+  "fr": "jouer",
+  "zh": "玩"
+ },
+ "sing": {
+  "pt-BR": "cantar",
+  "es": "cantar",
+  "de": "singen",
+  "fr": "chanter",
+  "zh": "唱"
+ },
+ "swim": {
+  "pt-BR": "nadar",
+  "es": "nadar",
+  "de": "schwimmen",
+  "fr": "nager",
+  "zh": "游泳"
+ },
+ "fly": {
+  "pt-BR": "voar",
+  "es": "volar",
+  "de": "fliegen",
+  "fr": "voler",
+  "zh": "飞"
+ },
+ "buy": {
+  "pt-BR": "comprar",
+  "es": "comprar",
+  "de": "kaufen",
+  "fr": "acheter",
+  "zh": "买"
+ },
+ "sell": {
+  "pt-BR": "vender",
+  "es": "vender",
+  "de": "verkaufen",
+  "fr": "vendre",
+  "zh": "卖"
+ },
+ "open": {
+  "pt-BR": "abrir",
+  "es": "abrir",
+  "de": "öffnen",
+  "fr": "ouvrir",
+  "zh": "打开"
+ },
+ "close": {
+  "pt-BR": "fechar",
+  "es": "cerrar",
+  "de": "schließen",
+  "fr": "fermer",
+  "zh": "关闭"
+ },
+ "science": {
+  "pt-BR": "ciência",
+  "es": "ciencia",
+  "de": "Wissenschaft",
+  "fr": "science",
+  "zh": "科学"
+ },
+ "mathematics": {
+  "pt-BR": "matemática",
+  "es": "matemáticas",
+  "de": "Mathematik",
+  "fr": "mathématiques",
+  "zh": "数学"
+ },
+ "physics": {
+  "pt-BR": "física",
+  "es": "física",
+  "de": "Physik",
+  "fr": "physique",
+  "zh": "物理"
+ },
+ "chemistry": {
+  "pt-BR": "química",
+  "es": "química",
+  "de": "Chemie",
+  "fr": "chimie",
+  "zh": "化学"
+ },
+ "biology": {
+  "pt-BR": "biologia",
+  "es": "biología",
+  "de": "Biologie",
+  "fr": "biologie",
+  "zh": "生物学"
+ },
+ "music": {
+  "pt-BR": "música",
+  "es": "música",
+  "de": "Musik",
+  "fr": "musique",
+  "zh": "音乐"
+ },
+ "art": {
+  "pt-BR": "arte",
+  "es": "arte",
+  "de": "Kunst",
+  "fr": "art",
+  "zh": "艺术"
+ },
+ "language": {
+  "pt-BR": "língua",
+  "es": "idioma",
+  "de": "Sprache",
+  "fr": "langue",
+  "zh": "语言"
+ },
+ "english": {
+  "pt-BR": "inglês",
+  "es": "inglés",
+  "de": "Englisch",
+  "fr": "anglais",
+  "zh": "英语"
+ },
+ "portuguese": {
+  "pt-BR": "português",
+  "es": "portugués",
+  "de": "Portugiesisch",
+  "fr": "portugais",
+  "zh": "葡萄牙语"
+ },
+ "spanish": {
+  "pt-BR": "espanhol",
+  "es": "español",
+  "de": "Spanisch",
+  "fr": "espagnol",
+  "zh": "西班牙语"
+ },
+ "german": {
+  "pt-BR": "alemão",
+  "es": "alemán",
+  "de": "Deutsch",
+  "fr": "allemand",
+  "zh": "德语"
+ },
+ "french": {
+  "pt-BR": "francês",
+  "es": "francés",
+  "de": "Französisch",
+  "fr": "français",
+  "zh": "法语"
+ },
+ "chinese": {
+  "pt-BR": "chinês",
+  "es": "chino",
+  "de": "Chinesisch",
+  "fr": "chinois",
+  "zh": "中文"
+ },
+ "software": {
+  "pt-BR": "software",
+  "es": "software",
+  "de": "Software",
+  "fr": "logiciel",
+  "zh": "软件"
+ },
+ "internet": {
+  "pt-BR": "internet",
+  "es": "internet",
+  "de": "Internet",
+  "fr": "internet",
+  "zh": "互联网"
+ },
+ "data": {
+  "pt-BR": "dados",
+  "es": "datos",
+  "de": "Daten",
+  "fr": "données",
+  "zh": "数据"
+ },
+ "model": {
+  "pt-BR": "modelo",
+  "es": "modelo",
+  "de": "Modell",
+  "fr": "modèle",
+  "zh": "模型"
+ },
+ "vector": {
+  "pt-BR": "vetor",
+  "es": "vector",
+  "de": "Vektor",
+  "fr": "vecteur",
+  "zh": "向量"
+ },
+ "machine": {
+  "pt-BR": "máquina",
+  "es": "máquina",
+  "de": "Maschine",
+  "fr": "machine",
+  "zh": "机器"
+ },
+ "robot": {
+  "pt-BR": "robô",
+  "es": "robot",
+  "de": "Roboter",
+  "fr": "robot",
+  "zh": "机器人"
+ },
+ "brain": {
+  "pt-BR": "cérebro",
+  "es": "cerebro",
+  "de": "Gehirn",
+  "fr": "cerveau",
+  "zh": "大脑"
+ },
+ "memory": {
+  "pt-BR": "memória",
+  "es": "memoria",
+  "de": "Gedächtnis",
+  "fr": "mémoire",
+  "zh": "记忆"
+ },
+ "idea": {
+  "pt-BR": "ideia",
+  "es": "idea",
+  "de": "Idee",
+  "fr": "idée",
+  "zh": "想法"
+ },
+ "question": {
+  "pt-BR": "pergunta",
+  "es": "pregunta",
+  "de": "Frage",
+  "fr": "question",
+  "zh": "问题"
+ },
+ "answer": {
+  "pt-BR": "resposta",
+  "es": "respuesta",
+  "de": "Antwort",
+  "fr": "réponse",
+  "zh": "答案"
+ },
+ "letter": {
+  "pt-BR": "letra",
+  "es": "letra",
+  "de": "Buchstabe",
+  "fr": "lettre",
+  "zh": "字母"
+ },
+ "sentence": {
+  "pt-BR": "frase",
+  "es": "frase",
+  "de": "Satz",
+  "fr": "phrase",
+  "zh": "句子"
+ },
+ "story": {
+  "pt-BR": "história",
+  "es": "cuento",
+  "de": "Geschichte",
+  "fr": "histoire",
+  "zh": "故事"
+ },
+ "newspaper": {
+  "pt-BR": "jornal",
+  "es": "periódico",
+  "de": "Zeitung",
+  "fr": "journal",
+  "zh": "报纸"
+ },
+ "film": {
+  "pt-BR": "filme",
+  "es": "película",
+  "de": "Film",
+  "fr": "film",
+  "zh": "电影"
+ },
+ "game": {
+  "pt-BR": "jogo",
+  "es": "juego",
+  "de": "Spiel",
+  "fr": "jeu",
+  "zh": "游戏"
+ },
+ "football": {
+  "pt-BR": "futebol",
+  "es": "fútbol",
+  "de": "Fußball",
+  "fr": "football",
+  "zh": "足球"
+ },
+ "ball": {
+  "pt-BR": "bola",
+  "es": "pelota",
+  "de": "Ball",
+  "fr": "balle",
+  "zh": "球"
+ },
+ "team": {
+  "pt-BR": "time",
+  "es": "equipo",
+  "de": "Mannschaft",
+  "fr": "équipe",
+  "zh": "队"
+ },
+ "world": {
+  "pt-BR": "mundo",
+  "es": "mundo",
+  "de": "Welt",
+  "fr": "monde",
+  "zh": "世界"
+ },
+ "people": {
+  "pt-BR": "pessoas",
+  "es": "gente",
+  "de": "Menschen",
+  "fr": "gens",
+  "zh": "人们"
+ },
+ "person": {
+  "pt-BR": "pessoa",
+  "es": "persona",
+  "de": "Person",
+  "fr": "personne",
+  "zh": "人"
+ },
+ "life": {
+  "pt-BR": "vida",
+  "es": "vida",
+  "de": "Leben",
+  "fr": "vie",
+  "zh": "生命"
+ },
+ "death": {
+  "pt-BR": "morte",
+  "es": "muerte",
+  "de": "Tod",
+  "fr": "mort",
+  "zh": "死亡"
+ },
+ "god": {
+  "pt-BR": "deus",
+  "es": "dios",
+  "de": "Gott",
+  "fr": "dieu",
+  "zh": "神"
+ },
+ "name": {
+  "pt-BR": "nome",
+  "es": "nombre",
+  "de": "Name",
+  "fr": "nom",
+  "zh": "名字"
+ },
+ "home": {
+  "pt-BR": "lar",
+  "es": "hogar",
+  "de": "Zuhause",
+  "fr": "foyer",
+  "zh": "家"
+ },
+ "work": {
+  "pt-BR": "trabalho",
+  "es": "trabajo",
+  "de": "Arbeit",
+  "fr": "travail",
+  "zh": "工作"
+ },
+ "dream": {
+  "pt-BR": "sonho",
+  "es": "sueño",
+  "de": "Traum",
+  "fr": "rêve",
+  "zh": "梦"
+ }
+}

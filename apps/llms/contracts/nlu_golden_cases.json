@@ -1,0 +1,1923 @@
+[
+ {
+  "idioma": "pt-BR",
+  "q": "oi",
+  "intencao": "SAUDACAO"
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "olá!",
+  "intencao": "SAUDACAO"
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "bom dia",
+  "intencao": "SAUDACAO"
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "ajuda",
+  "intencao": "AJUDA"
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "como funciona este app?",
+  "intencao": "AJUDA"
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "o que você faz?",
+  "intencao": "AJUDA"
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "de onde vêm os dados?",
+  "intencao": "SOBRE_DADOS"
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "sobre os dados",
+  "intencao": "SOBRE_DADOS"
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "fontes",
+  "intencao": "FONTES"
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "referências",
+  "intencao": "FONTES"
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "limpar o gráfico",
+  "intencao": "LIMPAR"
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "apague tudo",
+  "intencao": "LIMPAR"
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "começar de novo",
+  "intencao": "LIMPAR"
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "mostre king, queen, man e woman",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "king",
+   "queen",
+   "man",
+   "woman"
+  ]
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "coloque rei e rainha no gráfico",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "king",
+   "queen"
+  ]
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "adicione gato e cachorro",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "cat",
+   "dog"
+  ]
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "ponha paris e frança",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "paris",
+   "france"
+  ]
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "quero ver tower e castle",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "tower",
+   "castle"
+  ]
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "desenhe azul, vermelho e verde",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "blue",
+   "red",
+   "green"
+  ]
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "king queen",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "king",
+   "queen"
+  ]
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "e queen?",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "queen"
+  ],
+  "contexto": "mostre king",
+  "continuacao": true
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "também woman",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "woman"
+  ],
+  "contexto": "mostre man",
+  "continuacao": true
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "king - man + woman",
+  "intencao": "ANALOGIA",
+  "analogia": [
+   "king",
+   "man",
+   "woman"
+  ]
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "paris − france + italy",
+  "intencao": "ANALOGIA",
+  "analogia": [
+   "paris",
+   "france",
+   "italy"
+  ]
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "rei está para rainha assim como homem está para",
+  "intencao": "ANALOGIA",
+  "analogia": [
+   "queen",
+   "king",
+   "man"
+  ]
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "faça a analogia king, man, woman",
+  "intencao": "ANALOGIA",
+  "analogia": [
+   "king",
+   "man",
+   "woman"
+  ]
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "vizinhos de tower",
+  "intencao": "VIZINHOS",
+  "palavras": [
+   "tower"
+  ]
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "palavras parecidas com king",
+  "intencao": "VIZINHOS",
+  "palavras": [
+   "king"
+  ]
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "o que é próximo de paris?",
+  "intencao": "VIZINHOS",
+  "palavras": [
+   "paris"
+  ]
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "cat e dog são parecidas?",
+  "intencao": "SIMILARIDADE",
+  "palavras": [
+   "cat",
+   "dog"
+  ]
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "qual a similaridade entre king e queen?",
+  "intencao": "SIMILARIDADE",
+  "palavras": [
+   "king",
+   "queen"
+  ]
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "direção do plural",
+  "intencao": "DIRECAO",
+  "direcao": [
+   "cats",
+   "cat"
+  ]
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "cats - cat",
+  "intencao": "DIRECAO",
+  "direcao": [
+   "cats",
+   "cat"
+  ]
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "produto escalar de woman e man",
+  "intencao": "DIRECAO",
+  "direcao": [
+   "woman",
+   "man"
+  ]
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "o que é um token?",
+  "intencao": "CONCEITO",
+  "conceito": "token"
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "o que é embedding?",
+  "intencao": "CONCEITO",
+  "conceito": "embedding"
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "explique a atenção",
+  "intencao": "CONCEITO",
+  "conceito": "atencao"
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "como funciona a softmax?",
+  "intencao": "CONCEITO",
+  "conceito": "softmax"
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "o que é temperatura?",
+  "intencao": "CONCEITO",
+  "conceito": "temperatura"
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "o que é um transformer",
+  "intencao": "CONCEITO",
+  "conceito": "transformer"
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "mostre as capitais",
+  "intencao": "PRESET",
+  "preset": "capitais"
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "exemplo de realeza",
+  "intencao": "PRESET",
+  "preset": "realeza"
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "cores",
+  "intencao": "PRESET",
+  "preset": "cores"
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "mostre a família",
+  "intencao": "PRESET",
+  "preset": "familia"
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "xqzv",
+  "intencao": "DESCONHECIDA"
+ },
+ {
+  "idioma": "pt-BR",
+  "q": "qual é a capital da França?",
+  "intencao": "DESCONHECIDA"
+ },
+ {
+  "idioma": "en",
+  "q": "hi",
+  "intencao": "SAUDACAO"
+ },
+ {
+  "idioma": "en",
+  "q": "hello!",
+  "intencao": "SAUDACAO"
+ },
+ {
+  "idioma": "en",
+  "q": "good morning",
+  "intencao": "SAUDACAO"
+ },
+ {
+  "idioma": "en",
+  "q": "help",
+  "intencao": "AJUDA"
+ },
+ {
+  "idioma": "en",
+  "q": "how does this work?",
+  "intencao": "AJUDA"
+ },
+ {
+  "idioma": "en",
+  "q": "what can you do?",
+  "intencao": "AJUDA"
+ },
+ {
+  "idioma": "en",
+  "q": "where does the data come from?",
+  "intencao": "SOBRE_DADOS"
+ },
+ {
+  "idioma": "en",
+  "q": "about the data",
+  "intencao": "SOBRE_DADOS"
+ },
+ {
+  "idioma": "en",
+  "q": "sources",
+  "intencao": "FONTES"
+ },
+ {
+  "idioma": "en",
+  "q": "references",
+  "intencao": "FONTES"
+ },
+ {
+  "idioma": "en",
+  "q": "clear the chart",
+  "intencao": "LIMPAR"
+ },
+ {
+  "idioma": "en",
+  "q": "start over",
+  "intencao": "LIMPAR"
+ },
+ {
+  "idioma": "en",
+  "q": "reset",
+  "intencao": "LIMPAR"
+ },
+ {
+  "idioma": "en",
+  "q": "show king, queen, man and woman",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "king",
+   "queen",
+   "man",
+   "woman"
+  ]
+ },
+ {
+  "idioma": "en",
+  "q": "add cat and dog",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "cat",
+   "dog"
+  ]
+ },
+ {
+  "idioma": "en",
+  "q": "plot paris and france",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "paris",
+   "france"
+  ]
+ },
+ {
+  "idioma": "en",
+  "q": "I want to see tower and castle",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "tower",
+   "castle"
+  ]
+ },
+ {
+  "idioma": "en",
+  "q": "put blue, red and green on the chart",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "blue",
+   "red",
+   "green"
+  ]
+ },
+ {
+  "idioma": "en",
+  "q": "King, Queen",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "king",
+   "queen"
+  ]
+ },
+ {
+  "idioma": "en",
+  "q": "and queen?",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "queen"
+  ],
+  "contexto": "show king",
+  "continuacao": true
+ },
+ {
+  "idioma": "en",
+  "q": "also woman",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "woman"
+  ],
+  "contexto": "show man",
+  "continuacao": true
+ },
+ {
+  "idioma": "en",
+  "q": "king - man + woman",
+  "intencao": "ANALOGIA",
+  "analogia": [
+   "king",
+   "man",
+   "woman"
+  ]
+ },
+ {
+  "idioma": "en",
+  "q": "paris - france + italy",
+  "intencao": "ANALOGIA",
+  "analogia": [
+   "paris",
+   "france",
+   "italy"
+  ]
+ },
+ {
+  "idioma": "en",
+  "q": "king is to queen as man is to",
+  "intencao": "ANALOGIA",
+  "analogia": [
+   "queen",
+   "king",
+   "man"
+  ]
+ },
+ {
+  "idioma": "en",
+  "q": "analogy king man woman",
+  "intencao": "ANALOGIA",
+  "analogia": [
+   "king",
+   "man",
+   "woman"
+  ]
+ },
+ {
+  "idioma": "en",
+  "q": "neighbours of tower",
+  "intencao": "VIZINHOS",
+  "palavras": [
+   "tower"
+  ]
+ },
+ {
+  "idioma": "en",
+  "q": "words similar to king",
+  "intencao": "VIZINHOS",
+  "palavras": [
+   "king"
+  ]
+ },
+ {
+  "idioma": "en",
+  "q": "what is close to paris?",
+  "intencao": "VIZINHOS",
+  "palavras": [
+   "paris"
+  ]
+ },
+ {
+  "idioma": "en",
+  "q": "are cat and dog similar?",
+  "intencao": "SIMILARIDADE",
+  "palavras": [
+   "cat",
+   "dog"
+  ]
+ },
+ {
+  "idioma": "en",
+  "q": "how similar are king and queen?",
+  "intencao": "SIMILARIDADE",
+  "palavras": [
+   "king",
+   "queen"
+  ]
+ },
+ {
+  "idioma": "en",
+  "q": "plural direction",
+  "intencao": "DIRECAO",
+  "direcao": [
+   "cats",
+   "cat"
+  ]
+ },
+ {
+  "idioma": "en",
+  "q": "cats - cat",
+  "intencao": "DIRECAO",
+  "direcao": [
+   "cats",
+   "cat"
+  ]
+ },
+ {
+  "idioma": "en",
+  "q": "dot product of woman and man",
+  "intencao": "DIRECAO",
+  "direcao": [
+   "woman",
+   "man"
+  ]
+ },
+ {
+  "idioma": "en",
+  "q": "what is a token?",
+  "intencao": "CONCEITO",
+  "conceito": "token"
+ },
+ {
+  "idioma": "en",
+  "q": "what is an embedding?",
+  "intencao": "CONCEITO",
+  "conceito": "embedding"
+ },
+ {
+  "idioma": "en",
+  "q": "explain attention",
+  "intencao": "CONCEITO",
+  "conceito": "atencao"
+ },
+ {
+  "idioma": "en",
+  "q": "how does softmax work?",
+  "intencao": "CONCEITO",
+  "conceito": "softmax"
+ },
+ {
+  "idioma": "en",
+  "q": "what is temperature?",
+  "intencao": "CONCEITO",
+  "conceito": "temperatura"
+ },
+ {
+  "idioma": "en",
+  "q": "show the capitals",
+  "intencao": "PRESET",
+  "preset": "capitais"
+ },
+ {
+  "idioma": "en",
+  "q": "royalty example",
+  "intencao": "PRESET",
+  "preset": "realeza"
+ },
+ {
+  "idioma": "en",
+  "q": "colors",
+  "intencao": "PRESET",
+  "preset": "cores"
+ },
+ {
+  "idioma": "en",
+  "q": "show the family",
+  "intencao": "PRESET",
+  "preset": "familia"
+ },
+ {
+  "idioma": "en",
+  "q": "xqzv",
+  "intencao": "DESCONHECIDA"
+ },
+ {
+  "idioma": "en",
+  "q": "what is the capital of france?",
+  "intencao": "DESCONHECIDA"
+ },
+ {
+  "idioma": "es",
+  "q": "hola",
+  "intencao": "SAUDACAO"
+ },
+ {
+  "idioma": "es",
+  "q": "buenos días",
+  "intencao": "SAUDACAO"
+ },
+ {
+  "idioma": "es",
+  "q": "hey",
+  "intencao": "SAUDACAO"
+ },
+ {
+  "idioma": "es",
+  "q": "ayuda",
+  "intencao": "AJUDA"
+ },
+ {
+  "idioma": "es",
+  "q": "cómo funciona esto?",
+  "intencao": "AJUDA"
+ },
+ {
+  "idioma": "es",
+  "q": "qué puedes hacer?",
+  "intencao": "AJUDA"
+ },
+ {
+  "idioma": "es",
+  "q": "de dónde vienen los datos?",
+  "intencao": "SOBRE_DADOS"
+ },
+ {
+  "idioma": "es",
+  "q": "sobre los datos",
+  "intencao": "SOBRE_DADOS"
+ },
+ {
+  "idioma": "es",
+  "q": "fuentes",
+  "intencao": "FONTES"
+ },
+ {
+  "idioma": "es",
+  "q": "referencias",
+  "intencao": "FONTES"
+ },
+ {
+  "idioma": "es",
+  "q": "limpiar el gráfico",
+  "intencao": "LIMPAR"
+ },
+ {
+  "idioma": "es",
+  "q": "borra todo",
+  "intencao": "LIMPAR"
+ },
+ {
+  "idioma": "es",
+  "q": "empezar de nuevo",
+  "intencao": "LIMPAR"
+ },
+ {
+  "idioma": "es",
+  "q": "muestra king, queen, man y woman",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "king",
+   "queen",
+   "man",
+   "woman"
+  ]
+ },
+ {
+  "idioma": "es",
+  "q": "añade rey y reina",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "king",
+   "queen"
+  ]
+ },
+ {
+  "idioma": "es",
+  "q": "pon gato y perro",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "cat",
+   "dog"
+  ]
+ },
+ {
+  "idioma": "es",
+  "q": "dibuja parís y francia",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "paris",
+   "france"
+  ]
+ },
+ {
+  "idioma": "es",
+  "q": "quiero ver tower y castle",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "tower",
+   "castle"
+  ]
+ },
+ {
+  "idioma": "es",
+  "q": "coloca azul, rojo y verde",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "blue",
+   "red",
+   "green"
+  ]
+ },
+ {
+  "idioma": "es",
+  "q": "king queen",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "king",
+   "queen"
+  ]
+ },
+ {
+  "idioma": "es",
+  "q": "y queen?",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "queen"
+  ],
+  "contexto": "muestra king",
+  "continuacao": true
+ },
+ {
+  "idioma": "es",
+  "q": "también woman",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "woman"
+  ],
+  "contexto": "muestra man",
+  "continuacao": true
+ },
+ {
+  "idioma": "es",
+  "q": "king - man + woman",
+  "intencao": "ANALOGIA",
+  "analogia": [
+   "king",
+   "man",
+   "woman"
+  ]
+ },
+ {
+  "idioma": "es",
+  "q": "paris - france + italy",
+  "intencao": "ANALOGIA",
+  "analogia": [
+   "paris",
+   "france",
+   "italy"
+  ]
+ },
+ {
+  "idioma": "es",
+  "q": "rey es a reina como hombre es a",
+  "intencao": "ANALOGIA",
+  "analogia": [
+   "queen",
+   "king",
+   "man"
+  ]
+ },
+ {
+  "idioma": "es",
+  "q": "analogía king man woman",
+  "intencao": "ANALOGIA",
+  "analogia": [
+   "king",
+   "man",
+   "woman"
+  ]
+ },
+ {
+  "idioma": "es",
+  "q": "vecinos de tower",
+  "intencao": "VIZINHOS",
+  "palavras": [
+   "tower"
+  ]
+ },
+ {
+  "idioma": "es",
+  "q": "palabras parecidas a king",
+  "intencao": "VIZINHOS",
+  "palavras": [
+   "king"
+  ]
+ },
+ {
+  "idioma": "es",
+  "q": "qué está cerca de paris?",
+  "intencao": "VIZINHOS",
+  "palavras": [
+   "paris"
+  ]
+ },
+ {
+  "idioma": "es",
+  "q": "cat y dog son parecidas?",
+  "intencao": "SIMILARIDADE",
+  "palavras": [
+   "cat",
+   "dog"
+  ]
+ },
+ {
+  "idioma": "es",
+  "q": "qué tan parecidas son king y queen?",
+  "intencao": "SIMILARIDADE",
+  "palavras": [
+   "king",
+   "queen"
+  ]
+ },
+ {
+  "idioma": "es",
+  "q": "dirección del plural",
+  "intencao": "DIRECAO",
+  "direcao": [
+   "cats",
+   "cat"
+  ]
+ },
+ {
+  "idioma": "es",
+  "q": "cats - cat",
+  "intencao": "DIRECAO",
+  "direcao": [
+   "cats",
+   "cat"
+  ]
+ },
+ {
+  "idioma": "es",
+  "q": "producto escalar de woman y man",
+  "intencao": "DIRECAO",
+  "direcao": [
+   "woman",
+   "man"
+  ]
+ },
+ {
+  "idioma": "es",
+  "q": "qué es un token?",
+  "intencao": "CONCEITO",
+  "conceito": "token"
+ },
+ {
+  "idioma": "es",
+  "q": "qué es un embedding?",
+  "intencao": "CONCEITO",
+  "conceito": "embedding"
+ },
+ {
+  "idioma": "es",
+  "q": "explica la atención",
+  "intencao": "CONCEITO",
+  "conceito": "atencao"
+ },
+ {
+  "idioma": "es",
+  "q": "cómo funciona la softmax?",
+  "intencao": "CONCEITO",
+  "conceito": "softmax"
+ },
+ {
+  "idioma": "es",
+  "q": "qué es la temperatura?",
+  "intencao": "CONCEITO",
+  "conceito": "temperatura"
+ },
+ {
+  "idioma": "es",
+  "q": "muestra las capitales",
+  "intencao": "PRESET",
+  "preset": "capitais"
+ },
+ {
+  "idioma": "es",
+  "q": "ejemplo de realeza",
+  "intencao": "PRESET",
+  "preset": "realeza"
+ },
+ {
+  "idioma": "es",
+  "q": "colores",
+  "intencao": "PRESET",
+  "preset": "cores"
+ },
+ {
+  "idioma": "es",
+  "q": "muestra la familia",
+  "intencao": "PRESET",
+  "preset": "familia"
+ },
+ {
+  "idioma": "es",
+  "q": "xqzv",
+  "intencao": "DESCONHECIDA"
+ },
+ {
+  "idioma": "de",
+  "q": "hallo",
+  "intencao": "SAUDACAO"
+ },
+ {
+  "idioma": "de",
+  "q": "guten morgen",
+  "intencao": "SAUDACAO"
+ },
+ {
+  "idioma": "de",
+  "q": "hi",
+  "intencao": "SAUDACAO"
+ },
+ {
+  "idioma": "de",
+  "q": "hilfe",
+  "intencao": "AJUDA"
+ },
+ {
+  "idioma": "de",
+  "q": "wie funktioniert das?",
+  "intencao": "AJUDA"
+ },
+ {
+  "idioma": "de",
+  "q": "was kannst du?",
+  "intencao": "AJUDA"
+ },
+ {
+  "idioma": "de",
+  "q": "woher kommen die daten?",
+  "intencao": "SOBRE_DADOS"
+ },
+ {
+  "idioma": "de",
+  "q": "über die daten",
+  "intencao": "SOBRE_DADOS"
+ },
+ {
+  "idioma": "de",
+  "q": "quellen",
+  "intencao": "FONTES"
+ },
+ {
+  "idioma": "de",
+  "q": "referenzen",
+  "intencao": "FONTES"
+ },
+ {
+  "idioma": "de",
+  "q": "diagramm leeren",
+  "intencao": "LIMPAR"
+ },
+ {
+  "idioma": "de",
+  "q": "alles löschen",
+  "intencao": "LIMPAR"
+ },
+ {
+  "idioma": "de",
+  "q": "neu anfangen",
+  "intencao": "LIMPAR"
+ },
+ {
+  "idioma": "de",
+  "q": "zeige king, queen, man und woman",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "king",
+   "queen",
+   "man",
+   "woman"
+  ]
+ },
+ {
+  "idioma": "de",
+  "q": "füge könig und königin hinzu",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "king",
+   "queen"
+  ]
+ },
+ {
+  "idioma": "de",
+  "q": "setze katze und hund",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "cat",
+   "dog"
+  ]
+ },
+ {
+  "idioma": "de",
+  "q": "zeichne paris und frankreich",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "paris",
+   "france"
+  ]
+ },
+ {
+  "idioma": "de",
+  "q": "ich möchte tower und castle sehen",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "tower",
+   "castle"
+  ]
+ },
+ {
+  "idioma": "de",
+  "q": "lege blau, rot und grün ins diagramm",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "blue",
+   "red",
+   "green"
+  ]
+ },
+ {
+  "idioma": "de",
+  "q": "king queen",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "king",
+   "queen"
+  ]
+ },
+ {
+  "idioma": "de",
+  "q": "und queen?",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "queen"
+  ],
+  "contexto": "zeige king",
+  "continuacao": true
+ },
+ {
+  "idioma": "de",
+  "q": "auch woman",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "woman"
+  ],
+  "contexto": "zeige man",
+  "continuacao": true
+ },
+ {
+  "idioma": "de",
+  "q": "king - man + woman",
+  "intencao": "ANALOGIA",
+  "analogia": [
+   "king",
+   "man",
+   "woman"
+  ]
+ },
+ {
+  "idioma": "de",
+  "q": "paris - france + italy",
+  "intencao": "ANALOGIA",
+  "analogia": [
+   "paris",
+   "france",
+   "italy"
+  ]
+ },
+ {
+  "idioma": "de",
+  "q": "könig verhält sich zu königin wie mann zu",
+  "intencao": "ANALOGIA",
+  "analogia": [
+   "queen",
+   "king",
+   "man"
+  ]
+ },
+ {
+  "idioma": "de",
+  "q": "analogie king man woman",
+  "intencao": "ANALOGIA",
+  "analogia": [
+   "king",
+   "man",
+   "woman"
+  ]
+ },
+ {
+  "idioma": "de",
+  "q": "nachbarn von tower",
+  "intencao": "VIZINHOS",
+  "palavras": [
+   "tower"
+  ]
+ },
+ {
+  "idioma": "de",
+  "q": "wörter ähnlich wie king",
+  "intencao": "VIZINHOS",
+  "palavras": [
+   "king"
+  ]
+ },
+ {
+  "idioma": "de",
+  "q": "was liegt nahe bei paris?",
+  "intencao": "VIZINHOS",
+  "palavras": [
+   "paris"
+  ]
+ },
+ {
+  "idioma": "de",
+  "q": "sind cat und dog ähnlich?",
+  "intencao": "SIMILARIDADE",
+  "palavras": [
+   "cat",
+   "dog"
+  ]
+ },
+ {
+  "idioma": "de",
+  "q": "wie ähnlich sind king und queen?",
+  "intencao": "SIMILARIDADE",
+  "palavras": [
+   "king",
+   "queen"
+  ]
+ },
+ {
+  "idioma": "de",
+  "q": "pluralrichtung",
+  "intencao": "DIRECAO",
+  "direcao": [
+   "cats",
+   "cat"
+  ]
+ },
+ {
+  "idioma": "de",
+  "q": "cats - cat",
+  "intencao": "DIRECAO",
+  "direcao": [
+   "cats",
+   "cat"
+  ]
+ },
+ {
+  "idioma": "de",
+  "q": "skalarprodukt von woman und man",
+  "intencao": "DIRECAO",
+  "direcao": [
+   "woman",
+   "man"
+  ]
+ },
+ {
+  "idioma": "de",
+  "q": "was ist ein token?",
+  "intencao": "CONCEITO",
+  "conceito": "token"
+ },
+ {
+  "idioma": "de",
+  "q": "was ist ein embedding?",
+  "intencao": "CONCEITO",
+  "conceito": "embedding"
+ },
+ {
+  "idioma": "de",
+  "q": "erkläre attention",
+  "intencao": "CONCEITO",
+  "conceito": "atencao"
+ },
+ {
+  "idioma": "de",
+  "q": "wie funktioniert softmax?",
+  "intencao": "CONCEITO",
+  "conceito": "softmax"
+ },
+ {
+  "idioma": "de",
+  "q": "was ist die temperatur?",
+  "intencao": "CONCEITO",
+  "conceito": "temperatura"
+ },
+ {
+  "idioma": "de",
+  "q": "zeige die hauptstädte",
+  "intencao": "PRESET",
+  "preset": "capitais"
+ },
+ {
+  "idioma": "de",
+  "q": "beispiel königtum",
+  "intencao": "PRESET",
+  "preset": "realeza"
+ },
+ {
+  "idioma": "de",
+  "q": "farben",
+  "intencao": "PRESET",
+  "preset": "cores"
+ },
+ {
+  "idioma": "de",
+  "q": "zeige die familie",
+  "intencao": "PRESET",
+  "preset": "familia"
+ },
+ {
+  "idioma": "de",
+  "q": "xqzv",
+  "intencao": "DESCONHECIDA"
+ },
+ {
+  "idioma": "fr",
+  "q": "salut",
+  "intencao": "SAUDACAO"
+ },
+ {
+  "idioma": "fr",
+  "q": "bonjour",
+  "intencao": "SAUDACAO"
+ },
+ {
+  "idioma": "fr",
+  "q": "coucou",
+  "intencao": "SAUDACAO"
+ },
+ {
+  "idioma": "fr",
+  "q": "aide",
+  "intencao": "AJUDA"
+ },
+ {
+  "idioma": "fr",
+  "q": "comment ça marche ?",
+  "intencao": "AJUDA"
+ },
+ {
+  "idioma": "fr",
+  "q": "que peux-tu faire ?",
+  "intencao": "AJUDA"
+ },
+ {
+  "idioma": "fr",
+  "q": "d'où viennent les données ?",
+  "intencao": "SOBRE_DADOS"
+ },
+ {
+  "idioma": "fr",
+  "q": "à propos des données",
+  "intencao": "SOBRE_DADOS"
+ },
+ {
+  "idioma": "fr",
+  "q": "sources",
+  "intencao": "FONTES"
+ },
+ {
+  "idioma": "fr",
+  "q": "références",
+  "intencao": "FONTES"
+ },
+ {
+  "idioma": "fr",
+  "q": "effacer le graphique",
+  "intencao": "LIMPAR"
+ },
+ {
+  "idioma": "fr",
+  "q": "vide tout",
+  "intencao": "LIMPAR"
+ },
+ {
+  "idioma": "fr",
+  "q": "recommencer",
+  "intencao": "LIMPAR"
+ },
+ {
+  "idioma": "fr",
+  "q": "montre king, queen, man et woman",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "king",
+   "queen",
+   "man",
+   "woman"
+  ]
+ },
+ {
+  "idioma": "fr",
+  "q": "ajoute roi et reine",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "king",
+   "queen"
+  ]
+ },
+ {
+  "idioma": "fr",
+  "q": "mets chat et chien",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "cat",
+   "dog"
+  ]
+ },
+ {
+  "idioma": "fr",
+  "q": "dessine paris et france",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "paris",
+   "france"
+  ]
+ },
+ {
+  "idioma": "fr",
+  "q": "je veux voir tower et castle",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "tower",
+   "castle"
+  ]
+ },
+ {
+  "idioma": "fr",
+  "q": "place bleu, rouge et vert dans le graphique",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "blue",
+   "red",
+   "green"
+  ]
+ },
+ {
+  "idioma": "fr",
+  "q": "king queen",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "king",
+   "queen"
+  ]
+ },
+ {
+  "idioma": "fr",
+  "q": "et queen ?",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "queen"
+  ],
+  "contexto": "montre king",
+  "continuacao": true
+ },
+ {
+  "idioma": "fr",
+  "q": "aussi woman",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "woman"
+  ],
+  "contexto": "montre man",
+  "continuacao": true
+ },
+ {
+  "idioma": "fr",
+  "q": "king - man + woman",
+  "intencao": "ANALOGIA",
+  "analogia": [
+   "king",
+   "man",
+   "woman"
+  ]
+ },
+ {
+  "idioma": "fr",
+  "q": "paris - france + italy",
+  "intencao": "ANALOGIA",
+  "analogia": [
+   "paris",
+   "france",
+   "italy"
+  ]
+ },
+ {
+  "idioma": "fr",
+  "q": "roi est à reine ce que homme est à",
+  "intencao": "ANALOGIA",
+  "analogia": [
+   "queen",
+   "king",
+   "man"
+  ]
+ },
+ {
+  "idioma": "fr",
+  "q": "analogie king man woman",
+  "intencao": "ANALOGIA",
+  "analogia": [
+   "king",
+   "man",
+   "woman"
+  ]
+ },
+ {
+  "idioma": "fr",
+  "q": "voisins de tower",
+  "intencao": "VIZINHOS",
+  "palavras": [
+   "tower"
+  ]
+ },
+ {
+  "idioma": "fr",
+  "q": "mots proches de king",
+  "intencao": "VIZINHOS",
+  "palavras": [
+   "king"
+  ]
+ },
+ {
+  "idioma": "fr",
+  "q": "qu'est-ce qui ressemble à paris ?",
+  "intencao": "VIZINHOS",
+  "palavras": [
+   "paris"
+  ]
+ },
+ {
+  "idioma": "fr",
+  "q": "cat et dog sont-ils proches ?",
+  "intencao": "SIMILARIDADE",
+  "palavras": [
+   "cat",
+   "dog"
+  ]
+ },
+ {
+  "idioma": "fr",
+  "q": "similarité entre king et queen",
+  "intencao": "SIMILARIDADE",
+  "palavras": [
+   "king",
+   "queen"
+  ]
+ },
+ {
+  "idioma": "fr",
+  "q": "direction du pluriel",
+  "intencao": "DIRECAO",
+  "direcao": [
+   "cats",
+   "cat"
+  ]
+ },
+ {
+  "idioma": "fr",
+  "q": "cats - cat",
+  "intencao": "DIRECAO",
+  "direcao": [
+   "cats",
+   "cat"
+  ]
+ },
+ {
+  "idioma": "fr",
+  "q": "produit scalaire de woman et man",
+  "intencao": "DIRECAO",
+  "direcao": [
+   "woman",
+   "man"
+  ]
+ },
+ {
+  "idioma": "fr",
+  "q": "qu'est-ce qu'un token ?",
+  "intencao": "CONCEITO",
+  "conceito": "token"
+ },
+ {
+  "idioma": "fr",
+  "q": "c'est quoi un embedding ?",
+  "intencao": "CONCEITO",
+  "conceito": "embedding"
+ },
+ {
+  "idioma": "fr",
+  "q": "explique l'attention",
+  "intencao": "CONCEITO",
+  "conceito": "atencao"
+ },
+ {
+  "idioma": "fr",
+  "q": "comment fonctionne la softmax ?",
+  "intencao": "CONCEITO",
+  "conceito": "softmax"
+ },
+ {
+  "idioma": "fr",
+  "q": "qu'est-ce que la température ?",
+  "intencao": "CONCEITO",
+  "conceito": "temperatura"
+ },
+ {
+  "idioma": "fr",
+  "q": "montre les capitales",
+  "intencao": "PRESET",
+  "preset": "capitais"
+ },
+ {
+  "idioma": "fr",
+  "q": "exemple de royauté",
+  "intencao": "PRESET",
+  "preset": "realeza"
+ },
+ {
+  "idioma": "fr",
+  "q": "couleurs",
+  "intencao": "PRESET",
+  "preset": "cores"
+ },
+ {
+  "idioma": "fr",
+  "q": "montre la famille",
+  "intencao": "PRESET",
+  "preset": "familia"
+ },
+ {
+  "idioma": "fr",
+  "q": "xqzv",
+  "intencao": "DESCONHECIDA"
+ },
+ {
+  "idioma": "zh",
+  "q": "你好",
+  "intencao": "SAUDACAO"
+ },
+ {
+  "idioma": "zh",
+  "q": "您好！",
+  "intencao": "SAUDACAO"
+ },
+ {
+  "idioma": "zh",
+  "q": "早上好",
+  "intencao": "SAUDACAO"
+ },
+ {
+  "idioma": "zh",
+  "q": "帮助",
+  "intencao": "AJUDA"
+ },
+ {
+  "idioma": "zh",
+  "q": "这个怎么用？",
+  "intencao": "AJUDA"
+ },
+ {
+  "idioma": "zh",
+  "q": "你能做什么？",
+  "intencao": "AJUDA"
+ },
+ {
+  "idioma": "zh",
+  "q": "数据来自哪里？",
+  "intencao": "SOBRE_DADOS"
+ },
+ {
+  "idioma": "zh",
+  "q": "关于数据",
+  "intencao": "SOBRE_DADOS"
+ },
+ {
+  "idioma": "zh",
+  "q": "来源",
+  "intencao": "FONTES"
+ },
+ {
+  "idioma": "zh",
+  "q": "参考文献",
+  "intencao": "FONTES"
+ },
+ {
+  "idioma": "zh",
+  "q": "清空图表",
+  "intencao": "LIMPAR"
+ },
+ {
+  "idioma": "zh",
+  "q": "全部删除",
+  "intencao": "LIMPAR"
+ },
+ {
+  "idioma": "zh",
+  "q": "重新开始",
+  "intencao": "LIMPAR"
+ },
+ {
+  "idioma": "zh",
+  "q": "显示 king、queen、man 和 woman",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "king",
+   "queen",
+   "man",
+   "woman"
+  ]
+ },
+ {
+  "idioma": "zh",
+  "q": "加上国王和女王",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "king",
+   "queen"
+  ]
+ },
+ {
+  "idioma": "zh",
+  "q": "添加猫和狗",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "cat",
+   "dog"
+  ]
+ },
+ {
+  "idioma": "zh",
+  "q": "画出巴黎和法国",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "paris",
+   "france"
+  ]
+ },
+ {
+  "idioma": "zh",
+  "q": "我想看 tower 和 castle",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "tower",
+   "castle"
+  ]
+ },
+ {
+  "idioma": "zh",
+  "q": "把蓝色、红色和绿色放到图上",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "blue",
+   "red",
+   "green"
+  ]
+ },
+ {
+  "idioma": "zh",
+  "q": "king queen",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "king",
+   "queen"
+  ]
+ },
+ {
+  "idioma": "zh",
+  "q": "还有 queen？",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "queen"
+  ],
+  "contexto": "显示 king",
+  "continuacao": true
+ },
+ {
+  "idioma": "zh",
+  "q": "也加上 woman",
+  "intencao": "MOSTRAR",
+  "palavras": [
+   "woman"
+  ],
+  "contexto": "显示 man",
+  "continuacao": true
+ },
+ {
+  "idioma": "zh",
+  "q": "king - man + woman",
+  "intencao": "ANALOGIA",
+  "analogia": [
+   "king",
+   "man",
+   "woman"
+  ]
+ },
+ {
+  "idioma": "zh",
+  "q": "paris - france + italy",
+  "intencao": "ANALOGIA",
+  "analogia": [
+   "paris",
+   "france",
+   "italy"
+  ]
+ },
+ {
+  "idioma": "zh",
+  "q": "king 之于 queen 就像 man 之于",
+  "intencao": "ANALOGIA",
+  "analogia": [
+   "queen",
+   "king",
+   "man"
+  ]
+ },
+ {
+  "idioma": "zh",
+  "q": "类比 king man woman",
+  "intencao": "ANALOGIA",
+  "analogia": [
+   "king",
+   "man",
+   "woman"
+  ]
+ },
+ {
+  "idioma": "zh",
+  "q": "tower 的近邻",
+  "intencao": "VIZINHOS",
+  "palavras": [
+   "tower"
+  ]
+ },
+ {
+  "idioma": "zh",
+  "q": "和 king 相似的词",
+  "intencao": "VIZINHOS",
+  "palavras": [
+   "king"
+  ]
+ },
+ {
+  "idioma": "zh",
+  "q": "哪些词接近 paris？",
+  "intencao": "VIZINHOS",
+  "palavras": [
+   "paris"
+  ]
+ },
+ {
+  "idioma": "zh",
+  "q": "cat 和 dog 相似吗？",
+  "intencao": "SIMILARIDADE",
+  "palavras": [
+   "cat",
+   "dog"
+  ]
+ },
+ {
+  "idioma": "zh",
+  "q": "king 和 queen 有多相似？",
+  "intencao": "SIMILARIDADE",
+  "palavras": [
+   "king",
+   "queen"
+  ]
+ },
+ {
+  "idioma": "zh",
+  "q": "复数方向",
+  "intencao": "DIRECAO",
+  "direcao": [
+   "cats",
+   "cat"
+  ]
+ },
+ {
+  "idioma": "zh",
+  "q": "cats - cat",
+  "intencao": "DIRECAO",
+  "direcao": [
+   "cats",
+   "cat"
+  ]
+ },
+ {
+  "idioma": "zh",
+  "q": "woman 和 man 的点积",
+  "intencao": "DIRECAO",
+  "direcao": [
+   "woman",
+   "man"
+  ]
+ },
+ {
+  "idioma": "zh",
+  "q": "什么是 token？",
+  "intencao": "CONCEITO",
+  "conceito": "token"
+ },
+ {
+  "idioma": "zh",
+  "q": "什么是词嵌入？",
+  "intencao": "CONCEITO",
+  "conceito": "embedding"
+ },
+ {
+  "idioma": "zh",
+  "q": "解释注意力",
+  "intencao": "CONCEITO",
+  "conceito": "atencao"
+ },
+ {
+  "idioma": "zh",
+  "q": "softmax 是怎么工作的？",
+  "intencao": "CONCEITO",
+  "conceito": "softmax"
+ },
+ {
+  "idioma": "zh",
+  "q": "什么是温度？",
+  "intencao": "CONCEITO",
+  "conceito": "temperatura"
+ },
+ {
+  "idioma": "zh",
+  "q": "显示首都",
+  "intencao": "PRESET",
+  "preset": "capitais"
+ },
+ {
+  "idioma": "zh",
+  "q": "王室的例子",
+  "intencao": "PRESET",
+  "preset": "realeza"
+ },
+ {
+  "idioma": "zh",
+  "q": "颜色",
+  "intencao": "PRESET",
+  "preset": "cores"
+ },
+ {
+  "idioma": "zh",
+  "q": "显示家庭",
+  "intencao": "PRESET",
+  "preset": "familia"
+ },
+ {
+  "idioma": "zh",
+  "q": "xqzv",
+  "intencao": "DESCONHECIDA"
+ }
+]
