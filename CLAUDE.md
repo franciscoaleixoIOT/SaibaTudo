@@ -7,7 +7,7 @@ continuam valendo dentro da pasta.
 - `portal/` — a home de saibatudo.net. Vercel `saibatudo-portal`, servida pelo proxy de eleições; publica a cada push.
 - `apps/eleicoes2026/` — SaibaTudo Eleições 2026. Vercel `saibatudo`, que responde por saibatudo.net e encaminha a home e
   os outros apps.
-  **Congelamento de 24 a 26/10/2026** (guarda: `.github/workflows/eleicoes-congelamento.yml`).
+  Congelamento do 2º turno (24 a 26/10/2026) **encerrado em 26/10** com o fim das eleições; a guarda (`eleicoes-congelamento.yml`) passa sozinha fora da janela.
 - `apps/quimica/` — SaibaTudo Química. Vercel `saibatudo-quimica`, servido em saibatudo.net/quimica/ por proxy.
 - `apps/llms/` — SaibaTudo LLMs (como um modelo de linguagem funciona: vetores de palavras em 3D, lições, assistente em seis idiomas com
   chinês). Vercel `saibatudo-llms`, servido em saibatudo.net/llms/ por proxy (rota no ar desde 26/10/2026; alias direto `saibatudo-llms.vercel.app/llms/`).
@@ -27,7 +27,8 @@ continuam valendo dentro da pasta.
 5. **Domínio:** um app novo precisa de regras de proxy em `apps/eleicoes2026/vercel.json` (fora do congelamento), de
    exclusão no service worker da home (`portal/src/sw.js`) e de cartão em `portal/src/portal/apps.js`;
    `node --test "tests/*.test.mjs"` (raiz) confere os três. Passo a passo: `portal/README.md`.
-6. **Push na `main` não publica os apps:** cada app publica pelo `<app>-data-refresh.yml` (agendado ou `gh workflow run`).
+6. **Push na `main` não publica os apps** (exceção: eleições, cujo `eleicoes-data-refresh.yml` republica a cada 30 min quando o commit da `main` difere do
+   publicado, decisão do mantenedor em 25/10/2026 — código incompleto na `main` vai ao ar): cada app publica pelo `<app>-data-refresh.yml` (agendado ou `gh workflow run`).
    A home (`portal/`) publica a cada push que a toca (`portal-ci.yml`). Mudou `apps/eleicoes2026/vercel.json` (rotas da
    home e dos apps)? Só vale depois do próximo `eleicoes-data-refresh.yml`. Depois de cada push, conferir todos os
    workflows disparados (`gh run list --limit 10`). **Push com mais de 300 arquivos** (ex.: pacote de dados regerado): o GitHub

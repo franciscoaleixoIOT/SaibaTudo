@@ -18,10 +18,13 @@ a IA interpreta a pergunta, os dados respondem. Idioma de tudo o que o usuário 
 3. **Fato crítico não vem de texto gerado.** Quem foi eleito, se há 2º turno, datas e votos saem dos dados/apuração; o texto gerado é rotulado ("pode conter erros") e o servidor o descarta se contradisser o app.
 4. **Privacidade.** Nada é enviado sem toque ou consentimento. O Android **não usa localização**. Perguntas com dado pessoal ou que revelem opinião política nunca entram na captura. Política (`docs/PRIVACIDADE.md` = `web/src/privacidade/index.html`) tem de continuar verdadeira.
 5. **Segredos nunca no Git nem no chat.** Ficam em `secrets/` (ignorado pelo Git). Peça ao mantenedor para colar o segredo em um arquivo lá.
-6. **Congelamento de 24 a 26/10/2026** (2º turno): não mudar modelo, NLU, respostas, API, pipeline, workflows nem app. Dados, docs e testes seguem livres (`docs/PROJECT_MEMORY.md` §4.9).
+6. **Fase pós-eleição (desde 26/10/2026).** O congelamento do 2º turno (24 a 26/10) acabou com as eleições; as respostas falam do 2º turno no passado e a fase
+   vem de `regras.json` + relógio (`POS_ELEICAO`). Texto novo sobre o 2º turno, eleitos ou prazos tem de valer nas cinco fases (testes com `hoje`).
 
 ## Publicar (resumo; passo a passo em `docs/PROJECT_MEMORY.md` §4)
-- **Push na `main` não faz deploy.** Depois de enviar: `gh workflow run eleicoes-data-refresh.yml`, esperar terminar e conferir `curl -s https://saibatudo.net/api/health` (o `version` é o commit publicado).
+- **Push na `main` publica em até 30 min:** desde 25/10/2026 o `eleicoes-data-refresh.yml` reconstrói e publica quando a fase muda **ou** quando o commit da `main`
+  difere do `version` de `/api/health` (decisão do mantenedor). Só empurre conjuntos completos e testados; para publicar já: `gh workflow run eleicoes-data-refresh.yml`
+  e conferir `curl -s https://saibatudo.net/api/health`.
 - **Conferir também `eleicoes-web-ci.yml` e `eleicoes-android-ci.yml`** depois de cada push (`gh run list --limit 6`). Deploy verde não significa CI verde.
 - Push recusado? O robô de dados comita na `main`: `git pull --rebase origin main` e enviar de novo.
 - Variável da Vercel só vale no próximo deploy. `printf '%s' "$VALOR" | vercel env add NOME production --sensitive` (Git Bash).

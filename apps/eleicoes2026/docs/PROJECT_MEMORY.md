@@ -6,22 +6,22 @@
 > deste app: é o projeto `portal/` (Vercel `saibatudo-portal`), servido pelas regras de proxy do `vercel.json` daqui. O
 > `VERCEL_TOKEN` do GitHub é restrito a este projeto. Guia da raiz: [`../../../CLAUDE.md`](../../../CLAUDE.md).
 
-> **Atualizado em 09/10/2026** (entre o 1º turno, 04/10, e o 2º, 25/10). Feito para que outra pessoa, ou outra sessão do Claude, assuma o projeto sem contexto prévio:
+> **Atualizado em 26/10/2026** (pós-eleição: 1º turno em 04/10, 2º turno em 25/10; congelamento encerrado). Feito para que outra pessoa, ou outra sessão do Claude, assuma o projeto sem contexto prévio:
 > o que está no ar, **como publicar**, **como testar**, o que o mantenedor decidiu e o que já deu errado.
 > Estado operacional contínuo (alertas, chaves de desligamento, ciclo de auto-melhoria): [`OPERACAO.md`](OPERACAO.md).
 > Entrada para agentes de código: [`../CLAUDE.md`](../CLAUDE.md). Contrato de dados: [`DATA_CONTRACT.md`](DATA_CONTRACT.md).
 
-## 1. Em uma página — estado em 09/10/2026
+## 1. Em uma página — estado em 26/10/2026
 
 | Peça | Estado |
 | :-- | :-- |
-| Fase eleitoral | Entre turnos. 2º turno em **25/10/2026**. **Congelamento de 24 a 26/10** (ver §4.9). |
-| Site/PWA `saibatudo.net` e API | No ar na Vercel. Versão publicada = commit curto em `GET /api/health` (conferir contra `git rev-parse --short HEAD`). |
+| Fase eleitoral | **Pós-eleição** (`POS_ELEICAO` desde 26/10 03:31Z, troca automática). Congelamento de 24 a 26/10 encerrado em 26/10 com `[congelamento-ok]` (eleições acabaram). Textos do 2º turno no passado, justificativa/multa, prazos pós-eleitorais e resultado por candidato publicados em 26/10 (§11). |
+| Site/PWA `saibatudo.net` e API | No ar na Vercel. Versão publicada = commit curto em `GET /api/health`. **Desde 25/10 (6efc64a) o `data_refresh` publica sozinho quando a fase muda ou quando `HEAD` ≠ `version` publicado** (pedido do mantenedor): qualquer push na `main` vai ao ar em até 30 min. |
 | Pacote de dados | Atualizado a cada 30 min pelo GitHub Actions, assinado (ECDSA P-256). Já traz os resultados do 1º turno (governadores e deputados); **Presidente só pela apuração ao vivo do TSE** (ver §7). 19/10: percentual de Presidente no pacote agrupado por `SG_UE` (antes, pela UF da linha: 100 % e 99,92 % para os dois classificados). |
-| IA de interpretação (NLU) | Modelo **`v2.3-20261007`** no Modal (CPU). Intenção 93,7 % nos 111 casos de referência e 96,8 % em 435 perguntas reservadas. Treino e conversão **locais**. |
+| IA de interpretação (NLU) | **SaibaTudo IA `nlu-v3.4-20261017`** (`SaibaTudoIA-NLU-Eleicoes` no Modal, CPU) em produção (health `model`); medição de 20/10 em `eval/local/2026-10-20_SaibaTudoIA-NLU-Eleicoes_nlu-v3.4_endpoint.json` (116 casos: 96,6 %; holdout 97,0 %; fica em `eval/local/` porque `tools/test_metricas.py` exige que `eval/` só tenha medições sobre os mesmos 111 casos da linha de base). v3.7/v3.8/v3.9 não superam em eleições; **não há retreino previsto**: casos reais zerados (ninguém colheu o Redis) e as falhas pós-eleição eram das regras (corrigidas em 26/10). |
 | IA generativa (texto gerado) | **Ligada desde 07/10.** Space privado `franciscoaleixo/saibatudo-qwen7b` no ZeroGPU do Hugging Face (principal), Modal L4 como reserva (15/dia). Só roda quando a pessoa toca em "Gerar explicação com IA". Desde 22/10 o rótulo nomeia o modelo que respondeu (`model` da API). Troca pelo explicador SaibaTudo IA: ask-v1.3 reprovou no holdout de eleições em 22/10 (5,3 %); v1.5 em treino. |
 | Captura de perguntas ("Ajudar a melhorar o app") | Servidor ligado desde 06/10, Redis no Upstash. No app é **opt-in, desligado por padrão**. Filtro de dado pessoal e de opinião política no aparelho e no servidor. |
-| Política de privacidade | **Versão 1.4** (07/10/2026), em `docs/PRIVACIDADE.md` e `web/src/privacidade/index.html` (devem ser idênticas). |
+| Política de privacidade | **Versão 1.5** (26/10/2026: IA generativa ligada desde 07/10, opcional por toque, rótulo com o modelo), em `docs/PRIVACIDADE.md` e `web/src/privacidade/index.html` (idênticas). |
 | Android | Teste fechado na Play em andamento. A **1.0.3 (versionCode 4)** foi enviada à Play; a **1.0.4 (versionCode 5)** foi gerada mas não publicada; a **1.0.5 (versionCode 6)** (12/10/2026) traz a 1.0.4 + "deputado mais votado" + ponta a ponta do Android 15 sem `statusBarColor`/`navigationBarColor` (apontados pelo Play Console). AAB assinado em `app/build/outputs/bundle/release/`; falta testar num aparelho e enviar (`docs/RELEASE_1.0.5.md`). **19/10:** o código do app ganhou os textos do 2º turno (local de votação, prazos de justificativa, link novo do Autoatendimento) e a regra "não votei no 1º turno"; só chegam a quem instalar um release novo (versionCode 7), decisão do mantenedor. |
 | CI | `eleicoes-web-ci.yml`, `eleicoes-android-ci.yml`, `eleicoes-data-refresh.yml` verdes no commit `cc804a3` (09/10). |
 | Custos | Dentro dos US$ 30/mês grátis do Modal (§8). Cobrado até agora: **US$ 0**. |
@@ -63,7 +63,9 @@
 ## 4. Processo de publicação
 
 ### 4.1 Regra de ouro
-**Dar push na `main` não publica o site.** Quem faz o deploy na Vercel é o workflow `eleicoes-data-refresh.yml` (a cada 30 min no relógio `10,40 * * * *`, ou sob demanda). Depois de qualquer push que mude código ou documentação do site:
+**Push na `main` publica em até 30 min** (desde 25/10/2026, 6efc64a, a pedido do mantenedor): o `eleicoes-data-refresh.yml` (relógio `10,40 * * * *`) reconstrói e publica quando a fase
+eleitoral muda **ou** quando o commit curto da `main` difere do `version` de `/api/health`. Consequência: código incompleto na `main` vai ao ar; trabalhe num branch e
+empurre conjuntos testados. Para publicar sem esperar o relógio:
 
 ```bash
 git push origin main
@@ -264,22 +266,33 @@ Lição repetida: não dizer "corrigido" sem reproduzir antes e depois. Padrões
 1. **Enviar a 1.0.4 (versionCode 5) ao teste fechado** e testar o release num aparelho antes (`docs/RELEASE_1.0.4.md`; a 1.0.3 já foi enviada e o versionCode não se repete). Manter os 12 testadores por 14 dias.
 2. **Definir o teto de gasto no painel do Modal** (US$ 30) e testar.
 3. **Segredos `MODAL_ENDPOINT`, `MODAL_KEY`, `MODAL_SECRET` no GitHub** para a avaliação noturna realmente medir (hoje pula).
-4. **Decidir o texto gerado no congelamento** (24 a 26/10): hoje `on`.
+4. ~~Decidir o texto gerado no congelamento~~ (ficou `on`; congelamento encerrado em 26/10).
 5. Backup offline de `secrets/upload-keystore.p12`, `keystore.properties` e `secrets/data_signing_key.pem` (perder a chave de dados exige novo app).
 6. **Próximo ciclo do modelo (v2.4):** "quantos votos teve o lula?" volta sem o `nome`; "no rio" não vira RJ na nuvem; "Quantas mulheres são candidatas?" marca tema; acrescentar formulações com essas classes. Fora do congelamento.
 7. Texto gerado: avaliar o volume real (a cota de 40 min é da conta inteira) e a revisão jurídica da política 1.4.
 8. Código inerte de sugestão de estado por localização no Android (`SugestaoUf.kt`): pode ser removido numa limpeza.
-9. **Release Android com os textos do 2º turno** (19/10: local de votação, prazos de justificativa 03/12/2026 e 08/01/2027, link novo do Autoatendimento, regra "não votei no 1º turno"): subir para versionCode 7, testar num aparelho e enviar antes de 24/10, ou deixar para depois do congelamento — decisão do mantenedor. O site recebe tudo no próximo `data_refresh`.
+9. **Release Android versionCode 7** com tudo desde 19/10 (textos do 2º turno, rótulo do modelo, "já ganhou", propostas, status da votação) **e a pós-eleição de 26/10**: gerar o AAB, `tools/verificar_release.py`, testar num aparelho (mantenedor) e enviar ao teste fechado.
 10. **SaibaTudo IA em eleições (`SaibaTudoIA-NLU-Eleicoes`, nlu-v3.4-20261017)** — app e Volume próprios no ar e medidos (96,6 %) em 20/10; faltam
     só as variáveis da Vercel (`MODAL_CANARY_ENDPOINT`, `CANARY_MODEL_VERSION`, `CANARY_PCT=100`, `MODAL_TIMEOUT_MS=30000`) e o `data_refresh`
     (OPERACAO §7). Depois do teste: `MODAL_ENDPOINT` no app novo e `modal app stop saibatudo-nlu`. Explicador: Space `backend/hf_space_explica/`
     + `HF_ASK_SPACE_URL` quando o modelo ajustado passar nos gates.
-11. Licença da base Qwen2.5 no model card; relato privado de vulnerabilidades (*Settings › Security*); passada de acessibilidade (TalkBack) e tablets.
+11. Colher e revisar os sinais do Redis (expiram em 90 dias; segredos do Upstash com o mantenedor) e, com um lote de perguntas pós-eleição, re-medir o v3.4 antes de decidir qualquer retreino; reduzir o cron do `data_refresh` (hoje 30 min) depois que o TSE publicar o CSV do 2º turno; ligar ou desligar a avaliação noturna (segredos do Modal vazios); revisar os PRs do Dependabot segurados no congelamento.
+12. Licença da base Qwen2.5 no model card; relato privado de vulnerabilidades (*Settings › Security*); passada de acessibilidade (TalkBack) e tablets.
 
 ## 10. Segredos e backups (nunca no Git)
 `secrets/upload-keystore.p12` + `keystore.properties` (chave de **upload** do Play), `secrets/data_signing_key.pem` (assinatura dos **dados**; chave pública em `pipeline/data_signing_public.pem`), `secrets/hf_token.txt` (token do Space), `secrets/upstash.env` (URL e token do Redis). A pasta `secrets/` é ignorada pelo Git. Faça backup offline das chaves de assinatura.
 
-## 11. Histórico recente (05 a 22/10/2026)
+## 11. Histórico recente (05 a 26/10/2026)
+- **26/10 (pós-eleição, descongelamento autorizado pelo mantenedor):** auditoria de leitura mostrou que as respostas ainda falavam do 2º turno no futuro ("haverá 2º turno…
+  votação em 25/10") e, sem a apuração ao vivo, "disputam o 2º turno". Correções com TDD nos dois clientes (web + Kotlin, paridade): `segundoTurno` consulta a apuração do
+  turno 2 e fala no passado ("Houve 2º turno… ELEITO(A)"); CSV/panorama dizem "o 2º turno ocorreu em 25/10… resultado em resultados.tse.jus.br"; local de votação em
+  `POS_ELEICAO` vira título/justificativa (03/12 e 08/01)/multa (CE arts. 7º e 71); calendário ganha prestação de contas (03/11 e 14/11, Lei 9.504 art. 29), diplomação
+  (até 18/12, Res. TSE 23.760/2026) e posse do Legislativo (1º/02/2027); contexto da IA generativa por fase ("ocorreu"); **resultado por candidato** ("Lula foi eleito?",
+  "quantos votos o X teve no 2º turno?") pela apuração ao vivo ou pelo pacote; NLU: "novo presidente", "a eleição acabou?", "abstenção" (aviso de que o app não traz o
+  total), "o X ganhou?" → RESULTADOS; "nunca foram eleitos" volta a ser histórico. Golden 127 casos. `tools/frescor.py`: limite de 14 dias em `POS_ELEICAO` (o TSE parou o
+  consulta_cand em 25/10 12:30 e a issue abriria toda noite). Privacidade 1.5. Pendente: Android versionCode 7 (teste no aparelho pelo mantenedor).
+- **25/10 (dia do 2º turno, `[congelamento-ok]`, 6efc64a):** perguntas de status da votação/apuração (`RX_RESULTADOS`, `panoramaResultados`) e o `data_refresh` passou a
+  publicar quando a fase muda ou quando `HEAD` ≠ versão publicada (pedido do mantenedor). Registrado aqui em 26/10.
 - **22/10 (manhã):** mantenedor: "no eleições ainda aparece como IA da nuvem o Qwen; ajustar para usar a IA treinada". (1) **Rótulos** (0d7ef34): site e
   Android deixam de dizer "Qwen" fixo e mostram o `model` devolvido pelo servidor (`rotuloOrigem()` em answers.js + `modelo` na resposta GENERATIVA;
   Android `CloudAskClient.gerar()` + `HybridAiInferenceEngine.fonteGerada()` — entra no release 7). API: padrão do Space HF passa a "SaibaTudo IA".

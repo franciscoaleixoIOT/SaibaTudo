@@ -1,17 +1,17 @@
 # Operação — SaibaTudo Eleições 2026
 
 > **Este é o documento de estado atual da operação.** [`PROJECT_MEMORY.md`](PROJECT_MEMORY.md) é a memória completa do projeto (processo de publicação, testes,
-> decisões e observações) e [`PLANO_PRODUCAO.md`](PLANO_PRODUCAO.md) é o histórico de 01 a 03/10/2026. Atualizado em **09/10/2026**, entre o 1º turno (04/10) e o 2º (25/10).
+> decisões e observações) e [`PLANO_PRODUCAO.md`](PLANO_PRODUCAO.md) é o histórico de 01 a 03/10/2026. Atualizado em **26/10/2026**, pós-eleição (1º turno em 04/10, 2º em 25/10; congelamento encerrado).
 
 ## 1. O que roda, onde e com que cadência
 
 | Peça | Onde | Cadência / gatilho | Quem avisa se quebrar |
 | :-- | :-- | :-- | :-- |
-| Atualização dos dados | GitHub Actions `eleicoes-data-refresh.yml` | **a cada 30 min**, o ano todo; só reconstrói e publica se uma fonte do TSE mudou (ETag) | `eleicoes-data-freshness.yml` abre a issue `alerta-dados` |
-| Alerta de frescor | `eleicoes-data-freshness.yml` + `tools/frescor.py` | a cada 30 min | issue automática + job vermelho na aba Actions |
+| Atualização dos dados | GitHub Actions `eleicoes-data-refresh.yml` | **a cada 30 min**, o ano todo; reconstrói e publica se uma fonte do TSE mudou (ETag), se a fase eleitoral mudou **ou se o commit da `main` difere do publicado** (desde 25/10, pedido do mantenedor: push na `main` vai ao ar em até 30 min) | `eleicoes-data-freshness.yml` abre a issue `alerta-dados` |
+| Alerta de frescor | `eleicoes-data-freshness.yml` + `tools/frescor.py` | a cada 30 min; extração do TSE mais velha que 30 h alerta, mas em `POS_ELEICAO` o limite é 14 dias (o TSE para de regerar o consulta_cand depois da eleição) | issue automática + job vermelho na aba Actions |
 | Snapshot versionado do pacote | passo final do `data_refresh` | no máximo **1 commit/dia** (ou `workflow_dispatch` com `commit_snapshot`) | — |
 | Site/PWA e API | Vercel (Hobby), `saibatudo.net` | deploy a cada publicação de dados | `GET /api/health` |
-| IA de interpretação (NLU) | Modal, CPU, `saibatudo-nlu` (modelo `v2.3-20261007`, treinado e convertido localmente) | quando o NLU local não entendeu (com consentimento) ou quando a pessoa toca em "Perguntar à IA na nuvem" | `GET /api/health` (`nlu`, `model`) |
+| IA de interpretação (NLU) | Modal, CPU, app `SaibaTudoIA-NLU-Eleicoes` (modelo `nlu-v3.4-20261017`, treinado e convertido localmente; o app antigo `saibatudo-nlu`/v2.3 é a reserva) | quando o NLU local não entendeu (com consentimento) ou quando a pessoa toca em "Perguntar à IA na nuvem" | `GET /api/health` (`nlu`, `model`) |
 | IA generativa (`/api/ask`) | Space no ZeroGPU do Hugging Face (principal) e Modal, GPU L4 (reserva, 15/dia) | **LIGADA desde 07/10/2026** (ver §4); só quando a pessoa toca em "Gerar explicação com IA" | `GET /api/health` (`ask`) |
 | Captura de perguntas não entendidas (`/api/melhoria`) | Vercel + Redis (Upstash) | **LIGADA no servidor desde 06/10/2026**, mas só envia quem ligar a opção no app (desligada por padrão; ver §7) | `GET /api/health` (`melhoria`) |
 | Avaliação noturna do modelo | GitHub Actions `eleicoes-nightly-eval.yml` | 03:00 de Brasília; painel na branch `metrics` | issue `alerta-ia` |
@@ -77,7 +77,11 @@ na Vercel e fazer redeploy. **Antes**, acrescente o Upstash aos operadores (§7)
 instalação passam a ficar ali por até 1 dia. Falha aberto: se o Redis cair, vale só o limite local. **Não foi testado contra um Redis real**, só contra
 um simulado; faça um teste de fumaça (`curl` repetido em `/api/nlu` e `/api/health` mostrando `"shared":"on"`).
 
-## 6. Congelamento do 2º turno (24 a 26/10/2026)
+## 6. Congelamento do 2º turno (24 a 26/10/2026) — encerrado em 26/10/2026
+
+**Encerrado em 26/10/2026** com o fim das eleições, por decisão do mantenedor: o merge 1bf75fa2 e as correções pós-eleição usaram `[congelamento-ok]` com o motivo na mensagem.
+Fora da janela a guarda passa sozinha. O que segue vale como registro para a próxima eleição.
+
 
 Nada que decida o que o eleitor lê muda nesses três dias: modelo, NLU, respostas, API, pipeline, contratos, workflows e app. **Dados, documentação,
 métricas e testes seguem livres.** O workflow `eleicoes-congelamento.yml` roda `tools/congelamento.mjs` em todo push e PR e falha se algum arquivo protegido
