@@ -83,6 +83,10 @@ class Pacote(unittest.TestCase):
             gravado = json.loads((saida / "manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(gravado["files"]["vetores.i8"]["bytes"], 150)
             self.assertEqual(len(gravado["files"]["vetores.i8"]["sha256"]), 64)
+            # bytes assinados têm de ser os mesmos em qualquer plataforma: sem CRLF (o Git normaliza para LF; o Windows gravaria \r\n)
+            self.assertNotIn(b"\r", (saida / "manifest.json").read_bytes())
+            self.assertNotIn(b"\r", (saida / "manifest.sig").read_bytes())
+            self.assertTrue((saida / "manifest.json").read_bytes().endswith(b"}\n"))
 
 
 class Fontes(unittest.TestCase):

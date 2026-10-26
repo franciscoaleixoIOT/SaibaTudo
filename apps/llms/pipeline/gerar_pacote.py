@@ -109,7 +109,7 @@ def escrever_pacote(saida: Path, palavras: list[str], matriz: np.ndarray, glossa
         },
     }
     caminho = saida / "manifest.json"
-    caminho.write_text(json.dumps(manifesto, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    caminho.write_text(json.dumps(manifesto, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")  # LF em qualquer SO: bytes assinados
     sign.assinar(caminho, Path(chave_privada))
     return manifesto
 

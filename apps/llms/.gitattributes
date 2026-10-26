@@ -1,0 +1,3 @@
+# O pacote de dados é assinado byte a byte: o Git não pode converter fim de linha (CRLF/LF) em nenhum destes arquivos.
+data/llms/** -text
+web/test/fixtures/data-llms/** -text

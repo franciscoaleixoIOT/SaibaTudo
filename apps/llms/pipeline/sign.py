@@ -37,7 +37,7 @@ def gerar(priv: Path, pub: Path):
 def assinar(manifest: Path, priv: Path):
     sk = SigningKey.from_pem(Path(priv).read_bytes())
     sig = sk.sign(Path(manifest).read_bytes(), hashfunc=hashlib.sha256, sigencode=sigencode_der)
-    Path(manifest).with_name("manifest.sig").write_text(base64.b64encode(sig).decode() + "\n", encoding="utf-8")
+    Path(manifest).with_name("manifest.sig").write_text(base64.b64encode(sig).decode() + "\n", encoding="utf-8", newline="\n")
 
 
 def verificar(manifest: Path, pub: Path) -> bool:
