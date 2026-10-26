@@ -543,8 +543,10 @@ export class AnswerBuilder {
       `1º turno: ${d1}\n` +
       `2º turno: ${d2} — só onde houver (Presidente e Governador)\n` +
       `Horário de votação: ${horarioVotacao}\n` +
-      'Posse: Presidente em 05/01/2027; Governadores em 06/01/2027 (EC 111/2021)\n' +
-      `Demais prazos (prestação de contas, diplomação etc.): calendário oficial do TSE — ${URL_CALENDARIO_TSE}`;
+      'Prestação de contas final: até 03/11/2026 (1º turno) e 14/11/2026 (2º turno) — Lei 9.504/1997, art. 29\n' +
+      'Diplomação dos eleitos: até 18/12/2026 (Res. TSE 23.760/2026)\n' +
+      'Posse: Presidente em 05/01/2027; Governadores em 06/01/2027 (EC 111/2021); Deputados e Senadores em 1º/02/2027\n' +
+      `Demais prazos: calendário oficial do TSE — ${URL_CALENDARIO_TSE}`;
     return resposta({
       targetRoute: 'info/calendario', menuId: MENU.CALENDARIO, intent: 'CALENDARIO', directAnswer: texto,
       suggestedQuestions: ['Onde consultar meu local de votação?', 'Quem disputa a Presidência?'],
@@ -594,6 +596,20 @@ export class AnswerBuilder {
       });
     }
 
+    if (this.fase.id === 'POS_ELEICAO') {
+      // eleição encerrada (26/10/2026): o que resta ao eleitor é justificar, pagar multa e regularizar o título
+      return resposta({
+        targetRoute: 'info/locais', menuId: MENU.LOCAIS_VOTACAO, intent: 'LOCAL_VOTACAO',
+        directAnswer: 'Título de eleitor e justificativa depois das Eleições 2026 (sistemas oficiais):\n' +
+          `• As votações ocorreram em ${dataBr(this.regras.turno1)} (1º turno) e ${dataBr(this.regras.turno2)} (2º turno, onde houve)\n` +
+          `• Justificar a ausência: separadamente por turno, pelo app e-Título ou pelo Autoatendimento Eleitoral (${URL_AUTOATENDIMENTO_ELEITOR}) — até 03/12/2026 (1º turno) e 08/01/2027 (2º turno)\n` +
+          '• Quem não votou nem justificou no prazo paga multa por turno (Código Eleitoral, art. 7º), pelo Autoatendimento Eleitoral; cada turno conta como uma eleição, e três eleições seguidas sem votar nem justificar cancelam o título (art. 71, V)\n' +
+          '• Situação do título, quitação eleitoral e regularização: Autoatendimento Eleitoral ou app e-Título\n' +
+          'O app não consulta dados pessoais do eleitor.',
+        suggestedQuestions: ['Calendário eleitoral 2026', 'Quem foi eleito presidente?'],
+        fonte: 'Fonte: TSE – Autoatendimento Eleitoral; Código Eleitoral (Lei 4.737/1965), arts. 7º e 71.', origem: this.origem
+      });
+    }
     return resposta({
       targetRoute: 'info/locais', menuId: MENU.LOCAIS_VOTACAO, intent: 'LOCAL_VOTACAO',
       directAnswer: 'Onde votar e situação do título (sistemas oficiais):\n' +
@@ -992,8 +1008,14 @@ export class AnswerBuilder {
   // ------------------------------------------------------------------ resultados
 
   async resultados(p) {
-
     const textoNorm = normalizar(p.textoOriginal ?? '');
+    const r = await this.resultadosSemAviso(p, textoNorm);
+    // abstenção/comparecimento/brancos e nulos: o app não traz esses totais (nem do pacote nem da apuração) — diz isso em vez de ignorar (26/10/2026)
+    if (!/\babstenc|\bcomparecimento\b|\bbrancos? e nulos\b|\bvotos (brancos|nulos)\b/.test(textoNorm)) return r;
+    return { ...r, directAnswer: `Abstenção, comparecimento e votos brancos e nulos: o app não traz esses totais; consulte ${URL_RESULTADOS_TSE}\n\n${r.directAnswer}` };
+  }
+
+  async resultadosSemAviso(p, textoNorm) {
     // "deputado mais votado" sem federal/estadual: a Câmara é o padrão e o aviso oferece a Assembleia (antes o app pedia o cargo
     // de novo, e a IA da nuvem recebia esse pedido como contexto e dizia que não tinha o dado — 11/10/2026)
     const generico = p.cargo == null && /\bdeputad[oa]s?\b/.test(textoNorm) ? 'DEPUTADO_FEDERAL' : null;
@@ -1007,6 +1029,11 @@ export class AnswerBuilder {
           `Os resultados oficiais são divulgados pelo TSE em ${URL_RESULTADOS_TSE} e aparecerão aqui durante a apuração.`,
         suggestedQuestions: ['Calendário eleitoral 2026', 'Quem disputa a Presidência?'], fonte: this.fonte, origem: this.origem
       });
+    }
+    // "Lula foi eleito?", "quantos votos o X teve no 2º turno?": resultado do candidato citado (apuração ao vivo ou pacote) — 26/10/2026
+    if (p.nome != null || p.numero != null) {
+      const porCandidato = await this.resultadoCandidato(p, abrir);
+      if (porCandidato) return porCandidato;
     }
     const cargosValidos = ['PRESIDENTE', 'GOVERNADOR', 'SENADOR', 'DEPUTADO_FEDERAL', 'DEPUTADO_ESTADUAL', 'DEPUTADO_DISTRITAL'];
     if (cargo == null || !cargosValidos.includes(cargo)) return this.panoramaResultados(p, abrir);
@@ -1035,6 +1062,54 @@ export class AnswerBuilder {
     const comVotos = Boolean(ap && apTemVotos(ap));
     const r = comVotos ? this.respostaApuracao(p, ap, abrir) : this.respostaResultadosCsv(p, cargoConsulta, uf, turno, abrir);
     return anotarResultado(r, { generico, uf, maisVotado: comVotos && /mais votad/.test(textoNorm) ? decrescente(ap.linhas, (l) => l.votos)[0] : null });
+  }
+
+  /** Resultado de UM candidato citado pela pergunta: linha dele na apuração ao vivo (turno pedido; Executivo depois do 1º turno: 2º, senão 1º)
+   *  ou, sem apuração, o que o pacote (CSV oficial do TSE) traz. null quando o nome não identifica um candidato (segue o fluxo por cargo). */
+  async resultadoCandidato(p, fi) {
+    const c = this.escolher(this.localizar(p), p.nome);
+    if (!c) return null;
+    const cargo = c.cargoCodigo;
+    const uf = c.estadoUf;
+    const ehLegislativo = ['SENADOR', 'DEPUTADO_FEDERAL', 'DEPUTADO_ESTADUAL', 'DEPUTADO_DISTRITAL'].includes(cargo);
+    const depoisDo1T = ['ENTRE_TURNOS', 'DIA_2T', 'POS_ELEICAO'].includes(this.fase.id);
+    const turno = ehLegislativo ? 1 : (p.turno ?? (depoisDo1T ? 2 : 1));
+    let ap = await this.obterApuracao(cargo, uf, turno);
+    if (!(ap && apTemVotos(ap)) && turno === 2 && p.turno == null) ap = await this.obterApuracao(cargo, uf, 1);
+    const onde = uf !== 'BR' ? ` ${ufEm(uf)}` : '';
+    const cabeca = `${c.nomeUrna} (${c.partido}, nº ${c.numero}) — ${tituloCargo(cargo)}${onde}`;
+    const linha = ap && apTemVotos(ap) ? ap.linhas.find((l) => l.sqCandidato === c.id || igualSemCaixa(l.nome, c.nomeUrna)) ?? null : null;
+    const base = { targetRoute: 'info/resultados', menuId: MENU.RESULTADOS, intent: p.intent, filters: fi, abrirResultados: true, candidateIds: [c.id], origem: this.origem,
+      suggestedQuestions: [`Resultado para ${tituloCargo(cargo)}${uf !== 'BR' ? ` em ${uf}` : ''}`, 'Calendário eleitoral 2026'] };
+    if (linha) {
+      const ord = decrescente(ap.linhas, (l) => l.votos);
+      const situacao = linha.eleito ? ' — ELEITO' : (linha.segundoTurno ? ' — 2º TURNO' : (ap.totalizacaoFinal ? ' — NÃO ELEITO' : ''));
+      const andamento = ap.totalizacaoFinal ? 'Totalização final.'
+        : 'Apuração em andamento' + (ap.secoesTotalizadasPct != null ? ` (${ap.secoesTotalizadasPct}% das seções totalizadas)` : '') + '.';
+      return resposta({ ...base, apuracao: ap,
+        directAnswer: `${cabeca}, ${ap.turno}º turno: ${inteiro(linha.votos)} votos${linha.percentual != null ? ` (${linha.percentual}%)` : ''}${situacao}\n` +
+          `• ${ord.indexOf(linha) + 1}º colocado(a) entre ${ap.linhas.length} na apuração. ${andamento}\n` +
+          `Dados divulgados pelo TSE em ${ap.geradoEm}; números exibidos como publicados (${URL_RESULTADOS_TSE}).`,
+        fonte: 'Fonte: TSE – resultados.tse.jus.br (ao vivo), consultado agora.' });
+    }
+    const r = c.resultado;
+    if (!r) {
+      return resposta({ ...base, directAnswer: `${cabeca}: ainda não há resultado oficial publicado para este candidato (pacote de dados e apuração ao vivo do TSE).\n` +
+        `A apuração é divulgada em ${URL_RESULTADOS_TSE}.`, fonte: this.fonte });
+    }
+    const turnos = Object.keys(r.turnos ?? {}).sort().map((n) => {
+      const t = r.turnos[n];
+      return `${n}º turno: ${t.votos != null ? `${inteiro(t.votos)} votos` : 'votos não publicados no pacote'}` +
+        `${t.percentual != null ? ` (${decimal2(t.percentual)}%)` : ''}${t.situacao ? ` — ${String(t.situacao).toUpperCase()}` : ''}`;
+    });
+    let texto = turnos.length > 0 ? `${cabeca}, ${turnos.join('; ')}` : `${cabeca}`;
+    if (r.situacaoTotalizacao) texto += `\n• Situação na totalização oficial do TSE: ${r.situacaoTotalizacao}`;
+    if (resultadoSegundoTurno(r) && r.turnos?.[2] == null) {
+      texto += this.fase.id === 'POS_ELEICAO'
+        ? `\n• O 2º turno ocorreu em ${dataBr(this.regras.turno2)}; não foi possível consultar agora a apuração oficial do TSE — resultado em ${URL_RESULTADOS_TSE}`
+        : `\n• Disputa o 2º turno em ${dataBr(this.regras.turno2)}`;
+    }
+    return resposta({ ...base, directAnswer: texto, fonte: this.fonte });
   }
 
   /** Panorama geral da votação/apuração quando a pergunta não especifica o cargo (ex.: "qual status das votação atual", "como está a apuração"). */
@@ -1076,7 +1151,10 @@ export class AnswerBuilder {
         linhaPres = `• Presidente da República: ${elPres.numero} — ${elPres.nomeUrna} (${elPres.partido}) — ELEITO segundo o TSE`;
         ids.push(elPres.id);
       } else if (clPres.length >= 2) {
-        linhaPres = `• Presidente da República (2º turno): disputam ${clPres.slice(0, 2).map((c) => `${c.numero} — ${c.nomeUrna} (${c.partido})`).join(' e ')}`;
+        const dupla = clPres.slice(0, 2).map((c) => `${c.numero} — ${c.nomeUrna} (${c.partido})`).join(' e ');
+        linhaPres = this.fase.id === 'POS_ELEICAO'
+          ? `• Presidente da República: 2º turno em ${dataBr(this.regras.turno2)} entre ${dupla} — resultado oficial em ${URL_RESULTADOS_TSE} (apuração ao vivo indisponível agora)`
+          : `• Presidente da República (2º turno): disputam ${dupla}`;
         ids.push(...clPres.slice(0, 2).map((c) => c.id));
       } else {
         linhaPres = `• Presidente da República: apuração divulgada em tempo real pelo TSE em ${URL_RESULTADOS_TSE}`;
@@ -1098,7 +1176,10 @@ export class AnswerBuilder {
         if (elGov) {
           linhaGov = `\n• Governador (${uf}): ${elGov.numero} — ${elGov.nomeUrna} (${elGov.partido}) — ELEITO segundo o TSE`;
         } else if (clGov.length >= 2) {
-          linhaGov = `\n• Governador (${uf} — 2º turno): disputam ${clGov.slice(0, 2).map((c) => `${c.numero} — ${c.nomeUrna} (${c.partido})`).join(' e ')}`;
+          const duplaG = clGov.slice(0, 2).map((c) => `${c.numero} — ${c.nomeUrna} (${c.partido})`).join(' e ');
+          linhaGov = this.fase.id === 'POS_ELEICAO'
+            ? `\n• Governador (${uf}): 2º turno em ${dataBr(this.regras.turno2)} entre ${duplaG} — resultado oficial em ${URL_RESULTADOS_TSE} (apuração ao vivo indisponível agora)`
+            : `\n• Governador (${uf} — 2º turno): disputam ${duplaG}`;
         }
       }
     }
@@ -1173,8 +1254,11 @@ export class AnswerBuilder {
       // listava só os "NÃO ELEITO" e omitia justamente quem disputa (19/10/2026).
       const classificados = decrescente(daqui.filter((c) => resultadoSegundoTurno(c.resultado)), (c) => c.resultado.turnos?.[1]?.votos ?? 0);
       if (classificados.length >= 2) {
-        texto = `Ninguém foi eleito no 1º turno para ${tituloCargo(cargo)}${onde}; disputam o 2º turno (${dataBr(this.regras.turno2)}), segundo o TSE:` +
-          classificados.map((c) => `\n• ${c.numero} — ${c.nomeUrna} (${c.partido})`).join('');
+        const lista = classificados.map((c) => `\n• ${c.numero} — ${c.nomeUrna} (${c.partido})`).join('');
+        texto = this.fase.id === 'POS_ELEICAO'
+          ? `O 2º turno para ${tituloCargo(cargo)}${onde} ocorreu em ${dataBr(this.regras.turno2)} entre os classificados no 1º turno, segundo o TSE:${lista}` +
+            `\nNão foi possível consultar agora a apuração oficial do 2º turno; o resultado está em ${URL_RESULTADOS_TSE}`
+          : `Ninguém foi eleito no 1º turno para ${tituloCargo(cargo)}${onde}; disputam o 2º turno (${dataBr(this.regras.turno2)}), segundo o TSE:${lista}`;
       } else {
         texto = `O TSE já publicou a situação de totalização, mas ainda não há eleito definido para ${tituloCargo(cargo)}${onde}:` +
           daqui.filter((c) => c.resultado?.situacaoTotalizacao != null).slice(0, 6)
@@ -1246,9 +1330,31 @@ export class AnswerBuilder {
   statusSegundoTurnoPacote(cargo, uf) {
     const daqui = this.data.candidatos.filter((c) => c.cargoCodigo === cargo && c.estadoUf === uf && c.resultado != null);
     const eleito = daqui.find((c) => resultadoEleitoNoPrimeiroTurno(c.resultado));
-    if (eleito) return `Não haverá 2º turno — ${eleito.nomeUrna} (${eleito.partido}) foi eleito(a) em 1º turno`;
+    const pos = this.fase.id === 'POS_ELEICAO';
+    if (eleito) return `${pos ? 'Não houve' : 'Não haverá'} 2º turno — ${eleito.nomeUrna} (${eleito.partido}) foi eleito(a) em 1º turno`;
     const cl = decrescente(daqui.filter((c) => resultadoSegundoTurno(c.resultado)), (c) => c.resultado.turnos?.[1]?.votos ?? 0);
-    return cl.length >= 2 ? `Sim, haverá 2º turno entre ${cl[0].nomeUrna} (${cl[0].partido}) e ${cl[1].nomeUrna} (${cl[1].partido})` : null;
+    if (cl.length < 2) return null;
+    const dupla = `${cl[0].nomeUrna} (${cl[0].partido}) e ${cl[1].nomeUrna} (${cl[1].partido})`;
+    return pos ? `Houve 2º turno entre ${dupla} — resultado oficial em ${URL_RESULTADOS_TSE}` : `Sim, haverá 2º turno entre ${dupla}`;
+  }
+
+  /** 2º turno já ocorrido e com apuração ao vivo do turno 2: eleito(a), colocados e andamento, no passado (POS_ELEICAO). */
+  segundoTurnoOcorrido(rotuloCargo, ap2) {
+    const ord = decrescente(ap2.linhas, (l) => l.votos);
+    const el = ord.find((l) => l.eleito) ?? null;
+    const andamento = ap2.totalizacaoFinal ? 'Totalização final'
+      : 'Apuração em andamento' + (ap2.secoesTotalizadasPct != null ? ` (${ap2.secoesTotalizadasPct}% das seções totalizadas)` : '');
+    const linha = (l, i) => `  ${i + 1}º: ${l.nome} (${l.partido}) — ${l.percentual}% (${inteiro(l.votos)} votos)${l.eleito ? ' — ELEITO' : ''}`;
+    return resposta({
+      targetRoute: 'info/resultados', menuId: MENU.RESULTADOS, intent: 'SEGUNDO_TURNO', abrirResultados: true, apuracao: ap2,
+      directAnswer: `Houve 2º turno para ${rotuloCargo} em ${dataBr(this.regras.turno2)}.\n` +
+        (el ? `• ELEITO(A): ${el.nome} (${el.partido}) — ${el.percentual}% dos votos válidos (${inteiro(el.votos)} votos)\n` : '') +
+        `• ${andamento}:\n${ord.slice(0, 2).map(linha).join('\n')}\n` +
+        `• Dados divulgados pelo TSE em ${ap2.geradoEm}; números exibidos como publicados (${URL_RESULTADOS_TSE})`,
+      candidateIds: ord.slice(0, 2).map((l) => l.sqCandidato).filter((id) => id && this.data.porId.has(id)),
+      suggestedQuestions: ['Resultado para Presidente', 'Calendário eleitoral 2026'],
+      fonte: 'Fonte: TSE – resultados.tse.jus.br (ao vivo), consultado agora.', origem: this.origem
+    });
   }
 
   async segundoTurno(p) {
@@ -1279,6 +1385,16 @@ export class AnswerBuilder {
       const onde = uf && uf !== 'BR' ? ` ${ufEm(uf)}` : '';
       const rotuloCargo = cargo === 'PRESIDENTE' ? 'Presidente da República' : `Governador${onde}`;
 
+      const pos = this.fase.id === 'POS_ELEICAO';
+      // 2º turno já realizado: primeiro a apuração ao vivo do turno 2 (eleito(a) e colocados), no passado (26/10/2026)
+      if (pos) {
+        const ap2 = await this.obterApuracao(cargo, uf ?? 'BR', 2);
+        if (ap2 && apTemVotos(ap2)) return this.segundoTurnoOcorrido(rotuloCargo, ap2);
+      }
+      const naoHouve = pos ? 'Não houve' : 'Não haverá';
+      const rodape2T = pos
+        ? `• Não foi possível consultar agora a apuração oficial do 2º turno; o resultado está em ${URL_RESULTADOS_TSE}`
+        : `• Votação do 2º turno: ${dataTurno2}, das 8h às 17h (horário de Brasília)`;
       // Tenta apuração ao vivo do 1º turno (ou dados do pacote)
       let ap = await this.obterApuracao(cargo, uf ?? 'BR', 1);
       const daqui = this.data.candidatos.filter((c) => c.cargoCodigo === cargo && c.estadoUf === (uf ?? 'BR') && c.resultado != null);
@@ -1290,7 +1406,7 @@ export class AnswerBuilder {
         if (tipo === 'ELEITO') {
           return resposta({
             targetRoute: 'info/resultados', menuId: MENU.RESULTADOS, intent: 'SEGUNDO_TURNO', abrirResultados: true, apuracao: ap,
-            directAnswer: `Não haverá 2º turno para ${rotuloCargo}.\n` +
+            directAnswer: `${naoHouve} 2º turno para ${rotuloCargo}.\n` +
               `• ${l1.nome} (${l1.partido}) foi eleito(a) em 1º turno com ${l1.percentual}% dos votos válidos (${inteiro(l1.votos)} votos)\n` +
               (maioria ? '• Como obteve a maioria absoluta dos votos válidos (mais de 50%), a eleição foi liquidada em turno único'
                 : '• Situação informada pela apuração oficial do TSE'),
@@ -1302,12 +1418,12 @@ export class AnswerBuilder {
         if (tipo === 'SEGUNDO') {
           return resposta({
             targetRoute: 'info/resultados', menuId: MENU.RESULTADOS, intent: 'SEGUNDO_TURNO', abrirResultados: true, apuracao: ap,
-            directAnswer: `Sim, haverá 2º turno para ${rotuloCargo}.\n` +
+            directAnswer: (pos ? `Houve 2º turno para ${rotuloCargo} em ${dataTurno2}.\n` : `Sim, haverá 2º turno para ${rotuloCargo}.\n`) +
               '• Nenhum candidato alcançou mais de 50% dos votos válidos no 1º turno\n' +
-              '• Disputam o 2º turno os dois candidatos mais votados:\n' +
+              `• ${pos ? 'Disputaram' : 'Disputam'} o 2º turno os dois candidatos mais votados no 1º turno:\n` +
               `  1º: ${l1.nome} (${l1.partido}) — ${l1.percentual}% (${inteiro(l1.votos)} votos)\n` +
               `  2º: ${l2.nome} (${l2.partido}) — ${l2.percentual}% (${inteiro(l2.votos)} votos)\n` +
-              `• Votação do 2º turno: ${dataTurno2}, das 8h às 17h (horário de Brasília)`,
+              rodape2T,
             candidateIds: [l1.sqCandidato, l2.sqCandidato].filter((id) => id && this.data.porId.has(id)),
             suggestedQuestions: [`Pesquisas para ${tituloCargo(cargo)}`, 'Calendário eleitoral 2026'], fonte: this.fonte, origem: this.origem
           });
@@ -1332,7 +1448,7 @@ export class AnswerBuilder {
         const el = eleitos[0];
         return resposta({
           targetRoute: 'info/resultados', menuId: MENU.RESULTADOS, intent: 'SEGUNDO_TURNO', abrirResultados: true,
-          directAnswer: `Não haverá 2º turno para ${rotuloCargo}.\n` +
+          directAnswer: `${naoHouve} 2º turno para ${rotuloCargo}.\n` +
             `• ${el.nomeUrna} (${el.partido}) foi eleito(a) em 1º turno segundo os dados oficiais do TSE\n` +
             '• A eleição está definida sem necessidade de 2º turno',
           candidateIds: [el.id],
@@ -1350,12 +1466,12 @@ export class AnswerBuilder {
         };
         return resposta({
           targetRoute: 'info/resultados', menuId: MENU.RESULTADOS, intent: 'SEGUNDO_TURNO', abrirResultados: true,
-          directAnswer: `Sim, haverá 2º turno para ${rotuloCargo}.\n` +
+          directAnswer: (pos ? `Houve 2º turno para ${rotuloCargo} em ${dataTurno2}.\n` : `Sim, haverá 2º turno para ${rotuloCargo}.\n`) +
             '• Nenhum candidato alcançou mais de 50% dos votos válidos no 1º turno\n' +
-            '• Disputam o 2º turno, segundo a totalização oficial do TSE:\n' +
+            `• ${pos ? 'Disputaram' : 'Disputam'} o 2º turno, segundo a totalização oficial do TSE:\n` +
             `  1º: ${linha(classificados[0])}\n` +
             `  2º: ${linha(classificados[1])}\n` +
-            `• Votação do 2º turno: ${dataTurno2}, das 8h às 17h (horário de Brasília)`,
+            rodape2T,
           candidateIds: classificados.slice(0, 2).map((c) => c.id),
           suggestedQuestions: [`Pesquisas para ${tituloCargo(cargo)}`, 'Calendário eleitoral 2026'], fonte: this.fonte, origem: this.origem
         });
@@ -1367,7 +1483,8 @@ export class AnswerBuilder {
           targetRoute: 'info/resultados', menuId: MENU.RESULTADOS, intent: 'SEGUNDO_TURNO', abrirResultados: true,
           directAnswer: `Segundo turno para ${rotuloCargo}:\n` +
             `• O 1º turno foi em ${dataTurno1}, mas não foi possível consultar agora a apuração oficial do TSE para confirmar o resultado\n` +
-            `• Há 2º turno quando nenhum candidato obtém mais de 50% dos votos válidos; se houver, a votação é em ${dataTurno2}\n` +
+            (pos ? `• Há 2º turno quando nenhum candidato obtém mais de 50% dos votos válidos; onde houve, a votação foi em ${dataTurno2}\n`
+              : `• Há 2º turno quando nenhum candidato obtém mais de 50% dos votos válidos; se houver, a votação é em ${dataTurno2}\n`) +
             `• Confira em ${URL_RESULTADOS_TSE} ou tente de novo em instantes`,
           suggestedQuestions: [`Resultado para ${tituloCargo(cargo)}${cargo === 'GOVERNADOR' && uf ? ` em ${uf}` : ''}`, 'Calendário eleitoral 2026'],
           fonte: this.fonte, origem: this.origem
@@ -1390,17 +1507,31 @@ export class AnswerBuilder {
 
     // 3. Pergunta genérica (sem cargo): dá overview completo para a localização do usuário
     const jaVotou = ['ENTRE_TURNOS', 'DIA_2T', 'POS_ELEICAO'].includes(this.fase.id);
+    const pos = this.fase.id === 'POS_ELEICAO';
     const uf = p.uf ?? this.ufPadrao;
     let statusPresidente = null;
     let statusGov = null;
 
-    const apPres = await this.obterApuracao('PRESIDENTE', 'BR', 1);
+    /** Depois do 2º turno: o que a apuração ao vivo do turno 2 diz (eleito(a) ou andamento); null se não respondeu. */
+    const statusTurno2 = async (cargo, ufAp) => {
+      if (!pos) return null;
+      const ap2 = await this.obterApuracao(cargo, ufAp, 2);
+      if (!(ap2 && apTemVotos(ap2))) return null;
+      const ord = decrescente(ap2.linhas, (l) => l.votos);
+      const el = ord.find((l) => l.eleito);
+      if (el) return `Houve 2º turno em ${dataTurno2} — ${el.nome} (${el.partido}) eleito(a) com ${el.percentual}% dos votos válidos`;
+      return `Houve 2º turno em ${dataTurno2} — apuração em andamento${ap2.secoesTotalizadasPct != null ? ` (${ap2.secoesTotalizadasPct}%)` : ''}: ${ord[0].nome} (${ord[0].percentual}%) e ${ord[1]?.nome ?? '—'} (${ord[1]?.percentual ?? '—'}%)`;
+    };
+
+    statusPresidente = await statusTurno2('PRESIDENTE', 'BR');
+    const apPres = statusPresidente ? null : await this.obterApuracao('PRESIDENTE', 'BR', 1);
     if (apPres && apTemVotos(apPres)) {
       const { tipo, l1, l2 } = leituraSegundoTurno(apPres);
       if (tipo === 'ELEITO') {
-        statusPresidente = `Não haverá 2º turno — ${l1.nome} (${l1.partido}) foi eleito(a) em 1º turno (${l1.percentual}%)`;
+        statusPresidente = `${pos ? 'Não houve' : 'Não haverá'} 2º turno — ${l1.nome} (${l1.partido}) foi eleito(a) em 1º turno (${l1.percentual}%)`;
       } else if (tipo === 'SEGUNDO') {
-        statusPresidente = `Sim, haverá 2º turno entre ${l1.nome} (${l1.percentual}%) e ${l2.nome} (${l2.percentual}%)`;
+        statusPresidente = pos ? `Houve 2º turno entre ${l1.nome} (${l1.percentual}% no 1º turno) e ${l2.nome} (${l2.percentual}%) — resultado oficial em ${URL_RESULTADOS_TSE}`
+          : `Sim, haverá 2º turno entre ${l1.nome} (${l1.percentual}%) e ${l2.nome} (${l2.percentual}%)`;
       } else if (tipo === 'ANDAMENTO') {
         statusPresidente = `Apuração em andamento (${apPres.secoesTotalizadasPct ?? '0'}%) — liderança de ${l1.nome} (${l1.percentual}%) e ${l2.nome} (${l2.percentual}%)`;
       }
@@ -1413,13 +1544,15 @@ export class AnswerBuilder {
     }
 
     if (uf) {
-      const apGov = await this.obterApuracao('GOVERNADOR', uf, 1);
+      statusGov = await statusTurno2('GOVERNADOR', uf);
+      const apGov = statusGov ? null : await this.obterApuracao('GOVERNADOR', uf, 1);
       if (apGov && apTemVotos(apGov)) {
         const { tipo, l1, l2 } = leituraSegundoTurno(apGov);
         if (tipo === 'ELEITO') {
-          statusGov = `Não haverá 2º turno — ${l1.nome} (${l1.partido}) foi eleito(a) em 1º turno (${l1.percentual}%)`;
+          statusGov = `${pos ? 'Não houve' : 'Não haverá'} 2º turno — ${l1.nome} (${l1.partido}) foi eleito(a) em 1º turno (${l1.percentual}%)`;
         } else if (tipo === 'SEGUNDO') {
-          statusGov = `Sim, haverá 2º turno entre ${l1.nome} (${l1.percentual}%) e ${l2.nome} (${l2.percentual}%)`;
+          statusGov = pos ? `Houve 2º turno entre ${l1.nome} (${l1.percentual}% no 1º turno) e ${l2.nome} (${l2.percentual}%) — resultado oficial em ${URL_RESULTADOS_TSE}`
+            : `Sim, haverá 2º turno entre ${l1.nome} (${l1.percentual}%) e ${l2.nome} (${l2.percentual}%)`;
         } else if (tipo === 'ANDAMENTO') {
           statusGov = `Apuração em andamento (${apGov.secoesTotalizadasPct ?? '0'}%) — parcial: ${l1.nome} (${l1.percentual}%) e ${l2.nome} (${l2.percentual}%)`;
         }
@@ -1433,16 +1566,18 @@ export class AnswerBuilder {
     }
 
     let texto = 'Segundo turno nas Eleições 2026:\n' +
-      `• Só para Presidente e Governador, quando nenhum candidato alcança mais de 50% dos votos válidos no 1º turno (${dataTurno1}). Senadores e Deputados são eleitos em turno único\n` +
+      `• Só para Presidente e Governador, quando nenhum candidato ${pos ? 'alcançou' : 'alcança'} mais de 50% dos votos válidos no 1º turno (${dataTurno1}). Senadores e Deputados são eleitos em turno único\n` +
       `• Presidente da República: ${statusPresidente}\n`;
 
     if (uf) {
       texto += `• Governador (${uf}): ${statusGov}\n`;
     } else {
-      texto += '• Governador: cada estado define individualmente se haverá 2º turno de acordo com os votos válidos locais\n';
+      texto += pos ? '• Governador: cada estado teve ou não 2º turno conforme os votos válidos locais; pergunte "Segundo turno para Governador em SP"\n'
+        : '• Governador: cada estado define individualmente se haverá 2º turno de acordo com os votos válidos locais\n';
     }
 
-    texto += `• Data da votação do 2º turno (onde houver): ${dataTurno2}, das 8h às 17h (horário de Brasília).`;
+    texto += pos ? `• O 2º turno, onde houve, foi em ${dataTurno2}, das 8h às 17h (horário de Brasília).`
+      : `• Data da votação do 2º turno (onde houver): ${dataTurno2}, das 8h às 17h (horário de Brasília).`;
 
     return resposta({
       targetRoute: 'info/calendario', menuId: MENU.CALENDARIO, intent: 'SEGUNDO_TURNO',

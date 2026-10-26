@@ -160,8 +160,15 @@ const RX_RESULTADOS = new RegExp(
   '(votac\\w*|eleic\\w*|apurac\\w*) (atual|agora|hoje|em andamento|neste momento)|' +
   'quantas (urnas|secoes)|secoes totalizad\\w*|(percentual|porcentagem) de (urnas|secoes)|' +
   'votos (teve|recebeu|obteve|tem)|quantos votos|eleitos?|mais votad\\w*|percentual de votos|totalizacao|boletim de urna|' +
-  'passou para o segundo|quem passou)\\b'
+  'passou para o segundo|quem passou|' +
+  // pós-eleição (26/10/2026): "quem é o novo presidente", "o lula ganhou?", "a eleição acabou?", "qual foi a abstenção"
+  '(novo|nova) (presidente|governador\\w*|senador\\w*)|(presidente|governador\\w*|senador\\w*) eleit[oa]s?|' +
+  '(eleicao|eleicoes|votacao|votacoes|apuracao|segundo turno|2o turno) (ja )?(acabou|terminou|encerrou|acabaram|terminaram|encerraram)|' +
+  'abstencao|comparecimento|(?<!nunca )(foi|foram) eleit[oa]s?|se (re)?elegeu|foi reeleit[oa]|ganhou|venceu|perdeu)\\b'
 );
+
+/** Pergunta de resultado sobre UMA pessoa ("Lula foi eleito?", "o X ganhou?", "quantos votos Y teve"): o nome citado vai para a resposta. */
+const RX_RESULTADO_INDIVIDUAL = /\b(foi (re)?eleit[oa]|ganhou|venceu|perdeu|se (re)?elegeu|votos (teve|recebeu|obteve|tem)|quantos votos)\b/;
 
 /** Mensagem que é SÓ saudação/agradecimento/pedido de ajuda (ex.: "oi", "bom dia, tudo bem?", "obrigado!"). */
 const RX_SAUDACAO = new RegExp(
@@ -236,7 +243,7 @@ const RX = {
   patrimonio: /\bpatrimonio\b|\bbens\b|\briqueza\b|\bric[oa]s?\b|\bdeclarou\b|\bquanto (tem|possui)\b/,
   contar: /\bquantos\b|\bquantas\b|\bnumero de candidat\w*\b|\btotal de candidat\w*\b/,
   candidat: /\bcandidat\w*\b/,
-  estreante: /\bestreante\w*\b|\bprimeira vez\b|\bnunca (foi )?eleit\w*\b|\bnovato\w*\b/,
+  estreante: /\bestreante\w*\b|\bprimeira vez\b|\bnunca (foi |foram )?eleit\w*\b|\bnovato\w*\b/,
   reeleicao: /\breeleicao\b|\btentando reeleicao\b|\bja (foi )?eleit\w*\b/,
   veterano: /\bveterano\w*\b|\bvarias vezes eleito\b/,
   paraPA: /\b(estado do|no|em|do|de) para\b/
@@ -437,7 +444,11 @@ function parseSemContexto(query, gaz) {
 
   // 3.1 Segundo turno e resultados ("propostas do 2º turno sobre saúde" é plano de governo, não a regra do 2º turno)
   if (RX.turno2.test(t) && !RX_RESULTADOS.test(t.replaceAll('segundo turno', '')) && !sobrePropostas) return q('SEGUNDO_TURNO');
-  if (RX_RESULTADOS.test(t)) return q('RESULTADOS');
+  // "candidatos que nunca foram eleitos" é listagem por histórico, não resultado. O nome ("Lula foi eleito?", "quantos votos o X teve") vai junto
+  // para a resposta por candidato, mas só quando a frase tem verbo de resultado individual: "a eleição acabou?" não pode virar nome por semelhança.
+  if (RX_RESULTADOS.test(t) && !(historico != null && (RX.listagem.test(t) || RX.candidat.test(t)))) {
+    return q('RESULTADOS', RX_RESULTADO_INDIVIDUAL.test(t) ? nome() : (achado?.termo ?? null));
+  }
 
   // 4. Fontes e sobre os dados
   if (RX.sobreDados.test(t)) return q('SOBRE_DADOS');

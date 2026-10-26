@@ -14,21 +14,21 @@
    "hoje": "2026-10-01",
    "intent": "CALENDARIO",
    "resolvida": true,
-   "texto": "O 1º turno será em 04/10/2026 (daqui a 3 dias). 1º turno: 04/10/2026 2º turno: 25/10/2026 — só onde houver (Presidente e Governador) Horário de votação: 08h às 17h (horário de Brasília) Posse: Presidente em 05/01/2027; Governadores em 06/01/2027 (EC 111/2021) Demais prazos (prestação de contas, diplomação etc.): calendário oficial do TSE — https://www.tse.jus.br/eleicoes/calendario-eleitoral"
+   "texto": "O 1º turno será em 04/10/2026 (daqui a 3 dias). 1º turno: 04/10/2026 2º turno: 25/10/2026 — só onde houver (Presidente e Governador) Horário de votação: 08h às 17h (horário de Brasília) Prestação de contas final: até 03/11/2026 (1º turno) e 14/11/2026 (2º turno) — Lei 9.504/1997, art. 29 Diplomação dos eleitos: até 18/12/2026 (Res. TSE 23.760/2026) Posse: Presidente em 05/01/2027; Governadores em 06/01/2027 (EC 111/2021); Deputados e Senadores em 1º/02/2027 Demais prazos: calendário oficial do TSE — https://www.tse.jus.br/eleicoes/calendario-eleitoral"
   },
   {
    "q": "Qual a data do segundo turno?",
    "hoje": "2026-10-01",
    "intent": "CALENDARIO",
    "resolvida": true,
-   "texto": "O 1º turno será em 04/10/2026 (daqui a 3 dias). 1º turno: 04/10/2026 2º turno: 25/10/2026 — só onde houver (Presidente e Governador) Horário de votação: 08h às 17h (horário de Brasília) Posse: Presidente em 05/01/2027; Governadores em 06/01/2027 (EC 111/2021) Demais prazos (prestação de contas, diplomação etc.): calendário oficial do TSE — https://www.tse.jus.br/eleicoes/calendario-eleitoral"
+   "texto": "O 1º turno será em 04/10/2026 (daqui a 3 dias). 1º turno: 04/10/2026 2º turno: 25/10/2026 — só onde houver (Presidente e Governador) Horário de votação: 08h às 17h (horário de Brasília) Prestação de contas final: até 03/11/2026 (1º turno) e 14/11/2026 (2º turno) — Lei 9.504/1997, art. 29 Diplomação dos eleitos: até 18/12/2026 (Res. TSE 23.760/2026) Posse: Presidente em 05/01/2027; Governadores em 06/01/2027 (EC 111/2021); Deputados e Senadores em 1º/02/2027 Demais prazos: calendário oficial do TSE — https://www.tse.jus.br/eleicoes/calendario-eleitoral"
   },
   {
    "q": "Calendário eleitoral e prazos",
    "hoje": "2026-10-01",
    "intent": "CALENDARIO",
    "resolvida": true,
-   "texto": "O 1º turno será em 04/10/2026 (daqui a 3 dias). 1º turno: 04/10/2026 2º turno: 25/10/2026 — só onde houver (Presidente e Governador) Horário de votação: 08h às 17h (horário de Brasília) Posse: Presidente em 05/01/2027; Governadores em 06/01/2027 (EC 111/2021) Demais prazos (prestação de contas, diplomação etc.): calendário oficial do TSE — https://www.tse.jus.br/eleicoes/calendario-eleitoral"
+   "texto": "O 1º turno será em 04/10/2026 (daqui a 3 dias). 1º turno: 04/10/2026 2º turno: 25/10/2026 — só onde houver (Presidente e Governador) Horário de votação: 08h às 17h (horário de Brasília) Prestação de contas final: até 03/11/2026 (1º turno) e 14/11/2026 (2º turno) — Lei 9.504/1997, art. 29 Diplomação dos eleitos: até 18/12/2026 (Res. TSE 23.760/2026) Posse: Presidente em 05/01/2027; Governadores em 06/01/2027 (EC 111/2021); Deputados e Senadores em 1º/02/2027 Demais prazos: calendário oficial do TSE — https://www.tse.jus.br/eleicoes/calendario-eleitoral"
   },
   {
    "q": "Onde eu voto?",
@@ -168,14 +168,14 @@
    "hoje": "2026-10-01",
    "intent": "CALENDARIO",
    "resolvida": true,
-   "texto": "O 1º turno será em 04/10/2026 (daqui a 3 dias). 1º turno: 04/10/2026 2º turno: 25/10/2026 — só onde houver (Presidente e Governador) Horário de votação: 08h às 17h (horário de Brasília) Posse: Presidente em 05/01/2027; Governadores em 06/01/2027 (EC 111/2021) Demais prazos (prestação de contas, diplomação etc.): calendário oficial do TSE — https://www.tse.jus.br/eleicoes/calendario-eleitoral"
+   "texto": "O 1º turno será em 04/10/2026 (daqui a 3 dias). 1º turno: 04/10/2026 2º turno: 25/10/2026 — só onde houver (Presidente e Governador) Horário de votação: 08h às 17h (horário de Brasília) Prestação de contas final: até 03/11/2026 (1º turno) e 14/11/2026 (2º turno) — Lei 9.504/1997, art. 29 Diplomação dos eleitos: até 18/12/2026 (Res. TSE 23.760/2026) Posse: Presidente em 05/01/2027; Governadores em 06/01/2027 (EC 111/2021); Deputados e Senadores em 1º/02/2027 Demais prazos: calendário oficial do TSE — https://www.tse.jus.br/eleicoes/calendario-eleitoral"
   },
   {
    "q": "Que horas abre a votação?",
    "hoje": "2026-10-01",
    "intent": "CALENDARIO",
    "resolvida": true,
-   "texto": "O 1º turno será em 04/10/2026 (daqui a 3 dias). 1º turno: 04/10/2026 2º turno: 25/10/2026 — só onde houver (Presidente e Governador) Horário de votação: 08h às 17h (horário de Brasília) Posse: Presidente em 05/01/2027; Governadores em 06/01/2027 (EC 111/2021) Demais prazos (prestação de contas, diplomação etc.): calendário oficial do TSE — https://www.tse.jus.br/eleicoes/calendario-eleitoral"
+   "texto": "O 1º turno será em 04/10/2026 (daqui a 3 dias). 1º turno: 04/10/2026 2º turno: 25/10/2026 — só onde houver (Presidente e Governador) Horário de votação: 08h às 17h (horário de Brasília) Prestação de contas final: até 03/11/2026 (1º turno) e 14/11/2026 (2º turno) — Lei 9.504/1997, art. 29 Diplomação dos eleitos: até 18/12/2026 (Res. TSE 23.760/2026) Posse: Presidente em 05/01/2027; Governadores em 06/01/2027 (EC 111/2021); Deputados e Senadores em 1º/02/2027 Demais prazos: calendário oficial do TSE — https://www.tse.jus.br/eleicoes/calendario-eleitoral"
   },
   {
    "q": "Como votar?",
@@ -462,7 +462,7 @@
    "hoje": "2026-10-01",
    "intent": "CALENDARIO",
    "resolvida": true,
-   "texto": "O 1º turno será em 04/10/2026 (daqui a 3 dias). 1º turno: 04/10/2026 2º turno: 25/10/2026 — só onde houver (Presidente e Governador) Horário de votação: 08h às 17h (horário de Brasília) Posse: Presidente em 05/01/2027; Governadores em 06/01/2027 (EC 111/2021) Demais prazos (prestação de contas, diplomação etc.): calendário oficial do TSE — https://www.tse.jus.br/eleicoes/calendario-eleitoral"
+   "texto": "O 1º turno será em 04/10/2026 (daqui a 3 dias). 1º turno: 04/10/2026 2º turno: 25/10/2026 — só onde houver (Presidente e Governador) Horário de votação: 08h às 17h (horário de Brasília) Prestação de contas final: até 03/11/2026 (1º turno) e 14/11/2026 (2º turno) — Lei 9.504/1997, art. 29 Diplomação dos eleitos: até 18/12/2026 (Res. TSE 23.760/2026) Posse: Presidente em 05/01/2027; Governadores em 06/01/2027 (EC 111/2021); Deputados e Senadores em 1º/02/2027 Demais prazos: calendário oficial do TSE — https://www.tse.jus.br/eleicoes/calendario-eleitoral"
   },
   {
    "q": "tem voto impresso?",

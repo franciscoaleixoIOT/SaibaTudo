@@ -352,3 +352,105 @@ test('sem apuração ao vivo depois do 1º turno: usa o pacote oficial e não fa
     assert.ok(sp.directAnswer.startsWith('Não haverá 2º turno para Governador em São Paulo.'), sp.directAnswer);
   }
 });
+
+// ------------------------------------------------------------------ pós-eleição (26/10/2026): o 2º turno já ocorreu
+const POS = '2026-10-26';
+const linhaLula = (o = {}) => ({ sqCandidato: '280002542548', numero: '13', nome: 'LULA', partido: 'PT', votos: 60345678, percentual: '51,79', eleito: true, segundoTurno: false, ...o });
+const linhaFlavio = (o = {}) => ({ sqCandidato: '280002551544', numero: '22', nome: 'FLAVIO BOLSONARO', partido: 'PL', votos: 56123456, percentual: '48,21', eleito: false, segundoTurno: false, ...o });
+/** Apuração ao vivo do 2º turno (totalização final) só para Presidente; nada para os demais. */
+const ap2tFinal = { obter: async (cargo, uf, turno) => cargo === 'PRESIDENTE' && turno === 2
+  ? { cargo, uf, turno, geradoEm: '25/10/2026 23:27:10', secoesTotalizadasPct: '100,00', totalizacaoFinal: true, linhas: [linhaLula(), linhaFlavio()] }
+  : null };
+const semAoVivo = { obter: async () => null };
+const noFuturo = (t) => /haver[aá] 2º turno|Votação do 2º turno|disputam o 2º turno|no dia: leve/i.test(t);
+
+test('pós-eleição: "segundo turno para presidente" fala no passado e traz o eleito da apuração do 2º turno', async () => {
+  const r = await responder('Segundo turno para presidente', { hoje: POS, apuracao: ap2tFinal });
+  assert.equal(r.intent, 'SEGUNDO_TURNO');
+  assert.ok(r.directAnswer.startsWith('Houve 2º turno para Presidente da República em 25/10/2026'), r.directAnswer);
+  assert.ok(r.directAnswer.includes('LULA (PT)') && r.directAnswer.includes('51,79%') && r.directAnswer.includes('ELEITO'), r.directAnswer);
+  assert.ok(r.directAnswer.includes('Totalização final'), r.directAnswer);
+  assert.ok(!noFuturo(r.directAnswer), r.directAnswer);
+  assert.deepEqual(r.candidateIds, ['280002542548', '280002551544']);
+});
+
+test('pós-eleição sem apuração ao vivo: 2º turno no passado, com os classificados do pacote e o link do TSE, nunca "haverá"', async () => {
+  for (const [q, inicio] of [['Segundo turno para presidente', 'Houve 2º turno para Presidente da República em 25/10/2026'],
+    ['vai ter segundo turno para governador no ES?', 'Houve 2º turno para Governador no Espírito Santo em 25/10/2026']]) {
+    const r = await responder(q, { hoje: POS, apuracao: semAoVivo });
+    assert.equal(r.intent, 'SEGUNDO_TURNO', q);
+    assert.ok(r.directAnswer.startsWith(inicio), `${q}: ${r.directAnswer}`);
+    assert.ok(r.directAnswer.includes('resultados.tse.jus.br'), r.directAnswer);
+    assert.ok(!noFuturo(r.directAnswer), r.directAnswer);
+  }
+  const geral = await responder('Quem vai pro segundo turno?', { hoje: POS, uf: 'ES', apuracao: semAoVivo });
+  assert.ok(geral.directAnswer.includes('O 2º turno, onde houve, foi em 25/10/2026'), geral.directAnswer);
+  assert.ok(geral.directAnswer.includes('Presidente da República: Houve 2º turno entre'), geral.directAnswer);
+  assert.ok(geral.directAnswer.includes('Governador (ES): Houve 2º turno entre'), geral.directAnswer);
+  assert.ok(!noFuturo(geral.directAnswer), geral.directAnswer);
+  // cargo eleito no 1º turno continua no passado ("Não houve")
+  const sp = await responder('tem 2º turno pra governador em sp?', { hoje: POS, apuracao: semAoVivo });
+  assert.ok(sp.directAnswer.startsWith('Não houve 2º turno para Governador em São Paulo.'), sp.directAnswer);
+});
+
+test('pós-eleição: "quem foi eleito presidente" sem apuração ao vivo não diz que "disputam" o 2º turno', async () => {
+  const r = await responder('Quem foi eleito presidente?', { hoje: POS, apuracao: semAoVivo });
+  assert.equal(r.intent, 'RESULTADOS');
+  assert.ok(r.directAnswer.includes('O 2º turno para Presidente da República ocorreu em 25/10/2026'), r.directAnswer);
+  assert.ok(r.directAnswer.includes('resultados.tse.jus.br'), r.directAnswer);
+  assert.ok(!noFuturo(r.directAnswer), r.directAnswer);
+  const pan = await responder('como está a apuração?', { hoje: POS, uf: 'ES', apuracao: semAoVivo });
+  assert.ok(!noFuturo(pan.directAnswer), pan.directAnswer);
+  assert.ok(pan.directAnswer.includes('2º turno em 25/10/2026 entre'), pan.directAnswer);
+});
+
+test('pós-eleição: resultado por candidato ("Lula foi eleito?", "quantos votos o Lula teve no segundo turno?")', async () => {
+  for (const q of ['Lula foi eleito?', 'quantos votos o lula teve no segundo turno?', 'o lula ganhou?']) {
+    const r = await responder(q, { hoje: POS, apuracao: ap2tFinal });
+    assert.equal(r.intent, 'RESULTADOS', q);
+    assert.ok(r.directAnswer.startsWith('LULA (PT, nº 13) — Presidente da República, 2º turno'), `${q}: ${r.directAnswer}`);
+    assert.ok(r.directAnswer.includes('60.345.678 votos (51,79%) — ELEITO'), r.directAnswer);
+    assert.ok(r.directAnswer.includes('Totalização final'), r.directAnswer);
+    assert.deepEqual(r.candidateIds, ['280002542548'], q);
+    assert.ok(r.fonte.includes('ao vivo'), r.fonte);
+  }
+  // sem apuração ao vivo: o que o pacote (CSV do TSE) tem do candidato, sem inventar o 2º turno
+  const off = await responder('Lula foi eleito?', { hoje: POS, apuracao: semAoVivo });
+  assert.ok(off.directAnswer.startsWith('LULA (PT, nº 13) — Presidente da República'), off.directAnswer);
+  assert.ok(off.directAnswer.includes('1º turno'), off.directAnswer);
+  assert.ok(off.directAnswer.includes('resultados.tse.jus.br'), off.directAnswer);
+  assert.ok(!noFuturo(off.directAnswer), off.directAnswer);
+  // candidato eleito no 1º turno pelo pacote
+  const tarc = await responder('Tarcísio foi eleito?', { hoje: POS, apuracao: semAoVivo });
+  assert.ok(tarc.directAnswer.startsWith('TARCÍSIO (REPUBLICANOS, nº 10) — Governador em São Paulo, 1º turno'), tarc.directAnswer);
+  assert.ok(tarc.directAnswer.includes('— ELEITO'), tarc.directAnswer);
+});
+
+test('pós-eleição: abstenção e "a eleição acabou?" são respondidas pelos resultados, com o aviso de que o app não traz os totais de abstenção', async () => {
+  const abs = await responder('Qual foi a abstenção no segundo turno?', { hoje: POS, apuracao: ap2tFinal });
+  assert.equal(abs.intent, 'RESULTADOS');
+  assert.ok(abs.directAnswer.startsWith('Abstenção, comparecimento e votos brancos e nulos: o app não traz esses totais; consulte https://resultados.tse.jus.br/'), abs.directAnswer);
+  const fim = await responder('A eleição acabou?', { hoje: POS, apuracao: ap2tFinal });
+  assert.equal(fim.intent, 'RESULTADOS');
+  assert.ok(fim.directAnswer.includes('Status dos resultados das Eleições 2026'), fim.directAnswer);
+});
+
+test('pós-eleição: local de votação vira título, justificativa e multa; nada de "no dia" nem "pode votar no 2º turno"', async () => {
+  for (const q of ['Onde voto?', 'Não votei, como justifico?', 'Qual o prazo para justificar?']) {
+    const r = await responder(q, { hoje: POS });
+    assert.equal(r.intent, 'LOCAL_VOTACAO', q);
+    assert.ok(r.directAnswer.startsWith('Título de eleitor e justificativa depois das Eleições 2026 (sistemas oficiais):'), `${q}: ${r.directAnswer}`);
+    assert.ok(r.directAnswer.includes('03/12/2026') && r.directAnswer.includes('08/01/2027'), r.directAnswer);
+    assert.ok(r.directAnswer.includes('multa'), r.directAnswer);
+    assert.ok(!/No dia: leve|pode votar no 2º|vota-se no mesmo local/.test(r.directAnswer), r.directAnswer);
+  }
+  // antes do fim da eleição o texto antigo continua
+  assert.ok((await responder('Onde voto?', { hoje: '2026-10-20' })).directAnswer.includes('No dia: leve documento'));
+});
+
+test('calendário traz os prazos pós-eleitorais com fonte oficial (prestação de contas, diplomação, posse)', async () => {
+  const r = await responder('Quando é a eleição?', { hoje: POS });
+  assert.ok(r.directAnswer.includes('Prestação de contas final: até 03/11/2026 (1º turno) e 14/11/2026 (2º turno) — Lei 9.504/1997, art. 29'), r.directAnswer);
+  assert.ok(r.directAnswer.includes('Diplomação dos eleitos: até 18/12/2026 (Res. TSE 23.760/2026)'), r.directAnswer);
+  assert.ok(r.directAnswer.includes('Posse: Presidente em 05/01/2027; Governadores em 06/01/2027 (EC 111/2021); Deputados e Senadores em 1º/02/2027'), r.directAnswer);
+});

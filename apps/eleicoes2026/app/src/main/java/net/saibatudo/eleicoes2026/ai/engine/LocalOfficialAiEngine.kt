@@ -11,6 +11,7 @@ import net.saibatudo.eleicoes2026.ai.nlu.LocalNlu
 import net.saibatudo.eleicoes2026.data.datasource.ElectionData
 import net.saibatudo.eleicoes2026.domain.model.ApuracaoProvider
 import net.saibatudo.eleicoes2026.domain.model.Datas
+import net.saibatudo.eleicoes2026.domain.model.FaseEleitoral
 
 /**
  * Motor de IA LOCAL e DETERMINÍSTICO: NLU por regras + respostas montadas dos dados oficiais do TSE.
@@ -28,6 +29,10 @@ class LocalOfficialAiEngine(
 
     /** Contexto que valia quando a ÚLTIMA pergunta foi feita: serve para a nuvem seguir a conversa (a resposta atual ainda não conta). */
     @Volatile private var contextoDaPergunta: ParsedQuery? = null
+
+    /** Datas oficiais (regras.json) e fase do calendário hoje: o contexto da IA generativa muda o tempo verbal depois do 2º turno. */
+    suspend fun regras() = dados().regras
+    suspend fun faseAtual(): FaseEleitoral = regras().let { FaseEleitoral.de(hoje(), it.turno1, it.turno2) }
 
     /** Dicionário (partidos/nomes) derivado dos dados; reconstruído quando o pacote de dados muda. */
     suspend fun gazetteer(): Pair<ElectionData, Gazetteer> {

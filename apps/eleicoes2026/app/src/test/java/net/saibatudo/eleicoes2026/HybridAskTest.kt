@@ -26,7 +26,7 @@ import org.junit.Test
  */
 class HybridAskTest {
 
-    private class Cenario(askLigado: Boolean) {
+    private class Cenario(askLigado: Boolean, hoje: String = "2026-10-01") {
         // sem resposta enfileirada o MockWebServer BLOQUEIA a conexão (timeout de 10 s): o padrão aqui é falhar rápido com 503
         private fun rapido() = MockWebServer().apply {
             (dispatcher as QueueDispatcher).setFailFast(MockResponse().setResponseCode(503).setBody("""{"ok":false,"error":"disabled"}"""))
@@ -35,7 +35,7 @@ class HybridAskTest {
         val ask = rapido()
         val nlu = rapido()
         val motor = HybridAiInferenceEngine(
-            local = LocalOfficialAiEngine(dados = { TestData.dados }, hoje = { "2026-10-01" }),
+            local = LocalOfficialAiEngine(dados = { TestData.dados }, hoje = { hoje }),
             nuvem = CloudNluClient(OkHttpClient(), nlu.url("/api/nlu").toString()),
             nuvemHabilitada = { true },
             idInstalacao = { "iid-teste" },
@@ -149,6 +149,24 @@ class HybridAskTest {
             assertEquals("iid-teste", j.get("iid").asString)
             assertTrue("o contexto resume a resposta local (até 3.000 caracteres)", j.get("context").asString.length in 1..3000)
         } finally { c.fechar() }
+    }
+
+    @Test
+    fun contextoDaNuvemAcompanhaAFaseDepoisDoSegundoTurnoOcorreuNuncaOcorre() = runBlocking {
+        for ((hoje, esperado, proibido) in listOf(
+            Triple("2026-10-10", "2º turno em 25/10/2026", "ocorreu em"),
+            Triple("2026-10-26", "O 2º turno ocorreu em 25/10/2026", "2º turno em 25/10/2026 exclusivamente")
+        )) {
+            val c = Cenario(askLigado = true, hoje = hoje)
+            try {
+                c.enfileirarAsk("""{"ok":true,"answer":"ok","model":"m"}""")
+                val local = resolvida(c, "quando é o segundo turno?")
+                c.motor.perguntarNaNuvem("quando é o segundo turno?", local)
+                val contexto = com.google.gson.JsonParser.parseString(c.ask.takeRequest().body.readUtf8()).asJsonObject.get("context").asString
+                assertTrue("$hoje: $contexto", contexto.contains(esperado))
+                assertFalse("$hoje: $contexto", contexto.contains(proibido))
+            } finally { c.fechar() }
+        }
     }
 
     @Test

@@ -7,7 +7,9 @@ O que acusa problema:
   1. manifesto de produção inacessível ou ilegível;
   2. assinatura do manifesto de produção INVÁLIDA (a integridade é o contrato central do projeto);
   3. extração do TSE mais velha que MAX_IDADE_TSE_H (30 h: o TSE para de gerar à noite e, depois da eleição, pode gerar só 1x por dia;
-     um limite curto alertaria toda madrugada. Pipeline travado é pego pelos itens 4 e 5, que são rápidos);
+     um limite curto alertaria toda madrugada. Pipeline travado é pego pelos itens 4 e 5, que são rápidos). Na fase POS_ELEICAO
+     (faseEleitoral do manifesto) vale MAX_IDADE_TSE_H_POS_ELEICAO: depois do 2º turno o TSE pode ficar dias sem regerar o consulta_cand
+     (26/10/2026: parado desde 25/10 12:30, e a issue abriria toda noite);
   4. as últimas SEGUIDAS execuções do data_refresh terminaram em falha (o incidente de 05/10/2026: 18 falhas seguidas por ~9 h,
      sem ninguém perceber);
   5. nenhuma execução bem-sucedida do data_refresh nas últimas MAX_SEM_SUCESSO_H horas.
@@ -26,6 +28,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 MAX_IDADE_TSE_H = 30.0
+MAX_IDADE_TSE_H_POS_ELEICAO = 14 * 24.0
 FALHAS_SEGUIDAS = 3
 MAX_SEM_SUCESSO_H = 3.0
 BRT = timezone(timedelta(hours=-3))
@@ -60,9 +63,11 @@ def avaliar(manifesto: dict | None, runs: list, agora: datetime, assinatura_vali
         idade = idade_extracao_tse(manifesto.get("extracaoTse"), agora)
         if idade is None:
             problemas.append(f"Não foi possível ler extracaoTse do manifesto ({manifesto.get('extracaoTse')!r}).")
-        elif idade > MAX_IDADE_TSE_H:
+        else:
+            limite = MAX_IDADE_TSE_H_POS_ELEICAO if manifesto.get("faseEleitoral") == "POS_ELEICAO" else MAX_IDADE_TSE_H
+        if idade is not None and idade > limite:
             problemas.append(
-                f"A extração do TSE publicada tem {idade:.1f} h (limite {MAX_IDADE_TSE_H:.0f} h): "
+                f"A extração do TSE publicada tem {idade:.1f} h (limite {limite:.0f} h): "
                 f"{manifesto.get('extracaoTse')} (dataVersion {manifesto.get('dataVersion')})."
             )
 

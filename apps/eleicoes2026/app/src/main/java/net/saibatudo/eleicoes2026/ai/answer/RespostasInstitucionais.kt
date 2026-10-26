@@ -64,8 +64,10 @@ internal fun AnswerBuilder.calendario(): AiMenuResponse {
         "1º turno: $d1\n" +
         "2º turno: $d2 — só onde houver (Presidente e Governador)\n" +
         "Horário de votação: ${regras.horarioVotacao}\n" +
-        "Posse: Presidente em 05/01/2027; Governadores em 06/01/2027 (EC 111/2021)\n" +
-        "Demais prazos (prestação de contas, diplomação etc.): calendário oficial do TSE — ${AppConstants.URL_CALENDARIO_TSE}"
+        "Prestação de contas final: até 03/11/2026 (1º turno) e 14/11/2026 (2º turno) — Lei 9.504/1997, art. 29\n" +
+        "Diplomação dos eleitos: até 18/12/2026 (Res. TSE 23.760/2026)\n" +
+        "Posse: Presidente em 05/01/2027; Governadores em 06/01/2027 (EC 111/2021); Deputados e Senadores em 1º/02/2027\n" +
+        "Demais prazos: calendário oficial do TSE — ${AppConstants.URL_CALENDARIO_TSE}"
     return AiMenuResponse(
         targetRoute = "info/calendario", menuId = AppConstants.MENU_CALENDARIO, intent = Intent.CALENDARIO,
         directAnswer = texto, suggestedQuestions = listOf("Onde consultar meu local de votação?", "Quem disputa a Presidência?"),
@@ -115,6 +117,20 @@ internal fun AnswerBuilder.localVotacao(p: ParsedQuery? = null): AiMenuResponse 
         )
     }
 
+    if (fase == FaseEleitoral.POS_ELEICAO) {
+        // eleição encerrada (26/10/2026): o que resta ao eleitor é justificar, pagar multa e regularizar o título (texto = site)
+        return AiMenuResponse(
+            targetRoute = "info/locais", menuId = AppConstants.MENU_LOCAIS_VOTACAO, intent = Intent.LOCAL_VOTACAO,
+            directAnswer = "Título de eleitor e justificativa depois das Eleições 2026 (sistemas oficiais):\n" +
+                "• As votações ocorreram em ${dataBr(regras.turno1)} (1º turno) e ${dataBr(regras.turno2)} (2º turno, onde houve)\n" +
+                "• Justificar a ausência: separadamente por turno, pelo app e-Título ou pelo Autoatendimento Eleitoral (${AppConstants.URL_AUTOATENDIMENTO_ELEITOR}) — até 03/12/2026 (1º turno) e 08/01/2027 (2º turno)\n" +
+                "• Quem não votou nem justificou no prazo paga multa por turno (Código Eleitoral, art. 7º), pelo Autoatendimento Eleitoral; cada turno conta como uma eleição, e três eleições seguidas sem votar nem justificar cancelam o título (art. 71, V)\n" +
+                "• Situação do título, quitação eleitoral e regularização: Autoatendimento Eleitoral ou app e-Título\n" +
+                "O app não consulta dados pessoais do eleitor.",
+            suggestedQuestions = listOf("Calendário eleitoral 2026", "Quem foi eleito presidente?"),
+            fonte = "Fonte: TSE – Autoatendimento Eleitoral; Código Eleitoral (Lei 4.737/1965), arts. 7º e 71.", origem = origem
+        )
+    }
     return AiMenuResponse(
         targetRoute = "info/locais", menuId = AppConstants.MENU_LOCAIS_VOTACAO, intent = Intent.LOCAL_VOTACAO,
         directAnswer = "Onde votar e situação do título (sistemas oficiais):\n" +

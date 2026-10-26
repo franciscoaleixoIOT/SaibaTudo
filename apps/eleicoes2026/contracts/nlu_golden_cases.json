@@ -547,6 +547,74 @@
    "intent": "RESULTADOS",
    "cargo": "DEPUTADO_ESTADUAL",
    "uf": "SP"
+  },
+  {
+   "q": "Quem é o novo presidente?",
+   "intent": "RESULTADOS",
+   "cargo": "PRESIDENTE",
+   "nome": null
+  },
+  {
+   "q": "quem é a nova governadora do rio grande do norte",
+   "intent": "RESULTADOS",
+   "cargo": "GOVERNADOR",
+   "uf": "RN",
+   "nome": null
+  },
+  {
+   "q": "Lula foi eleito?",
+   "intent": "RESULTADOS",
+   "nome": "lula"
+  },
+  {
+   "q": "o lula ganhou?",
+   "intent": "RESULTADOS",
+   "nome": "lula"
+  },
+  {
+   "q": "Quantos votos o Lula teve no segundo turno?",
+   "intent": "RESULTADOS",
+   "nome": "lula",
+   "turno": 2
+  },
+  {
+   "q": "Qual foi a abstenção no segundo turno?",
+   "intent": "RESULTADOS",
+   "turno": 2,
+   "nome": null
+  },
+  {
+   "q": "A eleição acabou?",
+   "intent": "RESULTADOS",
+   "nome": null
+  },
+  {
+   "q": "quem ganhou o segundo turno para presidente",
+   "intent": "RESULTADOS",
+   "cargo": "PRESIDENTE",
+   "turno": 2,
+   "nome": null
+  },
+  {
+   "q": "quem foi eleito governador no ES",
+   "intent": "RESULTADOS",
+   "cargo": "GOVERNADOR",
+   "uf": "ES",
+   "nome": null
+  },
+  {
+   "q": "quem venceu a eleição para governador em minas?",
+   "intent": "RESULTADOS",
+   "cargo": "GOVERNADOR",
+   "uf": "MG",
+   "nome": null
+  },
+  {
+   "q": "candidatos a deputado federal em SP que nunca foram eleitos",
+   "intent": "LISTAR_CANDIDATOS",
+   "cargo": "DEPUTADO_FEDERAL",
+   "uf": "SP",
+   "historico": "NUNCA_ELEITO"
   }
  ]
 }

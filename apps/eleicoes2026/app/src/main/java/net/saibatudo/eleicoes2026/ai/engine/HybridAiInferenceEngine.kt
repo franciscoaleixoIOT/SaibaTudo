@@ -7,6 +7,8 @@ import net.saibatudo.eleicoes2026.ai.model.Intent
 import net.saibatudo.eleicoes2026.ai.model.OrigemResposta
 import net.saibatudo.eleicoes2026.ai.nlu.CloudAskClient
 import net.saibatudo.eleicoes2026.ai.nlu.CloudNluClient
+import net.saibatudo.eleicoes2026.domain.model.Datas
+import net.saibatudo.eleicoes2026.domain.model.FaseEleitoral
 
 /**
  * Motor HÍBRIDO: LOCAL primeiro, nuvem como apoio de interpretação e IA Generativa (SaibaTudo IA, explicador treinado).
@@ -44,11 +46,10 @@ class HybridAiInferenceEngine(
                     "• ${c.nomeUrna} (nº ${c.numero}, ${c.partido}/${if (c.estadoUf != "BR") c.estadoUf else "BR"}) — Cargo: ${c.cargo}. Situação: ${c.situacao}. $bens."
                 }
             val baseContexto = respostaAtual.directAnswer?.let { resumoParaContexto(it) }?.let { "Dados apurados no sistema:\n$it\n\n" }.orEmpty()
-            val contexto = if (dadosCandidatos.isNotBlank()) {
-                baseContexto + "Candidaturas oficiais do TSE no escopo da consulta:\n$dadosCandidatos"
-            } else {
-                baseContexto
-            }
+            // pergunta sobre o 2º turno: a regra vai junto, com as datas oficiais e o tempo verbal da fase (= site, engine.js)
+            val sobre2T = respostaAtual.intent == Intent.SEGUNDO_TURNO || Regex("""segundo turno|2 ?[oaº°ª]? turno""").containsMatchIn(query.lowercase())
+            val comCandidatos = if (dadosCandidatos.isNotBlank()) baseContexto + "Candidaturas oficiais do TSE no escopo da consulta:\n$dadosCandidatos" else baseContexto
+            val contexto = if (sobre2T) comCandidatos + (if (dadosCandidatos.isNotBlank()) "\n\n" else "") + regras2T() else comCandidatos
             val gerada = withTimeoutOrNull(timeoutExplicitoMs) {
                 askClient.gerar(query, contexto, idInstalacao())
             }
@@ -88,7 +89,7 @@ class HybridAiInferenceEngine(
                 respostaAtual?.directAnswer?.let {
                     append("Dados oficiais apurados:\n").append(resumoParaContexto(it)).append("\n\n")
                 }
-                append("Regras Eleições 2026: 2º turno em 25/10/2026 exclusivamente para Presidente e Governador se o primeiro colocado não alcançar mais de 50% dos votos válidos no 1º turno (04/10/2026). Senadores e Deputados são eleitos em turno único no 1º turno.")
+                append(regras2T())
             }
             val gerada = withTimeoutOrNull(timeoutExplicitoMs) {
                 askClient.gerar(query, contexto, idInstalacao())
@@ -110,6 +111,16 @@ class HybridAiInferenceEngine(
             }
         }
         return null
+    }
+
+    /** Regra do 2º turno com as datas oficiais (regras.json) e o tempo verbal da fase: depois do 2º turno (26/10/2026) o modelo não pode falar no futuro. */
+    private suspend fun regras2T(): String {
+        val regras = local.regras()
+        val d1 = Datas.formatarBr(regras.turno1)
+        val d2 = Datas.formatarBr(regras.turno2)
+        return if (local.faseAtual() == FaseEleitoral.POS_ELEICAO)
+            "Regras Eleições 2026: O 2º turno ocorreu em $d2, exclusivamente para Presidente e Governador nos casos em que o primeiro colocado não atingiu mais de 50% dos votos válidos no 1º turno ($d1). A eleição está encerrada; eleitos são os publicados pelo TSE. Senadores e Deputados foram eleitos em turno único no 1º turno."
+        else "Regras Eleições 2026: 2º turno em $d2 exclusivamente para Presidente e Governador se o primeiro colocado não alcançar mais de 50% dos votos válidos no 1º turno ($d1). Senadores e Deputados são eleitos em turno único no 1º turno."
     }
 
     override suspend fun parseUserQuery(query: String): AiMenuResponse {

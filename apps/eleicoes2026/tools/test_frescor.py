@@ -72,6 +72,20 @@ class Avaliar(unittest.TestCase):
         ok, p = f.avaliar({"extracaoTse": "05/10/2026 10:14:11"}, [run(10)], AGORA, True)
         self.assertTrue(ok, p)
 
+    def test_pos_eleicao_tolera_dias_sem_extracao_do_tse(self):
+        # Depois do 2º turno o TSE pode passar dias sem regerar o consulta_cand (26/10/2026: parado desde 25/10 12:30). O limite normal (30 h)
+        # alertaria toda noite; em POS_ELEICAO vale MAX_IDADE_TSE_H_POS_ELEICAO. A fase vem do manifesto (faseEleitoral).
+        velho = {"extracaoTse": "02/10/2026 12:30:00", "dataVersion": "v", "faseEleitoral": "POS_ELEICAO"}  # ~4 dias
+        ok, p = f.avaliar(velho, [run(10)], AGORA, True)
+        self.assertTrue(ok, p)
+        muito_velho = {"extracaoTse": "20/09/2026 12:30:00", "dataVersion": "v", "faseEleitoral": "POS_ELEICAO"}  # > limite pós-eleição
+        ok, p = f.avaliar(muito_velho, [run(10)], AGORA, True)
+        self.assertFalse(ok)
+        self.assertTrue(any("extração do TSE" in x and f"{f.MAX_IDADE_TSE_H_POS_ELEICAO:.0f} h" in x for x in p), p)
+        # fora da pós-eleição o limite continua o de sempre
+        ok, _ = f.avaliar({"extracaoTse": "02/10/2026 12:30:00", "dataVersion": "v", "faseEleitoral": "ENTRE_TURNOS"}, [run(10)], AGORA, True)
+        self.assertFalse(ok)
+
     def test_manifesto_inacessivel(self):
         ok, p = f.avaliar(None, [run(10)], AGORA)
         self.assertFalse(ok)

@@ -7,7 +7,7 @@ import { AnswerBuilder, usaMeuEstado } from './answers.js';
 import { Gazetteer } from './gazetteer.js';
 import { parse, resolverContinuacao } from './nlu.js';
 import { normalizar } from './model.js';
-import { hojeBrasilia } from './phase.js';
+import { faseDe, formatarBr, hojeBrasilia } from './phase.js';
 
 /** Intenções decididas ANTES da resolução de nomes: independem das candidaturas carregadas. */
 const INDEPENDENTES = new Set([
@@ -160,8 +160,15 @@ export class Engine {
           const ehSegundoTurno = respostaAtual?.intent === 'SEGUNDO_TURNO' ||
             qNorm.includes('segundo turno') || qNorm.includes('2o turno') || qNorm.includes('2 turno');
           if (ehSegundoTurno) {
+            // datas das regras oficiais e tempo verbal pela fase: depois do 2º turno (26/10/2026) o modelo não pode falar no futuro
+            const regras = this.store?.regras ?? null;
+            const d1 = regras ? formatarBr(regras.turno1) : '04/10/2026';
+            const d2 = regras ? formatarBr(regras.turno2) : '25/10/2026';
+            const passado = regras ? faseDe(this.hoje(), regras.turno1, regras.turno2).id === 'POS_ELEICAO' : false;
             contexto += 'Regras constitucionais do 2º turno (Eleições 2026):\n' +
-              '• O 2º turno ocorre em 25/10/2026 EXCLUSIVAMENTE para Presidente e Governador caso o primeiro colocado não atinja mais de 50% dos votos válidos no 1º turno (04/10/2026).\n' +
+              (passado
+                ? `• O 2º turno ocorreu em ${d2}, exclusivamente para Presidente e Governador nos casos em que o primeiro colocado não atingiu mais de 50% dos votos válidos no 1º turno (${d1}). A eleição está encerrada; eleitos são os publicados pelo TSE.\n`
+                : `• O 2º turno ocorre em ${d2} EXCLUSIVAMENTE para Presidente e Governador caso o primeiro colocado não atinja mais de 50% dos votos válidos no 1º turno (${d1}).\n`) +
               '• Senadores e Deputados são eleitos em turno único no 1º turno por maioria simples ou voto proporcional e NÃO disputam 2º turno.\n\n';
             const uf = respostaAtual?.filters?.estadoUf ?? (typeof this.ufPadrao === 'function' ? this.ufPadrao() : null);
             if (uf && this.store?.candidatos?.length) {

@@ -190,8 +190,16 @@ object LocalNlu {
             """(votac\w*|eleic\w*|apurac\w*) (atual|agora|hoje|em andamento|neste momento)|""" +
             """quantas (urnas|secoes)|secoes totalizad\w*|(percentual|porcentagem) de (urnas|secoes)|""" +
             """votos (teve|recebeu|obteve|tem)|quantos votos|eleitos?|mais votad\w*|percentual de votos|totalizacao|boletim de urna|""" +
-            """passou para o segundo|quem passou)\b"""
+            """passou para o segundo|quem passou|""" +
+            // pós-eleição (26/10/2026; paridade com nlu.js): "quem é o novo presidente", "o lula ganhou?", "a eleição acabou?", "qual foi a abstenção"
+            """(novo|nova) (presidente|governador\w*|senador\w*)|(presidente|governador\w*|senador\w*) eleit[oa]s?|""" +
+            """(eleicao|eleicoes|votacao|votacoes|apuracao|segundo turno|2o turno) (ja )?(acabou|terminou|encerrou|acabaram|terminaram|encerraram)|""" +
+            """abstencao|comparecimento|(?<!nunca )(foi|foram) eleit[oa]s?|se (re)?elegeu|foi reeleit[oa]|ganhou|venceu|perdeu)\b"""
     )
+
+    /** Pergunta de resultado sobre UMA pessoa ("Lula foi eleito?", "o X ganhou?", "quantos votos Y teve"): o nome citado vai para a resposta. */
+    private val RX_RESULTADO_INDIVIDUAL = Regex("""\b(foi (re)?eleit[oa]|ganhou|venceu|perdeu|se (re)?elegeu|votos (teve|recebeu|obteve|tem)|quantos votos)\b""")
+    private val RX_LISTAGEM_OU_CANDIDATOS = Regex("""\bquem (disputa|disputam|concorre|concorrem|sao)\b|\bcandidat\w*\b|\blista( de)? candidat\w*\b""")
 
     /** Mensagem que é SÓ saudação/agradecimento/pedido de ajuda (ex.: "oi", "bom dia, tudo bem?", "obrigado!"). */
     private val RX_SAUDACAO = Regex(
@@ -412,7 +420,10 @@ object LocalNlu {
         // 3.1 Segundo turno e resultados
         if (Regex("""\bsegundo turno\b|\b2 ?(o|a|º|ª|°)? turno\b""").containsMatchIn(t) && !RX_RESULTADOS.containsMatchIn(t.replace("segundo turno", "")) && !sobrePropostas)
             return q(Intent.SEGUNDO_TURNO)  // "propostas do 2º turno sobre saúde" é plano de governo, não a regra do 2º turno (21/10/2026)
-        if (RX_RESULTADOS.containsMatchIn(t)) return q(Intent.RESULTADOS)
+        // "candidatos que nunca foram eleitos" é listagem por histórico, não resultado. O nome ("Lula foi eleito?") vai junto só com verbo de
+        // resultado individual: "a eleição acabou?" não pode virar nome por semelhança (paridade com nlu.js, 26/10/2026)
+        if (RX_RESULTADOS.containsMatchIn(t) && !(historico != null && RX_LISTAGEM_OU_CANDIDATOS.containsMatchIn(t)))
+            return q(Intent.RESULTADOS, nome = if (RX_RESULTADO_INDIVIDUAL.containsMatchIn(t)) nome() else achado?.termo)
 
         // 4. Fontes e sobre os dados
         if (RX_SOBRE_DADOS.containsMatchIn(t)) return q(Intent.SOBRE_DADOS)
@@ -517,7 +528,7 @@ object LocalNlu {
     }
 
     private fun extrairHistorico(t: String): HistoricoOpcao? = when {
-        Regex("""\bestreante\w*\b|\bprimeira vez\b|\bnunca (foi )?eleit\w*\b|\bnovato\w*\b""").containsMatchIn(t) -> HistoricoOpcao.NUNCA_ELEITO
+        Regex("""\bestreante\w*\b|\bprimeira vez\b|\bnunca (foi |foram )?eleit\w*\b|\bnovato\w*\b""").containsMatchIn(t) -> HistoricoOpcao.NUNCA_ELEITO
         Regex("""\breeleicao\b|\btentando reeleicao\b|\bja (foi )?eleit\w*\b""").containsMatchIn(t) -> HistoricoOpcao.ELEITO_MESMO_CARGO
         Regex("""\bveterano\w*\b|\bvarias vezes eleito\b""").containsMatchIn(t) -> HistoricoOpcao.ELEITO_2_OU_MAIS
         else -> null

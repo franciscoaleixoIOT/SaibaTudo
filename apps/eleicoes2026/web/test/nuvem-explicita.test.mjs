@@ -295,3 +295,16 @@ test('contexto do texto gerado: não corta no meio da linha e avisa quando a lis
   const linhas = r.split('\n');
   assert.ok(linhas.slice(1, -1).every((l) => /\(PARTIDO\)$/.test(l)), 'nenhuma linha cortada pela metade');
 });
+
+test('contexto do texto gerado acompanha a fase: depois do 2º turno, "ocorreu em 25/10/2026", nunca "ocorre"', async () => {
+  const contextos = [];
+  const nuvem = { gerarResposta: async (_q, ctx) => { contextos.push(ctx); return { answer: 'ok', model: 'teste' }; } };
+  const antes = await motor({ hoje: '2026-10-10', nuvem });
+  await antes.perguntarANuvem('quando é o segundo turno?', { intent: 'SEGUNDO_TURNO', directAnswer: 'x' }, { generativo: true });
+  assert.match(contextos[0], /O 2º turno ocorre em 25\/10\/2026/);
+  const depois = await motor({ hoje: '2026-10-26', nuvem });
+  await depois.perguntarANuvem('quem ganhou o segundo turno?', { intent: 'SEGUNDO_TURNO', directAnswer: 'x' }, { generativo: true });
+  assert.match(contextos[1], /O 2º turno ocorreu em 25\/10\/2026/);
+  assert.ok(!/ocorre em/.test(contextos[1]), contextos[1]);
+  assert.ok(!/25\/10\/2026 EXCLUSIVAMENTE/.test(contextos[1]), 'a regra constitucional é citada no passado');
+});

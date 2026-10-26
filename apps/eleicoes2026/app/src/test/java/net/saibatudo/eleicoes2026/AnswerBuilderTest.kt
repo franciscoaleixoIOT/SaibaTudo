@@ -254,4 +254,112 @@ class AnswerBuilderTest {
             assertTrue(sp, sp.startsWith("Não haverá 2º turno para Governador em São Paulo."))
         }
     }
+
+    // ------------------------------------------------------------------ pós-eleição (26/10/2026): o 2º turno já ocorreu (paridade com answers.test.mjs)
+    private val POS = "2026-10-26"
+    private fun linhaLula(eleito: Boolean = true) = LinhaApuracao("280002542548", "13", "LULA", "PT", 60_345_678L, "51,79", eleito, null, false)
+    private fun linhaFlavio() = LinhaApuracao("280002551544", "22", "FLAVIO BOLSONARO", "PL", 56_123_456L, "48,21", false, null, false)
+    /** Apuração ao vivo do 2º turno (totalização final) só para Presidente; nada para os demais. */
+    private val ap2tFinal = ApuracaoProvider { cargo, uf, turno ->
+        if (cargo == "PRESIDENTE" && turno == 2) ApuracaoCargo(cargo, uf, turno, "25/10/2026 23:27:10", "100,00", true, listOf(linhaLula(), linhaFlavio())) else null
+    }
+    private val semAoVivo = ApuracaoProvider { _, _, _ -> null }
+    private fun noFuturo(t: String) = Regex("""haver[aá] 2º turno|Votação do 2º turno|disputam o 2º turno|no dia: leve""", RegexOption.IGNORE_CASE).containsMatchIn(t)
+
+    @Test
+    fun posEleicaoSegundoTurnoParaPresidenteFalaNoPassadoComOEleitoDoTurno2() {
+        val r = responder("Segundo turno para presidente", hoje = POS, apuracao = ap2tFinal)
+        assertEquals(Intent.SEGUNDO_TURNO, r.intent)
+        val t = r.directAnswer!!
+        assertTrue(t, t.startsWith("Houve 2º turno para Presidente da República em 25/10/2026"))
+        assertTrue(t, t.contains("LULA (PT)") && t.contains("51,79%") && t.contains("ELEITO") && t.contains("Totalização final"))
+        assertFalse(t, noFuturo(t))
+        assertEquals(listOf("280002542548", "280002551544"), r.candidateIds)
+    }
+
+    @Test
+    fun posEleicaoSemApuracaoAoVivoSegundoTurnoNoPassadoNuncaHavera() {
+        for ((q, inicio) in listOf(
+            "Segundo turno para presidente" to "Houve 2º turno para Presidente da República em 25/10/2026",
+            "vai ter segundo turno para governador no ES?" to "Houve 2º turno para Governador no Espírito Santo em 25/10/2026"
+        )) {
+            val r = responder(q, hoje = POS, apuracao = semAoVivo)
+            assertEquals(q, Intent.SEGUNDO_TURNO, r.intent)
+            val t = r.directAnswer!!
+            assertTrue("$q: $t", t.startsWith(inicio))
+            assertTrue(t, t.contains("resultados.tse.jus.br"))
+            assertFalse(t, noFuturo(t))
+        }
+        val geral = responder("Quem vai pro segundo turno?", hoje = POS, uf = "ES", apuracao = semAoVivo).directAnswer!!
+        assertTrue(geral, geral.contains("O 2º turno, onde houve, foi em 25/10/2026"))
+        assertTrue(geral, geral.contains("Presidente da República: Houve 2º turno entre"))
+        assertTrue(geral, geral.contains("Governador (ES): Houve 2º turno entre"))
+        assertFalse(geral, noFuturo(geral))
+        val sp = responder("tem 2º turno pra governador em sp?", hoje = POS, apuracao = semAoVivo).directAnswer!!
+        assertTrue(sp, sp.startsWith("Não houve 2º turno para Governador em São Paulo."))
+    }
+
+    @Test
+    fun posEleicaoQuemFoiEleitoPresidenteSemAoVivoNaoDizQueDisputam() {
+        val r = responder("Quem foi eleito presidente?", hoje = POS, apuracao = semAoVivo)
+        assertEquals(Intent.RESULTADOS, r.intent)
+        val t = r.directAnswer!!
+        assertTrue(t, t.contains("O 2º turno para Presidente da República ocorreu em 25/10/2026"))
+        assertTrue(t, t.contains("resultados.tse.jus.br"))
+        assertFalse(t, noFuturo(t))
+        val pan = responder("como está a apuração?", hoje = POS, uf = "ES", apuracao = semAoVivo).directAnswer!!
+        assertFalse(pan, noFuturo(pan))
+        assertTrue(pan, pan.contains("2º turno em 25/10/2026 entre"))
+    }
+
+    @Test
+    fun posEleicaoResultadoPorCandidato() {
+        for (q in listOf("Lula foi eleito?", "quantos votos o lula teve no segundo turno?", "o lula ganhou?")) {
+            val r = responder(q, hoje = POS, apuracao = ap2tFinal)
+            assertEquals(q, Intent.RESULTADOS, r.intent)
+            val t = r.directAnswer!!
+            assertTrue("$q: $t", t.startsWith("LULA (PT, nº 13) — Presidente da República, 2º turno"))
+            assertTrue(t, t.contains("60.345.678 votos (51,79%) — ELEITO") && t.contains("Totalização final"))
+            assertEquals(q, listOf("280002542548"), r.candidateIds)
+            assertTrue(r.fonte!!, r.fonte!!.contains("ao vivo"))
+        }
+        val off = responder("Lula foi eleito?", hoje = POS, apuracao = semAoVivo).directAnswer!!
+        assertTrue(off, off.startsWith("LULA (PT, nº 13) — Presidente da República"))
+        assertTrue(off, off.contains("1º turno") && off.contains("resultados.tse.jus.br"))
+        assertFalse(off, noFuturo(off))
+        val tarc = responder("Tarcísio foi eleito?", hoje = POS, apuracao = semAoVivo).directAnswer!!
+        assertTrue(tarc, tarc.startsWith("TARCÍSIO (REPUBLICANOS, nº 10) — Governador em São Paulo, 1º turno"))
+        assertTrue(tarc, tarc.contains("— ELEITO"))
+    }
+
+    @Test
+    fun posEleicaoAbstencaoEEleicaoAcabouSaoResultados() {
+        val abs = responder("Qual foi a abstenção no segundo turno?", hoje = POS, apuracao = ap2tFinal)
+        assertEquals(Intent.RESULTADOS, abs.intent)
+        assertTrue(abs.directAnswer!!, abs.directAnswer!!.startsWith("Abstenção, comparecimento e votos brancos e nulos: o app não traz esses totais; consulte https://resultados.tse.jus.br/"))
+        val fim = responder("A eleição acabou?", hoje = POS, apuracao = ap2tFinal)
+        assertEquals(Intent.RESULTADOS, fim.intent)
+        assertTrue(fim.directAnswer!!, fim.directAnswer!!.contains("Status dos resultados das Eleições 2026"))
+    }
+
+    @Test
+    fun posEleicaoLocalDeVotacaoViraTituloJustificativaEMulta() {
+        for (q in listOf("Onde voto?", "Não votei, como justifico?", "Qual o prazo para justificar?")) {
+            val r = responder(q, hoje = POS)
+            assertEquals(q, Intent.LOCAL_VOTACAO, r.intent)
+            val t = r.directAnswer!!
+            assertTrue("$q: $t", t.startsWith("Título de eleitor e justificativa depois das Eleições 2026 (sistemas oficiais):"))
+            assertTrue(t, t.contains("03/12/2026") && t.contains("08/01/2027") && t.contains("multa"))
+            assertFalse(t, Regex("""No dia: leve|pode votar no 2º|vota-se no mesmo local""").containsMatchIn(t))
+        }
+        assertTrue(responder("Onde voto?", hoje = "2026-10-20").directAnswer!!.contains("No dia: leve documento"))
+    }
+
+    @Test
+    fun calendarioTrazPrazosPosEleitoraisComFonteOficial() {
+        val t = responder("Quando é a eleição?", hoje = POS).directAnswer!!
+        assertTrue(t, t.contains("Prestação de contas final: até 03/11/2026 (1º turno) e 14/11/2026 (2º turno) — Lei 9.504/1997, art. 29"))
+        assertTrue(t, t.contains("Diplomação dos eleitos: até 18/12/2026 (Res. TSE 23.760/2026)"))
+        assertTrue(t, t.contains("Posse: Presidente em 05/01/2027; Governadores em 06/01/2027 (EC 111/2021); Deputados e Senadores em 1º/02/2027"))
+    }
 }
