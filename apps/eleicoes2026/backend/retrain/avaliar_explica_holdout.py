@@ -4,7 +4,7 @@ Gera, com o GGUF do explicador (SaibaTudo-Explica), as respostas do HOLDOUT de e
 nunca viu) para o verificador do servidor conferir (`verificar_holdout_explica.mjs`: recomendação, contradição com os dados, número sem fonte).
 
 O prompt é exatamente o do treino e o do Space (`treino_utils.montar_textos` = `nlu_core.build_ask_prompt`): system = `instruction`,
-user = `input` ("CONTEXTO (...):\\n…\\n\\nPERGUNTA DO ELEITOR: …"). Decodificação gulosa (reprodutível), `max_tokens` igual ao do Space (400).
+user = `input` ("CONTEXTO (...):\\n…\\n\\nPERGUNTA DO ELEITOR: …"). Decodificação gulosa (reprodutível), `max_tokens` igual ao do Space (560 desde 27/10/2026; 400 cortava 6 das 223 respostas do holdout).
 
   python -I backend/retrain/avaliar_explica_holdout.py --gguf ../quimica/ai_model/output/gguf/ask-v1-20261020/model-Q4_K_M.gguf --threads 10
   node backend/retrain/verificar_holdout_explica.mjs backend/retrain/out-ask/holdout_respostas.jsonl
@@ -50,7 +50,7 @@ def main(argv=None):
     ap.add_argument("--threads", type=int, default=8)
     ap.add_argument("--gpu-layers", type=int, default=0)
     ap.add_argument("--n-ctx", type=int, default=4096)
-    ap.add_argument("--max-tokens", type=int, default=400, help="igual ao MAX_NEW_TOKENS do Space")
+    ap.add_argument("--max-tokens", type=int, default=560, help="igual ao MAX_NEW_TOKENS do Space (test_limite_tokens_explica.py)")
     ap.add_argument("--retomar", action="store_true", help="pula ids já presentes em --out")
     a = ap.parse_args(argv)
 

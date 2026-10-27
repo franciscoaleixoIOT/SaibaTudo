@@ -2,9 +2,10 @@
 """Space do Hugging Face (ZeroGPU) que gera o texto do SaibaTudo IA para o app de eleições, chamado só pelo servidor do projeto (api/ask.js).
 
 Substitui o Space de teste `backend/hf_space_qwen7b` (Qwen2.5-7B genérico). Modelo: o explicador SaibaTudo IA (Qwen3-4B-Instruct-2507 ajustado
-por QLoRA em comportamento: só o contexto, neutralidade, recusa, "pode conter erros"), apontado por ASK_MODEL_ID / ASK_MODEL_REVISION nas
-"Variables" do Space — sem mexer no código. Sem as variáveis, serve a base (Qwen3-4B-Instruct-2507), que o benchmark de 12/10/2026 já preferiu
-ao 7B.
+por QLoRA em comportamento: só o contexto, neutralidade, recusa, "pode conter erros"), apontado nas "Variables" do Space — sem mexer no código:
+ASK_MODEL_ID / ASK_MODEL_REVISION (base ou modelo fundido) e, desde 27/10/2026, ASK_ADAPTER_ID / ASK_ADAPTER_REVISION (adaptador LoRA privado
+aplicado e fundido sobre a base na carga; ver carga.py). Sem as variáveis, serve a base (Qwen3-4B-Instruct-2507), que o benchmark de
+12/10/2026 já preferiu ao 7B.
 
 O prompt é o MESMO do treino, da avaliação e da reserva no Modal (nlu_core.build_ask_prompt, copiado de backend/modal/nlu_core.py para esta
 pasta na publicação). A API é a mesma do Space anterior, então api/_lib/ask-handler.js não muda: só HF_ASK_SPACE_URL na Vercel.
@@ -21,17 +22,30 @@ import spaces
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
+import carga
 import nlu_core as core
 
-MODEL_ID = os.environ.get("ASK_MODEL_ID", "Qwen/Qwen3-4B-Instruct-2507")
-MODEL_REVISION = os.environ.get("ASK_MODEL_REVISION") or None
 ROTULO = os.environ.get("ASK_MODEL_LABEL", "SaibaTudo IA")
 GPU_SEGUNDOS = 45
-MAX_NEW_TOKENS = 400
+MAX_NEW_TOKENS = 560  # maior texto do app: 519 tokens (27/10/2026); o gate mede com o mesmo valor (test_limite_tokens_explica.py)
 
-tok = AutoTokenizer.from_pretrained(MODEL_ID, revision=MODEL_REVISION)
+
+def _base(model_id, revision):
+    return AutoModelForCausalLM.from_pretrained(model_id, revision=revision, dtype=torch.bfloat16)
+
+
+def _adaptador(modelo, adapter_id, revision):
+    from peft import PeftModel  # só quando há adaptador
+    # torch_device="cpu": no ZeroGPU torch.cuda.is_available() é True fora de @spaces.GPU, mas não há GPU; o peft inferiria "cuda" e
+    # o safetensors falharia ("No CUDA GPUs are available"). Funde na CPU; o modelo vai para "cuda" depois, como a base.
+    return PeftModel.from_pretrained(modelo, adapter_id, revision=revision, torch_device="cpu").merge_and_unload()
+
+
+model, CARGA = carga.carregar(os.environ, _base, _adaptador)
+print("carga:", CARGA, flush=True)
+tok = AutoTokenizer.from_pretrained(CARGA["base"], revision=CARGA["base_revision"])
 # no ZeroGPU o modelo vai para "cuda" já na carga do módulo (emulação fora de @spaces.GPU; GPU real dentro)
-model = AutoModelForCausalLM.from_pretrained(MODEL_ID, revision=MODEL_REVISION, dtype=torch.bfloat16).to("cuda")
+model = model.to("cuda")
 model.eval()
 
 

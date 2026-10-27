@@ -1,4 +1,5 @@
-// POST /api/ask — proxy de resposta generativa ancorada no TSE -> Modal (Qwen2.5-7B-Instruct-AWQ).
+// POST /api/ask — proxy de resposta generativa ancorada no TSE -> SaibaTudo IA (explicador de eleições) no Space do Hugging Face;
+// reserva: Modal (Qwen2.5-7B-Instruct-AWQ). O rótulo devolvido em `model` é o do provedor que escreveu o texto.
 //
 // Entrada : { q: string, context?: string, v: 1, client: "android"|"web", iid: "<uuid>" }
 // Saída   : { ok: true, answer: string, model: string, cached: boolean }

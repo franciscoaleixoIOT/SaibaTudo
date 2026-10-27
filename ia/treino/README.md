@@ -435,7 +435,7 @@ são dado eleitoral. Resultados em `out/explica-v1.6/pos_treino.log`, `apps/elei
 --merged out/explica-v1.5/merged --versao ask-v1.5-20261022 --teste` (grava também o segredo `HF_TOKEN` nos Spaces — lição de 22/10) e `HF_ASK_SPACE_URL`
 na Vercel pela API REST (CLI ausente) + `eleicoes-data-refresh.yml`, até 23/10 (congelamento 24–26/10). Se reprovar: ficar no Qwen 7B até depois de 27/10.
 
-## Explica ELEIÇÕES v1.7 (fila 9, 27/10/2026 09h56 → ~13h): explicador de eleições SEPARADO — EM TREINO
+## Explica ELEIÇÕES v1.7 (fila 9, 27/10/2026 09h56 → 13h06): explicador de eleições SEPARADO — APROVADO (96 % / 98,2 %)
 Pedido do mantenedor (27/10, depois do fim das eleições): "siga para o treino e ajuste os apps para usá-la". Executa o plano de 23/10 (§Eleições):
 1. **Explicador só de eleições** (LoRA próprio sobre a mesma base Qwen3-4B-Instruct-2507; a química continua com o seu): a mistura única puxava os dois para
    baixo (química 81 → 73 % quando eleições subiu; eleições nunca passou de 76,6 %).
@@ -459,7 +459,18 @@ Pedido do mantenedor (27/10, depois do fim das eleições): "siga para o treino 
 6. **Publicação (só com o gate aprovado):** `publicar_explica.py --so eleicoes --modelo franciscoaleixo/SaibaTudoIA-Explica-Eleicoes --merged
    out/explica-ele-v1.7/merged --versao ask-v1.7-20261027 --teste` → `HF_ASK_SPACE_URL` na Vercel de eleições → `eleicoes-data-refresh.yml` → teste
    ao vivo → política de privacidade 1.6 e docs. **Precisa do token de escrita do HF em `secrets/hf_token_write.txt`** (não existe nesta máquina).
-Resultado: (preencher no fim do gate).
+**Resultado (27/10, 13h06):** treino 2h25 (156 passos, 821 pares; 12 descartados por truncamento em 1.792), perda 0,997 → 0,00036; merge + GGUF 1,5 min.
+**Gate: 214/223 = 96,0 % → APROVADO** (contexto 184/192, sem_contexto 22/22, recusa 7/7, sem_dado 1/2; 184 respostas idênticas ao texto esperado).
+Reprovações: **5 cortes em 400 tokens** (listas de senadores eleitos em GO/MA/MT/PB e governador em MG: o texto do app tem até 519 tokens e o limite do
+Space/gate era 400 — o modelo estava reproduzindo o esperado até o corte), **3 números com um dígito trocado** (Res. 23.734 por 23.736; nº 7077 por 70077;
+R$ 2.573.923,69 por 2.573.921,69 — o verificador do servidor descarta os três em produção) e 1 `sem_dado` em que o modelo repetiu o texto "Não entendi" do
+app em vez do molde SEM_DADO. Correção do teto: `MAX_NEW_TOKENS` 400 → **560** no Space e no `avaliar_explica_holdout.py` (teste
+`test_limite_tokens_explica.py`: gate = Space ≥ 560); reavaliando só os 5 cortados com 560 tokens, os 5 saem idênticos ao esperado (440–495 tokens, 32–40 s em
+CPU) → **219/223 = 98,2 %** (`out-ask/holdout_gate_v17_560.json`). Erros que restam: cópia de dígitos longos (3/223 = 1,3 %), todos pegos pelo servidor.
+Publicação: o modelo fundido (7,6 GB) subia a 0,4 MB/s (link de 0,8 MB/s: mais de 5 h) → **`publicar_explica.py --so eleicoes --adapter treino/final`** envia só o
+adaptador LoRA (137 MB) ao repositório privado `franciscoaleixo/SaibaTudoIA-Explica-Eleicoes`; o Space (`hf_space_explica/carga.py`, novo, com teste) carrega a base
+pública Qwen3-4B-Instruct-2507 e funde o adaptador na carga (`ASK_ADAPTER_ID`/`ASK_ADAPTER_REVISION`; `peft` no requirements). Token: OAuth da CLI `hf auth login`
+(válido até 30/10). Resultado da publicação e do teste ao vivo em `apps/eleicoes2026/docs/PROJECT_MEMORY.md` §11 (27/10).
 
 ## Base maior (Qwen3-8B) com VRAM + RAM — sondas de 22/10/2026 (`out/probe-8b/`)
 Pedido do mantenedor: treinar uma base maior usando a VRAM da GPU e a RAM do sistema. Resultado das sondas (48 pares, QLoRA 4 bits NF4, batch 1 ×

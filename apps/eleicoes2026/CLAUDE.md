@@ -47,7 +47,7 @@ Antes de dizer "corrigido": **reproduza, corrija, meça de novo** (varredura de 
 
 ## Onde mora cada coisa
 `app/` Android · `web/` site e PWA (JS puro; a home de saibatudo.net é `../../portal/`) · `api/` funções da Vercel · `pipeline/` dados do TSE · `backend/modal/` serviços e gate do modelo ·
-`backend/retrain/` dados de treino · `backend/hf_space_qwen7b/` Space do texto gerado · `ai_model/` scripts de treino (saídas fora do Git) ·
+`backend/retrain/` dados de treino · `backend/hf_space_explica/` Space do texto gerado (SaibaTudo IA; `hf_space_qwen7b/` é o antigo, de reserva) · `ai_model/` scripts de treino (saídas fora do Git) ·
 `contracts/` casos compartilhados Android×site×servidor · `eval/` histórico do painel (**só um arquivo por modelo em produção**; o resto em `eval/local/`) ·
 `tools/` verificações do CI · `docs/` documentação.
 

@@ -52,12 +52,15 @@ Se o resumo do job mostrar "testes de comportamento falharam", a publicação fo
 
 1. Atualizar a política de privacidade (já descreve o recurso, versão 1.2) e confirmar a tela de consentimento.
 2. Montar o contexto no servidor a partir do pacote assinado (hoje o app o fornece e o servidor não consegue verificá-lo).
-3. **Provedor principal: Space no ZeroGPU do Hugging Face** (`franciscoaleixo/saibatudo-qwen7b`, privado; código em `backend/hf_space_qwen7b/`). **Troca pelo
-   explicador SaibaTudo IA** (`backend/hf_space_explica/`, publicado por `ia/treino/publicar_explica.py`): só com o gate do holdout de eleições ≥ 95 %
-   (`backend/retrain/avaliar_explica_holdout.py` + `verificar_holdout_explica.mjs`). 22/10/2026: ask-v1.3 **reprovou** (5,3 %; 88,8 % sem a regra do
-   rodapé — números trocados, respostas de memória sem contexto); v1.5 com eleições ×3 na mistura em treino. A cota da conta PRO
+3. **Provedor principal: Space no ZeroGPU do Hugging Face** — desde 27/10/2026 o **explicador SaibaTudo IA** `franciscoaleixo/SaibaTudoIA-Explica-Eleicoes`
+   (privado; código em `backend/hf_space_explica/`, publicado por `ia/treino/publicar_explica.py --so eleicoes --adapter …`: o Space carrega a base pública
+   Qwen3-4B-Instruct-2507 e funde na carga o adaptador LoRA ask-v1.7-20261027 do repositório privado de mesmo nome — `carga.py`, variáveis
+   `ASK_ADAPTER_ID`/`ASK_ADAPTER_REVISION`; treinado só com as respostas do app). Gate que autoriza qualquer versão nova: holdout de eleições ≥ 95 %
+   (`backend/retrain/avaliar_explica_holdout.py` + `verificar_holdout_explica.mjs`; v1.7: 96 % com 400 tokens, 98,2 % com os 560 atuais; v1.3 5,3 %, v1.5 18,1 %,
+   v1.6 76,6 % reprovados). Voltar ao Qwen 7B: `HF_ASK_SPACE_URL=https://franciscoaleixo-saibatudo-qwen7b.hf.space` (Space `saibatudo-qwen7b`, código em
+   `backend/hf_space_qwen7b/`) e novo deploy. A cota da conta PRO
    (40 min de GPU por dia) só conta o tempo em que a GPU trabalha: medido em 07/10/2026, **3,0 s por resposta em média** (0,7 a 10 s), ou cerca de 800 respostas por dia.
-   Na Vercel: `HF_ASK_SPACE_URL=https://franciscoaleixo-saibatudo-qwen7b.hf.space` e `HF_TOKEN=<token de leitura, de preferência restrito a esse Space>` (segredo).
+   Na Vercel: `HF_ASK_SPACE_URL=https://franciscoaleixo-saibatudoia-explica-eleicoes.hf.space` e `HF_TOKEN=<token de leitura do namespace>` (segredo).
    Limites: `HF_ASK_DAILY_BUDGET` (padrão 400 chamadas/dia) e, para a **reserva no Modal**, `MODAL_ASK_DAILY_BUDGET` (padrão 15/dia). Com o Hugging Face configurado, o Modal
    (`MODAL_ASK_ENDPOINT`) só é chamado se o Space falhar ou a cota acabar; resposta reprovada no verificador não é refeita. Sem créditos pré-pagos no Hugging Face, passar da
    cota apenas recusa a chamada (com créditos, cobra US$ 1 por 10 min: não deixe saldo se não quiser cobrança).

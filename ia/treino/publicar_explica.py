@@ -20,6 +20,8 @@ Token: o da CLI do Hugging Face (`hf auth login`, com escrita — decisão do ma
 
   python -I ia/treino/publicar_explica.py --merged ia/treino/out/explica-v1/merged --versao ask-v1-20261020 --teste
   python -I ia/treino/publicar_explica.py --so-spaces --teste          # só republica o código dos Spaces (modelo já enviado)
+  python -I ia/treino/publicar_explica.py --so eleicoes --modelo franciscoaleixo/SaibaTudoIA-Explica-Eleicoes \
+      --adapter ia/treino/out/explica-ele-v1.7/treino/final --versao ask-v1.7-20261027 --teste   # só o adaptador LoRA (137 MB): o Space funde na carga
 """
 import argparse
 import json
@@ -75,15 +77,35 @@ def ler_token_leitura(caminho: Path) -> str:
 
 
 def montar_space(nome: str, destino: Path) -> Path:
+    """Todos os módulos Python da pasta do Space (menos testes), requirements.txt e README.md, mais o core copiado de backend/modal/."""
     pasta, core = SPACES[nome]
     d = destino / f"space_{nome}"
     if d.exists():
         shutil.rmtree(d)
     d.mkdir(parents=True)
-    for f in ("app.py", "requirements.txt", "README.md"):
-        shutil.copy(pasta / f, d / f)
+    for f in sorted(pasta.iterdir()):
+        if (f.suffix == ".py" and not f.name.startswith("test_")) or f.name in ("requirements.txt", "README.md"):
+            shutil.copy(f, d / f.name)
     shutil.copy(core, d / core.name)
     return d
+
+
+def base_do_adaptador(pasta: Path) -> str:
+    """Base declarada pelo adaptador LoRA (adapter_config.json → base_model_name_or_path)."""
+    cfg = json.loads((pasta / "adapter_config.json").read_text(encoding="utf-8"))
+    base = cfg.get("base_model_name_or_path") or ""
+    if "/" not in base:
+        sys.exit(f"adapter_config.json sem base_model_name_or_path reconhecível: {base!r}")
+    return base
+
+
+def variaveis_space(modelo: str, sha: str, rotulo: str, base_do_adaptador: str | None = None) -> dict:
+    """Variables do Space. Modelo fundido: ASK_MODEL_* aponta a ele e o adaptador fica vazio. Adaptador: ASK_MODEL_ID é a base pública
+    (sem revisão fixa) e ASK_ADAPTER_* aponta ao repositório privado do adaptador, na revisão enviada."""
+    if base_do_adaptador:
+        return {"ASK_MODEL_ID": base_do_adaptador, "ASK_MODEL_REVISION": "", "ASK_MODEL_LABEL": rotulo,
+                "ASK_ADAPTER_ID": modelo, "ASK_ADAPTER_REVISION": sha}
+    return {"ASK_MODEL_ID": modelo, "ASK_MODEL_REVISION": sha, "ASK_MODEL_LABEL": rotulo, "ASK_ADAPTER_ID": "", "ASK_ADAPTER_REVISION": ""}
 
 
 def esperar_running(api, repo_id: str, segundos: int) -> str:
@@ -129,7 +151,8 @@ def main(argv=None):
     ap.add_argument("--token-leitura", default=str(ELE / "secrets" / "hf_token.txt"),
                     help="token de LEITURA gravado como segredo HF_TOKEN nos Spaces (para baixar o modelo privado); mesmo token que a Vercel usa")
     ap.add_argument("--modelo", default="franciscoaleixo/SaibaTudoIA-Explica", help="repositório privado do modelo fundido")
-    ap.add_argument("--merged", help="diretório do modelo fundido a enviar (omita com --so-spaces)")
+    ap.add_argument("--merged", help="diretório do modelo fundido a enviar (omita com --so-spaces ou use --adapter)")
+    ap.add_argument("--adapter", help="diretório do adaptador LoRA (treino/final) a enviar em vez do modelo fundido; o Space funde na carga")
     ap.add_argument("--versao", default="", help="rótulo da versão na mensagem do commit (ex.: ask-v1-20261020)")
     ap.add_argument("--rotulo", default="SaibaTudo IA", help="ASK_MODEL_LABEL mostrado pelos apps")
     ap.add_argument("--space-eleicoes", default="franciscoaleixo/SaibaTudoIA-Explica-Eleicoes")
@@ -149,18 +172,31 @@ def main(argv=None):
     print("conta:", quem.get("name"), "| token:", quem.get("auth", {}).get("accessToken", {}).get("displayName"))
     relatorio = {"modelo": a.modelo, "spaces": {}}
 
-    # 1. modelo
+    # 1. modelo (fundido) ou adaptador LoRA
+    base_adaptador = None
+    if a.adapter:
+        base_adaptador = base_do_adaptador(Path(a.adapter))
     if not a.so_spaces:
-        if not a.merged or not Path(a.merged).is_dir():
-            sys.exit("--merged deve apontar para o diretório do modelo fundido (ou use --so-spaces)")
+        origem = a.adapter or a.merged
+        if not origem or not Path(origem).is_dir():
+            sys.exit("--merged (modelo fundido) ou --adapter (adaptador LoRA) deve apontar para um diretório (ou use --so-spaces)")
         api.create_repo(a.modelo, repo_type="model", private=True, exist_ok=True)
-        msg = f"Explica {a.versao or 'nova revisão'}: QLoRA Qwen3-4B-Instruct-2507 fundido; comportamento SaibaTudo IA (quimica + eleicoes)"
-        print("enviando modelo:", a.merged, "→", a.modelo)
-        api.upload_folder(repo_id=a.modelo, repo_type="model", folder_path=a.merged, commit_message=msg,
+        oque = f"adaptador LoRA sobre {base_adaptador}" if a.adapter else "QLoRA Qwen3-4B-Instruct-2507 fundido"
+        msg = f"Explica {a.versao or 'nova revisão'}: {oque}; comportamento SaibaTudo IA"
+        print("enviando", "adaptador:" if a.adapter else "modelo:", origem, "→", a.modelo, flush=True)
+        api.upload_folder(repo_id=a.modelo, repo_type="model", folder_path=origem, commit_message=msg,
                           ignore_patterns=["*.gguf", "checkpoint-*", "runs/*", "*.log"])
+    elif a.so_spaces and not a.adapter:
+        # revisão atual: se o repositório guarda um adaptador, as variáveis têm de dizer isso
+        nomes = {s.rfilename for s in api.model_info(a.modelo).siblings or []}
+        if "adapter_config.json" in nomes:
+            import tempfile as _tf
+            from huggingface_hub import hf_hub_download
+            base_adaptador = base_do_adaptador(Path(hf_hub_download(a.modelo, "adapter_config.json", token=token, cache_dir=_tf.mkdtemp())).parent)
     sha = api.model_info(a.modelo).sha
     relatorio["revisao"] = sha
-    print("revisão do modelo:", sha)
+    relatorio["adaptador_sobre"] = base_adaptador
+    print("revisão do modelo:", sha, "| adaptador sobre:", base_adaptador, flush=True)
 
     # 2-3. Spaces
     alvos = a.so or ["eleicoes", "quimica"]
@@ -175,11 +211,17 @@ def main(argv=None):
             pasta = montar_space(nome, Path(tmp))
             api.upload_folder(repo_id=rid, repo_type="space", folder_path=str(pasta),
                               commit_message=f"Explica {a.versao or ''}: codigo do Space + {SPACES[nome][1].name}".strip())
-            for k, v in (("ASK_MODEL_ID", a.modelo), ("ASK_MODEL_REVISION", sha), ("ASK_MODEL_LABEL", a.rotulo)):
-                api.add_space_variable(rid, k, v)
+            for k, v in variaveis_space(a.modelo, sha, a.rotulo, base_adaptador).items():
+                if v:
+                    api.add_space_variable(rid, k, v)
+                else:  # vazio = ausente (carga.py trata igual); remover em vez de gravar ""
+                    try:
+                        api.delete_space_variable(rid, k)
+                    except Exception:  # noqa: BLE001 — a variável pode não existir
+                        pass
             # segredo (não variável): o modelo está em repositório privado; sem HF_TOKEN o Space falha ao carregar (lição de 22/10/2026)
             api.add_space_secret(rid, "HF_TOKEN", token_leitura)
-            print("  variáveis ASK_MODEL_* e segredo HF_TOKEN gravados")
+            print("  variáveis ASK_MODEL_* / ASK_ADAPTER_* e segredo HF_TOKEN gravados", flush=True)
             info = api.space_info(rid)
             hw = info.runtime.hardware if info.runtime else None
             if hw and hw != a.hardware and hw != "cpu-basic":

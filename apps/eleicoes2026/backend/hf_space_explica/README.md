@@ -8,7 +8,7 @@ sdk_version: 5.49.1
 python_version: 3.10.13
 app_file: app.py
 pinned: false
-short_description: Texto gerado do SaibaTudo IA para o app de eleicoes (uso interno)
+short_description: Texto gerado da SaibaTudo IA para o app de eleicoes
 ---
 
 Space do projeto **SaibaTudo Eleições 2026**: gera o texto da "SaibaTudo IA" (explicador Qwen3-4B-Instruct-2507 ajustado em comportamento, no
