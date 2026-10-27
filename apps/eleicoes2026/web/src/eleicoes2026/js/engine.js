@@ -134,56 +134,66 @@ export class Engine {
    * Fallback: reinterpretação NLU estruturada com montagem via AnswerBuilder.
    * Retorna a resposta (origem GENERATIVA ou NUVEM) ou null se a nuvem falhar. Nunca lança.
    */
+  /**
+   * Contexto enviado ao texto gerado (/api/ask): resumo da resposta do app, candidaturas no escopo e, em perguntas de 2º turno,
+   * as regras com as datas oficiais no tempo verbal da fase. É a ÚNICA montagem: perguntarANuvem e o gerador do dataset do
+   * explicador (backend/retrain/dump_respostas_ask.mjs) usam esta função, para o treino ver exatamente o que o site envia.
+   */
+  contextoParaNuvem(pergunta, respostaAtual = null) {
+    let contexto = '';
+    if (respostaAtual?.directAnswer) {
+      contexto += `Dados apurados no sistema:\n${resumoParaContexto(respostaAtual.directAnswer)}\n\n`;
+    }
+    if (respostaAtual?.candidateIds?.length > 0) {
+      const cands = respostaAtual.candidateIds
+        .map((id) => this.store.porId.get(id))
+        .filter(Boolean)
+        .slice(0, 15);
+      if (cands.length > 0) {
+        contexto += 'Candidaturas oficiais do TSE no escopo da consulta:\n';
+        for (const c of cands) {
+          const bens = typeof c.patrimonioDeclarado === 'number' && c.patrimonioDeclarado > 0
+            ? `Bens: R$ ${c.patrimonioDeclarado.toLocaleString('pt-BR')}`
+            : (c.declaraBens === false ? 'Não declarou bens' : 'Sem dados de bens');
+          contexto += `• ${c.nomeUrna} (nº ${c.numero}, ${c.partido}/${c.estadoUf !== 'BR' ? c.estadoUf : 'BR'}) — ${c.cargo}. Situação: ${c.situacao}. ${bens}.\n`;
+        }
+      }
+    } else {
+      const qNorm = pergunta.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      const ehSegundoTurno = respostaAtual?.intent === 'SEGUNDO_TURNO' ||
+        qNorm.includes('segundo turno') || qNorm.includes('2o turno') || qNorm.includes('2 turno');
+      if (ehSegundoTurno) {
+        // datas das regras oficiais e tempo verbal pela fase: depois do 2º turno (26/10/2026) o modelo não pode falar no futuro
+        const regras = this.store?.regras ?? null;
+        const d1 = regras ? formatarBr(regras.turno1) : '04/10/2026';
+        const d2 = regras ? formatarBr(regras.turno2) : '25/10/2026';
+        const passado = regras ? faseDe(this.hoje(), regras.turno1, regras.turno2).id === 'POS_ELEICAO' : false;
+        contexto += 'Regras constitucionais do 2º turno (Eleições 2026):\n' +
+          (passado
+            ? `• O 2º turno ocorreu em ${d2}, exclusivamente para Presidente e Governador nos casos em que o primeiro colocado não atingiu mais de 50% dos votos válidos no 1º turno (${d1}). A eleição está encerrada; eleitos são os publicados pelo TSE.\n`
+            : `• O 2º turno ocorre em ${d2} EXCLUSIVAMENTE para Presidente e Governador caso o primeiro colocado não atinja mais de 50% dos votos válidos no 1º turno (${d1}).\n`) +
+          '• Senadores e Deputados são eleitos em turno único no 1º turno por maioria simples ou voto proporcional e NÃO disputam 2º turno.\n\n';
+        const uf = respostaAtual?.filters?.estadoUf ?? (typeof this.ufPadrao === 'function' ? this.ufPadrao() : null);
+        if (uf && this.store?.candidatos?.length) {
+          const govs = this.store.candidatos
+            .filter((c) => c.cargoCodigo === 'GOVERNADOR' && c.estadoUf === uf)
+            .slice(0, 10);
+          if (govs.length > 0) {
+            contexto += `Candidatos registrados a Governador (${uf}) nas Eleições 2026:\n`;
+            for (const c of govs) {
+              contexto += `• ${c.nomeUrna} (nº ${c.numero}, ${c.partido}/${c.estadoUf}) — Situação: ${c.situacao}\n`;
+            }
+          }
+        }
+      }
+    }
+    return contexto;
+  }
+
   async perguntarANuvem(pergunta, respostaAtual = null, { generativo = false } = {}) {
     if (generativo && respostaAtual?.intent !== 'RECOMENDACAO' && typeof this.nuvem?.gerarResposta === 'function') {
       try {
-        let contexto = '';
-        if (respostaAtual?.directAnswer) {
-          contexto += `Dados apurados no sistema:\n${resumoParaContexto(respostaAtual.directAnswer)}\n\n`;
-        }
-        if (respostaAtual?.candidateIds?.length > 0) {
-          const cands = respostaAtual.candidateIds
-            .map((id) => this.store.porId.get(id))
-            .filter(Boolean)
-            .slice(0, 15);
-          if (cands.length > 0) {
-            contexto += 'Candidaturas oficiais do TSE no escopo da consulta:\n';
-            for (const c of cands) {
-              const bens = typeof c.patrimonioDeclarado === 'number' && c.patrimonioDeclarado > 0
-                ? `Bens: R$ ${c.patrimonioDeclarado.toLocaleString('pt-BR')}`
-                : (c.declaraBens === false ? 'Não declarou bens' : 'Sem dados de bens');
-              contexto += `• ${c.nomeUrna} (nº ${c.numero}, ${c.partido}/${c.estadoUf !== 'BR' ? c.estadoUf : 'BR'}) — ${c.cargo}. Situação: ${c.situacao}. ${bens}.\n`;
-            }
-          }
-        } else {
-          const qNorm = pergunta.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-          const ehSegundoTurno = respostaAtual?.intent === 'SEGUNDO_TURNO' ||
-            qNorm.includes('segundo turno') || qNorm.includes('2o turno') || qNorm.includes('2 turno');
-          if (ehSegundoTurno) {
-            // datas das regras oficiais e tempo verbal pela fase: depois do 2º turno (26/10/2026) o modelo não pode falar no futuro
-            const regras = this.store?.regras ?? null;
-            const d1 = regras ? formatarBr(regras.turno1) : '04/10/2026';
-            const d2 = regras ? formatarBr(regras.turno2) : '25/10/2026';
-            const passado = regras ? faseDe(this.hoje(), regras.turno1, regras.turno2).id === 'POS_ELEICAO' : false;
-            contexto += 'Regras constitucionais do 2º turno (Eleições 2026):\n' +
-              (passado
-                ? `• O 2º turno ocorreu em ${d2}, exclusivamente para Presidente e Governador nos casos em que o primeiro colocado não atingiu mais de 50% dos votos válidos no 1º turno (${d1}). A eleição está encerrada; eleitos são os publicados pelo TSE.\n`
-                : `• O 2º turno ocorre em ${d2} EXCLUSIVAMENTE para Presidente e Governador caso o primeiro colocado não atinja mais de 50% dos votos válidos no 1º turno (${d1}).\n`) +
-              '• Senadores e Deputados são eleitos em turno único no 1º turno por maioria simples ou voto proporcional e NÃO disputam 2º turno.\n\n';
-            const uf = respostaAtual?.filters?.estadoUf ?? (typeof this.ufPadrao === 'function' ? this.ufPadrao() : null);
-            if (uf && this.store?.candidatos?.length) {
-              const govs = this.store.candidatos
-                .filter((c) => c.cargoCodigo === 'GOVERNADOR' && c.estadoUf === uf)
-                .slice(0, 10);
-              if (govs.length > 0) {
-                contexto += `Candidatos registrados a Governador (${uf}) nas Eleições 2026:\n`;
-                for (const c of govs) {
-                  contexto += `• ${c.nomeUrna} (nº ${c.numero}, ${c.partido}/${c.estadoUf}) — Situação: ${c.situacao}\n`;
-                }
-              }
-            }
-          }
-        }
+        const contexto = this.contextoParaNuvem(pergunta, respostaAtual);
         const gen = await this.nuvem.gerarResposta(pergunta, contexto);
         if (gen && gen.answer) {
           return {

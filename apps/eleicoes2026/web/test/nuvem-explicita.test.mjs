@@ -308,3 +308,18 @@ test('contexto do texto gerado acompanha a fase: depois do 2º turno, "ocorreu e
   assert.ok(!/ocorre em/.test(contextos[1]), contextos[1]);
   assert.ok(!/25\/10\/2026 EXCLUSIVAMENTE/.test(contextos[1]), 'a regra constitucional é citada no passado');
 });
+
+test('contextoParaNuvem é exatamente o que perguntarANuvem envia ao texto gerado (o gerador do dataset do explicador usa a mesma função)', async () => {
+  const contextos = [];
+  const nuvem = { gerarResposta: async (_q, ctx) => { contextos.push(ctx); return { answer: 'ok', model: 'teste' }; } };
+  const engine = await motor({ hoje: '2026-10-27', ufPadrao: 'SP', nuvem });
+  const resposta = await engine.responder('candidatos a governador em SP');
+  await engine.perguntarANuvem('candidatos a governador em SP', resposta, { generativo: true });
+  assert.equal(engine.contextoParaNuvem('candidatos a governador em SP', resposta), contextos[0]);
+  assert.match(contextos[0], /^Dados apurados no sistema:\n/);
+  assert.match(contextos[0], /Candidaturas oficiais do TSE no escopo da consulta:/);
+  const r2 = { intent: 'SEGUNDO_TURNO', directAnswer: 'x' };
+  await engine.perguntarANuvem('quando foi o segundo turno?', r2, { generativo: true });
+  assert.equal(engine.contextoParaNuvem('quando foi o segundo turno?', r2), contextos[1]);
+  assert.match(contextos[1], /O 2º turno ocorreu em 25\/10\/2026/);
+});

@@ -68,9 +68,11 @@ def exemplo(reg: dict, com_contexto: bool = True) -> dict | None:
     contexto = reg.get("contexto") or ""
     if tipo == "recusa" or intent == "RECOMENDACAO":
         # o app recusa com neutralidade; o explicador aprende a MESMA recusa (nunca chega a recomendar)
-        saida = ("Não indico, recomendo, comparo nem prevejo candidatos: a decisão do voto é sua (Res. TSE 23.755/2026). "
+        # v1.7 (27/10/2026): sem citação de lei (o modelo acrescentava "(LC 64/90)" e o gate contava como número) e COM o rodapé,
+        # como todo tipo de saída — o modelo aprende um único fecho
+        saida = ("Não indico, recomendo, comparo nem prevejo candidatos: a decisão do voto é sua. "
                  "Com os dados oficiais do TSE, o aplicativo mostra quem disputa cada cargo, número na urna, perfil, Ficha Limpa, bens, "
-                 "contas de campanha, plano de governo, pesquisas registradas e resultados oficiais.")
+                 "contas de campanha, plano de governo, pesquisas registradas e resultados oficiais. " + RODAPE)
         ctx = ""  # o site não envia contexto em recusas (perguntarANuvem pula RECOMENDACAO); treina-se sem contexto
     elif not com_contexto:
         saida, ctx = SEM_CONTEXTO, ""

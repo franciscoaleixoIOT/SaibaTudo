@@ -3,7 +3,7 @@
 // ao /api/ask (engine.perguntarANuvem: "Dados apurados no sistema:" + candidaturas no escopo). Nada é inventado: tudo vem do pacote
 // do TSE. A montagem dos exemplos de treino (prompt do explicador, holdout, verificação de fidelidade) é do build_ask_dataset.py.
 //
-//   node backend/retrain/dump_respostas_ask.mjs --out backend/retrain/out-ask/respostas.jsonl [--hoje 2026-10-20] [--max-nomes 320]
+//   node backend/retrain/dump_respostas_ask.mjs --out backend/retrain/out-ask/respostas.jsonl [--hoje 2026-10-27] [--max-nomes 320] [--sem-apuracao]
 //
 // Fontes de perguntas: contracts/nlu_golden_cases.json e nlu_nome_cases.json (perguntas), opiniao_cases.json (recusas), uma grade
 // cargo × UF (listar, contar, resultado, 2º turno), perguntas institucionais e perguntas sobre candidatos reais (nome de urna).
@@ -12,13 +12,13 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { resumoParaContexto } from '../../web/src/eleicoes2026/js/engine.js';
+import { ApuracaoClient } from '../../web/src/eleicoes2026/js/live.js';
 import { motor } from '../../web/test/support.mjs';
 
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const args = Object.fromEntries(process.argv.slice(2).map((a, i, arr) => (a.startsWith('--') ? [a.slice(2), arr[i + 1]] : null)).filter(Boolean));
 const OUT = resolve(RAIZ, args.out ?? 'backend/retrain/out-ask/respostas.jsonl');
-const HOJE = args.hoje ?? '2026-10-20';
+const HOJE = args.hoje ?? '2026-10-27';
 const MAX_NOMES = Number.parseInt(args['max-nomes'] ?? '320', 10);
 
 const lerCasos = (f) => JSON.parse(readFileSync(resolve(RAIZ, 'contracts', f), 'utf8')).cases;
@@ -34,40 +34,16 @@ const INSTITUCIONAIS = [
   'De onde vêm os dados do app?', 'Como funciona o segundo turno?', 'Quem disputa a Presidência?', 'Quem disputa o segundo turno?',
   'Resultado da eleição para presidente', 'Quantas candidaturas há no Brasil?', 'Quantas mulheres são candidatas?', 'Pesquisas para presidente',
   'O que o app faz?', 'Ajuda', 'Simular voto na urna', 'Quem foi eleito presidente?', 'Haverá segundo turno para presidente?',
+  // pós-eleição (26/10/2026 em diante)
+  'Quem é o novo presidente?', 'A eleição acabou?', 'Quem ganhou o segundo turno?', 'Quem foi eleito governador?', 'Houve segundo turno para governador?',
+  'Quem foi eleito senador?', 'Quantos votos o presidente eleito teve?', 'Qual foi a abstenção?', 'Não votei, como justifico?',
+  'Até quando posso justificar?', 'Quanto é a multa por não votar?', 'Quando é a diplomação dos eleitos?', 'Quando é a posse do presidente?',
+  'Prazo da prestação de contas final', 'Segundo turno para presidente', 'Resultado do segundo turno', 'Quem perdeu o segundo turno?',
 ];
 
-function contextoDe(engine, resposta, pergunta) {
-  // Cópia fiel de engine.perguntarANuvem (o que o site envia ao /api/ask), sem a chamada à nuvem.
-  let contexto = '';
-  if (resposta?.directAnswer) contexto += `Dados apurados no sistema:\n${resumoParaContexto(resposta.directAnswer)}\n\n`;
-  if (resposta?.candidateIds?.length > 0) {
-    const cands = resposta.candidateIds.map((id) => engine.store.porId.get(id)).filter(Boolean).slice(0, 15);
-    if (cands.length > 0) {
-      contexto += 'Candidaturas oficiais do TSE no escopo da consulta:\n';
-      for (const c of cands) {
-        const bens = typeof c.patrimonioDeclarado === 'number' && c.patrimonioDeclarado > 0
-          ? `Bens: R$ ${c.patrimonioDeclarado.toLocaleString('pt-BR')}`
-          : (c.declaraBens === false ? 'Não declarou bens' : 'Sem dados de bens');
-        contexto += `• ${c.nomeUrna} (nº ${c.numero}, ${c.partido}/${c.estadoUf !== 'BR' ? c.estadoUf : 'BR'}) — ${c.cargo}. Situação: ${c.situacao}. ${bens}.\n`;
-      }
-    }
-  } else {
-    const qNorm = pergunta.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-    const ehSegundoTurno = resposta?.intent === 'SEGUNDO_TURNO' || qNorm.includes('segundo turno') || qNorm.includes('2o turno') || qNorm.includes('2 turno');
-    if (ehSegundoTurno) {
-      contexto += 'Regras constitucionais do 2º turno (Eleições 2026):\n' +
-        '• O 2º turno ocorre em 25/10/2026 EXCLUSIVAMENTE para Presidente e Governador caso o primeiro colocado não atinja mais de 50% dos votos válidos no 1º turno (04/10/2026).\n' +
-        '• Senadores e Deputados são eleitos em turno único no 1º turno por maioria simples ou voto proporcional e NÃO disputam 2º turno.\n\n';
-      const uf = resposta?.filters?.estadoUf ?? 'SP';
-      const govs = engine.store.candidatos.filter((c) => c.cargoCodigo === 'GOVERNADOR' && c.estadoUf === uf).slice(0, 10);
-      if (govs.length > 0) {
-        contexto += `Candidatos registrados a Governador (${uf}) nas Eleições 2026:\n`;
-        for (const c of govs) contexto += `• ${c.nomeUrna} (nº ${c.numero}, ${c.partido}/${c.estadoUf}) — Situação: ${c.situacao}\n`;
-      }
-    }
-  }
-  return contexto.trim();
-}
+/** O contexto é o do próprio motor (engine.contextoParaNuvem): o treino vê EXATAMENTE o que o site envia ao /api/ask, inclusive o
+ *  tempo verbal das regras do 2º turno na fase atual. */
+const contextoDe = (engine, resposta, pergunta) => engine.contextoParaNuvem(pergunta, resposta);
 
 function* perguntas(engine) {
   for (const c of lerCasos('nlu_golden_cases.json')) yield { q: c.q, tipo: c.intent === 'RECOMENDACAO' ? 'recusa' : 'golden' };
@@ -81,6 +57,9 @@ function* perguntas(engine) {
     }
     yield { q: `resultado para governador em ${uf}`, tipo: 'grade' };
     yield { q: `quem vai para o segundo turno em ${uf}?`, tipo: 'grade' };
+    yield { q: `quem foi eleito governador em ${uf}?`, tipo: 'grade' };
+    yield { q: `houve segundo turno para governador em ${uf}?`, tipo: 'grade' };
+    yield { q: `senadores eleitos em ${uf}`, tipo: 'grade' };
     yield { q: `candidatas mulheres a deputada federal em ${uf}`, tipo: 'grade' };
     yield { q: `candidatos do PT a deputado estadual em ${uf}`, tipo: 'grade' };
   }
@@ -90,12 +69,15 @@ function* perguntas(engine) {
   const amostra = todos.map((c) => [h(String(c.id)), c]).sort((a, b) => (a[0] < b[0] ? -1 : 1)).slice(0, MAX_NOMES).map((x) => x[1]);
   const moldes = [
     (n) => `quem é ${n}?`, (n) => `${n} é ficha limpa?`, (n) => `plano de governo de ${n}`, (n) => `patrimônio declarado de ${n}`,
-    (n) => `qual o número de ${n}?`, (n) => `${n} foi eleito?`, (n) => `prestação de contas de ${n}`,
+    (n) => `qual o número de ${n}?`, (n) => `${n} foi eleito?`, (n) => `prestação de contas de ${n}`, (n) => `quantos votos ${n} teve?`,
   ];
   for (const [i, c] of amostra.entries()) yield { q: moldes[i % moldes.length](c.nomeUrna.toLowerCase()), tipo: 'candidato' };
 }
 
-const engine = await motor({ hoje: HOJE, ufPadrao: 'SP' });
+// apuração oficial ao vivo (resultados.tse.jus.br), como o site faz; `--sem-apuracao` treina só com o pacote
+let engine;
+const apuracao = 'sem-apuracao' in args ? null : new ApuracaoClient(() => engine?.store?.regras?.resultadosTse ?? null);
+engine = await motor({ hoje: HOJE, ufPadrao: 'SP', apuracao });
 await engine.store.ensureTodas?.();
 mkdirSync(dirname(OUT), { recursive: true });
 const vistos = new Set();

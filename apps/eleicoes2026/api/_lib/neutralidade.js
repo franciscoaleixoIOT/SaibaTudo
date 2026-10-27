@@ -103,13 +103,22 @@ export function numerosNaoFundamentados(resposta, { q = '', context = '' } = {})
   return [...new Set(sobras)];
 }
 
-/** Afirma "sem segundo turno" junto de percentual de 50 % ou menos para Executivo? (contradição com Art. 28 e 77 da CF) */
+/**
+ * Afirma "sem segundo turno" junto de percentual de 50 % ou menos para Executivo? (contradição com Art. 28 e 77 da CF)
+ * Só os percentuais da PRÓPRIA linha da afirmação contam: o app lista o 2º colocado com menos de 50 % e cita o limiar legal
+ * "mais de 50%" ("Como obteve a maioria absoluta dos votos válidos (mais de 50%), a eleição foi liquidada em turno único") —
+ * falsos positivos vistos em 27/10/2026 no holdout do explicador, com o texto do próprio app.
+ */
 export function contradizSegundoTurno(resposta) {
-  const t = fold(String(resposta ?? ''));
-  const semSegundo = /\b(nao (havera|tera) segundo turno|liquid\w+ (a eleicao|em turno unico)|eleito em (primeiro|1o|1) turno)\b/.test(t);
-  if (!semSegundo) return false;
-  const pcts = [...String(resposta).matchAll(/(\d{1,3}(?:[.,]\d{1,2})?)\s*%/g)].map((m) => parseFloat(m[1].replace(',', '.')));
-  return pcts.some((p) => p > 0 && p <= 50) && /\b(governador|president)\w*/.test(t);
+  const texto = String(resposta ?? '');
+  if (!/\b(governador|president)\w*/.test(fold(texto))) return false;
+  for (const linha of texto.split('\n')) {
+    const t = fold(linha);
+    if (!/\b(nao (havera|tera) segundo turno|liquid\w+ (a eleicao|em turno unico)|eleit[oa](?: ?\(a\))? em (primeiro|1[oº°]?) turno)\b/.test(t)) continue;
+    const pcts = [...linha.replace(/mais de\s*50\s*%/gi, '').matchAll(/(\d{1,3}(?:[.,]\d{1,2})?)\s*%/g)].map((m) => parseFloat(m[1].replace(',', '.')));
+    if (pcts.some((p) => p > 0 && p <= 50)) return true;
+  }
+  return false;
 }
 
 /**
@@ -122,7 +131,8 @@ export function contradizLegislativo(resposta, { q = '', context = '' } = {}) {
   if (!/\b(deputad|senad)\w*/.test(escopo) || /\b(president|governador)\w*/.test(escopo)) return false;
   const r = fold(String(resposta ?? ''));
   // só a regra do Executivo aplicada ao Legislativo ("50% dos votos válidos", "maioria absoluta"); datas e "não disputam 2º turno" passam
-  return /\b50\s*%|\bmaioria absoluta\b|\bmetade dos votos\b|\bvotos validos\b/.test(r);
+  // "50%" só como limiar isolado: "11,50%" é um percentual de votação (falso positivo de 27/10/2026)
+  return /(?<![\d.,])50\s*%|\bmaioria absoluta\b|\bmetade dos votos\b|\bvotos validos\b/.test(r);
 }
 
 /**

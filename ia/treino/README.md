@@ -435,6 +435,32 @@ são dado eleitoral. Resultados em `out/explica-v1.6/pos_treino.log`, `apps/elei
 --merged out/explica-v1.5/merged --versao ask-v1.5-20261022 --teste` (grava também o segredo `HF_TOKEN` nos Spaces — lição de 22/10) e `HF_ASK_SPACE_URL`
 na Vercel pela API REST (CLI ausente) + `eleicoes-data-refresh.yml`, até 23/10 (congelamento 24–26/10). Se reprovar: ficar no Qwen 7B até depois de 27/10.
 
+## Explica ELEIÇÕES v1.7 (fila 9, 27/10/2026 09h56 → ~13h): explicador de eleições SEPARADO — EM TREINO
+Pedido do mantenedor (27/10, depois do fim das eleições): "siga para o treino e ajuste os apps para usá-la". Executa o plano de 23/10 (§Eleições):
+1. **Explicador só de eleições** (LoRA próprio sobre a mesma base Qwen3-4B-Instruct-2507; a química continua com o seu): a mistura única puxava os dois para
+   baixo (química 81 → 73 % quando eleições subiu; eleições nunca passou de 76,6 %).
+2. **Dataset regerado com o motor pós-eleição** (`apps/eleicoes2026/backend/retrain/dump_respostas_ask.mjs --hoje 2026-10-27`): 944 perguntas, agora com
+   a **apuração oficial ao vivo do TSE** (`ApuracaoClient`, como o site) — 2º turno no passado, eleitos do 2º turno, resultado por candidato, justificativa e
+   multa, prazos de prestação de contas/diplomação/posse — e 20 perguntas novas de pós-eleição + grade "quem foi eleito governador / houve 2º turno /
+   senadores eleitos" por UF. O contexto vem de `engine.contextoParaNuvem()` (função nova, extraída de `perguntarANuvem`): o treino vê EXATAMENTE o
+   que o site envia ao `/api/ask`, inclusive o tempo verbal das regras. `build_ask_dataset.py` → **833 treino / 223 holdout, 0 descartados**.
+3. **Recusa sem citação de lei e rodapé em TODO tipo de saída** (`build_ask_dataset.py`; teste `test_build_ask_dataset.py`): o v1.6 acrescentava
+   "(LC 64/90)" à recusa e errava o fecho em recusa/sem-contexto.
+4. **Gate ajustado** (`verificar_holdout_explica.mjs`, agora com `problemasDe()`/`semCitacoesDeLei()` exportados e `verificar_holdout_explica.test.mjs`):
+   citação de lei ("LC 64/90", "Res. TSE 23.755/2026", "Lei 9.504/1997, art. 29", "CF, arts. 28 e 77") não conta como número; rodapé exigido também na
+   recusa. **Dois falsos positivos do verificador do SERVIDOR** achados ao passar as 223 saídas esperadas (texto do próprio app) pelo gate, corrigidos em
+   `api/_lib/neutralidade.js` com teste: `contradizSegundoTurno` contava o 2º colocado (< 50 %) e o limiar "mais de 50%" de outra linha (agora só a
+   linha da afirmação, e aceita "1º"); `contradizLegislativo` lia "11,50%" como o limiar de 50 %. Em produção isso descartava o texto do Qwen 7B em
+   "houve 2º turno para governador em X?" e "senadores eleitos em X". Saídas esperadas: **223/223** no gate.
+5. **Treino:** `train_hybrid.py --target ask --version ask-v1.7-20261027 --epochs 3 --max_length 1792 --cpu_modules lm_head,model.embed_tokens
+   --gpu_mem 7.0 --cpu_offload off --optim adamw_bnb_8bit --save_steps 25` (`out/fila-20261027i.sh`): mediana 1.042 tokens, 821 de 833 pares cabem em
+   1.792 (a 1.280 só 578); 156 passos a ~68 s (VRAM 6,9 GB), ~3 h. `pos_treino.sh`: merge → **`ia/treino/gguf_explica.py`** (novo: f16 → Q4_K_M sem o gate
+   da química, que não vale para um modelo só de eleições) → `avaliar_explica_holdout.py` (223, CPU) → `verificar_holdout_explica.mjs` (mínimo 95 %).
+6. **Publicação (só com o gate aprovado):** `publicar_explica.py --so eleicoes --modelo franciscoaleixo/SaibaTudoIA-Explica-Eleicoes --merged
+   out/explica-ele-v1.7/merged --versao ask-v1.7-20261027 --teste` → `HF_ASK_SPACE_URL` na Vercel de eleições → `eleicoes-data-refresh.yml` → teste
+   ao vivo → política de privacidade 1.6 e docs. **Precisa do token de escrita do HF em `secrets/hf_token_write.txt`** (não existe nesta máquina).
+Resultado: (preencher no fim do gate).
+
 ## Base maior (Qwen3-8B) com VRAM + RAM — sondas de 22/10/2026 (`out/probe-8b/`)
 Pedido do mantenedor: treinar uma base maior usando a VRAM da GPU e a RAM do sistema. Resultado das sondas (48 pares, QLoRA 4 bits NF4, batch 1 ×
 acum. 16, RTX 5060 8 GB, 32 GB de RAM; `train_hybrid.py --base_model Qwen/Qwen3-8B`, 16 GB baixados em ~35 min):

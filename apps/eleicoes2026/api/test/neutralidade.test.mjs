@@ -64,6 +64,10 @@ test('números: aceita os do contexto, da pergunta e das regras; rejeita os inve
 test('contradição com a CF: "sem segundo turno" com 50 % ou menos para Executivo', () => {
   assert.ok(contradizSegundoTurno('Para Governador não haverá segundo turno: obteve 40% dos votos válidos.'));
   assert.ok(!contradizSegundoTurno('Haverá segundo turno porque ninguém passou de 50% dos votos válidos para Governador.'));
+  // falso positivo visto em 27/10/2026 (holdout do explicador): o próprio app lista o 2º colocado com menos de 50 % e cita o limiar "mais de 50%"
+  assert.ok(!contradizSegundoTurno('Não houve 2º turno para Governador no Paraná.\n• SERGIO MORO (PL) foi eleito(a) em 1º turno com 50,10% dos votos válidos (3.127.911 votos)\n• Como obteve a maioria absoluta dos votos válidos (mais de 50%), a eleição foi liquidada em turno único'));
+  assert.ok(!contradizSegundoTurno('TARCÍSIO (REPUBLICANOS) foi eleito(a) em 1º turno com 62,65% dos votos válidos\n• 2º: FERNANDO HADDAD (PT) — 36,42%'));
+  assert.ok(contradizSegundoTurno('• FULANO (X) foi eleito(a) em 1º turno com 46,10% dos votos válidos para Governador'), 'o percentual da própria afirmação continua pegando');
 });
 
 test('legislativo: texto gerado que fala em 2º turno ou 50 % para deputado/senador é descartado (relato de 21/10/2026)', () => {
@@ -79,6 +83,9 @@ test('legislativo: texto gerado que fala em 2º turno ou 50 % para deputado/sena
   assert.ok(!contradizLegislativo('Os deputados eleitos estão listados acima.', { q: 'deputados eleitos em SP', context: ctx }));
   assert.ok(!contradizLegislativo('O segundo turno será em 25/10/2026.', { q: 'pergunta sobre o senado' }));  // só a data: inofensivo
   assert.ok(contradizLegislativo('Para senador não houve segundo turno porque ninguém fez maioria absoluta.', { q: 'quem ganhou para senador?' }));
+  // "11,50%" não é o limiar de 50 % (falso positivo de 27/10/2026 em "senadores eleitos em MT")
+  assert.ok(!contradizLegislativo('• 444 — MAURO MENDES (UNIÃO): 1.187.352 votos (33,21%) — ELEITO\n• 555 — FÁVARO (PSD): 411.020 votos (11,50%)', { q: 'senadores eleitos em MT' }));
+  assert.ok(contradizLegislativo('Nenhum candidato a senador obteve mais de 50% dos votos.', { q: 'senadores eleitos em MT' }));
 });
 
 test('nega os dados do app: o app apurou eleitos e o texto diz que "não há informações" ou inventa "segundo mandato" (caso real de 21/10/2026)', () => {
