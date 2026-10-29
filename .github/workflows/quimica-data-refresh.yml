@@ -73,7 +73,7 @@ jobs:
 
       - name: Cache de coleta (ETag, corpos das fontes)
         if: inputs.forcar != true
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: apps/quimica/pipeline/.cache
           key: coleta-${{ github.run_id }}
@@ -198,7 +198,7 @@ jobs:
       # nunca terminaria; assim cada execução aproveita o que a anterior já baixou (11/10/2026: a 1ª execução agendada falhou assim).
       - name: Guardar o cache de coleta (sempre)
         if: always()
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: apps/quimica/pipeline/.cache
           key: coleta-${{ github.run_id }}
