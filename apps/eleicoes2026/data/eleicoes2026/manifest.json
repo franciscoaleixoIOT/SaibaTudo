@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "id": "eleicoes2026",
-  "dataVersion": "20261029T072009Z-ac97b8b365bf",
-  "generatedAt": "2026-10-29T07:20:09Z",
-  "extracaoTse": "28/10/2026 19:30:48",
+  "dataVersion": "20261030T072025Z-849dfd777c8d",
+  "generatedAt": "2026-10-30T07:20:25Z",
+  "extracaoTse": "29/10/2026 19:30:46",
   "faseEleitoral": "POS_ELEICAO",
   "eleicao": {
     "ano": 2026,
@@ -13,7 +13,7 @@
   "resultadosDisponiveis": true,
   "contagens": {
     "candidaturas": 20989,
-    "comPrestacaoDeContas": 19277,
+    "comPrestacaoDeContas": 19286,
     "naUrna": 19920,
     "pesquisas": 3644,
     "candidatosComFoto": 20986,
@@ -39,10 +39,10 @@
       "descricao": "Candidaturas registradas (TSE - Candidatos)",
       "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/consulta_cand/consulta_cand_2026.zip",
       "licenca": "CC BY 4.0 (Dados Abertos do TSE)",
-      "etag": "\"318107-65eee3019b0ad\"",
-      "lastModified": "Wed, 28 Oct 2026 22:36:02 GMT",
-      "sha256": "db26eb7bd1df767986ec0a6c2a4bf486332162dee5e7ec9886350028ff8181b0",
-      "coletadoEm": "2026-10-28T22:41:44Z",
+      "etag": "\"3222a9-65f024b095952\"",
+      "lastModified": "Thu, 29 Oct 2026 22:35:13 GMT",
+      "sha256": "cde34f04b9ca9a39239917eb45f161eabdeb29e699d35bc94a35990d097d2ca3",
+      "coletadoEm": "2026-10-29T22:42:30Z",
       "vazio": null
     },
     {
@@ -50,10 +50,10 @@
       "descricao": "Informações complementares das candidaturas (situação de julgamento, inserção na urna, substituição)",
       "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/consulta_cand_complementar/consulta_cand_complementar_2026.zip",
       "licenca": "CC BY 4.0 (Dados Abertos do TSE)",
-      "etag": "\"14c81b-65eee2ffb014c\"",
-      "lastModified": "Wed, 28 Oct 2026 22:36:00 GMT",
-      "sha256": "b127ced852aadca0a164f02f8ce5ae6c528333901a658653d08138162c3e7962",
-      "coletadoEm": "2026-10-28T22:41:48Z",
+      "etag": "\"14bf67-65f024ae5664d\"",
+      "lastModified": "Thu, 29 Oct 2026 22:35:11 GMT",
+      "sha256": "6cc43bfb47734b5f3fc62194f95212c19717b6abedaf90a54f8cba0503147265",
+      "coletadoEm": "2026-10-29T22:42:33Z",
       "vazio": null
     },
     {
@@ -61,10 +61,10 @@
       "descricao": "Bens declarados pelos candidatos",
       "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/bem_candidato/bem_candidato_2026.zip",
       "licenca": "CC BY 4.0 (Dados Abertos do TSE)",
-      "etag": "\"395ae1-65eee30335ae9\"",
-      "lastModified": "Wed, 28 Oct 2026 22:36:04 GMT",
-      "sha256": "532f0540e54a9f781ac92c78e581808a6e289d643b1b1aa1e26a9b048f25e8fd",
-      "coletadoEm": "2026-10-28T22:41:53Z",
+      "etag": "\"3959bd-65f02442d289d\"",
+      "lastModified": "Thu, 29 Oct 2026 22:33:18 GMT",
+      "sha256": "0571499c5ee6e7b452fc514dccf10203c57ed238c6393e3bf81f944ff4a2d3c2",
+      "coletadoEm": "2026-10-29T22:42:34Z",
       "vazio": null
     },
     {
@@ -72,10 +72,10 @@
       "descricao": "Coligações e federações",
       "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/consulta_coligacao/consulta_coligacao_2026.zip",
       "licenca": "CC BY 4.0 (Dados Abertos do TSE)",
-      "etag": "\"552b2-65eee2898862d\"",
-      "lastModified": "Wed, 28 Oct 2026 22:33:56 GMT",
-      "sha256": "7cb5a12946b46b3a66d6baa96199cc73402abf3df5596facdd70eaf6f2ca8d01",
-      "coletadoEm": "2026-10-28T22:41:55Z",
+      "etag": "\"5541a-65f0244273532\"",
+      "lastModified": "Thu, 29 Oct 2026 22:33:18 GMT",
+      "sha256": "f172318e14b1f8ff4e2bbdd306592c7fb705c846c8f1f8e7fd6998860452111c",
+      "coletadoEm": "2026-10-29T22:42:35Z",
       "vazio": null
     },
     {
@@ -83,10 +83,10 @@
       "descricao": "Vagas em disputa por cargo/UF",
       "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/consulta_vagas/consulta_vagas_2026.zip",
       "licenca": "CC BY 4.0 (Dados Abertos do TSE)",
-      "etag": "\"2ced9-65eee2ff1684c\"",
-      "lastModified": "Wed, 28 Oct 2026 22:35:59 GMT",
-      "sha256": "ff274fcfaaed4b076c9c7d9c0f8aa7858563c8a6d81173d6b24022a5df6acfdf",
-      "coletadoEm": "2026-10-28T22:41:56Z",
+      "etag": "\"2ced1-65f0243e2681d\"",
+      "lastModified": "Thu, 29 Oct 2026 22:33:13 GMT",
+      "sha256": "ad2f1001fe458455b9521c7c5c60642dc619b9f486b9f18bbae0403497b1b963",
+      "coletadoEm": "2026-10-29T22:42:35Z",
       "vazio": null
     },
     {
@@ -94,10 +94,10 @@
       "descricao": "Motivos de indeferimento/cassação registrados no julgamento da candidatura",
       "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/motivo_cassacao/motivo_cassacao_2026.zip",
       "licenca": "CC BY 4.0 (Dados Abertos do TSE)",
-      "etag": "\"2004b-65eee303990bd\"",
-      "lastModified": "Wed, 28 Oct 2026 22:36:04 GMT",
-      "sha256": "61feb0e56496fe4a00a8ea1b366b63a4b84cb388a395ca40a7fd5dbb0561d489",
-      "coletadoEm": "2026-10-28T22:41:57Z",
+      "etag": "\"2001c-65f024aeff565\"",
+      "lastModified": "Thu, 29 Oct 2026 22:35:12 GMT",
+      "sha256": "630db90608ff80e93cc09616c43a0411a2db0ff13ef602cd0c2050a71d5d3008",
+      "coletadoEm": "2026-10-29T22:42:36Z",
       "vazio": null
     },
     {
@@ -105,10 +105,10 @@
       "descricao": "Redes sociais informadas pelos candidatos",
       "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/consulta_cand/rede_social_candidato_2026.zip",
       "licenca": "CC BY 4.0 (Dados Abertos do TSE)",
-      "etag": "\"2dce3f-65eee3040ef6f\"",
-      "lastModified": "Wed, 28 Oct 2026 22:36:05 GMT",
-      "sha256": "029ba0621107478ddc8eb4885b7f3ca56aee4d4b12ab787822e93a385000fd7d",
-      "coletadoEm": "2026-10-28T22:42:01Z",
+      "etag": "\"2dd4f5-65f02445b8792\"",
+      "lastModified": "Thu, 29 Oct 2026 22:33:21 GMT",
+      "sha256": "90ef54dae36a6ddb9736c3b1c510e16882e4d3ef441133d770bed25023a42e33",
+      "coletadoEm": "2026-10-29T22:42:37Z",
       "vazio": null
     },
     {
@@ -116,10 +116,10 @@
       "descricao": "Histórico de candidaturas anteriores",
       "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/historico_candidatura/historico_candidatura_2026.zip",
       "licenca": "CC BY 4.0 (Dados Abertos do TSE)",
-      "etag": "\"437a8c-65eee30587e9d\"",
-      "lastModified": "Wed, 28 Oct 2026 22:36:06 GMT",
-      "sha256": "bf9c167fcd3f681febd702db29543080583b3f492cac3a85cd8021084b1d23a3",
-      "coletadoEm": "2026-10-28T22:42:07Z",
+      "etag": "\"43628a-65f024b4dd45e\"",
+      "lastModified": "Thu, 29 Oct 2026 22:35:18 GMT",
+      "sha256": "bbb6570528cb998f802a0243b26fea43ed0686a187d40565c57286d1a00d57e1",
+      "coletadoEm": "2026-10-29T22:42:43Z",
       "vazio": null
     },
     {
@@ -127,10 +127,10 @@
       "descricao": "Pesquisas eleitorais registradas no TSE (PesqEle)",
       "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/pesquisa_eleitoral/pesquisa_eleitoral_2026.zip",
       "licenca": "CC BY 4.0 (Dados Abertos do TSE)",
-      "etag": "\"5eec09-65ee2a03ab80b\"",
-      "lastModified": "Wed, 28 Oct 2026 08:48:24 GMT",
-      "sha256": "ab310f92bc3e04d6ef9d53a8afcfebc7cefc1c44df7310554eb02fa218c04dbe",
-      "coletadoEm": "2026-10-28T18:42:54Z",
+      "etag": "\"5e81a5-65ef6bd19e6bb\"",
+      "lastModified": "Thu, 29 Oct 2026 08:48:07 GMT",
+      "sha256": "3d5f11b4b07c88bee944de6ef935f2190731343fa46e6047c1e84e35fa40fefe",
+      "coletadoEm": "2026-10-29T14:19:22Z",
       "vazio": null
     },
     {
@@ -138,203 +138,203 @@
       "descricao": "Votação nominal por candidato, município e zona (resultado oficial)",
       "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/votacao_candidato_munzona/votacao_candidato_munzona_2026.zip",
       "licenca": "CC BY 4.0 (Dados Abertos do TSE)",
-      "etag": "\"1c1570dd-65eeeba779522\"",
-      "lastModified": "Wed, 28 Oct 2026 23:14:43 GMT",
-      "sha256": "e666532be5d201264cb0939c6807fb3ddd40fefdaf176b0be1393d91f384d97d",
-      "coletadoEm": "2026-10-28T23:16:30Z",
-      "vazio": true
+      "etag": "\"1bc964d5-65f02ca7ae42c\"",
+      "lastModified": "Thu, 29 Oct 2026 23:10:51 GMT",
+      "sha256": "6e7c7e1f79c1bbb4c00ecc804fe3b11ef4f36b0169b1f887d539ce1e85eb0e7e",
+      "coletadoEm": "2026-10-29T23:25:50Z",
+      "vazio": null
     },
     {
       "id": "detalhe_votacao_munzona",
       "descricao": "Detalhe da votação (comparecimento, abstenções, brancos e nulos)",
       "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/detalhe_votacao_munzona/detalhe_votacao_munzona_2026.zip",
       "licenca": "CC BY 4.0 (Dados Abertos do TSE)",
-      "etag": "\"3024ed-65eee5daeb2ef\"",
-      "lastModified": "Wed, 28 Oct 2026 22:48:47 GMT",
-      "sha256": "717dc1bd7f92c5d44198397b8261dfe368a1a967c4bf488ff42ca58eef16cfd7",
-      "coletadoEm": "2026-10-29T05:41:32Z",
+      "etag": "\"3fd926-65f02715cbeb5\"",
+      "lastModified": "Thu, 29 Oct 2026 22:45:56 GMT",
+      "sha256": "ffac52294e0cba082b5415a946de7072d360195b7c1a2e229909497dbc47b8d2",
+      "coletadoEm": "2026-10-30T06:27:55Z",
       "vazio": null
     }
   ],
   "arquivos": [
     {
       "path": "candidatos/AC.json",
-      "bytes": 358694,
-      "sha256": "50d0b3d00f952f29e58a4940807c8d612807b83ef2560532626b346cbb83e1df",
+      "bytes": 361635,
+      "sha256": "06449405fbb8c89fd640578d5d6c5584f570bae7cb8206937624ae24dcde11bd",
       "records": 388
     },
     {
       "path": "candidatos/AL.json",
-      "bytes": 272791,
-      "sha256": "a0cf37b52dfa9e6d3348ab9104be7b91df99a20a39d8beaaa81b7b8c9ac11d8a",
+      "bytes": 275378,
+      "sha256": "1db764c470bffa509ab7625270dd1bd8130c5fd72921dd1798711785cebe9a00",
       "records": 299
     },
     {
       "path": "candidatos/AM.json",
-      "bytes": 473070,
-      "sha256": "af1fc41ec3c36355f4da3764e340ca534cb4cb9eeba325782920473d9a3d75ec",
+      "bytes": 476809,
+      "sha256": "d648ad49cdc99e586fed031939b01cae40f1411c93182d6021373a7bd2f14738",
       "records": 475
     },
     {
       "path": "candidatos/AP.json",
-      "bytes": 307082,
-      "sha256": "6ec6b8755fed5c1ee0d49ea26afa11d3d4f7fd87bff5bf2fdc4571077f666f10",
+      "bytes": 309609,
+      "sha256": "13046a81e423965a12203768c1e89a6eea1e8da7cd6e0fb8f4845eff74911549",
       "records": 322
     },
     {
       "path": "candidatos/BA.json",
-      "bytes": 1150695,
-      "sha256": "a343a6aaca1954ccbaec9080d811c6885779c43dcb3225cda920cae49672766a",
+      "bytes": 1160087,
+      "sha256": "c3cc19fa5fdd50d8952d786f44d2c20f971ab9f6c5848ab0afa62a8f18d7373f",
       "records": 1224
     },
     {
       "path": "candidatos/BR.json",
-      "bytes": 28190,
-      "sha256": "262a1d5aad3648a3194e6751e2b3079bcad5068275aadacd0d4dfa2186a3d54c",
+      "bytes": 28549,
+      "sha256": "bb16da61dde3c4cc9ab0f9a1e27796aaee8fe97c5c64b1d18d4632707e4bc22f",
       "records": 28
     },
     {
       "path": "candidatos/CE.json",
-      "bytes": 700410,
-      "sha256": "dbac639a734d7c2dd67d23b892ab3f041b0bdd1366a4006434f5d4a2e5b1280f",
+      "bytes": 705799,
+      "sha256": "213bf78c4043e6ba0f2a70461c50545b62d13227d7d2f36d62dd1a1c5a6e4d9f",
       "records": 714
     },
     {
       "path": "candidatos/DF.json",
-      "bytes": 657194,
-      "sha256": "c4bb3ba6b9034010e22e531a8157c250fd146a61152ce3b9738c835db579d868",
+      "bytes": 661951,
+      "sha256": "2711c3ebdd10b1c0f2f4a8a9c4f638dd133d5098b38595506d9a8bac1d19a766",
       "records": 668
     },
     {
       "path": "candidatos/ES.json",
-      "bytes": 581797,
-      "sha256": "d57c123a919647e2c7a99810920c5a44c4f9272fdd3da8e39bd0b9fbcddd62c7",
+      "bytes": 586299,
+      "sha256": "dcfa6710a151c78c958a4a7071fc39dfb1dc0390a026fc2cba27ee279a19b01b",
       "records": 591
     },
     {
       "path": "candidatos/GO.json",
-      "bytes": 859709,
-      "sha256": "a1efc1e23b0a6a071cbc90a5c74a0ca7624a981fca63a549b3e4184992f1f550",
+      "bytes": 866929,
+      "sha256": "8822bd97b54f06b9585e588569b73b35aea30d005eed2b6672ca422f559ff5f6",
       "records": 906
     },
     {
       "path": "candidatos/MA.json",
-      "bytes": 586205,
-      "sha256": "99837353ff0ad475b11b2be5eaae16542d75067a58aa28e88ce67cd7681ba5c8",
+      "bytes": 591812,
+      "sha256": "31961bffba097f182ac07f1a85b04d947fa1e6ca6df1c2217e663f228c8d2712",
       "records": 619
     },
     {
       "path": "candidatos/MG.json",
-      "bytes": 1756386,
-      "sha256": "635ec242d2bc1633c29c5984d0d81952100a5f411400d99d78b141f38f19dd3a",
+      "bytes": 1771618,
+      "sha256": "c27addbc4e63ef8cd731a88075e05d157ac7c9f0414ceacefe91bb5fe68532a6",
       "records": 1832
     },
     {
       "path": "candidatos/MS.json",
-      "bytes": 428669,
-      "sha256": "465cd4c3d115ef21b25bf65f7d39e8c837594fd5e54c5d24ce20cebb4f5ca9ab",
+      "bytes": 432517,
+      "sha256": "9353bd62fcf369d512bf6c8ca0ab04ef13c1852f97d4f87aacb0f0b3f3b72b86",
       "records": 425
     },
     {
       "path": "candidatos/MT.json",
-      "bytes": 442176,
-      "sha256": "3b25e976ae5d139610cdc339788b7da55d02ea9b76964d54c1de3ef8dbd715d1",
+      "bytes": 445816,
+      "sha256": "df9ab2b543651fbf393a9d0baf2ffa692e0661b478aaaee3d827d8c3663d2d23",
       "records": 455
     },
     {
       "path": "candidatos/PA.json",
-      "bytes": 717708,
-      "sha256": "155fa81386d316cfac0e5803e42b61ccd55b98b517617435d73b72165f7beb1c",
+      "bytes": 723612,
+      "sha256": "30b857ec07da4a74a504d04dcfc8b1691ff8df60cb3a99ef6b74f6b68a737006",
       "records": 741
     },
     {
       "path": "candidatos/PB.json",
-      "bytes": 408792,
-      "sha256": "43b9655b202fc232b6493a8acb1de3ac3771288ccc9f8a004a969951362e738e",
+      "bytes": 412454,
+      "sha256": "64c56e955eb9e413a5a9b52246d7e2e372e8d363e04fc838840a423b3f9da14c",
       "records": 450
     },
     {
       "path": "candidatos/PE.json",
-      "bytes": 919179,
-      "sha256": "8d7b171707e4236128ddb01f5190c95a428b93994d74fc3695306409a86639d4",
+      "bytes": 926988,
+      "sha256": "d9d8593c08368c01d346906d2a8905729d712bb177c5a3404fb40db7ecb303ae",
       "records": 961
     },
     {
       "path": "candidatos/PI.json",
-      "bytes": 385018,
-      "sha256": "794e885b90b3d566e12a2d9e1f0349d1a6b605531f29e4ff90b977eb693c4331",
+      "bytes": 388522,
+      "sha256": "bf443eee1ddc9e0ff508558f68d90450cf87c7cdc574be059295aa8172b2c266",
       "records": 402
     },
     {
       "path": "candidatos/PR.json",
-      "bytes": 1136555,
-      "sha256": "632dc3ffd5c20b7fcb87cceb607a4ab252e55d1228eaef3ca443304ceb7920a0",
+      "bytes": 1146414,
+      "sha256": "95404d625bc1693e6db1707ac3846d3e65e9755b36b2b9a4e98e5cd6e69886dc",
       "records": 1090
     },
     {
       "path": "candidatos/RJ.json",
-      "bytes": 1991943,
-      "sha256": "1ccfd854c07e1325cfaa74a7662f9268160adc01361b98ce21533ed457a61050",
+      "bytes": 2008444,
+      "sha256": "7f170cbf74b29feec1a69ab43342cab28798a41cd2fe1a123d66d4bfdc58ed6a",
       "records": 2055
     },
     {
       "path": "candidatos/RN.json",
-      "bytes": 322754,
-      "sha256": "8258b7e36cc280fdf53d452402b233c5bda9f7fcfd004122d59ae71b821d2cc8",
+      "bytes": 325359,
+      "sha256": "f7c42cc73b5492eea456c56d20e89e0455ad0427c37e149a3185ed9a48dd0192",
       "records": 330
     },
     {
       "path": "candidatos/RO.json",
-      "bytes": 439077,
-      "sha256": "cb919c0aa7e002308e3b173b6756080a183f9ea68fc9dcce06a998d6c6d1471d",
+      "bytes": 442306,
+      "sha256": "afaa1e59e6c4401d235e086aaefdccb94540e25f2c1f43781802c07a43aa17e2",
       "records": 438
     },
     {
       "path": "candidatos/RR.json",
-      "bytes": 392518,
-      "sha256": "bd42d1e353cb3307bf9c57d7ebcd4ab15ef8d362eb60bcafb75b8c9a357c0758",
+      "bytes": 395530,
+      "sha256": "d33f221e0c461fa2aa2eb2abc2f2f834a5c4cb9257e85d630600ede1888103d4",
       "records": 413
     },
     {
       "path": "candidatos/RS.json",
-      "bytes": 1073359,
-      "sha256": "9471628e0cadb258bf57b1f4bd20afd52ee11fb01fbe0e19b7efce77b5fff1e2",
+      "bytes": 1083260,
+      "sha256": "e698375ea1158a5db431cb3b0f1d3a7f78d42d374538c93f88070af674a84651",
       "records": 1054
     },
     {
       "path": "candidatos/SC.json",
-      "bytes": 693137,
-      "sha256": "1ac9625250966dd7d2f70b46c978dd56cf949b9760b3687e5121e5a0c2fc7b0b",
+      "bytes": 699306,
+      "sha256": "9d186286b63e85c02ec8772969f4efac609534f660f3aeb9963f8c7765cceade",
       "records": 700
     },
     {
       "path": "candidatos/SE.json",
-      "bytes": 383782,
-      "sha256": "5922a688551b6798e2a90b7f1393e4d5c23805bcb15591e7c20592d780de36f2",
+      "bytes": 387457,
+      "sha256": "d4de985b6744afaab87821351a2c281ef5fae109b6cd205250642dc2cb303aea",
       "records": 411
     },
     {
       "path": "candidatos/SP.json",
-      "bytes": 2597213,
-      "sha256": "43438837e358bbd29e2d608485acfc2ba38458d7fa98a12bbb94326474ecaa7e",
+      "bytes": 2619141,
+      "sha256": "e2f284caca09ce9d21d5c49ef98893184f1750fe912b278ced74eda6e44d019e",
       "records": 2630
     },
     {
       "path": "candidatos/TO.json",
-      "bytes": 357295,
-      "sha256": "6338b31289a3389e4b47cd53393962718d963f856c1ccdeb90714d37694ac940",
+      "bytes": 359867,
+      "sha256": "61cab0000619769e2b945ee22bace0ea118a6c5ff5747ff5f8d6dcc189605588",
       "records": 368
     },
     {
       "path": "pesquisas.json",
       "bytes": 2836782,
-      "sha256": "3f32e0fbb7b0f3a4157d5a83c3f6d8a2c408a69d3dd1e281989d07680dc25aea",
+      "sha256": "d23e7c1b4878f0037362254b57adfc549d4ef0d543914ec3f50088e8cd6a4f3b",
       "records": 3644
     },
     {
       "path": "regras.json",
       "bytes": 17657,
-      "sha256": "06695932624b7ede06f9e7219906ae8ce0bdfa2750ec33b2c74f8b35ac2a4548"
+      "sha256": "80bc0d5052edaa46a33d50794ca2d8baf76261bff5aeba96863612ed506dc7ac"
     },
     {
       "path": "fontes.json",
@@ -343,170 +343,170 @@
     },
     {
       "path": "resultados/AC.json",
-      "bytes": 17735,
-      "sha256": "ed66fdc32f6a77986a0fce1d2d5fbe09238405e39a74596d14aa94afba44fe0e",
+      "bytes": 31577,
+      "sha256": "e674523fecec58384253cec75f2be4ef821ac2bb2f72ac7edf54e11dbfea4127",
       "records": 351
     },
     {
       "path": "resultados/AL.json",
-      "bytes": 13123,
-      "sha256": "511b7bd4a1e72e16454b1f6ef193971c2d294116f09829dd51ff83de02b7cde8",
+      "bytes": 23347,
+      "sha256": "40d21ebb492ef701c2d46f46382e9a7937ff6c1a85e4010a61559733b62e5e83",
       "records": 257
     },
     {
       "path": "resultados/AM.json",
-      "bytes": 23061,
-      "sha256": "cfc05bcc83b56f92c5b3569ca2beccb374ca70cf1122d8aa697a0f9065d621da",
+      "bytes": 41602,
+      "sha256": "494e24d3dc57ce53e5eb4cdab7f3b1a29dcda4702fc0c1356a947bfd9d030d72",
       "records": 455
     },
     {
       "path": "resultados/AP.json",
-      "bytes": 15556,
-      "sha256": "9ac5daedc2c2cc056a943eb92bb71653cb64ee517f97748529b2224895e88025",
+      "bytes": 27572,
+      "sha256": "cd926183150c4f50418eddbc077d98625fce03748c87aa6acf07f809978d89c7",
       "records": 308
     },
     {
       "path": "resultados/BA.json",
-      "bytes": 58455,
-      "sha256": "419905fac6dfee4c4d6ebf70bd578c1bd592a8114ae7bf1837907000f3e6f342",
+      "bytes": 106035,
+      "sha256": "00f51cba8d12f37e79bece56172f23d63a7da74f798eca8a74b39ef4f03a6afb",
       "records": 1163
     },
     {
       "path": "resultados/BR.json",
-      "bytes": 1370,
-      "sha256": "511c476d904bb8ea9e5405706d217c9302d87b66201ee4146e011de163596198",
+      "bytes": 2261,
+      "sha256": "a8ff0163a2c7ae0bf6fd74af3685e3059f91d59eb77e90693feba1ca741e3e8a",
       "records": 26
     },
     {
       "path": "resultados/CE.json",
-      "bytes": 33542,
-      "sha256": "b6ba136d021299f046f5bc3036c991d64cdda4b5e4aed56ae05ba7ef389a0711",
+      "bytes": 60582,
+      "sha256": "de6667836deee87e82722af727bd22a3c234eb5f2ab23aa0ff25a2ae95a647ae",
       "records": 663
     },
     {
       "path": "resultados/DF.json",
-      "bytes": 32705,
-      "sha256": "549a041ca9a12922139f35404e812945a5286b076917f9ee066ef061eac79ce8",
+      "bytes": 58750,
+      "sha256": "f256fa47352d386203f86ef40836f77fadc9d2219267afc49e2bb354920879ee",
       "records": 640
     },
     {
       "path": "resultados/ES.json",
-      "bytes": 29067,
-      "sha256": "eae530994a600345c3b7e020c23b223e909e8ea2e90845985d438ebabfc193c9",
+      "bytes": 52305,
+      "sha256": "b41ada6a137d04b0fc81e988c586c80b476cfa5df9ccfd3c9453ff8168f0d189",
       "records": 573
     },
     {
       "path": "resultados/GO.json",
-      "bytes": 43168,
-      "sha256": "4af5e1b83704f0ede50972f3911b47ae83bdd73642c765862e80a1f44644faef",
+      "bytes": 77713,
+      "sha256": "71d9342ca4ce7cd1ded3077f8dcceff014b564bb9385842874f3fcc607969974",
       "records": 859
     },
     {
       "path": "resultados/MA.json",
-      "bytes": 30733,
-      "sha256": "b8482ddc7c0fbab28574ecedcd6a544e51244c5701cf28d7b2290c18d7853bf7",
+      "bytes": 54747,
+      "sha256": "ae105b0ec4a4d949a2df296e569e8938f29111ea73deda12ebc9c75b86cf6e17",
       "records": 593
     },
     {
       "path": "resultados/MG.json",
-      "bytes": 89687,
-      "sha256": "75c4b2dc2e0e40aa95b617abb63fa6b1c450581a703274a4b26a6932796e34ac",
+      "bytes": 160122,
+      "sha256": "77da2f4d8c05e2706d3fc61f9445766c1eda0556ecf8ccc6829c3532339b275f",
       "records": 1753
     },
     {
       "path": "resultados/MS.json",
-      "bytes": 21094,
-      "sha256": "2a0c8d26e94a0751e48a4ab48e7155f81b18b28daa5d4d7eb9ced1a2536f24d1",
+      "bytes": 37255,
+      "sha256": "94f2d42c3645b536cea03e056ca35b7f5cb6ba00516249643b04a882be557895",
       "records": 406
     },
     {
       "path": "resultados/MT.json",
-      "bytes": 22197,
-      "sha256": "da629fb53dbfdc0ed6b660891a6d7cb83b857ff4be64862f39978c29e9a6e4f3",
+      "bytes": 39486,
+      "sha256": "cd8cf4d3a0884bd44ee79b8e8366b8b3386b74022baccbb294de6085b7907a0f",
       "records": 428
     },
     {
       "path": "resultados/PA.json",
-      "bytes": 35913,
-      "sha256": "3519c1d6dd4d2cfb05c0a3e07bba1b527919331782843d4987899732ff8f1265",
+      "bytes": 64102,
+      "sha256": "aea56609b0bc1495d308d48dbb47d6315fb221532576d480b06a881af8b18dcd",
       "records": 697
     },
     {
       "path": "resultados/PB.json",
-      "bytes": 21267,
-      "sha256": "e7df159aa894628e4352bd3edeb9a0ef104e29030cda7def2921a867e8d4b065",
+      "bytes": 37444,
+      "sha256": "c8a29d1bd6b4aa79362e16cb154242bee5de29f79ffa37117c9518b191355de1",
       "records": 410
     },
     {
       "path": "resultados/PE.json",
-      "bytes": 46671,
-      "sha256": "f6e9711a089995b6f1098a9047a2235d6501b807fc801ecc810393f70742b747",
+      "bytes": 83121,
+      "sha256": "733bed44b1b075f068734d7bb2a290f1647c5b6e623921cdba0de9107d4c2e7d",
       "records": 910
     },
     {
       "path": "resultados/PI.json",
-      "bytes": 19711,
-      "sha256": "6c03210c7356f34cfe27ed19c367bcb8014c24bce54789655b92c40152670572",
+      "bytes": 33955,
+      "sha256": "b43479d266591813c440892216d535395fb53fdeb086df77a2ff15fa97f650b9",
       "records": 377
     },
     {
       "path": "resultados/PR.json",
-      "bytes": 53811,
-      "sha256": "00a2086ec2c9fb677bf4ae5390ee02d2f1845a7620d9e15b61cd2adec7c0f29b",
+      "bytes": 96965,
+      "sha256": "69a5c07b53d6a97244e0f5a20f4f1826ec112d17c3496ea1be49fe8980d3e5d8",
       "records": 1042
     },
     {
       "path": "resultados/RJ.json",
-      "bytes": 101610,
-      "sha256": "c630c2c647c5e5c1e28ab8007d800175bfc28f4bdf33e54a2015854d2fc5ebd4",
+      "bytes": 182299,
+      "sha256": "4563513aa412ff309a03d8ffdb93006e14f5fd721206ae6299f54f8474d181c5",
       "records": 1980
     },
     {
       "path": "resultados/RN.json",
-      "bytes": 16166,
-      "sha256": "28432a4f1951eb934cc7b236be249549ff8dab0a4b7d4c8529bca6ef7dab1f9e",
+      "bytes": 28047,
+      "sha256": "313cafc16262ea786a44492bdf415394975394b43d8e6c1a4da9a2d600bf838e",
       "records": 310
     },
     {
       "path": "resultados/RO.json",
-      "bytes": 21718,
-      "sha256": "d324bcf6ba4064962c5b8256cb00511c55802c27e4c2af2bcbd7f7f49afea981",
+      "bytes": 38477,
+      "sha256": "e81f0f63da272a182e2b89e9605c1c6274fdcdc6e0cf520de8b5d5c06675c210",
       "records": 419
     },
     {
       "path": "resultados/RR.json",
-      "bytes": 20044,
-      "sha256": "e805079bf0a8025b02c0b1d52fdd06b9ceee28306e8da14da68188ab234c802f",
+      "bytes": 34768,
+      "sha256": "c08b3a42c406caf8ef9b53ab0ae266347219d3d215e271fd3925e6e96b40abd4",
       "records": 386
     },
     {
       "path": "resultados/RS.json",
-      "bytes": 52933,
-      "sha256": "71d096dc117407c28b4dd5b4144737d6ecae2e34a3f07dcaf3dece2f30fd9f48",
+      "bytes": 94499,
+      "sha256": "421e59b4231eadf595fcd76a72912227372ae4408f665351dc8acafdfa3d33e9",
       "records": 1034
     },
     {
       "path": "resultados/SC.json",
-      "bytes": 35417,
-      "sha256": "95cdc1e92cee486eaca6196e9fcf24317203dea0e8e76c090bcfa80add19d2e9",
+      "bytes": 62941,
+      "sha256": "85a064e16eb7a70f7a31ea3f627e0b7f552a205e5d557f88f1b933b4370a129b",
       "records": 688
     },
     {
       "path": "resultados/SE.json",
-      "bytes": 19802,
-      "sha256": "97ffd97e9aa02f19a4dcb647e5abf2c85be57353663964b29f90148f9031e753",
+      "bytes": 34659,
+      "sha256": "d18272eeac70dc86dcca0f74932d0b2012bf0d428734eb1ce66c91ab071c83dd",
       "records": 383
     },
     {
       "path": "resultados/SP.json",
-      "bytes": 126488,
-      "sha256": "6c928b166eefd5dc3de34bf0c72af69f67d5c403c85ddf1d44555b7e24053a73",
+      "bytes": 227483,
+      "sha256": "cc947d6e743fd752adc0e652b879f0a3077d749c3f8fa61887fd82bf95da80cd",
       "records": 2474
     },
     {
       "path": "resultados/TO.json",
-      "bytes": 17268,
-      "sha256": "dfd9b242755dd9826a1192e74109a722052cbfa3e19fb78226438d1dfbabd062",
+      "bytes": 30198,
+      "sha256": "049eb487102ca85291ee93fd14c8063b2a3c34685fdf25abaa4b6778cb42b8f3",
       "records": 335
     },
     {
