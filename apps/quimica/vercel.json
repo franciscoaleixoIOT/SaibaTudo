@@ -190,6 +190,9 @@
     },
     "api/nlu.js": {
       "includeFiles": "data/quimica/compostos/index.json"
+    },
+    "api/bot/telegram.js": {
+      "includeFiles": "data/quimica/**"
     }
   }
 }
