@@ -13,12 +13,13 @@ const pagina = (i) => readFileSync(join(SRC, 'privacidade', i === 'pt-BR' ? 'ind
 const alternativas = (html) => [...html.matchAll(/<link rel="alternate" hreflang="([^"]+)" href="([^"]+)">/g)].map((m) => `${m[1]} ${m[2]}`);
 const ESPERADAS = [...IDIOMAS.map((i) => `${i} https://saibatudo.net${caminhoPrivacidade(i)}`), 'x-default https://saibatudo.net/llms/privacidade'];
 
-test('pt-BR é o texto-fonte: versão 1.0, contato, 12 seções, tabela de conexões com Vercel, links externos e IA na nuvem; sem inline', () => {
+test('pt-BR é o texto-fonte: versão 1.1, contato, 12 seções, tabela de conexões com Vercel, links externos e IA na nuvem; sem inline', () => {
   const pt = pagina('pt-BR');
   assert.match(pt, /<html lang="pt-BR">/);
   assert.match(pt, /<link rel="canonical" href="https:\/\/saibatudo\.net\/llms\/privacidade">/);
   assert.deepEqual(alternativas(pt), ESPERADAS);
-  assert.match(pt, /Versão 1\.0/);
+  assert.match(pt, /Versão 1\.1/);
+  assert.ok(pt.includes('Upstash') && (pt.match(/<tr>/g) ?? []).length >= 5, 'o contador compartilhado (Upstash) está descrito na tabela de conexões');
   assert.ok(pt.includes('saibatudo@saibatudo.net') && pt.includes('Francisco Aleixo'));
   assert.equal((pt.match(/<h2>/g) ?? []).length, 12);
   assert.ok((pt.match(/<tr>/g) ?? []).length >= 4, 'cabeçalho + 3 conexões');
@@ -42,6 +43,7 @@ test('cada idioma: html lang, canonical próprio, as seis alternativas, link ao 
     assert.ok(p.includes('saibatudo@saibatudo.net') && p.includes('Francisco Aleixo'), `${idioma}: contato`);
     assert.ok(!/<script(?![^>]*\bsrc=)[^>]*>[^<]/i.test(p) && !/\sstyle=/.test(p), `${idioma}: CSP`);
     assert.ok(p.includes('/llms/api/ask'), `${idioma}: conexão da IA`);
+    assert.ok(p.includes('Upstash') && p.includes('1.1'), `${idioma}: Upstash e versão 1.1`);
     if (idioma === 'zh') assert.ok(/[一-鿿]{20,}/.test(p), 'zh: texto em chinês');
   }
 });

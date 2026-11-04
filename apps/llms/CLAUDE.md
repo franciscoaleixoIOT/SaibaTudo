@@ -26,7 +26,8 @@ próprias e uma IA na nuvem opcional que só explica. Rota `saibatudo.net/llms/`
 6. **Nuvem opt-in, que só explica.** Consentimento por pergunta ou chave em Configurações (desligada por padrão); o corpo leva pergunta, idioma,
    resumo do gráfico e trechos das seções, nunca o histórico. Kill switch: `ASK_ENABLED` na Vercel. Política de privacidade em seis arquivos
    (`web/src/llms/privacidade/`), pt-BR é o texto-fonte.
-7. **Segredos em `secrets/`** (ignorado): `data_signing_key.pem` (chave do pacote, diferente das dos outros apps). Na Vercel: `HF_TOKEN`; no GitHub:
+7. **Segredos em `secrets/`** (ignorado): `data_signing_key.pem` (chave do pacote, diferente das dos outros apps) e `hf_token.txt` (token fine-grained
+   `saibatudo_llms`, só leitura). Na Vercel: `HF_TOKEN` e `UPSTASH_REDIS_REST_*` (contador global, política 1.1); no GitHub:
    `DATA_SIGNING_KEY_LLMS`, `VERCEL_PROJECT_ID_LLMS` (o agente não grava segredos). O Space do Hugging Face é privado.
 8. **Padrão do assistente** (`../../docs/PADRAO_ASSISTENTE.md`): campo que cresce, histórico ↑/↓, chips, origem e data dos dados, copiar, fechar,
    relatar, nuvem opt-in, acessibilidade. Melhoria num app → portar para os outros.

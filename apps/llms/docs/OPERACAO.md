@@ -17,6 +17,7 @@
 | GitHub (vars) | `LLMS_ASK_ENABLED` | mantenedor | informativo no log do deploy |
 | Vercel (produção) | `HF_TOKEN` | **mantenedor** (segredo) | token de leitura do HF para chamar o Space privado |
 | Vercel | `ASK_ENABLED`, `HF_ASK_SPACE_URL`, `ASK_MODEL_VERSION`, `HF_ASK_DAILY_BUDGET`, `ALLOWED_ORIGINS` | agente (API REST do time) ou mantenedor | nuvem; `ASK_ENABLED` vazio = kill switch |
+| Vercel (produção) | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | mantenedor ou agente autorizado (variável sensível) | contadores compartilhados de limite (mesmo banco Redis de eleições e química, ver abaixo) |
 | Local | `secrets/data_signing_key.pem` | gerado por `sign.py gen` | assina o pacote |
 
 ## 3. Space do explicador
@@ -25,7 +26,14 @@
 - Trocar o modelo (S4): variáveis `ASK_MODEL_ID`, `ASK_MODEL_REVISION`, `ASK_MODEL_LABEL` no Space; sem mexer no código. O rótulo que o app
   mostra vem do `model` da resposta.
 - Space em RUNTIME_ERROR: ver logs em `https://huggingface.co/spaces/franciscoaleixo/saibatudo-llms`; `transformers>=5.17,<6` é obrigatório.
-- Cota ZeroGPU: compartilhada com os Spaces da química e de eleições; `HF_ASK_DAILY_BUDGET` (padrão 200) limita as chamadas por dia.
+- Cota ZeroGPU: compartilhada com os Spaces da química e de eleições; `HF_ASK_DAILY_BUDGET` limita as chamadas por dia (**50** desde 04/11/2026).
+  Quando a cota diária da conta acaba, o Space responde `event: error / data: null` e a API devolve 502 `upstream`; é só esperar a janela de 24 h
+  (aconteceu em 04/11/2026, na primeira chamada depois de ligar o `HF_TOKEN`).
+- **Contador global (04/11/2026):** com `UPSTASH_REDIS_REST_*` o orçamento diário usa a chave `st:orcamento:ask-hf:<dia>`, a MESMA dos três apps
+  quando apontam para o mesmo banco. Cada app compara a soma do dia com o seu próprio limite (LLMs 50, eleições 400): o LLMs só responde enquanto
+  a soma for menor que 50, ou seja, é o primeiro a ser cortado e protege eleições e química. Decisão do mantenedor em 04/11/2026. Se quiser
+  contagem própria do LLMs, troque o nome `'ask-hf'` em `api/_lib/ask-handler.js` por `'ask-hf-llms'` (e republique).
+  A política de privacidade 1.1 (seis idiomas) descreve o Upstash e a retenção (IP ~1 min, resumo do código até 1 dia, contador sem identificação até 2 dias).
 
 ## 4. Kill switch e falhas
 - Desligar a nuvem: esvaziar `ASK_ENABLED` na Vercel (vale na próxima requisição). O app mostra "IA na nuvem desligada nesta versão".

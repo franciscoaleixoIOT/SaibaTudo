@@ -57,7 +57,10 @@ Guia do app: `../CLAUDE.md`. Plano e spec do S1 na raiz do repositório (`docs/s
 - O service worker serve o shell antigo na primeira visita depois de um build: limpar caches ao testar no navegador.
 
 ## 4. Pendências
-- Mantenedor: `HF_TOKEN` na Vercel `saibatudo-llms`; `DATA_SIGNING_KEY_LLMS` e `VERCEL_PROJECT_ID_LLMS` no GitHub; `LLMS_ASK_ENABLED`.
+- ~~`HF_TOKEN` na Vercel~~ feito em 04/11/2026 (token fine-grained `saibatudo_llms`, só leitura). Mantenedor: `DATA_SIGNING_KEY_LLMS` e `VERCEL_PROJECT_ID_LLMS` no GitHub; `LLMS_ASK_ENABLED`.
+- 04/11/2026: nuvem ligada (`ask: on`) mas a cota diária do ZeroGPU da conta estava esgotada (502 `upstream`); repetir o teste pt-BR e zh quando a janela voltar.
+  `HF_ASK_DAILY_BUDGET` baixado para 50. **Contador global** (decisão do mantenedor): `UPSTASH_REDIS_REST_*` ligados no projeto e política de
+  privacidade **1.1** nos seis idiomas (Upstash, retenção do IP, do resumo do código e do contador). O LLMs vira o primeiro a ser cortado quando a soma do dia passa de 50.
 - Revisão por falante nativo das traduções (marcadas `pendente`).
 - 27/10: merge da `llms-dominio` na main, `gh run list`, `gh workflow run eleicoes-data-refresh.yml`, conferir saibatudo.net/llms/ e /zh/.
 - S2 (tokens), S3 (modelo por dentro), S4 (SaibaTudo IA), S5 (Android).
