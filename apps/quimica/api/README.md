@@ -110,6 +110,15 @@ Provedores: **Space do Hugging Face (ZeroGPU)** é o principal (`POST /gradio_ap
 
 Erros comuns: `400` corpo inválido · `403` origem não permitida · `405` método · `413`/`415` corpo grande ou tipo errado · `429` limite (com `Retry-After`) · `502` provedor · `503` desligada ou orçamento do dia · `504` tempo esgotado.
 
+### `POST /api/bot/telegram` (bot de mensagens, teste interno, desde 04/11/2026)
+Webhook do Telegram (`@SaibaTudoNetBot`). Cabeçalho `X-Telegram-Bot-Api-Secret-Token` ≠ `BOT_TELEGRAM_SECRET` → `401`; `BOT_ENABLED` vazio → `200` sem processar;
+`from.id` fora de `BOT_TELEGRAM_IDS` → `200` e **nenhuma** mensagem (silêncio); `update_id` repetido em 30 min → `200` sem reprocessar. Comandos `/start`, `/ajuda`,
+`/sobre`, `/limpar`; texto → motor do site (`web/src/quimica/js/engine.js`) sobre o pacote empacotado na função (`includeFiles: data/quimica/**`); botões
+"Explicar com IA" (chama `chamarAsk` internamente: mesmo orçamento, verificador e contador global) e "Sugestões". Contexto por conversa 30 min (memória + Redis
+`bot:ctx:<sha256>`); limites `BOT_RATE_POR_MIN`/`BOT_RATE_POR_DIA` por conversa. Sempre `200 { ok:true }` depois de enviar (1 retentativa). Log: só `evt`, `canal`,
+`status`, `ms`, `motivo`. Módulos: `_lib/bot/{loja,conversas,formato,nucleo,telegram}.js`; registro do webhook: `tools/bot_telegram_webhook.py`.
+Spec: `docs/superpowers/specs/2026-11-04-quimica-bot-mensagens-design.md` (raiz); operação: `docs/OPERACAO.md` §9.
+
 ## Variáveis de ambiente (Vercel, produção) — nomes apenas; segredos nunca no Git
 | Variável | Para quê | Padrão |
 | :-- | :-- | :-- |
@@ -128,6 +137,10 @@ Erros comuns: `400` corpo inválido · `403` origem não permitida · `405` mét
 | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` (ou `KV_REST_API_*`) | contadores **globais** de limite e de orçamento entre instâncias (opcional; falha aberto) e o armazenamento do `/api/melhoria` (obrigatório para ele) | vazio = só local |
 | `MELHORIA_ENABLED` | **só `1` liga** o `/api/melhoria` (e é preciso o Redis acima) | desligado |
 | `MELHORIA_PER_HOUR` · `MELHORIA_PER_DAY` · `MELHORIA_MAX_POR_MES` | envios por IP/hora · envios por instalação/dia · perguntas guardadas por mês (as mais antigas saem) | 6 · 20 · 5000 |
+| `BOT_ENABLED` | **só `1` liga** o bot de mensagens (`/api/bot/*`) | desligado |
+| `BOT_TELEGRAM_TOKEN`, `BOT_TELEGRAM_SECRET` | token do bot (BotFather) e segredo do webhook (32 bytes hex, gerado localmente) — sensíveis | vazio |
+| `BOT_TELEGRAM_IDS` | ids numéricos do Telegram autorizados, separados por vírgula (lista fechada; os demais recebem silêncio) | vazio = ninguém |
+| `BOT_RATE_POR_MIN` · `BOT_RATE_POR_DIA` | mensagens por conversa por minuto · por dia | 10 · 200 |
 | `VERCEL_GIT_COMMIT_SHA` | preenchida pela Vercel; vira `version` no health | `dev` |
 
 No Git Bash grave sempre com `printf '%s' "$VALOR" | vercel env add NOME production [--sensitive]` (sem quebra de linha no fim). `vercel env ls production` lista só os nomes.
@@ -142,6 +155,7 @@ No Git Bash grave sempre com `printf '%s' "$VALOR" | vercel env add NOME product
 | Limites compartilhados | remover `UPSTASH_REDIS_REST_*` | volta a valer só o limite por instância (e o `/api/melhoria` desliga: `503 disabled`) |
 | "Ajudar a melhorar o app" | `vercel env rm MELHORIA_ENABLED production -y` + deploy | `503 disabled`; a fila fica no aparelho, sem erro |
 | Gastar menos | `DAILY_BUDGET`, `HF_ASK_DAILY_BUDGET`, `MODAL_ASK_DAILY_BUDGET` menores (0 = esgotado) | `503 budget` |
+| Bot de mensagens | `vercel env rm BOT_ENABLED production -y` + deploy (imediato, sem deploy: `python tools/bot_telegram_webhook.py --remover`) | o Telegram recebe 200 e nada é respondido |
 Reverter a versão do modelo: `docs/MODELO.md` §9.
 
 ## Testes
@@ -150,7 +164,8 @@ segurança e ancoragem em **todos os idiomas** (`seguranca_idiomas`, `ground_idi
 fidelidade, golden compartilhado (`contracts/nlu_golden_cases.json`: o "modelo perfeito" não perde entidade, sem tolerância; os casos sem a entidade que a intenção exige — o golden
 não traz `composto` quando o composto não está no pacote — devem virar `DESCONHECIDA`), handlers (503 desligado, CORS, validação, limites por IP/instalação/Redis, cache,
 `melhoria` (desligado/ligado, filtros de pedido perigoso em 5 idiomas e de dado pessoal com falsos positivos da química, lista do mês com LTRIM/EXPIREAT, privacidade do que é guardado e do log),
-orçamento, coalescência, falhas do Modal, caminho Hugging Face → Modal → falha, verificador), health e adaptador Node. Não há modo mock: nada responde "como se fosse o modelo".
+orçamento, coalescência, falhas do Modal, caminho Hugging Face → Modal → falha, verificador), health e adaptador Node, e o bot (`bot_*`: loja do disco, contexto/dedup/limites com Redis falso,
+formato HTML em partes, núcleo sobre o pacote de teste, adaptador e endpoint do Telegram, golden de 20 casos sobre o pacote real). Não há modo mock: nada responde "como se fosse o modelo".
 
 ## Idiomas: como a API usa o léxico compartilhado
 O site e o app falam pt-BR (padrão), en, es, de e fr. A **fonte da verdade** dos padrões de interpretação e de segurança é `contracts/lexico/<idioma>.json`

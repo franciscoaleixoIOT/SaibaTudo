@@ -97,6 +97,7 @@ No Git Bash grave sempre com `printf '%s' "$VALOR" | vercel env add NOME product
 | Gastar menos na nuvem | `DAILY_BUDGET` menor (0 = esgotado) | 503 `budget`; o app segue com o NLU local |
 | Modelo ruim em produção | `python backend/modal/promover.py --version <anterior> --target nlu --rollback` + `MODEL_VERSION=<anterior>` na Vercel + redeploy (`MODELO.md` §9) | volta ao modelo anterior; a chave do cache muda com `MODEL_VERSION` |
 | Pacote de dados ruim | redeploy do commit anterior na Vercel; se a assinatura falhar, investigar a chave | — |
+| Bot de mensagens (Telegram) | `BOT_ENABLED` vazio + redeploy; ou `python tools/bot_telegram_webhook.py --remover` (imediato, sem deploy) | o Telegram recebe 200 e ninguém é respondido; o site e o Android não mudam (§9) |
 
 ## 4. Custos e limites
 
@@ -207,3 +208,20 @@ Dados: semanal. Modelo: mensal, ou quando o gate/medição ao vivo reprovar a pr
 - Conta do Hugging Face para o explicador (quando houver).
 - Revisar o texto de privacidade da captura antes de ligar `MELHORIA_ENABLED` (§6.2) e declarar no Data Safety.
 - Habilitar, se quiser, o relato privado de vulnerabilidades em *Settings › Security* (a `SECURITY.md` da raiz já o cita); passada manual de acessibilidade (TalkBack), tablets e orientação horizontal.
+
+## 9. Bot de mensagens (Telegram, teste interno, desde 04/11/2026)
+
+Spec: `docs/superpowers/specs/2026-11-04-quimica-bot-mensagens-design.md` (raiz); plano F1: `docs/superpowers/plans/2026-11-04-quimica-bot-telegram-f1.md`. Endpoint `POST /quimica/api/bot/telegram`
+(`api/bot/telegram.js`), núcleo em `api/_lib/bot/`, contrato em `api/README.md`.
+- **Segredos locais**: `secrets/telegram_token.txt` (BotFather) e `secrets/telegram_bot.env` (`BOT_TELEGRAM_IDS`, `BOT_TELEGRAM_SECRET`, `BOT_ENABLED`, limites). Nunca no Git nem no chat.
+- **Vercel (produção, sensíveis)**: `BOT_ENABLED=1`, `BOT_TELEGRAM_TOKEN`, `BOT_TELEGRAM_SECRET`, `BOT_TELEGRAM_IDS`; opcionais `BOT_RATE_POR_MIN` (10), `BOT_RATE_POR_DIA` (200).
+  Gravar com `printf '%s' "$VALOR" | vercel env add NOME production --sensitive`.
+- **Registrar o webhook** (depois do deploy e com a política 1.4 no ar): `python tools/bot_telegram_webhook.py --registrar https://saibatudo.net/quimica/api/bot/telegram`;
+  conferir com `--info` (`pending_update_count=0`, `last_error_message=nenhum`). Remover: `--remover`.
+- **Autorizar alguém**: a pessoa escreve ao bot; o mantenedor lê o `from.id` com `getUpdates` (só funciona sem webhook: `--remover`, `getUpdates`, `--registrar`; o id nunca vai ao log),
+  acrescenta à `BOT_TELEGRAM_IDS` e republica.
+- **Reverter**: `BOT_ENABLED` vazio + deploy, ou `--remover` (imediato).
+- **Logs**: `vercel logs` mostra só `{evt:"bot", canal, status, ms, motivo}`; motivos: `ok`, `metodo`, `auth_falhou`, `desligado`, `corpo_invalido`, `ignorado`, `nao_autorizado`,
+  `duplicado`, `limite`, `dados`, `acao_invalida`, `sem_resposta`, `ia_<kind>`, `envio_falhou`.
+- **Custos**: a explicação por IA consome o mesmo orçamento diário do `/api/ask` (`HF_ASK_DAILY_BUDGET`, contador global `ask-hf` no Upstash); o pacote inteiro (17 MB) vai junto da função.
+- **F2 (WhatsApp)**: aguarda o app "Empresa" na Meta (`PENDENCIAS.md` §14).

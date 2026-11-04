@@ -282,3 +282,15 @@ PubChem voltam com `cid=`), +11 compostos e 2 apelidos; 7 lacunas das regras do 
 3. Permissão da OpenStax (opcional; em 17/10 a termoquímica foi resolvida sem ela, pelo chembox da Wikipédia en — o CLAUDE.md da química passou a dizer "OpenStax e LibreTexts só como link").
 4. ~~Tokens do Modal~~ (par de Proxy Auth criado pelo mantenedor em 13/10, em `secrets/modal_proxy_quimica.env` da raiz e na Vercel); conta do Hugging Face para o explicador; **teto de gasto no Modal** (ainda não definido).
 5. ~~Chave de upload~~ (criada em 14/10, fazer backup) e conta da Play para o Android (criar o app, subir o AAB, teste interno → fechado). **AAB 1.0.3 (versionCode 4) gerado em 18/10** (`docs/RELEASE_1.0.3.md`, notas em `store/play/release-notes-1.0.3.json`); testar num aparelho antes de enviar (nenhum conectado em 18/10 de madrugada).
+
+## 14. Bot de mensagens (04/11/2026) — spec `docs/superpowers/specs/2026-11-04-quimica-bot-mensagens-design.md` (raiz)
+1. **Publicar a F1 (Telegram)** — Task 11 do plano: variáveis `BOT_ENABLED`, `BOT_TELEGRAM_TOKEN`, `BOT_TELEGRAM_SECRET`, `BOT_TELEGRAM_IDS` na Vercel (valores em
+   `secrets/telegram_bot.env` e `secrets/telegram_token.txt`), `vercel deploy --prod` em `apps/quimica`, `python tools/bot_telegram_webhook.py --registrar
+   https://saibatudo.net/quimica/api/bot/telegram`, teste ao vivo (5 perguntas com uma continuação, um pedido perigoso recusado, `/limpar`, "Explicar com IA") e
+   `vercel logs` sem texto. `OPERACAO.md` §9.
+2. **F2 — WhatsApp (Cloud API da Meta)**: o app criado em 04/11 é do tipo "Login do Facebook" e não serve; criar app "Outro → Empresa", adicionar o produto
+   WhatsApp, copiar o token temporário (`EAA…`, 24 h), `WHATSAPP_PHONE_ID`, `WHATSAPP_WABA_ID` e a chave secreta do app novo para `secrets/whatsapp.env`
+   (`KEY=valor`). Depois: `api/_lib/bot/whatsapp.js` + `api/bot/whatsapp.js` (aperto de mão GET, HMAC `X-Hub-Signature-256`, botões de resposta), política 1.5,
+   número de teste com até 5 destinatários. A Meta proíbe chatbots de IA de uso geral desde 15/01/2026: o bot é de química, dados do pacote.
+3. Idiomas do bot pelo `language_code` do Telegram (o motor já é multilíngue; F1 responde só em pt-BR).
+4. Fora de escopo por ora: imagens de moléculas (SmilesDrawer exige canvas), grupos, voz, divulgação pública, verificação de empresa na Meta.
