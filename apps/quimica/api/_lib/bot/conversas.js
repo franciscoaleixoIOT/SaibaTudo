@@ -2,18 +2,25 @@
 // 1ª camada: memória da instância (barata, sem rede). 2ª camada, opcional: o mesmo Redis do Upstash dos limites compartilhados
 // (compartilhado.js), para que outra instância continue a conversa e não reprocesse um update reenviado. FALHA ABERTA: sem Redis ou com
 // Redis fora do ar vale só a memória. Privacidade: a chave no Redis leva o SHA-256 do id da conversa, nunca o id em claro; nada aqui vai a log.
-import { createHash } from 'node:crypto';
+import { createHash, createHmac } from 'node:crypto';
 import { JANELAS, createSlidingWindow } from '../ratelimit.js';
 
 export const TTL_CONVERSA_MS = 30 * 60_000;
 
-export const hashConversa = (id) => createHash('sha256').update(String(id)).digest('hex');
+export { hashConversaExport as hashConversa };
 
 /**
- * @param {{ shared?: ReturnType<import('../compartilhado.js').createSharedLimiter>|null, now?: () => number, ttlMs?: number }} deps
+ * Pseudônimo do id da conversa para as chaves do Redis: HMAC-SHA256 com uma chave só do servidor (ids do Telegram são inteiros densos,
+ * um SHA-256 puro seria enumerável em minutos). Sem chave (só nos testes) cai no SHA-256 simples.
  */
-export function criarConversas({ shared = null, now = () => Date.now(), ttlMs = TTL_CONVERSA_MS } = {}) {
+const hashConversaExport = (id, chave = '') => (chave ? createHmac('sha256', chave) : createHash('sha256')).update(String(id)).digest('hex');
+
+/**
+ * @param {{ shared?: ReturnType<import('../compartilhado.js').createSharedLimiter>|null, now?: () => number, ttlMs?: number, chave?: string }} deps
+ */
+export function criarConversas({ shared = null, now = () => Date.now(), ttlMs = TTL_CONVERSA_MS, chave = '' } = {}) {
   const ttlSeg = String(Math.ceil(ttlMs / 1000));
+  const hashConversa = (id) => hashConversaExport(id, chave);
   /** @type {Map<string, object>} hash → contexto (com guardadoEm) */
   const contextos = new Map();
   /** @type {Map<string, number>} eventoId → instante */

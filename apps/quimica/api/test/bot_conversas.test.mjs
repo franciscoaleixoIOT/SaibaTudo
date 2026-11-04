@@ -35,11 +35,22 @@ const CTX = {
   sugestoes: ['pH de HCl 0,01 mol/L'],
 };
 
-test('hashConversa: SHA-256 hex, determinístico, não contém o id', () => {
-  const h = hashConversa(827000000);
+test('hashConversa: HMAC-SHA256 com chave do servidor (hex, determinístico, não contém o id); chaves diferentes dão resumos diferentes', () => {
+  const h = hashConversa(827000000, 'chave-a');
   assert.match(h, /^[0-9a-f]{64}$/);
-  assert.equal(h, hashConversa('827000000'));
+  assert.equal(h, hashConversa('827000000', 'chave-a'));
   assert.ok(!h.includes('827000000'));
+  assert.notEqual(h, hashConversa(827000000, 'chave-b'), 'um id denso não pode ser enumerado sem a chave');
+  assert.notEqual(h, hashConversa(827000000), 'sem chave (só testes) o resumo é outro');
+});
+
+test('criarConversas({ chave }): as chaves do Redis usam o HMAC com a chave do servidor', async () => {
+  const r = redisFalso();
+  const shared = createSharedLimiter({ env: () => ENV_REDIS, fetchFn: r.fetchFn, now: relogio() });
+  const c = criarConversas({ shared, now: relogio(), chave: 'segredo-do-webhook' });
+  await c.guardar('827000000', CTX);
+  assert.ok(r.dados.has(`bot:ctx:${hashConversa('827000000', 'segredo-do-webhook')}`));
+  assert.ok(!r.dados.has(`bot:ctx:${hashConversa('827000000')}`));
 });
 
 test('memória: guardar/obter/apagar e expiração em 30 min', async () => {

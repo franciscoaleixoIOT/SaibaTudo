@@ -30,7 +30,8 @@ export function createTelegramBotHandler(deps = {}) {
   const fetchFn = deps.fetch ?? ((...a) => globalThis.fetch(...a));
   const log = deps.log ?? logBot;
   const obterStore = deps.obterStore ?? (() => storeDoDisco());
-  const conversas = deps.conversas ?? criarConversas({ shared: createSharedLimiter({ env, now }), now });
+  // as chaves do Redis levam um HMAC do id do chat com o segredo do webhook (só do servidor): ids do Telegram são enumeráveis sem chave
+  const conversas = deps.conversas ?? criarConversas({ shared: createSharedLimiter({ env, now }), now, chave: lerConfigTelegram(env()).segredo });
   const estadoAsk = deps.estadoAsk ?? createAskState({ now });
   const nucleo = deps.nucleo ?? criarNucleo({
     obterStore,
@@ -60,7 +61,7 @@ export function createTelegramBotHandler(deps = {}) {
     if (!msg) return responder(200, 'ignorado');
 
     const cliente = criarClienteTelegram({ token: cfgTg.token, fetchFn, esperar: deps.esperar, log: () => {} });
-    if (msg.callbackId) await cliente.responderCallback(msg.callbackId, msg.acao === ACAO_EXPLICAR ? TEXTOS.gerando : '');
+    if (msg.callbackId) await cliente.responderCallback(msg.callbackId, String(msg.acao ?? '').startsWith(ACAO_EXPLICAR) ? TEXTOS.gerando : '');
 
     const saida = await nucleo.processar(msg);
     if (saida.silencio) return responder(200, saida.motivo);

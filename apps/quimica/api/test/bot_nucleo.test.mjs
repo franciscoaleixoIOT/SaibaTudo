@@ -54,7 +54,8 @@ test('pergunta resolvida: mesma intenção e entidade do site, rodapé com fonte
   assert.ok(semIa.resposta.rodape.fontes.length > 0 && typeof semIa.resposta.rodape.dataPacote === 'string');
   assert.deepEqual(semIa.botoes.map((b) => b.acao), [ACAO_SUGESTOES], 'sem ASK_ENABLED não há botão de IA');
   const comIa = await montar({ env: ENV_IA }).nucleo.processar(msg('Qual é a massa molar da água?'));
-  assert.deepEqual(comIa.botoes.map((b) => b.acao), [ACAO_EXPLICAR, ACAO_SUGESTOES]);
+  assert.deepEqual(comIa.botoes.map((b) => b.acao.split(':')[0]), [ACAO_EXPLICAR, ACAO_SUGESTOES]);
+  assert.match(comIa.botoes[0].acao, /^explicar:\d+$/, 'o botão leva o número da resposta a que pertence');
   assert.equal(comIa.botoes[0].rotulo, TEXTOS.explicarRotulo);
   for (const b of comIa.botoes) assert.ok(Buffer.byteLength(b.acao) <= 64);
 });
@@ -164,6 +165,36 @@ test('Explicar com IA: sem resposta recente → aviso; com resposta → chamarAs
   const cota = montar({ env: { ...ENV_IA, HF_ASK_DAILY_BUDGET: '0' } });
   await cota.nucleo.processar(msg('Fale sobre o oxigênio', { conversaId: c }));
   assert.equal((await cota.nucleo.processar(msg(null, { conversaId: c, acao: ACAO_EXPLICAR, callbackId: 'cb' }))).motivo, 'ia_budget');
+});
+
+test('botão de uma resposta anterior (Explicar ou sugestão) → aviso "botão antigo", nada é executado; o botão atual funciona', async () => {
+  const BOA = 'O ferro é o elemento 26.';
+  const sse = (obj) => new Response(`event: complete\ndata: ${JSON.stringify([obj])}\n\n`, { status: 200 });
+  const { nucleo, chamadas } = montar({ env: ENV_IA, hf: () => sse({ ok: true, answer: BOA, model: 'Qwen3-4B' }) });
+  const c = 'conversa-seq';
+  const antiga = await nucleo.processar(msg('Fale sobre o oxigênio', { conversaId: c }));
+  const nova = await nucleo.processar(msg('Fale sobre o ferro', { conversaId: c }));
+  const botaoAntigo = antiga.botoes.find((b) => b.acao.startsWith(ACAO_EXPLICAR)).acao;
+  const botaoNovo = nova.botoes.find((b) => b.acao.startsWith(ACAO_EXPLICAR)).acao;
+  assert.notEqual(botaoAntigo, botaoNovo);
+  const r = await nucleo.processar(msg(null, { conversaId: c, acao: botaoAntigo, callbackId: 'cb1' }));
+  assert.equal(r.motivo, 'botao_antigo');
+  assert.equal(r.resposta.blocos[0].texto, TEXTOS.botaoAntigo);
+  assert.equal(chamadas.filter((x) => x.init?.method === 'POST').length, 0, 'não chamou a nuvem');
+  const ok = await nucleo.processar(msg(null, { conversaId: c, acao: botaoNovo, callbackId: 'cb2' }));
+  assert.equal(ok.resposta.blocos[0].texto, BOA);
+  const naoResolvida = await nucleo.processar(msg('xyzzy plugh', { conversaId: c }));
+  await nucleo.processar(msg('Fale sobre o ferro', { conversaId: c }));
+  const sugAntiga = await nucleo.processar(msg(null, { conversaId: c, acao: naoResolvida.botoes[0].acao, callbackId: 'cb3' }));
+  assert.equal(sugAntiga.motivo, 'botao_antigo');
+});
+
+test('erro interno inesperado (ex.: armazenamento das conversas lança) → resposta "dados indisponíveis", motivo erro, sem lançar', async () => {
+  const quebrado = { ...criarConversas(), obter: async () => { throw new Error('redis explodiu'); } };
+  const nucleo = criarNucleo({ obterStore: () => storeDoDisco({ dir: FIXTURE }), env: () => ENV_SEM_IA, autorizado: () => true, conversas: quebrado });
+  const r = await nucleo.processar(msg('/ajuda'));
+  assert.equal(r.motivo, 'erro');
+  assert.equal(r.resposta.blocos[0].texto, TEXTOS.dados);
 });
 
 test('limite por conversa: a 11ª mensagem no minuto recebe o aviso de limite', async () => {

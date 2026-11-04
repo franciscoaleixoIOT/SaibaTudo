@@ -73,6 +73,21 @@ test('enviar: sendMessage em HTML com teclado; falha → 1 retentativa após 500
   assert.equal(await lanca.enviar(1, 'w'), false, 'exceção não propaga');
 });
 
+test('enviar: 400 do Telegram (HTML recusado) → reenvia em texto simples sem parse_mode, sem tags e com entidades desfeitas', async () => {
+  const chamadas = [];
+  const fetchFn = async (url, init) => {
+    const body = JSON.parse(init.body);
+    chamadas.push(body);
+    return body.parse_mode ? new Response('{"ok":false,"description":"Bad Request: can\'t parse entities"}', { status: 400 }) : new Response('{"ok":true}', { status: 200 });
+  };
+  const cli = criarClienteTelegram({ token: 't', fetchFn, esperar: async () => {}, log: () => {} });
+  assert.equal(await cli.enviar(1, '<b>Água</b>\n\n⚠️ 1 &lt; 2 &amp; <i>x</i>', { botoes: [{ rotulo: 'A', acao: 'a' }] }), true);
+  assert.equal(chamadas.length, 2);
+  assert.ok(!('parse_mode' in chamadas[1]));
+  assert.equal(chamadas[1].text, 'Água\n\n⚠️ 1 < 2 & x');
+  assert.deepEqual(chamadas[1].reply_markup, chamadas[0].reply_markup, 'os botões continuam');
+});
+
 test('responderCallback: answerCallbackQuery com texto; falha → false sem lançar', async () => {
   const chamadas = [];
   const cli = criarClienteTelegram({ token: 't', fetchFn: async (url, init) => { chamadas.push({ url: String(url), body: JSON.parse(init.body) }); return new Response('{"ok":true}', { status: 200 }); } });

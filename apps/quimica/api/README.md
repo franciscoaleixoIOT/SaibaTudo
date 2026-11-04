@@ -115,7 +115,7 @@ Webhook do Telegram (`@SaibaTudoNetBot`). Cabeçalho `X-Telegram-Bot-Api-Secret-
 `from.id` fora de `BOT_TELEGRAM_IDS` → `200` e **nenhuma** mensagem (silêncio); `update_id` repetido em 30 min → `200` sem reprocessar. Comandos `/start`, `/ajuda`,
 `/sobre`, `/limpar`; texto → motor do site (`web/src/quimica/js/engine.js`) sobre o pacote empacotado na função (`includeFiles: data/quimica/**`); botões
 "Explicar com IA" (chama `chamarAsk` internamente: mesmo orçamento, verificador e contador global) e "Sugestões". Contexto por conversa 30 min (memória + Redis
-`bot:ctx:<sha256>`); limites `BOT_RATE_POR_MIN`/`BOT_RATE_POR_DIA` por conversa. Sempre `200 { ok:true }` depois de enviar (1 retentativa). Log: só `evt`, `canal`,
+`bot:ctx:<hmac-sha256 do id com BOT_TELEGRAM_SECRET>`); limites `BOT_RATE_POR_MIN`/`BOT_RATE_POR_DIA` por conversa. Sempre `200 { ok:true }` depois de enviar (1 retentativa). Log: só `evt`, `canal`,
 `status`, `ms`, `motivo`. Módulos: `_lib/bot/{loja,conversas,formato,nucleo,telegram}.js`; registro do webhook: `tools/bot_telegram_webhook.py`.
 Spec: `docs/superpowers/specs/2026-11-04-quimica-bot-mensagens-design.md` (raiz); operação: `docs/OPERACAO.md` §9.
 

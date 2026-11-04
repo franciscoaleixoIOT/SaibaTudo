@@ -416,7 +416,12 @@ global). Testes: api 253 → 293 (bot_loja, bot_conversas, bot_formato, bot_nucl
 tools +8. Lições: o NLU local só herda contexto nas formas de PROPRIEDADE ("e o ponto de ebulição?"); o worktree novo veio com CRLF nos módulos gerados do léxico
 (testes de bytes) — recheckout com LF resolve. **Pendente (Task 11, mantenedor):** variáveis na Vercel (de `secrets/telegram_bot.env` e `telegram_token.txt`),
 `vercel deploy --prod`, `tools/bot_telegram_webhook.py --registrar`, teste ao vivo (critério 6 da spec). ID do mantenedor capturado por `getUpdates` em 04/11 e
-gravado em `secrets/telegram_bot.env` (nunca no Git).
+gravado em `secrets/telegram_bot.env` (nunca no Git). Revisão final (opus, 04/11): sem crítico; corrigidos no mesmo ciclo — divisão de mensagens longas
+fecha/reabre `<b>`/`<i>` e não parte entidades (o Telegram recusava a parte), reenvio em texto simples quando o HTML é recusado (400), botões levam o número
+da resposta (`explicar:<seq>`, `sug:<seq>:<i>`; botão antigo → aviso), pseudônimo do chat por HMAC-SHA256 com `BOT_TELEGRAM_SECRET` (SHA-256 puro era
+enumerável), erro inesperado vira "dados indisponíveis" em vez de 500, política 1.4 sem contradição (contexto fica 30 min no Upstash; Hugging Face em §7;
+o que "Explicar com IA" envia). Adiados (menores): leitura do Redis antes da memória, dedup de duplo toque, poda do Map de contextos, `--remetentes` na
+ferramenta do webhook, HTTPError com descrição, callback de não autorizado respondido.
 
 ## 7. Contas e segredos
 Vercel `saibatudo-quimica` (time `franciscoaleixo-9696`); GitHub `franciscoaleixoIOT`; Hugging Face `franciscoaleixo` (PRO, 40 min/dia de ZeroGPU); Modal `franciscoaleixo/main` (US$ 30/mês grátis; já usados pelo app de eleições, ~US$ 5/mês).

@@ -39,6 +39,9 @@ export function lerUpdate(update) {
   return null;
 }
 
+/** Versão em texto simples do HTML do bot (só <b>/<i> e as três entidades que escaparHtml produz). */
+export const textoSemHtml = (html) => String(html ?? '').replace(/<\/?[a-z]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+
 /** Um botão por linha. */
 export function tecladoInline(botoes) {
   if (!Array.isArray(botoes) || !botoes.length) return undefined;
@@ -56,7 +59,10 @@ export function criarClienteTelegram({ token, fetchFn = (...a) => globalThis.fet
   }
 
   return {
-    /** sendMessage em HTML; 1 retentativa após 500 ms; false quando as duas falham (log bot_envio_falhou, sem texto). */
+    /**
+     * sendMessage em HTML; 1 retentativa após 500 ms; se o Telegram recusar o HTML (400), reenvia em texto simples sem parse_mode.
+     * false quando tudo falha (log bot_envio_falhou, sem texto).
+     */
     async enviar(chatId, html, { botoes = [] } = {}) {
       const corpo = { chat_id: chatId, text: html, parse_mode: 'HTML', disable_web_page_preview: true };
       const teclado = tecladoInline(botoes);
@@ -65,6 +71,13 @@ export function criarClienteTelegram({ token, fetchFn = (...a) => globalThis.fet
       for (let tentativa = 0; tentativa < 2; tentativa++) {
         if (tentativa > 0) await esperar(ESPERA_RETENTATIVA_MS);
         ultimo = await chamar('sendMessage', corpo);
+        if (ultimo.ok) return true;
+        if (ultimo.status === 400) break; // HTML recusado: repetir não adianta
+      }
+      if (ultimo.status === 400) {
+        const { parse_mode: _ignorado, ...simples } = corpo;
+        simples.text = textoSemHtml(html);
+        ultimo = await chamar('sendMessage', simples);
         if (ultimo.ok) return true;
       }
       log({ evt: 'bot_envio_falhou', status: ultimo.status });

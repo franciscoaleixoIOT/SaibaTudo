@@ -375,6 +375,9 @@ test('index.html: hreflang dos cinco idiomas + x-default; cada idioma tem manife
   assert.ok(ptPriv.includes('<h2>12. Bot de mensagens no Telegram (teste interno)</h2>') && ptPriv.includes('<h2>13. Alterações</h2>'), 'seção do bot antes de Alterações');
   assert.ok(ptPriv.includes('/quimica/api/bot/telegram') && ptPriv.includes('30 minutos'), 'destino e retenção do bot');
   assert.equal((ptPriv.match(/<tr>/g) ?? []).length, 6, 'cabeçalho + 5 conexões (Telegram incluído)');
+  assert.ok(!ptPriv.includes('não ficam em log nem em banco de dados'), 'o contexto de 30 min fica num banco: a política não pode dizer o contrário');
+  assert.ok(ptPriv.includes('HMAC-SHA256') && !ptPriv.includes('resumo irreversível (SHA-256)'), 'pseudônimo com chave do servidor, não SHA-256 puro');
+  assert.ok((ptPriv.match(/Hugging Face/g) ?? []).length >= 2, 'o Hugging Face aparece na linha do bot e entre os operadores (§7)');
   const descricoes = new Set([pt.description]);
   for (const idioma of IDIOMAS.filter((i) => i !== 'pt-BR')) {
     const m = JSON.parse(readFileSync(join(SRC, arquivoPorIdioma('manifest', 'webmanifest', idioma)), 'utf8'));
@@ -403,6 +406,7 @@ test('index.html: hreflang dos cinco idiomas + x-default; cada idioma tem manife
     assert.equal((priv.match(/<h2>/g) ?? []).length, (ptPriv.match(/<h2>/g) ?? []).length, `${idioma}: mesma estrutura de seções da política em português`);
     assert.equal((priv.match(/<tr>/g) ?? []).length, (ptPriv.match(/<tr>/g) ?? []).length, `${idioma}: mesma tabela de conexões`);
     assert.ok(priv.includes('1.4') && priv.includes('Telegram') && priv.includes('/quimica/api/bot/telegram'), `${idioma}: política 1.4 com a seção do bot`);
+    assert.ok(priv.includes('HMAC-SHA256') && (priv.match(/Hugging Face/g) ?? []).length >= 2, `${idioma}: pseudônimo com chave e Hugging Face como operador`);
     assert.ok(priv.includes('saibatudo@saibatudo.net') && priv.includes('Francisco Aleixo'), `${idioma}: contato do responsável`);
     assert.equal(arquivoPorIdioma('manifest', 'webmanifest', idioma), `manifest.${idioma}.webmanifest`);
     assert.equal(caminhoPrivacidade(idioma), `/quimica/privacidade/${idioma}`);

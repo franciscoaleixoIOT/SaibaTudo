@@ -52,3 +52,20 @@ test('dividir e partes numeradas: nada acima de 4 000, corte em quebra de linha,
   assert.ok(html.at(-1).includes('Dados de 28/10/2026') && !html[0].includes('Dados de'), 'rodapé só na última');
   for (const p of html) assert.ok(p.length <= LIMITE_TELEGRAM);
 });
+
+test('dividir: um <i> de várias linhas que cruza o corte fica fechado numa parte e reaberto na seguinte; entidade &amp; nunca é partida', () => {
+  const citacao = `<i>${Array.from({ length: 120 }, (_, i) => `Trecho ${i} da citação com texto bastante longo para forçar a divisão.`).join('\n')}\n(Wikipédia, CC BY-SA 4.0)</i>`;
+  const partes = dividir(`<b>Título</b>\n\n${citacao}`);
+  assert.ok(partes.length >= 2);
+  for (const p of partes) {
+    assert.ok(p.length <= LIMITE_TELEGRAM);
+    assert.equal((p.match(/<i>/g) ?? []).length, (p.match(/<\/i>/g) ?? []).length, `tags <i> balanceadas em cada parte: ${p.slice(0, 40)}…`);
+    assert.equal((p.match(/<b>/g) ?? []).length, (p.match(/<\/b>/g) ?? []).length);
+  }
+  assert.ok(partes[1].startsWith('<i>'), 'a parte seguinte reabre a tag');
+  const semQuebra = 'x&amp;'.repeat(1200); // 6 000 caracteres sem \n: corte duro
+  for (const p of dividir(semQuebra)) {
+    assert.ok(p.length <= LIMITE_TELEGRAM);
+    assert.ok(!/&[a-z]*$/.test(p) && !/^[a-z]*;/.test(p), 'nenhuma entidade partida');
+  }
+});

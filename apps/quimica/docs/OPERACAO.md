@@ -222,6 +222,6 @@ Spec: `docs/superpowers/specs/2026-11-04-quimica-bot-mensagens-design.md` (raiz)
   acrescenta à `BOT_TELEGRAM_IDS` e republica.
 - **Reverter**: `BOT_ENABLED` vazio + deploy, ou `--remover` (imediato).
 - **Logs**: `vercel logs` mostra só `{evt:"bot", canal, status, ms, motivo}`; motivos: `ok`, `metodo`, `auth_falhou`, `desligado`, `corpo_invalido`, `ignorado`, `nao_autorizado`,
-  `duplicado`, `limite`, `dados`, `acao_invalida`, `sem_resposta`, `ia_<kind>`, `envio_falhou`.
+  `duplicado`, `limite`, `dados`, `acao_invalida`, `botao_antigo` (botão de resposta anterior), `sem_resposta`, `ia_<kind>`, `envio_falhou`, `erro` (falha inesperada; a pessoa recebe "dados indisponíveis").
 - **Custos**: a explicação por IA consome o mesmo orçamento diário do `/api/ask` (`HF_ASK_DAILY_BUDGET`, contador global `ask-hf` no Upstash); o pacote inteiro (17 MB) vai junto da função.
 - **F2 (WhatsApp)**: aguarda o app "Empresa" na Meta (`PENDENCIAS.md` §14).

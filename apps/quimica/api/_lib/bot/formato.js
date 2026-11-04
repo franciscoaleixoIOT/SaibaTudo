@@ -36,18 +36,42 @@ function blocoHtml(b) {
   return t;
 }
 
-/** Corta em quebras de linha sem ultrapassar o limite e sem partir uma tag `<...>`. */
+const MARGEM_TAGS = 16; // espaço para fechar as tags abertas no fim da parte (</i></b>)
+
+/** Tags <b>/<i> abertas e não fechadas em `s`, na ordem de abertura. */
+function tagsAbertas(s) {
+  const pilha = [];
+  for (const m of s.matchAll(/<(\/?)([bi])>/g)) {
+    if (m[1]) { const i = pilha.lastIndexOf(m[2]); if (i >= 0) pilha.splice(i, 1); } else pilha.push(m[2]);
+  }
+  return pilha;
+}
+
+/**
+ * Corta em quebras de linha sem ultrapassar o limite, sem partir uma tag `<...>` nem uma entidade `&...;`; uma tag <b>/<i> aberta
+ * no fim de uma parte é fechada ali e reaberta no começo da seguinte (o Telegram recusa HTML desbalanceado).
+ */
 export function dividir(texto, limite = LIMITE_TELEGRAM) {
   const partes = [];
   let resto = String(texto ?? '');
   while (resto.length > limite) {
-    let corte = resto.lastIndexOf('\n', limite);
-    if (corte <= 0) corte = limite;
-    // não cortar dentro de uma tag: se há um "<" aberto antes do corte sem ">" depois dele, recua até antes do "<"
+    const alvo = limite - MARGEM_TAGS;
+    let corte = resto.lastIndexOf('\n', alvo);
+    if (corte <= 0) corte = alvo;
+    // não cortar dentro de uma tag: se há um "<" aberto antes do corte sem ">" antes dele, recua até antes do "<"
     const abre = resto.lastIndexOf('<', corte - 1);
     if (abre >= 0 && resto.indexOf('>', abre) >= corte) corte = Math.max(1, abre);
-    partes.push(resto.slice(0, corte).replace(/\n$/, ''));
+    // não cortar dentro de uma entidade: "&" antes do corte sem ";" antes do corte
+    const ecomercial = resto.lastIndexOf('&', corte - 1);
+    if (ecomercial >= 0 && resto.indexOf(';', ecomercial) >= corte) corte = Math.max(1, ecomercial);
+    let parte = resto.slice(0, corte).replace(/\n$/, '');
     resto = resto.slice(corte).replace(/^\n/, '');
+    const abertas = tagsAbertas(parte);
+    if (abertas.length) {
+      parte += abertas.map((t) => `</${t}>`).reverse().join('');
+      resto = abertas.map((t) => `<${t}>`).join('') + resto;
+    }
+    partes.push(parte);
   }
   if (resto.length || !partes.length) partes.push(resto);
   return partes;

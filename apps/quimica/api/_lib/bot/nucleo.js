@@ -22,6 +22,7 @@ export const TEXTOS = Object.freeze({
   start: 'Olá! Eu sou o SaibaTudo Química em teste interno. Pergunte sobre elementos, compostos, cálculos e segurança química: as respostas vêm do pacote de dados assinado do app, e a IA na nuvem só entra quando você toca em "Explicar com IA". Comandos: /ajuda, /sobre, /limpar.',
   limpar: 'Contexto da conversa apagado.',
   semResposta: 'Não há resposta recente para explicar. Faça uma pergunta primeiro.',
+  botaoAntigo: 'Esse botão é de uma resposta anterior. Faça a pergunta de novo para ter botões atualizados.',
   limite: 'Muitas mensagens em pouco tempo. Aguarde um minuto e tente de novo.',
   dados: 'Dados indisponíveis no momento. Tente de novo em alguns minutos.',
   gerando: 'Gerando a explicação…',
@@ -134,14 +135,16 @@ export function criarNucleo({
 
   const rodape = (store, fontes) => ({ fontes: nomesDasFontes(fontes), dataPacote: dataDoPacote(store) });
   const botaoSugestoes = { rotulo: TEXTOS.sugestoesRotulo, acao: ACAO_SUGESTOES };
-  const botoesSugestao = (sugestoes) => sugestoes.slice(0, MAX_BOTOES_SUGESTAO).map((s, i) => ({ rotulo: s, acao: `${PREFIXO_SUGESTAO}${i}` }));
+  // Cada estado guardado da conversa tem um número (`seq`); os botões levam esse número para que um botão de resposta antiga não aja sobre a atual.
+  const seqDe = (ctx) => (Number.isInteger(ctx?.seq) ? ctx.seq : 0);
+  const botoesSugestao = (sugestoes, seq) => sugestoes.slice(0, MAX_BOTOES_SUGESTAO).map((s, i) => ({ rotulo: s, acao: `${PREFIXO_SUGESTAO}${seq}:${i}` }));
   const sugestoesDe = (ctx) => (Array.isArray(ctx?.sugestoes) && ctx.sugestoes.length ? ctx.sugestoes : SUGESTOES_PADRAO);
-  const guardarSugestoes = (conversaId, ctx, sugestoes) => conversas.guardar(conversaId, { ultimoContexto: null, ultimaInterpretacao: null, ultima: null, ...(ctx ?? {}), sugestoes });
+  const guardarSugestoes = (conversaId, ctx, sugestoes, seq = seqDe(ctx)) => conversas.guardar(conversaId, { ultimoContexto: null, ultimaInterpretacao: null, ultima: null, ...(ctx ?? {}), sugestoes, seq });
+  const botaoAntigo = () => ({ resposta: { titulo: null, blocos: [B.texto(TEXTOS.botaoAntigo)] }, botoes: [], motivo: 'botao_antigo' });
 
   async function comando(nome, msg, store, ctx) {
     if (nome === '/limpar') {
       await conversas.apagar(msg.conversaId);
-      engine?.limparContexto();
       return { resposta: { titulo: null, blocos: [B.texto(TEXTOS.limpar)] }, botoes: [] };
     }
     await guardarSugestoes(msg.conversaId, ctx, SUGESTOES_PADRAO);
@@ -181,6 +184,7 @@ export function criarNucleo({
     const interpretacao = { intent: parsed.intent ?? resp.intent, elemento: parsed.elemento ?? null, composto: parsed.composto ?? null };
     const sugestoes = Array.isArray(resp.sugestoes) ? resp.sugestoes : [];
     const recusa = interpretacao.intent === 'RECUSA_PERIGO';
+    const seq = seqDe(ctx) + 1;
     if (!recusa) {
       if (resp.resolvida && !SEM_NUVEM.has(resp.intent)) {
         await conversas.guardar(msg.conversaId, {
@@ -188,15 +192,16 @@ export function criarNucleo({
           ultimaInterpretacao: r.ultimaInterpretacao,
           ultima: { q: texto, directAnswer: resp.directAnswer ?? '', parsed: interpretacao },
           sugestoes,
+          seq,
         });
       } else {
-        await guardarSugestoes(msg.conversaId, ctx, sugestoes.length ? sugestoes : SUGESTOES_PADRAO);
+        await guardarSugestoes(msg.conversaId, ctx, sugestoes.length ? sugestoes : SUGESTOES_PADRAO, seq);
       }
     }
     const botoes = [];
     if (!recusa) {
-      if (resp.resolvida && !SEM_NUVEM.has(resp.intent) && askAtivo(readConfig(env()))) botoes.push({ rotulo: TEXTOS.explicarRotulo, acao: ACAO_EXPLICAR });
-      if (resp.resolvida) { if (sugestoes.length) botoes.push(botaoSugestoes); } else botoes.push(...botoesSugestao(sugestoes.length ? sugestoes : SUGESTOES_PADRAO));
+      if (resp.resolvida && !SEM_NUVEM.has(resp.intent) && askAtivo(readConfig(env()))) botoes.push({ rotulo: TEXTOS.explicarRotulo, acao: `${ACAO_EXPLICAR}:${seq}` });
+      if (resp.resolvida) { if (sugestoes.length) botoes.push(botaoSugestoes); } else botoes.push(...botoesSugestao(sugestoes.length ? sugestoes : SUGESTOES_PADRAO, seq));
     }
     return { resposta: { titulo: resp.titulo ?? null, blocos: resp.blocos ?? [], rodape: rodape(store, resp.fontes) }, botoes, interpretacao };
   }
@@ -221,6 +226,15 @@ export function criarNucleo({
   async function processar(msg) {
     const t0 = agora();
     const fim = (saida) => { log({ evt: 'bot_nucleo', motivo: saida.motivo ?? (saida.silencio ? 'silencio' : 'ok'), ms: agora() - t0 }); return saida; };
+    try {
+      return await processarInterno(msg, fim);
+    } catch {
+      // erro inesperado: a pessoa recebe um aviso (em vez de silêncio e reenvio pelo Telegram); nada do erro vai ao log (poderia trazer texto)
+      return fim({ resposta: { titulo: null, blocos: [B.texto(TEXTOS.dados)] }, botoes: [], motivo: 'erro' });
+    }
+  }
+
+  async function processarInterno(msg, fim) {
     if (!autorizado(msg)) return fim({ silencio: true, motivo: 'nao_autorizado' });
     if (await conversas.jaVisto(msg.eventoId)) return fim({ silencio: true, motivo: 'duplicado' });
     const cfg = lerConfigBot(env());
@@ -233,19 +247,26 @@ export function criarNucleo({
 
     let texto = typeof msg.texto === 'string' ? cleanText(msg.texto).slice(0, MAX_Q) : '';
     if (msg.acao != null) {
-      if (msg.acao === ACAO_EXPLICAR) return fim(await explicar(msg, store, ctx));
-      if (msg.acao === ACAO_SUGESTOES) {
-        const sugestoes = sugestoesDe(ctx);
-        return fim({ resposta: { titulo: TEXTOS.sugestoesTitulo, blocos: [B.lista(null, sugestoes.slice(0, MAX_BOTOES_SUGESTAO))] }, botoes: botoesSugestao(sugestoes) });
+      const acao = String(msg.acao);
+      const seqAtual = seqDe(ctx);
+      // "explicar" ou "explicar:<seq>": só a resposta atual pode ser explicada
+      const mExplicar = acao.match(/^explicar(?::(\d{1,9}))?$/);
+      if (mExplicar) {
+        if (mExplicar[1] !== undefined && Number(mExplicar[1]) !== seqAtual) return fim(botaoAntigo());
+        return fim(await explicar(msg, store, ctx));
       }
-      if (String(msg.acao).startsWith(PREFIXO_SUGESTAO)) {
-        const i = Number(msg.acao.slice(PREFIXO_SUGESTAO.length));
+      if (acao === ACAO_SUGESTOES) {
         const sugestoes = sugestoesDe(ctx);
-        if (!Number.isInteger(i) || i < 0 || i >= Math.min(sugestoes.length, MAX_BOTOES_SUGESTAO)) return fim({ silencio: true, motivo: 'acao_invalida' });
-        texto = cleanText(sugestoes[i]).slice(0, MAX_Q);
-      } else {
-        return fim({ silencio: true, motivo: 'acao_invalida' });
+        return fim({ resposta: { titulo: TEXTOS.sugestoesTitulo, blocos: [B.lista(null, sugestoes.slice(0, MAX_BOTOES_SUGESTAO))] }, botoes: botoesSugestao(sugestoes, seqAtual) });
       }
+      // "sug:<seq>:<i>" (botões atuais) ou "sug:<i>" (forma curta)
+      const mSug = acao.match(/^sug:(?:(\d{1,9}):)?(\d)$/);
+      if (!mSug) return fim({ silencio: true, motivo: 'acao_invalida' });
+      if (mSug[1] !== undefined && Number(mSug[1]) !== seqAtual) return fim(botaoAntigo());
+      const i = Number(mSug[2]);
+      const sugestoes = sugestoesDe(ctx);
+      if (i >= Math.min(sugestoes.length, MAX_BOTOES_SUGESTAO)) return fim({ silencio: true, motivo: 'acao_invalida' });
+      texto = cleanText(sugestoes[i]).slice(0, MAX_Q);
     }
     if (!texto) return fim(await comando('/ajuda', msg, store, ctx));
     if (texto.startsWith('/')) return fim(await comando(texto.split(/\s+/)[0].toLowerCase(), msg, store, ctx));

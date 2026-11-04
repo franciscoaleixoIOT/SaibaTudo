@@ -82,8 +82,9 @@ test('callback Explicar: answerCallbackQuery imediato com "Gerando…", depois a
   const env = { ...ENV, ASK_ENABLED: '1', HF_ASK_SPACE_URL: 'https://exemplo.hf.space', HF_TOKEN: 'hf_x' };
   const { handler, telegram } = montar({ env, hf: () => new Response(`event: complete\ndata: ${JSON.stringify([{ ok: true, answer: BOA, model: 'Qwen3-4B' }])}\n\n`, { status: 200 }) });
   await handler(post(update('Qual é a massa molar da água?')));
-  assert.ok(telegram[0].body.reply_markup.inline_keyboard.flat().some((b) => b.callback_data === 'explicar'));
-  await handler(post(callback('explicar')));
+  const botaoExplicar = telegram[0].body.reply_markup.inline_keyboard.flat().find((b) => b.callback_data.startsWith('explicar'));
+  assert.ok(botaoExplicar);
+  await handler(post(callback(botaoExplicar.callback_data)));
   assert.equal(telegram[1].metodo, 'answerCallbackQuery');
   assert.equal(telegram[1].body.text, TEXTOS.gerando);
   assert.equal(telegram[2].metodo, 'sendMessage');
