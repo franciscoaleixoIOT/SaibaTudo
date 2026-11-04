@@ -371,6 +371,10 @@ test('index.html: hreflang dos cinco idiomas + x-default; cada idioma tem manife
   const alternativas = (pagina) => [...pagina.matchAll(/<link rel="alternate" hreflang="([^"]+)" href="([^"]+)">/g)].map((m) => `${m[1]} ${m[2]}`);
   const esperadas = [...IDIOMAS.map((i) => `${i} https://saibatudo.net/quimica/privacidade${i === 'pt-BR' ? '' : `/${i}`}`), 'x-default https://saibatudo.net/quimica/privacidade'];
   assert.deepEqual(alternativas(ptPriv), esperadas, 'a política em português lista as cinco versões');
+  assert.match(ptPriv, /Versão 1\.4 — 4 de novembro de 2026/);
+  assert.ok(ptPriv.includes('<h2>12. Bot de mensagens no Telegram (teste interno)</h2>') && ptPriv.includes('<h2>13. Alterações</h2>'), 'seção do bot antes de Alterações');
+  assert.ok(ptPriv.includes('/quimica/api/bot/telegram') && ptPriv.includes('30 minutos'), 'destino e retenção do bot');
+  assert.equal((ptPriv.match(/<tr>/g) ?? []).length, 6, 'cabeçalho + 5 conexões (Telegram incluído)');
   const descricoes = new Set([pt.description]);
   for (const idioma of IDIOMAS.filter((i) => i !== 'pt-BR')) {
     const m = JSON.parse(readFileSync(join(SRC, arquivoPorIdioma('manifest', 'webmanifest', idioma)), 'utf8'));
@@ -398,6 +402,7 @@ test('index.html: hreflang dos cinco idiomas + x-default; cada idioma tem manife
     assert.ok(!/<script(?![^>]*\bsrc=)[^>]*>[^<]/i.test(priv) && !/\sstyle=/.test(priv), `${idioma}: CSP, sem inline`);
     assert.equal((priv.match(/<h2>/g) ?? []).length, (ptPriv.match(/<h2>/g) ?? []).length, `${idioma}: mesma estrutura de seções da política em português`);
     assert.equal((priv.match(/<tr>/g) ?? []).length, (ptPriv.match(/<tr>/g) ?? []).length, `${idioma}: mesma tabela de conexões`);
+    assert.ok(priv.includes('1.4') && priv.includes('Telegram') && priv.includes('/quimica/api/bot/telegram'), `${idioma}: política 1.4 com a seção do bot`);
     assert.ok(priv.includes('saibatudo@saibatudo.net') && priv.includes('Francisco Aleixo'), `${idioma}: contato do responsável`);
     assert.equal(arquivoPorIdioma('manifest', 'webmanifest', idioma), `manifest.${idioma}.webmanifest`);
     assert.equal(caminhoPrivacidade(idioma), `/quimica/privacidade/${idioma}`);
