@@ -263,8 +263,9 @@ test('vercel.json: build, saída, cleanUrls, rewrite do SPA em /quimica/, CSP re
     {
       'api/health.js': { includeFiles: 'data/quimica/manifest.json' },
       'api/nlu.js': { includeFiles: 'data/quimica/compostos/index.json' },
+      'api/bot/telegram.js': { includeFiles: 'data/quimica/**' },
     },
-    'o manifesto vai junto do /health e o índice de compostos junto do /nlu (resolução do composto)',
+    'o manifesto vai junto do /health, o índice de compostos junto do /nlu (resolução do composto) e o pacote inteiro junto do bot do Telegram',
   );
   const todos = vercel.headers.find((h) => h.source === '/(.*)').headers;
   const h = Object.fromEntries(todos.map((x) => [x.key, x.value]));

@@ -47,7 +47,7 @@ const fonteDe = (f) => (typeof f === 'string' ? { nome: f } : f && typeof f === 
 const dado = (...fontes) => fontes.filter(Boolean).map(fonteDe);
 const origemUnidades = (tabela) => t(`respostas.unidades.origem.${tabela?.origemChave ?? 'padrao'}`);
 
-function textoDoBloco(b) {
+export function textoDoBloco(b) {
   switch (b.tipo) {
     case 'texto': case 'aviso': return b.texto;
     case 'formula': return formulaUnicode(b.formula);
