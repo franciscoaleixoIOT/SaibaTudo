@@ -22,9 +22,8 @@ a IA interpreta a pergunta, os dados respondem. Idioma de tudo o que o usuário 
    vem de `regras.json` + relógio (`POS_ELEICAO`). Texto novo sobre o 2º turno, eleitos ou prazos tem de valer nas cinco fases (testes com `hoje`).
 
 ## Publicar (resumo; passo a passo em `docs/PROJECT_MEMORY.md` §4)
-- **Push na `main` publica em até 30 min:** desde 25/10/2026 o `eleicoes-data-refresh.yml` reconstrói e publica quando a fase muda **ou** quando o commit da `main`
-  difere do `version` de `/api/health` (decisão do mantenedor). Só empurre conjuntos completos e testados; para publicar já: `gh workflow run eleicoes-data-refresh.yml`
-  e conferir `curl -s https://saibatudo.net/api/health`.
+- **Pausa pós-pleito (22/11/2026).** Publicação manual via `gh workflow run eleicoes-data-refresh.yml` com o pacote assinado versionado. Confira
+  `curl -s https://saibatudo.net/api/health`. Coleta excepcional de 2026 exige `-f atualizar_dados=true`. O alerta de frescor também deixa de ser agendado.
 - **Conferir também `eleicoes-web-ci.yml` e `eleicoes-android-ci.yml`** depois de cada push (`gh run list --limit 6`). Deploy verde não significa CI verde.
 - Push recusado? O robô de dados comita na `main`: `git pull --rebase origin main` e enviar de novo.
 - Variável da Vercel só vale no próximo deploy. `printf '%s' "$VALOR" | vercel env add NOME production --sensitive` (Git Bash).

@@ -1103,7 +1103,8 @@ export class AnswerBuilder {
         `${t.percentual != null ? ` (${decimal2(t.percentual)}%)` : ''}${t.situacao ? ` — ${String(t.situacao).toUpperCase()}` : ''}`;
     });
     let texto = turnos.length > 0 ? `${cabeca}, ${turnos.join('; ')}` : `${cabeca}`;
-    if (r.situacaoTotalizacao) texto += `\n• Situação na totalização oficial do TSE: ${r.situacaoTotalizacao}`;
+    // O campo geral do CSV pode continuar como "2º TURNO" após a totalização do segundo turno.
+    if (r.situacaoTotalizacao && !r.turnos?.[2]?.situacao?.trim()) texto += `\n• Situação na totalização oficial do TSE: ${r.situacaoTotalizacao}`;
     if (resultadoSegundoTurno(r) && r.turnos?.[2] == null) {
       texto += this.fase.id === 'POS_ELEICAO'
         ? `\n• O 2º turno ocorreu em ${dataBr(this.regras.turno2)}; não foi possível consultar agora a apuração oficial do TSE — resultado em ${URL_RESULTADOS_TSE}`

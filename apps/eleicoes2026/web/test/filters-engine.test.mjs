@@ -43,7 +43,10 @@ test('filtros de situação, histórico, tema, região, partido, urna e busca', 
   const eleitos = filtrar(d, novoFiltro({ apenasEleitos: true }));
   if (store.manifest.resultadosDisponiveis) {
     assert.ok(eleitos.length > 0, 'com resultados publicados, há eleitos no pacote');
-    assert.ok(eleitos.every((c) => /^eleito/i.test(String(c.resultado?.situacaoTotalizacao ?? ''))), 'só aparece quem o TSE declarou eleito');
+    assert.ok(eleitos.every(({ resultado }) => {
+      const situacoes = [resultado?.situacaoTotalizacao, ...Object.values(resultado?.turnos ?? {}).map((t) => t.situacao)];
+      return situacoes.some((situacao) => /^eleito/i.test(situacao ?? ''));
+    }), 'só aparece quem o TSE declarou eleito na totalização ou em um dos turnos');
   } else {
     assert.equal(eleitos.length, 0, 'sem resultados publicados, ninguém consta como eleito');
   }

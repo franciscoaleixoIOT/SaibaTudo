@@ -20,7 +20,7 @@ except ImportError:  # pragma: no cover
 
 RAIZ = Path(__file__).resolve().parent.parent
 # Repositório único (SaibaTudo): os workflows ficam na raiz do repositório, com o prefixo do app.
-REPO = next(p for p in [RAIZ, *RAIZ.parents] if (p / ".github" / "workflows").is_dir())
+REPO = next(p for p in [RAIZ, *RAIZ.parents] if any((p / ".github" / "workflows").glob("eleicoes-*.yml")))
 GITHUB = REPO / ".github"
 WORKFLOWS = sorted((GITHUB / "workflows").glob("eleicoes-*.yml"))
 BASH = shutil.which("bash")
@@ -52,6 +52,14 @@ class Yaml(unittest.TestCase):
                     self.assertTrue(job.get("steps"), f"{nome}: sem steps")
                     for passo in job["steps"]:
                         self.assertTrue("run" in passo or "uses" in passo, f"{nome}: passo sem run/uses: {passo}")
+
+    def test_pausa_do_pacote_eleitoral(self):
+        refresh = _carregar(GITHUB / "workflows" / "eleicoes-data-refresh.yml")
+        freshness = _carregar(GITHUB / "workflows" / "eleicoes-data-freshness.yml")
+        gatilhos = refresh[True]
+        self.assertEqual(set(gatilhos), {"workflow_dispatch"})
+        self.assertEqual(set(freshness[True]), {"workflow_dispatch"})
+        self.assertIs(gatilhos["workflow_dispatch"]["inputs"]["atualizar_dados"]["default"], False)
 
     def test_workflows_com_escrita_declaram_permissoes(self):
         # quem faz push, abre issue ou PR precisa dizer o que pode (o padrão do repositório pode ser só leitura)

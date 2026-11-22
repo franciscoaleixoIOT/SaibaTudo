@@ -7,8 +7,8 @@
 
 | Peça | Onde | Cadência / gatilho | Quem avisa se quebrar |
 | :-- | :-- | :-- | :-- |
-| Atualização dos dados | GitHub Actions `eleicoes-data-refresh.yml` | **a cada 30 min**, o ano todo; reconstrói e publica se uma fonte do TSE mudou (ETag), se a fase eleitoral mudou **ou se o commit da `main` difere do publicado** (desde 25/10, pedido do mantenedor: push na `main` vai ao ar em até 30 min) | `eleicoes-data-freshness.yml` abre a issue `alerta-dados` |
-| Alerta de frescor | `eleicoes-data-freshness.yml` + `tools/frescor.py` | a cada 30 min; extração do TSE mais velha que 30 h alerta, mas em `POS_ELEICAO` o limite é 14 dias (o TSE para de regerar o consulta_cand depois da eleição) | issue automática + job vermelho na aba Actions |
+| Atualização dos dados | GitHub Actions `eleicoes-data-refresh.yml` | Pausada após o pleito. O acionamento manual publica o snapshot assinado versionado por padrão. Use `-f atualizar_dados=true` somente para uma reconstrução deliberada de 2026. | Verifique `/api/health` após publicar. |
+| Alerta de frescor | `eleicoes-data-freshness.yml` + `tools/frescor.py` | Acionamento manual. A idade do snapshot cresce durante a pausa, por isso o alerta agendado foi removido. | Quando acionado, pode abrir a issue `alerta-dados`. |
 | Snapshot versionado do pacote | passo final do `data_refresh` | no máximo **1 commit/dia** (ou `workflow_dispatch` com `commit_snapshot`) | — |
 | Site/PWA e API | Vercel (Hobby), `saibatudo.net` | deploy a cada publicação de dados | `GET /api/health` |
 | IA de interpretação (NLU) | Modal, CPU, app `SaibaTudoIA-NLU-Eleicoes` (modelo `nlu-v3.4-20261017`, treinado e convertido localmente; o app antigo `saibatudo-nlu`/v2.3 é a reserva) | quando o NLU local não entendeu (com consentimento) ou quando a pessoa toca em "Perguntar à IA na nuvem" | `GET /api/health` (`nlu`, `model`) |

@@ -358,7 +358,9 @@ private fun FaixaDeFase(fase: FaseEleitoral, turno1: String, turno2: String) {
         FaseEleitoral.DIA_1T -> "Hoje é dia de votação (1º turno): 8h às 17h, horário de Brasília. Apuração em tempo real: pergunte \"Resultado para Presidente\"." to true
         FaseEleitoral.ENTRE_TURNOS -> "2º turno em ${Datas.formatarBr(turno2)}. Resultados do 1º turno disponíveis no menu." to true
         FaseEleitoral.DIA_2T -> "Hoje é dia de votação (2º turno): 8h às 17h, horário de Brasília." to true
-        FaseEleitoral.POS_ELEICAO -> "Eleições encerradas. Consulte os resultados e eleitos no menu." to true
+        FaseEleitoral.POS_ELEICAO -> ("Atualizações eleitorais pausadas. A cobertura volta nas Eleições Municipais de 2028, " +
+            "com 1º turno em 1º de outubro e eventual 2º turno em 29 de outubro. " +
+            "Os resultados de 2026 continuam disponíveis para consulta.") to true
     }
     Row(
         modifier = Modifier.fillMaxWidth().background(if (destaque) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceVariant)

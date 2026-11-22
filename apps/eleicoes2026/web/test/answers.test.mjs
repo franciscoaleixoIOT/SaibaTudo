@@ -393,15 +393,15 @@ test('pós-eleição sem apuração ao vivo: 2º turno no passado, com os classi
   assert.ok(sp.directAnswer.startsWith('Não houve 2º turno para Governador em São Paulo.'), sp.directAnswer);
 });
 
-test('pós-eleição: "quem foi eleito presidente" sem apuração ao vivo não diz que "disputam" o 2º turno', async () => {
+test('pós-eleição: "quem foi eleito presidente" usa o resultado do pacote sem apuração ao vivo', async () => {
   const r = await responder('Quem foi eleito presidente?', { hoje: POS, apuracao: semAoVivo });
   assert.equal(r.intent, 'RESULTADOS');
-  assert.ok(r.directAnswer.includes('O 2º turno para Presidente da República ocorreu em 25/10/2026'), r.directAnswer);
-  assert.ok(r.directAnswer.includes('resultados.tse.jus.br'), r.directAnswer);
+  assert.ok(r.directAnswer.includes('Eleito para Presidente da República segundo o TSE'), r.directAnswer);
+  assert.ok(r.directAnswer.includes('13 — LULA (PT)'), r.directAnswer);
   assert.ok(!noFuturo(r.directAnswer), r.directAnswer);
   const pan = await responder('como está a apuração?', { hoje: POS, uf: 'ES', apuracao: semAoVivo });
   assert.ok(!noFuturo(pan.directAnswer), pan.directAnswer);
-  assert.ok(pan.directAnswer.includes('2º turno em 25/10/2026 entre'), pan.directAnswer);
+  assert.ok(pan.directAnswer.includes('Presidente da República: 13 — LULA (PT) — ELEITO segundo o TSE'), pan.directAnswer);
 });
 
 test('pós-eleição: resultado por candidato ("Lula foi eleito?", "quantos votos o Lula teve no segundo turno?")', async () => {
@@ -414,11 +414,12 @@ test('pós-eleição: resultado por candidato ("Lula foi eleito?", "quantos voto
     assert.deepEqual(r.candidateIds, ['280002542548'], q);
     assert.ok(r.fonte.includes('ao vivo'), r.fonte);
   }
-  // sem apuração ao vivo: o que o pacote (CSV do TSE) tem do candidato, sem inventar o 2º turno
+  // sem apuração ao vivo: o pacote do TSE traz o resultado dos dois turnos
   const off = await responder('Lula foi eleito?', { hoje: POS, apuracao: semAoVivo });
   assert.ok(off.directAnswer.startsWith('LULA (PT, nº 13) — Presidente da República'), off.directAnswer);
   assert.ok(off.directAnswer.includes('1º turno'), off.directAnswer);
-  assert.ok(off.directAnswer.includes('resultados.tse.jus.br'), off.directAnswer);
+  assert.match(off.directAnswer, /2º turno:[^;\n]+— ELEITO/);
+  assert.doesNotMatch(off.directAnswer, /Situação na totalização oficial do TSE: 2º TURNO/i);
   assert.ok(!noFuturo(off.directAnswer), off.directAnswer);
   // candidato eleito no 1º turno pelo pacote
   const tarc = await responder('Tarcísio foi eleito?', { hoje: POS, apuracao: semAoVivo });

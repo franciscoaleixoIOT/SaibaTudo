@@ -601,7 +601,7 @@ function renderFase() {
     DIA_1T: ['Hoje é dia de votação (1º turno): 8h às 17h, horário de Brasília. Apuração em tempo real: pergunte "Resultado para Presidente".', true],
     ENTRE_TURNOS: [`2º turno em ${formatarBr(turno2)}. Resultados do 1º turno disponíveis no menu.`, true],
     DIA_2T: ['Hoje é dia de votação (2º turno): 8h às 17h, horário de Brasília.', true],
-    POS_ELEICAO: ['Eleições encerradas. Consulte os resultados e eleitos no menu.', true]
+    POS_ELEICAO: ['Atualizações eleitorais pausadas. A cobertura volta nas Eleições Municipais de 2028, com 1º turno em 1º de outubro e eventual 2º turno em 29 de outubro. Os resultados de 2026 continuam disponíveis para consulta.', true]
   };
   const [texto, destaque] = mapa[S.fase.id];
   el.classList.toggle('destaque', destaque);

@@ -2,9 +2,8 @@ name: Eleições — Atualização dos dados oficiais (TSE)
 
 # Atualiza e publica o pacote de dados (assinado) SEM nova versão do app.
 #
-# Cadência: a cada 30 minutos, o ano todo. A checagem de mudança é barata (HEAD com ETag nas fontes do TSE) e o TSE gera os
-# arquivos 5x/dia e mais seguido na apuração; assim não há janelas de data fixas no cron (a de 2º turno e as próximas
-# eleições não dependem de editar este arquivo). O pacote só é reconstruído e publicado quando alguma fonte mudou.
+# Durante a pausa eleitoral, a publicação manual usa por padrão o pacote assinado versionado.
+# A coleta e a assinatura de dados de 2026 exigem opção explícita na execução manual.
 #
 # Três etapas de teste, com pesos diferentes (um teste de HIPÓTESE sobre a fase da eleição já derrubou a publicação dos
 # resultados do 1º turno por ~9 h; ver docs/OPERACAO.md):
@@ -13,10 +12,12 @@ name: Eleições — Atualização dos dados oficiais (TSE)
 #      resumo e é investigada, mas NÃO impede que o eleitor veja dados atuais.
 #   3. Os mesmos testes bloqueiam normalmente em push/PR (web_ci.yml): lá o que muda é o código.
 on:
-  schedule:
-    - cron: "10,40 * * * *"
   workflow_dispatch:
     inputs:
+      atualizar_dados:
+        description: "Coletar e reconstruir os dados de 2026 (desligado durante a pausa)"
+        type: boolean
+        default: false
       forcar:
         description: "Ignorar ETag e baixar tudo"
         type: boolean
@@ -53,6 +54,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
+        if: inputs.atualizar_dados
         with:
           python-version: '3.12'
           cache: pip
@@ -62,10 +64,12 @@ jobs:
         with:
           node-version: '22'
 
-      - run: pip install -r pipeline/requirements.txt
+      - if: inputs.atualizar_dados
+        run: pip install -r pipeline/requirements.txt
 
       # O estado (ETag/Last-Modified) e os arquivos baixados são reaproveitados entre execuções
       - name: Cache dos arquivos oficiais
+        if: inputs.atualizar_dados
         uses: actions/cache@v4
         with:
           path: apps/eleicoes2026/ai_model/data/tse_official
@@ -73,7 +77,7 @@ jobs:
           restore-keys: tse-official-
 
       - name: Coletar (somente o que mudou)
-        id: fetch
+        if: inputs.atualizar_dados
         run: |
           # prestação de contas (≈150 MB) é baixada só quando o ETag muda (o TSE gera 1x/dia)
           ARGS="--com-contas"
@@ -84,18 +88,9 @@ jobs:
             echo "::warning::fetch falhou (tentativa $i/3)"; sleep $((i * 30))
           done
           [ "${ok:-0}" = "1" ]
-          FASE_ATUAL=$(python -c "from pipeline.build import fase_eleitoral, hoje_brasilia; print(fase_eleitoral(hoje_brasilia()))")
-          FASE_PACOTE=$(python -c "import json; print(json.load(open('data/eleicoes2026/manifest.json')).get('faseEleitoral',''))" 2>/dev/null || echo "")
-          HEAD_CURTO=$(git rev-parse --short HEAD)
-          PROD_VER=$(curl -fsSL --max-time 10 https://saibatudo.net/api/health 2>/dev/null | python -c "import json,sys; print(json.load(sys.stdin).get('version',''))" 2>/dev/null || echo "$HEAD_CURTO")
-          if [ "$FASE_ATUAL" != "$FASE_PACOTE" ] || [ "$HEAD_CURTO" != "$PROD_VER" ]; then
-            echo "Fase ($FASE_PACOTE -> $FASE_ATUAL) ou codigo ($PROD_VER -> $HEAD_CURTO) mudou: reconstruindo e publicando"
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-          fi
 
       - name: Construir, validar e assinar o pacote (troca atômica)
-        id: build
-        if: steps.fetch.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
+        if: inputs.atualizar_dados
         run: |
           mkdir -p secrets
           printf '%s' "${{ secrets.DATA_SIGNING_KEY }}" > secrets/data_signing_key.pem
@@ -104,16 +99,14 @@ jobs:
 
       # a chave privada sai do disco do runner SEMPRE (antes só saía se o build passasse)
       - name: Remover a chave de assinatura
-        if: always()
+        if: always() && inputs.atualizar_dados
         run: rm -f secrets/data_signing_key.pem
 
       - name: "1/3 Integridade do pacote (bloqueia a publicação)"
-        if: steps.build.outcome == 'success'
         run: node --test "web/test/data.test.mjs" "web/test/modules.test.mjs"
 
       - name: "2/3 Comportamento sobre os dados reais (informativo)"
         id: comportamento
-        if: steps.build.outcome == 'success'
         continue-on-error: true
         run: |
           node --test "web/test/answers.test.mjs" "web/test/context.test.mjs" "web/test/filters-engine.test.mjs" \
@@ -122,7 +115,7 @@ jobs:
 
       - name: Publicar na Vercel (site e dados)
         id: publicar
-        if: steps.build.outcome == 'success' && env.VERCEL_PROJECT_ID != '' && env.TEM_VERCEL_TOKEN == 'true'
+        if: env.VERCEL_PROJECT_ID != '' && env.TEM_VERCEL_TOKEN == 'true'
         run: |
           npm i -g vercel@latest
           for i in 1 2 3; do
@@ -134,7 +127,7 @@ jobs:
       # Mantém o snapshot versionado (assets do app, testes, semente do site) perto da produção: no máximo 1 commit por dia
       # (cada refresh reescreve vários MB; commitar 48x/dia incharia o repositório). Não bloqueia nada se falhar.
       - name: Atualizar o snapshot versionado
-        if: steps.publicar.outcome == 'success'
+        if: inputs.atualizar_dados && steps.publicar.outcome == 'success'
         continue-on-error: true
         run: |
           # checkout raso: `git log -1 -- arquivo` devolveria a data do commit mais recente de qualquer coisa (nunca passava de 24 h
@@ -171,8 +164,8 @@ jobs:
         if: always()
         run: |
           echo "### Dados oficiais" >> $GITHUB_STEP_SUMMARY
-          echo "Alteracoes detectadas: ${{ steps.fetch.outputs.changed }}" >> $GITHUB_STEP_SUMMARY
-          if [ "$TEM_VERCEL_TOKEN" != "true" ]; then echo "::warning::Segredo VERCEL_TOKEN ausente: o pacote foi gerado e assinado, mas NAO publicado na Vercel."; echo "**VERCEL_TOKEN ausente: dados nao publicados.**" >> $GITHUB_STEP_SUMMARY; fi
+          echo "Coleta habilitada: ${{ inputs.atualizar_dados }}" >> $GITHUB_STEP_SUMMARY
+          if [ "$TEM_VERCEL_TOKEN" != "true" ]; then echo "::warning::Segredo VERCEL_TOKEN ausente: o pacote nao foi publicado na Vercel."; echo "**VERCEL_TOKEN ausente: dados nao publicados.**" >> $GITHUB_STEP_SUMMARY; fi
           if [ "${{ steps.comportamento.outcome }}" = "failure" ]; then
             echo "::warning::Testes de COMPORTAMENTO falharam sobre o pacote novo (a publicação NÃO foi bloqueada). Investigue: provável hipótese de fase desatualizada em algum teste, ou regressão do NLU diante de dados novos."
             echo "**Testes de comportamento falharam (publicação mantida): investigar.**" >> $GITHUB_STEP_SUMMARY

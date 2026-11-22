@@ -5,8 +5,6 @@ name: Eleições — Alerta de frescor dos dados
 # data_refresh falhou 18 vezes seguidas (~9 h) e os resultados do 1º turno não chegaram a ninguém, sem aviso.
 # Regras e limites: tools/frescor.py.
 on:
-  schedule:
-    - cron: "20,50 * * * *"
   workflow_dispatch:
 
 permissions:

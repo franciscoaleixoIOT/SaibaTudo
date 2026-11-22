@@ -134,7 +134,10 @@ internal suspend fun AnswerBuilder.resultadoCandidato(p: ParsedQuery, fi: AiFilt
             (t.percentual?.let { " (${String.format(ptBr, "%.2f", it)}%)" } ?: "") + (t.situacao?.let { " — ${it.uppercase(ptBr)}" } ?: "")
     }
     var texto = if (turnos.isNotEmpty()) "$cabeca, ${turnos.joinToString("; ")}" else cabeca
-    r.situacaoTotalizacao?.let { texto += "\n• Situação na totalização oficial do TSE: $it" }
+    // O campo geral do CSV pode continuar como "2º TURNO" após a totalização do segundo turno.
+    if (r.turnos[2]?.situacao.isNullOrBlank()) {
+        r.situacaoTotalizacao?.let { texto += "\n• Situação na totalização oficial do TSE: $it" }
+    }
     if (r.segundoTurno && !r.turnos.containsKey(2)) {
         texto += if (fase == FaseEleitoral.POS_ELEICAO)
             "\n• O 2º turno ocorreu em ${dataBr(regras.turno2)}; não foi possível consultar agora a apuração oficial do TSE — resultado em ${AppConstants.URL_RESULTADOS_TSE}"

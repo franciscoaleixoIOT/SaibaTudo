@@ -11,13 +11,17 @@
 > Estado operacional contínuo (alertas, chaves de desligamento, ciclo de auto-melhoria): [`OPERACAO.md`](OPERACAO.md).
 > Entrada para agentes de código: [`../CLAUDE.md`](../CLAUDE.md). Contrato de dados: [`DATA_CONTRACT.md`](DATA_CONTRACT.md).
 
+> **Pausa pós-pleito (22/11/2026).** Site/PWA e Android exibem aviso com as próximas eleições municipais (1º turno em 01/10/2028 e eventual 2º turno em 29/10/2028). São as datas decorrentes do [art. 29 da Constituição](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm#art29).
+> O refresh e o alerta de frescor passam a manuais. O refresh manual publica o snapshot assinado versionado por padrão. Coleta de 2026 exige `-f atualizar_dados=true`.
+> As rotas dos outros apps continuam dependendo da publicação manual do proxy de Eleições quando `vercel.json` for alterado.
+
 ## 1. Em uma página — estado em 26/10/2026
 
 | Peça | Estado |
 | :-- | :-- |
 | Fase eleitoral | **Pós-eleição** (`POS_ELEICAO` desde 26/10 03:31Z, troca automática). Congelamento de 24 a 26/10 encerrado em 26/10 com `[congelamento-ok]` (eleições acabaram). Textos do 2º turno no passado, justificativa/multa, prazos pós-eleitorais e resultado por candidato publicados em 26/10 (§11). |
 | Site/PWA `saibatudo.net` e API | No ar na Vercel. Versão publicada = commit curto em `GET /api/health`. **Desde 25/10 (6efc64a) o `data_refresh` publica sozinho quando a fase muda ou quando `HEAD` ≠ `version` publicado** (pedido do mantenedor): qualquer push na `main` vai ao ar em até 30 min. |
-| Pacote de dados | Atualizado a cada 30 min pelo GitHub Actions, assinado (ECDSA P-256). Já traz os resultados do 1º turno (governadores e deputados); **Presidente só pela apuração ao vivo do TSE** (ver §7). 19/10: percentual de Presidente no pacote agrupado por `SG_UE` (antes, pela UF da linha: 100 % e 99,92 % para os dois classificados). |
+| Pacote de dados | Atualizado a cada 30 min pelo GitHub Actions, assinado (ECDSA P-256). Em 26/10 trazia os resultados do 1º turno para governadores e deputados. O snapshot de 22/11 também traz os resultados dos dois turnos para Presidente. 19/10: percentual de Presidente no pacote agrupado por `SG_UE` (antes, pela UF da linha: 100 % e 99,92 % para os dois classificados). |
 | IA de interpretação (NLU) | **SaibaTudo IA `nlu-v3.4-20261017`** (`SaibaTudoIA-NLU-Eleicoes` no Modal, CPU) em produção (health `model`); medição de 20/10 em `eval/local/2026-10-20_SaibaTudoIA-NLU-Eleicoes_nlu-v3.4_endpoint.json` (116 casos: 96,6 %; holdout 97,0 %; fica em `eval/local/` porque `tools/test_metricas.py` exige que `eval/` só tenha medições sobre os mesmos 111 casos da linha de base). v3.7/v3.8/v3.9 não superam em eleições; **não há retreino previsto**: casos reais zerados (ninguém colheu o Redis) e as falhas pós-eleição eram das regras (corrigidas em 26/10). |
 | IA generativa (texto gerado) | **Ligada desde 07/10; desde 27/10 é a SaibaTudo IA.** Space privado `franciscoaleixo/SaibaTudoIA-Explica-Eleicoes` (ZeroGPU; base pública Qwen3-4B + adaptador LoRA privado ask-v1.7-20261027 fundido na carga, treinado só com as respostas do app; gate 96 %), Modal L4 com Qwen 7B como reserva (15/dia). Só roda quando a pessoa toca em "Gerar explicação com IA"; o rótulo nomeia o modelo que respondeu (`model` da API). Space antigo `saibatudo-qwen7b` fica parado para volta rápida (OPERACAO §4). |
 | Captura de perguntas ("Ajudar a melhorar o app") | Servidor ligado desde 06/10, Redis no Upstash. No app é **opt-in, desligado por padrão**. Filtro de dado pessoal e de opinião política no aparelho e no servidor. |
@@ -63,13 +67,12 @@
 ## 4. Processo de publicação
 
 ### 4.1 Regra de ouro
-**Push na `main` publica em até 30 min** (desde 25/10/2026, 6efc64a, a pedido do mantenedor): o `eleicoes-data-refresh.yml` (relógio `10,40 * * * *`) reconstrói e publica quando a fase
-eleitoral muda **ou** quando o commit curto da `main` difere do `version` de `/api/health`. Consequência: código incompleto na `main` vai ao ar; trabalhe num branch e
-empurre conjuntos testados. Para publicar sem esperar o relógio:
+Desde a pausa pós-pleito, publicar em produção exige executar manualmente `eleicoes-data-refresh.yml`. A publicação usa o snapshot assinado versionado.
+Use `-f atualizar_dados=true` apenas quando houver decisão de reconstruir os dados de 2026. Para publicar código ou rotas:
 
 ```bash
 git push origin main
-gh workflow run eleicoes-data-refresh.yml              # publica agora, sem esperar o relógio
+gh workflow run eleicoes-data-refresh.yml              # publica o snapshot assinado versionado
 gh run watch <id> --exit-status               # id: gh run list --workflow eleicoes-data-refresh.yml --limit 1
 curl -s https://saibatudo.net/api/health      # "version" tem de ser o commit curto publicado
 ```

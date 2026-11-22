@@ -300,16 +300,16 @@ class AnswerBuilderTest {
     }
 
     @Test
-    fun posEleicaoQuemFoiEleitoPresidenteSemAoVivoNaoDizQueDisputam() {
+    fun posEleicaoQuemFoiEleitoPresidenteUsaPacoteSemAoVivo() {
         val r = responder("Quem foi eleito presidente?", hoje = POS, apuracao = semAoVivo)
         assertEquals(Intent.RESULTADOS, r.intent)
         val t = r.directAnswer!!
-        assertTrue(t, t.contains("O 2º turno para Presidente da República ocorreu em 25/10/2026"))
-        assertTrue(t, t.contains("resultados.tse.jus.br"))
+        assertTrue(t, t.contains("Eleito para Presidente da República segundo o TSE"))
+        assertTrue(t, t.contains("13 — LULA (PT)"))
         assertFalse(t, noFuturo(t))
         val pan = responder("como está a apuração?", hoje = POS, uf = "ES", apuracao = semAoVivo).directAnswer!!
         assertFalse(pan, noFuturo(pan))
-        assertTrue(pan, pan.contains("2º turno em 25/10/2026 entre"))
+        assertTrue(pan, pan.contains("Presidente da República: 13 — LULA (PT) — ELEITO segundo o TSE"))
     }
 
     @Test
@@ -325,7 +325,9 @@ class AnswerBuilderTest {
         }
         val off = responder("Lula foi eleito?", hoje = POS, apuracao = semAoVivo).directAnswer!!
         assertTrue(off, off.startsWith("LULA (PT, nº 13) — Presidente da República"))
-        assertTrue(off, off.contains("1º turno") && off.contains("resultados.tse.jus.br"))
+        assertTrue(off, off.contains("1º turno"))
+        assertTrue(off, Regex("2º turno:[^;\n]+— ELEITO").containsMatchIn(off))
+        assertFalse(off, off.contains("Situação na totalização oficial do TSE: 2º TURNO", ignoreCase = true))
         assertFalse(off, noFuturo(off))
         val tarc = responder("Tarcísio foi eleito?", hoje = POS, apuracao = semAoVivo).directAnswer!!
         assertTrue(tarc, tarc.startsWith("TARCÍSIO (REPUBLICANOS, nº 10) — Governador em São Paulo, 1º turno"))

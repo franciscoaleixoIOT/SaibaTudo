@@ -27,8 +27,7 @@ continuam valendo dentro da pasta.
 5. **Domínio:** um app novo precisa de regras de proxy em `apps/eleicoes2026/vercel.json` (fora do congelamento), de
    exclusão no service worker da home (`portal/src/sw.js`) e de cartão em `portal/src/portal/apps.js`;
    `node --test "tests/*.test.mjs"` (raiz) confere os três. Passo a passo: `portal/README.md`.
-6. **Push na `main` não publica os apps** (exceção: eleições, cujo `eleicoes-data-refresh.yml` republica a cada 30 min quando o commit da `main` difere do
-   publicado, decisão do mantenedor em 25/10/2026 — código incompleto na `main` vai ao ar): cada app publica pelo `<app>-data-refresh.yml` (agendado ou `gh workflow run`).
+6. **Cada app publica pelo próprio workflow**. Durante a pausa eleitoral, `eleicoes-data-refresh.yml` publica somente por acionamento manual e usa o snapshot assinado versionado por padrão. Química e LLMs usam seus próprios workflows.
    A home (`portal/`) publica a cada push que a toca (`portal-ci.yml`). Mudou `apps/eleicoes2026/vercel.json` (rotas da
    home e dos apps)? Só vale depois do próximo `eleicoes-data-refresh.yml`. Depois de cada push, conferir todos os
    workflows disparados (`gh run list --limit 10`). **Push com mais de 300 arquivos** (ex.: pacote de dados regerado): o GitHub
