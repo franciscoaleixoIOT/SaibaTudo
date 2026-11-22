@@ -90,7 +90,7 @@ jobs:
           python pipeline/build.py --assinar-com secrets/data_signing_key.pem $ARGS
           python pipeline/sign.py verify data/quimica/manifest.json --public pipeline/data_signing_public.pem
           DEPOIS=$(sha256sum data/quimica/manifest.json | cut -c1-64)
-          N_ANTES=$(git show HEAD:data/quimica/manifest.json 2>/dev/null | python -c "import json,sys; print(json.load(sys.stdin)['contagens']['compostos'])" 2>/dev/null || echo 0)
+          N_ANTES=$(python -c "import json,sys; print(json.load(open(sys.argv[1]))['contagens']['compostos'])" "$RUNNER_TEMP/pacote-versionado/manifest.json")
           N_DEPOIS=$(python -c "import json; print(json.load(open('data/quimica/manifest.json'))['contagens']['compostos'])")
           if [ "$N_DEPOIS" -lt "$N_ANTES" ]; then
             echo "::warning::Pacote novo tem $N_DEPOIS compostos, menos que os $N_ANTES versionados: NAO sera publicado (restaurando o versionado)."

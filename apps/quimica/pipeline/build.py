@@ -493,9 +493,7 @@ def construir(opts, log=print):
     # --paciente: o bloqueio do PubChem (429) dura horas; em vez de desistir em ~18 min, espera até 15 min por tentativa, 40 vezes,
     # e pede a 1 req/s (o progresso fica no cache, então o build pode ficar a noite toda e terminar)
     paciente = dict(tentativas=40, espera_max_429=900) if getattr(opts, 'paciente', False) else {}
-    http = HttpCache(pasta=opts.cache, offline=opts.offline, log=log, **paciente)
-    if paciente:
-        http.limitador.reduzir('pubchem.ncbi.nlm.nih.gov', fator=0.5, minimo=0.5)
+    http = HttpCache(pasta=opts.cache, offline=opts.offline, log=log)
     idiomas = normalizar_idiomas(getattr(opts, "idiomas", None) or IDIOMAS)
     idiomas_textos = [] if getattr(opts, "sem_textos_idiomas", False) else [i for i in idiomas if i != "pt-BR"]
     stats = {"geradoEm": agora.strftime("%Y-%m-%dT%H:%M:%SZ"), "modo": "rapido" if opts.rapido else "completo",
@@ -533,10 +531,12 @@ def construir(opts, log=print):
         log("== compostos")
         # --pubchem-offline: o PubChem só responde do cache (útil quando ele bloqueia o IP com 429); as outras fontes seguem na rede
         # --pubchem-cache-primeiro: qualquer entrada do cache vale (sem TTL) e só o que falta vai à rede (compostos novos da seleção)
+        cache_primeiro = getattr(opts, "pubchem_cache_primeiro", False)
         if opts.pubchem_offline:
             pubchem = PubChem(HttpCache(pasta=opts.cache, offline=True, log=log))
-        elif getattr(opts, "pubchem_cache_primeiro", False):
-            pc_http = HttpCache(pasta=opts.cache, offline=False, log=log, ttl_s=10 ** 10, **paciente)
+        elif cache_primeiro or paciente:
+            ttl = {"ttl_s": 10 ** 10} if cache_primeiro else {}
+            pc_http = HttpCache(pasta=opts.cache, offline=opts.offline, log=log, **ttl, **paciente)
             pc_http.limitador.reduzir('pubchem.ncbi.nlm.nih.gov', fator=0.5, minimo=0.5)
             pubchem = PubChem(pc_http)
         else:

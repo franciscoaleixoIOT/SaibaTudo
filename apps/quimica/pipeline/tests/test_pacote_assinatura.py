@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 """Validação do pacote (gates), assinatura ECDSA (chave temporária), regras.json e fontes.json."""
 import json
+import os
 import sys
 import tempfile
 import unittest
 from datetime import datetime, timezone
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import build  # noqa: E402
@@ -226,6 +228,7 @@ class TextosEmLotesTest(unittest.TestCase):
 
 
 class ManifestoEAssinaturaTest(unittest.TestCase):
+    @patch.dict(os.environ, {"SAIBATUDO_ASK_ENABLED": "", "SAIBATUDO_MELHORIA_ENABLED": ""})
     def test_manifesto_segue_o_contrato_e_assinatura_confere(self):
         with tempfile.TemporaryDirectory() as tmp:
             raiz = Path(tmp) / "pacote"
