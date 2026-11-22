@@ -404,6 +404,26 @@ quimica-data-refresh.yml`; sem o token, não publicar (o pacote ligaria o botão
 v1.6 a 1.280 tokens (fila 8): química 0 % / **73,4 %** / 100 % — pior que o v1.3 em legítimos (mais recusas com as amostras longas); eleições 76,6 %.
 Reprovado nos dois; a química continua no v1.3. Próximo ciclo (após 27/10): explicador de eleições separado do da química. MODELO.md §8 continua valendo.
 
+### 6.ah. 04/11/2026: bot de mensagens, F1 (Telegram, teste interno)
+Pedido do mantenedor: oferecer o SaibaTudo por WhatsApp e Telegram com a IA que já existe, começando por um **teste interno sem divulgação** e com uma só pessoa
+autorizada (ele). Decisões: só o app de química; bot **dentro de `apps/quimica/`**; **Telegram primeiro**, WhatsApp (F2) quando a conta da Meta estiver pronta.
+Spec `docs/superpowers/specs/2026-11-04-quimica-bot-mensagens-design.md` e plano `docs/superpowers/plans/2026-11-04-quimica-bot-telegram-f1.md` (raiz).
+Feito (branch do worktree, tasks 1–10 do plano): `api/_lib/bot/{loja,conversas,formato,nucleo,telegram}.js`, endpoint `api/bot/telegram.js`
+(`includeFiles: data/quimica/**`, `maxDuration 60`), `tools/bot_telegram_webhook.py`, política de privacidade **1.4** nos cinco idiomas (seção 12 "Bot de
+mensagens no Telegram", linha na tabela de conexões, Telegram como operador, contexto de 30 min), docs. O motor do site roda no servidor sobre o pacote lido do
+disco; o contexto da conversa fica 30 min em memória e no Redis sob SHA-256 do id; "Explicar com IA" chama `chamarAsk` internamente (mesmo orçamento e contador
+global). Testes: api 253 → 293 (bot_loja, bot_conversas, bot_formato, bot_nucleo, bot_telegram, bot_endpoint, bot_golden 20/20 sobre o pacote real), web 226,
+tools +8. Lições: o NLU local só herda contexto nas formas de PROPRIEDADE ("e o ponto de ebulição?"); o worktree novo veio com CRLF nos módulos gerados do léxico
+(testes de bytes) — recheckout com LF resolve. **Pendente (Task 11, mantenedor):** variáveis na Vercel (de `secrets/telegram_bot.env` e `telegram_token.txt`),
+`vercel deploy --prod`, `tools/bot_telegram_webhook.py --registrar`, teste ao vivo (critério 6 da spec). ID do mantenedor capturado por `getUpdates` em 04/11 e
+gravado em `secrets/telegram_bot.env` (nunca no Git). Revisão final (opus, 04/11): sem crítico; corrigidos no mesmo ciclo — divisão de mensagens longas
+fecha/reabre `<b>`/`<i>` e não parte entidades (o Telegram recusava a parte), reenvio em texto simples quando o HTML é recusado (400), botões levam o número
+da resposta (`explicar:<seq>`, `sug:<seq>:<i>`; botão antigo → aviso), pseudônimo do chat por HMAC-SHA256 com `BOT_TELEGRAM_SECRET` (SHA-256 puro era
+enumerável), erro inesperado vira "dados indisponíveis" em vez de 500, política 1.4 sem contradição (contexto fica 30 min no Upstash; Hugging Face em §7;
+o que "Explicar com IA" envia). Adiados (menores): leitura do Redis antes da memória, dedup de duplo toque, poda do Map de contextos, `--remetentes` na
+ferramenta do webhook, HTTPError com descrição, callback de não autorizado respondido.
+
 ## 7. Contas e segredos
 Vercel `saibatudo-quimica` (time `franciscoaleixo-9696`); GitHub `franciscoaleixoIOT`; Hugging Face `franciscoaleixo` (PRO, 40 min/dia de ZeroGPU); Modal `franciscoaleixo/main` (US$ 30/mês grátis; já usados pelo app de eleições, ~US$ 5/mês).
-`secrets/data_signing_key.pem` (nova, exclusiva deste app; pública em `pipeline/data_signing_public.pem`). Fazer backup offline. Modal: app `SaibaTudoIA-NLU-Quimica`, Volume `SaibaTudoIA-Models-Quimica` (nomes desde 14/10/2026; os antigos `saibatudo-quimica-*` foram apagados), par de Proxy Auth Token criado pelo mantenedor em 13/10/2026 (guardado em `secrets/modal_proxy_quimica.env` da raiz do monorepo, ignorado, e como variáveis sensíveis na Vercel; nunca no Git nem no chat).
+`secrets/data_signing_key.pem` (nova, exclusiva deste app; pública em `pipeline/data_signing_public.pem`). Fazer backup offline. Bot do Telegram (04/11/2026): `secrets/telegram_token.txt` (BotFather,
+`@SaibaTudoNetBot`) e `secrets/telegram_bot.env` (`BOT_TELEGRAM_IDS`, `BOT_TELEGRAM_SECRET`, limites), ambos ignorados; na Vercel como variáveis sensíveis. Modal: app `SaibaTudoIA-NLU-Quimica`, Volume `SaibaTudoIA-Models-Quimica` (nomes desde 14/10/2026; os antigos `saibatudo-quimica-*` foram apagados), par de Proxy Auth Token criado pelo mantenedor em 13/10/2026 (guardado em `secrets/modal_proxy_quimica.env` da raiz do monorepo, ignorado, e como variáveis sensíveis na Vercel; nunca no Git nem no chat).

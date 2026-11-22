@@ -81,7 +81,7 @@ WhatsApp ──POST /quimica/api/bot/whatsapp──▶ api/bot/whatsapp.js ─�
 7. Resposta resolvida: blocos → HTML do Telegram, rodapé com fontes e "Dados de <data do pacote>", teclado inline com **"Explicar com IA"**
    e **"Sugestões"**. Não resolvida: aviso padrão do app + até 4 sugestões como botões que reenviam a pergunta.
 8. O contexto da conversa (`_ultimoContexto` e `_ultimaInterpretacao` do motor, serializados) é guardado por `conversaId` com validade de
-   **30 min**: em memória da instância e, se `UPSTASH_REDIS_REST_*` existirem, no Redis sob `bot:ctx:<sha256(conversaId)>` com `EXPIRE`.
+   **30 min**: em memória da instância e, se `UPSTASH_REDIS_REST_*` existirem, no Redis sob `bot:ctx:<hmac_sha256(conversaId, BOT_TELEGRAM_SECRET)>` com `EXPIRE` (revisão de 04/11: ids do Telegram são inteiros densos, um SHA-256 puro seria enumerável).
    Falha aberta: sem Redis, vale só a memória.
 9. Toque em "Explicar com IA" (`callback_query`): `answerCallbackQuery` imediato ("Gerando…"); o núcleo monta
    `{ q, contexto, trechos }` a partir da última resposta guardada (mesma montagem que `nuvem.js` faz no site) e chama `chamarAsk`;
@@ -99,7 +99,7 @@ WhatsApp ──POST /quimica/api/bot/whatsapp──▶ api/bot/whatsapp.js ─�
 - **Autorização**: lista fechada; não autorizado recebe silêncio (não revela que o bot existe nem que há lista). Autorizar alguém = editar a
   variável e redeploy; documentado em `OPERACAO.md`.
 - **Logs**: só `evt`, `status`, `ms`, `canal`, `motivo`, `cache`. Nenhum id de remetente em claro, nenhum texto. O contexto no Redis é
-  indexado pelo SHA-256 do id da conversa e expira em 30 min; nenhuma mensagem é guardada.
+  indexado por HMAC-SHA256 do id da conversa com chave só do servidor (`BOT_TELEGRAM_SECRET`) e expira em 30 min; nenhuma mensagem é guardada.
 - **Limites**: por conversa, `BOT_RATE_POR_MIN` (padrão 10) e `BOT_RATE_POR_DIA` (padrão 200) via `ratelimit.js`; o orçamento diário da nuvem é o global (`ask-hf`, Upstash), então o bot entra na mesma proteção da
   cota ZeroGPU que os apps.
 - **Segurança química**: o filtro do motor roda antes de tudo; pedido recusado nunca vai à nuvem nem ao Redis.

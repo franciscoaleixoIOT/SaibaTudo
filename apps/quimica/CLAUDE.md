@@ -25,17 +25,19 @@ cliente). Contrato completo: [`docs/I18N.md`](docs/I18N.md). Nunca escreva texto
 4. **Cada resposta traz a fonte e a licença.** "Sobre os dados" lista tudo.
 5. **Sem CDN, CSP estrita, sem analytics, sem anúncios, sem login.** Bibliotecas vendorizadas em `web/src/quimica/vendor/` com a licença ao lado (SmilesDrawer e KaTeX: MIT).
 6. **Segredos em `secrets/`** (ignorado). A chave privada dos dados é `secrets/data_signing_key.pem` (**diferente** da do app de eleições); pública em `pipeline/data_signing_public.pem`.
+   Bot do Telegram (04/11/2026): `secrets/telegram_token.txt` e `secrets/telegram_bot.env` (ids autorizados, segredo do webhook); na Vercel: `BOT_*` sensíveis (`docs/OPERACAO.md` §9).
 7. **Treino e conversão de modelo são locais**; o Hugging Face é a publicação principal e o Modal, a reserva.
 8. **Android:** release assinado com `keystore.properties` + `secrets/upload-keystore.p12` (fora do Git; criados em 14/10/2026). `./gradlew.bat :app:bundleRelease` + `python tools/verificar_release.py app/build/outputs/apk/release/app-release.apk` antes de enviar; `docs/PLAY_STORE.md` e `docs/RELEASE_<versão>.md`.
 
 ## Publicar
 - Push na `main` **não** faz deploy: `gh workflow run quimica-data-refresh.yml` publica; conferir `https://saibatudo.net/quimica/api/health` depois.
 - Conferir **todos** os workflows depois de cada push (`gh run list --limit 6`).
+- Bot do Telegram (teste interno): depois do deploy, `python tools/bot_telegram_webhook.py --registrar https://saibatudo.net/quimica/api/bot/telegram`; desligar com `BOT_ENABLED` vazio ou `--remover` (`docs/OPERACAO.md` §9).
 - Home do saibatudo.net: o cartão deste app é um objeto em `web/src/assets/apps.js` do projeto irmão; a rota `/quimica/*` é um *rewrite* no `vercel.json` de lá para este projeto.
 
 ## Testar
 `cd web && npm test` · `cd api && npm test` · `python -m unittest discover -s pipeline/tests` · `python -m unittest discover -s dataset -p "test_*.py"` ·
-`python tools/test_workflows.py` · Android (fase 6): `./gradlew.bat testDebugUnitTest lintRelease` com `JAVA_HOME="/c/Program Files/Android/Android Studio/jbr"`.
+`python tools/test_workflows.py` · `python -m unittest discover -s tools -p "test_*.py"` (ferramentas, inclusive o webhook do bot) · Android (fase 6): `./gradlew.bat testDebugUnitTest lintRelease` com `JAVA_HOME="/c/Program Files/Android/Android Studio/jbr"`.
 Antes de dizer "corrigido": reproduza, corrija, meça de novo (varredura de todos os elementos/compostos, comparação antigo × novo) e teste ao vivo depois do deploy.
 
 ## Armadilhas desta máquina (Windows 11, Git Bash)
