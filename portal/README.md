@@ -32,7 +32,7 @@ Uma página por idioma, gerada no build (contrato: `apps/quimica/docs/I18N.md` �
 `/en/`, `/es/`, `/de/`, `/fr/`. Cada página tem `<html lang>`, título/descrição/Open Graph no idioma, `<link rel="alternate"
 hreflang>` para as cinco + `x-default`, canônica própria, seletor de idiomas no topo (links simples, sem JS; idioma atual com
 `aria-current`), o cartão de Química apontando para `/quimica/?lang=<idioma>`, o cartão de Eleições com o selo
-"só em português" (o app de Eleições é só em português) e o cartão do AchaVagaIA com os selos "primeira versão em construção"
+"só em português" (o app de Eleições é só em português) e o cartão do AchaVagaAI com os selos "primeira versão em construção"
 (todos os idiomas) e "só em português" (fora do português), apontando para `/achavagaia/` sem `?lang=`. Os números do cartão de química saem no formato do idioma
 (`Intl.NumberFormat`), mantendo os ganchos `<span data-num>`. Na página em português, `home.js` mostra a quem não navega
 em português um aviso de uma linha ("This page is also available in English", dispensável, lembrado em `localStorage`);
@@ -41,7 +41,7 @@ nunca redireciona.
 ### Como traduzir ou corrigir um texto
 Edite `src/portal/i18n/<idioma>.js` (textos fixos da página), `src/portal/textos.js` (textos criados por `home.js`:
 tema, "Em breve", Google Play, aviso de idioma) ou `traducoes` em `src/portal/apps.js` (cartões "Em breve"). Marcas
-(`SaibaTudo`, `SaibaTudo — Eleições 2026`, `SaibaTudo — Química`, `SaibaTudo — AchaVagaIA`, `PubChem`, `Wikidata`) não se traduzem. Os catálogos
+(`SaibaTudo`, `SaibaTudo — Eleições 2026`, `SaibaTudo — Química`, `AchaVagaAI`, `PubChem`, `Wikidata`) não se traduzem. Os catálogos
 en/es/de/fr foram escritos por agente e estão marcados `revisao: 'pendente'`; depois da revisão por falante nativo, troque
 para `'humana'`.
 
@@ -56,7 +56,7 @@ para `'humana'`.
 4. `node --test test/*.test.mjs` aqui e `node --test "tests/*.test.mjs"` na raiz conferem catálogo, páginas, rotas e SW.
 
 ## Como adicionar um novo app à home
-1. Cartão: os apps principais no ar (Eleições, Química e AchaVagaIA) são cartões fixos no `src/index.html`, com textos nos
+1. Cartão: os apps principais no ar (Eleições, Química e AchaVagaAI) são cartões fixos no `src/index.html`, com textos nos
    cinco catálogos (`src/portal/i18n/*.js`, mesmas chaves, conferidas por teste) e ícone em `src/portal/brand/svg/`. Outros
    apps: `src/portal/apps.js` (`APPS` para apps no ar, `EM_BREVE` para planejados, com `traducoes`).
 2. Rota: se o app é outro projeto da Vercel, acrescente em `apps/eleicoes2026/vercel.json` as três regras de proxy
@@ -66,5 +66,5 @@ para `'humana'`.
 5. Destaque igual para todos os apps no ar: no `index.html`, um botão no hero com a mesma classe (`btn btn-ouro grande`) e um
    cartão `card app-principal` com o mesmo botão `btn btn-primario grande` (decisão do mantenedor, 12/10/2026: nenhum app
    com cor ou destaque diferente dos outros). O teste da home confere os botões do topo e dos cartões nas cinco páginas.
-6. App só em português (como Eleições e AchaVagaIA): selo "só em português" nos idiomas que não são pt-BR e link **sem**
+6. App só em português (como Eleições e AchaVagaAI): selo "só em português" nos idiomas que não são pt-BR e link **sem**
    `?lang=` (só o `/quimica/` é reescrito pelo `build.mjs`).

@@ -29,7 +29,7 @@ export default {
     abrirEleicoes: 'Open the 2026 Elections app',
     abrirQuimica: 'Open the Chemistry app',
     abrirLLMs: 'Open the LLMs app',
-    abrirAchaVagaIA: 'Open achavagaai'
+    abrirAchaVagaIA: 'Open AchaVagaAI'
   },
   apps: { titulo: 'Our apps' },
   eleicoes: {
@@ -79,7 +79,7 @@ export default {
     selo: 'Careers — résumé and job search',
     emConstrucao: 'first version, under construction',
     apenasPortugues: 'Portuguese only',
-    nome: 'achavagaai',
+    nome: 'AchaVagaAI',
     descricao: 'A personal career assistant: it improves your résumé with a diagnosis (and optional AI), builds the right search for each job channel through the official links, tracks your applications and generates prompts and automation packs for the AIs you already use.',
     vantagens: [
       'Résumé diagnosis with points to improve — and optional AI, only if you want it',
@@ -87,7 +87,7 @@ export default {
       'Your applications tracked in one place',
       'Prompts and automation packs for the AIs you already use: Claude, ChatGPT, Gemini, Perplexity and Kilo Code'
     ],
-    abrir: 'Open achavagaai',
+    abrir: 'Open AchaVagaAI',
     nota: 'Privacy: nothing from your résumé leaves your device without a tap from you. This is the first version of the app and it is still under construction.'
   },
   confianca: {
@@ -95,7 +95,7 @@ export default {
     pilares: [
       { titulo: 'Official, open data', texto: 'Elections: the TSE’s open files. Chemistry: PubChem, Wikidata, CODATA and open texts. Every answer carries its source; nothing is simulated or made up.' },
       { titulo: 'Neutral, independent and safe', texto: 'No ties to the TSE, the government or any party: we do not endorse, compare or predict candidates. In chemistry, dangerous requests are refused.' },
-      { titulo: 'Open and ad-free', texto: 'Eleições 2026 and Química are open source under the MIT license, auditable by anyone; achavagaai, still under construction, has no published code yet. No ads and no sign-up required.' }
+      { titulo: 'Open and ad-free', texto: 'Eleições 2026 and Química are open source under the MIT license, auditable by anyone; AchaVagaAI, still under construction, has no published code yet. No ads and no sign-up required.' }
     ]
   },
   instalar: {
@@ -134,7 +134,7 @@ export default {
     titulo: 'Public project',
     codigo: {
       titulo: 'Open source (MIT)',
-      texto: 'For Eleições 2026 and Química, all the code — website, web app, Android app, data pipeline and AI model — is public and auditable. achavagaai, still under construction, has no published code yet.'
+      texto: 'For Eleições 2026 and Química, all the code — website, web app, Android app, data pipeline and AI model — is public and auditable. AchaVagaAI, still under construction, has no published code yet.'
     },
     fontes: {
       titulo: 'Official sources',

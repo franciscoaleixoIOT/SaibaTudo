@@ -32,7 +32,7 @@ self.addEventListener('fetch', (event) => {
   const p = url.pathname;
   if (p.startsWith('/api/') || p.startsWith('/data/')) return;
   if (p === '/quimica' || p.startsWith('/quimica/')) return; // SaibaTudo Química: nada passa por este cache
-  if (p === '/achavagaia' || p.startsWith('/achavagaia/')) return; // SaibaTudo AchaVagaIA: idem
+  if (p === '/achavagaia' || p.startsWith('/achavagaia/')) return; // AchaVagaAI: idem
   if (p === '/llms' || p.startsWith('/llms/')) return; // SaibaTudo LLMs: idem
   if (p.startsWith('/eleicoes2026/') && req.mode === 'navigate') return; // o app tem o próprio service worker
   if (req.mode === 'navigate') { event.respondWith(redeOuCache(event, req)); return; }

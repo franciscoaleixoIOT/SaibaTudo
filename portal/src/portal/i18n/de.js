@@ -30,7 +30,7 @@ export default {
     abrirEleicoes: 'App Wahlen 2026 öffnen',
     abrirQuimica: 'App Chemie öffnen',
     abrirLLMs: 'LLMs-App öffnen',
-    abrirAchaVagaIA: 'achavagaai öffnen'
+    abrirAchaVagaIA: 'AchaVagaAI öffnen'
   },
   apps: { titulo: 'Unsere Apps' },
   eleicoes: {
@@ -80,7 +80,7 @@ export default {
     selo: 'Karriere — Lebenslauf und Jobsuche',
     emConstrucao: 'erste Version im Aufbau',
     apenasPortugues: 'nur auf Portugiesisch',
-    nome: 'achavagaai',
+    nome: 'AchaVagaAI',
     descricao: 'Persönlicher Karriereassistent: verbessert Ihren Lebenslauf mit einer Diagnose (und optionaler KI), stellt über die offiziellen Links die passende Suche für jeden Stellenkanal zusammen, verfolgt Ihre Bewerbungen und erzeugt Prompts und Automatisierungspakete für die KI-Dienste, die Sie schon nutzen.',
     vantagens: [
       'Lebenslauf-Diagnose mit Verbesserungspunkten — und optionaler KI, nur wenn Sie möchten',
@@ -88,7 +88,7 @@ export default {
       'Ihre Bewerbungen an einem Ort im Blick',
       'Prompts und Automatisierungspakete für die KI-Dienste, die Sie schon nutzen: Claude, ChatGPT, Gemini, Perplexity und Kilo Code'
     ],
-    abrir: 'achavagaai öffnen',
+    abrir: 'AchaVagaAI öffnen',
     nota: 'Datenschutz: Nichts aus Ihrem Lebenslauf verlässt Ihr Gerät ohne Ihren Fingertipp. Dies ist die erste Version der App, und sie befindet sich noch im Aufbau.'
   },
   confianca: {
@@ -96,7 +96,7 @@ export default {
     pilares: [
       { titulo: 'Amtliche, offene Daten', texto: 'Wahlen: offene Dateien des TSE. Chemie: PubChem, Wikidata, CODATA und offene Texte. Jede Antwort nennt ihre Quelle; nichts ist simuliert oder erfunden.' },
       { titulo: 'Neutral, unabhängig und sicher', texto: 'Keine Verbindung zum TSE, zur Regierung oder zu Parteien: wir empfehlen, vergleichen und prognostizieren keine Kandidaten. In der Chemie werden gefährliche Anfragen abgelehnt.' },
-      { titulo: 'Offen und werbefrei', texto: 'Eleições 2026 und Química sind quelloffen unter MIT-Lizenz, für alle überprüfbar; achavagaai ist noch im Aufbau und sein Code noch nicht veröffentlicht. Ohne Werbung und ohne Registrierung.' }
+      { titulo: 'Offen und werbefrei', texto: 'Eleições 2026 und Química sind quelloffen unter MIT-Lizenz, für alle überprüfbar; AchaVagaAI ist noch im Aufbau und sein Code noch nicht veröffentlicht. Ohne Werbung und ohne Registrierung.' }
     ]
   },
   instalar: {
@@ -135,7 +135,7 @@ export default {
     titulo: 'Öffentliches Projekt',
     codigo: {
       titulo: 'Quelloffen (MIT)',
-      texto: 'Bei Eleições 2026 und Química ist der gesamte Code — Website, Web-App, Android-App, Datenpipeline und KI-Modell — öffentlich und überprüfbar. Der Code von achavagaai, noch im Aufbau, ist noch nicht veröffentlicht.'
+      texto: 'Bei Eleições 2026 und Química ist der gesamte Code — Website, Web-App, Android-App, Datenpipeline und KI-Modell — öffentlich und überprüfbar. Der Code von AchaVagaAI, noch im Aufbau, ist noch nicht veröffentlicht.'
     },
     fontes: {
       titulo: 'Amtliche Quellen',
