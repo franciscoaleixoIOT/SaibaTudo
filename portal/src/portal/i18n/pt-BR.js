@@ -1,7 +1,7 @@
 // Catálogo de referência da home (português do Brasil): toda chave existe aqui; os outros idiomas são conferidos contra este.
 // Valores são fragmentos de HTML confiáveis (só <strong>, <em> e <a> com os mesmos atributos em todos os idiomas).
 // {num:chave} vira <span data-num="chave">número no formato do idioma</span>, com o número de NUMEROS_QUIMICA (apps.js).
-// Nunca traduzir as marcas: "SaibaTudo", "SaibaTudo — Eleições 2026", "SaibaTudo — Química", "SaibaTudo — AchaVagaIA", "PubChem", "Wikidata".
+// Nunca traduzir as marcas: "SaibaTudo", "SaibaTudo — Eleições 2026", "SaibaTudo — Química", "achavagaai", "PubChem", "Wikidata".
 export default {
   idioma: 'pt-BR',
   nomeNativo: 'Português (Brasil)',
@@ -32,7 +32,7 @@ export default {
     abrirEleicoes: 'Abrir app Eleições 2026',
     abrirQuimica: 'Abrir app Química',
     abrirLLMs: 'Abrir app LLMs',
-    abrirAchaVagaIA: 'Abrir o AchaVagaIA'
+    abrirAchaVagaIA: 'Abrir o achavagaai'
   },
   apps: { titulo: 'Nossos apps' },
   eleicoes: {
@@ -82,7 +82,7 @@ export default {
     selo: 'Carreira — currículo e busca de vagas',
     emConstrucao: 'primeira versão em construção',
     apenasPortugues: '',
-    nome: 'SaibaTudo — AchaVagaIA',
+    nome: 'achavagaai',
     descricao: 'Assistente pessoal de carreira: melhora o seu currículo com diagnóstico (e IA opcional), monta a busca certa em cada canal de vagas pelos links oficiais, acompanha as suas candidaturas e gera prompts e pacotes de automação para as IAs que você já usa.',
     vantagens: [
       'Diagnóstico do currículo, com pontos a melhorar — e IA opcional, só se você quiser',
@@ -90,7 +90,7 @@ export default {
       'Acompanhamento das suas candidaturas em um só lugar',
       'Prompts e pacotes de automação para as IAs que você já usa: Claude, ChatGPT, Gemini, Perplexity e Kilo Code'
     ],
-    abrir: 'Abrir o AchaVagaIA',
+    abrir: 'Abrir o achavagaai',
     nota: 'Privacidade: nada do seu currículo sai do aparelho sem um toque seu. É a primeira versão do app e ainda está em construção.'
   },
   confianca: {
@@ -98,7 +98,7 @@ export default {
     pilares: [
       { titulo: 'Dados oficiais e abertos', texto: 'Eleições: arquivos abertos do TSE. Química: PubChem, Wikidata, CODATA e textos abertos. Cada resposta traz a fonte; nada é simulado ou inventado.' },
       { titulo: 'Neutro, independente e seguro', texto: 'Sem vínculo com o TSE, o governo ou partidos: não indicamos, comparamos nem prevemos candidatos. Em química, pedidos perigosos são recusados.' },
-      { titulo: 'Aberto e sem anúncios', texto: 'Eleições 2026 e Química têm código aberto sob licença MIT, auditável por qualquer pessoa; o AchaVagaIA, em construção, ainda não tem o código publicado. Sem anúncios e sem cadastro para consultar.' }
+      { titulo: 'Aberto e sem anúncios', texto: 'Eleições 2026 e Química têm código aberto sob licença MIT, auditável por qualquer pessoa; o achavagaai, em construção, ainda não tem o código publicado. Sem anúncios e sem cadastro para consultar.' }
     ]
   },
   instalar: {
@@ -137,7 +137,7 @@ export default {
     titulo: 'Projeto público',
     codigo: {
       titulo: 'Código aberto (MIT)',
-      texto: 'Em Eleições 2026 e Química, todo o código — site, app web, app Android, pipeline de dados e modelo de IA — é público e auditável. O AchaVagaIA, em construção, ainda não tem o código publicado.'
+      texto: 'Em Eleições 2026 e Química, todo o código — site, app web, app Android, pipeline de dados e modelo de IA — é público e auditável. O achavagaai, em construção, ainda não tem o código publicado.'
     },
     fontes: {
       titulo: 'Fontes oficiais',

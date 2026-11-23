@@ -1,5 +1,5 @@
 // 首页目录（简体中文）：与 pt-BR 相同的键；由测试核对。品牌名称不翻译："SaibaTudo"、"SaibaTudo — Eleições 2026"、"SaibaTudo — Química"、
-// "SaibaTudo — AchaVagaIA"、"SaibaTudo — LLMs"、"PubChem"、"Wikidata"。由智能体翻译（2026-10-26）；母语者审校待定。
+// "achavagaai"、"SaibaTudo — LLMs"、"PubChem"、"Wikidata"。由智能体翻译（2026-10-26）；母语者审校待定。
 export default {
   idioma: 'zh',
   nomeNativo: '中文',
@@ -30,7 +30,7 @@ export default {
     abrirEleicoes: '打开 Eleições 2026 应用',
     abrirQuimica: '打开 Química 应用',
     abrirLLMs: '打开 LLMs 应用',
-    abrirAchaVagaIA: '打开 AchaVagaIA'
+    abrirAchaVagaIA: '打开 achavagaai'
   },
   apps: { titulo: '我们的应用' },
   eleicoes: {
@@ -80,7 +80,7 @@ export default {
     selo: '职业——简历与求职',
     emConstrucao: '首个版本建设中',
     apenasPortugues: '仅葡萄牙语',
-    nome: 'SaibaTudo — AchaVagaIA',
+    nome: 'achavagaai',
     descricao: '个人职业助手：通过诊断（和可选的 AI）改进您的简历，通过官方链接为每个招聘渠道生成正确的搜索，跟踪您的申请，并为您已经使用的 AI 生成提示词和自动化包。',
     vantagens: [
       '简历诊断，指出需要改进的地方——可选的 AI，只在您需要时使用',
@@ -88,7 +88,7 @@ export default {
       '在一个地方跟踪您的所有申请',
       '为您已经使用的 AI 生成提示词和自动化包：Claude、ChatGPT、Gemini、Perplexity 和 Kilo Code'
     ],
-    abrir: '打开 AchaVagaIA',
+    abrir: '打开 achavagaai',
     nota: '隐私：未经您点击，简历中的任何内容都不会离开设备。这是应用的首个版本，仍在建设中。'
   },
   confianca: {
@@ -96,7 +96,7 @@ export default {
     pilares: [
       { titulo: '官方和开放的数据', texto: '选举：TSE 的开放文件。化学：PubChem、Wikidata、CODATA 和开放文本。LLMs：斯坦福的 GloVe。每个回答都注明来源；没有任何内容是模拟或编造的。' },
       { titulo: '中立、独立、安全', texto: '与 TSE、政府或政党没有任何关联：我们不推荐、不比较、不预测候选人。在化学中，危险请求会被拒绝。' },
-      { titulo: '开放且无广告', texto: 'Eleições 2026、Química 和 LLMs 以 MIT 许可开源，任何人都可以审计；建设中的 AchaVagaIA 尚未公开代码。无广告，查询无需注册。' }
+      { titulo: '开放且无广告', texto: 'Eleições 2026、Química 和 LLMs 以 MIT 许可开源，任何人都可以审计；建设中的 achavagaai 尚未公开代码。无广告，查询无需注册。' }
     ]
   },
   instalar: {
@@ -135,7 +135,7 @@ export default {
     titulo: '公开项目',
     codigo: {
       titulo: '开源（MIT）',
-      texto: '在 Eleições 2026、Química 和 LLMs 中，所有代码——网站、网页应用、Android 应用、数据管道和 AI 模型——都是公开且可审计的。建设中的 AchaVagaIA 尚未公开代码。'
+      texto: '在 Eleições 2026、Química 和 LLMs 中，所有代码——网站、网页应用、Android 应用、数据管道和 AI 模型——都是公开且可审计的。建设中的 achavagaai 尚未公开代码。'
     },
     fontes: {
       titulo: '官方来源',

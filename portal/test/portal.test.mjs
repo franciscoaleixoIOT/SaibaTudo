@@ -114,7 +114,7 @@ test('catálogos: mesmas chaves que pt-BR, sem vazios, mesmas marcas inline e {n
     assert.ok(['pendente', 'humana'].includes(c.revisao), `${idioma}: revisao deve ser 'pendente' ou 'humana'`);
     assert.equal(c.eleicoes.nome, 'SaibaTudo — Eleições 2026', `${idioma}: marca traduzida`);
     assert.equal(c.quimica.nome, 'SaibaTudo — Química', `${idioma}: marca traduzida`);
-    assert.equal(c.achavagaia.nome, 'SaibaTudo — AchaVagaIA', `${idioma}: marca traduzida`);
+    assert.equal(c.achavagaia.nome, 'achavagaai', `${idioma}: marca traduzida`);
     assert.equal(c.llms.nome, 'SaibaTudo — LLMs', `${idioma}: marca traduzida`);
     assert.ok(c.meta.titulo.startsWith('SaibaTudo') && c.nomeNativo && c.ogLocale && c.eleicoes.apenasPortugues && c.achavagaia.apenasPortugues, idioma);
   }
@@ -124,7 +124,7 @@ test('catálogos: mesmas chaves que pt-BR, sem vazios, mesmas marcas inline e {n
   assert.equal(ref.achavagaia.apenasPortugues, '');
 });
 
-test('uma página por idioma: lang, título, canônica, hreflang (cinco + x-default), seletor com aria-current, links de química com ?lang (AchaVagaIA sem) e selos de eleições e AchaVagaIA', async () => {
+test('uma página por idioma: lang, título, canônica, hreflang (cinco + x-default), seletor com aria-current, links de química com ?lang (achavagaai sem) e selos de eleições e achavagaai', async () => {
   for (const idioma of IDIOMAS) {
     const html = pagina(idioma);
     const c = await catalogo(idioma);
@@ -157,13 +157,13 @@ test('uma página por idioma: lang, título, canônica, hreflang (cinco + x-defa
     assert.ok(html.includes('href="/eleicoes2026/"') && !html.includes('/eleicoes2026/?lang'), `${idioma}: eleições`);
     const selos = [...html.matchAll(/<span class="tag tag-neutro selo-idioma">([^<]+)<\/span>/g)].map((m) => m[1]);
     if (idioma === PADRAO) assert.deepEqual(selos, [], 'a página em português não tem selo "só em português"');
-    else assert.deepEqual(selos, [c.eleicoes.apenasPortugues, c.achavagaia.apenasPortugues], `${idioma}: selos "só em português" (eleições e AchaVagaIA)`);
-    // AchaVagaIA: só em português por enquanto, então o link NÃO ganha ?lang= (diferente de química); selo de "em construção" em todos os idiomas
+    else assert.deepEqual(selos, [c.eleicoes.apenasPortugues, c.achavagaia.apenasPortugues], `${idioma}: selos "só em português" (eleições e achavagaai)`);
+    // achavagaai: só em português por enquanto, então o link NÃO ganha ?lang= (diferente de química); selo de "em construção" em todos os idiomas
     const achavaga = [...html.matchAll(/href="(\/achavagaia\/[^"]*)"/g)].map((m) => m[1]);
-    assert.equal(achavaga.length, 2, `${idioma}: links do AchaVagaIA (botão do topo e do cartão)`);
-    for (const u of achavaga) assert.equal(u, '/achavagaia/', `${idioma}: link do AchaVagaIA sem ?lang=`);
+    assert.equal(achavaga.length, 2, `${idioma}: links do achavagaai (botão do topo e do cartão)`);
+    for (const u of achavaga) assert.equal(u, '/achavagaia/', `${idioma}: link do achavagaai sem ?lang=`);
     assert.ok(html.includes(`<span class="tag tag-ouro selo-idioma">${c.achavagaia.emConstrucao}</span>`), `${idioma}: selo de primeira versão em construção`);
-    assert.ok(!/github\.com\/[^"]*achavaga/i.test(html), `${idioma}: a home não linka o repositório do AchaVagaIA`);
+    assert.ok(!/github\.com\/[^"]*achavaga/i.test(html), `${idioma}: a home não linka o repositório do achavagaai`);
     assert.ok(html.includes(`href="${caminho(idioma)}" aria-label="${c.topo.marcaAria}"`), `${idioma}: marca leva à home do idioma`);
     assert.ok(!html.includes('{{') && !html.includes('{num:') && !html.includes('<!-- molde'), `${idioma}: marcador não resolvido`);
   }
@@ -211,7 +211,7 @@ function carregarSw() {
   };
 }
 
-test('service worker: NUNCA intercepta química, AchaVagaIA, API, dados, navegações de eleições nem métodos além de GET; atende as páginas por idioma', () => {
+test('service worker: NUNCA intercepta química, achavagaai, API, dados, navegações de eleições nem métodos além de GET; atende as páginas por idioma', () => {
   const intercepta = carregarSw();
   for (const u of ['/quimica', '/quimica/', '/quimica/tabela', '/quimica/js/main.js', '/quimica/data/manifest.json', '/quimica/api/health', '/quimica/?lang=en',
     '/achavagaia', '/achavagaia/', '/achavagaia/curriculo', '/achavagaia/js/main.js', '/achavagaia/manifest.webmanifest', '/achavagaia/?lang=en']) {
